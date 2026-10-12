@@ -1,7 +1,14 @@
 import 'package:engineering_core/engineering_core.dart';
 export 'package:engineering_core/engineering_core.dart';
 
-enum EditorTool { select, point, route, measure, architecturalFeature }
+enum EditorTool {
+  select,
+  point,
+  equipment,
+  route,
+  measure,
+  architecturalFeature,
+}
 
 class ProjectDraft {
   ProjectDraft({
