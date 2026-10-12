@@ -7,4 +7,5 @@ export 'src/length.dart';
 export 'src/manufacturer_catalog.dart';
 export 'src/panel_assembly.dart';
 export 'src/panel_generation.dart';
+export 'src/recalculation.dart';
 export 'src/routing_junction.dart';
