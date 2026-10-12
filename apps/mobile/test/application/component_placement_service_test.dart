@@ -66,35 +66,38 @@ void main() {
     expect(result.rotationRadians, 0.25);
   });
 
-  test('placement outside host patch is rejected before repository write', () async {
-    final components = _RecordingComponentRepository();
-    final geometry = _FakeGeometryRepository(
-      RoomGeometrySnapshot(roomId: roomId, patches: [patch]),
-    );
-    final service = ComponentPlacementService(
-      components: components,
-      geometry: geometry,
-      idGenerator: FixedSequenceIdGenerator(const ['instance-invalid']),
-    );
+  test(
+    'placement outside host patch is rejected before repository write',
+    () async {
+      final components = _RecordingComponentRepository();
+      final geometry = _FakeGeometryRepository(
+        RoomGeometrySnapshot(roomId: roomId, patches: [patch]),
+      );
+      final service = ComponentPlacementService(
+        components: components,
+        geometry: geometry,
+        idGenerator: FixedSequenceIdGenerator(const ['instance-invalid']),
+      );
 
-    await expectLater(
-      service.place(
-        roomId: roomId,
-        definition: definition,
-        hostSurfacePatchId: patch.id,
-        localPosition: const Point2Mm(4500, 300),
-      ),
-      throwsA(
-        isA<StateError>().having(
-          (error) => error.message,
-          'message',
-          contains('outsideHostPatch'),
+      await expectLater(
+        service.place(
+          roomId: roomId,
+          definition: definition,
+          hostSurfacePatchId: patch.id,
+          localPosition: const Point2Mm(4500, 300),
         ),
-      ),
-    );
+        throwsA(
+          isA<StateError>().having(
+            (error) => error.message,
+            'message',
+            contains('outsideHostPatch'),
+          ),
+        ),
+      );
 
-    expect(components.saved, isEmpty);
-  });
+      expect(components.saved, isEmpty);
+    },
+  );
 }
 
 final class _RecordingComponentRepository
@@ -133,7 +136,8 @@ final class _FakeGeometryRepository implements GeometryRepository {
   final RoomGeometrySnapshot snapshot;
 
   @override
-  Future<RoomGeometrySnapshot> loadRoomGeometry(String roomId) async => snapshot;
+  Future<RoomGeometrySnapshot> loadRoomGeometry(String roomId) async =>
+      snapshot;
 
   @override
   Future<void> replaceRoomGeometry(RoomGeometrySnapshot snapshot) async =>

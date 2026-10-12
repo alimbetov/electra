@@ -69,11 +69,12 @@ final class DriftComponentInstanceRepository
       }
 
       final existing =
-          await (database.select(database.componentInstances)..where(
-            (row) => row.id.equals(instance.id),
-          )).getSingleOrNull();
+          await (database.select(database.componentInstances)
+            ..where((row) => row.id.equals(instance.id))).getSingleOrNull();
       final now = _clock();
-      await database.into(database.componentInstances).insertOnConflictUpdate(
+      await database
+          .into(database.componentInstances)
+          .insertOnConflictUpdate(
             _companion(instance, now, existing: existing),
           );
     });
