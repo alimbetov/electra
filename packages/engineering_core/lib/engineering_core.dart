@@ -1,4 +1,5 @@
 export 'src/component_catalog.dart';
+export 'src/component_placement.dart';
 export 'src/core_enums.dart';
 export 'src/engineering_decision.dart';
 export 'src/field_lifecycle.dart';
