@@ -196,25 +196,55 @@ final class Polygon2Mm {
     return inside;
   }
 
-  /// True when all of [other] lies inside or on this polygon boundary.
-  bool containsPolygon(Polygon2Mm other) {
-    if (!other.vertices.every(containsPointInclusive)) {
+  /// True when the entire segment lies inside or on the boundary.
+  bool containsSegment(Segment2Mm segment) {
+    if (!containsPointInclusive(segment.start) ||
+        !containsPointInclusive(segment.end)) {
       return false;
     }
-    for (final childEdge in other.edges) {
-      for (final hostEdge in edges) {
-        if (_segmentsProperlyIntersect(
-          childEdge.start,
-          childEdge.end,
-          hostEdge.start,
-          hostEdge.end,
-        )) {
-          return false;
-        }
+    for (final edge in edges) {
+      if (_segmentsProperlyIntersect(
+        segment.start,
+        segment.end,
+        edge.start,
+        edge.end,
+      )) {
+        return false;
+      }
+    }
+
+    // Vertex contacts can leave a concave polygon without a proper crossing.
+    // Split at every contact and test each interval, retaining half-mm points
+    // by doubling coordinates rather than rounding to integer millimetres.
+    final contacts = <Point2Mm>{
+      segment.start,
+      segment.end,
+      ...vertices.where(
+        (point) => _pointOnSegment(point, segment.start, segment.end),
+      ),
+    }.toList()
+      ..sort(
+        (a, b) => segment.start.xMm != segment.end.xMm
+            ? a.xMm.compareTo(b.xMm)
+            : a.yMm.compareTo(b.yMm),
+      );
+    final doubled = Polygon2Mm(
+      vertices.map((point) => Point2Mm(point.xMm * 2, point.yMm * 2)),
+    );
+    for (var i = 1; i < contacts.length; i++) {
+      final a = contacts[i - 1];
+      final b = contacts[i];
+      if (!doubled.containsPointInclusive(
+        Point2Mm(a.xMm + b.xMm, a.yMm + b.yMm),
+      )) {
+        return false;
       }
     }
     return true;
   }
+
+  /// True when all of [other] lies inside or on this polygon boundary.
+  bool containsPolygon(Polygon2Mm other) => other.edges.every(containsSegment);
 
   bool _hasSelfIntersection() {
     final polygonEdges = edges;
@@ -285,10 +315,8 @@ final class Polygon2Mm {
 }
 
 final class GeometryTolerance {
-  const GeometryTolerance({
-    this.linearMm = 0.5,
-    this.angularRadians = 1e-6,
-  })  : assert(linearMm >= 0),
+  const GeometryTolerance({this.linearMm = 0.5, this.angularRadians = 1e-6})
+      : assert(linearMm >= 0),
         assert(angularRadians >= 0);
 
   final double linearMm;

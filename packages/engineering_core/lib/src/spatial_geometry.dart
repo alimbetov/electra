@@ -249,12 +249,11 @@ abstract final class SpatialGeometryValidator {
             objectId: edge.id,
           ),
         );
-      } else if (!patch.boundary.containsPointInclusive(edge.start) ||
-          !patch.boundary.containsPointInclusive(edge.end)) {
+      } else if (!patch.boundary.containsSegment(edge.segment)) {
         violations.add(
           GeometryInvariantViolation(
             code: 'EDGE_OUTSIDE_PATCH',
-            message: 'Surface edge endpoints must lie on or inside its patch.',
+            message: 'The entire surface edge must lie on or inside its patch.',
             objectId: edge.id,
           ),
         );

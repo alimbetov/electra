@@ -24,6 +24,42 @@ void main() {
         orientation: SurfaceOrientation.vertical,
       );
 
+  test('rejects an edge bridging the exterior of a concave patch', () {
+    final patch = SurfacePatch(
+      id: 'concave',
+      roomId: 'room-1',
+      surfaceId: 'wall',
+      frame: buildPatch('frame').frame,
+      orientation: SurfaceOrientation.vertical,
+      boundary: Polygon2Mm(const [
+        Point2Mm(0, 0),
+        Point2Mm(6, 0),
+        Point2Mm(6, 6),
+        Point2Mm(4, 6),
+        Point2Mm(4, 2),
+        Point2Mm(2, 2),
+        Point2Mm(2, 6),
+        Point2Mm(0, 6),
+      ]),
+    );
+    final violations = SpatialGeometryValidator.validatePatchTopology(
+      patches: [patch],
+      edges: [
+        SurfaceEdge(
+          id: 'bridge',
+          patchId: patch.id,
+          start: const Point2Mm(2, 6),
+          end: const Point2Mm(4, 6),
+        ),
+      ],
+      adjacencies: [],
+      openings: [],
+      features: [],
+    );
+    expect(violations.map((item) => item.code), ['EDGE_OUTSIDE_PATCH']);
+    expect(violations.single.objectId, 'bridge');
+  });
+
   test('spatial topology validates consistent patch graph', () {
     final patchA = buildPatch('patch-a');
     final patchB = buildPatch('patch-b', origin: const Point3Mm(4000, 0, 0));

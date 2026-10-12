@@ -2,6 +2,88 @@ import 'package:engineering_core/engineering_core.dart';
 import 'package:test/test.dart';
 
 void main() {
+  group('concave segment containment', () {
+    final host = Polygon2Mm(const [
+      Point2Mm(0, 0),
+      Point2Mm(6, 0),
+      Point2Mm(6, 6),
+      Point2Mm(4, 6),
+      Point2Mm(4, 2),
+      Point2Mm(2, 2),
+      Point2Mm(2, 6),
+      Point2Mm(0, 6),
+    ]);
+
+    test('rejects crossing a notch with both endpoints inside', () {
+      expect(
+        host.containsSegment(
+          Segment2Mm(const Point2Mm(1, 4), const Point2Mm(5, 4)),
+        ),
+        isFalse,
+      );
+    });
+
+    test('rejects exit through vertices in either direction', () {
+      for (final points in [
+        const [Point2Mm(2, 6), Point2Mm(4, 6)],
+        const [Point2Mm(4, 6), Point2Mm(2, 6)],
+      ]) {
+        expect(host.containsSegment(Segment2Mm(points[0], points[1])), isFalse);
+      }
+    });
+
+    test(
+      'detects a one-mm exterior interval without rounding its midpoint',
+      () {
+        final narrow = Polygon2Mm(const [
+          Point2Mm(0, 0),
+          Point2Mm(5, 0),
+          Point2Mm(5, 5),
+          Point2Mm(3, 5),
+          Point2Mm(3, 2),
+          Point2Mm(2, 2),
+          Point2Mm(2, 5),
+          Point2Mm(0, 5),
+        ]);
+        expect(
+          narrow.containsSegment(
+            Segment2Mm(const Point2Mm(2, 5), const Point2Mm(3, 5)),
+          ),
+          isFalse,
+        );
+      },
+    );
+
+    test('accepts boundary overlap and a tangent vertex contact', () {
+      expect(
+        host.containsSegment(
+          Segment2Mm(const Point2Mm(0, 2), const Point2Mm(6, 2)),
+        ),
+        isTrue,
+      );
+      expect(
+        host.containsSegment(
+          Segment2Mm(const Point2Mm(0, 4), const Point2Mm(4, 0)),
+        ),
+        isTrue,
+      );
+    });
+
+    test('polygon containment rejects a bridge across notch vertices', () {
+      expect(
+        host.containsPolygon(
+          Polygon2Mm(const [
+            Point2Mm(0, 0),
+            Point2Mm(6, 0),
+            Point2Mm(4, 6),
+            Point2Mm(2, 6),
+          ]),
+        ),
+        isFalse,
+      );
+    });
+  });
+
   group('geometry primitives', () {
     test('segment length is deterministic in millimetres', () {
       final segment = Segment3Mm(
@@ -121,10 +203,7 @@ void main() {
         isTrue,
       );
       expect(
-        tolerance.pointsEqual(
-          const Point3D(1, 2, 3),
-          const Point3D(2, 2, 3),
-        ),
+        tolerance.pointsEqual(const Point3D(1, 2, 3), const Point3D(2, 2, 3)),
         isFalse,
       );
     });
