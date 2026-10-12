@@ -84,9 +84,7 @@ final class SurfaceNavigationResolver {
     ];
 
     candidates.sort((a, b) {
-      final aEffective = _effectiveDistance(a);
-      final bEffective = _effectiveDistance(b);
-      final byDistance = aEffective.compareTo(bEffective);
+      final byDistance = _effectiveDistance(a).compareTo(_effectiveDistance(b));
       if (byDistance != 0) return byDistance;
 
       if (a.isNavigable != b.isNavigable) {
@@ -140,6 +138,11 @@ final class SurfaceNavigationResolver {
     required String? currentPreviewEdgeId,
   }) {
     final distance = distanceToSegmentMm(pointer, edge.segment);
+    final isCurrentPreview = currentPreviewEdgeId == edge.id;
+    final effectiveDistance = isCurrentPreview
+        ? math.max(0, distance - thresholds.previewHysteresisMm)
+        : distance;
+
     String? adjacencyId;
     String? adjacentPatchId;
     for (final adjacency in adjacencies) {
@@ -160,10 +163,10 @@ final class SurfaceNavigationResolver {
     return SurfaceEdgeCandidate(
       edge: edge,
       distanceMm: distance,
-      proximity: thresholds.classify(distance),
+      proximity: thresholds.classify(effectiveDistance),
       adjacentPatchId: adjacentPatchId,
       adjacencyId: adjacencyId,
-      isCurrentPreview: currentPreviewEdgeId == edge.id,
+      isCurrentPreview: isCurrentPreview,
     );
   }
 
@@ -184,7 +187,11 @@ double distanceToSegmentMm(Point2Mm point, Segment2Mm segment) {
   final dx = bx - ax;
   final dy = by - ay;
   final lengthSquared = dx * dx + dy * dy;
-  if (lengthSquared == 0) return math.sqrt((px - ax) * (px - ax) + (py - ay) * (py - ay));
+  if (lengthSquared == 0) {
+    final offsetX = px - ax;
+    final offsetY = py - ay;
+    return math.sqrt(offsetX * offsetX + offsetY * offsetY);
+  }
 
   final projection = ((px - ax) * dx + (py - ay) * dy) / lengthSquared;
   final t = projection.clamp(0.0, 1.0);
