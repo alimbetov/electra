@@ -23,79 +23,87 @@ void main() {
   testWidgets(
     'persisted catalog placement undo redo and preferences survive reopening',
     (tester) async {
-      final directory = await Directory.systemTemp.createTemp('electra-fl6-');
-      final file = File('${directory.path}/electra.sqlite');
+      final fixture = await tester.runAsync(() async {
+        final directory = await Directory.systemTemp.createTemp('electra-fl6-');
+        final file = File('${directory.path}/electra.sqlite');
+        AppDatabase openDatabase() => AppDatabase(NativeDatabase(file));
+
+        var database = openDatabase();
+        final hierarchy = DriftProjectHierarchyRepository(database);
+        final hierarchyService = ProjectHierarchyService(
+          projects: hierarchy,
+          floors: hierarchy,
+          rooms: hierarchy,
+          unitOfWork: DriftUnitOfWork(database),
+          idGenerator: FixedSequenceIdGenerator(const [
+            'project-components',
+            'floor-components',
+            'room-components',
+          ]),
+          originDeviceId: 'component-test-device',
+          clock: () => DateTime.utc(2026, 10, 12, 15),
+        );
+
+        final project = await hierarchyService.createProject(
+          const ProjectFormDraft(
+            name: 'Components Project',
+            reference: 'C-01',
+            measurementSystem: MeasurementSystem.metric,
+            defaultStructuralHeightMm: 3200,
+            defaultFinishedCeilingHeightMm: 3000,
+          ),
+        );
+        final floor = await hierarchyService.createFloor(
+          projectId: project.id,
+          draft: const FloorFormDraft(
+            name: 'Floor 01',
+            code: 'F01',
+            sortOrder: 1,
+          ),
+        );
+        final room = await hierarchyService.createRoom(
+          floorId: floor.id,
+          draft: const RoomFormDraft(
+            name: 'Workshop',
+            type: RoomType.workshop,
+            category: RoomCategory.technical,
+            widthMm: 6000,
+            depthMm: 5000,
+          ),
+        );
+
+        final patch = SurfacePatch(
+          id: 'wall-components',
+          roomId: room.id,
+          surfaceId: 'Wall A',
+          frame: LocalCoordinateFrame(
+            origin: const Point3Mm(0, 0, 0),
+            uAxis: const Vector3D(1, 0, 0),
+            vAxis: const Vector3D(0, 0, 1),
+          ),
+          boundary: Polygon2Mm(const [
+            Point2Mm(0, 0),
+            Point2Mm(6000, 0),
+            Point2Mm(6000, 3200),
+            Point2Mm(0, 3200),
+          ]),
+          orientation: SurfaceOrientation.vertical,
+        );
+        final geometry = DriftGeometryRepository(
+          database,
+          originDeviceId: 'component-test-device',
+          clock: () => DateTime.utc(2026, 10, 12, 16),
+        );
+        await geometry.replaceRoomGeometry(
+          RoomGeometrySnapshot(roomId: room.id, patches: [patch]),
+        );
+
+        return (directory, file, database, project, floor, room, patch);
+      });
+      final (directory, file, initialDatabase, project, floor, room, patch) =
+          fixture!;
+      var database = initialDatabase;
       AppDatabase openDatabase() => AppDatabase(NativeDatabase(file));
-
-      var database = openDatabase();
-      final hierarchy = DriftProjectHierarchyRepository(database);
-      final hierarchyService = ProjectHierarchyService(
-        projects: hierarchy,
-        floors: hierarchy,
-        rooms: hierarchy,
-        unitOfWork: DriftUnitOfWork(database),
-        idGenerator: FixedSequenceIdGenerator(const [
-          'project-components',
-          'floor-components',
-          'room-components',
-        ]),
-        originDeviceId: 'component-test-device',
-        clock: () => DateTime.utc(2026, 10, 12, 15),
-      );
-
-      final project = await hierarchyService.createProject(
-        const ProjectFormDraft(
-          name: 'Components Project',
-          reference: 'C-01',
-          measurementSystem: MeasurementSystem.metric,
-          defaultStructuralHeightMm: 3200,
-          defaultFinishedCeilingHeightMm: 3000,
-        ),
-      );
-      final floor = await hierarchyService.createFloor(
-        projectId: project.id,
-        draft: const FloorFormDraft(
-          name: 'Floor 01',
-          code: 'F01',
-          sortOrder: 1,
-        ),
-      );
-      final room = await hierarchyService.createRoom(
-        floorId: floor.id,
-        draft: const RoomFormDraft(
-          name: 'Workshop',
-          type: RoomType.workshop,
-          category: RoomCategory.technical,
-          widthMm: 6000,
-          depthMm: 5000,
-        ),
-      );
-
-      final patch = SurfacePatch(
-        id: 'wall-components',
-        roomId: room.id,
-        surfaceId: 'Wall A',
-        frame: LocalCoordinateFrame(
-          origin: const Point3Mm(0, 0, 0),
-          uAxis: const Vector3D(1, 0, 0),
-          vAxis: const Vector3D(0, 0, 1),
-        ),
-        boundary: Polygon2Mm(const [
-          Point2Mm(0, 0),
-          Point2Mm(6000, 0),
-          Point2Mm(6000, 3200),
-          Point2Mm(0, 3200),
-        ]),
-        orientation: SurfaceOrientation.vertical,
-      );
-      final geometry = DriftGeometryRepository(
-        database,
-        originDeviceId: 'component-test-device',
-        clock: () => DateTime.utc(2026, 10, 12, 16),
-      );
-      await geometry.replaceRoomGeometry(
-        RoomGeometrySnapshot(roomId: room.id, patches: [patch]),
-      );
 
       await tester.binding.setSurfaceSize(const Size(1200, 800));
       addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -146,7 +154,12 @@ void main() {
       await tester.pumpWidget(const SizedBox());
       await tester.pumpAndSettle();
       await database.close();
-      database = openDatabase();
+      database =
+          (await tester.runAsync(() async {
+            final reopened = openDatabase();
+            await reopened.customSelect('SELECT 1').get();
+            return reopened;
+          }))!;
       await tester.pumpWidget(application());
       await tester.pumpAndSettle();
       final restored = await DriftComponentInstanceRepository(
@@ -169,7 +182,7 @@ void main() {
       await tester.pumpWidget(const SizedBox());
       await tester.pumpAndSettle();
       await database.close();
-      await directory.delete(recursive: true);
+      await tester.runAsync(() => directory.delete(recursive: true));
     },
   );
 }
