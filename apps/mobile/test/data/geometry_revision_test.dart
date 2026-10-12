@@ -11,6 +11,10 @@ import 'package:engineering_core/engineering_core.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  void expectSameInstant(DateTime actual, DateTime expected) {
+    expect(actual.millisecondsSinceEpoch, expected.millisecondsSinceEpoch);
+  }
+
   test(
     'geometry updates preserve creation time and advance revision',
     () async {
@@ -90,8 +94,8 @@ void main() {
             ..where((row) => row.id.equals(patch.id))).getSingle();
 
       expect(first.revision, 1);
-      expect(first.createdAt, now);
-      expect(first.updatedAt, now);
+      expectSameInstant(first.createdAt, now);
+      expectSameInstant(first.updatedAt, now);
       expect(first.deletedAt, isNull);
 
       final createdAt = first.createdAt;
@@ -104,8 +108,8 @@ void main() {
             ..where((row) => row.id.equals(patch.id))).getSingle();
 
       expect(second.revision, 2);
-      expect(second.createdAt, createdAt);
-      expect(second.updatedAt, now);
+      expectSameInstant(second.createdAt, createdAt);
+      expectSameInstant(second.updatedAt, now);
       expect(second.deletedAt, isNull);
 
       now = DateTime.utc(2026, 10, 12, 13);
@@ -117,9 +121,10 @@ void main() {
             ..where((row) => row.id.equals(patch.id))).getSingle();
 
       expect(deleted.revision, 3);
-      expect(deleted.createdAt, createdAt);
-      expect(deleted.updatedAt, now);
-      expect(deleted.deletedAt, now);
+      expectSameInstant(deleted.createdAt, createdAt);
+      expectSameInstant(deleted.updatedAt, now);
+      expect(deleted.deletedAt, isNotNull);
+      expectSameInstant(deleted.deletedAt!, now);
 
       now = DateTime.utc(2026, 10, 12, 14);
       await repository.replaceRoomGeometry(
@@ -130,8 +135,8 @@ void main() {
             ..where((row) => row.id.equals(patch.id))).getSingle();
 
       expect(restored.revision, 4);
-      expect(restored.createdAt, createdAt);
-      expect(restored.updatedAt, now);
+      expectSameInstant(restored.createdAt, createdAt);
+      expectSameInstant(restored.updatedAt, now);
       expect(restored.deletedAt, isNull);
 
       await database.close();
