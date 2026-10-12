@@ -91,10 +91,10 @@ final class Vector3D {
   double dot(Vector3D other) => x * other.x + y * other.y + z * other.z;
 
   Vector3D cross(Vector3D other) => Vector3D(
-    y * other.z - z * other.y,
-    z * other.x - x * other.z,
-    x * other.y - y * other.x,
-  );
+        y * other.z - z * other.y,
+        z * other.x - x * other.z,
+        x * other.y - y * other.x,
+      );
 
   Vector3D operator *(double scale) =>
       Vector3D(x * scale, y * scale, z * scale);
@@ -134,7 +134,7 @@ final class Segment3Mm {
 /// Closed simple polygon represented without repeating the first vertex at the end.
 final class Polygon2Mm {
   Polygon2Mm(Iterable<Point2Mm> vertices)
-    : vertices = List.unmodifiable(vertices) {
+      : vertices = List.unmodifiable(vertices) {
     if (this.vertices.length < 3) {
       throw ArgumentError('Polygon requires at least three vertices.');
     }
@@ -167,9 +167,9 @@ final class Polygon2Mm {
   double get areaMm2 => signedDoubleAreaMm2.abs() / 2.0;
 
   List<Segment2Mm> get edges => List.unmodifiable([
-    for (var i = 0; i < vertices.length; i++)
-      Segment2Mm(vertices[i], vertices[(i + 1) % vertices.length]),
-  ]);
+        for (var i = 0; i < vertices.length; i++)
+          Segment2Mm(vertices[i], vertices[(i + 1) % vertices.length]),
+      ]);
 
   bool containsPointInclusive(Point2Mm point) {
     final polygonEdges = edges;
@@ -188,9 +188,7 @@ final class Polygon2Mm {
         continue;
       }
       final crossingX =
-          (b.xMm - a.xMm) * (point.yMm - a.yMm) /
-              (b.yMm - a.yMm) +
-          a.xMm;
+          (b.xMm - a.xMm) * (point.yMm - a.yMm) / (b.yMm - a.yMm) + a.xMm;
       if (point.xMm < crossingX) {
         inside = !inside;
       }
@@ -222,8 +220,7 @@ final class Polygon2Mm {
     final polygonEdges = edges;
     for (var i = 0; i < polygonEdges.length; i++) {
       for (var j = i + 1; j < polygonEdges.length; j++) {
-        final adjacent =
-            j == i + 1 || (i == 0 && j == polygonEdges.length - 1);
+        final adjacent = j == i + 1 || (i == 0 && j == polygonEdges.length - 1);
         if (adjacent) {
           continue;
         }
@@ -238,8 +235,7 @@ final class Polygon2Mm {
   }
 
   static int _cross(Point2Mm a, Point2Mm b, Point2Mm c) =>
-      (b.xMm - a.xMm) * (c.yMm - a.yMm) -
-      (b.yMm - a.yMm) * (c.xMm - a.xMm);
+      (b.xMm - a.xMm) * (c.yMm - a.yMm) - (b.yMm - a.yMm) * (c.xMm - a.xMm);
 
   static bool _pointOnSegment(Point2Mm p, Point2Mm a, Point2Mm b) {
     if (_cross(a, b, p) != 0) {
@@ -284,15 +280,16 @@ final class Polygon2Mm {
     return _oppositeSigns(o1, o2) && _oppositeSigns(o3, o4);
   }
 
-  static bool _oppositeSigns(int a, int b) => (a < 0 && b > 0) || (a > 0 && b < 0);
+  static bool _oppositeSigns(int a, int b) =>
+      (a < 0 && b > 0) || (a > 0 && b < 0);
 }
 
 final class GeometryTolerance {
   const GeometryTolerance({
     this.linearMm = 0.5,
     this.angularRadians = 1e-6,
-  }) : assert(linearMm >= 0),
-       assert(angularRadians >= 0);
+  })  : assert(linearMm >= 0),
+        assert(angularRadians >= 0);
 
   final double linearMm;
   final double angularRadians;
@@ -312,7 +309,7 @@ final class GeometryTolerance {
 
 final class Plane {
   Plane({required this.origin, required Vector3D normal})
-    : normal = normal.normalized();
+      : normal = normal.normalized();
 
   final Point3Mm origin;
   final Vector3D normal;
@@ -334,8 +331,8 @@ final class LocalCoordinateFrame {
     required Vector3D uAxis,
     required Vector3D vAxis,
     this.tolerance = const GeometryTolerance(),
-  }) : uAxis = uAxis.normalized(),
-       vAxis = vAxis.normalized() {
+  })  : uAxis = uAxis.normalized(),
+        vAxis = vAxis.normalized() {
     final dot = this.uAxis.dot(this.vAxis).abs();
     if (dot > tolerance.angularRadians) {
       throw ArgumentError('uAxis and vAxis must be orthogonal.');
@@ -350,10 +347,10 @@ final class LocalCoordinateFrame {
   Vector3D get normal => uAxis.cross(vAxis).normalized();
 
   Point3D localToWorld(Point2Mm local) => Point3D(
-    origin.xMm + uAxis.x * local.xMm + vAxis.x * local.yMm,
-    origin.yMm + uAxis.y * local.xMm + vAxis.y * local.yMm,
-    origin.zMm + uAxis.z * local.xMm + vAxis.z * local.yMm,
-  );
+        origin.xMm + uAxis.x * local.xMm + vAxis.x * local.yMm,
+        origin.yMm + uAxis.y * local.xMm + vAxis.y * local.yMm,
+        origin.zMm + uAxis.z * local.xMm + vAxis.z * local.yMm,
+      );
 
   Point2D worldToLocal(Point3D world) {
     final delta = Vector3D(
