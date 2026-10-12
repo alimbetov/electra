@@ -4,8 +4,7 @@ on:
   push:
     branches:
       - main
-      - feat/flutter-local-app-foundation
-      - feat/flutter-geometry-kernel
+      - 'feat/flutter-*'
   pull_request:
     paths:
       - 'apps/mobile/**'
@@ -37,7 +36,7 @@ jobs:
       - name: Generate Drift code
         run: dart run build_runner build
 
-      - name: Verify formatting
+      - name: Verify mobile formatting
         run: dart format --output=none --set-exit-if-changed lib test
 
       - name: Analyze mobile app
@@ -49,6 +48,14 @@ jobs:
       - name: Install engineering core dependencies
         working-directory: packages/engineering_core
         run: dart pub get
+
+      - name: Verify engineering core formatting
+        working-directory: packages/engineering_core
+        run: dart format --output=none --set-exit-if-changed lib test
+
+      - name: Analyze engineering core
+        working-directory: packages/engineering_core
+        run: dart analyze
 
       - name: Test engineering core
         working-directory: packages/engineering_core
