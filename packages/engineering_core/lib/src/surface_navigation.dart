@@ -163,7 +163,9 @@ final class SurfaceNavigationResolver {
     final distance = distanceToSegmentMm(pointer, edge.segment);
     final isCurrentPreview = currentPreviewEdgeId == edge.id;
     final effectiveDistance = isCurrentPreview
-        ? math.max(0, distance - thresholds.previewHysteresisMm)
+        ? math
+            .max(0.0, distance - thresholds.previewHysteresisMm)
+            .toDouble()
         : distance;
 
     String? adjacencyId;
@@ -195,7 +197,12 @@ final class SurfaceNavigationResolver {
 
   double _effectiveDistance(SurfaceEdgeCandidate candidate) {
     if (!candidate.isCurrentPreview) return candidate.distanceMm;
-    return math.max(0, candidate.distanceMm - thresholds.previewHysteresisMm);
+    return math
+        .max(
+          0.0,
+          candidate.distanceMm - thresholds.previewHysteresisMm,
+        )
+        .toDouble();
   }
 }
 
