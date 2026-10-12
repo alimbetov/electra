@@ -1,11 +1,15 @@
+import 'package:engineering_core/engineering_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../application/component_instance_repository.dart';
+import '../application/component_placement_service.dart';
 import '../application/geometry_repository.dart';
 import '../application/id_generator.dart';
 import '../application/project_hierarchy_service.dart';
 import '../application/project_repositories.dart';
 import '../data/database/app_database.dart';
 import '../data/database/drift_unit_of_work.dart';
+import '../data/repositories/drift_component_instance_repository.dart';
 import '../data/repositories/drift_geometry_repository.dart';
 import '../data/repositories/drift_project_hierarchy_repository.dart';
 import '../domain/project_models.dart';
@@ -40,6 +44,14 @@ final geometryRepositoryProvider = Provider<GeometryRepository>((ref) {
   );
 });
 
+final componentInstanceRepositoryProvider =
+    Provider<ComponentInstanceRepository>((ref) {
+      return DriftComponentInstanceRepository(
+        ref.watch(databaseProvider),
+        originDeviceId: 'local-device',
+      );
+    });
+
 final unitOfWorkProvider = Provider<LocalUnitOfWork>((ref) {
   return DriftUnitOfWork(ref.watch(databaseProvider));
 });
@@ -58,6 +70,16 @@ final projectHierarchyServiceProvider = Provider<ProjectHierarchyService>((
     unitOfWork: ref.watch(unitOfWorkProvider),
     idGenerator: ref.watch(idGeneratorProvider),
     originDeviceId: 'local-device',
+  );
+});
+
+final componentPlacementServiceProvider = Provider<ComponentPlacementService>((
+  ref,
+) {
+  return ComponentPlacementService(
+    components: ref.watch(componentInstanceRepositoryProvider),
+    geometry: ref.watch(geometryRepositoryProvider),
+    idGenerator: ref.watch(idGeneratorProvider),
   );
 });
 
@@ -100,4 +122,11 @@ final roomProvider = StreamProvider.family<RoomRecord?, String>((ref, roomId) {
 final roomGeometryProvider =
     StreamProvider.family<RoomGeometrySnapshot, String>((ref, roomId) {
       return ref.watch(geometryRepositoryProvider).watchRoomGeometry(roomId);
+    });
+
+final roomComponentsProvider =
+    StreamProvider.family<List<ComponentInstance>, String>((ref, roomId) {
+      return ref
+          .watch(componentInstanceRepositoryProvider)
+          .watchRoomComponents(roomId);
     });
