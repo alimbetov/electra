@@ -1,6 +1,6 @@
 # Electra
 
-Professional local-first mobile planner for electrical and engineering systems.
+Professional local-first mobile planner for multi-discipline field engineering.
 
 ## Repository model
 
@@ -11,78 +11,91 @@ electra/
 ├── apps/
 │   └── mobile/                    Flutter client
 ├── packages/
-│   └── engineering_core/          Pure Dart engineering core
+│   └── engineering_core/          Pure Dart spatial/network/engineering core
 ├── backend/                       Spring Boot modular monolith
 ├── infra/                         Local/dev deployment assets
 └── docs/
-    ├── product/                    Product and technical specification
-    ├── architecture/               Architecture overview
-    └── adr/                        Architecture Decision Records
+    ├── product/
+    ├── architecture/
+    └── adr/
 ```
 
-## Target stack
+## Platform architecture
 
-### Mobile
+```text
+Shared Spatial Model
+  -> piecewise-planar room geometry
+  -> SurfacePatch / SurfaceEdge / adjacency
+  -> doors/windows/openings/features
+
+Engineering Layers
+  -> Electrical
+  -> Plumbing / Heating
+  -> HVAC
+  -> Low Voltage / CCTV / Fire / Security
+  -> future disciplines
+
+Generic Network + Routing Core
+  -> Run
+  -> Route
+  -> RouteNode
+  -> RouteSegment
+  -> surface transitions
+```
+
+Electrical remains the first commercial vertical, but it is not the architectural boundary of the product.
+
+## Mobile stack
+
 - Flutter / Dart
-- Riverpod
-- go_router
-- SQLite + Drift
+- SQLite + Drift (next persistence gate)
 - CustomPainter
-- vector_math
+- Riverpod / go_router planned after initial UI/domain contracts stabilize
 
-### Engineering core
-Pure Dart with no Flutter or backend dependency.
+The initial source skeleton now supports the product flow:
 
-Main domains:
-- geometry;
-- units;
-- routing;
-- electrical rules;
-- equipment;
-- panels;
-- BOM/materials;
-- labels/document models.
+```text
+Projects
+  -> Create Project
+  -> Rooms
+  -> Create Room
+  -> Room Editor
+      -> discipline selection
+      -> surface navigation shell
+      -> Door / Window / Beam / feature selection
+      -> Calculations placeholder
+      -> Reports placeholder
+```
 
-### Backend
+Engineering calculations and final reports are deliberately deferred until geometry and routing contracts are validated.
+
+## Spatial/editor principles
+
+1. Local-first and offline-first.
+2. Canonical persisted geometry uses millimetres.
+3. Metric/imperial selection affects input/output only.
+4. UI is 2D/2.5D, while spatial objects are x/y/z aware.
+5. Room surfaces may be piecewise-planar and include slopes, beams, steps, niches and other construction geometry.
+6. The primary navigation model is edge-driven: approaching/tapping an edge reveals or activates the adjacent surface/patch.
+7. Routing remains continuous across surface transitions.
+8. Windows, doors and other openings are real spatial constraints, not decoration.
+9. Shared geometry is reused by all engineering disciplines.
+10. Cloud sync/collaboration is optional; offline engineering work does not require the backend.
+
+## Backend target
+
 - Java 21+
-- Spring Boot
+- Spring Boot modular monolith
 - Spring Security / OIDC
 - PostgreSQL
 - Liquibase
 - REST/JSON
 - S3-compatible object storage
 
-## Architectural principles
-
-1. Local-first: offline engineering work must remain fully functional.
-2. SQLite/Drift is the local operational source of truth.
-3. Cloud synchronization is optional, asynchronous and privacy-aware.
-4. UI is 2D while the engineering domain is height-aware (2.5D / x-y-z semantics).
-5. Geometry uses canonical millimetre-based world coordinates, never screen pixels.
-6. Mounting surface and cable route plane are separate concepts.
-7. Technical project sharing uses secure share tokens and can publish immutable snapshots.
-8. Start as a modular monolith. Do not introduce microservices without an actual scaling boundary.
-
-## Initial product focus
-
-Electrical workflow first:
-
-```text
-Room geometry
-  -> Points / Equipment
-  -> Circuits
-  -> Routing
-  -> Cable / protection calculations
-  -> Panel
-  -> BOM
-  -> Labels / QR
-  -> PDF documentation
-```
-
-HVAC, low-voltage, plumbing and heating are later modules on top of the same editor and geometry foundation.
+The backend is responsible for authentication, subscriptions, optional project synchronization, sharing, revisions, published snapshots, collaboration and audit. It is not required for offline geometry editing or engineering calculations.
 
 ## Current development branch
 
 `feat/platform-foundation`
 
-The foundation branch establishes the repository structure, architecture contracts and technical specification before application scaffolding begins.
+The branch is transitioning from architecture-only discovery to the first implementation foundation. Next gates are geometry kernel, surface topology, editor edge proximity/navigation, Drift persistence and automated tests.
