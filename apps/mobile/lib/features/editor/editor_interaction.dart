@@ -92,7 +92,9 @@ final class SurfaceViewportTransform {
     final widthMm = (maxX - minX).abs();
     final heightMm = (maxY - minY).abs();
     if (widthMm == 0 || heightMm == 0) {
-      throw ArgumentError('Surface viewport requires non-zero width and height.');
+      throw ArgumentError(
+        'Surface viewport requires non-zero width and height.',
+      );
     }
 
     final horizontalScale = (viewportWidth - padding * 2) / widthMm;
@@ -111,13 +113,11 @@ final class SurfaceViewportTransform {
   late final double offsetX;
   late final double offsetY;
 
-  Point2D localToViewport(Point2Mm point) => Point2D(
-        offsetX + point.xMm * scale,
-        offsetY - point.yMm * scale,
-      );
+  Point2D localToViewport(Point2Mm point) =>
+      Point2D(offsetX + point.xMm * scale, offsetY - point.yMm * scale);
 
   Point2Mm viewportToLocal(double x, double y) => Point2Mm(
-        ((x - offsetX) / scale).round(),
-        ((offsetY - y) / scale).round(),
-      );
+    ((x - offsetX) / scale).round(),
+    ((offsetY - y) / scale).round(),
+  );
 }

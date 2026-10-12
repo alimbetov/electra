@@ -53,11 +53,12 @@ class PersistedRoomEditorScreen extends ConsumerWidget {
                 return geometryAsync.when(
                   loading: () => const _LoadingScaffold(),
                   error: (error, stackTrace) => _ErrorScaffold(error: error),
-                  data: (geometry) => RoomEditorScreen(
-                    project: project,
-                    room: room,
-                    geometry: geometry,
-                  ),
+                  data:
+                      (geometry) => RoomEditorScreen(
+                        project: project,
+                        room: room,
+                        geometry: geometry,
+                      ),
                 );
               },
             );

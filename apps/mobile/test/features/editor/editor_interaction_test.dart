@@ -5,22 +5,22 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   SurfacePatch patch() => SurfacePatch(
-        id: 'patch-a',
-        roomId: 'room-a',
-        surfaceId: 'wall-a',
-        frame: LocalCoordinateFrame(
-          origin: const Point3Mm(0, 0, 0),
-          uAxis: const Vector3D(1, 0, 0),
-          vAxis: const Vector3D(0, 0, 1),
-        ),
-        boundary: Polygon2Mm(const [
-          Point2Mm(0, 0),
-          Point2Mm(4000, 0),
-          Point2Mm(4000, 3000),
-          Point2Mm(0, 3000),
-        ]),
-        orientation: SurfaceOrientation.vertical,
-      );
+    id: 'patch-a',
+    roomId: 'room-a',
+    surfaceId: 'wall-a',
+    frame: LocalCoordinateFrame(
+      origin: const Point3Mm(0, 0, 0),
+      uAxis: const Vector3D(1, 0, 0),
+      vAxis: const Vector3D(0, 0, 1),
+    ),
+    boundary: Polygon2Mm(const [
+      Point2Mm(0, 0),
+      Point2Mm(4000, 0),
+      Point2Mm(4000, 3000),
+      Point2Mm(0, 3000),
+    ]),
+    orientation: SurfaceOrientation.vertical,
+  );
 
   RoomGeometrySnapshot snapshot() {
     final surface = patch();
