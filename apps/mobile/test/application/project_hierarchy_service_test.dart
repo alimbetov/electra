@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:electra_mobile/application/id_generator.dart';
 import 'package:electra_mobile/application/project_hierarchy_service.dart';
 import 'package:electra_mobile/application/project_repositories.dart';
