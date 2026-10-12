@@ -26,6 +26,8 @@ class RoomEditorScreen extends StatefulWidget {
 }
 
 class _RoomEditorScreenState extends State<RoomEditorScreen> {
+  static const _navigationResolver = SurfaceNavigationResolver();
+
   EditorTool tool = EditorTool.select;
   Discipline discipline = Discipline.electrical;
   ArchitecturalFeatureType? featureType;
@@ -33,6 +35,8 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
   EditorSelection? selection;
   Point2Mm? measurementStart;
   EditorMeasurement? measurement;
+  SurfaceEdgeCandidate? navigationCandidate;
+  String? currentPreviewEdgeId;
 
   int get ceilingHeight =>
       widget.room.finishedCeilingHeightMmOverride ??
@@ -49,12 +53,23 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
     return widget.geometry.patches.first;
   }
 
+  SurfacePatch? get adjacentPreviewPatch {
+    final adjacentId = navigationCandidate?.adjacentPatchId;
+    if (adjacentId == null) return null;
+    for (final patch in widget.geometry.patches) {
+      if (patch.id == adjacentId) return patch;
+    }
+    return null;
+  }
+
   void selectPatch(String patchId) {
     setState(() {
       activePatchId = patchId;
       selection = null;
       measurementStart = null;
       measurement = null;
+      navigationCandidate = null;
+      currentPreviewEdgeId = null;
     });
   }
 
@@ -67,10 +82,61 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
       if (value != EditorTool.measure) {
         measurementStart = null;
       }
+      if (value != EditorTool.select) {
+        navigationCandidate = null;
+        currentPreviewEdgeId = null;
+      }
     });
   }
 
+  SurfaceEdgeCandidate? _resolveNavigationCandidate(
+    SurfacePatch patch,
+    Point2Mm localPoint,
+  ) =>
+      _navigationResolver.nearestNavigableCandidate(
+        pointer: localPoint,
+        activePatch: patch,
+        edges: widget.geometry.edges,
+        adjacencies: widget.geometry.adjacencies,
+        currentPreviewEdgeId: currentPreviewEdgeId,
+      );
+
+  void handleSurfacePointer(SurfacePatch patch, Point2Mm localPoint) {
+    if (tool != EditorTool.select) return;
+    final candidate = _resolveNavigationCandidate(patch, localPoint);
+    final keepPreview = switch (candidate?.proximity) {
+      SurfaceEdgeProximity.preview || SurfaceEdgeProximity.strongPreview => true,
+      _ => false,
+    };
+    final nextPreviewId = keepPreview ? candidate?.edge.id : null;
+
+    if (candidate?.edge.id == navigationCandidate?.edge.id &&
+        candidate?.proximity == navigationCandidate?.proximity &&
+        nextPreviewId == currentPreviewEdgeId) {
+      return;
+    }
+
+    setState(() {
+      navigationCandidate = candidate;
+      currentPreviewEdgeId = nextPreviewId;
+    });
+  }
+
+  bool _navigateAcrossStrongEdge(SurfacePatch patch, Point2Mm localPoint) {
+    if (tool != EditorTool.select) return false;
+    final candidate = _resolveNavigationCandidate(patch, localPoint);
+    if (candidate?.proximity != SurfaceEdgeProximity.strongPreview) {
+      return false;
+    }
+    final adjacentPatchId = candidate?.adjacentPatchId;
+    if (adjacentPatchId == null) return false;
+    selectPatch(adjacentPatchId);
+    return true;
+  }
+
   void handleSurfaceTap(SurfacePatch patch, Point2Mm localPoint) {
+    if (_navigateAcrossStrongEdge(patch, localPoint)) return;
+
     switch (tool) {
       case EditorTool.select:
         setState(() {
@@ -106,6 +172,7 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
   @override
   Widget build(BuildContext context) {
     final patch = activePatch;
+    final previewPatch = adjacentPreviewPatch;
     final inspector = _Inspector(
       project: widget.project,
       room: widget.room,
@@ -115,6 +182,8 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
       selection: selection,
       measurement: measurement,
       measurementStart: measurementStart,
+      navigationCandidate: navigationCandidate,
+      adjacentPreviewPatch: previewPatch,
     );
 
     return Scaffold(
@@ -131,8 +200,7 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
               if (value == 'calculations') {
                 Navigator.of(context).push(
                   MaterialPageRoute<void>(
-                    builder:
-                        (_) => CalculationsScreen(roomName: widget.room.name),
+                    builder: (_) => CalculationsScreen(roomName: widget.room.name),
                   ),
                 );
               } else if (value == 'reports') {
@@ -143,14 +211,13 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
                 );
               }
             },
-            itemBuilder:
-                (_) => const [
-                  PopupMenuItem(
-                    value: 'calculations',
-                    child: Text('Calculations'),
-                  ),
-                  PopupMenuItem(value: 'reports', child: Text('Reports')),
-                ],
+            itemBuilder: (_) => const [
+              PopupMenuItem(
+                value: 'calculations',
+                child: Text('Calculations'),
+              ),
+              PopupMenuItem(value: 'reports', child: Text('Reports')),
+            ],
           ),
         ],
       ),
@@ -167,7 +234,10 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
             selection: selection,
             measurement: measurement,
             measurementStart: measurementStart,
+            navigationCandidate: navigationCandidate,
+            adjacentPreviewPatch: previewPatch,
             onSurfaceTap: handleSurfaceTap,
+            onSurfacePointer: handleSurfacePointer,
           );
 
           return Column(
@@ -176,53 +246,50 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
                 tool: tool,
                 discipline: discipline,
                 onToolChanged: changeTool,
-                onDisciplineChanged:
-                    (value) => setState(() => discipline = value),
-                onFeatureChanged:
-                    (value) => setState(() {
-                      tool = EditorTool.architecturalFeature;
-                      featureType = value;
-                      measurementStart = null;
-                    }),
+                onDisciplineChanged: (value) =>
+                    setState(() => discipline = value),
+                onFeatureChanged: (value) => setState(() {
+                  tool = EditorTool.architecturalFeature;
+                  featureType = value;
+                  measurementStart = null;
+                  navigationCandidate = null;
+                  currentPreviewEdgeId = null;
+                }),
               ),
               Expanded(
-                child:
-                    wide
-                        ? Row(
-                          children: [
-                            Expanded(child: editor),
-                            SizedBox(width: 320, child: inspector),
-                          ],
-                        )
-                        : Column(
-                          children: [
-                            Expanded(child: editor),
-                            _CompactContextBar(
-                              tool: tool,
-                              selection: selection,
-                              measurement: measurement,
-                              measurementStart: measurementStart,
-                              onOpen:
-                                  () => showModalBottomSheet<void>(
-                                    context: context,
-                                    isScrollControlled: true,
-                                    builder:
-                                        (_) => SafeArea(
-                                          child: SizedBox(
-                                            height: math.min(
-                                              MediaQuery.sizeOf(
-                                                    context,
-                                                  ).height *
-                                                  0.72,
-                                              560,
-                                            ),
-                                            child: inspector,
-                                          ),
-                                        ),
+                child: wide
+                    ? Row(
+                        children: [
+                          Expanded(child: editor),
+                          SizedBox(width: 320, child: inspector),
+                        ],
+                      )
+                    : Column(
+                        children: [
+                          Expanded(child: editor),
+                          _CompactContextBar(
+                            tool: tool,
+                            selection: selection,
+                            measurement: measurement,
+                            measurementStart: measurementStart,
+                            navigationCandidate: navigationCandidate,
+                            adjacentPreviewPatch: previewPatch,
+                            onOpen: () => showModalBottomSheet<void>(
+                              context: context,
+                              isScrollControlled: true,
+                              builder: (_) => SafeArea(
+                                child: SizedBox(
+                                  height: math.min(
+                                    MediaQuery.sizeOf(context).height * 0.72,
+                                    560,
                                   ),
+                                  child: inspector,
+                                ),
+                              ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
+                      ),
               ),
             ],
           );
@@ -268,15 +335,14 @@ class _EditorToolbar extends StatelessWidget {
             const SizedBox(width: 12),
             DropdownButton<Discipline>(
               value: discipline,
-              items:
-                  Discipline.values
-                      .map(
-                        (value) => DropdownMenuItem(
-                          value: value,
-                          child: Text(value.name),
-                        ),
-                      )
-                      .toList(),
+              items: Discipline.values
+                  .map(
+                    (value) => DropdownMenuItem(
+                      value: value,
+                      child: Text(value.name),
+                    ),
+                  )
+                  .toList(),
               onChanged: (value) {
                 if (value != null) onDisciplineChanged(value);
               },
@@ -285,16 +351,14 @@ class _EditorToolbar extends StatelessWidget {
             PopupMenuButton<ArchitecturalFeatureType>(
               tooltip: 'Add opening / feature',
               onSelected: onFeatureChanged,
-              itemBuilder:
-                  (_) =>
-                      ArchitecturalFeatureType.values
-                          .map(
-                            (value) => PopupMenuItem(
-                              value: value,
-                              child: Text(value.name),
-                            ),
-                          )
-                          .toList(),
+              itemBuilder: (_) => ArchitecturalFeatureType.values
+                  .map(
+                    (value) => PopupMenuItem(
+                      value: value,
+                      child: Text(value.name),
+                    ),
+                  )
+                  .toList(),
               child: const Chip(
                 avatar: Icon(Icons.architecture, size: 18),
                 label: Text('Door / Window / Beam...'),
@@ -318,7 +382,10 @@ class _EditorCanvasShell extends StatelessWidget {
     required this.selection,
     required this.measurement,
     required this.measurementStart,
+    required this.navigationCandidate,
+    required this.adjacentPreviewPatch,
     required this.onSurfaceTap,
+    required this.onSurfacePointer,
   });
 
   final RoomGeometrySnapshot geometry;
@@ -330,7 +397,10 @@ class _EditorCanvasShell extends StatelessWidget {
   final EditorSelection? selection;
   final EditorMeasurement? measurement;
   final Point2Mm? measurementStart;
+  final SurfaceEdgeCandidate? navigationCandidate;
+  final SurfacePatch? adjacentPreviewPatch;
   final void Function(SurfacePatch patch, Point2Mm localPoint) onSurfaceTap;
+  final void Function(SurfacePatch patch, Point2Mm localPoint) onSurfacePointer;
 
   @override
   Widget build(BuildContext context) {
@@ -373,64 +443,69 @@ class _EditorCanvasShell extends StatelessWidget {
           Expanded(
             child: Card(
               clipBehavior: Clip.antiAlias,
-              child:
-                  patch == null
-                      ? const Center(
-                        child: Text(
-                          'Room geometry is empty.\nCreate persisted SurfacePatch data to begin.',
-                          textAlign: TextAlign.center,
-                        ),
-                      )
-                      : LayoutBuilder(
-                        builder: (context, constraints) {
-                          final transform = SurfaceViewportTransform(
-                            boundary: patch.boundary,
-                            viewportWidth: constraints.maxWidth,
-                            viewportHeight: constraints.maxHeight,
-                          );
-                          return InteractiveViewer(
-                            minScale: 0.25,
-                            maxScale: 8,
-                            boundaryMargin: const EdgeInsets.all(300),
-                            child: SizedBox(
-                              width: constraints.maxWidth,
-                              height: constraints.maxHeight,
+              child: patch == null
+                  ? const Center(
+                      child: Text(
+                        'Room geometry is empty.\nCreate persisted SurfacePatch data to begin.',
+                        textAlign: TextAlign.center,
+                      ),
+                    )
+                  : LayoutBuilder(
+                      builder: (context, constraints) {
+                        final transform = SurfaceViewportTransform(
+                          boundary: patch.boundary,
+                          viewportWidth: constraints.maxWidth,
+                          viewportHeight: constraints.maxHeight,
+                        );
+
+                        Point2Mm toLocal(Offset position) =>
+                            transform.viewportToLocal(position.dx, position.dy);
+
+                        return InteractiveViewer(
+                          minScale: 0.25,
+                          maxScale: 8,
+                          boundaryMargin: const EdgeInsets.all(300),
+                          child: SizedBox(
+                            width: constraints.maxWidth,
+                            height: constraints.maxHeight,
+                            child: Listener(
+                              onPointerHover: (event) =>
+                                  onSurfacePointer(patch, toLocal(event.localPosition)),
+                              onPointerMove: (event) =>
+                                  onSurfacePointer(patch, toLocal(event.localPosition)),
                               child: GestureDetector(
                                 behavior: HitTestBehavior.opaque,
-                                onTapDown: (details) {
-                                  final local = transform.viewportToLocal(
-                                    details.localPosition.dx,
-                                    details.localPosition.dy,
-                                  );
-                                  onSurfaceTap(patch, local);
-                                },
+                                onTapDown: (details) => onSurfaceTap(
+                                  patch,
+                                  toLocal(details.localPosition),
+                                ),
                                 child: CustomPaint(
                                   painter: _RoomSurfacePainter(
                                     patch: patch,
                                     openings: geometry.openings
                                         .where(
                                           (item) =>
-                                              item.hostSurfacePatchId ==
-                                              patch.id,
+                                              item.hostSurfacePatchId == patch.id,
                                         )
                                         .toList(growable: false),
                                     features: geometry.features
                                         .where(
                                           (item) =>
-                                              item.hostSurfacePatchId ==
-                                              patch.id,
+                                              item.hostSurfacePatchId == patch.id,
                                         )
                                         .toList(growable: false),
                                     selection: selection,
                                     measurement: measurement,
                                     measurementStart: measurementStart,
+                                    navigationCandidate: navigationCandidate,
                                   ),
                                 ),
                               ),
                             ),
-                          );
-                        },
-                      ),
+                          ),
+                        );
+                      },
+                    ),
             ),
           ),
           _ToolContextBar(
@@ -438,6 +513,8 @@ class _EditorCanvasShell extends StatelessWidget {
             selection: selection,
             measurement: measurement,
             measurementStart: measurementStart,
+            navigationCandidate: navigationCandidate,
+            adjacentPreviewPatch: adjacentPreviewPatch,
           ),
         ],
       ),
@@ -451,16 +528,23 @@ class _ToolContextBar extends StatelessWidget {
     required this.selection,
     required this.measurement,
     required this.measurementStart,
+    required this.navigationCandidate,
+    required this.adjacentPreviewPatch,
   });
 
   final EditorTool tool;
   final EditorSelection? selection;
   final EditorMeasurement? measurement;
   final Point2Mm? measurementStart;
+  final SurfaceEdgeCandidate? navigationCandidate;
+  final SurfacePatch? adjacentPreviewPatch;
 
   @override
   Widget build(BuildContext context) {
     String text;
+    final candidate = navigationCandidate;
+    final target = adjacentPreviewPatch?.surfaceId ?? candidate?.adjacentPatchId;
+
     if (tool == EditorTool.measure) {
       if (measurementStart != null) {
         text = 'Measure · choose second point';
@@ -469,11 +553,18 @@ class _ToolContextBar extends StatelessWidget {
       } else {
         text = 'Measure · choose first point';
       }
+    } else if (tool == EditorTool.select && candidate != null) {
+      text = switch (candidate.proximity) {
+        SurfaceEdgeProximity.strongPreview => 'Open → $target · tap edge',
+        SurfaceEdgeProximity.preview => 'Preview → $target',
+        SurfaceEdgeProximity.highlight =>
+          'Edge → $target · ${candidate.distanceMm.toStringAsFixed(0)} mm',
+        SurfaceEdgeProximity.none => 'Select · tap a surface object',
+      };
     } else if (tool == EditorTool.select) {
-      text =
-          selection == null
-              ? 'Select · tap a surface object'
-              : 'Selected · ${selection!.kind.name} · ${selection!.id}';
+      text = selection == null
+          ? 'Select · tap a surface object'
+          : 'Selected · ${selection!.kind.name} · ${selection!.id}';
     } else {
       text = '${tool.name} · contextual actions will appear here';
     }
@@ -491,6 +582,8 @@ class _CompactContextBar extends StatelessWidget {
     required this.selection,
     required this.measurement,
     required this.measurementStart,
+    required this.navigationCandidate,
+    required this.adjacentPreviewPatch,
     required this.onOpen,
   });
 
@@ -498,14 +591,25 @@ class _CompactContextBar extends StatelessWidget {
   final EditorSelection? selection;
   final EditorMeasurement? measurement;
   final Point2Mm? measurementStart;
+  final SurfaceEdgeCandidate? navigationCandidate;
+  final SurfacePatch? adjacentPreviewPatch;
   final VoidCallback onOpen;
 
   @override
   Widget build(BuildContext context) {
+    final target =
+        adjacentPreviewPatch?.surfaceId ?? navigationCandidate?.adjacentPatchId;
     final summary = switch (tool) {
       EditorTool.measure when measurementStart != null => 'Choose second point',
       EditorTool.measure when measurement != null =>
         '${measurement!.lengthMm.toStringAsFixed(0)} mm',
+      EditorTool.select
+          when navigationCandidate?.proximity ==
+              SurfaceEdgeProximity.strongPreview =>
+        'Open → $target',
+      EditorTool.select
+          when navigationCandidate?.proximity == SurfaceEdgeProximity.preview =>
+        'Preview → $target',
       EditorTool.select when selection != null => selection!.id,
       _ => 'Context',
     };
@@ -541,6 +645,7 @@ class _RoomSurfacePainter extends CustomPainter {
     required this.selection,
     required this.measurement,
     required this.measurementStart,
+    required this.navigationCandidate,
   });
 
   final SurfacePatch patch;
@@ -549,13 +654,13 @@ class _RoomSurfacePainter extends CustomPainter {
   final EditorSelection? selection;
   final EditorMeasurement? measurement;
   final Point2Mm? measurementStart;
+  final SurfaceEdgeCandidate? navigationCandidate;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final gridPaint =
-        Paint()
-          ..color = Colors.blueGrey.withValues(alpha: 0.15)
-          ..strokeWidth = 1;
+    final gridPaint = Paint()
+      ..color = Colors.blueGrey.withValues(alpha: 0.15)
+      ..strokeWidth = 1;
     const gridStep = 32.0;
     for (double x = 0; x <= size.width; x += gridStep) {
       canvas.drawLine(Offset(x, 0), Offset(x, size.height), gridPaint);
@@ -587,35 +692,47 @@ class _RoomSurfacePainter extends CustomPainter {
       return path;
     }
 
-    final patchSelected =
-        selection?.kind == EditorSelectionKind.surfacePatch &&
+    final patchSelected = selection?.kind == EditorSelectionKind.surfacePatch &&
         selection?.id == patch.id;
-    final boundaryPaint =
-        Paint()
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = patchSelected ? 3 : 2;
+    final boundaryPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = patchSelected ? 3 : 2;
     canvas.drawPath(polygonPath(patch.boundary), boundaryPaint);
 
     for (final opening in openings) {
-      final selected =
-          selection?.kind == EditorSelectionKind.opening &&
+      final selected = selection?.kind == EditorSelectionKind.opening &&
           selection?.id == opening.id;
-      final paint =
-          Paint()
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = selected ? 3 : 1.5;
+      final paint = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = selected ? 3 : 1.5;
       canvas.drawPath(polygonPath(opening.boundary), paint);
     }
 
     for (final feature in features) {
-      final selected =
-          selection?.kind == EditorSelectionKind.spatialFeature &&
+      final selected = selection?.kind == EditorSelectionKind.spatialFeature &&
           selection?.id == feature.id;
-      final paint =
-          Paint()
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = selected ? 3 : 1;
+      final paint = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = selected ? 3 : 1;
       canvas.drawPath(polygonPath(feature.footprint), paint);
+    }
+
+    final candidate = navigationCandidate;
+    if (candidate != null && candidate.edge.patchId == patch.id) {
+      final width = switch (candidate.proximity) {
+        SurfaceEdgeProximity.none => 0.0,
+        SurfaceEdgeProximity.highlight => 2.0,
+        SurfaceEdgeProximity.preview => 4.0,
+        SurfaceEdgeProximity.strongPreview => 6.0,
+      };
+      if (width > 0) {
+        final segment = candidate.edge.segment;
+        final paint = Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = width
+          ..strokeCap = StrokeCap.round;
+        canvas.drawLine(mapPoint(segment.start), mapPoint(segment.end), paint);
+      }
     }
 
     final pending = measurementStart;
@@ -628,10 +745,9 @@ class _RoomSurfacePainter extends CustomPainter {
     if (completed != null) {
       final start = mapPoint(completed.start);
       final end = mapPoint(completed.end);
-      final paint =
-          Paint()
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = 1.5;
+      final paint = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.5;
       canvas.drawLine(start, end, paint);
       canvas.drawCircle(start, 4, Paint()..style = PaintingStyle.fill);
       canvas.drawCircle(end, 4, Paint()..style = PaintingStyle.fill);
@@ -655,7 +771,9 @@ class _RoomSurfacePainter extends CustomPainter {
       oldDelegate.features != features ||
       oldDelegate.selection != selection ||
       oldDelegate.measurement != measurement ||
-      oldDelegate.measurementStart != measurementStart;
+      oldDelegate.measurementStart != measurementStart ||
+      oldDelegate.navigationCandidate?.edge.id != navigationCandidate?.edge.id ||
+      oldDelegate.navigationCandidate?.proximity != navigationCandidate?.proximity;
 }
 
 class _Inspector extends StatelessWidget {
@@ -668,6 +786,8 @@ class _Inspector extends StatelessWidget {
     required this.selection,
     required this.measurement,
     required this.measurementStart,
+    required this.navigationCandidate,
+    required this.adjacentPreviewPatch,
   });
 
   final ProjectRecord project;
@@ -678,15 +798,17 @@ class _Inspector extends StatelessWidget {
   final EditorSelection? selection;
   final EditorMeasurement? measurement;
   final Point2Mm? measurementStart;
+  final SurfaceEdgeCandidate? navigationCandidate;
+  final SurfacePatch? adjacentPreviewPatch;
 
   @override
   Widget build(BuildContext context) {
     final structural =
         room.structuralHeightMmOverride ?? project.defaultStructuralHeightMm;
-    final ceiling =
-        room.finishedCeilingHeightMmOverride ??
+    final ceiling = room.finishedCeilingHeightMmOverride ??
         project.defaultFinishedCeilingHeightMm;
     final selected = selection;
+    final candidate = navigationCandidate;
 
     return Card(
       margin: const EdgeInsets.all(12),
@@ -711,6 +833,14 @@ class _Inspector extends StatelessWidget {
             Text('Surface: ${activePatch!.surfaceId}'),
             Text('Orientation: ${activePatch!.orientation.name}'),
             Text('Boundary vertices: ${activePatch!.boundary.vertices.length}'),
+          ],
+          if (candidate != null) ...[
+            const Divider(),
+            Text('Edge proximity: ${candidate.proximity.name}'),
+            Text('Edge distance: ${candidate.distanceMm.toStringAsFixed(0)} mm'),
+            Text(
+              'Adjacent surface: ${adjacentPreviewPatch?.surfaceId ?? candidate.adjacentPatchId}',
+            ),
           ],
           if (selected != null) ...[
             const Divider(),
