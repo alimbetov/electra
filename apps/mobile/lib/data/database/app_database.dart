@@ -148,6 +148,23 @@ class SpatialFeatures extends Table with GeometryAuditColumns {
   Set<Column<Object>> get primaryKey => {id};
 }
 
+@DataClassName('ComponentInstanceRow')
+class ComponentInstances extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get definitionId => text()();
+  IntColumn get definitionVersion => integer()();
+  TextColumn get roomId => text().references(Rooms, #id)();
+  TextColumn get hostSurfacePatchId => text().references(SurfacePatches, #id)();
+  IntColumn get localXmm => integer()();
+  IntColumn get localYmm => integer()();
+  RealColumn get rotationRadians => real().withDefault(const Constant(0))();
+  TextColumn get displayNameOverride => text().nullable()();
+  TextColumn get metadataOverridesJson => text().withDefault(const Constant('{}'))();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
 @DriftDatabase(
   tables: [
     Projects,
@@ -158,6 +175,7 @@ class SpatialFeatures extends Table with GeometryAuditColumns {
     SurfaceAdjacencies,
     Openings,
     SpatialFeatures,
+    ComponentInstances,
   ],
 )
 final class AppDatabase extends _$AppDatabase {
@@ -165,7 +183,7 @@ final class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'electra'));
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -176,12 +194,17 @@ final class AppDatabase extends _$AppDatabase {
     onUpgrade: (migrator, from, to) async {
       if (from < 1) {
         await migrator.createAll();
-      } else if (from < 2) {
-        await migrator.createTable(surfacePatches);
-        await migrator.createTable(surfaceEdges);
-        await migrator.createTable(surfaceAdjacencies);
-        await migrator.createTable(openings);
-        await migrator.createTable(spatialFeatures);
+      } else {
+        if (from < 2) {
+          await migrator.createTable(surfacePatches);
+          await migrator.createTable(surfaceEdges);
+          await migrator.createTable(surfaceAdjacencies);
+          await migrator.createTable(openings);
+          await migrator.createTable(spatialFeatures);
+        }
+        if (from < 3) {
+          await migrator.createTable(componentInstances);
+        }
       }
       await _createIndexes();
     },
@@ -218,6 +241,18 @@ final class AppDatabase extends _$AppDatabase {
     await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_spatial_feature_patch '
       'ON spatial_features(host_surface_patch_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_component_instance_room '
+      'ON component_instances(room_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_component_instance_patch '
+      'ON component_instances(host_surface_patch_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_component_instance_definition '
+      'ON component_instances(definition_id, definition_version)',
     );
   }
 }
