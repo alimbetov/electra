@@ -113,6 +113,29 @@ final class SurfaceNavigationResolver {
     return ranked.first;
   }
 
+  SurfaceEdgeCandidate? nearestNavigableCandidate({
+    required Point2Mm pointer,
+    required SurfacePatch activePatch,
+    required List<SurfaceEdge> edges,
+    required List<SurfaceAdjacency> adjacencies,
+    String? currentPreviewEdgeId,
+  }) {
+    final ranked = rankCandidates(
+      pointer: pointer,
+      activePatch: activePatch,
+      edges: edges,
+      adjacencies: adjacencies,
+      currentPreviewEdgeId: currentPreviewEdgeId,
+    );
+    for (final candidate in ranked) {
+      if (candidate.isNavigable &&
+          candidate.proximity != SurfaceEdgeProximity.none) {
+        return candidate;
+      }
+    }
+    return null;
+  }
+
   String? resolveAdjacentPatchId({
     required String activePatchId,
     required String edgeId,
