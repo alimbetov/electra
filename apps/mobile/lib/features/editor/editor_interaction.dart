@@ -1,5 +1,7 @@
 import 'package:engineering_core/engineering_core.dart';
 
+import '../../application/geometry_repository.dart';
+
 enum EditorSelectionKind { surfacePatch, opening, spatialFeature }
 
 final class EditorSelection {
