@@ -52,7 +52,11 @@ class _ComponentCatalogSheetState extends State<ComponentCatalogSheet> {
         );
       case _CatalogScope.recent:
         final order = {
-          for (var index = 0; index < widget.recentDefinitionIds.length; index++)
+          for (
+            var index = 0;
+            index < widget.recentDefinitionIds.length;
+            index++
+          )
             widget.recentDefinitionIds[index]: index,
         };
         values = values.where((definition) => order.containsKey(definition.id));
@@ -132,7 +136,9 @@ class _ComponentCatalogSheetState extends State<ComponentCatalogSheet> {
                         itemBuilder: (context, index) {
                           final definition = definitions[index];
                           return ListTile(
-                            leading: _CatalogSymbol(category: definition.category),
+                            leading: _CatalogSymbol(
+                              category: definition.category,
+                            ),
                             title: Text(definition.displayName),
                             subtitle: Text(
                               '${definition.code} · ${definition.category}',

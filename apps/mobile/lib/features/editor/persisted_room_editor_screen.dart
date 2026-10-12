@@ -60,8 +60,7 @@ class PersistedRoomEditorScreen extends ConsumerWidget {
                       (geometry) => componentsAsync.when(
                         loading: () => const _LoadingScaffold(),
                         error:
-                            (error, stackTrace) =>
-                                _ErrorScaffold(error: error),
+                            (error, stackTrace) => _ErrorScaffold(error: error),
                         data:
                             (components) => RoomEditorScreen(
                               project: project,
