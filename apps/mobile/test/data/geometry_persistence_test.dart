@@ -189,14 +189,15 @@ void main() {
     await directory.delete(recursive: true);
   });
 
-  test('schema v1 upgrades to v2 without losing hierarchy data', () async {
-    final directory = await Directory.systemTemp.createTemp('electra-v1-v2-');
+  test('schema v1 upgrades through v3 without losing hierarchy data', () async {
+    final directory = await Directory.systemTemp.createTemp('electra-v1-v3-');
     final file = File('${directory.path}/electra.sqlite');
     AppDatabase openDatabase() => AppDatabase(NativeDatabase(file));
 
     var database = openDatabase();
     final roomId = await createRoom(database);
 
+    await database.customStatement('DROP TABLE component_instances');
     await database.customStatement('DROP TABLE surface_adjacencies');
     await database.customStatement('DROP TABLE openings');
     await database.customStatement('DROP TABLE spatial_features');
@@ -216,7 +217,7 @@ void main() {
     final names = tables.map((row) => row.read<String>('name')).toSet();
 
     expect(restoredRoom?.name, 'Workshop');
-    expect(database.schemaVersion, 2);
+    expect(database.schemaVersion, 3);
     expect(
       names,
       containsAll([
@@ -225,6 +226,7 @@ void main() {
         'surface_adjacencies',
         'openings',
         'spatial_features',
+        'component_instances',
       ]),
     );
 
