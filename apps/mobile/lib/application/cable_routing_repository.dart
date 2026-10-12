@@ -6,12 +6,24 @@ final class RoomRoutingSnapshot {
   const RoomRoutingSnapshot({
     required this.geometry,
     this.routes = const [],
+    this.junctions = const [],
     this.runs = const [],
     this.channels = const [],
     this.activeCircuitIds = const {},
   });
   final RoomGeometrySnapshot geometry;
   final List<CableRoute> routes;
+  final List<RoutingJunction> junctions;
+  List<String> junctionIssues(RoutingJunction junction) =>
+      RoutingJunctionValidator.validate(
+        junction: junction,
+        runs: runs,
+        routes: routes,
+        patches: geometry.patches,
+        activeCircuitIds: activeCircuitIds,
+        routeReady: (route) => calculate(route).ready,
+        others: junctions,
+      );
   final List<CableRun> runs;
   final List<PhysicalChannel> channels;
   final Set<String> activeCircuitIds;
@@ -39,5 +51,6 @@ abstract interface class CableRoutingRepository {
     required CableRoute route,
     required CableRun run,
   });
+  Future<void> saveJunction(RoutingJunction junction);
   Future<void> saveChannel(PhysicalChannel channel);
 }

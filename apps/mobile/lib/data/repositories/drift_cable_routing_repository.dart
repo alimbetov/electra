@@ -17,6 +17,7 @@ final class DriftCableRoutingRepository implements CableRoutingRepository {
         '''
     WITH scope AS (SELECT ? AS room_id)
     SELECT 'room' AS kind, id, revision FROM rooms WHERE id = (SELECT room_id FROM scope)
+    UNION ALL SELECT 'junction', id, revision FROM routing_junctions WHERE room_id = (SELECT room_id FROM scope)
     UNION ALL SELECT 'route', id, revision FROM cable_routes WHERE room_id = (SELECT room_id FROM scope)
     UNION ALL SELECT 'node', n.id, n.revision FROM cable_route_nodes n JOIN cable_routes r ON r.id = n.route_id WHERE r.room_id = (SELECT room_id FROM scope)
     UNION ALL SELECT 'segment', n.id, n.revision FROM cable_route_segments n JOIN cable_routes r ON r.id = n.route_id WHERE r.room_id = (SELECT room_id FROM scope)
@@ -33,6 +34,8 @@ final class DriftCableRoutingRepository implements CableRoutingRepository {
         variables: [Variable.withString(roomId)],
         readsFrom: {
           database.rooms,
+          database.routingJunctions,
+          database.junctionConnections,
           database.cableRoutes,
           database.cableRouteNodes,
           database.cableRouteSegments,
@@ -122,8 +125,49 @@ final class DriftCableRoutingRepository implements CableRoutingRepository {
             await (database.select(database.electricalCircuits)..where(
               (row) => row.roomId.equals(roomId) & row.deletedAt.isNull(),
             )).get();
+        final junctionRows =
+            await (database.select(database.routingJunctions)
+                  ..where(
+                    (row) => row.roomId.equals(roomId) & row.deletedAt.isNull(),
+                  )
+                  ..orderBy([(row) => OrderingTerm.asc(row.code)]))
+                .get();
+        final connections =
+            await (database.select(database.junctionConnections)..where(
+              (row) => row.junctionId.isIn(junctionRows.map((j) => j.id)),
+            )).get();
         return RoomRoutingSnapshot(
           geometry: geometry,
+          junctions: junctionRows
+              .map(
+                (j) => RoutingJunction(
+                  id: j.id,
+                  code: j.code,
+                  type: RoutingJunctionType.values.byName(j.kind),
+                  roomId: j.roomId,
+                  surfacePatchId: j.patchId,
+                  localPosition: Point2Mm(j.localXmm, j.localYmm),
+                  xMm: j.worldXmm,
+                  yMm: j.worldYmm,
+                  zMm: j.worldZmm,
+                  notes: j.notes,
+                  connections: connections
+                      .where((c) => c.junctionId == j.id)
+                      .map(
+                        (c) => RoutingJunctionConnection(
+                          runId: c.runId,
+                          nodeId: c.nodeId,
+                          direction: RoutingConnectionDirection.values.byName(
+                            c.direction,
+                          ),
+                          circuitOrNetworkId: c.circuitId,
+                          physicalChannelId: c.channelId,
+                        ),
+                      )
+                      .toList(growable: false),
+                ),
+              )
+              .toList(growable: false),
           routes: routeRows
               .map(
                 (row) => CableRoute(
@@ -197,6 +241,64 @@ final class DriftCableRoutingRepository implements CableRoutingRepository {
     layingMethod: LayingMethod.values.byName(row.layingMethod),
     physicalChannelId: row.physicalChannelId,
   );
+
+  @override
+  Future<void> saveJunction(RoutingJunction junction) =>
+      database.transaction(() async {
+        final snapshot = await loadRoomRouting(junction.roomId ?? '');
+        final issues = snapshot.junctionIssues(junction);
+        if (issues.isNotEmpty) throw StateError(issues.join(' '));
+        if (snapshot.junctions.any(
+          (j) => j.id != junction.id && j.code == junction.code.trim(),
+        )) {
+          throw StateError('Junction code must be unique in this room.');
+        }
+        final old =
+            await (database.select(database.routingJunctions)
+              ..where((r) => r.id.equals(junction.id))).getSingleOrNull();
+        if (old != null && old.roomId != junction.roomId) {
+          throw StateError('Cannot move a junction between rooms.');
+        }
+        final now = DateTime.now().toUtc();
+        await database
+            .into(database.routingJunctions)
+            .insertOnConflictUpdate(
+              RoutingJunctionsCompanion(
+                id: Value(junction.id),
+                roomId: Value(junction.roomId!),
+                patchId: Value(junction.surfacePatchId!),
+                code: Value(junction.code.trim()),
+                kind: Value(junction.type.name),
+                localXmm: Value(junction.localPosition!.xMm),
+                localYmm: Value(junction.localPosition!.yMm),
+                worldXmm: Value(junction.xMm),
+                worldYmm: Value(junction.yMm),
+                worldZmm: Value(junction.zMm),
+                notes: Value(junction.notes),
+                revision: Value((old?.revision ?? 0) + 1),
+                createdAt: Value(old?.createdAt ?? now),
+                updatedAt: Value(now),
+                deletedAt: const Value(null),
+                originDeviceId: Value(originDeviceId),
+              ),
+            );
+        await (database.delete(database.junctionConnections)
+          ..where((r) => r.junctionId.equals(junction.id))).go();
+        for (final c in junction.connections) {
+          await database
+              .into(database.junctionConnections)
+              .insert(
+                JunctionConnectionsCompanion.insert(
+                  junctionId: junction.id,
+                  runId: c.runId,
+                  nodeId: c.nodeId!,
+                  direction: c.direction.name,
+                  circuitId: c.circuitOrNetworkId!,
+                  channelId: Value(c.physicalChannelId),
+                ),
+              );
+        }
+      });
 
   @override
   Future<void> saveChannel(PhysicalChannel channel) async {

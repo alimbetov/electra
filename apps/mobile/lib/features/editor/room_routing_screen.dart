@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/providers.dart';
 import '../../application/cable_routing_repository.dart';
 import 'editor_interaction.dart';
+import 'junction_editor.dart';
 
 class RoomRoutingScreen extends ConsumerWidget {
   const RoomRoutingScreen({
@@ -42,6 +43,8 @@ class RoomRoutingScreen extends ConsumerWidget {
                         ({required route, required run}) => ref
                             .read(cableRoutingRepositoryProvider)
                             .saveRouteWithRun(route: route, run: run),
+                    onSaveJunction:
+                        ref.read(cableRoutingRepositoryProvider).saveJunction,
                     onSaveChannel:
                         ref.read(cableRoutingRepositoryProvider).saveChannel,
                   ),
@@ -59,6 +62,7 @@ class CableRouteEditor extends StatefulWidget {
     required this.nextId,
     required this.onSave,
     this.onSaveChannel,
+    this.onSaveJunction,
   });
   final RoomRoutingSnapshot snapshot;
   final Map<String, String> circuits;
@@ -69,6 +73,7 @@ class CableRouteEditor extends StatefulWidget {
   })
   onSave;
   final Future<void> Function(PhysicalChannel channel)? onSaveChannel;
+  final Future<void> Function(RoutingJunction junction)? onSaveJunction;
   @override
   State<CableRouteEditor> createState() => _CableRouteEditorState();
 }
@@ -98,6 +103,30 @@ class _CableRouteEditorState extends State<CableRouteEditor> {
   void message(Object error) => ScaffoldMessenger.of(
     context,
   ).showSnackBar(SnackBar(content: Text('$error')));
+  Future<void> openJunction([RoutingJunction? junction]) async {
+    if (widget.onSaveJunction == null) return;
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder:
+            (_) => JunctionEditor(
+              snapshot: widget.snapshot,
+              id: junction?.id ?? widget.nextId(),
+              junction: junction,
+              onSave: widget.onSaveJunction!,
+              onOpenRun: (run) {
+                final route =
+                    widget.snapshot.routes
+                        .where((r) => r.id == run.routeId)
+                        .firstOrNull;
+                if (route == null) return;
+                Navigator.of(context).pop();
+                begin(route: route, run: run);
+              },
+            ),
+      ),
+    );
+  }
+
   void begin({CableRoute? route, CableRun? run}) {
     setState(() {
       draft = SurfaceRouteDraft(
@@ -264,6 +293,22 @@ class _CableRouteEditorState extends State<CableRouteEditor> {
           (context, constraints) => ListView(
             padding: const EdgeInsets.all(12),
             children: [
+              if (widget.onSaveJunction != null) ...[
+                OutlinedButton.icon(
+                  onPressed: draft == null ? () => openJunction() : null,
+                  icon: const Icon(Icons.account_tree),
+                  label: const Text('New junction'),
+                ),
+                for (final junction in widget.snapshot.junctions)
+                  ListTile(
+                    leading: const Icon(Icons.account_tree),
+                    title: Text(junction.code),
+                    subtitle: Text(
+                      '${junction.incoming.length} in → ${junction.outgoing.length} out · ${widget.snapshot.junctionIssues(junction).isEmpty ? "Ready" : "Review required"}',
+                    ),
+                    onTap: () => openJunction(junction),
+                  ),
+              ],
               Row(
                 children: [
                   Expanded(
@@ -323,6 +368,7 @@ class _CableRouteEditorState extends State<CableRouteEditor> {
                   preview: preview,
                   enabled: draft != null && !saving,
                   onTap: tapPoint,
+                  onJunction: openJunction,
                 ),
               ),
               Padding(
@@ -608,12 +654,14 @@ class _RoutingCanvas extends StatelessWidget {
     required this.preview,
     required this.enabled,
     required this.onTap,
+    required this.onJunction,
   });
   final SurfacePatch patch;
   final RoomRoutingSnapshot snapshot;
   final CableRoute? preview;
   final bool enabled;
   final ValueChanged<Point2Mm> onTap;
+  final ValueChanged<RoutingJunction> onJunction;
   @override
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (context, constraints) {
@@ -630,15 +678,26 @@ class _RoutingCanvas extends StatelessWidget {
           height: constraints.maxHeight,
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
-            onTapUp:
-                enabled
-                    ? (details) => onTap(
-                      transform.viewportToLocal(
-                        details.localPosition.dx,
-                        details.localPosition.dy,
-                      ),
-                    )
-                    : null,
+            onTapUp: (details) {
+              if (enabled) {
+                onTap(
+                  transform.viewportToLocal(
+                    details.localPosition.dx,
+                    details.localPosition.dy,
+                  ),
+                );
+                return;
+              }
+              for (final junction in snapshot.junctions.where(
+                (j) => j.surfacePatchId == patch.id && j.localPosition != null,
+              )) {
+                final p = transform.localToViewport(junction.localPosition!);
+                if ((Offset(p.x, p.y) - details.localPosition).distance <= 18) {
+                  onJunction(junction);
+                  return;
+                }
+              }
+            },
             child: CustomPaint(
               painter: _RoutingPainter(
                 patch: patch,
@@ -713,6 +772,27 @@ class _RoutingPainter extends CustomPainter {
           ..color = Colors.lightBlue
           ..strokeWidth = 5,
       );
+    }
+    for (final junction in snapshot.junctions.where(
+      (j) => j.surfacePatchId == patch.id && j.localPosition != null,
+    )) {
+      final point = map(junction.localPosition!);
+      canvas.drawRect(
+        Rect.fromCenter(center: point, width: 16, height: 16),
+        Paint()
+          ..color =
+              snapshot.junctionIssues(junction).isEmpty
+                  ? Colors.orange
+                  : Colors.red,
+      );
+      final label = TextPainter(
+        text: TextSpan(
+          text: junction.code,
+          style: const TextStyle(color: Colors.black, fontSize: 12),
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      label.paint(canvas, point + const Offset(10, -18));
     }
     for (final route in routes) {
       final nodes = {for (final node in route.nodes) node.id: node};

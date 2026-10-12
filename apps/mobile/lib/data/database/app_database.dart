@@ -312,6 +312,36 @@ class CableRuns extends Table with GeometryAuditColumns {
   Set<Column<Object>> get primaryKey => {id};
 }
 
+@DataClassName('RoutingJunctionRow')
+class RoutingJunctions extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get roomId => text().references(Rooms, #id)();
+  TextColumn get patchId => text().references(SurfacePatches, #id)();
+  TextColumn get code => text()();
+  TextColumn get kind => text()();
+  IntColumn get localXmm => integer()();
+  IntColumn get localYmm => integer()();
+  IntColumn get worldXmm => integer()();
+  IntColumn get worldYmm => integer()();
+  IntColumn get worldZmm => integer()();
+  TextColumn get notes => text().nullable()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('JunctionConnectionRow')
+class JunctionConnections extends Table {
+  TextColumn get junctionId => text().references(RoutingJunctions, #id)();
+  TextColumn get runId => text().references(CableRuns, #id)();
+  TextColumn get nodeId => text().references(CableRouteNodes, #id)();
+  TextColumn get direction => text()();
+  TextColumn get circuitId => text().references(ElectricalCircuits, #id)();
+  TextColumn get channelId =>
+      text().nullable().references(PhysicalChannels, #id)();
+  @override
+  Set<Column<Object>> get primaryKey => {junctionId, runId};
+}
+
 @DriftDatabase(
   tables: [
     Projects,
@@ -333,6 +363,8 @@ class CableRuns extends Table with GeometryAuditColumns {
     CableRouteNodes,
     CableRouteSegments,
     CableRuns,
+    RoutingJunctions,
+    JunctionConnections,
   ],
 )
 final class AppDatabase extends _$AppDatabase {
@@ -340,7 +372,7 @@ final class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'electra'));
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -385,6 +417,10 @@ final class AppDatabase extends _$AppDatabase {
           await migrator.createTable(cableRouteNodes);
           await migrator.createTable(cableRouteSegments);
           await migrator.createTable(cableRuns);
+        }
+        if (from < 8) {
+          await migrator.createTable(routingJunctions);
+          await migrator.createTable(junctionConnections);
         }
       }
       await _createIndexes();

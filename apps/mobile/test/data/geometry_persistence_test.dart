@@ -197,6 +197,8 @@ void main() {
     var database = openDatabase();
     final roomId = await createRoom(database);
 
+    await database.customStatement('DROP TABLE junction_connections');
+    await database.customStatement('DROP TABLE routing_junctions');
     await database.customStatement('DROP TABLE cable_runs');
     await database.customStatement('DROP TABLE cable_route_segments');
     await database.customStatement('DROP TABLE cable_route_nodes');
@@ -227,7 +229,7 @@ void main() {
     final names = tables.map((row) => row.read<String>('name')).toSet();
 
     expect(restoredRoom?.name, 'Workshop');
-    expect(database.schemaVersion, 7);
+    expect(database.schemaVersion, 8);
     expect(
       names,
       containsAll([

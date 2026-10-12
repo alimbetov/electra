@@ -52,6 +52,8 @@ void main() {
       final file = File('${directory.path}/catalog.sqlite');
       var database = AppDatabase(NativeDatabase(file));
       await database.customSelect('SELECT 1').get();
+      await database.customStatement('DROP TABLE junction_connections');
+      await database.customStatement('DROP TABLE routing_junctions');
       await database.customStatement('DROP TABLE cable_runs');
       await database.customStatement('DROP TABLE cable_route_segments');
       await database.customStatement('DROP TABLE cable_route_nodes');
