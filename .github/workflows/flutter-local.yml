@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - feat/flutter-local-app-foundation
+      - feat/flutter-geometry-kernel
   pull_request:
     paths:
       - 'apps/mobile/**'
