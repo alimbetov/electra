@@ -333,7 +333,7 @@ A persisted consumption group can create a persisted circuit proposal without ma
 
 ## WP-FL9 — Routing
 
-**Status: IMPLEMENTED BASELINE on `feat/flutter-routing-cablerun`; exact-SHA gate pending. Branch starts at the verified FL8 `d1c0f90d3fc90fea5f4275221d7c94b7b2232b0c`.**
+**Status: BASELINE CLOSED on `feat/flutter-routing-cablerun`. Full Flutter/core exact-SHA gate passed on `534ac9e162e56ad19004cbaa37dc6adea4405701`. Branch starts at the verified FL8 `d1c0f90d3fc90fea5f4275221d7c94b7b2232b0c`.**
 
 ### Implemented behavior
 
