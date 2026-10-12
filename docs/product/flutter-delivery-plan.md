@@ -231,6 +231,21 @@ without switching to a 3D scene. Additional multi-patch fixtures can extend cove
 
 ## WP-FL6 — Component catalog placement
 
+**Status: IMPLEMENTED; full exact-SHA CI gate pending.**
+
+### Implemented behavior
+
+- searchable system catalog and repeated component placement;
+- SQLite schema v3 component instances with exact host/local coordinates;
+- schema v4 local catalog preferences: favorites and eight deduplicated recent selections;
+- favorite toggling writes SQLite before updating the visible state;
+- async placement undo/redo tombstones/restores the individual instance with the same ID;
+- failed history operations preserve their stacks for retry;
+- new placement clears redo; room changes clear session history;
+- undo/redo history is session-local; the resulting project state and catalog preferences survive restart;
+- close/reopen, migration, revision, catalog interaction and failure regression tests.
+
+
 ### Scope
 
 - layer component library;

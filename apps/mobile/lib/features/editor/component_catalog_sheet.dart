@@ -7,17 +7,20 @@ class ComponentCatalogSheet extends StatefulWidget {
     required this.definitions,
     this.recentDefinitionIds = const [],
     this.favoriteDefinitionIds = const {},
+    this.onSetFavorite,
   });
 
   final List<ComponentDefinition> definitions;
   final List<String> recentDefinitionIds;
   final Set<String> favoriteDefinitionIds;
+  final Future<void> Function(String id, bool favorite)? onSetFavorite;
 
   static Future<ComponentDefinition?> show(
     BuildContext context, {
     required List<ComponentDefinition> definitions,
     List<String> recentDefinitionIds = const [],
     Set<String> favoriteDefinitionIds = const {},
+    Future<void> Function(String id, bool favorite)? onSetFavorite,
   }) {
     return showModalBottomSheet<ComponentDefinition>(
       context: context,
@@ -30,6 +33,7 @@ class ComponentCatalogSheet extends StatefulWidget {
               definitions: definitions,
               recentDefinitionIds: recentDefinitionIds,
               favoriteDefinitionIds: favoriteDefinitionIds,
+              onSetFavorite: onSetFavorite,
             ),
           ),
     );
@@ -41,6 +45,34 @@ class ComponentCatalogSheet extends StatefulWidget {
 
 class _ComponentCatalogSheetState extends State<ComponentCatalogSheet> {
   var query = '';
+  late final favorites = {...widget.favoriteDefinitionIds};
+  bool savingFavorite = false;
+
+  Future<void> toggleFavorite(String id) async {
+    if (savingFavorite || widget.onSetFavorite == null) return;
+    final favorite = !favorites.contains(id);
+    setState(() => savingFavorite = true);
+    try {
+      await widget.onSetFavorite!(id, favorite);
+      if (!mounted) return;
+      setState(() {
+        if (favorite) {
+          favorites.add(id);
+        } else {
+          favorites.remove(id);
+        }
+      });
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Unable to save favorite: $error')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => savingFavorite = false);
+    }
+  }
+
   _CatalogScope scope = _CatalogScope.system;
 
   List<ComponentDefinition> get visibleDefinitions {
@@ -65,7 +97,7 @@ class _ComponentCatalogSheetState extends State<ComponentCatalogSheet> {
         values = list;
       case _CatalogScope.favorites:
         values = values.where(
-          (definition) => widget.favoriteDefinitionIds.contains(definition.id),
+          (definition) => favorites.contains(definition.id),
         );
     }
 
@@ -143,7 +175,21 @@ class _ComponentCatalogSheetState extends State<ComponentCatalogSheet> {
                             subtitle: Text(
                               '${definition.code} · ${definition.category}',
                             ),
-                            trailing: const Icon(Icons.add),
+                            trailing: IconButton(
+                              tooltip:
+                                  favorites.contains(definition.id)
+                                      ? 'Remove favorite'
+                                      : 'Add favorite',
+                              icon: Icon(
+                                favorites.contains(definition.id)
+                                    ? Icons.star
+                                    : Icons.star_outline,
+                              ),
+                              onPressed:
+                                  savingFavorite || widget.onSetFavorite == null
+                                      ? null
+                                      : () => toggleFavorite(definition.id),
+                            ),
                             onTap: () => Navigator.of(context).pop(definition),
                           );
                         },

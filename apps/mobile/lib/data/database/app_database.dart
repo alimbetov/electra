@@ -166,6 +166,15 @@ class ComponentInstances extends Table with GeometryAuditColumns {
   Set<Column<Object>> get primaryKey => {id};
 }
 
+class ComponentCatalogPreferences extends Table {
+  TextColumn get definitionId => text()();
+  BoolColumn get favorite => boolean().withDefault(const Constant(false))();
+  IntColumn get useOrder => integer().nullable()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {definitionId};
+}
+
 @DriftDatabase(
   tables: [
     Projects,
@@ -177,6 +186,7 @@ class ComponentInstances extends Table with GeometryAuditColumns {
     Openings,
     SpatialFeatures,
     ComponentInstances,
+    ComponentCatalogPreferences,
   ],
 )
 final class AppDatabase extends _$AppDatabase {
@@ -184,7 +194,7 @@ final class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'electra'));
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -205,6 +215,9 @@ final class AppDatabase extends _$AppDatabase {
         }
         if (from < 3) {
           await migrator.createTable(componentInstances);
+        }
+        if (from < 4) {
+          await migrator.createTable(componentCatalogPreferences);
         }
       }
       await _createIndexes();

@@ -203,6 +203,7 @@ void main() {
     await database.customStatement('DROP TABLE spatial_features');
     await database.customStatement('DROP TABLE surface_edges');
     await database.customStatement('DROP TABLE surface_patches');
+    await database.customStatement('DROP TABLE component_catalog_preferences');
     await database.customStatement('PRAGMA user_version = 1');
     await database.close();
 
@@ -217,7 +218,7 @@ void main() {
     final names = tables.map((row) => row.read<String>('name')).toSet();
 
     expect(restoredRoom?.name, 'Workshop');
-    expect(database.schemaVersion, 3);
+    expect(database.schemaVersion, 4);
     expect(
       names,
       containsAll([

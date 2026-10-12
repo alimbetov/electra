@@ -5,6 +5,8 @@ abstract interface class ComponentInstanceRepository {
 
   Future<List<ComponentInstance>> loadRoomComponents(String roomId);
 
+  Future<void> removeComponent(String instanceId);
+
   Future<void> saveComponent(ComponentInstance instance);
 
   Future<void> replaceRoomComponents({

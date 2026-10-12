@@ -1,3 +1,6 @@
+import '../application/catalog_preferences_repository.dart';
+import '../data/repositories/drift_catalog_preferences_repository.dart';
+
 import 'package:engineering_core/engineering_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -50,6 +53,11 @@ final componentInstanceRepositoryProvider =
         ref.watch(databaseProvider),
         originDeviceId: 'local-device',
       );
+    });
+
+final catalogPreferencesRepositoryProvider =
+    Provider<CatalogPreferencesRepository>((ref) {
+      return DriftCatalogPreferencesRepository(ref.watch(databaseProvider));
     });
 
 final unitOfWorkProvider = Provider<LocalUnitOfWork>((ref) {

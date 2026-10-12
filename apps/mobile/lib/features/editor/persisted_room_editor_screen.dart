@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/providers.dart';
+import '../../application/component_placement_history.dart';
 import 'room_editor_screen.dart';
 
 /// Persistent route boundary for the Room Editor.
@@ -9,7 +10,7 @@ import 'room_editor_screen.dart';
 /// Project, floor, room, geometry and component instances are loaded from
 /// SQLite-backed repository streams. Only ephemeral editor interaction state
 /// lives inside [RoomEditorScreen].
-class PersistedRoomEditorScreen extends ConsumerWidget {
+class PersistedRoomEditorScreen extends ConsumerStatefulWidget {
   const PersistedRoomEditorScreen({
     super.key,
     required this.projectId,
@@ -22,7 +23,43 @@ class PersistedRoomEditorScreen extends ConsumerWidget {
   final String roomId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PersistedRoomEditorScreen> createState() =>
+      _PersistedRoomEditorScreenState();
+}
+
+class _PersistedRoomEditorScreenState
+    extends ConsumerState<PersistedRoomEditorScreen> {
+  late var history = ComponentPlacementHistory(
+    ref.read(componentInstanceRepositoryProvider),
+  );
+  String get projectId => widget.projectId;
+  String get floorId => widget.floorId;
+  String get roomId => widget.roomId;
+
+  @override
+  void didUpdateWidget(covariant PersistedRoomEditorScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.roomId != widget.roomId) {
+      history = ComponentPlacementHistory(
+        ref.read(componentInstanceRepositoryProvider),
+      );
+    }
+  }
+
+  Future<void> changeHistory(bool undo) async {
+    try {
+      if (undo) {
+        await history.undo();
+      } else {
+        await history.redo();
+      }
+    } finally {
+      if (mounted) setState(() {});
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final projectAsync = ref.watch(projectProvider(projectId));
     final floorAsync = ref.watch(floorProvider(floorId));
     final roomAsync = ref.watch(roomProvider(roomId));
@@ -62,16 +99,25 @@ class PersistedRoomEditorScreen extends ConsumerWidget {
                             (error, stackTrace) => _ErrorScaffold(error: error),
                         data:
                             (components) => RoomEditorScreen(
+                              key: ValueKey(room.id),
                               project: project,
                               room: room,
                               geometry: geometry,
                               components: components,
+                              catalogPreferences: ref.watch(
+                                catalogPreferencesRepositoryProvider,
+                              ),
+                              canUndoPlacement: history.canUndo,
+                              canRedoPlacement: history.canRedo,
+                              onUndoPlacement: () => changeHistory(true),
+                              onRedoPlacement: () => changeHistory(false),
                               onPlaceComponent: (
                                 definition,
                                 hostSurfacePatchId,
                                 localPosition,
                               ) async {
-                                await ref
+                                final placementHistory = history;
+                                final instance = await ref
                                     .read(componentPlacementServiceProvider)
                                     .place(
                                       roomId: room.id,
@@ -79,6 +125,8 @@ class PersistedRoomEditorScreen extends ConsumerWidget {
                                       hostSurfacePatchId: hostSurfacePatchId,
                                       localPosition: localPosition,
                                     );
+                                placementHistory.record(instance);
+                                if (mounted) setState(() {});
                               },
                             ),
                       ),

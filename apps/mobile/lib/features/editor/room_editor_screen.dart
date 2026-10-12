@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../application/geometry_repository.dart';
+import '../../application/catalog_preferences_repository.dart';
 import '../../domain/models.dart';
 import '../../domain/project_models.dart';
 import '../../domain/system_component_catalog.dart';
@@ -27,6 +28,11 @@ class RoomEditorScreen extends StatefulWidget {
     required this.geometry,
     this.components = const [],
     this.onPlaceComponent,
+    this.catalogPreferences,
+    this.onUndoPlacement,
+    this.onRedoPlacement,
+    this.canUndoPlacement = false,
+    this.canRedoPlacement = false,
   });
 
   final ProjectRecord project;
@@ -34,6 +40,11 @@ class RoomEditorScreen extends StatefulWidget {
   final RoomGeometrySnapshot geometry;
   final List<ComponentInstance> components;
   final ComponentPlacementCallback? onPlaceComponent;
+  final CatalogPreferencesRepository? catalogPreferences;
+  final Future<void> Function()? onUndoPlacement;
+  final Future<void> Function()? onRedoPlacement;
+  final bool canUndoPlacement;
+  final bool canRedoPlacement;
 
   @override
   State<RoomEditorScreen> createState() => _RoomEditorScreenState();
@@ -52,8 +63,7 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
   SurfaceEdgeCandidate? navigationCandidate;
   String? currentPreviewEdgeId;
   ComponentDefinition? activeComponentDefinition;
-  final List<String> recentComponentDefinitionIds = [];
-  final Set<String> favoriteComponentDefinitionIds = {};
+
   bool placingComponent = false;
 
   int get ceilingHeight =>
@@ -156,29 +166,51 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
   }
 
   Future<void> openComponentCatalog() async {
-    final selected = await ComponentCatalogSheet.show(
-      context,
-      definitions: electricalSystemComponentLibrary.definitions,
-      recentDefinitionIds: recentComponentDefinitionIds,
-      favoriteDefinitionIds: favoriteComponentDefinitionIds,
-    );
-    if (selected == null || !mounted) return;
-    setState(() {
-      tool = EditorTool.equipment;
-      activeComponentDefinition = selected;
-      recentComponentDefinitionIds
-        ..remove(selected.id)
-        ..insert(0, selected.id);
-      if (recentComponentDefinitionIds.length > 8) {
-        recentComponentDefinitionIds.removeRange(
-          8,
-          recentComponentDefinitionIds.length,
+    try {
+      final repository = widget.catalogPreferences;
+      final preferences =
+          await repository?.load() ?? const CatalogPreferences();
+      if (!mounted) return;
+      final selected = await ComponentCatalogSheet.show(
+        context,
+        definitions: electricalSystemComponentLibrary.definitions,
+        recentDefinitionIds: preferences.recentIds,
+        favoriteDefinitionIds: preferences.favoriteIds,
+        onSetFavorite: repository?.setFavorite,
+      );
+      if (selected == null || !mounted) return;
+      await repository?.recordUse(selected.id);
+      if (!mounted) return;
+      setState(() {
+        tool = EditorTool.equipment;
+        activeComponentDefinition = selected;
+        navigationCandidate = null;
+        currentPreviewEdgeId = null;
+        measurementStart = null;
+      });
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Unable to open catalog: $error')),
         );
       }
-      navigationCandidate = null;
-      currentPreviewEdgeId = null;
-      measurementStart = null;
-    });
+    }
+  }
+
+  Future<void> runHistory(Future<void> Function() operation) async {
+    if (placingComponent) return;
+    setState(() => placingComponent = true);
+    try {
+      await operation();
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Unable to change placement: $error')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => placingComponent = false);
+    }
   }
 
   void finishComponentPlacement() {
@@ -274,6 +306,26 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
               : '${widget.room.name} · ${patch.surfaceId}',
         ),
         actions: [
+          IconButton(
+            tooltip: 'Undo placement',
+            icon: const Icon(Icons.undo),
+            onPressed:
+                !placingComponent &&
+                        widget.canUndoPlacement &&
+                        widget.onUndoPlacement != null
+                    ? () => runHistory(widget.onUndoPlacement!)
+                    : null,
+          ),
+          IconButton(
+            tooltip: 'Redo placement',
+            icon: const Icon(Icons.redo),
+            onPressed:
+                !placingComponent &&
+                        widget.canRedoPlacement &&
+                        widget.onRedoPlacement != null
+                    ? () => runHistory(widget.onRedoPlacement!)
+                    : null,
+          ),
           PopupMenuButton<String>(
             tooltip: 'Project tools',
             onSelected: (value) {

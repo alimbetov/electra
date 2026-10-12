@@ -1,3 +1,5 @@
+import 'package:electra_mobile/application/component_placement_history.dart';
+
 import 'dart:io';
 
 import 'package:drift/native.dart';
@@ -127,6 +129,52 @@ void main() {
     expect(restoredInstance.displayNameOverride, 'Bench socket');
     expect(restoredInstance.metadataOverrides['circuitHint'], 'C-12');
 
+    final history = ComponentPlacementHistory(components);
+    history.record(restoredInstance);
+    await history.undo();
+    expect(await components.loadRoomComponents(room.id), isEmpty);
+    var row = await database.select(database.componentInstances).getSingle();
+    expect(row.deletedAt, isNotNull);
+    expect(row.revision, 2);
+    final createdAt = row.createdAt;
+    await history.redo();
+    row = await database.select(database.componentInstances).getSingle();
+    expect(row.deletedAt, isNull);
+    expect(row.revision, 3);
+    expect(row.createdAt, createdAt);
+    expect(
+      (await components.loadRoomComponents(room.id)).single.id,
+      instance.id,
+    );
+    expect(
+      (await components.loadRoomComponents(room.id)).single.localPosition,
+      instance.localPosition,
+    );
+
+    // A new placement invalidates redo, without replacing another component.
+    await history.undo();
+    const second = ComponentInstance(
+      id: 'socket-002',
+      definitionId: 'system-socket-230v',
+      definitionVersion: 4,
+      roomId: 'room-components',
+      hostSurfacePatchId: 'wall-components',
+      localPosition: Point2Mm(2000, 500),
+    );
+    await components.saveComponent(second);
+    history.record(second);
+    expect(history.canRedo, isFalse);
+    await history.undo();
+    await history.redo();
+    expect((await components.loadRoomComponents(room.id)).single.id, second.id);
+    await database.close();
+    database = openDatabase();
+    components = DriftComponentInstanceRepository(
+      database,
+      originDeviceId: 'component-test-device',
+    );
+    expect((await components.loadRoomComponents(room.id)).single.id, second.id);
+
     await database.close();
     await directory.delete(recursive: true);
   });
@@ -202,6 +250,7 @@ void main() {
     );
 
     await database.customStatement('DROP TABLE component_instances');
+    await database.customStatement('DROP TABLE component_catalog_preferences');
     await database.customStatement('PRAGMA user_version = 2');
     await database.close();
 
@@ -216,7 +265,7 @@ void main() {
             .get();
     final names = tables.map((row) => row.read<String>('name')).toSet();
 
-    expect(database.schemaVersion, 3);
+    expect(database.schemaVersion, 4);
     expect(names, contains('component_instances'));
     expect(restoredGeometry.patches, hasLength(1));
     expect(restoredGeometry.patches.single.id, patch.id);

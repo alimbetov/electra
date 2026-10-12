@@ -41,6 +41,27 @@ final class DriftComponentInstanceRepository
   }
 
   @override
+  Future<void> removeComponent(String instanceId) async {
+    await database.transaction(() async {
+      final row =
+          await (database.select(database.componentInstances)..where(
+            (row) => row.id.equals(instanceId) & row.deletedAt.isNull(),
+          )).getSingleOrNull();
+      if (row == null) throw StateError('Component $instanceId is not active.');
+      final now = _clock();
+      await (database.update(database.componentInstances)
+        ..where((item) => item.id.equals(instanceId))).write(
+        ComponentInstancesCompanion(
+          revision: Value(row.revision + 1),
+          updatedAt: Value(now),
+          deletedAt: Value(now),
+          originDeviceId: Value(originDeviceId),
+        ),
+      );
+    });
+  }
+
+  @override
   Future<void> saveComponent(ComponentInstance instance) async {
     await database.transaction(() async {
       final room =

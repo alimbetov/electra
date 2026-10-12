@@ -105,6 +105,11 @@ final class _RecordingComponentRepository
   final List<ComponentInstance> saved = [];
 
   @override
+  Future<void> removeComponent(String instanceId) async {
+    saved.removeWhere((item) => item.id == instanceId);
+  }
+
+  @override
   Future<List<ComponentInstance>> loadRoomComponents(String roomId) async =>
       List.unmodifiable(saved.where((item) => item.roomId == roomId));
 
