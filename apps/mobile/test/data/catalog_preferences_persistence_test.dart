@@ -52,6 +52,8 @@ void main() {
       final file = File('${directory.path}/catalog.sqlite');
       var database = AppDatabase(NativeDatabase(file));
       await database.customSelect('SELECT 1').get();
+      await database.customStatement('DROP TABLE equipment_electrical_loads');
+      await database.customStatement('DROP TABLE consumption_groups');
       await database.customStatement(
         'DROP TABLE component_catalog_preferences',
       );

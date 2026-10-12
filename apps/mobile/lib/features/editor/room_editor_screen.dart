@@ -12,6 +12,7 @@ import '../calculations/calculations_screen.dart';
 import '../reports/reports_screen.dart';
 import 'component_catalog_sheet.dart';
 import 'editor_interaction.dart';
+import 'electrical_loads_screen.dart';
 
 typedef ComponentPlacementCallback =
     Future<void> Function(
@@ -329,7 +330,17 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
           PopupMenuButton<String>(
             tooltip: 'Project tools',
             onSelected: (value) {
-              if (value == 'calculations') {
+              if (value == 'loads') {
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder:
+                        (_) => ElectricalLoadsScreen(
+                          roomId: widget.room.id,
+                          roomName: widget.room.name,
+                        ),
+                  ),
+                );
+              } else if (value == 'calculations') {
                 Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder:
@@ -346,6 +357,10 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
             },
             itemBuilder:
                 (_) => const [
+                  PopupMenuItem(
+                    value: 'loads',
+                    child: Text('Electrical loads'),
+                  ),
                   PopupMenuItem(
                     value: 'calculations',
                     child: Text('Calculations'),

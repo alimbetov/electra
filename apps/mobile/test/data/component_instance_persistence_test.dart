@@ -249,6 +249,8 @@ void main() {
       RoomGeometrySnapshot(roomId: room.id, patches: [patch]),
     );
 
+    await database.customStatement('DROP TABLE equipment_electrical_loads');
+    await database.customStatement('DROP TABLE consumption_groups');
     await database.customStatement('DROP TABLE component_instances');
     await database.customStatement('DROP TABLE component_catalog_preferences');
     await database.customStatement('PRAGMA user_version = 2');
@@ -265,7 +267,7 @@ void main() {
             .get();
     final names = tables.map((row) => row.read<String>('name')).toSet();
 
-    expect(database.schemaVersion, 4);
+    expect(database.schemaVersion, 5);
     expect(names, contains('component_instances'));
     expect(restoredGeometry.patches, hasLength(1));
     expect(restoredGeometry.patches.single.id, patch.id);

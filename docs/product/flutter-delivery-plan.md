@@ -231,7 +231,7 @@ without switching to a 3D scene. Additional multi-patch fixtures can extend cove
 
 ## WP-FL6 — Component catalog placement
 
-**Status: IMPLEMENTED; full exact-SHA CI gate pending.**
+**Status: CLOSED. Full Flutter/core exact-SHA gate passed on `59a925e27be3b9738dd1c6aa12cf32ab5f97aab4`.**
 
 ### Implemented behavior
 
@@ -259,6 +259,25 @@ without switching to a 3D scene. Additional multi-patch fixtures can extend cove
 A component can be selected from the catalog, placed repeatedly, persisted and restored with exact host surface and local coordinates.
 
 ## WP-FL7 — Electrical loads
+
+**Status: IMPLEMENTED BASELINE; full exact-SHA CI gate pending.**
+
+### Implemented behavior
+
+- validated project electrical profiles reference exact placed component instance IDs;
+- schema v5 persists every `ElectricalLoadProfile` field as a typed column;
+- room-owned `RoomConsumptionGroup` records and optional load-to-group assignment;
+- cross-room assignments, missing/deleted equipment and invalid parameters are rejected transactionally;
+- electrical-load screen opens from Room Editor project tools, edits voltage/supply/phases/power/current/power factor/efficiency and assigns a group;
+- other profile fields are preserved during editing;
+- equipment undo hides its loads; redo restores visibility without losing profile or group identity;
+- exact profile/group close-reopen, v4-to-v5 migration and UI validation tests;
+- these persisted room groups are input records; the existing `ConsumptionGroup` panel-proposal aggregate remains a derived model for later FL8/FL15 integration.
+
+### Remaining boundary
+
+Circuit generation/design-current calculation belongs to FL8. This baseline does not infer rated power for generic catalog definitions, and does not auto-create loads for switches, junction boxes or panels. An engineer explicitly configures an equipment load. Advanced motor/profile fields are persisted but are not all exposed in the initial form.
+
 
 ### Scope
 

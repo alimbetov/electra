@@ -175,6 +175,43 @@ class ComponentCatalogPreferences extends Table {
   Set<Column<Object>> get primaryKey => {definitionId};
 }
 
+@DataClassName('ConsumptionGroupRow')
+class ConsumptionGroups extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get roomId => text().references(Rooms, #id)();
+  TextColumn get name => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('EquipmentElectricalLoadRow')
+class EquipmentElectricalLoads extends Table with GeometryAuditColumns {
+  TextColumn get componentInstanceId =>
+      text().references(ComponentInstances, #id)();
+  TextColumn get consumptionGroupId =>
+      text().nullable().references(ConsumptionGroups, #id)();
+  RealColumn get nominalVoltageV => real()();
+  IntColumn get phases => integer()();
+  TextColumn get supplySystem => text()();
+  TextColumn get phaseConfiguration => text().nullable()();
+  RealColumn get frequencyHz => real().nullable()();
+  RealColumn get ratedPowerW => real().nullable()();
+  RealColumn get ratedCurrentA => real().nullable()();
+  RealColumn get powerFactor => real().nullable()();
+  RealColumn get efficiency => real().nullable()();
+  TextColumn get startingMethod => text()();
+  RealColumn get startingCurrentFactor => real().nullable()();
+  TextColumn get loadType => text().nullable()();
+  BoolColumn get dedicatedCircuitRecommended =>
+      boolean().withDefault(const Constant(false))();
+  BoolColumn get requiresNeutral =>
+      boolean().withDefault(const Constant(false))();
+  BoolColumn get requiresProtectiveEarth =>
+      boolean().withDefault(const Constant(true))();
+  @override
+  Set<Column<Object>> get primaryKey => {componentInstanceId};
+}
+
 @DriftDatabase(
   tables: [
     Projects,
@@ -187,6 +224,8 @@ class ComponentCatalogPreferences extends Table {
     SpatialFeatures,
     ComponentInstances,
     ComponentCatalogPreferences,
+    ConsumptionGroups,
+    EquipmentElectricalLoads,
   ],
 )
 final class AppDatabase extends _$AppDatabase {
@@ -194,7 +233,7 @@ final class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'electra'));
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -219,6 +258,10 @@ final class AppDatabase extends _$AppDatabase {
         if (from < 4) {
           await migrator.createTable(componentCatalogPreferences);
         }
+        if (from < 5) {
+          await migrator.createTable(consumptionGroups);
+          await migrator.createTable(equipmentElectricalLoads);
+        }
       }
       await _createIndexes();
     },
@@ -228,6 +271,12 @@ final class AppDatabase extends _$AppDatabase {
   );
 
   Future<void> _createIndexes() async {
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_consumption_group_room ON consumption_groups(room_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_equipment_load_group ON equipment_electrical_loads(consumption_group_id)',
+    );
     await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_floor_project_order '
       'ON floors(project_id, sort_order)',
