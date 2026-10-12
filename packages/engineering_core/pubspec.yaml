@@ -1,0 +1,10 @@
+name: engineering_core
+description: Pure Dart spatial, routing and engineering domain for Electra.
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: '>=3.5.0 <4.0.0'
+
+dev_dependencies:
+  test: ^1.25.0

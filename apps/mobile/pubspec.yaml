@@ -1,0 +1,16 @@
+name: electra_mobile
+description: Electra local-first field engineering editor.
+publish_to: none
+version: 0.1.0+1
+
+environment:
+  sdk: '>=3.5.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  engineering_core:
+    path: ../../packages/engineering_core
+
+flutter:
+  uses-material-design: true
