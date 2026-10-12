@@ -9,7 +9,7 @@ void main() {
       ruleset: ElectricalRulesetRef(
         id: 'ruleset-1',
         jurisdiction: 'example',
-        standard: 'example-standard',
+        standardCode: 'example-standard',
         version: '1.0',
       ),
       circuits: [
@@ -26,8 +26,10 @@ void main() {
       ],
     );
 
-    expect(proposal.circuits.single.protectionRequirement.role,
-        FunctionalDeviceRole.mcb);
+    expect(
+      proposal.circuits.single.protectionRequirement.role,
+      FunctionalDeviceRole.mcb,
+    );
     expect(proposal.circuits.single.selectedManufacturerProductId, isNull);
   });
 }
