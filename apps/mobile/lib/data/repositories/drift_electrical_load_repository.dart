@@ -9,11 +9,7 @@ final class DriftElectricalLoadRepository implements ElectricalLoadRepository {
   final AppDatabase database;
   final String originDeviceId;
 
-  JoinedSelectStatement<
-    $EquipmentElectricalLoadsTable,
-    EquipmentElectricalLoadRow
-  >
-  _loads(String roomId) {
+  JoinedSelectStatement<HasResultSet, dynamic> _loads(String roomId) {
     final loads = database.equipmentElectricalLoads;
     final components = database.componentInstances;
     return database.select(loads).join([
