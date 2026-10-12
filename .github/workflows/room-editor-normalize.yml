@@ -1,0 +1,45 @@
+name: Normalize Room Editor Slice
+
+on:
+  push:
+    branches:
+      - feat/flutter-geometry-kernel
+
+permissions:
+  contents: write
+
+jobs:
+  normalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: feat/flutter-geometry-kernel
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Resolve dependencies
+        working-directory: apps/mobile
+        run: flutter pub get --enforce-lockfile
+
+      - name: Normalize editor slice
+        working-directory: apps/mobile
+        run: dart format lib/features/editor test/features/editor
+
+      - name: Commit normalization
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/mobile/lib/features/editor apps/mobile/test/features/editor
+          if git diff --cached --quiet; then
+            echo "Nothing to normalize"
+            exit 0
+          fi
+          git commit -m "style: normalize room editor slice"
+          git push origin HEAD:feat/flutter-geometry-kernel
