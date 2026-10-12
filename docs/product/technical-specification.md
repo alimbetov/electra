@@ -12,6 +12,9 @@ Local-first with optional privacy-preserving cloud synchronization and sharing.
 ## Initial commercial focus
 Electrical installation workflow first. HVAC, low-voltage, plumbing and heating are future domain modules built on the same geometry/editor foundation.
 
+## Language strategy
+All source code, domain names, database schema names, API contracts, enum/code values and technical documentation are English-first. User-facing strings must be localization-ready from the beginning. Domain codes remain language-neutral, for example `BATHROOM`, while display names are localized later.
+
 ## Core editor
 
 The editor operates as a field-oriented CAD-lite tool:
@@ -28,6 +31,78 @@ The editor operates as a field-oriented CAD-lite tool:
 - room default/custom heights;
 - point installation height;
 - mounting surface independent from cable routing plane.
+
+The UI is 2D, but the engineering model is 2.5D: persisted engineering objects may carry `x`, `y` and `z` coordinates in millimetres.
+
+## Room classification
+
+A room is not identified only by a free-form name. It has a semantic category and type that can drive engineering defaults and future rule profiles.
+
+### RoomCategory
+
+- `RESIDENTIAL`
+- `WET`
+- `TECHNICAL`
+- `COMMERCIAL`
+- `OUTDOOR`
+- `OTHER`
+
+### Initial RoomType codes
+
+Residential:
+- `LIVING_ROOM`
+- `BEDROOM`
+- `KITCHEN`
+- `DINING_ROOM`
+- `HALLWAY`
+- `WARDROBE`
+
+Wet:
+- `BATHROOM`
+- `TOILET`
+- `SHOWER`
+- `LAUNDRY`
+
+Technical:
+- `GARAGE`
+- `BOILER_ROOM`
+- `ELECTRICAL_ROOM`
+- `SERVER_ROOM`
+- `STORAGE`
+
+Commercial:
+- `OFFICE`
+- `SHOP`
+- `WAREHOUSE`
+- `WORKSHOP`
+
+Outdoor:
+- `BALCONY`
+- `TERRACE`
+- `YARD`
+- `FACADE`
+
+Extensibility:
+- `CUSTOM`
+
+Room type must be modeled as a data-driven definition so that recommended devices, defaults and future engineering rule profiles can be associated with the room without hardcoding every behavior into UI code.
+
+## Room height model
+
+```text
+Project defaults
+  -> Floor defaults
+    -> Room overrides
+```
+
+The model distinguishes at least:
+
+- structural height;
+- finished ceiling height;
+- per-room overrides;
+- per-device installation height.
+
+Effective values are resolved by inheritance. Structural and finished ceiling heights may diverge.
 
 ## Engineering objects
 
@@ -63,30 +138,158 @@ The editor operates as a field-oriented CAD-lite tool:
 - fans;
 - smart relays and sensors.
 
-Equipment definitions must be extensible and user-customizable.
+Equipment definitions must be extensible and user-customizable through a `DeviceDefinition`-style catalog. Definitions may include category, default mounting surface, default installation height, nominal power, circuit recommendations and icon metadata.
 
-## Routing
+### Mounting surfaces
 
-Supported route concepts include:
+- `WALL`
+- `CEILING`
+- `FLOOR`
+- `FURNITURE`
+- `FREE`
 
-- ceiling;
-- floor screed;
-- wall/chase;
-- tray;
-- conduit;
-- custom routing.
+Mounting surface describes where an object is physically installed. It is independent from the physical path used by its cable.
 
-Route geometry is stored as explicit route segments. Cable length includes horizontal path, vertical drops/rises and configurable reserve/termination allowance.
+## Cable routing domain
 
-## Room height model
+`Circuit.calculatedLength` must not be treated as primary route data. Physical routing is represented explicitly as a graph.
 
 ```text
-Project default structural/ceiling height
-  -> Floor default override
-    -> Room custom override
+Circuit
+  -> CableRun
+      -> Route
+          -> RouteNode[]
+          -> RouteSegment[]
 ```
 
-The effective room height is resolved by inheritance. Structural height and finished ceiling height may diverge and should remain separate concepts.
+### RouteNode
+
+A route node represents a significant routing position with `xMm`, `yMm`, `zMm`.
+
+Initial node types:
+
+- `ENDPOINT`
+- `BEND`
+- `JUNCTION`
+- `TRANSITION`
+- `ENTRY`
+- `EXIT`
+- `RISER`
+
+Bend nodes may be inferred automatically from adjacent segment geometry where possible.
+
+### RouteSegment
+
+A segment connects two route nodes and stores the physical path between them.
+
+Important properties:
+
+- `fromNodeId`;
+- `toNodeId`;
+- `layingMethod`;
+- `mountingSurface` or route plane;
+- calculated geometric length;
+- optional physical channel reference;
+- conduit requirement/default metadata.
+
+A single cable may transition across different segment methods, for example tray -> ceiling conduit -> wall chase -> device.
+
+### Laying methods / route channels
+
+Initial concepts:
+
+- `CEILING_FREE`
+- `CONDUIT`
+- `FLOOR_SCREED`
+- `WALL_CHASE`
+- `CABLE_TRAY`
+- `DUCT`
+- `SURFACE_MOUNTED`
+- `UNDERGROUND`
+- `CUSTOM`
+
+### Route transitions
+
+Engineering relationships between consecutive segments may include:
+
+- straight continuation;
+- 90-degree bend;
+- custom bend;
+- vertical rise;
+- vertical drop;
+- surface transition;
+- room transition;
+- floor transition.
+
+These can be inferred where deterministic, but must remain representable in the domain.
+
+## CableRun
+
+A `CableRun` is the physical cable instance between electrical endpoints. It belongs to a circuit and references its route.
+
+Representative properties:
+
+- circuit;
+- cable type;
+- conductor count;
+- cross-section;
+- source endpoint;
+- destination endpoint;
+- route;
+- reserve percentage;
+- termination allowance;
+- calculated total length.
+
+The total cable length is derived from route geometry plus configured reserve and termination allowances.
+
+## Junctions and distribution nodes
+
+A junction is not merely a bend. Junction-specific semantics must be represented for branching/distribution.
+
+Initial junction types:
+
+- `JUNCTION_BOX`
+- `DISTRIBUTION_BOX`
+- `TEE`
+- `SPLITTER`
+- `TERMINAL_BOX`
+- `PANEL_ENTRY`
+- `FLOOR_BOX`
+- `CEILING_BOX`
+
+Junction metadata may include box type, dimensions, accessibility, mounting surface and installation height.
+
+## Conduit and shared physical channels
+
+Conduit must not be modeled only as `conduitRequired = true` on a cable. Multiple cable runs may share a physical conduit or tray.
+
+```text
+ConduitRun
+  -> CableRun[]
+```
+
+Representative conduit properties:
+
+- type/material;
+- nominal diameter;
+- allowed fill percentage;
+- calculated fill percentage;
+- route/segment association.
+
+This enables future conduit fill validation, BOM calculation and shared-route optimization.
+
+## Editor routing UX
+
+The same room supports multiple views over the same data:
+
+- Plan;
+- Ceiling;
+- Floor;
+- Wall elevation.
+
+Routing mode creates route nodes and segments from taps/drag operations. The UI should automatically infer common bends and convert intersecting/branching topology into junction semantics when possible.
+
+Route rendering must distinguish laying methods using more than color alone, for example line pattern plus icon/legend, so printed and monochrome documentation remains understandable.
 
 ## Electrical module
 
@@ -104,7 +307,9 @@ Calculation rules must be versioned and isolated from UI code.
 
 ## Local data
 
-SQLite/Drift stores structured project information. Heavy files remain in the filesystem. A user may keep hundreds or thousands of local projects; project_id acts as the logical partition key and indexes are designed around project/floor/room access patterns.
+SQLite/Drift stores structured project information. Heavy files remain in the filesystem. A user may keep hundreds or thousands of local projects; `project_id` acts as the logical partition key and indexes are designed around project/floor/room access patterns.
+
+Route nodes, route segments, cable runs, conduit runs and junctions are persisted as normalized entities rather than a single route JSON blob so that geometry, BOM and validation can query them efficiently.
 
 ## Cloud sharing
 
@@ -121,12 +326,13 @@ Project PII sharing is controlled separately from technical documentation sharin
 ## MVP vertical slice
 
 1. Create project.
-2. Create floor and room with exact dimensions.
+2. Create floor and room with exact dimensions and semantic room type.
 3. Add walls/openings and room height.
-4. Add sockets/switches/lights/equipment with installation height.
-5. Create a circuit.
-6. Route cable through ceiling/floor/wall.
-7. Calculate length and basic protection/cable recommendation.
-8. Generate BOM.
-9. Generate labels/QR.
-10. Export professional PDF.
+4. Add sockets/switches/lights/equipment with installation height and mounting surface.
+5. Create a circuit and physical cable run.
+6. Route cable with explicit bend/transition nodes through ceiling/floor/wall.
+7. Support at least one junction branch and optional conduit assignment.
+8. Calculate route/cable length and basic protection/cable recommendation.
+9. Generate BOM.
+10. Generate labels/QR.
+11. Export professional PDF.
