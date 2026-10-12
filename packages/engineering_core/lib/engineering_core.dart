@@ -11,3 +11,4 @@ export 'src/panel_generation.dart';
 export 'src/recalculation.dart';
 export 'src/routing_junction.dart';
 export 'src/spatial_geometry.dart';
+export 'src/surface_navigation.dart';
