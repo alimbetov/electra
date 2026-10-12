@@ -2,15 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/providers.dart';
-import '../../domain/models.dart';
 import 'room_editor_screen.dart';
 
-/// Route boundary for the legacy room editor presentation.
+/// Persistent route boundary for the Room Editor.
 ///
-/// Canonical project and room state is loaded from SQLite-backed repository
-/// streams. The temporary [ProjectDraft]/[RoomDraft] adaptation exists only at
-/// the presentation boundary until WP-FL4 migrates the editor to canonical
-/// records directly.
+/// Project, floor, room and geometry are loaded from SQLite-backed repository
+/// streams. Only ephemeral editor state lives inside [RoomEditorScreen].
 class PersistedRoomEditorScreen extends ConsumerWidget {
   const PersistedRoomEditorScreen({
     super.key,
@@ -28,6 +25,7 @@ class PersistedRoomEditorScreen extends ConsumerWidget {
     final projectAsync = ref.watch(projectProvider(projectId));
     final floorAsync = ref.watch(floorProvider(floorId));
     final roomAsync = ref.watch(roomProvider(roomId));
+    final geometryAsync = ref.watch(roomGeometryProvider(roomId));
 
     return projectAsync.when(
       loading: () => const _LoadingScaffold(),
@@ -52,27 +50,13 @@ class PersistedRoomEditorScreen extends ConsumerWidget {
                     error: 'Room context is invalid.',
                   );
                 }
-
-                return RoomEditorScreen(
-                  project: ProjectDraft(
-                    id: project.id,
-                    name: project.name,
-                    reference: project.reference,
-                    measurementSystem: project.measurementSystem,
-                    defaultStructuralHeightMm:
-                        project.defaultStructuralHeightMm,
-                    defaultFinishedCeilingHeightMm:
-                        project.defaultFinishedCeilingHeightMm,
-                  ),
-                  room: RoomDraft(
-                    id: room.id,
-                    name: room.name,
-                    type: room.type,
-                    widthMm: room.widthMm,
-                    depthMm: room.depthMm,
-                    structuralHeightMmOverride: room.structuralHeightMmOverride,
-                    finishedCeilingHeightMmOverride:
-                        room.finishedCeilingHeightMmOverride,
+                return geometryAsync.when(
+                  loading: () => const _LoadingScaffold(),
+                  error: (error, stackTrace) => _ErrorScaffold(error: error),
+                  data: (geometry) => RoomEditorScreen(
+                    project: project,
+                    room: room,
+                    geometry: geometry,
                   ),
                 );
               },
