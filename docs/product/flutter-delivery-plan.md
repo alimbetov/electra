@@ -61,7 +61,7 @@ The same persisted project is usable on compact, medium and expanded layouts wit
 
 ## WP-FL3 — Geometry kernel integration
 
-**Implementation status: complete in `feat/flutter-geometry-kernel`; exact-HEAD CI is the closure gate.**
+**Status: CLOSED. Exact-SHA gate passed on `2bdb1545666216a940c221005b6801e003c49e53`; later Room Editor gates continue to execute the same kernel/persistence suite.**
 
 ### Scope
 
@@ -96,6 +96,7 @@ The FL3 gate requires at minimum:
 - world/local transform reversibility within tolerance;
 - opening and feature containment inside the host patch;
 - valid patch/edge/adjacency references;
+- adjacent patch edges represent the same physical world-space segment within tolerance;
 - declared surface orientation consistent with the local-frame normal;
 - duplicate patch/edge identifiers reported by validation.
 
@@ -114,6 +115,15 @@ spatial_features
 ```
 
 alongside the existing Project/Floor/Room hierarchy.
+
+Geometry replacement preserves version metadata:
+
+```text
+create    revision 1
+update    revision +1, preserve createdAt
+tombstone revision +1, set deletedAt
+restore   revision +1, clear deletedAt
+```
 
 ### Acceptance
 
@@ -137,26 +147,34 @@ schema v1 hierarchy data
 → create geometry tables and indexes
 ```
 
-No Room Editor work starts until the permanent CI workflow is green on the exact branch HEAD.
-
 ## WP-FL4 — Room Editor shell
 
-### Scope
+**Status: BASELINE GREEN. Exact-SHA gate passed on `81f95f351fff83dfb1b6b89a9ade372ab53db134`.**
 
-- room route and persistent room context;
-- engineering canvas driven from `roomGeometryProvider`;
+### Implemented baseline
+
+- canonical persisted `ProjectRecord` / `RoomRecord` route context;
+- engineering canvas driven from `roomGeometryProvider` and `RoomGeometrySnapshot`;
+- technical linework from persisted `SurfacePatch`, `Opening` and `SpatialFeature` geometry;
+- millimetre-to-viewport transform isolated from persisted geometry;
 - pan/zoom;
-- select tool;
-- measure tool;
-- context panel;
-- bottom sheet in compact mode;
-- desktop inspector in expanded mode;
-- undo/redo command layer;
-- technical linework renderer using geometry-domain data only.
+- deterministic Select hit-testing;
+- selection overlay and contextual inspector state;
+- deterministic two-point Measure tool in millimetres;
+- compact context bar with bottom-sheet inspector;
+- expanded side inspector;
+- reversible command-history abstraction with undo/redo regression tests;
+- pure interaction tests and widget-level Select/Measure flow tests.
+
+### Remaining FL4 boundary
+
+The command history is deliberately not attached to fake geometry mutations. Undo/redo controls become active when the first real placement/edit command is introduced. Mutation tools must execute reversible commands and persist canonical snapshots through repository/application boundaries rather than modifying widget-owned collections.
 
 ### Acceptance
 
-The same persisted room can be opened, selected, measured and navigated using touch and mouse without mutating geometry accidentally. Closing and reopening the application must render the same geometry from SQLite.
+The same persisted room can be opened, selected, measured and navigated using touch and mouse without mutating geometry accidentally. Closing and reopening the application renders the same geometry from SQLite.
+
+The baseline acceptance is covered by the FL3 SQLite round-trip tests plus FL4 pure interaction and widget tests. Further geometry mutation acceptance belongs to the first real placement/edit work package rather than to a demo-only editor mutation.
 
 ## WP-FL5 — Edge-driven surface navigation
 
