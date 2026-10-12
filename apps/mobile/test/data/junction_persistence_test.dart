@@ -246,7 +246,16 @@ void main() {
         const Point2Mm(1100, 1000),
         const Point2Mm(2100, 1000),
       );
+      final reviewEvent = repository
+          .watchRoomRouting(room.id)
+          .firstWhere(
+            (state) =>
+                state.junctions.isNotEmpty &&
+                state.junctionIssues(state.junctions.single).isNotEmpty,
+          )
+          .timeout(const Duration(seconds: 5));
       await repository.saveRouteWithRun(route: moved, run: run(moved));
+      expect((await reviewEvent).junctions.single.isBranching, isTrue);
       snapshot = await repository.loadRoomRouting(room.id);
       expect(snapshot.junctionIssues(snapshot.junctions.single), isNotEmpty);
       expect(snapshot.junctions.single.connections.length, 3);

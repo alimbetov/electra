@@ -95,9 +95,18 @@ void main() {
           ),
         ),
       );
+      await tester.scrollUntilVisible(
+        find.text('Open route').first,
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
       await tester.tap(find.text('Open route').first);
       expect(opened?.id, 'in');
-      await tester.scrollUntilVisible(find.text('Save junction'), 300);
+      await tester.scrollUntilVisible(
+        find.text('Save junction'),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
       await tester.tap(find.text('Save junction'));
       await tester.pumpAndSettle();
       expect(find.textContaining('write failed'), findsOneWidget);

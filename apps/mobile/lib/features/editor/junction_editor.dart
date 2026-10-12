@@ -142,12 +142,44 @@ class _JunctionEditorState extends State<JunctionEditor> {
           ),
         ),
         if (widget.junction != null) ...[
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Branch schematic'),
+                  for (final c in widget.junction!.incoming)
+                    Text(
+                      '${c.runId} → ${widget.junction!.code} · ${c.circuitOrNetworkId ?? "unassigned"}',
+                    ),
+                  for (final c in widget.junction!.outgoing)
+                    Text(
+                      '${widget.junction!.code} → ${c.runId} · ${c.circuitOrNetworkId ?? "unassigned"}',
+                    ),
+                ],
+              ),
+            ),
+          ),
+
           Text(
             'Surface: ${widget.junction!.surfacePatchId} · ${widget.junction!.xMm}, ${widget.junction!.yMm}, ${widget.junction!.zMm} mm',
           ),
           for (final issue in widget.snapshot.junctionIssues(widget.junction!))
             Text(issue, style: const TextStyle(color: Colors.red)),
         ],
+        for (final id in selected.keys.where(
+          (id) => !widget.snapshot.runs.any((run) => run.id == id),
+        ))
+          ListTile(
+            title: Text('Missing run: $id'),
+            trailing: IconButton(
+              tooltip: 'Remove missing connection',
+              onPressed:
+                  saving ? null : () => setState(() => selected.remove(id)),
+              icon: const Icon(Icons.link_off),
+            ),
+          ),
         for (final run in widget.snapshot.runs)
           Card(
             child: Padding(
