@@ -215,6 +215,11 @@ void main() {
     );
     await tester.tap(find.text('DB-01 · Panel'));
     await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('Trace: 2 runs · 1 source panels'),
+      -200,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text('Trace: 2 runs · 1 source panels'), findsOneWidget);
     await tester.scrollUntilVisible(
       find.text('Workshop'),
@@ -231,6 +236,11 @@ void main() {
     await tester.tap(find.byTooltip('Open room route'));
     await tester.pump();
     expect(opened?.id, 'Workshop');
+    await tester.scrollUntilVisible(
+      find.text('Trace: 2 runs · 1 source panels'),
+      -200,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text('Trace: 2 runs · 1 source panels'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });

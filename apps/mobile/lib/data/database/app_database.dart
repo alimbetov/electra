@@ -474,6 +474,13 @@ final class AppDatabase extends _$AppDatabase {
 
   Future<void> _createIndexes() async {
     await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_floor_routing_panel ON floor_routing_panels(floor_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_floor_routing_handoff ON floor_routing_handoffs(floor_id)',
+    );
+
+    await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_cable_route_room ON cable_routes(room_id)',
     );
     await customStatement(

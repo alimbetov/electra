@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'dart:async';
 import 'package:drift/native.dart';
 import 'package:electra_mobile/application/geometry_repository.dart';
+import 'package:electra_mobile/application/floor_routing_repository.dart';
 import 'package:electra_mobile/data/repositories/drift_floor_routing_repository.dart';
 import 'package:electra_mobile/application/id_generator.dart';
 import 'package:electra_mobile/application/project_hierarchy_service.dart';
@@ -318,10 +320,18 @@ void main() {
           await (database.select(database.floorRoutingPanels)
             ..where((r) => r.id.equals('panel'))).getSingle();
       expect(panelRow.revision, 2);
-      final review = floorRepository
-          .watch(floor.id)
-          .firstWhere((s) => s.graph().issues.containsKey('handoff:handoff'))
-          .timeout(const Duration(seconds: 5));
+      final events = StreamIterator(floorRepository.watch(floor.id));
+      expect(await events.moveNext(), isTrue);
+      expect(events.current.graph().issues, isEmpty);
+      Future<FloorRoutingSnapshot> waitForReview() async {
+        while (await events.moveNext()) {
+          if (events.current.graph().issues.containsKey('handoff:handoff'))
+            return events.current;
+        }
+        throw StateError('Floor watch ended without review.');
+      }
+
+      final review = waitForReview().timeout(const Duration(seconds: 5));
       final moved = path(b.id, secondPatch, channelB, start: 200);
       await repository.saveRouteWithRun(route: moved, run: run(moved));
       expect(
@@ -331,6 +341,7 @@ void main() {
             .panelIds,
         isEmpty,
       );
+      await events.cancel();
       await floorRepository.deleteHandoff('handoff');
       await floorRepository.deletePanel('panel');
       snapshot = await floorRepository.load(floor.id);
@@ -350,6 +361,8 @@ void main() {
       expect(snapshot.graph().runs.length, 2);
       expect(snapshot.panels, isEmpty);
       expect(database.schemaVersion, 9);
+      await DriftProjectHierarchyRepository(database).deleteProject(project.id);
+      expect((await floorRepository.load(floor.id)).floor, isNull);
       await database.close();
       await directory.delete(recursive: true);
     },
