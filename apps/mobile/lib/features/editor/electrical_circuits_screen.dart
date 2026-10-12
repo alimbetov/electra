@@ -435,7 +435,8 @@ class _ElectricalCircuitDialogState extends State<ElectricalCircuitDialog> {
                                       null &&
                                   widget.assignedCircuitIds[load
                                           .componentInstanceId] !=
-                                      widget.circuitId)
+                                      widget.circuitId &&
+                                  !selected.contains(load.componentInstanceId))
                           ? null
                           : (value) => setState(() {
                             if (value == true)

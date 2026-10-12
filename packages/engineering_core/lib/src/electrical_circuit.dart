@@ -133,6 +133,8 @@ abstract final class CircuitCurrentCalculator {
     final seen = <String>{};
     final signatureLoads = <Object?>[];
     var total = 0.0;
+    PhaseConfiguration? phaseIdentity;
+    double? frequency;
     for (final id in ids) {
       final load = byId[id];
       if (!seen.add(id)) {
@@ -154,6 +156,8 @@ abstract final class CircuitCurrentCalculator {
         profile.nominalVoltageV,
         profile.phases,
         profile.supplySystem.name,
+        profile.phaseConfiguration?.name,
+        profile.frequencyHz,
         profile.ratedCurrentA,
         profile.ratedPowerW,
         profile.powerFactor,
@@ -175,6 +179,40 @@ abstract final class CircuitCurrentCalculator {
         continue;
       }
       if (!supported) continue;
+      final configuration = profile.phaseConfiguration;
+      final dc = profile.supplySystem == SupplySystem.directCurrent;
+      if (configuration != null && configuration != PhaseConfiguration.custom) {
+        final threePhase = configuration == PhaseConfiguration.l1L2L3 ||
+            configuration == PhaseConfiguration.l1L2L3N;
+        if ((profile.phases == 3 && !threePhase) ||
+            (profile.phases == 1 && threePhase) ||
+            (dc != (configuration == PhaseConfiguration.dcPosNeg))) {
+          issues.add(CircuitIssue('INCOMPATIBLE_PHASE_CONFIGURATION',
+              'Check the load phase configuration against its supply.',
+              loadId: id));
+          continue;
+        }
+        if (!dc && profile.phases == 1) {
+          if (phaseIdentity != null && phaseIdentity != configuration) {
+            issues.add(CircuitIssue('MIXED_PHASE_CONFIGURATION',
+                'Loads on different known phases cannot share this single-phase circuit.',
+                loadId: id));
+            continue;
+          }
+          phaseIdentity = configuration;
+        }
+      }
+      if (!dc && profile.frequencyHz != null) {
+        if (frequency != null &&
+            (frequency - profile.frequencyHz!).abs() > 1e-6) {
+          issues.add(CircuitIssue('MIXED_FREQUENCY',
+              'Assigned AC loads must have compatible frequencies.',
+              loadId: id));
+          continue;
+        }
+        frequency = profile.frequencyHz;
+      }
+
       double current;
       String formula;
       if (profile.ratedCurrentA != null) {

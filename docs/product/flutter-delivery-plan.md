@@ -292,7 +292,7 @@ Loads are persisted and traceable back to equipment instances.
 
 ## WP-FL8 — Circuits
 
-**Status: IMPLEMENTED BASELINE; exact-SHA CI gate pending.**
+**Status: BASELINE CLOSED. Initial full Flutter/core exact-SHA gate passed on `27ba2e62cedb5a27f8d7c732a4be6626bbaad645`; subsequent changes run the same gate.**
 
 ### Implemented behavior
 
@@ -303,6 +303,7 @@ Loads are persisted and traceable back to equipment instances.
 - circuit/assignment replacement is transactional; missing, inactive, cross-room and already-assigned loads are rejected without partial writes;
 - demand factor kD is persisted explicitly in (0, 1]; default 1 is visible and editable;
 - rated current takes priority; otherwise single-phase AC, balanced three-phase AC and DC use explicit voltage/power inputs;
+- explicitly conflicting AC phase configurations/frequencies block calculation and invalidate confirmation;
 - AC requires power factor; mechanical output power additionally requires efficiency; no implicit unity PF/efficiency and no partial total when inputs are incomplete;
 - `Ib = kD * sum(load current magnitudes)` is a conservative aggregation, not vector or phase-balancing analysis;
 - result/evidence are recomputed from current SQLite data and are not saved as authoritative current values;

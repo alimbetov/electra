@@ -40,6 +40,43 @@ EquipmentElectricalLoad load(
             efficiency: efficiency));
 
 void main() {
+  test(
+      'known phase and frequency conflicts block confirmation and affect freshness',
+      () {
+    EquipmentElectricalLoad configured(
+            String id, PhaseConfiguration configuration, double frequency) =>
+        EquipmentElectricalLoad(
+            componentInstanceId: id,
+            profile: ElectricalLoadProfile(
+                nominalVoltageV: 230,
+                phases: 1,
+                ratedCurrentA: 10,
+                phaseConfiguration: configuration,
+                frequencyHz: frequency));
+    final proposal = circuit(ids: ['a', 'b']);
+    final normal = CircuitCurrentCalculator.calculate(proposal, [
+      configured('a', PhaseConfiguration.l1N, 50),
+      configured('b', PhaseConfiguration.l1N, 50)
+    ]);
+    expect(normal.designCurrentA, 20);
+    final phases = CircuitCurrentCalculator.calculate(proposal, [
+      configured('a', PhaseConfiguration.l1N, 50),
+      configured('b', PhaseConfiguration.l2N, 50)
+    ]);
+    expect(phases.designCurrentA, isNull);
+    expect(phases.issues.single.code, 'MIXED_PHASE_CONFIGURATION');
+    expect(phases.inputSignature, isNot(normal.inputSignature));
+    final frequencies = CircuitCurrentCalculator.calculate(proposal, [
+      configured('a', PhaseConfiguration.l1N, 50),
+      configured('b', PhaseConfiguration.l1N, 60)
+    ]);
+    expect(frequencies.designCurrentA, isNull);
+    expect(frequencies.issues.single.code, 'MIXED_FREQUENCY');
+    final invalid = CircuitCurrentCalculator.calculate(
+        circuit(), [configured('load', PhaseConfiguration.l1L2L3, 50)]);
+    expect(invalid.issues.single.code, 'INCOMPATIBLE_PHASE_CONFIGURATION');
+  });
+
   test('single phase input power uses PF and never double-applies efficiency',
       () {
     final result =

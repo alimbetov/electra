@@ -4,6 +4,128 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  testWidgets(
+    'compact three-phase group form remains usable without overflow',
+    (tester) async {
+      await tester.binding.setSurfaceSize(const Size(390, 844));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder:
+                  (context) => TextButton(
+                    onPressed:
+                        () => showDialog<void>(
+                          context: context,
+                          builder:
+                              (_) => ElectricalCircuitDialog(
+                                circuitId: 'circuit',
+                                roomId: 'room',
+                                sourceGroup: const RoomConsumptionGroup(
+                                  id: 'group',
+                                  roomId: 'room',
+                                  name: 'Motors',
+                                ),
+                                loads: const [
+                                  EquipmentElectricalLoad(
+                                    componentInstanceId: 'motor',
+                                    consumptionGroupId: 'group',
+                                    profile: ElectricalLoadProfile(
+                                      nominalVoltageV: 400,
+                                      phases: 3,
+                                      supplySystem: SupplySystem.threePhaseAc,
+                                      ratedCurrentA: 15,
+                                    ),
+                                  ),
+                                ],
+                                onSave: (_) async {},
+                              ),
+                        ),
+                    child: const Text('Open circuits'),
+                  ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('Open circuits'));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      expect(find.text('Balanced three-phase AC'), findsOneWidget);
+      await tester.tap(find.text('Save circuit'));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      expect(find.text('Save circuit'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'group conflicts can be deselected without stealing the assignment',
+    (tester) async {
+      await tester.binding.setSurfaceSize(const Size(1000, 900));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      final saved = <ElectricalCircuit>[];
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder:
+                  (context) => TextButton(
+                    onPressed:
+                        () => showDialog<void>(
+                          context: context,
+                          builder:
+                              (_) => ElectricalCircuitDialog(
+                                circuitId: 'new-circuit',
+                                roomId: 'room',
+                                sourceGroup: const RoomConsumptionGroup(
+                                  id: 'group',
+                                  roomId: 'room',
+                                  name: 'Sockets',
+                                ),
+                                loads: const [
+                                  EquipmentElectricalLoad(
+                                    componentInstanceId: 'socket',
+                                    consumptionGroupId: 'group',
+                                    profile: ElectricalLoadProfile(
+                                      nominalVoltageV: 230,
+                                      phases: 1,
+                                      ratedCurrentA: 10,
+                                    ),
+                                  ),
+                                ],
+                                assignedCircuitIds: const {
+                                  'socket': 'other-circuit',
+                                },
+                                onSave: (value) async => saved.add(value),
+                              ),
+                        ),
+                    child: const Text('From group'),
+                  ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('From group'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(CheckboxListTile));
+      await tester.pump();
+      expect(
+        tester.widget<CheckboxListTile>(find.byType(CheckboxListTile)).value,
+        isFalse,
+      );
+      expect(
+        tester
+            .widget<CheckboxListTile>(find.byType(CheckboxListTile))
+            .onChanged,
+        isNull,
+      );
+      await tester.tap(find.text('Save circuit'));
+      await tester.pump();
+      expect(saved.single.loadIds, isEmpty);
+    },
+  );
+
   const group = RoomConsumptionGroup(
     id: 'group',
     roomId: 'room',
