@@ -47,3 +47,5 @@ jobs:
           fi
           git commit -m "style: normalize geometry kernel changes"
           git push origin HEAD:feat/flutter-geometry-kernel
+
+# Temporary geometry normalization gate; remove after the formatter commit.
