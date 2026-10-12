@@ -1,6 +1,10 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
+import '../../application/geometry_repository.dart';
 import '../../domain/models.dart';
+import '../../domain/project_models.dart';
 import '../calculations/calculations_screen.dart';
 import '../reports/reports_screen.dart';
 
@@ -9,10 +13,12 @@ class RoomEditorScreen extends StatefulWidget {
     super.key,
     required this.project,
     required this.room,
+    required this.geometry,
   });
 
-  final ProjectDraft project;
-  final RoomDraft room;
+  final ProjectRecord project;
+  final RoomRecord room;
+  final RoomGeometrySnapshot geometry;
 
   @override
   State<RoomEditorScreen> createState() => _RoomEditorScreenState();
@@ -22,21 +28,37 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
   EditorTool tool = EditorTool.select;
   Discipline discipline = Discipline.electrical;
   ArchitecturalFeatureType? featureType;
-  String activeSurface = 'Wall A';
+  String? activePatchId;
 
   int get ceilingHeight =>
       widget.room.finishedCeilingHeightMmOverride ??
       widget.project.defaultFinishedCeilingHeightMm;
 
-  void switchSurface(String surface) {
-    setState(() => activeSurface = surface);
+  SurfacePatch? get activePatch {
+    if (widget.geometry.patches.isEmpty) return null;
+    final requested = activePatchId;
+    if (requested != null) {
+      for (final patch in widget.geometry.patches) {
+        if (patch.id == requested) return patch;
+      }
+    }
+    return widget.geometry.patches.first;
+  }
+
+  void selectPatch(String patchId) {
+    setState(() => activePatchId = patchId);
   }
 
   @override
   Widget build(BuildContext context) {
+    final patch = activePatch;
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.room.name} · $activeSurface'),
+        title: Text(
+          patch == null
+              ? widget.room.name
+              : '${widget.room.name} · ${patch.surfaceId}',
+        ),
         actions: [
           PopupMenuButton<String>(
             tooltip: 'Project tools',
@@ -44,8 +66,7 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
               if (value == 'calculations') {
                 Navigator.of(context).push(
                   MaterialPageRoute<void>(
-                    builder:
-                        (_) => CalculationsScreen(roomName: widget.room.name),
+                    builder: (_) => CalculationsScreen(roomName: widget.room.name),
                   ),
                 );
               } else if (value == 'reports') {
@@ -56,14 +77,13 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
                 );
               }
             },
-            itemBuilder:
-                (_) => const [
-                  PopupMenuItem(
-                    value: 'calculations',
-                    child: Text('Calculations'),
-                  ),
-                  PopupMenuItem(value: 'reports', child: Text('Reports')),
-                ],
+            itemBuilder: (_) => const [
+              PopupMenuItem(
+                value: 'calculations',
+                child: Text('Calculations'),
+              ),
+              PopupMenuItem(value: 'reports', child: Text('Reports')),
+            ],
           ),
         ],
       ),
@@ -71,16 +91,17 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
         builder: (context, constraints) {
           final wide = constraints.maxWidth >= 900;
           final editor = _EditorCanvasShell(
-            room: widget.room,
-            activeSurface: activeSurface,
+            geometry: widget.geometry,
+            activePatch: patch,
             ceilingHeightMm: ceilingHeight,
-            onSurfaceTap: switchSurface,
+            onPatchTap: selectPatch,
             featureType: featureType,
           );
           final inspector = _Inspector(
             project: widget.project,
             room: widget.room,
-            activeSurface: activeSurface,
+            geometry: widget.geometry,
+            activePatch: patch,
             discipline: discipline,
           );
 
@@ -89,35 +110,33 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
               _EditorToolbar(
                 tool: tool,
                 discipline: discipline,
-                onToolChanged:
-                    (value) => setState(() {
-                      tool = value;
-                      if (value != EditorTool.architecturalFeature)
-                        featureType = null;
-                    }),
-                onDisciplineChanged:
-                    (value) => setState(() => discipline = value),
-                onFeatureChanged:
-                    (value) => setState(() {
-                      tool = EditorTool.architecturalFeature;
-                      featureType = value;
-                    }),
+                onToolChanged: (value) => setState(() {
+                  tool = value;
+                  if (value != EditorTool.architecturalFeature) {
+                    featureType = null;
+                  }
+                }),
+                onDisciplineChanged: (value) =>
+                    setState(() => discipline = value),
+                onFeatureChanged: (value) => setState(() {
+                  tool = EditorTool.architecturalFeature;
+                  featureType = value;
+                }),
               ),
               Expanded(
-                child:
-                    wide
-                        ? Row(
-                          children: [
-                            Expanded(child: editor),
-                            SizedBox(width: 300, child: inspector),
-                          ],
-                        )
-                        : Column(
-                          children: [
-                            Expanded(child: editor),
-                            SizedBox(height: 190, child: inspector),
-                          ],
-                        ),
+                child: wide
+                    ? Row(
+                        children: [
+                          Expanded(child: editor),
+                          SizedBox(width: 320, child: inspector),
+                        ],
+                      )
+                    : Column(
+                        children: [
+                          Expanded(child: editor),
+                          SizedBox(height: 210, child: inspector),
+                        ],
+                      ),
               ),
             ],
           );
@@ -163,15 +182,14 @@ class _EditorToolbar extends StatelessWidget {
             const SizedBox(width: 12),
             DropdownButton<Discipline>(
               value: discipline,
-              items:
-                  Discipline.values
-                      .map(
-                        (value) => DropdownMenuItem(
-                          value: value,
-                          child: Text(value.name),
-                        ),
-                      )
-                      .toList(),
+              items: Discipline.values
+                  .map(
+                    (value) => DropdownMenuItem(
+                      value: value,
+                      child: Text(value.name),
+                    ),
+                  )
+                  .toList(),
               onChanged: (value) {
                 if (value != null) onDisciplineChanged(value);
               },
@@ -180,16 +198,14 @@ class _EditorToolbar extends StatelessWidget {
             PopupMenuButton<ArchitecturalFeatureType>(
               tooltip: 'Add opening / feature',
               onSelected: onFeatureChanged,
-              itemBuilder:
-                  (_) =>
-                      ArchitecturalFeatureType.values
-                          .map(
-                            (value) => PopupMenuItem(
-                              value: value,
-                              child: Text(value.name),
-                            ),
-                          )
-                          .toList(),
+              itemBuilder: (_) => ArchitecturalFeatureType.values
+                  .map(
+                    (value) => PopupMenuItem(
+                      value: value,
+                      child: Text(value.name),
+                    ),
+                  )
+                  .toList(),
               child: const Chip(
                 avatar: Icon(Icons.architecture, size: 18),
                 label: Text('Door / Window / Beam...'),
@@ -204,81 +220,88 @@ class _EditorToolbar extends StatelessWidget {
 
 class _EditorCanvasShell extends StatelessWidget {
   const _EditorCanvasShell({
-    required this.room,
-    required this.activeSurface,
+    required this.geometry,
+    required this.activePatch,
     required this.ceilingHeightMm,
-    required this.onSurfaceTap,
+    required this.onPatchTap,
     required this.featureType,
   });
 
-  final RoomDraft room;
-  final String activeSurface;
+  final RoomGeometrySnapshot geometry;
+  final SurfacePatch? activePatch;
   final int ceilingHeightMm;
-  final ValueChanged<String> onSurfaceTap;
+  final ValueChanged<String> onPatchTap;
   final ArchitecturalFeatureType? featureType;
 
   @override
   Widget build(BuildContext context) {
+    final patch = activePatch;
     return Padding(
       padding: const EdgeInsets.all(12),
       child: Column(
         children: [
           Text(
-            'Active surface: $activeSurface · ceiling $ceilingHeightMm mm',
+            patch == null
+                ? 'No persisted surface geometry · ceiling $ceilingHeightMm mm'
+                : 'Active surface: ${patch.surfaceId} · ceiling $ceilingHeightMm mm',
             style: Theme.of(context).textTheme.titleMedium,
           ),
-          if (featureType != null)
+          if (featureType != null && patch != null)
             Padding(
               padding: const EdgeInsets.only(top: 6),
               child: Text(
-                'Place feature: ${featureType!.name} on $activeSurface',
+                'Place feature: ${featureType!.name} on ${patch.surfaceId}',
               ),
             ),
           const SizedBox(height: 8),
+          if (geometry.patches.length > 1)
+            SizedBox(
+              height: 42,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: geometry.patches.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 6),
+                itemBuilder: (context, index) {
+                  final candidate = geometry.patches[index];
+                  return ChoiceChip(
+                    label: Text(candidate.surfaceId),
+                    selected: candidate.id == patch?.id,
+                    onSelected: (_) => onPatchTap(candidate.id),
+                  );
+                },
+              ),
+            ),
           Expanded(
-            child: Row(
-              children: [
-                _EdgeButton(
-                  label: 'Wall D',
-                  icon: Icons.chevron_left,
-                  onTap: () => onSurfaceTap('Wall D'),
-                ),
-                Expanded(
-                  child: Column(
-                    children: [
-                      _EdgeButton(
-                        label: 'Ceiling',
-                        icon: Icons.keyboard_arrow_up,
-                        onTap: () => onSurfaceTap('Ceiling'),
+            child: Card(
+              clipBehavior: Clip.antiAlias,
+              child: patch == null
+                  ? const Center(
+                      child: Text(
+                        'Room geometry is empty.\nCreate persisted SurfacePatch data to begin.',
+                        textAlign: TextAlign.center,
                       ),
-                      Expanded(
-                        child: Card(
-                          clipBehavior: Clip.antiAlias,
-                          child: CustomPaint(
-                            painter: _RoomSurfacePainter(),
-                            child: const Center(
-                              child: Text(
-                                'Surface canvas foundation\nCustomPainter + edge proximity follows next',
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ),
+                    )
+                  : InteractiveViewer(
+                      minScale: 0.25,
+                      maxScale: 8,
+                      boundaryMargin: const EdgeInsets.all(300),
+                      child: CustomPaint(
+                        painter: _RoomSurfacePainter(
+                          patch: patch,
+                          openings: geometry.openings
+                              .where(
+                                (item) => item.hostSurfacePatchId == patch.id,
+                              )
+                              .toList(growable: false),
+                          features: geometry.features
+                              .where(
+                                (item) => item.hostSurfacePatchId == patch.id,
+                              )
+                              .toList(growable: false),
                         ),
+                        child: const SizedBox.expand(),
                       ),
-                      _EdgeButton(
-                        label: 'Floor',
-                        icon: Icons.keyboard_arrow_down,
-                        onTap: () => onSurfaceTap('Floor'),
-                      ),
-                    ],
-                  ),
-                ),
-                _EdgeButton(
-                  label: 'Wall B',
-                  icon: Icons.chevron_right,
-                  onTap: () => onSurfaceTap('Wall B'),
-                ),
-              ],
+                    ),
             ),
           ),
         ],
@@ -287,69 +310,103 @@ class _EditorCanvasShell extends StatelessWidget {
   }
 }
 
-class _EdgeButton extends StatelessWidget {
-  const _EdgeButton({
-    required this.label,
-    required this.icon,
-    required this.onTap,
-  });
-  final String label;
-  final IconData icon;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(4),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon),
-              Text(label, style: const TextStyle(fontSize: 11)),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class _RoomSurfacePainter extends CustomPainter {
+  const _RoomSurfacePainter({
+    required this.patch,
+    required this.openings,
+    required this.features,
+  });
+
+  final SurfacePatch patch;
+  final List<Opening> openings;
+  final List<SpatialFeature> features;
+
   @override
   void paint(Canvas canvas, Size size) {
-    final paint =
-        Paint()
-          ..color = Colors.blueGrey.withValues(alpha: 0.25)
-          ..strokeWidth = 1;
-    const step = 32.0;
-    for (double x = 0; x <= size.width; x += step) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
+    final gridPaint = Paint()
+      ..color = Colors.blueGrey.withValues(alpha: 0.15)
+      ..strokeWidth = 1;
+    const gridStep = 32.0;
+    for (double x = 0; x <= size.width; x += gridStep) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), gridPaint);
     }
-    for (double y = 0; y <= size.height; y += step) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+    for (double y = 0; y <= size.height; y += gridStep) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
+    }
+
+    final vertices = patch.boundary.vertices;
+    final minX = vertices.map((p) => p.xMm).reduce(math.min).toDouble();
+    final maxX = vertices.map((p) => p.xMm).reduce(math.max).toDouble();
+    final minY = vertices.map((p) => p.yMm).reduce(math.min).toDouble();
+    final maxY = vertices.map((p) => p.yMm).reduce(math.max).toDouble();
+    final widthMm = math.max(1.0, maxX - minX);
+    final heightMm = math.max(1.0, maxY - minY);
+    final scale = math.min(
+      (size.width - 48) / widthMm,
+      (size.height - 48) / heightMm,
+    );
+    final origin = Offset(
+      (size.width - widthMm * scale) / 2 - minX * scale,
+      (size.height - heightMm * scale) / 2 + maxY * scale,
+    );
+
+    Offset mapPoint(Point2Mm point) => Offset(
+          origin.dx + point.xMm * scale,
+          origin.dy - point.yMm * scale,
+        );
+
+    Path polygonPath(Polygon2Mm polygon) {
+      final path = Path();
+      final first = mapPoint(polygon.vertices.first);
+      path.moveTo(first.dx, first.dy);
+      for (final point in polygon.vertices.skip(1)) {
+        final mapped = mapPoint(point);
+        path.lineTo(mapped.dx, mapped.dy);
+      }
+      path.close();
+      return path;
+    }
+
+    final boundaryPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
+    canvas.drawPath(polygonPath(patch.boundary), boundaryPaint);
+
+    final openingPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+    for (final opening in openings) {
+      canvas.drawPath(polygonPath(opening.boundary), openingPaint);
+    }
+
+    final featurePaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
+    for (final feature in features) {
+      canvas.drawPath(polygonPath(feature.footprint), featurePaint);
     }
   }
 
   @override
-  bool shouldRepaint(covariant _RoomSurfacePainter oldDelegate) => false;
+  bool shouldRepaint(covariant _RoomSurfacePainter oldDelegate) =>
+      oldDelegate.patch != patch ||
+      oldDelegate.openings != openings ||
+      oldDelegate.features != features;
 }
 
 class _Inspector extends StatelessWidget {
   const _Inspector({
     required this.project,
     required this.room,
-    required this.activeSurface,
+    required this.geometry,
+    required this.activePatch,
     required this.discipline,
   });
 
-  final ProjectDraft project;
-  final RoomDraft room;
-  final String activeSurface;
+  final ProjectRecord project;
+  final RoomRecord room;
+  final RoomGeometrySnapshot geometry;
+  final SurfacePatch? activePatch;
   final Discipline discipline;
 
   @override
@@ -368,15 +425,23 @@ class _Inspector extends StatelessWidget {
           const SizedBox(height: 12),
           Text('Room: ${room.name}'),
           Text('Type: ${room.type.name}'),
-          Text('Surface: $activeSurface'),
           Text('Discipline: ${discipline.name}'),
           Text('Structural height: $structural mm'),
           Text('Finished ceiling: $ceiling mm'),
           Text('Units: ${project.measurementSystem.name}'),
-          const SizedBox(height: 12),
-          const Text(
-            'Object inspector fields will appear here after selection.',
-          ),
+          const Divider(),
+          Text('Patches: ${geometry.patches.length}'),
+          Text('Edges: ${geometry.edges.length}'),
+          Text('Openings: ${geometry.openings.length}'),
+          Text('Features: ${geometry.features.length}'),
+          if (activePatch != null) ...[
+            const Divider(),
+            Text('Surface: ${activePatch!.surfaceId}'),
+            Text('Orientation: ${activePatch!.orientation.name}'),
+            Text(
+              'Boundary vertices: ${activePatch!.boundary.vertices.length}',
+            ),
+          ],
         ],
       ),
     );
