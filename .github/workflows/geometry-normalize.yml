@@ -1,0 +1,53 @@
+name: Normalize Geometry Changes
+
+on:
+  push:
+    branches:
+      - feat/flutter-geometry-kernel
+
+permissions:
+  contents: write
+
+jobs:
+  normalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: feat/flutter-geometry-kernel
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Resolve mobile dependencies
+        working-directory: apps/mobile
+        run: flutter pub get --enforce-lockfile
+
+      - name: Normalize mobile sources
+        working-directory: apps/mobile
+        run: dart format lib test
+
+      - name: Resolve engineering core dependencies
+        working-directory: packages/engineering_core
+        run: dart pub get
+
+      - name: Normalize engineering core
+        working-directory: packages/engineering_core
+        run: dart format lib test
+
+      - name: Commit normalization
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/mobile/lib apps/mobile/test packages/engineering_core/lib packages/engineering_core/test
+          if git diff --cached --quiet; then
+            echo "Nothing to normalize"
+            exit 0
+          fi
+          git commit -m "style: normalize geometry packages"
+          git push origin HEAD:feat/flutter-geometry-kernel
