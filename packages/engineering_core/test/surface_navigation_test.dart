@@ -83,7 +83,8 @@ void main() {
     );
   });
 
-  test('proximity transitions from none to strong preview deterministically', () {
+  test('proximity transitions from none to strong preview deterministically',
+      () {
     const thresholds = SurfaceNavigationThresholds(
       highlightDistanceMm: 600,
       previewDistanceMm: 300,
