@@ -54,13 +54,17 @@ void main() {
     return room.id;
   }
 
-  SurfacePatch patch({required String id, required String roomId}) =>
+  SurfacePatch patch({
+    required String id,
+    required String roomId,
+    Point3Mm origin = const Point3Mm(1000, 2000, 0),
+  }) =>
       SurfacePatch(
         id: id,
         roomId: roomId,
         surfaceId: 'surface-$id',
         frame: LocalCoordinateFrame(
-          origin: const Point3Mm(1000, 2000, 0),
+          origin: origin,
           uAxis: const Vector3D(1, 0, 0),
           vAxis: const Vector3D(0, 0, 1),
         ),
@@ -87,7 +91,11 @@ void main() {
     );
 
     final patchA = patch(id: 'patch-a', roomId: roomId);
-    final patchB = patch(id: 'patch-b', roomId: roomId);
+    final patchB = patch(
+      id: 'patch-b',
+      roomId: roomId,
+      origin: const Point3Mm(5000, 2000, 0),
+    );
     final edgeA = SurfaceEdge(
       id: 'edge-a',
       patchId: patchA.id,
