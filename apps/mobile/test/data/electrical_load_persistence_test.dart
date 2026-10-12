@@ -276,6 +276,11 @@ void main() {
       await DriftCatalogPreferencesRepository(
         database,
       ).setFavorite('motor', true);
+      await database.customStatement('DROP TABLE cable_runs');
+      await database.customStatement('DROP TABLE cable_route_segments');
+      await database.customStatement('DROP TABLE cable_route_nodes');
+      await database.customStatement('DROP TABLE cable_routes');
+      await database.customStatement('DROP TABLE physical_channels');
       await database.customStatement('DROP TABLE circuit_load_assignments');
       await database.customStatement('DROP TABLE electrical_circuits');
       await database.customStatement('DROP TABLE equipment_electrical_loads');

@@ -15,3 +15,5 @@ export 'src/spatial_geometry.dart';
 export 'src/surface_navigation.dart';
 export 'src/electrical_load.dart';
 export 'src/electrical_circuit.dart';
+export 'src/cable_routing.dart';
+export 'src/surface_route_draft.dart';

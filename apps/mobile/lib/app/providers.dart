@@ -1,3 +1,5 @@
+import '../application/cable_routing_repository.dart';
+import '../data/repositories/drift_cable_routing_repository.dart';
 import '../application/electrical_circuit_repository.dart';
 import '../data/repositories/drift_electrical_circuit_repository.dart';
 import '../application/electrical_load_repository.dart';
@@ -175,3 +177,14 @@ final roomElectricalCircuitsProvider =
           .watch(electricalCircuitRepositoryProvider)
           .watchRoomCircuits(roomId),
     );
+
+final cableRoutingRepositoryProvider = Provider<CableRoutingRepository>(
+  (ref) => DriftCableRoutingRepository(
+    ref.watch(databaseProvider),
+    originDeviceId: 'local-device',
+  ),
+);
+final roomRoutingProvider = StreamProvider.family<RoomRoutingSnapshot, String>(
+  (ref, roomId) =>
+      ref.watch(cableRoutingRepositoryProvider).watchRoomRouting(roomId),
+);

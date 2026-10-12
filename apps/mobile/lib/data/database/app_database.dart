@@ -238,6 +238,80 @@ class CircuitLoadAssignments extends Table {
   Set<Column<Object>> get primaryKey => {componentInstanceId};
 }
 
+@DataClassName('PhysicalChannelRow')
+class PhysicalChannels extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get roomId => text().references(Rooms, #id)();
+  TextColumn get name => text()();
+  TextColumn get kind => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('CableRouteRow')
+class CableRoutes extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get roomId => text().references(Rooms, #id)();
+  TextColumn get name => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('CableRouteNodeRow')
+class CableRouteNodes extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get routeId => text().references(CableRoutes, #id)();
+  IntColumn get sequence => integer()();
+  TextColumn get kind => text()();
+  @ReferenceName('primaryRouteNodes')
+  TextColumn get patchId => text().references(SurfacePatches, #id)();
+  IntColumn get localXmm => integer()();
+  IntColumn get localYmm => integer()();
+  IntColumn get worldXmm => integer()();
+  IntColumn get worldYmm => integer()();
+  IntColumn get worldZmm => integer()();
+  @ReferenceName('secondaryRouteNodes')
+  TextColumn get otherPatchId =>
+      text().nullable().references(SurfacePatches, #id)();
+  IntColumn get otherLocalXmm => integer().nullable()();
+  IntColumn get otherLocalYmm => integer().nullable()();
+  TextColumn get adjacencyId =>
+      text().nullable().references(SurfaceAdjacencies, #id)();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('CableRouteSegmentRow')
+class CableRouteSegments extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get routeId => text().references(CableRoutes, #id)();
+  IntColumn get sequence => integer()();
+  @ReferenceName('outgoingRouteSegments')
+  TextColumn get fromNodeId => text().references(CableRouteNodes, #id)();
+  @ReferenceName('incomingRouteSegments')
+  TextColumn get toNodeId => text().references(CableRouteNodes, #id)();
+  TextColumn get surfacePatchId => text().references(SurfacePatches, #id)();
+  TextColumn get layingMethod => text()();
+  TextColumn get physicalChannelId =>
+      text().nullable().references(PhysicalChannels, #id)();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('CableRunRow')
+class CableRuns extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get roomId => text().references(Rooms, #id)();
+  TextColumn get name => text()();
+  TextColumn get circuitId => text().references(ElectricalCircuits, #id)();
+  TextColumn get routeId => text().references(CableRoutes, #id)();
+  RealColumn get reservePercent => real().withDefault(const Constant(0))();
+  IntColumn get terminationAllowanceMm =>
+      integer().withDefault(const Constant(0))();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
 @DriftDatabase(
   tables: [
     Projects,
@@ -254,6 +328,11 @@ class CircuitLoadAssignments extends Table {
     EquipmentElectricalLoads,
     ElectricalCircuits,
     CircuitLoadAssignments,
+    PhysicalChannels,
+    CableRoutes,
+    CableRouteNodes,
+    CableRouteSegments,
+    CableRuns,
   ],
 )
 final class AppDatabase extends _$AppDatabase {
@@ -261,7 +340,7 @@ final class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'electra'));
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -300,6 +379,13 @@ final class AppDatabase extends _$AppDatabase {
           await migrator.createTable(electricalCircuits);
           await migrator.createTable(circuitLoadAssignments);
         }
+        if (from < 7) {
+          await migrator.createTable(physicalChannels);
+          await migrator.createTable(cableRoutes);
+          await migrator.createTable(cableRouteNodes);
+          await migrator.createTable(cableRouteSegments);
+          await migrator.createTable(cableRuns);
+        }
       }
       await _createIndexes();
     },
@@ -309,6 +395,21 @@ final class AppDatabase extends _$AppDatabase {
   );
 
   Future<void> _createIndexes() async {
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_cable_route_room ON cable_routes(room_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_route_node_order ON cable_route_nodes(route_id, sequence)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_route_segment_order ON cable_route_segments(route_id, sequence)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_cable_run_circuit ON cable_runs(circuit_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_channel_room ON physical_channels(room_id)',
+    );
     await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_electrical_circuit_room ON electrical_circuits(room_id)',
     );

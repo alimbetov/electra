@@ -333,6 +333,30 @@ A persisted consumption group can create a persisted circuit proposal without ma
 
 ## WP-FL9 — Routing
 
+**Status: IMPLEMENTED BASELINE on `feat/flutter-routing-cablerun`; exact-SHA gate pending. Branch starts at the verified FL8 `d1c0f90d3fc90fea5f4275221d7c94b7b2232b0c`.**
+
+### Implemented behavior
+
+- typed `CableRoute`, ordered nodes/segments, physical channels and circuit-bound `CableRun`;
+- canonical local anchors and rounded world points are persisted in integer millimetres;
+- transition nodes bind one physical point to two local frames and an explicit adjacency;
+- shared finite edges must coincide in world space and be real patch boundaries;
+- segments cannot leave their host polygon, cross/touch openings or teleport between surfaces;
+- non-branching chain validation reports duplicate IDs, zero lengths, missing references and stale world coordinates;
+- geometric length is the sum of segment lengths projected from exact local anchors; world quantization is not used to shorten sloped segments;
+- physical length adds only explicit reserve percentage and integer-mm termination allowance, both initially zero;
+- schema v7: `physical_channels`, `cable_routes`, `cable_route_nodes`, `cable_route_segments`, `cable_runs` and query indexes;
+- route/graph/CableRun replacement is one transaction, preserves creation times, advances revisions and tombstones removed nodes/segments;
+- IDs cannot be borrowed from another route; circuit/channel references must be active in the same room and channel kind must match the laying method;
+- coherent routing snapshots watch geometry, topology, channels, circuits and routing revisions; invalidated routes expose review instead of a misleading cached length;
+- Route tool opens the room routing workspace; points, fold crossing, draft undo, per-segment methods/channels, allowance edits and saved-run editing are supported;
+- tests cover perpendicular and sloped surfaces, beam folds, invalid topology/openings, graph replacement, watches, close/reopen, v6-to-v7 migration and compact editor interaction.
+
+### Remaining boundary
+
+Each CableRun follows a non-branching route. Routing junctions/branch relationships are FL10. Automatic route finding, collision policy for structural features, equipment-port endpoint binding and cable/conduit capacity/sizing are later capabilities. Openings are excluded including their boundaries; clearance and penetration rules are not inferred. Global world coordinates round the primary local projection to integer mm; exact local anchors remain canonical for length and transition coincidence.
+
+
 ### Scope
 
 - routes;
