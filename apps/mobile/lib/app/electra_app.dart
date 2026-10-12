@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../features/projects/project_list_screen.dart';
-import 'app_state.dart';
+import 'app_router.dart';
 
 class ElectraApp extends StatefulWidget {
   const ElectraApp({super.key});
@@ -11,7 +10,13 @@ class ElectraApp extends StatefulWidget {
 }
 
 class _ElectraAppState extends State<ElectraApp> {
-  final ElectraAppState appState = ElectraAppState();
+  late final router = createElectraRouter();
+
+  @override
+  void dispose() {
+    router.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,9 +25,10 @@ class _ElectraAppState extends State<ElectraApp> {
       brightness: Brightness.light,
     );
 
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Electra',
       debugShowCheckedModeBanner: false,
+      routerConfig: router,
       theme: ThemeData(
         colorScheme: scheme,
         useMaterial3: true,
@@ -40,7 +46,6 @@ class _ElectraAppState extends State<ElectraApp> {
           border: OutlineInputBorder(),
         ),
       ),
-      home: ProjectListScreen(appState: appState),
     );
   }
 }
