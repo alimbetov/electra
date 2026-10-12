@@ -22,9 +22,7 @@ jobs:
           cache: true
       - working-directory: apps/mobile
         run: flutter pub get --enforce-lockfile
-      - name: Disambiguate ToolContext anchor
-        run: >-
-          python3 -c "from pathlib import Path; p=Path('.github/scripts/patch_fl6_editor.py'); t=p.read_text(); old='  final SurfacePatch? adjacentPreviewPatch;\\n\\n  @override\\n  Widget build(BuildContext context) {\\n'; new='  final SurfaceEdgeCandidate? navigationCandidate;\\n  final SurfacePatch? adjacentPreviewPatch;\\n\\n  @override\\n  Widget build(BuildContext context) {\\n'; replacement='  final SurfaceEdgeCandidate? navigationCandidate;\\n  final SurfacePatch? adjacentPreviewPatch;\\n  final ComponentDefinition? activeComponentDefinition;\\n  final bool placingComponent;\\n\\n  @override\\n  Widget build(BuildContext context) {\\n'; assert t.count(old)==1 or t.count(old)==2; t=t.replace('replace_once(\\n    \\\"'+old.replace('\\n','\\\\n')+'\\\",\\n    \\\"  final SurfacePatch? adjacentPreviewPatch;\\\\n\\\"\\n    \\\"  final ComponentDefinition? activeComponentDefinition;\\\\n\\\"\\n    \\\"  final bool placingComponent;\\\\n\\\\n\\\"\\n    \\\"  @override\\\\n\\\"\\n    \\\"  Widget build(BuildContext context) {\\\\n\\\",\\n)', 'replace_once(\\n    \\\"'+new.replace('\\n','\\\\n')+'\\\",\\n    \\\"'+replacement.replace('\\n','\\\\n')+'\\\",\\n)'); p.write_text(t)"
+      - run: sed -i 's/if count != 1:/if count < 1:/' .github/scripts/patch_fl6_editor.py
       - run: python3 .github/scripts/patch_fl6_editor.py
       - working-directory: apps/mobile
         run: dart format lib/features/editor/room_editor_screen.dart
