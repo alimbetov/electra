@@ -35,7 +35,9 @@ A wall is not represented only by the generic value `WALL`; it is represented by
 
 ## Interaction model
 
-When the pointer or touch location approaches an edge of the active surface, the UI progressively reveals the adjacent surface.
+Every navigable edge participates in proximity preview. This includes upper, lower and lateral/side edges.
+
+When the pointer or touch location approaches an edge of the active surface, the UI progressively reveals the surface adjacent to that specific edge.
 
 Illustrative behavior:
 
@@ -46,6 +48,27 @@ closer               -> adjacent surface preview
 very close           -> strong preview / snap hint
 tap edge             -> adjacent surface becomes active
 ```
+
+For a typical wall:
+
+```text
+             CEILING
+                ^
+                |
+WALL D  <-   WALL A   ->  WALL B
+                |
+                v
+              FLOOR
+```
+
+Therefore:
+
+- approaching the upper edge previews the ceiling;
+- approaching the lower edge previews the floor;
+- approaching the left side edge previews the adjacent wall on that side;
+- approaching the right side edge previews the adjacent wall on that side.
+
+Side-surface previews are mandatory behavior, not an optional desktop enhancement.
 
 The exact pixel thresholds are presentation concerns and may be tuned by device class and input method.
 
@@ -61,6 +84,20 @@ snapStrength
 ```
 
 The adjacent surface may visually unfold toward the user, with an intermediate preview around 45 degrees before activation. The visual fold angle is not persisted domain data.
+
+## Corner behavior
+
+Near a corner, two edges may be within the activation radius at the same time. The editor must avoid ambiguous or flickering navigation.
+
+Recommended behavior:
+
+1. calculate proximity to all navigable edges;
+2. rank candidates by normalized distance and pointer/gesture direction;
+3. emphasize one primary candidate;
+4. optionally show the secondary neighbor at lower opacity;
+5. lock the selected candidate once the user begins a deliberate crossing/tap gesture.
+
+The domain does not encode this ranking policy; it only exposes correct edge adjacency.
 
 ## Tap navigation
 
@@ -87,6 +124,14 @@ The editor creates a route transition node at the shared boundary:
 RouteSegment(surfaceId = wallA)
   -> RouteNode(type = SURFACE_TRANSITION)
   -> RouteSegment(surfaceId = ceiling)
+```
+
+The same applies to lateral transitions:
+
+```text
+RouteSegment(surfaceId = wallA)
+  -> RouteNode(type = SURFACE_TRANSITION)
+  -> RouteSegment(surfaceId = wallB)
 ```
 
 The route therefore remains physically continuous across surfaces.
@@ -119,6 +164,7 @@ SurfaceNavigationState
   previewSurfaceId?
   nearestEdgeId?
   proximity
+  candidateEdges[]
 ```
 
 This belongs to editor/application state, not the persistent engineering domain.
@@ -130,6 +176,7 @@ Benefits:
 - preserves spatial context while remaining primarily 2D;
 - reduces explicit navigation controls;
 - supports continuous cable, pipe and duct routing;
+- side walls are reachable directly from the current surface without a separate navigator;
 - works for electrical, plumbing, heating, HVAC, CCTV and fire-alarm layers;
 - avoids requiring a full 3D/BIM editor for field workflows;
 - creates a consistent interaction model for phone and tablet.
@@ -139,6 +186,7 @@ Costs:
 - room surfaces and adjacency must be explicitly modeled;
 - coordinate conversion between global 3D and per-surface local 2D space is required;
 - hit testing and edge proximity need dedicated editor logic;
+- corner candidate selection needs deterministic UI behavior;
 - malformed surface topology must be detected and validated.
 
 ## Non-goals
