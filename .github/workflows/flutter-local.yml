@@ -3,6 +3,7 @@ name: Flutter Local Foundation
 on:
   push:
     branches:
+      - main
       - feat/flutter-local-app-foundation
   pull_request:
     paths:
@@ -30,13 +31,13 @@ jobs:
         run: flutter --version
 
       - name: Install mobile dependencies
-        run: flutter pub get
+        run: flutter pub get --enforce-lockfile
 
       - name: Generate Drift code
         run: dart run build_runner build
 
-      - name: Format working checkout
-        run: dart format --output=none lib test
+      - name: Verify formatting
+        run: dart format --output=none --set-exit-if-changed lib test
 
       - name: Analyze mobile app
         run: flutter analyze
