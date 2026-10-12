@@ -3,22 +3,22 @@ import 'package:test/test.dart';
 
 void main() {
   SurfacePatch buildPatch(String id) => SurfacePatch(
-        id: id,
-        roomId: 'room-1',
-        surfaceId: 'wall-1',
-        frame: LocalCoordinateFrame(
-          origin: const Point3Mm(0, 0, 0),
-          uAxis: const Vector3D(1, 0, 0),
-          vAxis: const Vector3D(0, 0, 1),
-        ),
-        boundary: Polygon2Mm(const [
-          Point2Mm(0, 0),
-          Point2Mm(4000, 0),
-          Point2Mm(4000, 3000),
-          Point2Mm(0, 3000),
-        ]),
-        orientation: SurfaceOrientation.vertical,
-      );
+    id: id,
+    roomId: 'room-1',
+    surfaceId: 'wall-1',
+    frame: LocalCoordinateFrame(
+      origin: const Point3Mm(0, 0, 0),
+      uAxis: const Vector3D(1, 0, 0),
+      vAxis: const Vector3D(0, 0, 1),
+    ),
+    boundary: Polygon2Mm(const [
+      Point2Mm(0, 0),
+      Point2Mm(4000, 0),
+      Point2Mm(4000, 3000),
+      Point2Mm(0, 3000),
+    ]),
+    orientation: SurfaceOrientation.vertical,
+  );
 
   test('spatial topology validates consistent patch graph', () {
     final patchA = buildPatch('patch-a');
@@ -132,8 +132,83 @@ void main() {
       containsAll([
         'EDGE_HOST_MISSING',
         'OPENING_HOST_MISSING',
-        'FEATURE_HOST_MISSING'
+        'FEATURE_HOST_MISSING',
       ]),
+    );
+  });
+
+  test('validator reports opening and feature outside host patch', () {
+    final patch = buildPatch('patch-a');
+    final violations = SpatialGeometryValidator.validatePatchTopology(
+      patches: [patch],
+      edges: const [],
+      adjacencies: const [],
+      openings: [
+        Opening(
+          id: 'window-outside',
+          hostSurfacePatchId: patch.id,
+          type: OpeningType.window,
+          boundary: Polygon2Mm(const [
+            Point2Mm(3500, 500),
+            Point2Mm(4500, 500),
+            Point2Mm(4500, 1500),
+            Point2Mm(3500, 1500),
+          ]),
+        ),
+      ],
+      features: [
+        SpatialFeature(
+          id: 'feature-outside',
+          hostSurfacePatchId: patch.id,
+          type: SpatialFeatureType.column,
+          footprint: Polygon2Mm(const [
+            Point2Mm(-100, 0),
+            Point2Mm(300, 0),
+            Point2Mm(300, 300),
+            Point2Mm(-100, 300),
+          ]),
+          depthMm: 300,
+          elevationMm: 0,
+        ),
+      ],
+    );
+
+    expect(
+      violations.map((e) => e.code),
+      containsAll(['OPENING_OUTSIDE_PATCH', 'FEATURE_OUTSIDE_PATCH']),
+    );
+  });
+
+  test('validator reports orientation that disagrees with frame normal', () {
+    final patch = SurfacePatch(
+      id: 'patch-horizontal-declared',
+      roomId: 'room-1',
+      surfaceId: 'surface-1',
+      frame: LocalCoordinateFrame(
+        origin: const Point3Mm(0, 0, 0),
+        uAxis: const Vector3D(1, 0, 0),
+        vAxis: const Vector3D(0, 0, 1),
+      ),
+      boundary: Polygon2Mm(const [
+        Point2Mm(0, 0),
+        Point2Mm(1000, 0),
+        Point2Mm(1000, 1000),
+        Point2Mm(0, 1000),
+      ]),
+      orientation: SurfaceOrientation.horizontal,
+    );
+
+    final violations = SpatialGeometryValidator.validatePatchTopology(
+      patches: [patch],
+      edges: const [],
+      adjacencies: const [],
+      openings: const [],
+      features: const [],
+    );
+
+    expect(
+      violations.map((e) => e.code),
+      contains('SURFACE_ORIENTATION_NORMAL_MISMATCH'),
     );
   });
 
