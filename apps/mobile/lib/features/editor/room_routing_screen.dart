@@ -643,7 +643,7 @@ class _RoutingCanvas extends StatelessWidget {
               painter: _RoutingPainter(
                 patch: patch,
                 snapshot: snapshot,
-                routes: preview == null ? snapshot.routes : [preview],
+                routes: preview == null ? snapshot.routes : [preview!],
                 transform: transform,
               ),
             ),
