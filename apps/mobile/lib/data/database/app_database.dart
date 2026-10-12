@@ -104,9 +104,17 @@ class SurfaceEdges extends Table with GeometryAuditColumns {
 @DataClassName('SurfaceAdjacencyRow')
 class SurfaceAdjacencies extends Table with GeometryAuditColumns {
   TextColumn get id => text()();
+
+  @ReferenceName('outgoingSurfaceAdjacencies')
   TextColumn get fromPatchId => text().references(SurfacePatches, #id)();
+
+  @ReferenceName('outgoingEdgeAdjacencies')
   TextColumn get fromEdgeId => text().references(SurfaceEdges, #id)();
+
+  @ReferenceName('incomingSurfaceAdjacencies')
   TextColumn get toPatchId => text().references(SurfacePatches, #id)();
+
+  @ReferenceName('incomingEdgeAdjacencies')
   TextColumn get toEdgeId => text().references(SurfaceEdges, #id)();
 
   @override
