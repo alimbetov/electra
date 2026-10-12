@@ -321,7 +321,8 @@ abstract final class SpatialGeometryValidator {
         violations.add(
           GeometryInvariantViolation(
             code: 'ADJACENCY_WORLD_EDGE_MISMATCH',
-            message: 'Adjacent surface edges must represent the same world-space segment.',
+            message:
+                'Adjacent surface edges must represent the same world-space segment.',
             objectId: adjacency.id,
           ),
         );
@@ -385,8 +386,8 @@ abstract final class SpatialGeometryValidator {
     final toEnd = toPatch.worldPoint(to.end);
     final tolerance =
         fromPatch.frame.tolerance.linearMm > toPatch.frame.tolerance.linearMm
-        ? fromPatch.frame.tolerance.linearMm
-        : toPatch.frame.tolerance.linearMm;
+            ? fromPatch.frame.tolerance.linearMm
+            : toPatch.frame.tolerance.linearMm;
 
     bool close(Point3D a, Point3D b) => a.distanceTo(b) <= tolerance;
 
