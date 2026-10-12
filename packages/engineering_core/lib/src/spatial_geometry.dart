@@ -78,8 +78,9 @@ final class SurfaceAdjacency {
     required this.toPatchId,
     required this.toEdgeId,
   }) {
-    if ({id, fromPatchId, fromEdgeId, toPatchId, toEdgeId}
-        .any((e) => e.isEmpty)) {
+    if ({id, fromPatchId, fromEdgeId, toPatchId, toEdgeId}.any(
+      (e) => e.isEmpty,
+    )) {
       throw ArgumentError('SurfaceAdjacency identifiers must be non-empty.');
     }
     if (fromPatchId == toPatchId && fromEdgeId == toEdgeId) {
@@ -193,16 +194,63 @@ abstract final class SpatialGeometryValidator {
     required List<SpatialFeature> features,
   }) {
     final violations = <GeometryInvariantViolation>[];
-    final patchIds = patches.map((e) => e.id).toSet();
-    final edgeById = {for (final edge in edges) edge.id: edge};
+    final patchById = <String, SurfacePatch>{};
+    final edgeById = <String, SurfaceEdge>{};
+
+    for (final patch in patches) {
+      if (patchById.containsKey(patch.id)) {
+        violations.add(
+          GeometryInvariantViolation(
+            code: 'DUPLICATE_PATCH_ID',
+            message: 'Surface patch identifiers must be unique.',
+            objectId: patch.id,
+          ),
+        );
+      } else {
+        patchById[patch.id] = patch;
+      }
+      if (!_orientationMatchesFrame(patch)) {
+        violations.add(
+          GeometryInvariantViolation(
+            code: 'SURFACE_ORIENTATION_NORMAL_MISMATCH',
+            message:
+                'Surface orientation does not match the local frame normal.',
+            objectId: patch.id,
+          ),
+        );
+      }
+    }
 
     for (final edge in edges) {
-      if (!patchIds.contains(edge.patchId)) {
-        violations.add(GeometryInvariantViolation(
-          code: 'EDGE_HOST_MISSING',
-          message: 'Surface edge references a missing patch.',
-          objectId: edge.id,
-        ));
+      if (edgeById.containsKey(edge.id)) {
+        violations.add(
+          GeometryInvariantViolation(
+            code: 'DUPLICATE_EDGE_ID',
+            message: 'Surface edge identifiers must be unique.',
+            objectId: edge.id,
+          ),
+        );
+      } else {
+        edgeById[edge.id] = edge;
+      }
+      final patch = patchById[edge.patchId];
+      if (patch == null) {
+        violations.add(
+          GeometryInvariantViolation(
+            code: 'EDGE_HOST_MISSING',
+            message: 'Surface edge references a missing patch.',
+            objectId: edge.id,
+          ),
+        );
+      } else if (!patch.boundary.containsPointInclusive(edge.start) ||
+          !patch.boundary.containsPointInclusive(edge.end)) {
+        violations.add(
+          GeometryInvariantViolation(
+            code: 'EDGE_OUTSIDE_PATCH',
+            message: 'Surface edge endpoints must lie on or inside its patch.',
+            objectId: edge.id,
+          ),
+        );
       }
     }
 
@@ -210,43 +258,84 @@ abstract final class SpatialGeometryValidator {
       final from = edgeById[adjacency.fromEdgeId];
       final to = edgeById[adjacency.toEdgeId];
       if (from == null || to == null) {
-        violations.add(GeometryInvariantViolation(
-          code: 'ADJACENCY_EDGE_MISSING',
-          message: 'Surface adjacency references a missing edge.',
-          objectId: adjacency.id,
-        ));
+        violations.add(
+          GeometryInvariantViolation(
+            code: 'ADJACENCY_EDGE_MISSING',
+            message: 'Surface adjacency references a missing edge.',
+            objectId: adjacency.id,
+          ),
+        );
         continue;
       }
       if (from.patchId != adjacency.fromPatchId ||
           to.patchId != adjacency.toPatchId) {
-        violations.add(GeometryInvariantViolation(
-          code: 'ADJACENCY_PATCH_EDGE_MISMATCH',
-          message: 'Adjacency patch and edge references do not match.',
-          objectId: adjacency.id,
-        ));
+        violations.add(
+          GeometryInvariantViolation(
+            code: 'ADJACENCY_PATCH_EDGE_MISMATCH',
+            message: 'Adjacency patch and edge references do not match.',
+            objectId: adjacency.id,
+          ),
+        );
       }
     }
 
     for (final opening in openings) {
-      if (!patchIds.contains(opening.hostSurfacePatchId)) {
-        violations.add(GeometryInvariantViolation(
-          code: 'OPENING_HOST_MISSING',
-          message: 'Opening references a missing surface patch.',
-          objectId: opening.id,
-        ));
+      final host = patchById[opening.hostSurfacePatchId];
+      if (host == null) {
+        violations.add(
+          GeometryInvariantViolation(
+            code: 'OPENING_HOST_MISSING',
+            message: 'Opening references a missing surface patch.',
+            objectId: opening.id,
+          ),
+        );
+      } else if (!host.boundary.containsPolygon(opening.boundary)) {
+        violations.add(
+          GeometryInvariantViolation(
+            code: 'OPENING_OUTSIDE_PATCH',
+            message: 'Opening boundary must be contained by its host patch.',
+            objectId: opening.id,
+          ),
+        );
       }
     }
 
     for (final feature in features) {
-      if (!patchIds.contains(feature.hostSurfacePatchId)) {
-        violations.add(GeometryInvariantViolation(
-          code: 'FEATURE_HOST_MISSING',
-          message: 'Spatial feature references a missing surface patch.',
-          objectId: feature.id,
-        ));
+      final host = patchById[feature.hostSurfacePatchId];
+      if (host == null) {
+        violations.add(
+          GeometryInvariantViolation(
+            code: 'FEATURE_HOST_MISSING',
+            message: 'Spatial feature references a missing surface patch.',
+            objectId: feature.id,
+          ),
+        );
+      } else if (!host.boundary.containsPolygon(feature.footprint)) {
+        violations.add(
+          GeometryInvariantViolation(
+            code: 'FEATURE_OUTSIDE_PATCH',
+            message: 'Spatial feature footprint must be contained by its host.',
+            objectId: feature.id,
+          ),
+        );
       }
     }
 
     return List.unmodifiable(violations);
+  }
+
+  static bool _orientationMatchesFrame(SurfacePatch patch) {
+    final normal = patch.frame.normal;
+    final tolerance = patch.frame.tolerance;
+    final isHorizontal = tolerance.vectorsParallel(
+      normal,
+      const Vector3D(0, 0, 1),
+    );
+    final isVertical = normal.z.abs() <= tolerance.angularRadians;
+    return switch (patch.orientation) {
+      SurfaceOrientation.horizontal => isHorizontal,
+      SurfaceOrientation.vertical => isVertical,
+      SurfaceOrientation.sloped => !isHorizontal && !isVertical,
+    };
   }
 }
