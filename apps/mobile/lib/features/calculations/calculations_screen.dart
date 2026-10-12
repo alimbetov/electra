@@ -23,9 +23,18 @@ class CalculationsScreen extends StatelessWidget {
               ),
             ),
           ),
-          const ListTile(title: Text('Route lengths'), subtitle: Text('Not calculated yet')),
-          const ListTile(title: Text('Electrical sizing'), subtitle: Text('Not calculated yet')),
-          const ListTile(title: Text('Validation / clashes'), subtitle: Text('Not calculated yet')),
+          const ListTile(
+            title: Text('Route lengths'),
+            subtitle: Text('Not calculated yet'),
+          ),
+          const ListTile(
+            title: Text('Electrical sizing'),
+            subtitle: Text('Not calculated yet'),
+          ),
+          const ListTile(
+            title: Text('Validation / clashes'),
+            subtitle: Text('Not calculated yet'),
+          ),
         ],
       ),
     );

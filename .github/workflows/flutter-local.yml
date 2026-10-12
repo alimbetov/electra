@@ -1,0 +1,54 @@
+name: Flutter Local Foundation
+
+on:
+  push:
+    branches:
+      - main
+      - feat/flutter-local-app-foundation
+  pull_request:
+    paths:
+      - 'apps/mobile/**'
+      - 'packages/engineering_core/**'
+      - '.github/workflows/flutter-local.yml'
+
+jobs:
+  flutter-local:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Flutter version
+        run: flutter --version
+
+      - name: Install mobile dependencies
+        run: flutter pub get --enforce-lockfile
+
+      - name: Generate Drift code
+        run: dart run build_runner build
+
+      - name: Verify formatting
+        run: dart format --output=none --set-exit-if-changed lib test
+
+      - name: Analyze mobile app
+        run: flutter analyze
+
+      - name: Test mobile app
+        run: flutter test
+
+      - name: Install engineering core dependencies
+        working-directory: packages/engineering_core
+        run: dart pub get
+
+      - name: Test engineering core
+        working-directory: packages/engineering_core
+        run: dart test

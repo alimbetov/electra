@@ -1,10 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-enum ElectraSizeClass {
-  compact,
-  medium,
-  expanded,
-}
+enum ElectraSizeClass { compact, medium, expanded }
 
 class ElectraBreakpoints {
   const ElectraBreakpoints._();
@@ -43,10 +39,7 @@ class ElectraLayoutInfo {
 }
 
 class ElectraAdaptiveBuilder extends StatelessWidget {
-  const ElectraAdaptiveBuilder({
-    super.key,
-    required this.builder,
-  });
+  const ElectraAdaptiveBuilder({super.key, required this.builder});
 
   final Widget Function(BuildContext context, ElectraLayoutInfo layout) builder;
 

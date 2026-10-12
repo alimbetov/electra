@@ -23,10 +23,19 @@ class ReportsScreen extends StatelessWidget {
               ),
             ),
           ),
-          const ListTile(title: Text('Project / room summary'), subtitle: Text('Planned')),
-          const ListTile(title: Text('Routes and materials'), subtitle: Text('Planned')),
+          const ListTile(
+            title: Text('Project / room summary'),
+            subtitle: Text('Planned'),
+          ),
+          const ListTile(
+            title: Text('Routes and materials'),
+            subtitle: Text('Planned'),
+          ),
           const ListTile(title: Text('Labels / QR'), subtitle: Text('Planned')),
-          const ListTile(title: Text('Published package'), subtitle: Text('Planned')),
+          const ListTile(
+            title: Text('Published package'),
+            subtitle: Text('Planned'),
+          ),
         ],
       ),
     );
