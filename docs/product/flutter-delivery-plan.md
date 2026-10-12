@@ -178,6 +178,24 @@ The baseline acceptance is covered by the FL3 SQLite round-trip tests plus FL4 p
 
 ## WP-FL5 — Edge-driven surface navigation
 
+**Status: BASELINE GREEN. Core exact-SHA gate passed on `ad6d0ec16a08a5702b290f8dfe6af89597187fe8`; Flutter integration and two-surface transition gate passed on `e5e8dc7922132aa3841061d57e542ffe80eb6efb`.**
+
+### Implemented baseline
+
+- active persisted surface patch;
+- finite-segment edge distance in engineering millimetres;
+- bidirectional adjacency resolution;
+- deterministic proximity states: `none`, `highlight`, `preview`, `strongPreview`;
+- bounded preview hysteresis for stable corner behavior;
+- candidate ranking with a stable current-preview bias;
+- nearest-navigable-edge resolution so plain boundaries cannot mask real folds;
+- Flutter pointer position converted through the same mm-to-viewport transform used by the editor;
+- progressive edge emphasis in the technical renderer;
+- textual context for edge highlight/preview/open state so navigation is not color-only;
+- strong-preview tap activates the adjacent persisted patch;
+- core tests for thresholds, ranking, hysteresis, adjacency and physical world-space validity;
+- widget test proving a real `Wall A -> Wall B` persisted adjacency transition.
+
 ### Scope
 
 - active patch;
@@ -189,7 +207,17 @@ The baseline acceptance is covered by the FL3 SQLite round-trip tests plus FL4 p
 
 ### Acceptance
 
-A user can navigate:
+The first vertical proof is green:
+
+```text
+Wall A
+→ pointer enters strong-preview zone 50 mm from the fold
+→ Open → Wall B
+→ tap
+→ Wall B becomes the active persisted patch
+```
+
+The generalized navigation model supports the intended folded sequence:
 
 ```text
 wall
@@ -199,7 +227,7 @@ wall
 → opposite beam side
 ```
 
-without switching to a 3D scene.
+without switching to a 3D scene. Additional multi-patch fixtures can extend coverage without changing the navigation contract.
 
 ## WP-FL6 — Component catalog placement
 
