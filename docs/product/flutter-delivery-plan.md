@@ -408,6 +408,33 @@ A one-in/two-out branch is represented as a first-class junction rather than a d
 
 ## WP-FL11 — Floor Routing View
 
+**Status: BASELINE CLOSED on `feat/flutter-routing-cablerun`. Full Flutter/core exact-SHA gate passed on `c151c3641ff46de4c17106ad8d983397c3e28cb7` (46 mobile tests, 78 engineering-core tests).**
+
+### Implemented behavior
+
+- coherent floor routing snapshots resolve the active project, floor, rooms, CableRun, routes, channels and junctions from canonical SQLite records;
+- source panels have stable floor-owned identity, code/name and explicit outgoing feed assignments to route-start endpoints;
+- physical room handoffs declare directed transport continuity from one run end to another run start; they require active runs on the same floor, different rooms and matching tray/conduit laying methods;
+- handoffs describe physical transport, not an electrical splice or an additional measured segment; different room circuits remain separate;
+- endpoint signatures bind source feeds and handoffs to run/route/node identity, local/world coordinates, circuit, laying method and physical channel;
+- changed endpoints, missing circuits/channels, invalid routes and unavailable rooms expose review diagnostics instead of silently reconnecting the graph;
+- the derived graph combines valid in-room junction branches and declared room handoffs; geometric crossings do not add edges;
+- upstream/downstream traversal returns all reachable runs and valid source panels; cycles terminate deterministically and cyclic edges are excluded with diagnostics;
+- duplicate handoffs, foreign-floor sources, reused panel ownership and cyclic handoff proposals are rejected;
+- schema v9 adds `floor_routing_panels`, `floor_panel_feeds`, `floor_routing_handoffs`, typed foreign keys and floor query indexes;
+- panel/feed replacement is atomic; creation timestamps survive edits, revisions advance and panel/handoff removal uses tombstones;
+- live snapshots refresh after local database changes, including route changes and project/room deletion;
+- the floor workspace opens a pan/zoom logical topology canvas with overview, tray, conduit and selected-branch modes, channel filters and downstream panel selection;
+- room groups reveal runs/junctions on demand; selected runs open directly in the room route editor, while junctions open their real detail editor;
+- project/floor/room context remains in navigation and returning preserves floor selection;
+- compact editor forms retain drafts on failed saves and support repair of unavailable source feeds;
+- tests cover source-to-room-endpoint tracing, branching, stale signatures, cycles, filters, source ownership, exact SQLite restart, atomic rejection, live invalidation after initial subscription, project deletion, v8-to-v9 migration and 390-px navigation.
+
+### Remaining boundary
+
+The canvas is a logical topology view: rooms do not yet have a shared floor placement transform or a measured floor outline. Handoffs do not add cable length or prove electrical continuity between different circuits. Source panel records declare routing ownership and do not replace the later PanelAssembly sizing/placement workflow. Physical inter-room segments, riser geometry, device-port endpoints, control/instrumentation discipline filtering, installation sequence/status overlays and floor drawing/BOM exports remain later capabilities. Display modes are limited to data supported by the current persisted model.
+
+
 ### Scope
 
 - floor-wide panels/backbones;
