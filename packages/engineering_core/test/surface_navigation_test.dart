@@ -133,6 +133,28 @@ void main() {
     expect(candidate.proximity, SurfaceEdgeProximity.strongPreview);
   });
 
+  test('nearest navigable edge ignores a closer plain boundary', () {
+    const resolver = SurfaceNavigationResolver();
+    final nonNavigable = SurfaceEdge(
+      id: 'edge-a-inner',
+      patchId: 'wall-a',
+      start: const Point2Mm(3800, 1000),
+      end: const Point2Mm(3800, 2000),
+    );
+
+    final candidate = resolver.nearestNavigableCandidate(
+      pointer: const Point2Mm(3810, 1500),
+      activePatch: wallA(),
+      edges: [nonNavigable, edgeRightA],
+      adjacencies: [adjacency],
+    );
+
+    expect(candidate, isNotNull);
+    expect(candidate!.edge.id, 'edge-a-right');
+    expect(candidate.distanceMm, 190);
+    expect(candidate.adjacentPatchId, 'wall-b');
+  });
+
   test('current preview receives bounded hysteresis near a corner', () {
     const resolver = SurfaceNavigationResolver(
       thresholds: SurfaceNavigationThresholds(previewHysteresisMm: 80),
