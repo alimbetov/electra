@@ -706,25 +706,6 @@ class _ToolContextBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String text;
-    for (final component in components) {
-      final center = mapPoint(component.localPosition);
-      final paint =
-          Paint()
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = 1.5;
-      canvas.drawCircle(center, 8, paint);
-      canvas.drawLine(
-        center + const Offset(-6, 0),
-        center + const Offset(6, 0),
-        paint,
-      );
-      canvas.drawLine(
-        center + const Offset(0, -6),
-        center + const Offset(0, 6),
-        paint,
-      );
-    }
-
     final candidate = navigationCandidate;
     final target =
         adjacentPreviewPatch?.surfaceId ?? candidate?.adjacentPatchId;
@@ -927,6 +908,25 @@ class _RoomSurfacePainter extends CustomPainter {
             ..style = PaintingStyle.stroke
             ..strokeWidth = selected ? 3 : 1;
       canvas.drawPath(polygonPath(feature.footprint), paint);
+    }
+
+    for (final component in components) {
+      final center = mapPoint(component.localPosition);
+      final paint =
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 1.5;
+      canvas.drawCircle(center, 8, paint);
+      canvas.drawLine(
+        center + const Offset(-6, 0),
+        center + const Offset(6, 0),
+        paint,
+      );
+      canvas.drawLine(
+        center + const Offset(0, -6),
+        center + const Offset(0, 6),
+        paint,
+      );
     }
 
     final candidate = navigationCandidate;
