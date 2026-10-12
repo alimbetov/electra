@@ -10,6 +10,9 @@ enum RoomType {
   office,
   garage,
   technical,
+  workshop,
+  production,
+  warehouse,
   custom,
 }
 
@@ -28,6 +31,7 @@ enum Discipline {
   drainage,
   solar,
   evCharging,
+  industrialAutomation,
 }
 
 enum ArchitecturalFeatureType {
@@ -44,5 +48,57 @@ enum ArchitecturalFeatureType {
   platform,
   recess,
   protrusion,
+  custom,
+}
+
+enum EquipmentCategory {
+  electricalPoint,
+  lighting,
+  distribution,
+  motor,
+  pump,
+  fan,
+  compressor,
+  machineTool,
+  cncMachine,
+  conveyor,
+  weldingEquipment,
+  heater,
+  boiler,
+  refrigeration,
+  hvacEquipment,
+  processEquipment,
+  variableFrequencyDrive,
+  softStarter,
+  controlPanel,
+  plcPanel,
+  sensor,
+  actuator,
+  instrumentation,
+  networkEquipment,
+  safetyEquipment,
+  custom,
+}
+
+enum EquipmentPortType {
+  power,
+  control,
+  digitalInput,
+  digitalOutput,
+  analogInput,
+  analogOutput,
+  ethernet,
+  ethernetPoe,
+  fieldbus,
+  compressedAir,
+  coldWater,
+  hotWater,
+  drain,
+  gas,
+  supply,
+  returnFlow,
+  refrigerantIn,
+  refrigerantOut,
+  exhaust,
   custom,
 }
