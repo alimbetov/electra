@@ -1,10 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../application/geometry_repository.dart';
 import '../application/id_generator.dart';
 import '../application/project_hierarchy_service.dart';
 import '../application/project_repositories.dart';
 import '../data/database/app_database.dart';
 import '../data/database/drift_unit_of_work.dart';
+import '../data/repositories/drift_geometry_repository.dart';
 import '../data/repositories/drift_project_hierarchy_repository.dart';
 import '../domain/project_models.dart';
 
@@ -29,6 +31,13 @@ final floorRepositoryProvider = Provider<FloorRepository>((ref) {
 
 final roomRepositoryProvider = Provider<RoomRepository>((ref) {
   return ref.watch(projectHierarchyRepositoryProvider);
+});
+
+final geometryRepositoryProvider = Provider<GeometryRepository>((ref) {
+  return DriftGeometryRepository(
+    ref.watch(databaseProvider),
+    originDeviceId: 'local-device',
+  );
 });
 
 final unitOfWorkProvider = Provider<LocalUnitOfWork>((ref) {
@@ -86,4 +95,9 @@ final roomsProvider = StreamProvider.family<List<RoomRecord>, String>((
 
 final roomProvider = StreamProvider.family<RoomRecord?, String>((ref, roomId) {
   return ref.watch(roomRepositoryProvider).watchRoom(roomId);
+});
+
+final roomGeometryProvider =
+    StreamProvider.family<RoomGeometrySnapshot, String>((ref, roomId) {
+  return ref.watch(geometryRepositoryProvider).watchRoomGeometry(roomId);
 });

@@ -58,13 +58,106 @@ class Rooms extends Table {
   Set<Column<Object>> get primaryKey => {id};
 }
 
-@DriftDatabase(tables: [Projects, Floors, Rooms])
+mixin GeometryAuditColumns on Table {
+  IntColumn get revision => integer().withDefault(const Constant(1))();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+  DateTimeColumn get deletedAt => dateTime().nullable()();
+  TextColumn get originDeviceId => text()();
+}
+
+@DataClassName('SurfacePatchRow')
+class SurfacePatches extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get roomId => text().references(Rooms, #id)();
+  TextColumn get surfaceId => text()();
+  IntColumn get originXmm => integer()();
+  IntColumn get originYmm => integer()();
+  IntColumn get originZmm => integer()();
+  RealColumn get uAxisX => real()();
+  RealColumn get uAxisY => real()();
+  RealColumn get uAxisZ => real()();
+  RealColumn get vAxisX => real()();
+  RealColumn get vAxisY => real()();
+  RealColumn get vAxisZ => real()();
+  TextColumn get orientation => text()();
+  TextColumn get boundaryJson => text()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('SurfaceEdgeRow')
+class SurfaceEdges extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get patchId => text().references(SurfacePatches, #id)();
+  IntColumn get startXmm => integer()();
+  IntColumn get startYmm => integer()();
+  IntColumn get endXmm => integer()();
+  IntColumn get endYmm => integer()();
+  TextColumn get kind => text()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('SurfaceAdjacencyRow')
+class SurfaceAdjacencies extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get fromPatchId => text().references(SurfacePatches, #id)();
+  TextColumn get fromEdgeId => text().references(SurfaceEdges, #id)();
+  TextColumn get toPatchId => text().references(SurfacePatches, #id)();
+  TextColumn get toEdgeId => text().references(SurfaceEdges, #id)();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('OpeningRow')
+class Openings extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get hostSurfacePatchId => text().references(SurfacePatches, #id)();
+  TextColumn get boundaryJson => text()();
+  TextColumn get openingType => text()();
+  IntColumn get depthMm => integer().nullable()();
+  IntColumn get sillHeightMm => integer().nullable()();
+  IntColumn get headHeightMm => integer().nullable()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('SpatialFeatureRow')
+class SpatialFeatures extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get hostSurfacePatchId => text().references(SurfacePatches, #id)();
+  TextColumn get featureType => text()();
+  TextColumn get footprintJson => text()();
+  IntColumn get depthMm => integer()();
+  IntColumn get elevationMm => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DriftDatabase(
+  tables: [
+    Projects,
+    Floors,
+    Rooms,
+    SurfacePatches,
+    SurfaceEdges,
+    SurfaceAdjacencies,
+    Openings,
+    SpatialFeatures,
+  ],
+)
 final class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor])
     : super(executor ?? driftDatabase(name: 'electra'));
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -75,6 +168,12 @@ final class AppDatabase extends _$AppDatabase {
     onUpgrade: (migrator, from, to) async {
       if (from < 1) {
         await migrator.createAll();
+      } else if (from < 2) {
+        await migrator.createTable(surfacePatches);
+        await migrator.createTable(surfaceEdges);
+        await migrator.createTable(surfaceAdjacencies);
+        await migrator.createTable(openings);
+        await migrator.createTable(spatialFeatures);
       }
       await _createIndexes();
     },
@@ -95,6 +194,22 @@ final class AppDatabase extends _$AppDatabase {
     await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_project_updated '
       'ON projects(updated_at)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_surface_patch_room '
+      'ON surface_patches(room_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_surface_edge_patch '
+      'ON surface_edges(patch_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_opening_patch '
+      'ON openings(host_surface_patch_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_spatial_feature_patch '
+      'ON spatial_features(host_surface_patch_id)',
     );
   }
 }

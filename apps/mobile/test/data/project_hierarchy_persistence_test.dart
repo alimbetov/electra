@@ -90,21 +90,19 @@ void main() {
     },
   );
 
-  test('schema v1 creates required tables and indexes', () async {
+  test('schema v2 keeps hierarchy tables and indexes', () async {
     final database = AppDatabase(NativeDatabase.memory());
 
-    final tables =
-        await database
-            .customSelect("SELECT name FROM sqlite_master WHERE type = 'table'")
-            .get();
+    final tables = await database
+        .customSelect("SELECT name FROM sqlite_master WHERE type = 'table'")
+        .get();
     final tableNames = tables.map((row) => row.read<String>('name')).toSet();
 
     expect(tableNames, containsAll(['projects', 'floors', 'rooms']));
 
-    final indexes =
-        await database
-            .customSelect("SELECT name FROM sqlite_master WHERE type = 'index'")
-            .get();
+    final indexes = await database
+        .customSelect("SELECT name FROM sqlite_master WHERE type = 'index'")
+        .get();
     final indexNames = indexes.map((row) => row.read<String>('name')).toSet();
 
     expect(
@@ -115,7 +113,7 @@ void main() {
         'idx_project_updated',
       ]),
     );
-    expect(database.schemaVersion, 1);
+    expect(database.schemaVersion, 2);
 
     await database.close();
   });
