@@ -20,7 +20,7 @@ abstract final class ElectraIcons {
         ArchitecturalFeatureType.beam => Icons.horizontal_rule,
         ArchitecturalFeatureType.column => Icons.view_column_outlined,
         ArchitecturalFeatureType.soffit => Icons.view_stream_outlined,
-        ArchitecturalFeatureType.niche => Icons.inset_chart_outlined,
+        ArchitecturalFeatureType.niche => Icons.insert_chart_outlined,
         ArchitecturalFeatureType.shaft => Icons.unfold_more_outlined,
         ArchitecturalFeatureType.step => Icons.stairs_outlined,
         ArchitecturalFeatureType.platform => Icons.layers_outlined,
