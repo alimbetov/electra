@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -5,9 +6,18 @@ import 'package:flutter/material.dart';
 import '../../application/geometry_repository.dart';
 import '../../domain/models.dart';
 import '../../domain/project_models.dart';
+import '../../domain/system_component_catalog.dart';
 import '../calculations/calculations_screen.dart';
 import '../reports/reports_screen.dart';
+import 'component_catalog_sheet.dart';
 import 'editor_interaction.dart';
+
+typedef ComponentPlacementCallback =
+    Future<void> Function(
+      ComponentDefinition definition,
+      String hostSurfacePatchId,
+      Point2Mm localPosition,
+    );
 
 class RoomEditorScreen extends StatefulWidget {
   const RoomEditorScreen({
@@ -15,11 +25,15 @@ class RoomEditorScreen extends StatefulWidget {
     required this.project,
     required this.room,
     required this.geometry,
+    this.components = const [],
+    this.onPlaceComponent,
   });
 
   final ProjectRecord project;
   final RoomRecord room;
   final RoomGeometrySnapshot geometry;
+  final List<ComponentInstance> components;
+  final ComponentPlacementCallback? onPlaceComponent;
 
   @override
   State<RoomEditorScreen> createState() => _RoomEditorScreenState();
@@ -37,6 +51,10 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
   EditorMeasurement? measurement;
   SurfaceEdgeCandidate? navigationCandidate;
   String? currentPreviewEdgeId;
+  ComponentDefinition? activeComponentDefinition;
+  final List<String> recentComponentDefinitionIds = [];
+  final Set<String> favoriteComponentDefinitionIds = {};
+  bool placingComponent = false;
 
   int get ceilingHeight =>
       widget.room.finishedCeilingHeightMmOverride ??
@@ -86,6 +104,9 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
         navigationCandidate = null;
         currentPreviewEdgeId = null;
       }
+      if (value != EditorTool.equipment) {
+        activeComponentDefinition = null;
+      }
     });
   }
 
@@ -134,6 +155,60 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
     return true;
   }
 
+  Future<void> openComponentCatalog() async {
+    final selected = await ComponentCatalogSheet.show(
+      context,
+      definitions: electricalSystemComponentLibrary.definitions,
+      recentDefinitionIds: recentComponentDefinitionIds,
+      favoriteDefinitionIds: favoriteComponentDefinitionIds,
+    );
+    if (selected == null || !mounted) return;
+    setState(() {
+      tool = EditorTool.equipment;
+      activeComponentDefinition = selected;
+      recentComponentDefinitionIds
+        ..remove(selected.id)
+        ..insert(0, selected.id);
+      if (recentComponentDefinitionIds.length > 8) {
+        recentComponentDefinitionIds.removeRange(
+          8,
+          recentComponentDefinitionIds.length,
+        );
+      }
+      navigationCandidate = null;
+      currentPreviewEdgeId = null;
+      measurementStart = null;
+    });
+  }
+
+  void finishComponentPlacement() {
+    setState(() {
+      activeComponentDefinition = null;
+      tool = EditorTool.select;
+    });
+  }
+
+  Future<void> placeActiveComponent(
+    SurfacePatch patch,
+    Point2Mm localPoint,
+  ) async {
+    final definition = activeComponentDefinition;
+    final place = widget.onPlaceComponent;
+    if (definition == null || place == null || placingComponent) return;
+
+    setState(() => placingComponent = true);
+    try {
+      await place(definition, patch.id, localPoint);
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Unable to place component: $error')),
+      );
+    } finally {
+      if (mounted) setState(() => placingComponent = false);
+    }
+  }
+
   void handleSurfaceTap(SurfacePatch patch, Point2Mm localPoint) {
     if (_navigateAcrossStrongEdge(patch, localPoint)) return;
 
@@ -161,8 +236,11 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
           measurement = EditorMeasurement(start: start, end: localPoint);
           measurementStart = null;
         });
-      case EditorTool.point:
       case EditorTool.equipment:
+        if (activeComponentDefinition != null) {
+          unawaited(placeActiveComponent(patch, localPoint));
+        }
+      case EditorTool.point:
       case EditorTool.route:
       case EditorTool.architecturalFeature:
         break;
@@ -184,6 +262,8 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
       measurementStart: measurementStart,
       navigationCandidate: navigationCandidate,
       adjacentPreviewPatch: previewPatch,
+      components: widget.components,
+      activeComponentDefinition: activeComponentDefinition,
     );
 
     return Scaffold(
@@ -238,6 +318,9 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
             measurementStart: measurementStart,
             navigationCandidate: navigationCandidate,
             adjacentPreviewPatch: previewPatch,
+            components: widget.components,
+            activeComponentDefinition: activeComponentDefinition,
+            placingComponent: placingComponent,
             onSurfaceTap: handleSurfaceTap,
             onSurfacePointer: handleSurfacePointer,
           );
@@ -250,6 +333,9 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
                 onToolChanged: changeTool,
                 onDisciplineChanged:
                     (value) => setState(() => discipline = value),
+                activeComponentDefinition: activeComponentDefinition,
+                onOpenComponentCatalog: openComponentCatalog,
+                onFinishComponentPlacement: finishComponentPlacement,
                 onFeatureChanged:
                     (value) => setState(() {
                       tool = EditorTool.architecturalFeature;
@@ -278,6 +364,9 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
                               measurementStart: measurementStart,
                               navigationCandidate: navigationCandidate,
                               adjacentPreviewPatch: previewPatch,
+                              activeComponentDefinition:
+                                  activeComponentDefinition,
+                              placingComponent: placingComponent,
                               onOpen:
                                   () => showModalBottomSheet<void>(
                                     context: context,
@@ -315,6 +404,9 @@ class _EditorToolbar extends StatelessWidget {
     required this.onToolChanged,
     required this.onDisciplineChanged,
     required this.onFeatureChanged,
+    required this.activeComponentDefinition,
+    required this.onOpenComponentCatalog,
+    required this.onFinishComponentPlacement,
   });
 
   final EditorTool tool;
@@ -322,6 +414,9 @@ class _EditorToolbar extends StatelessWidget {
   final ValueChanged<EditorTool> onToolChanged;
   final ValueChanged<Discipline> onDisciplineChanged;
   final ValueChanged<ArchitecturalFeatureType> onFeatureChanged;
+  final ComponentDefinition? activeComponentDefinition;
+  final VoidCallback onOpenComponentCatalog;
+  final VoidCallback onFinishComponentPlacement;
 
   @override
   Widget build(BuildContext context) {
@@ -358,6 +453,23 @@ class _EditorToolbar extends StatelessWidget {
               },
             ),
             const SizedBox(width: 12),
+            if (tool == EditorTool.equipment) ...[
+              FilledButton.tonalIcon(
+                onPressed: onOpenComponentCatalog,
+                icon: const Icon(Icons.widgets_outlined, size: 18),
+                label: Text(
+                  activeComponentDefinition?.displayName ?? 'Catalog',
+                ),
+              ),
+              if (activeComponentDefinition != null) ...[
+                const SizedBox(width: 6),
+                TextButton(
+                  onPressed: onFinishComponentPlacement,
+                  child: const Text('Done'),
+                ),
+              ],
+              const SizedBox(width: 12),
+            ],
             PopupMenuButton<ArchitecturalFeatureType>(
               tooltip: 'Add opening / feature',
               onSelected: onFeatureChanged,
@@ -396,6 +508,9 @@ class _EditorCanvasShell extends StatelessWidget {
     required this.measurementStart,
     required this.navigationCandidate,
     required this.adjacentPreviewPatch,
+    required this.components,
+    required this.activeComponentDefinition,
+    required this.placingComponent,
     required this.onSurfaceTap,
     required this.onSurfacePointer,
   });
@@ -411,6 +526,9 @@ class _EditorCanvasShell extends StatelessWidget {
   final Point2Mm? measurementStart;
   final SurfaceEdgeCandidate? navigationCandidate;
   final SurfacePatch? adjacentPreviewPatch;
+  final List<ComponentInstance> components;
+  final ComponentDefinition? activeComponentDefinition;
+  final bool placingComponent;
   final void Function(SurfacePatch patch, Point2Mm localPoint) onSurfaceTap;
   final void Function(SurfacePatch patch, Point2Mm localPoint) onSurfacePointer;
 
@@ -427,6 +545,17 @@ class _EditorCanvasShell extends StatelessWidget {
                 : 'Active surface: ${patch.surfaceId} · ceiling $ceilingHeightMm mm',
             style: Theme.of(context).textTheme.titleMedium,
           ),
+          if (tool == EditorTool.equipment &&
+              activeComponentDefinition != null &&
+              patch != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Text(
+                placingComponent
+                    ? 'Saving ${activeComponentDefinition!.displayName}…'
+                    : 'Place ${activeComponentDefinition!.displayName} · tap repeatedly on ${patch.surfaceId}',
+              ),
+            ),
           if (featureType != null && patch != null)
             Padding(
               padding: const EdgeInsets.only(top: 6),
@@ -516,6 +645,13 @@ class _EditorCanvasShell extends StatelessWidget {
                                                 patch.id,
                                           )
                                           .toList(growable: false),
+                                      components: components
+                                          .where(
+                                            (item) =>
+                                                item.hostSurfacePatchId ==
+                                                patch.id,
+                                          )
+                                          .toList(growable: false),
                                       selection: selection,
                                       measurement: measurement,
                                       measurementStart: measurementStart,
@@ -537,6 +673,8 @@ class _EditorCanvasShell extends StatelessWidget {
             measurementStart: measurementStart,
             navigationCandidate: navigationCandidate,
             adjacentPreviewPatch: adjacentPreviewPatch,
+            activeComponentDefinition: activeComponentDefinition,
+            placingComponent: placingComponent,
           ),
         ],
       ),
@@ -552,6 +690,8 @@ class _ToolContextBar extends StatelessWidget {
     required this.measurementStart,
     required this.navigationCandidate,
     required this.adjacentPreviewPatch,
+    required this.activeComponentDefinition,
+    required this.placingComponent,
   });
 
   final EditorTool tool;
@@ -560,15 +700,46 @@ class _ToolContextBar extends StatelessWidget {
   final Point2Mm? measurementStart;
   final SurfaceEdgeCandidate? navigationCandidate;
   final SurfacePatch? adjacentPreviewPatch;
+  final ComponentDefinition? activeComponentDefinition;
+  final bool placingComponent;
 
   @override
   Widget build(BuildContext context) {
     String text;
+    for (final component in components) {
+      final center = mapPoint(component.localPosition);
+      final paint =
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 1.5;
+      canvas.drawCircle(center, 8, paint);
+      canvas.drawLine(
+        center + const Offset(-6, 0),
+        center + const Offset(6, 0),
+        paint,
+      );
+      canvas.drawLine(
+        center + const Offset(0, -6),
+        center + const Offset(0, 6),
+        paint,
+      );
+    }
+
     final candidate = navigationCandidate;
     final target =
         adjacentPreviewPatch?.surfaceId ?? candidate?.adjacentPatchId;
 
-    if (tool == EditorTool.measure) {
+    if (tool == EditorTool.equipment) {
+      final definition = activeComponentDefinition;
+      if (definition == null) {
+        text = 'Equipment · open Catalog';
+      } else if (placingComponent) {
+        text = 'Equipment · saving ${definition.displayName}…';
+      } else {
+        text =
+            'Equipment · ${definition.displayName} · tap to place repeatedly';
+      }
+    } else if (tool == EditorTool.measure) {
       if (measurementStart != null) {
         text = 'Measure · choose second point';
       } else if (measurement != null) {
@@ -608,6 +779,8 @@ class _CompactContextBar extends StatelessWidget {
     required this.measurementStart,
     required this.navigationCandidate,
     required this.adjacentPreviewPatch,
+    required this.activeComponentDefinition,
+    required this.placingComponent,
     required this.onOpen,
   });
 
@@ -617,6 +790,8 @@ class _CompactContextBar extends StatelessWidget {
   final Point2Mm? measurementStart;
   final SurfaceEdgeCandidate? navigationCandidate;
   final SurfacePatch? adjacentPreviewPatch;
+  final ComponentDefinition? activeComponentDefinition;
+  final bool placingComponent;
   final VoidCallback onOpen;
 
   @override
@@ -624,6 +799,10 @@ class _CompactContextBar extends StatelessWidget {
     final target =
         adjacentPreviewPatch?.surfaceId ?? navigationCandidate?.adjacentPatchId;
     final summary = switch (tool) {
+      EditorTool.equipment when placingComponent => 'Saving component…',
+      EditorTool.equipment when activeComponentDefinition != null =>
+        'Place ${activeComponentDefinition!.displayName}',
+      EditorTool.equipment => 'Equipment catalog',
       EditorTool.measure when measurementStart != null => 'Choose second point',
       EditorTool.measure when measurement != null =>
         '${measurement!.lengthMm.toStringAsFixed(0)} mm',
@@ -666,6 +845,7 @@ class _RoomSurfacePainter extends CustomPainter {
     required this.patch,
     required this.openings,
     required this.features,
+    required this.components,
     required this.selection,
     required this.measurement,
     required this.measurementStart,
@@ -675,6 +855,7 @@ class _RoomSurfacePainter extends CustomPainter {
   final SurfacePatch patch;
   final List<Opening> openings;
   final List<SpatialFeature> features;
+  final List<ComponentInstance> components;
   final EditorSelection? selection;
   final EditorMeasurement? measurement;
   final Point2Mm? measurementStart;
@@ -802,6 +983,7 @@ class _RoomSurfacePainter extends CustomPainter {
       oldDelegate.patch != patch ||
       oldDelegate.openings != openings ||
       oldDelegate.features != features ||
+      oldDelegate.components != components ||
       oldDelegate.selection != selection ||
       oldDelegate.measurement != measurement ||
       oldDelegate.measurementStart != measurementStart ||
@@ -823,6 +1005,8 @@ class _Inspector extends StatelessWidget {
     required this.measurementStart,
     required this.navigationCandidate,
     required this.adjacentPreviewPatch,
+    required this.components,
+    required this.activeComponentDefinition,
   });
 
   final ProjectRecord project;
@@ -835,6 +1019,8 @@ class _Inspector extends StatelessWidget {
   final Point2Mm? measurementStart;
   final SurfaceEdgeCandidate? navigationCandidate;
   final SurfacePatch? adjacentPreviewPatch;
+  final List<ComponentInstance> components;
+  final ComponentDefinition? activeComponentDefinition;
 
   @override
   Widget build(BuildContext context) {
@@ -864,6 +1050,9 @@ class _Inspector extends StatelessWidget {
           Text('Edges: ${geometry.edges.length}'),
           Text('Openings: ${geometry.openings.length}'),
           Text('Features: ${geometry.features.length}'),
+          Text('Placed components: ${components.length}'),
+          if (activeComponentDefinition != null)
+            Text('Placement: ${activeComponentDefinition!.displayName}'),
           if (activePatch != null) ...[
             const Divider(),
             Text('Surface: ${activePatch!.surfaceId}'),
