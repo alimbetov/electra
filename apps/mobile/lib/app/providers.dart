@@ -99,5 +99,5 @@ final roomProvider = StreamProvider.family<RoomRecord?, String>((ref, roomId) {
 
 final roomGeometryProvider =
     StreamProvider.family<RoomGeometrySnapshot, String>((ref, roomId) {
-  return ref.watch(geometryRepositoryProvider).watchRoomGeometry(roomId);
-});
+      return ref.watch(geometryRepositoryProvider).watchRoomGeometry(roomId);
+    });

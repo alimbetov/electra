@@ -54,7 +54,8 @@ void main() {
     return room.id;
   }
 
-  SurfacePatch patch({required String id, required String roomId}) => SurfacePatch(
+  SurfacePatch patch({required String id, required String roomId}) =>
+      SurfacePatch(
         id: id,
         roomId: roomId,
         surfaceId: 'surface-$id',
@@ -171,7 +172,10 @@ void main() {
     expect(restoredPatch.frame.vAxis.z, patchA.frame.vAxis.z);
 
     final restoredOpening = restored.openings.single;
-    expect(restoredOpening.boundary.vertices, snapshot.openings.single.boundary.vertices);
+    expect(
+      restoredOpening.boundary.vertices,
+      snapshot.openings.single.boundary.vertices,
+    );
     expect(restoredOpening.headHeightMm, 2100);
 
     await database.close();
@@ -198,9 +202,10 @@ void main() {
     final hierarchy = DriftProjectHierarchyRepository(database);
     final restoredRoom = await hierarchy.findRoom(roomId);
 
-    final tables = await database
-        .customSelect("SELECT name FROM sqlite_master WHERE type = 'table'")
-        .get();
+    final tables =
+        await database
+            .customSelect("SELECT name FROM sqlite_master WHERE type = 'table'")
+            .get();
     final names = tables.map((row) => row.read<String>('name')).toSet();
 
     expect(restoredRoom?.name, 'Workshop');
