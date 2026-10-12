@@ -21,19 +21,21 @@ final class DriftComponentInstanceRepository
 
   @override
   Stream<List<ComponentInstance>> watchRoomComponents(String roomId) {
-    final query = database.select(database.componentInstances)
-      ..where((row) => row.roomId.equals(roomId) & row.deletedAt.isNull())
-      ..orderBy([(row) => OrderingTerm.asc(row.id)]);
+    final query =
+        database.select(database.componentInstances)
+          ..where((row) => row.roomId.equals(roomId) & row.deletedAt.isNull())
+          ..orderBy([(row) => OrderingTerm.asc(row.id)]);
     return query.watch().map(
-          (rows) => rows.map(_instanceFromRow).toList(growable: false),
-        );
+      (rows) => rows.map(_instanceFromRow).toList(growable: false),
+    );
   }
 
   @override
   Future<List<ComponentInstance>> loadRoomComponents(String roomId) async {
-    final query = database.select(database.componentInstances)
-      ..where((row) => row.roomId.equals(roomId) & row.deletedAt.isNull())
-      ..orderBy([(row) => OrderingTerm.asc(row.id)]);
+    final query =
+        database.select(database.componentInstances)
+          ..where((row) => row.roomId.equals(roomId) & row.deletedAt.isNull())
+          ..orderBy([(row) => OrderingTerm.asc(row.id)]);
     final rows = await query.get();
     return rows.map(_instanceFromRow).toList(growable: false);
   }
@@ -60,16 +62,18 @@ final class DriftComponentInstanceRepository
     }
 
     await database.transaction(() async {
-      final room = await (database.select(database.rooms)
-            ..where((row) => row.id.equals(roomId) & row.deletedAt.isNull()))
-          .getSingleOrNull();
+      final room =
+          await (database.select(database.rooms)..where(
+            (row) => row.id.equals(roomId) & row.deletedAt.isNull(),
+          )).getSingleOrNull();
       if (room == null) {
         throw StateError('Room $roomId does not exist.');
       }
 
-      final patchRows = await (database.select(database.surfacePatches)
-            ..where((row) => row.roomId.equals(roomId) & row.deletedAt.isNull()))
-          .get();
+      final patchRows =
+          await (database.select(database.surfacePatches)..where(
+            (row) => row.roomId.equals(roomId) & row.deletedAt.isNull(),
+          )).get();
       final patches = patchRows.map(_patchFromRow).toList(growable: false);
 
       for (final instance in next) {
@@ -85,9 +89,9 @@ final class DriftComponentInstanceRepository
         }
       }
 
-      final existingRows = await (database.select(database.componentInstances)
-            ..where((row) => row.roomId.equals(roomId)))
-          .get();
+      final existingRows =
+          await (database.select(database.componentInstances)
+            ..where((row) => row.roomId.equals(roomId))).get();
       final existingById = {for (final row in existingRows) row.id: row};
       final nextIds = next.map((instance) => instance.id).toSet();
       final now = _clock();
@@ -95,8 +99,7 @@ final class DriftComponentInstanceRepository
       for (final row in existingRows) {
         if (!nextIds.contains(row.id) && row.deletedAt == null) {
           await (database.update(database.componentInstances)
-                ..where((item) => item.id.equals(row.id)))
-              .write(
+            ..where((item) => item.id.equals(row.id))).write(
             ComponentInstancesCompanion(
               revision: Value(row.revision + 1),
               updatedAt: Value(now),
@@ -108,12 +111,10 @@ final class DriftComponentInstanceRepository
       }
 
       for (final instance in next) {
-        await database.into(database.componentInstances).insertOnConflictUpdate(
-              _companion(
-                instance,
-                now,
-                existing: existingById[instance.id],
-              ),
+        await database
+            .into(database.componentInstances)
+            .insertOnConflictUpdate(
+              _companion(instance, now, existing: existingById[instance.id]),
             );
       }
     });
@@ -123,24 +124,23 @@ final class DriftComponentInstanceRepository
     ComponentInstance instance,
     DateTime now, {
     ComponentInstanceRow? existing,
-  }) =>
-      ComponentInstancesCompanion(
-        id: Value(instance.id),
-        definitionId: Value(instance.definitionId),
-        definitionVersion: Value(instance.definitionVersion),
-        roomId: Value(instance.roomId),
-        hostSurfacePatchId: Value(instance.hostSurfacePatchId),
-        localXmm: Value(instance.localPosition.xMm),
-        localYmm: Value(instance.localPosition.yMm),
-        rotationRadians: Value(instance.rotationRadians),
-        displayNameOverride: Value(instance.displayNameOverride),
-        metadataOverridesJson: Value(jsonEncode(instance.metadataOverrides)),
-        revision: Value((existing?.revision ?? 0) + 1),
-        createdAt: Value(existing?.createdAt ?? now),
-        updatedAt: Value(now),
-        deletedAt: const Value(null),
-        originDeviceId: Value(originDeviceId),
-      );
+  }) => ComponentInstancesCompanion(
+    id: Value(instance.id),
+    definitionId: Value(instance.definitionId),
+    definitionVersion: Value(instance.definitionVersion),
+    roomId: Value(instance.roomId),
+    hostSurfacePatchId: Value(instance.hostSurfacePatchId),
+    localXmm: Value(instance.localPosition.xMm),
+    localYmm: Value(instance.localPosition.yMm),
+    rotationRadians: Value(instance.rotationRadians),
+    displayNameOverride: Value(instance.displayNameOverride),
+    metadataOverridesJson: Value(jsonEncode(instance.metadataOverrides)),
+    revision: Value((existing?.revision ?? 0) + 1),
+    createdAt: Value(existing?.createdAt ?? now),
+    updatedAt: Value(now),
+    deletedAt: const Value(null),
+    originDeviceId: Value(originDeviceId),
+  );
 
   ComponentInstance _instanceFromRow(ComponentInstanceRow row) =>
       ComponentInstance(
@@ -158,15 +158,15 @@ final class DriftComponentInstanceRepository
       );
 
   SurfacePatch _patchFromRow(SurfacePatchRow row) => SurfacePatch(
-        id: row.id,
-        roomId: row.roomId,
-        surfaceId: row.surfaceId,
-        frame: LocalCoordinateFrame(
-          origin: Point3Mm(row.originXmm, row.originYmm, row.originZmm),
-          uAxis: Vector3D(row.uAxisX, row.uAxisY, row.uAxisZ),
-          vAxis: Vector3D(row.vAxisX, row.vAxisY, row.vAxisZ),
-        ),
-        boundary: GeometryCodec.decodePolygon(row.boundaryJson),
-        orientation: SurfaceOrientation.values.byName(row.orientation),
-      );
+    id: row.id,
+    roomId: row.roomId,
+    surfaceId: row.surfaceId,
+    frame: LocalCoordinateFrame(
+      origin: Point3Mm(row.originXmm, row.originYmm, row.originZmm),
+      uAxis: Vector3D(row.uAxisX, row.uAxisY, row.uAxisZ),
+      vAxis: Vector3D(row.vAxisX, row.vAxisY, row.vAxisZ),
+    ),
+    boundary: GeometryCodec.decodePolygon(row.boundaryJson),
+    orientation: SurfaceOrientation.values.byName(row.orientation),
+  );
 }

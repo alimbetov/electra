@@ -159,7 +159,8 @@ class ComponentInstances extends Table with GeometryAuditColumns {
   IntColumn get localYmm => integer()();
   RealColumn get rotationRadians => real().withDefault(const Constant(0))();
   TextColumn get displayNameOverride => text().nullable()();
-  TextColumn get metadataOverridesJson => text().withDefault(const Constant('{}'))();
+  TextColumn get metadataOverridesJson =>
+      text().withDefault(const Constant('{}'))();
 
   @override
   Set<Column<Object>> get primaryKey => {id};
