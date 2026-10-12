@@ -129,7 +129,11 @@ void main() {
 
     expect(
       violations.map((e) => e.code),
-      containsAll(['EDGE_HOST_MISSING', 'OPENING_HOST_MISSING', 'FEATURE_HOST_MISSING']),
+      containsAll([
+        'EDGE_HOST_MISSING',
+        'OPENING_HOST_MISSING',
+        'FEATURE_HOST_MISSING'
+      ]),
     );
   });
 

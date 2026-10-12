@@ -96,7 +96,8 @@ final class Vector3D {
         x * other.y - y * other.x,
       );
 
-  Vector3D operator *(double scale) => Vector3D(x * scale, y * scale, z * scale);
+  Vector3D operator *(double scale) =>
+      Vector3D(x * scale, y * scale, z * scale);
 }
 
 final class Segment2Mm {

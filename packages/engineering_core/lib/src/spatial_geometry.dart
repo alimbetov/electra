@@ -78,7 +78,8 @@ final class SurfaceAdjacency {
     required this.toPatchId,
     required this.toEdgeId,
   }) {
-    if ({id, fromPatchId, fromEdgeId, toPatchId, toEdgeId}.any((e) => e.isEmpty)) {
+    if ({id, fromPatchId, fromEdgeId, toPatchId, toEdgeId}
+        .any((e) => e.isEmpty)) {
       throw ArgumentError('SurfaceAdjacency identifiers must be non-empty.');
     }
     if (fromPatchId == toPatchId && fromEdgeId == toEdgeId) {
