@@ -35,16 +35,18 @@ Only the electrical vertical is implemented first. The other discipline modules 
 - canonical geometry uses millimetres;
 - persisted engineering objects may have x/y/z semantics even when edited in a 2D UI;
 - shared project geometry is discipline-neutral;
-- engineering layers reference the same `Floor`, `Room`, `Wall`, `Opening` and `RoomSurface` entities;
+- engineering layers reference the same shared spatial entities;
+- room boundaries are polygonal and piecewise-planar rather than assumed globally flat;
 - discipline, project phase and installation status are independent dimensions;
 - room height is resolved from project/floor defaults plus optional room overrides;
+- local patch geometry may override actual local floor/ceiling elevation;
 - structural height and finished ceiling height are distinct concepts;
-- mounting surface and physical routing surface are separate concepts;
+- mounting surface type and exact physical surface patch are separate concepts;
 - engineering calculations are deterministic, versioned and testable offline;
 - equipment definitions are extensible and data-driven;
 - physical run length is derived from route topology, not treated as authoritative source data;
 - domain and code identifiers use English language-neutral codes;
-- navigation between wall/floor/ceiling surfaces is driven by explicit surface topology.
+- navigation between surfaces is driven by explicit patch/edge topology.
 
 ## Spatial core
 
@@ -56,8 +58,11 @@ Zone
 Wall
 Opening
 RoomSurface
+SurfacePatch
 SurfaceEdge
 SurfaceAdjacency
+SpatialFeature
+Point2Mm
 Point3Mm
 BoundingBox
 MountingSurface
@@ -67,66 +72,160 @@ SpatialRevision
 
 The spatial core must not know whether a routed object is a cable, pipe or ventilation duct.
 
-### RoomSurface
+## Piecewise-planar geometry
 
-`RoomSurface` is a concrete editable surface belonging to a room.
-
-Representative types:
+`RoomSurface` is a logical surface grouping such as a room floor, ceiling or wall. A logical surface may contain multiple planar `SurfacePatch` objects.
 
 ```text
-FLOOR
-CEILING
-WALL
+RoomSurface
+  -> SurfacePatch[]
+       -> SurfaceEdge[]
+```
+
+Each `SurfacePatch` is a bounded planar polygon and owns a deterministic local 2D coordinate frame mapped to global project coordinates.
+
+Representative patch data:
+
+```text
+SurfacePatch
+  id
+  surfaceId
+  boundary
+  localCoordinateFrame
+  plane
+  normal
+  elevation/orientation
+```
+
+This supports geometry such as:
+
+```text
+CeilingSurface
+  -> main horizontal patch
+  -> vertical beam/soffit side patch
+  -> lower underside patch
+
+FloorSurface
+  -> main floor patch
+  -> vertical step patch
+  -> raised platform patch
+
+WallSurface
+  -> main wall patch
+  -> niche return patch
+  -> niche back patch
+```
+
+Supported initial geometry includes horizontal, vertical and sloped planes with polygonal boundaries and explicit folds/steps.
+
+Free-form mesh editing, NURBS and BIM-grade solid modeling are intentionally out of scope initially.
+
+## Spatial features
+
+Semantically meaningful construction geometry is represented as `SpatialFeature`.
+
+Initial types:
+
+```text
+BEAM
+COLUMN
+SOFFIT
+NICHE
+SHAFT
+STEP
+PLATFORM
+RECESS
+PROTRUSION
 CUSTOM
 ```
 
-Each surface has its own identity and local 2D coordinate frame mapped to global project coordinates.
+A feature may own/generate one or more patches. For example a beam may expose bottom, side and end patches.
 
-### SurfaceEdge
+Feature identity is retained for measurements, annotations, routing constraints, clash detection and documentation.
 
-A `SurfaceEdge` is a concrete boundary of one `RoomSurface`. It exposes local 2D and world 3D start/end positions and may resolve to an adjacent surface.
+## SurfaceEdge
 
-All navigable edges are equivalent from the Spatial Core perspective. The editor may therefore navigate through:
+A `SurfaceEdge` is a concrete boundary of one `SurfacePatch`. It exposes local 2D and world 3D start/end positions and may resolve to an adjacent patch/surface.
+
+All navigable edges are equivalent from the Spatial Core perspective. Common examples include:
 
 ```text
-upper edge   -> adjacent ceiling-like surface
-lower edge   -> adjacent floor-like surface
-left edge    -> adjacent lateral wall
-right edge   -> adjacent lateral wall
-custom edge  -> any explicitly adjacent surface
+wall upper edge   -> ceiling patch
+wall lower edge   -> floor patch
+wall lateral edge -> adjacent wall patch
+ceiling edge      -> beam/soffit side patch
+floor edge        -> step/platform patch
+custom edge       -> explicitly adjacent patch
 ```
 
-These labels describe common UI orientation only. The actual relationship is always determined by `SurfaceAdjacency`.
+These labels describe common UI orientation only. The actual relationship is always determined by topology.
 
-### SurfaceAdjacency
+## SurfaceAdjacency
 
-`SurfaceAdjacency` captures topological continuity between concrete surfaces.
+`SurfaceAdjacency` captures topological continuity between concrete patches/surfaces.
 
 Examples:
 
 ```text
-Wall A <-> Ceiling
-Wall A <-> Floor
-Wall A <-> Wall B
-Wall A <-> Wall D
+Wall A patch <-> Ceiling patch
+Wall A patch <-> Floor patch
+Wall A patch <-> Wall B patch
+Ceiling patch <-> Beam side patch
+Beam side patch <-> Beam underside patch
+Floor patch <-> Step face patch
+Step face patch <-> Raised floor patch
 ```
 
 Adjacency is explicit so complex/non-rectangular rooms do not depend on hardcoded navigation assumptions.
 
-### Surface navigation support
+## Surface navigation support
 
 The engineering core provides the data needed for the editor to resolve:
 
 ```text
 activeSurface
+activePatch
   -> candidate SurfaceEdge[]
   -> nearest/target edge
+  -> adjacentPatch
   -> adjacentSurface
 ```
 
 The UI owns proximity thresholds, highlighting, preview opacity, fold animation and gesture interpretation.
 
-When several edges are simultaneously close, such as near a corner, the core exposes the valid adjacency candidates while the editor selects a primary preview deterministically.
+When several edges are simultaneously close, such as near a corner, the core exposes valid adjacency candidates while the editor selects a primary preview deterministically.
+
+The navigation state is presentation/application state and may include:
+
+```text
+activeSurfaceId
+activePatchId
+previewSurfaceId?
+previewPatchId?
+nearestEdgeId?
+proximity
+```
+
+## Coordinate conversion
+
+Every patch must support exact conversion:
+
+```text
+Point2Mm localToWorld(Point2Mm local) -> Point3Mm
+Point2Mm worldToLocal(Point3Mm world) -> Point2Mm
+```
+
+The precise API shape may differ, but the transformation must be deterministic and reversible within accepted numeric tolerance.
+
+This is required for:
+
+- placement;
+- measurements;
+- snap;
+- surface transitions;
+- route lengths;
+- clash detection;
+- exports.
 
 ## Engineering layers
 
@@ -212,6 +311,8 @@ AIR_RETURN
 
 A device can therefore participate in several disciplines at once. For example an air-conditioner indoor unit can expose power, control, refrigerant and drain ports.
 
+Exact placement on construction geometry references a `surfacePatchId` when surface-bound.
+
 ## Network core
 
 The generic network layer captures connectivity/topology without absorbing discipline-specific physics.
@@ -271,22 +372,32 @@ A route node carries `xMm`, `yMm`, `zMm`.
 
 ### RouteSegment
 
-A route segment connects two nodes and provides reusable spatial geometry. Surface-bound segments reference a concrete `RoomSurface` through `surfaceId`.
+A route segment connects two nodes and provides reusable spatial geometry. Surface-bound segments reference the exact `SurfacePatch` through `surfacePatchId`.
 
 This supports continuous transitions such as:
 
 ```text
-Wall A segment
+Wall patch
   -> SURFACE_TRANSITION
-  -> Ceiling segment
+  -> Ceiling patch
 ```
 
-and lateral transitions:
+lateral transitions:
 
 ```text
-Wall A segment
+Wall A patch
   -> SURFACE_TRANSITION
-  -> Wall B segment
+  -> Wall B patch
+```
+
+and construction-feature transitions:
+
+```text
+Ceiling patch
+  -> SURFACE_TRANSITION
+  -> Beam side patch
+  -> SURFACE_TRANSITION
+  -> Beam underside patch
 ```
 
 A discipline-specific run references the route and adds physical properties.
@@ -329,7 +440,27 @@ sum(RouteSegment geometric lengths)
 = calculated physical run length
 ```
 
-Vertical rises, drops and surface transitions are explicit route geometry, so changes to room height or equipment installation height can trigger deterministic recalculation.
+Vertical rises, drops and patch/surface transitions are explicit route geometry, so changes to room geometry or equipment placement trigger deterministic recalculation.
+
+## Spatial revision compatibility
+
+`SurfacePatch`, `SurfaceEdge`, `SurfaceAdjacency` and `SpatialFeature` belong to the shared spatial model.
+
+Any geometry edit that changes their topology or coordinates participates in `SpatialRevision`. Engineering layers retain `baseSpatialRevision` so they can detect stale routing/placement after shared geometry changes.
+
+## Validation expectations
+
+The Spatial Core should validate at least:
+
+- planar patch validity;
+- non-degenerate polygon boundaries;
+- valid local/world transformations;
+- surface-edge ownership;
+- adjacency consistency/symmetry where applicable;
+- required shared-edge coincidence within tolerance;
+- feature-generated patch ownership;
+- invalid gaps/overlaps where topology requires continuity;
+- route transition location on valid adjacent boundaries.
 
 ## Collaboration compatibility
 
@@ -340,15 +471,20 @@ Layer objects retain their `layerId`, `discipline`, `revision` and `baseSpatialR
 The engineering core should be testable without Flutter. Priority test areas:
 
 - shared geometry and coordinate transforms;
+- polygonal surface patch validation;
+- horizontal, vertical and sloped patches;
 - room surface local/world coordinate conversion;
-- surface edge adjacency;
+- patch/edge adjacency;
 - lateral wall adjacency;
+- beam/soffit/step topology;
 - corner cases with multiple adjacent edge candidates;
-- room-height inheritance;
+- room-height inheritance plus local patch elevation;
+- spatial feature ownership;
 - layer/spatial revision compatibility;
 - equipment port compatibility;
 - route node/segment topology;
-- surface-transition continuity;
+- surface/patch-transition continuity;
+- routes crossing beam/step/sloped geometry;
 - bend, transition and junction inference;
 - discipline-specific run lengths;
 - electrical conduit assignment/fill rules;
