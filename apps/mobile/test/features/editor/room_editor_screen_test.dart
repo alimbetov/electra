@@ -9,49 +9,49 @@ void main() {
   final timestamp = DateTime.utc(2026, 10, 12, 12);
 
   ProjectRecord project() => ProjectRecord(
-        id: 'project-editor',
-        name: 'Editor Project',
-        reference: 'ED-01',
-        measurementSystem: MeasurementSystem.metric,
-        defaultStructuralHeightMm: 3200,
-        defaultFinishedCeilingHeightMm: 3000,
-        revision: 1,
-        createdAt: timestamp,
-        updatedAt: timestamp,
-        originDeviceId: 'widget-test',
-      );
+    id: 'project-editor',
+    name: 'Editor Project',
+    reference: 'ED-01',
+    measurementSystem: MeasurementSystem.metric,
+    defaultStructuralHeightMm: 3200,
+    defaultFinishedCeilingHeightMm: 3000,
+    revision: 1,
+    createdAt: timestamp,
+    updatedAt: timestamp,
+    originDeviceId: 'widget-test',
+  );
 
   RoomRecord room() => RoomRecord(
-        id: 'room-editor',
-        floorId: 'floor-editor',
-        name: 'Workshop 01',
-        type: RoomType.workshop,
-        category: RoomCategory.technical,
-        widthMm: 4000,
-        depthMm: 3000,
-        revision: 1,
-        createdAt: timestamp,
-        updatedAt: timestamp,
-        originDeviceId: 'widget-test',
-      );
+    id: 'room-editor',
+    floorId: 'floor-editor',
+    name: 'Workshop 01',
+    type: RoomType.workshop,
+    category: RoomCategory.technical,
+    widthMm: 4000,
+    depthMm: 3000,
+    revision: 1,
+    createdAt: timestamp,
+    updatedAt: timestamp,
+    originDeviceId: 'widget-test',
+  );
 
   SurfacePatch patch() => SurfacePatch(
-        id: 'patch-editor',
-        roomId: 'room-editor',
-        surfaceId: 'wall-a',
-        frame: LocalCoordinateFrame(
-          origin: const Point3Mm(0, 0, 0),
-          uAxis: const Vector3D(1, 0, 0),
-          vAxis: const Vector3D(0, 0, 1),
-        ),
-        boundary: Polygon2Mm(const [
-          Point2Mm(0, 0),
-          Point2Mm(4000, 0),
-          Point2Mm(4000, 3000),
-          Point2Mm(0, 3000),
-        ]),
-        orientation: SurfaceOrientation.vertical,
-      );
+    id: 'patch-editor',
+    roomId: 'room-editor',
+    surfaceId: 'wall-a',
+    frame: LocalCoordinateFrame(
+      origin: const Point3Mm(0, 0, 0),
+      uAxis: const Vector3D(1, 0, 0),
+      vAxis: const Vector3D(0, 0, 1),
+    ),
+    boundary: Polygon2Mm(const [
+      Point2Mm(0, 0),
+      Point2Mm(4000, 0),
+      Point2Mm(4000, 3000),
+      Point2Mm(0, 3000),
+    ]),
+    orientation: SurfaceOrientation.vertical,
+  );
 
   Future<void> pumpEditor(WidgetTester tester) async {
     final surface = patch();
