@@ -41,6 +41,45 @@ final class DriftComponentInstanceRepository
   }
 
   @override
+  Future<void> saveComponent(ComponentInstance instance) async {
+    await database.transaction(() async {
+      final room =
+          await (database.select(database.rooms)..where(
+            (row) => row.id.equals(instance.roomId) & row.deletedAt.isNull(),
+          )).getSingleOrNull();
+      if (room == null) {
+        throw StateError('Room ${instance.roomId} does not exist.');
+      }
+
+      final patchRow =
+          await (database.select(database.surfacePatches)..where(
+            (row) =>
+                row.id.equals(instance.hostSurfacePatchId) &
+                row.deletedAt.isNull(),
+          )).getSingleOrNull();
+      final violations = ComponentPlacementValidator.validate(
+        instance: instance,
+        patches: patchRow == null ? const [] : [_patchFromRow(patchRow)],
+      );
+      if (violations.isNotEmpty) {
+        throw StateError(
+          'Invalid component ${instance.id}: '
+          '${violations.map((item) => item.code.name).join(', ')}',
+        );
+      }
+
+      final existing =
+          await (database.select(database.componentInstances)..where(
+            (row) => row.id.equals(instance.id),
+          )).getSingleOrNull();
+      final now = _clock();
+      await database.into(database.componentInstances).insertOnConflictUpdate(
+            _companion(instance, now, existing: existing),
+          );
+    });
+  }
+
+  @override
   Future<void> replaceRoomComponents({
     required String roomId,
     required Iterable<ComponentInstance> instances,
