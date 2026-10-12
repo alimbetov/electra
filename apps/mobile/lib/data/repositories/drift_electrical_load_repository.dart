@@ -29,7 +29,7 @@ final class DriftElectricalLoadRepository implements ElectricalLoadRepository {
   List<EquipmentElectricalLoad> _mapLoads(List<TypedResult> rows) => rows
       .map(
         (result) =>
-            _fromRow(result.readTable(database.equipmentElectricalLoads)),
+            decodeRow(result.readTable(database.equipmentElectricalLoads)),
       )
       .toList(growable: false);
 
@@ -157,6 +157,7 @@ final class DriftElectricalLoadRepository implements ElectricalLoadRepository {
               startingMethod: Value(profile.startingMethod.name),
               startingCurrentFactor: Value(profile.startingCurrentFactor),
               loadType: Value(profile.loadType),
+              powerBasis: Value(load.powerBasis?.name),
               dedicatedCircuitRecommended: Value(
                 profile.dedicatedCircuitRecommended,
               ),
@@ -172,10 +173,14 @@ final class DriftElectricalLoadRepository implements ElectricalLoadRepository {
     });
   }
 
-  EquipmentElectricalLoad _fromRow(EquipmentElectricalLoadRow row) =>
+  static EquipmentElectricalLoad decodeRow(EquipmentElectricalLoadRow row) =>
       EquipmentElectricalLoad(
         componentInstanceId: row.componentInstanceId,
         consumptionGroupId: row.consumptionGroupId,
+        powerBasis:
+            row.powerBasis == null
+                ? null
+                : ElectricalPowerBasis.values.byName(row.powerBasis!),
         profile: ElectricalLoadProfile(
           nominalVoltageV: row.nominalVoltageV,
           phases: row.phases,

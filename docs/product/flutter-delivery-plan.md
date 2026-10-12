@@ -292,6 +292,32 @@ Loads are persisted and traceable back to equipment instances.
 
 ## WP-FL8 — Circuits
 
+**Status: IMPLEMENTED BASELINE; exact-SHA CI gate pending.**
+
+### Implemented behavior
+
+- pure domain circuit inputs, assigned load IDs, proposal snapshots and per-load calculation evidence;
+- schema v6 persists circuits, one-circuit-per-load assignments and confirmation input signatures;
+- v5 load power basis migrates to unknown, requiring explicit electrical-input/mechanical-output interpretation when calculating from power;
+- named proposals can be created from persisted consumption groups or explicit selected room loads;
+- circuit/assignment replacement is transactional; missing, inactive, cross-room and already-assigned loads are rejected without partial writes;
+- demand factor kD is persisted explicitly in (0, 1]; default 1 is visible and editable;
+- rated current takes priority; otherwise single-phase AC, balanced three-phase AC and DC use explicit voltage/power inputs;
+- AC requires power factor; mechanical output power additionally requires efficiency; no implicit unity PF/efficiency and no partial total when inputs are incomplete;
+- `Ib = kD * sum(load current magnitudes)` is a conservative aggregation, not vector or phase-balancing analysis;
+- result/evidence are recomputed from current SQLite data and are not saved as authoritative current values;
+- proposed/confirmed/review-required state is tied to a deterministic versioned input signature; load changes invalidate confirmation;
+- inactive equipment remains assigned but blocks current/confirmation; restoring identical equipment restores the same evidence;
+- compact and expanded circuit forms edit supply, phases, voltage, kD and assignments; formula details and issues appear on demand;
+- regression coverage includes formulas, missing data, live load updates, confirmation freshness, assignments, rollback, v5-to-v6 migration, close/reopen and form interactions.
+
+### Calculation references and limits
+
+Motor current and voltage/power interpretation follow [Schneider Electric Electrical Installation Guide — Induction motors](https://www.electrical-installation.org/enwiki/Induction_motors): three-phase voltage is line-to-line; mechanical output power is converted through efficiency before calculating input current.
+
+Mixed phase counts or voltages are reported as incompatible. Custom/control supplies and unbalanced phase allocation require future capabilities. Starting/inrush current, cable sizing and protection selection are separate later stages; FL8 confirms a load-current proposal without manufacturer-specific product coupling.
+
+
 ### Scope
 
 - circuit creation;

@@ -276,6 +276,8 @@ void main() {
       await DriftCatalogPreferencesRepository(
         database,
       ).setFavorite('motor', true);
+      await database.customStatement('DROP TABLE circuit_load_assignments');
+      await database.customStatement('DROP TABLE electrical_circuits');
       await database.customStatement('DROP TABLE equipment_electrical_loads');
       await database.customStatement('DROP TABLE consumption_groups');
       await database.customStatement('PRAGMA user_version = 4');

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/providers.dart';
 import '../../domain/system_component_catalog.dart';
+import 'electrical_circuits_screen.dart';
 
 class ElectricalLoadsScreen extends ConsumerWidget {
   const ElectricalLoadsScreen({
@@ -20,7 +21,25 @@ class ElectricalLoadsScreen extends ConsumerWidget {
     final loads = ref.watch(roomElectricalLoadsProvider(roomId));
     final groups = ref.watch(roomConsumptionGroupsProvider(roomId));
     return Scaffold(
-      appBar: AppBar(title: Text('$roomName · Electrical loads')),
+      appBar: AppBar(
+        title: Text('$roomName · Electrical loads'),
+        actions: [
+          IconButton(
+            tooltip: 'Circuits',
+            icon: const Icon(Icons.account_tree_outlined),
+            onPressed:
+                () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder:
+                        (_) => ElectricalCircuitsScreen(
+                          roomId: roomId,
+                          roomName: roomName,
+                        ),
+                  ),
+                ),
+          ),
+        ],
+      ),
       body: components.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error:
@@ -227,6 +246,7 @@ class _ElectricalLoadDialogState extends State<ElectricalLoadDialog> {
   );
   late SupplySystem supply = base.supplySystem;
   late int phases = base.phases;
+  late ElectricalPowerBasis? powerBasis = widget.existing?.powerBasis;
   late String groupId = widget.existing?.consumptionGroupId ?? '';
   bool saving = false;
   String? error;
@@ -294,6 +314,7 @@ class _ElectricalLoadDialogState extends State<ElectricalLoadDialog> {
           componentInstanceId: widget.component.id,
           profile: profile,
           consumptionGroupId: groupId.isEmpty ? null : groupId,
+          powerBasis: powerBasis,
         ),
       );
       if (mounted) Navigator.of(context).pop();
@@ -373,6 +394,31 @@ class _ElectricalLoadDialogState extends State<ElectricalLoadDialog> {
                 ),
                 decoration: InputDecoration(labelText: field.$2),
               ),
+            DropdownButtonFormField<String>(
+              initialValue: powerBasis?.name ?? '',
+              decoration: const InputDecoration(labelText: 'Rated power basis'),
+              items: const [
+                DropdownMenuItem(value: '', child: Text('Not specified')),
+                DropdownMenuItem(
+                  value: 'electricalInput',
+                  child: Text('Electrical input power'),
+                ),
+                DropdownMenuItem(
+                  value: 'mechanicalOutput',
+                  child: Text('Mechanical output power'),
+                ),
+              ],
+              onChanged:
+                  saving
+                      ? null
+                      : (value) => setState(
+                        () =>
+                            powerBasis =
+                                value == null || value.isEmpty
+                                    ? null
+                                    : ElectricalPowerBasis.values.byName(value),
+                      ),
+            ),
             DropdownButtonFormField<String>(
               initialValue: groupId,
               decoration: const InputDecoration(labelText: 'Consumption group'),

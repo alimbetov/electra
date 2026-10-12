@@ -1,3 +1,5 @@
+import '../application/electrical_circuit_repository.dart';
+import '../data/repositories/drift_electrical_circuit_repository.dart';
 import '../application/electrical_load_repository.dart';
 import '../data/repositories/drift_electrical_load_repository.dart';
 import '../application/catalog_preferences_repository.dart';
@@ -158,4 +160,18 @@ final roomConsumptionGroupsProvider =
     StreamProvider.family<List<RoomConsumptionGroup>, String>(
       (ref, roomId) =>
           ref.watch(electricalLoadRepositoryProvider).watchRoomGroups(roomId),
+    );
+
+final electricalCircuitRepositoryProvider =
+    Provider<ElectricalCircuitRepository>(
+      (ref) => DriftElectricalCircuitRepository(
+        ref.watch(databaseProvider),
+        originDeviceId: 'local-device',
+      ),
+    );
+final roomElectricalCircuitsProvider =
+    StreamProvider.family<List<CircuitSnapshot>, String>(
+      (ref, roomId) => ref
+          .watch(electricalCircuitRepositoryProvider)
+          .watchRoomCircuits(roomId),
     );

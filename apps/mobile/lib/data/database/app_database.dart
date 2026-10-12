@@ -208,6 +208,32 @@ class EquipmentElectricalLoads extends Table with GeometryAuditColumns {
       boolean().withDefault(const Constant(false))();
   BoolColumn get requiresProtectiveEarth =>
       boolean().withDefault(const Constant(true))();
+  TextColumn get powerBasis => text().nullable()();
+  @override
+  Set<Column<Object>> get primaryKey => {componentInstanceId};
+}
+
+@DataClassName('ElectricalCircuitRow')
+class ElectricalCircuits extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get roomId => text().references(Rooms, #id)();
+  TextColumn get name => text()();
+  RealColumn get nominalVoltageV => real()();
+  IntColumn get phases => integer()();
+  TextColumn get supplySystem => text()();
+  RealColumn get demandFactor => real().withDefault(const Constant(1))();
+  TextColumn get sourceGroupId =>
+      text().nullable().references(ConsumptionGroups, #id)();
+  TextColumn get reviewedInputSignature => text().nullable()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('CircuitLoadAssignmentRow')
+class CircuitLoadAssignments extends Table {
+  TextColumn get componentInstanceId =>
+      text().references(EquipmentElectricalLoads, #componentInstanceId)();
+  TextColumn get circuitId => text().references(ElectricalCircuits, #id)();
   @override
   Set<Column<Object>> get primaryKey => {componentInstanceId};
 }
@@ -226,6 +252,8 @@ class EquipmentElectricalLoads extends Table with GeometryAuditColumns {
     ComponentCatalogPreferences,
     ConsumptionGroups,
     EquipmentElectricalLoads,
+    ElectricalCircuits,
+    CircuitLoadAssignments,
   ],
 )
 final class AppDatabase extends _$AppDatabase {
@@ -233,7 +261,7 @@ final class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'electra'));
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -262,6 +290,16 @@ final class AppDatabase extends _$AppDatabase {
           await migrator.createTable(consumptionGroups);
           await migrator.createTable(equipmentElectricalLoads);
         }
+        if (from < 6) {
+          // Earlier upgrades create the current load table including this column.
+          if (from >= 5)
+            await migrator.addColumn(
+              equipmentElectricalLoads,
+              equipmentElectricalLoads.powerBasis,
+            );
+          await migrator.createTable(electricalCircuits);
+          await migrator.createTable(circuitLoadAssignments);
+        }
       }
       await _createIndexes();
     },
@@ -271,6 +309,12 @@ final class AppDatabase extends _$AppDatabase {
   );
 
   Future<void> _createIndexes() async {
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_electrical_circuit_room ON electrical_circuits(room_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_circuit_load_assignment_circuit ON circuit_load_assignments(circuit_id)',
+    );
     await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_consumption_group_room ON consumption_groups(room_id)',
     );

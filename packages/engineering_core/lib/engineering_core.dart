@@ -14,3 +14,4 @@ export 'src/routing_junction.dart';
 export 'src/spatial_geometry.dart';
 export 'src/surface_navigation.dart';
 export 'src/electrical_load.dart';
+export 'src/electrical_circuit.dart';

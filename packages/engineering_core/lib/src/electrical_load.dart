@@ -1,5 +1,7 @@
 import 'component_catalog.dart';
 
+enum ElectricalPowerBasis { electricalInput, mechanicalOutput }
+
 final class RoomConsumptionGroup {
   const RoomConsumptionGroup(
       {required this.id, required this.roomId, required this.name});
@@ -13,10 +15,12 @@ final class EquipmentElectricalLoad {
   const EquipmentElectricalLoad(
       {required this.componentInstanceId,
       required this.profile,
-      this.consumptionGroupId});
+      this.consumptionGroupId,
+      this.powerBasis});
   final String componentInstanceId;
   final ElectricalLoadProfile profile;
   final String? consumptionGroupId;
+  final ElectricalPowerBasis? powerBasis;
 }
 
 abstract final class ElectricalLoadValidator {
