@@ -1,5 +1,6 @@
 import 'package:electra_mobile/application/geometry_repository.dart';
 import 'package:electra_mobile/domain/project_models.dart';
+import 'package:electra_mobile/features/editor/editor_interaction.dart';
 import 'package:electra_mobile/features/editor/room_editor_screen.dart';
 import 'package:engineering_core/engineering_core.dart';
 import 'package:flutter/gestures.dart';
@@ -122,16 +123,25 @@ void main() {
 
     final viewer = find.byType(InteractiveViewer);
     final rect = tester.getRect(viewer);
-    final nearRightEdge = Offset(rect.right - 28, rect.center.dy);
+    final transform = SurfaceViewportTransform(
+      boundary: wallA.boundary,
+      viewportWidth: rect.width,
+      viewportHeight: rect.height,
+    );
+    final engineeringPoint = transform.localToViewport(
+      const Point2Mm(3950, 1500),
+    );
+    final strongPreviewPoint =
+        rect.topLeft + Offset(engineeringPoint.x, engineeringPoint.y);
 
     final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
     await gesture.addPointer(location: rect.center);
-    await gesture.moveTo(nearRightEdge);
+    await gesture.moveTo(strongPreviewPoint);
     await tester.pump();
 
     expect(find.textContaining('Open → Wall B'), findsOneWidget);
 
-    await tester.tapAt(nearRightEdge);
+    await tester.tapAt(strongPreviewPoint);
     await tester.pump();
 
     expect(find.textContaining('Navigation Room · Wall B'), findsOneWidget);
