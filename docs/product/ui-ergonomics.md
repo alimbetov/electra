@@ -16,47 +16,210 @@ Electra is a field engineering editor, not a generic CAD workstation. The interf
 8. Do not encode engineering meaning by color alone; use icon, line pattern, label or shape as a second channel.
 9. Tablet and phone use different compositions over the same domain state. Phone is not a scaled-down tablet.
 10. Surface navigation is geometry-driven. Edge proximity and tap navigation are preferred over a separate wall/ceiling/floor navigator.
+11. Inactive feature groups are hidden, not merely disabled.
+12. Detailed information is loaded progressively through the current tool/selection context.
+
+## Canvas-first editor shell
+
+Permanent editor chrome is intentionally small:
+
+```text
+Header
+Tool Rail
+Canvas
+Context Bar
+```
+
+The editor is not a dashboard. Large palettes, layer management, route settings, navigation and object properties must not all remain visible at the same time.
+
+## Contextual side panel carousel
+
+On tablet and desktop-like widths, detailed information appears in one contextual side panel. The panel behaves as a slide stack/carousel rather than a long collection of simultaneously visible panels.
+
+Only one primary card is visible at a time.
+
+Navigation may use:
+
+- swipe;
+- previous/next arrows;
+- compact tabs;
+- automatic selection based on the active tool/object.
+
+Representative cards:
+
+```text
+Object
+Circuit / Network
+Surface
+Room
+Layers
+Navigation
+```
+
+The side panel may collapse completely when the current task does not require it.
+
+## Tool-driven context
+
+### Select
+
+Show only selection-related context:
+
+```text
+Object Properties
+Geometry
+Engineering
+```
+
+If nothing is selected, show lightweight room/surface context instead of an empty full inspector.
+
+### Point
+
+Show:
+
+```text
+Point presets
+Recent
+Favorites
+Placement height
+Mounting defaults
+```
+
+### Equipment
+
+Show:
+
+```text
+Search
+Recent
+Favorites
+Project presets
+Equipment categories
+```
+
+Categories may include electrical equipment, lighting, distribution, motors/drives, pumps/fans, industrial machines, automation/control, instrumentation, network and safety equipment.
+
+### Route
+
+Show only route-relevant controls:
+
+```text
+Run / cable / pipe / duct preset
+Laying method
+Conduit/channel
+Snap
+Finish
+Cancel
+```
+
+Do not expose reports, equipment browsing or unrelated metadata while routing.
+
+### Measure
+
+Show:
+
+```text
+Linear
+Area
+Height
+Clearance
+```
+
+### Architectural Feature
+
+Show:
+
+```text
+Door
+Window
+Passage
+Technical Opening
+Beam
+Column
+Soffit
+Niche
+Shaft
+Step
+Platform
+Recess
+Protrusion
+Custom
+```
+
+## Progressive disclosure
+
+Object information is revealed gradually.
+
+Representative property progression:
+
+```text
+Basic
+Geometry
+Engineering
+Advanced
+```
+
+The initial card should contain only properties required for the current operation. Advanced engineering details are not rendered until explicitly requested.
 
 ## Tablet layout
 
 ```text
-+---------------------------------------------------------------+
-| Room / surface       discipline          units     tools       |
-+--------+--------------------------------------+----------------+
-|        |                                      |                |
-| tool   |                                      | inspector      |
-| rail   |                CANVAS                |                |
-|        |                                      | context        |
-|        |                                      |                |
-+--------+--------------------------------------+----------------+
-| undo | redo | snap | grid | status | zoom                     |
-+---------------------------------------------------------------+
++----------------------------------------------------------------+
+| Project / Room | Surface | Discipline | Units | Undo/Redo       |
++------+-------------------------------------------+---------------+
+|      |                                           |               |
+| Tool |                                           | Context Slide |
+| Rail |                  CANVAS                   |               |
+|      |                                           |               |
++------+-------------------------------------------+---------------+
+| Tool-specific Context Bar                                        |
++----------------------------------------------------------------+
 ```
 
 Recommended proportions:
 
-- tool rail: ~80 px;
-- inspector: ~300 px;
+- tool rail: ~72-80 px;
+- context slide: ~280-320 px when open;
 - remaining width: canvas;
-- inspector may collapse when not needed.
+- context panel collapses when unused.
+
+The canvas remains dominant even when the side context is visible.
 
 ## Phone layout
 
 ```text
-+----------------------------+
-| room / surface / discipline|
-+----------------------------+
-|                            |
-|           CANVAS           |
-|                            |
-+----------------------------+
-| select point route ...     |
-+----------------------------+
-| contextual bottom sheet    |
-+----------------------------+
++-------------------------------+
+| Room / Surface / Discipline   |
++-------------------------------+
+|                               |
+|             CANVAS            |
+|                               |
++-------------------------------+
+| Tool Rail / Context Bar       |
++-------------------------------+
+| Swipeable Context Bottom Sheet|
++-------------------------------+
 ```
 
-The inspector appears as a bottom sheet. Tool selection stays reachable by thumb near the bottom edge.
+The inspector/context area becomes a swipeable bottom sheet. Tool selection stays reachable by thumb near the bottom edge.
+
+## Context bar
+
+The bottom context bar is tool-specific and keeps the most frequent action within one tap.
+
+Examples:
+
+```text
+Route:
+Cable preset | Method | Conduit | Snap | Finish | Cancel
+
+Equipment:
+Search | Recent | Favorites | Presets
+
+Measure:
+Linear | Area | Height | Clearance
+```
+
+The context bar must remain concise. Less frequent controls move into the contextual slide/bottom sheet.
 
 ## Tool vocabulary
 
@@ -64,11 +227,37 @@ Primary tools:
 
 - Select
 - Point
+- Equipment
 - Route
 - Measure
 - Architectural Feature
 
 Every tool has one stable semantic icon throughout the product. Tool icons must not change meaning between screens.
+
+## Repeated placement
+
+Repeated placement remains active until the user explicitly finishes or changes tools.
+
+Examples:
+
+```text
+Socket 300 mm
+-> place
+-> place
+-> place
+-> Done
+```
+
+and:
+
+```text
+Door 900x2100
+-> place
+-> place
+-> Done
+```
+
+This applies to engineering points, equipment and architectural features where repeated placement is meaningful.
 
 ## Architectural feature palette
 
@@ -89,11 +278,9 @@ When `Architectural Feature` is active, show only the feature palette:
 - Protrusion
 - Custom
 
-Repeated placement remains active until the user explicitly finishes or changes tools.
-
 ## Object placement presets
 
-Future engineering object palettes should support presets such as:
+Engineering object palettes should support presets such as:
 
 ```text
 Socket 300 mm
@@ -101,9 +288,13 @@ Switch 900 mm
 Kitchen socket 1100 mm
 Ceiling light
 Camera ceiling
+Motor 7.5 kW
+Pump
+VFD
+PLC panel
 ```
 
-A preset combines object definition + common mounting defaults. This reduces repetitive property editing.
+A preset combines object definition + common mounting/engineering defaults. This reduces repetitive property editing.
 
 ## Route mode
 
@@ -146,18 +337,19 @@ Near a corner, candidate selection should consider:
 - current tool intent;
 - previous preview lock.
 
-## Inspector
+## Passive component policy
 
-Inspector content is contextual and progressively disclosed:
+Inactive component groups are hidden instead of left visible in a disabled state.
 
-```text
-Basic
-Geometry
-Engineering
-Advanced
-```
+Examples:
 
-Do not show dozens of fields for an unselected object. Room/surface context remains visible while nothing is selected.
+- Reports are hidden during route drawing.
+- Equipment browsing is hidden during measurement.
+- Full layer management is hidden during repeated point placement.
+- Detailed room metadata is not permanently shown while tracing a run.
+- Calculations are not displayed as a permanent editor panel.
+
+The user may still explicitly navigate to these contexts when required.
 
 ## Visibility overlays
 
@@ -189,4 +381,6 @@ A usability pass should ultimately demonstrate that an engineer can create a typ
 - placing repeated objects without reopening the palette;
 - routing wall -> ceiling -> adjacent wall without a separate surface navigator;
 - undoing the last action in one tap;
-- identifying active discipline, surface and units without opening settings.
+- identifying active discipline, surface and units without opening settings;
+- never seeing more than one detailed contextual side panel at once;
+- completing the active task without unrelated passive panels occupying canvas space.
