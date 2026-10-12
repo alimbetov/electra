@@ -479,6 +479,23 @@ class _EditorToolbar extends StatelessWidget {
         padding: const EdgeInsets.all(8),
         child: Row(
           children: [
+            if (tool == EditorTool.equipment) ...[
+              FilledButton.tonalIcon(
+                onPressed: onOpenComponentCatalog,
+                icon: const Icon(Icons.widgets_outlined, size: 18),
+                label: Text(
+                  activeComponentDefinition?.displayName ?? 'Catalog',
+                ),
+              ),
+              if (activeComponentDefinition != null) ...[
+                const SizedBox(width: 6),
+                TextButton(
+                  onPressed: onFinishComponentPlacement,
+                  child: const Text('Done'),
+                ),
+              ],
+              const SizedBox(width: 12),
+            ],
             for (final value in EditorTool.values)
               Padding(
                 padding: const EdgeInsets.only(right: 6),
@@ -505,23 +522,6 @@ class _EditorToolbar extends StatelessWidget {
               },
             ),
             const SizedBox(width: 12),
-            if (tool == EditorTool.equipment) ...[
-              FilledButton.tonalIcon(
-                onPressed: onOpenComponentCatalog,
-                icon: const Icon(Icons.widgets_outlined, size: 18),
-                label: Text(
-                  activeComponentDefinition?.displayName ?? 'Catalog',
-                ),
-              ),
-              if (activeComponentDefinition != null) ...[
-                const SizedBox(width: 6),
-                TextButton(
-                  onPressed: onFinishComponentPlacement,
-                  child: const Text('Done'),
-                ),
-              ],
-              const SizedBox(width: 12),
-            ],
             PopupMenuButton<ArchitecturalFeatureType>(
               tooltip: 'Add opening / feature',
               onSelected: onFeatureChanged,

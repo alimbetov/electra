@@ -87,6 +87,7 @@ void main() {
       await tester.pump();
       expect(find.text('Catalog'), findsOneWidget);
 
+      expect(tester.getCenter(find.text('Catalog')).dx, lessThan(1200));
       await tester.tap(find.text('Catalog'));
       await tester.pumpAndSettle();
       expect(find.text('Component catalog'), findsOneWidget);
@@ -136,6 +137,7 @@ void main() {
         findsOneWidget,
       );
 
+      expect(tester.getCenter(find.text('Done')).dx, lessThan(1200));
       await tester.tap(find.text('Done'));
       await tester.pump();
 
