@@ -1,0 +1,154 @@
+import 'package:engineering_core/engineering_core.dart';
+import 'package:test/test.dart';
+
+void main() {
+  SurfacePatch buildPatch(String id) => SurfacePatch(
+        id: id,
+        roomId: 'room-1',
+        surfaceId: 'wall-1',
+        frame: LocalCoordinateFrame(
+          origin: const Point3Mm(0, 0, 0),
+          uAxis: const Vector3D(1, 0, 0),
+          vAxis: const Vector3D(0, 0, 1),
+        ),
+        boundary: Polygon2Mm(const [
+          Point2Mm(0, 0),
+          Point2Mm(4000, 0),
+          Point2Mm(4000, 3000),
+          Point2Mm(0, 3000),
+        ]),
+        orientation: SurfaceOrientation.vertical,
+      );
+
+  test('spatial topology validates consistent patch graph', () {
+    final patchA = buildPatch('patch-a');
+    final patchB = buildPatch('patch-b');
+    final edgeA = SurfaceEdge(
+      id: 'edge-a',
+      patchId: patchA.id,
+      start: const Point2Mm(4000, 0),
+      end: const Point2Mm(4000, 3000),
+      kind: SurfaceEdgeKind.fold,
+    );
+    final edgeB = SurfaceEdge(
+      id: 'edge-b',
+      patchId: patchB.id,
+      start: const Point2Mm(0, 0),
+      end: const Point2Mm(0, 3000),
+      kind: SurfaceEdgeKind.fold,
+    );
+
+    final violations = SpatialGeometryValidator.validatePatchTopology(
+      patches: [patchA, patchB],
+      edges: [edgeA, edgeB],
+      adjacencies: [
+        SurfaceAdjacency(
+          id: 'adj-1',
+          fromPatchId: patchA.id,
+          fromEdgeId: edgeA.id,
+          toPatchId: patchB.id,
+          toEdgeId: edgeB.id,
+        ),
+      ],
+      openings: [
+        Opening(
+          id: 'door-1',
+          hostSurfacePatchId: patchA.id,
+          type: OpeningType.door,
+          boundary: Polygon2Mm(const [
+            Point2Mm(500, 0),
+            Point2Mm(1400, 0),
+            Point2Mm(1400, 2100),
+            Point2Mm(500, 2100),
+          ]),
+          sillHeightMm: 0,
+          headHeightMm: 2100,
+        ),
+      ],
+      features: [
+        SpatialFeature(
+          id: 'beam-1',
+          hostSurfacePatchId: patchA.id,
+          type: SpatialFeatureType.beam,
+          footprint: Polygon2Mm(const [
+            Point2Mm(0, 2600),
+            Point2Mm(4000, 2600),
+            Point2Mm(4000, 3000),
+            Point2Mm(0, 3000),
+          ]),
+          depthMm: 300,
+          elevationMm: 2600,
+        ),
+      ],
+    );
+
+    expect(violations, isEmpty);
+  });
+
+  test('validator reports orphan spatial objects', () {
+    final violations = SpatialGeometryValidator.validatePatchTopology(
+      patches: const [],
+      edges: [
+        SurfaceEdge(
+          id: 'edge-orphan',
+          patchId: 'missing',
+          start: const Point2Mm(0, 0),
+          end: const Point2Mm(1000, 0),
+        ),
+      ],
+      adjacencies: const [],
+      openings: [
+        Opening(
+          id: 'opening-orphan',
+          hostSurfacePatchId: 'missing',
+          type: OpeningType.window,
+          boundary: Polygon2Mm(const [
+            Point2Mm(0, 0),
+            Point2Mm(1000, 0),
+            Point2Mm(1000, 1000),
+            Point2Mm(0, 1000),
+          ]),
+        ),
+      ],
+      features: [
+        SpatialFeature(
+          id: 'feature-orphan',
+          hostSurfacePatchId: 'missing',
+          type: SpatialFeatureType.column,
+          footprint: Polygon2Mm(const [
+            Point2Mm(0, 0),
+            Point2Mm(300, 0),
+            Point2Mm(300, 300),
+            Point2Mm(0, 300),
+          ]),
+          depthMm: 300,
+          elevationMm: 0,
+        ),
+      ],
+    );
+
+    expect(
+      violations.map((e) => e.code),
+      containsAll(['EDGE_HOST_MISSING', 'OPENING_HOST_MISSING', 'FEATURE_HOST_MISSING']),
+    );
+  });
+
+  test('opening rejects inverted vertical bounds', () {
+    expect(
+      () => Opening(
+        id: 'bad',
+        hostSurfacePatchId: 'patch-a',
+        type: OpeningType.window,
+        boundary: Polygon2Mm(const [
+          Point2Mm(0, 0),
+          Point2Mm(100, 0),
+          Point2Mm(100, 100),
+          Point2Mm(0, 100),
+        ]),
+        sillHeightMm: 1200,
+        headHeightMm: 1000,
+      ),
+      throwsArgumentError,
+    );
+  });
+}
