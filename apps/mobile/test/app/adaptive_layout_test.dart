@@ -4,22 +4,10 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('classifies exact responsive boundaries', () {
-    expect(
-      ElectraBreakpoints.fromWidth(699),
-      ElectraSizeClass.compact,
-    );
-    expect(
-      ElectraBreakpoints.fromWidth(700),
-      ElectraSizeClass.medium,
-    );
-    expect(
-      ElectraBreakpoints.fromWidth(1099),
-      ElectraSizeClass.medium,
-    );
-    expect(
-      ElectraBreakpoints.fromWidth(1100),
-      ElectraSizeClass.expanded,
-    );
+    expect(ElectraBreakpoints.fromWidth(699), ElectraSizeClass.compact);
+    expect(ElectraBreakpoints.fromWidth(700), ElectraSizeClass.medium);
+    expect(ElectraBreakpoints.fromWidth(1099), ElectraSizeClass.medium);
+    expect(ElectraBreakpoints.fromWidth(1100), ElectraSizeClass.expanded);
   });
 
   for (final width in <double>[390, 834, 1440]) {

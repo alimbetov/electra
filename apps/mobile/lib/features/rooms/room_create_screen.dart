@@ -43,12 +43,15 @@ class _RoomCreateScreenState extends ConsumerState<RoomCreateScreen> {
     if (!formKey.currentState!.validate() || saving) return;
     final structural = optionalMm(structuralController.text);
     final ceiling = optionalMm(ceilingController.text);
-    if (structuralController.text.trim().isNotEmpty && structural == null) return;
+    if (structuralController.text.trim().isNotEmpty && structural == null)
+      return;
     if (ceilingController.text.trim().isNotEmpty && ceiling == null) return;
 
     setState(() => saving = true);
     try {
-      await ref.read(projectHierarchyServiceProvider).createRoom(
+      await ref
+          .read(projectHierarchyServiceProvider)
+          .createRoom(
             floorId: widget.floorId,
             draft: RoomFormDraft(
               name: nameController.text,
@@ -61,14 +64,12 @@ class _RoomCreateScreenState extends ConsumerState<RoomCreateScreen> {
             ),
           );
       if (!mounted) return;
-      context.go(
-        '/projects/${widget.projectId}/floors/${widget.floorId}',
-      );
+      context.go('/projects/${widget.projectId}/floors/${widget.floorId}');
     } catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Unable to create room: $error')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Unable to create room: $error')));
     } finally {
       if (mounted) setState(() => saving = false);
     }
@@ -99,41 +100,47 @@ class _RoomCreateScreenState extends ConsumerState<RoomCreateScreen> {
                 TextFormField(
                   controller: nameController,
                   decoration: const InputDecoration(labelText: 'Room name'),
-                  validator: (value) => value == null || value.trim().isEmpty
-                      ? 'Room name is required'
-                      : null,
+                  validator:
+                      (value) =>
+                          value == null || value.trim().isEmpty
+                              ? 'Room name is required'
+                              : null,
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<RoomCategory>(
                   initialValue: roomCategory,
                   decoration: const InputDecoration(labelText: 'Room category'),
-                  items: RoomCategory.values
-                      .map(
-                        (value) => DropdownMenuItem(
-                          value: value,
-                          child: Text(value.name),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (value) => setState(() {
-                    roomCategory = value ?? RoomCategory.other;
-                  }),
+                  items:
+                      RoomCategory.values
+                          .map(
+                            (value) => DropdownMenuItem(
+                              value: value,
+                              child: Text(value.name),
+                            ),
+                          )
+                          .toList(),
+                  onChanged:
+                      (value) => setState(() {
+                        roomCategory = value ?? RoomCategory.other;
+                      }),
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<RoomType>(
                   initialValue: roomType,
                   decoration: const InputDecoration(labelText: 'Room type'),
-                  items: RoomType.values
-                      .map(
-                        (value) => DropdownMenuItem(
-                          value: value,
-                          child: Text(value.name),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (value) => setState(() {
-                    roomType = value ?? RoomType.custom;
-                  }),
+                  items:
+                      RoomType.values
+                          .map(
+                            (value) => DropdownMenuItem(
+                              value: value,
+                              child: Text(value.name),
+                            ),
+                          )
+                          .toList(),
+                  onChanged:
+                      (value) => setState(() {
+                        roomType = value ?? RoomType.custom;
+                      }),
                 ),
                 const SizedBox(height: 12),
                 Row(
@@ -146,9 +153,11 @@ class _RoomCreateScreenState extends ConsumerState<RoomCreateScreen> {
                           labelText: 'Width',
                           suffixText: 'mm',
                         ),
-                        validator: (value) => positiveMm(value ?? '') == null
-                            ? 'Invalid width'
-                            : null,
+                        validator:
+                            (value) =>
+                                positiveMm(value ?? '') == null
+                                    ? 'Invalid width'
+                                    : null,
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -160,9 +169,11 @@ class _RoomCreateScreenState extends ConsumerState<RoomCreateScreen> {
                           labelText: 'Depth',
                           suffixText: 'mm',
                         ),
-                        validator: (value) => positiveMm(value ?? '') == null
-                            ? 'Invalid depth'
-                            : null,
+                        validator:
+                            (value) =>
+                                positiveMm(value ?? '') == null
+                                    ? 'Invalid depth'
+                                    : null,
                       ),
                     ),
                   ],

@@ -13,12 +13,13 @@ final class DriftProjectHierarchyRepository
 
   @override
   Stream<List<ProjectRecord>> watchProjects() {
-    final query = database.select(database.projects)
-      ..where((row) => row.deletedAt.isNull())
-      ..orderBy([(row) => OrderingTerm.desc(row.updatedAt)]);
+    final query =
+        database.select(database.projects)
+          ..where((row) => row.deletedAt.isNull())
+          ..orderBy([(row) => OrderingTerm.desc(row.updatedAt)]);
     return query.watch().map(
-          (rows) => rows.map(_projectFromRow).toList(growable: false),
-        );
+      (rows) => rows.map(_projectFromRow).toList(growable: false),
+    );
   }
 
   @override
@@ -26,8 +27,8 @@ final class DriftProjectHierarchyRepository
     final query = database.select(database.projects)
       ..where((row) => row.id.equals(projectId) & row.deletedAt.isNull());
     return query.watchSingleOrNull().map(
-          (row) => row == null ? null : _projectFromRow(row),
-        );
+      (row) => row == null ? null : _projectFromRow(row),
+    );
   }
 
   @override
@@ -40,16 +41,18 @@ final class DriftProjectHierarchyRepository
 
   @override
   Future<void> saveProject(ProjectRecord project) async {
-    await database.into(database.projects).insertOnConflictUpdate(
+    await database
+        .into(database.projects)
+        .insertOnConflictUpdate(
           ProjectsCompanion(
             id: Value(project.id),
             name: Value(project.name),
             reference: Value(project.reference),
             measurementSystem: Value(project.measurementSystem.name),
-            defaultStructuralHeightMm:
-                Value(project.defaultStructuralHeightMm),
-            defaultFinishedCeilingHeightMm:
-                Value(project.defaultFinishedCeilingHeightMm),
+            defaultStructuralHeightMm: Value(project.defaultStructuralHeightMm),
+            defaultFinishedCeilingHeightMm: Value(
+              project.defaultFinishedCeilingHeightMm,
+            ),
             revision: Value(project.revision),
             createdAt: Value(project.createdAt),
             updatedAt: Value(project.updatedAt),
@@ -61,14 +64,13 @@ final class DriftProjectHierarchyRepository
 
   @override
   Future<void> deleteProject(String projectId) async {
-    final row = await (database.select(database.projects)
-          ..where((item) => item.id.equals(projectId)))
-        .getSingleOrNull();
+    final row =
+        await (database.select(database.projects)
+          ..where((item) => item.id.equals(projectId))).getSingleOrNull();
     if (row == null) return;
     final now = DateTime.now().toUtc();
     await (database.update(database.projects)
-          ..where((item) => item.id.equals(projectId)))
-        .write(
+      ..where((item) => item.id.equals(projectId))).write(
       ProjectsCompanion(
         revision: Value(row.revision + 1),
         updatedAt: Value(now),
@@ -79,17 +81,18 @@ final class DriftProjectHierarchyRepository
 
   @override
   Stream<List<FloorRecord>> watchFloors(String projectId) {
-    final query = database.select(database.floors)
-      ..where(
-        (row) => row.projectId.equals(projectId) & row.deletedAt.isNull(),
-      )
-      ..orderBy([
-        (row) => OrderingTerm.asc(row.sortOrder),
-        (row) => OrderingTerm.asc(row.name),
-      ]);
+    final query =
+        database.select(database.floors)
+          ..where(
+            (row) => row.projectId.equals(projectId) & row.deletedAt.isNull(),
+          )
+          ..orderBy([
+            (row) => OrderingTerm.asc(row.sortOrder),
+            (row) => OrderingTerm.asc(row.name),
+          ]);
     return query.watch().map(
-          (rows) => rows.map(_floorFromRow).toList(growable: false),
-        );
+      (rows) => rows.map(_floorFromRow).toList(growable: false),
+    );
   }
 
   @override
@@ -97,8 +100,8 @@ final class DriftProjectHierarchyRepository
     final query = database.select(database.floors)
       ..where((row) => row.id.equals(floorId) & row.deletedAt.isNull());
     return query.watchSingleOrNull().map(
-          (row) => row == null ? null : _floorFromRow(row),
-        );
+      (row) => row == null ? null : _floorFromRow(row),
+    );
   }
 
   @override
@@ -111,17 +114,19 @@ final class DriftProjectHierarchyRepository
 
   @override
   Future<void> saveFloor(FloorRecord floor) async {
-    await database.into(database.floors).insertOnConflictUpdate(
+    await database
+        .into(database.floors)
+        .insertOnConflictUpdate(
           FloorsCompanion(
             id: Value(floor.id),
             projectId: Value(floor.projectId),
             name: Value(floor.name),
             code: Value(floor.code),
             sortOrder: Value(floor.sortOrder),
-            defaultStructuralHeightMm:
-                Value(floor.defaultStructuralHeightMm),
-            defaultFinishedCeilingHeightMm:
-                Value(floor.defaultFinishedCeilingHeightMm),
+            defaultStructuralHeightMm: Value(floor.defaultStructuralHeightMm),
+            defaultFinishedCeilingHeightMm: Value(
+              floor.defaultFinishedCeilingHeightMm,
+            ),
             revision: Value(floor.revision),
             createdAt: Value(floor.createdAt),
             updatedAt: Value(floor.updatedAt),
@@ -133,14 +138,13 @@ final class DriftProjectHierarchyRepository
 
   @override
   Future<void> deleteFloor(String floorId) async {
-    final row = await (database.select(database.floors)
-          ..where((item) => item.id.equals(floorId)))
-        .getSingleOrNull();
+    final row =
+        await (database.select(database.floors)
+          ..where((item) => item.id.equals(floorId))).getSingleOrNull();
     if (row == null) return;
     final now = DateTime.now().toUtc();
     await (database.update(database.floors)
-          ..where((item) => item.id.equals(floorId)))
-        .write(
+      ..where((item) => item.id.equals(floorId))).write(
       FloorsCompanion(
         revision: Value(row.revision + 1),
         updatedAt: Value(now),
@@ -151,12 +155,13 @@ final class DriftProjectHierarchyRepository
 
   @override
   Stream<List<RoomRecord>> watchRooms(String floorId) {
-    final query = database.select(database.rooms)
-      ..where((row) => row.floorId.equals(floorId) & row.deletedAt.isNull())
-      ..orderBy([(row) => OrderingTerm.asc(row.name)]);
+    final query =
+        database.select(database.rooms)
+          ..where((row) => row.floorId.equals(floorId) & row.deletedAt.isNull())
+          ..orderBy([(row) => OrderingTerm.asc(row.name)]);
     return query.watch().map(
-          (rows) => rows.map(_roomFromRow).toList(growable: false),
-        );
+      (rows) => rows.map(_roomFromRow).toList(growable: false),
+    );
   }
 
   @override
@@ -164,8 +169,8 @@ final class DriftProjectHierarchyRepository
     final query = database.select(database.rooms)
       ..where((row) => row.id.equals(roomId) & row.deletedAt.isNull());
     return query.watchSingleOrNull().map(
-          (row) => row == null ? null : _roomFromRow(row),
-        );
+      (row) => row == null ? null : _roomFromRow(row),
+    );
   }
 
   @override
@@ -178,7 +183,9 @@ final class DriftProjectHierarchyRepository
 
   @override
   Future<void> saveRoom(RoomRecord room) async {
-    await database.into(database.rooms).insertOnConflictUpdate(
+    await database
+        .into(database.rooms)
+        .insertOnConflictUpdate(
           RoomsCompanion(
             id: Value(room.id),
             floorId: Value(room.floorId),
@@ -187,10 +194,10 @@ final class DriftProjectHierarchyRepository
             roomCategory: Value(room.category.name),
             widthMm: Value(room.widthMm),
             depthMm: Value(room.depthMm),
-            structuralHeightMmOverride:
-                Value(room.structuralHeightMmOverride),
-            finishedCeilingHeightMmOverride:
-                Value(room.finishedCeilingHeightMmOverride),
+            structuralHeightMmOverride: Value(room.structuralHeightMmOverride),
+            finishedCeilingHeightMmOverride: Value(
+              room.finishedCeilingHeightMmOverride,
+            ),
             revision: Value(room.revision),
             createdAt: Value(room.createdAt),
             updatedAt: Value(room.updatedAt),
@@ -202,14 +209,13 @@ final class DriftProjectHierarchyRepository
 
   @override
   Future<void> deleteRoom(String roomId) async {
-    final row = await (database.select(database.rooms)
-          ..where((item) => item.id.equals(roomId)))
-        .getSingleOrNull();
+    final row =
+        await (database.select(database.rooms)
+          ..where((item) => item.id.equals(roomId))).getSingleOrNull();
     if (row == null) return;
     final now = DateTime.now().toUtc();
     await (database.update(database.rooms)
-          ..where((item) => item.id.equals(roomId)))
-        .write(
+      ..where((item) => item.id.equals(roomId))).write(
       RoomsCompanion(
         revision: Value(row.revision + 1),
         updatedAt: Value(now),
@@ -219,53 +225,48 @@ final class DriftProjectHierarchyRepository
   }
 
   ProjectRecord _projectFromRow(Project row) => ProjectRecord(
-        id: row.id,
-        name: row.name,
-        reference: row.reference,
-        measurementSystem: MeasurementSystem.values.byName(
-          row.measurementSystem,
-        ),
-        defaultStructuralHeightMm: row.defaultStructuralHeightMm,
-        defaultFinishedCeilingHeightMm:
-            row.defaultFinishedCeilingHeightMm,
-        revision: row.revision,
-        createdAt: row.createdAt,
-        updatedAt: row.updatedAt,
-        deletedAt: row.deletedAt,
-        originDeviceId: row.originDeviceId,
-      );
+    id: row.id,
+    name: row.name,
+    reference: row.reference,
+    measurementSystem: MeasurementSystem.values.byName(row.measurementSystem),
+    defaultStructuralHeightMm: row.defaultStructuralHeightMm,
+    defaultFinishedCeilingHeightMm: row.defaultFinishedCeilingHeightMm,
+    revision: row.revision,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+    deletedAt: row.deletedAt,
+    originDeviceId: row.originDeviceId,
+  );
 
   FloorRecord _floorFromRow(Floor row) => FloorRecord(
-        id: row.id,
-        projectId: row.projectId,
-        name: row.name,
-        code: row.code,
-        sortOrder: row.sortOrder,
-        defaultStructuralHeightMm: row.defaultStructuralHeightMm,
-        defaultFinishedCeilingHeightMm:
-            row.defaultFinishedCeilingHeightMm,
-        revision: row.revision,
-        createdAt: row.createdAt,
-        updatedAt: row.updatedAt,
-        deletedAt: row.deletedAt,
-        originDeviceId: row.originDeviceId,
-      );
+    id: row.id,
+    projectId: row.projectId,
+    name: row.name,
+    code: row.code,
+    sortOrder: row.sortOrder,
+    defaultStructuralHeightMm: row.defaultStructuralHeightMm,
+    defaultFinishedCeilingHeightMm: row.defaultFinishedCeilingHeightMm,
+    revision: row.revision,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+    deletedAt: row.deletedAt,
+    originDeviceId: row.originDeviceId,
+  );
 
   RoomRecord _roomFromRow(Room row) => RoomRecord(
-        id: row.id,
-        floorId: row.floorId,
-        name: row.name,
-        type: RoomType.values.byName(row.roomType),
-        category: RoomCategory.values.byName(row.roomCategory),
-        widthMm: row.widthMm,
-        depthMm: row.depthMm,
-        structuralHeightMmOverride: row.structuralHeightMmOverride,
-        finishedCeilingHeightMmOverride:
-            row.finishedCeilingHeightMmOverride,
-        revision: row.revision,
-        createdAt: row.createdAt,
-        updatedAt: row.updatedAt,
-        deletedAt: row.deletedAt,
-        originDeviceId: row.originDeviceId,
-      );
+    id: row.id,
+    floorId: row.floorId,
+    name: row.name,
+    type: RoomType.values.byName(row.roomType),
+    category: RoomCategory.values.byName(row.roomCategory),
+    widthMm: row.widthMm,
+    depthMm: row.depthMm,
+    structuralHeightMmOverride: row.structuralHeightMmOverride,
+    finishedCeilingHeightMmOverride: row.finishedCeilingHeightMmOverride,
+    revision: row.revision,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+    deletedAt: row.deletedAt,
+    originDeviceId: row.originDeviceId,
+  );
 }

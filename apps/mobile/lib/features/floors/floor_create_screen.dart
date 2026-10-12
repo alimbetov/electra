@@ -6,10 +6,7 @@ import '../../app/providers.dart';
 import '../../domain/project_models.dart';
 
 class FloorCreateScreen extends ConsumerStatefulWidget {
-  const FloorCreateScreen({
-    super.key,
-    required this.projectId,
-  });
+  const FloorCreateScreen({super.key, required this.projectId});
 
   final String projectId;
 
@@ -40,25 +37,29 @@ class _FloorCreateScreenState extends ConsumerState<FloorCreateScreen> {
     if (!formKey.currentState!.validate() || saving) return;
     setState(() => saving = true);
     try {
-      final floor = await ref.read(projectHierarchyServiceProvider).createFloor(
+      final floor = await ref
+          .read(projectHierarchyServiceProvider)
+          .createFloor(
             projectId: widget.projectId,
             draft: FloorFormDraft(
               name: nameController.text,
               code: codeController.text,
               sortOrder: positiveInt(orderController.text)!,
-              defaultStructuralHeightMm:
-                  optionalPositiveInt(structuralController.text),
-              defaultFinishedCeilingHeightMm:
-                  optionalPositiveInt(ceilingController.text),
+              defaultStructuralHeightMm: optionalPositiveInt(
+                structuralController.text,
+              ),
+              defaultFinishedCeilingHeightMm: optionalPositiveInt(
+                ceilingController.text,
+              ),
             ),
           );
       if (!mounted) return;
       context.go('/projects/${widget.projectId}/floors/${floor.id}');
     } catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Unable to create floor: $error')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Unable to create floor: $error')));
     } finally {
       if (mounted) setState(() => saving = false);
     }
@@ -89,9 +90,11 @@ class _FloorCreateScreenState extends ConsumerState<FloorCreateScreen> {
                 TextFormField(
                   controller: nameController,
                   decoration: const InputDecoration(labelText: 'Floor name'),
-                  validator: (value) => value == null || value.trim().isEmpty
-                      ? 'Floor name is required'
-                      : null,
+                  validator:
+                      (value) =>
+                          value == null || value.trim().isEmpty
+                              ? 'Floor name is required'
+                              : null,
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
@@ -103,9 +106,11 @@ class _FloorCreateScreenState extends ConsumerState<FloorCreateScreen> {
                   controller: orderController,
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(labelText: 'Sort order'),
-                  validator: (value) => positiveInt(value ?? '') == null
-                      ? 'Enter a positive order'
-                      : null,
+                  validator:
+                      (value) =>
+                          positiveInt(value ?? '') == null
+                              ? 'Enter a positive order'
+                              : null,
                 ),
                 const SizedBox(height: 12),
                 TextFormField(

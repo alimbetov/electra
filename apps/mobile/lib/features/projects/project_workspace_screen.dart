@@ -6,10 +6,7 @@ import '../../app/adaptive_layout.dart';
 import '../../app/providers.dart';
 
 class ProjectWorkspaceScreen extends ConsumerWidget {
-  const ProjectWorkspaceScreen({
-    super.key,
-    required this.projectId,
-  });
+  const ProjectWorkspaceScreen({super.key, required this.projectId});
 
   final String projectId;
 
@@ -38,9 +35,9 @@ class ProjectWorkspaceScreen extends ConsumerWidget {
               constraints: BoxConstraints(maxWidth: width),
               child: floors.when(
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (error, _) => Center(
-                  child: Text('Unable to load floors: $error'),
-                ),
+                error:
+                    (error, _) =>
+                        Center(child: Text('Unable to load floors: $error')),
                 data: (items) {
                   if (items.isEmpty) {
                     return const Center(
@@ -63,9 +60,10 @@ class ProjectWorkspaceScreen extends ConsumerWidget {
                                 : '${floor.code} · order ${floor.sortOrder}',
                           ),
                           trailing: const Icon(Icons.chevron_right),
-                          onTap: () => context.go(
-                            '/projects/$projectId/floors/${floor.id}',
-                          ),
+                          onTap:
+                              () => context.go(
+                                '/projects/$projectId/floors/${floor.id}',
+                              ),
                         ),
                       );
                     },

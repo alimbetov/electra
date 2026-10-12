@@ -40,9 +40,9 @@ class FloorWorkspaceScreen extends ConsumerWidget {
               constraints: BoxConstraints(maxWidth: width),
               child: rooms.when(
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (error, _) => Center(
-                  child: Text('Unable to load rooms: $error'),
-                ),
+                error:
+                    (error, _) =>
+                        Center(child: Text('Unable to load rooms: $error')),
                 data: (items) {
                   if (items.isEmpty) {
                     return const Center(
@@ -84,9 +84,8 @@ class FloorWorkspaceScreen extends ConsumerWidget {
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.go(
-          '/projects/$projectId/floors/$floorId/rooms/new',
-        ),
+        onPressed:
+            () => context.go('/projects/$projectId/floors/$floorId/rooms/new'),
         icon: const Icon(Icons.add),
         label: const Text('New room'),
       ),

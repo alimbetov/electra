@@ -9,50 +9,55 @@ import '../features/projects/project_workspace_screen.dart';
 import '../features/rooms/room_create_screen.dart';
 
 GoRouter createElectraRouter() => GoRouter(
-      initialLocation: '/projects',
+  initialLocation: '/projects',
+  routes: [
+    GoRoute(
+      path: '/projects',
+      builder: (context, state) => const ProjectListScreen(),
       routes: [
         GoRoute(
-          path: '/projects',
-          builder: (context, state) => const ProjectListScreen(),
-          routes: [
-            GoRoute(
-              path: 'new',
-              builder: (context, state) => const ProjectCreateScreen(),
-            ),
-            GoRoute(
-              path: ':projectId',
-              builder: (context, state) => ProjectWorkspaceScreen(
+          path: 'new',
+          builder: (context, state) => const ProjectCreateScreen(),
+        ),
+        GoRoute(
+          path: ':projectId',
+          builder:
+              (context, state) => ProjectWorkspaceScreen(
                 projectId: state.pathParameters['projectId']!,
               ),
-              routes: [
-                GoRoute(
-                  path: 'floors/new',
-                  builder: (context, state) => FloorCreateScreen(
+          routes: [
+            GoRoute(
+              path: 'floors/new',
+              builder:
+                  (context, state) => FloorCreateScreen(
                     projectId: state.pathParameters['projectId']!,
                   ),
-                ),
-                GoRoute(
-                  path: 'floors/:floorId',
-                  builder: (context, state) => FloorWorkspaceScreen(
+            ),
+            GoRoute(
+              path: 'floors/:floorId',
+              builder:
+                  (context, state) => FloorWorkspaceScreen(
                     projectId: state.pathParameters['projectId']!,
                     floorId: state.pathParameters['floorId']!,
                   ),
-                  routes: [
-                    GoRoute(
-                      path: 'rooms/new',
-                      builder: (context, state) => RoomCreateScreen(
+              routes: [
+                GoRoute(
+                  path: 'rooms/new',
+                  builder:
+                      (context, state) => RoomCreateScreen(
                         projectId: state.pathParameters['projectId']!,
                         floorId: state.pathParameters['floorId']!,
                       ),
-                    ),
-                  ],
                 ),
               ],
             ),
           ],
         ),
       ],
-      errorBuilder: (context, state) => Scaffold(
+    ),
+  ],
+  errorBuilder:
+      (context, state) => Scaffold(
         body: Center(child: Text('Navigation error: ${state.error}')),
       ),
-    );
+);

@@ -16,8 +16,8 @@ final databaseProvider = Provider<AppDatabase>((ref) {
 
 final projectHierarchyRepositoryProvider =
     Provider<DriftProjectHierarchyRepository>((ref) {
-  return DriftProjectHierarchyRepository(ref.watch(databaseProvider));
-});
+      return DriftProjectHierarchyRepository(ref.watch(databaseProvider));
+    });
 
 final projectRepositoryProvider = Provider<ProjectRepository>((ref) {
   return ref.watch(projectHierarchyRepositoryProvider);
@@ -39,7 +39,9 @@ final idGeneratorProvider = Provider<IdGenerator>((ref) {
   return UuidV7IdGenerator();
 });
 
-final projectHierarchyServiceProvider = Provider<ProjectHierarchyService>((ref) {
+final projectHierarchyServiceProvider = Provider<ProjectHierarchyService>((
+  ref,
+) {
   return ProjectHierarchyService(
     projects: ref.watch(projectRepositoryProvider),
     floors: ref.watch(floorRepositoryProvider),
@@ -54,27 +56,34 @@ final projectsProvider = StreamProvider<List<ProjectRecord>>((ref) {
   return ref.watch(projectRepositoryProvider).watchProjects();
 });
 
-final projectProvider =
-    StreamProvider.family<ProjectRecord?, String>((ref, projectId) {
+final projectProvider = StreamProvider.family<ProjectRecord?, String>((
+  ref,
+  projectId,
+) {
   return ref.watch(projectRepositoryProvider).watchProject(projectId);
 });
 
-final floorsProvider =
-    StreamProvider.family<List<FloorRecord>, String>((ref, projectId) {
+final floorsProvider = StreamProvider.family<List<FloorRecord>, String>((
+  ref,
+  projectId,
+) {
   return ref.watch(floorRepositoryProvider).watchFloors(projectId);
 });
 
-final floorProvider =
-    StreamProvider.family<FloorRecord?, String>((ref, floorId) {
+final floorProvider = StreamProvider.family<FloorRecord?, String>((
+  ref,
+  floorId,
+) {
   return ref.watch(floorRepositoryProvider).watchFloor(floorId);
 });
 
-final roomsProvider =
-    StreamProvider.family<List<RoomRecord>, String>((ref, floorId) {
+final roomsProvider = StreamProvider.family<List<RoomRecord>, String>((
+  ref,
+  floorId,
+) {
   return ref.watch(roomRepositoryProvider).watchRooms(floorId);
 });
 
-final roomProvider =
-    StreamProvider.family<RoomRecord?, String>((ref, roomId) {
+final roomProvider = StreamProvider.family<RoomRecord?, String>((ref, roomId) {
   return ref.watch(roomRepositoryProvider).watchRoom(roomId);
 });

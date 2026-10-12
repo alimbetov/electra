@@ -61,27 +61,27 @@ class Rooms extends Table {
 @DriftDatabase(tables: [Projects, Floors, Rooms])
 final class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor])
-      : super(executor ?? driftDatabase(name: 'electra'));
+    : super(executor ?? driftDatabase(name: 'electra'));
 
   @override
   int get schemaVersion => 1;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onCreate: (migrator) async {
-          await migrator.createAll();
-          await _createIndexes();
-        },
-        onUpgrade: (migrator, from, to) async {
-          if (from < 1) {
-            await migrator.createAll();
-          }
-          await _createIndexes();
-        },
-        beforeOpen: (details) async {
-          await customStatement('PRAGMA foreign_keys = ON');
-        },
-      );
+    onCreate: (migrator) async {
+      await migrator.createAll();
+      await _createIndexes();
+    },
+    onUpgrade: (migrator, from, to) async {
+      if (from < 1) {
+        await migrator.createAll();
+      }
+      await _createIndexes();
+    },
+    beforeOpen: (details) async {
+      await customStatement('PRAGMA foreign_keys = ON');
+    },
+  );
 
   Future<void> _createIndexes() async {
     await customStatement(
