@@ -24,20 +24,19 @@ void main() {
 
   for (final width in <double>[390, 834, 1440]) {
     testWidgets('renders adaptive builder at width $width', (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = Size(width, 600);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetPhysicalSize);
+
       ElectraSizeClass? captured;
       await tester.pumpWidget(
         MaterialApp(
-          home: Center(
-            child: SizedBox(
-              width: width,
-              height: 600,
-              child: ElectraAdaptiveBuilder(
-                builder: (context, layout) {
-                  captured = layout.sizeClass;
-                  return Text(layout.sizeClass.name);
-                },
-              ),
-            ),
+          home: ElectraAdaptiveBuilder(
+            builder: (context, layout) {
+              captured = layout.sizeClass;
+              return Text(layout.sizeClass.name);
+            },
           ),
         ),
       );
