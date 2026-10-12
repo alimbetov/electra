@@ -336,6 +336,7 @@ class _ElectricalLoadDialogState extends State<ElectricalLoadDialog> {
           children: [
             Text('Equipment: ${widget.component.id}'),
             DropdownButtonFormField<SupplySystem>(
+              isExpanded: true,
               initialValue: supply,
               decoration: const InputDecoration(labelText: 'Supply system'),
               items:
@@ -343,7 +344,10 @@ class _ElectricalLoadDialogState extends State<ElectricalLoadDialog> {
                       .map(
                         (value) => DropdownMenuItem(
                           value: value,
-                          child: Text(_supplyLabel(value)),
+                          child: Text(
+                            _supplyLabel(value),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       )
                       .toList(),
@@ -360,6 +364,7 @@ class _ElectricalLoadDialogState extends State<ElectricalLoadDialog> {
                       },
             ),
             DropdownButtonFormField<int>(
+              isExpanded: true,
               key: ValueKey(phases),
               initialValue: phases,
               decoration: const InputDecoration(labelText: 'Phases'),
@@ -395,6 +400,7 @@ class _ElectricalLoadDialogState extends State<ElectricalLoadDialog> {
                 decoration: InputDecoration(labelText: field.$2),
               ),
             DropdownButtonFormField<String>(
+              isExpanded: true,
               initialValue: powerBasis?.name ?? '',
               decoration: const InputDecoration(labelText: 'Rated power basis'),
               items: const [
@@ -420,6 +426,7 @@ class _ElectricalLoadDialogState extends State<ElectricalLoadDialog> {
                       ),
             ),
             DropdownButtonFormField<String>(
+              isExpanded: true,
               initialValue: groupId,
               decoration: const InputDecoration(labelText: 'Consumption group'),
               items: [

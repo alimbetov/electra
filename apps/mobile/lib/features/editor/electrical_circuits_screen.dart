@@ -345,6 +345,7 @@ class _ElectricalCircuitDialogState extends State<ElectricalCircuitDialog> {
                 onChanged: (_) => setState(() {}),
               ),
               DropdownButtonFormField<SupplySystem>(
+                isExpanded: true,
                 initialValue: supply,
                 decoration: const InputDecoration(labelText: 'Supply system'),
                 items:
@@ -352,7 +353,10 @@ class _ElectricalCircuitDialogState extends State<ElectricalCircuitDialog> {
                         .map(
                           (value) => DropdownMenuItem(
                             value: value,
-                            child: Text(_supplyName(value)),
+                            child: Text(
+                              _supplyName(value),
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         )
                         .toList(),
@@ -369,6 +373,7 @@ class _ElectricalCircuitDialogState extends State<ElectricalCircuitDialog> {
                         },
               ),
               DropdownButtonFormField<int>(
+                isExpanded: true,
                 key: ValueKey(phases),
                 initialValue: phases,
                 decoration: const InputDecoration(labelText: 'Phases'),
