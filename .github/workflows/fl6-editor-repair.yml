@@ -1,0 +1,33 @@
+name: Repair FL6 Component Painter
+
+on:
+  push:
+    branches:
+      - feat/flutter-geometry-kernel
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/flutter-geometry-kernel
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - working-directory: apps/mobile
+        run: flutter pub get --enforce-lockfile
+      - run: python3 .github/scripts/repair_fl6_component_painter.py
+      - working-directory: apps/mobile
+        run: dart format lib/features/editor/room_editor_screen.dart
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/mobile/lib/features/editor/room_editor_screen.dart
+          git commit -m "fix(mobile): render persisted components on room canvas"
+          git push origin HEAD:feat/flutter-geometry-kernel
