@@ -9,6 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  engineering_core:
+    path: ../../packages/engineering_core
 
 flutter:
   uses-material-design: true
