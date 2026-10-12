@@ -199,6 +199,7 @@ class _FloorRoutingWorkspaceState extends State<FloorRoutingWorkspace> {
           ],
         ),
         DropdownButtonFormField<FloorGraphMode>(
+          key: ValueKey(mode),
           initialValue: mode,
           isExpanded: true,
           decoration: const InputDecoration(labelText: 'Display mode'),

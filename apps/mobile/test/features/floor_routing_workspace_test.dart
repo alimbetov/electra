@@ -3,6 +3,7 @@ import 'package:electra_mobile/application/floor_routing_repository.dart';
 import 'package:electra_mobile/application/geometry_repository.dart';
 import 'package:electra_mobile/domain/project_models.dart';
 import 'package:electra_mobile/features/floors/floor_routing_screen.dart';
+import 'package:electra_mobile/features/editor/room_routing_screen.dart';
 import 'package:engineering_core/engineering_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -161,6 +162,47 @@ void main() {
     );
   }
 
+  testWidgets(
+    'floor drill-down opens the selected persisted route immediately',
+    (tester) async {
+      final snapshot = fixture().routing['Workshop']!;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: CableRouteEditor(
+              snapshot: snapshot,
+              initialRunId: 'Workshop',
+              circuits: const {'c-Workshop': 'Workshop circuit'},
+              nextId: () => 'unused',
+              onSave: ({required route, required run}) async {},
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text('Route / CableRun name'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(
+        tester
+            .widget<TextField>(
+              find.widgetWithText(TextField, 'Route / CableRun name'),
+            )
+            .controller!
+            .text,
+        'Route Workshop',
+      );
+      await tester.scrollUntilVisible(
+        find.text('Cancel draft'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.text('Cancel draft'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
   testWidgets('compact floor trace retains selection and opens real room run', (
     tester,
   ) async {

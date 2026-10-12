@@ -352,6 +352,7 @@ class FloorRoutingPanels extends Table with GeometryAuditColumns {
   Set<Column<Object>> get primaryKey => {id};
 }
 
+@DataClassName('FloorPanelFeedRow')
 class FloorPanelFeeds extends Table {
   TextColumn get panelId => text().references(FloorRoutingPanels, #id)();
   TextColumn get runId => text().references(CableRuns, #id)();
