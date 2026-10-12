@@ -90,7 +90,7 @@ void main() {
     },
   );
 
-  test('schema v2 keeps hierarchy tables and indexes', () async {
+  test('current schema keeps hierarchy tables and indexes', () async {
     final database = AppDatabase(NativeDatabase.memory());
 
     final tables =
@@ -115,7 +115,7 @@ void main() {
         'idx_project_updated',
       ]),
     );
-    expect(database.schemaVersion, 2);
+    expect(database.schemaVersion, 3);
 
     await database.close();
   });
