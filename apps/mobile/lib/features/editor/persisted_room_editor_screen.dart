@@ -48,7 +48,9 @@ class PersistedRoomEditorScreen extends ConsumerWidget {
               error: (error, stackTrace) => _ErrorScaffold(error: error),
               data: (room) {
                 if (room == null || room.floorId != floorId) {
-                  return const _ErrorScaffold(error: 'Room context is invalid.');
+                  return const _ErrorScaffold(
+                    error: 'Room context is invalid.',
+                  );
                 }
 
                 return RoomEditorScreen(
@@ -57,7 +59,8 @@ class PersistedRoomEditorScreen extends ConsumerWidget {
                     name: project.name,
                     reference: project.reference,
                     measurementSystem: project.measurementSystem,
-                    defaultStructuralHeightMm: project.defaultStructuralHeightMm,
+                    defaultStructuralHeightMm:
+                        project.defaultStructuralHeightMm,
                     defaultFinishedCeilingHeightMm:
                         project.defaultFinishedCeilingHeightMm,
                   ),
@@ -85,9 +88,8 @@ class _LoadingScaffold extends StatelessWidget {
   const _LoadingScaffold();
 
   @override
-  Widget build(BuildContext context) => const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+  Widget build(BuildContext context) =>
+      const Scaffold(body: Center(child: CircularProgressIndicator()));
 }
 
 class _ErrorScaffold extends StatelessWidget {
@@ -96,7 +98,6 @@ class _ErrorScaffold extends StatelessWidget {
   final Object error;
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        body: Center(child: Text('Unable to open room editor: $error')),
-      );
+  Widget build(BuildContext context) =>
+      Scaffold(body: Center(child: Text('Unable to open room editor: $error')));
 }

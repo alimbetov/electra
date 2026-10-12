@@ -5,31 +5,27 @@ void main() {
   SurfacePatch buildPatch(
     String id, {
     Point3Mm origin = const Point3Mm(0, 0, 0),
-  }) =>
-      SurfacePatch(
-        id: id,
-        roomId: 'room-1',
-        surfaceId: 'wall-$id',
-        frame: LocalCoordinateFrame(
-          origin: origin,
-          uAxis: const Vector3D(1, 0, 0),
-          vAxis: const Vector3D(0, 0, 1),
-        ),
-        boundary: Polygon2Mm(const [
-          Point2Mm(0, 0),
-          Point2Mm(4000, 0),
-          Point2Mm(4000, 3000),
-          Point2Mm(0, 3000),
-        ]),
-        orientation: SurfaceOrientation.vertical,
-      );
+  }) => SurfacePatch(
+    id: id,
+    roomId: 'room-1',
+    surfaceId: 'wall-$id',
+    frame: LocalCoordinateFrame(
+      origin: origin,
+      uAxis: const Vector3D(1, 0, 0),
+      vAxis: const Vector3D(0, 0, 1),
+    ),
+    boundary: Polygon2Mm(const [
+      Point2Mm(0, 0),
+      Point2Mm(4000, 0),
+      Point2Mm(4000, 3000),
+      Point2Mm(0, 3000),
+    ]),
+    orientation: SurfaceOrientation.vertical,
+  );
 
   test('spatial topology validates consistent patch graph', () {
     final patchA = buildPatch('patch-a');
-    final patchB = buildPatch(
-      'patch-b',
-      origin: const Point3Mm(4000, 0, 0),
-    );
+    final patchB = buildPatch('patch-b', origin: const Point3Mm(4000, 0, 0));
     final edgeA = SurfaceEdge(
       id: 'edge-a',
       patchId: patchA.id,
@@ -94,10 +90,7 @@ void main() {
 
   test('validator rejects adjacency between non-coincident world edges', () {
     final patchA = buildPatch('patch-a');
-    final patchB = buildPatch(
-      'patch-b',
-      origin: const Point3Mm(5000, 0, 0),
-    );
+    final patchB = buildPatch('patch-b', origin: const Point3Mm(5000, 0, 0));
     final edgeA = SurfaceEdge(
       id: 'edge-a',
       patchId: patchA.id,

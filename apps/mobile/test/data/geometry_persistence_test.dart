@@ -58,24 +58,23 @@ void main() {
     required String id,
     required String roomId,
     Point3Mm origin = const Point3Mm(1000, 2000, 0),
-  }) =>
-      SurfacePatch(
-        id: id,
-        roomId: roomId,
-        surfaceId: 'surface-$id',
-        frame: LocalCoordinateFrame(
-          origin: origin,
-          uAxis: const Vector3D(1, 0, 0),
-          vAxis: const Vector3D(0, 0, 1),
-        ),
-        boundary: Polygon2Mm(const [
-          Point2Mm(0, 0),
-          Point2Mm(4000, 0),
-          Point2Mm(4000, 3000),
-          Point2Mm(0, 3000),
-        ]),
-        orientation: SurfaceOrientation.vertical,
-      );
+  }) => SurfacePatch(
+    id: id,
+    roomId: roomId,
+    surfaceId: 'surface-$id',
+    frame: LocalCoordinateFrame(
+      origin: origin,
+      uAxis: const Vector3D(1, 0, 0),
+      vAxis: const Vector3D(0, 0, 1),
+    ),
+    boundary: Polygon2Mm(const [
+      Point2Mm(0, 0),
+      Point2Mm(4000, 0),
+      Point2Mm(4000, 3000),
+      Point2Mm(0, 3000),
+    ]),
+    orientation: SurfaceOrientation.vertical,
+  );
 
   test('room geometry survives SQLite close and reopen exactly', () async {
     final directory = await Directory.systemTemp.createTemp('electra-fl3-');
@@ -210,10 +209,9 @@ void main() {
     final hierarchy = DriftProjectHierarchyRepository(database);
     final restoredRoom = await hierarchy.findRoom(roomId);
 
-    final tables =
-        await database
-            .customSelect("SELECT name FROM sqlite_master WHERE type = 'table'")
-            .get();
+    final tables = await database
+        .customSelect("SELECT name FROM sqlite_master WHERE type = 'table'")
+        .get();
     final names = tables.map((row) => row.read<String>('name')).toSet();
 
     expect(restoredRoom?.name, 'Workshop');

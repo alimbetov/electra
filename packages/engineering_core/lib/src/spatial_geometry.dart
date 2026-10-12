@@ -78,9 +78,13 @@ final class SurfaceAdjacency {
     required this.toPatchId,
     required this.toEdgeId,
   }) {
-    if ({id, fromPatchId, fromEdgeId, toPatchId, toEdgeId}.any(
-      (e) => e.isEmpty,
-    )) {
+    if ({
+      id,
+      fromPatchId,
+      fromEdgeId,
+      toPatchId,
+      toEdgeId,
+    }.any((e) => e.isEmpty)) {
       throw ArgumentError('SurfaceAdjacency identifiers must be non-empty.');
     }
     if (fromPatchId == toPatchId) {
@@ -317,8 +321,7 @@ abstract final class SpatialGeometryValidator {
         violations.add(
           GeometryInvariantViolation(
             code: 'ADJACENCY_WORLD_EDGE_MISMATCH',
-            message:
-                'Adjacent surface edges must represent the same world-space segment.',
+            message: 'Adjacent surface edges must represent the same world-space segment.',
             objectId: adjacency.id,
           ),
         );
@@ -380,8 +383,8 @@ abstract final class SpatialGeometryValidator {
     final fromEnd = fromPatch.worldPoint(from.end);
     final toStart = toPatch.worldPoint(to.start);
     final toEnd = toPatch.worldPoint(to.end);
-    final tolerance = fromPatch.frame.tolerance.linearMm >
-            toPatch.frame.tolerance.linearMm
+    final tolerance =
+        fromPatch.frame.tolerance.linearMm > toPatch.frame.tolerance.linearMm
         ? fromPatch.frame.tolerance.linearMm
         : toPatch.frame.tolerance.linearMm;
 
