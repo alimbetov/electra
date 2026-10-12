@@ -27,12 +27,120 @@ The editor operates as a field-oriented CAD-lite tool:
 - undo/redo;
 - autosave;
 - project/floor/room hierarchy;
-- plan, ceiling, floor and wall-elevation views;
+- edge-driven navigation between adjacent room surfaces;
+- progressive neighbor-surface preview near all valid edges;
+- tap-to-activate adjacent wall/floor/ceiling/feature surface;
 - room default/custom heights;
 - point installation height;
-- mounting surface independent from cable routing plane.
+- mounting surface independent from routing path.
 
 The UI is 2D, but the engineering model is 2.5D: persisted engineering objects may carry `x`, `y` and `z` coordinates in millimetres.
+
+## Piecewise-planar room geometry
+
+Room boundaries are not assumed to be globally flat or rectangular. Walls, floors and ceilings are represented using polygonal piecewise-planar geometry.
+
+```text
+Room
+  -> RoomSurface[]
+       -> SurfacePatch[]
+            -> SurfaceEdge[]
+  -> SpatialFeature[]
+```
+
+A logical surface such as a ceiling or floor may contain several planar patches with different elevations or orientations.
+
+Examples:
+
+```text
+Ceiling
+  -> main horizontal patch at 2700 mm
+  -> vertical soffit/beam side patch
+  -> underside patch at 2400 mm
+
+Floor
+  -> main patch at 0 mm
+  -> vertical step face
+  -> raised patch at 150 mm
+```
+
+A `SurfacePatch` is an exact bounded planar polygon with a local 2D coordinate system mapped to global 3D project coordinates.
+
+The initial geometry scope includes:
+
+- horizontal planes;
+- vertical planes;
+- sloped planes;
+- polygonal boundaries;
+- folds and steps;
+- lowered/raised zones;
+- beams and soffits;
+- niches and recesses;
+- columns and shafts;
+- platforms and protrusions.
+
+Full free-form BIM/NURBS/mesh editing is not required for the initial product.
+
+## Spatial features
+
+Construction geometry with useful semantic identity is represented as `SpatialFeature`.
+
+Initial feature types:
+
+- `BEAM`;
+- `COLUMN`;
+- `SOFFIT`;
+- `NICHE`;
+- `SHAFT`;
+- `STEP`;
+- `PLATFORM`;
+- `RECESS`;
+- `PROTRUSION`;
+- `CUSTOM`.
+
+A feature may own/generate multiple surface patches. For example, a beam may expose side, bottom and end patches that can be used for placement and routing.
+
+## Edge-driven navigation
+
+The editor uses the geometry itself as the primary navigator.
+
+When the pointer/touch approaches any valid edge of the active patch:
+
+```text
+far        -> no preview
+near       -> weak edge highlight
+closer     -> adjacent patch preview
+very close -> strong preview / snap hint
+tap        -> adjacent patch becomes active
+```
+
+This applies to all valid edges, including lateral wall edges.
+
+Typical wall interaction:
+
+```text
+            CEILING
+               ^
+               |
+WALL D <- WALL A -> WALL B
+               |
+               v
+             FLOOR
+```
+
+The actual target is always resolved from explicit surface adjacency, not hardcoded orientation assumptions.
+
+Around beams, niches, steps or other piecewise-planar geometry the same model applies:
+
+```text
+ceiling
+  -> beam side
+  -> beam underside
+  -> opposite beam side
+  -> ceiling
+```
+
+The adjacent surface may be shown as a progressive folded preview around an intermediate 45-degree visual angle. Fold angle is UI-only state.
 
 ## Room classification
 
@@ -100,9 +208,10 @@ The model distinguishes at least:
 - structural height;
 - finished ceiling height;
 - per-room overrides;
-- per-device installation height.
+- per-device installation height;
+- local patch elevation/orientation.
 
-Effective values are resolved by inheritance. Structural and finished ceiling heights may diverge.
+Effective defaults are resolved by inheritance, while local piecewise-planar geometry may alter the actual usable floor/ceiling elevation at a specific location.
 
 ## Engineering objects
 
@@ -148,7 +257,7 @@ Equipment definitions must be extensible and user-customizable through a `Device
 - `FURNITURE`
 - `FREE`
 
-Mounting surface describes where an object is physically installed. It is independent from the physical path used by its cable.
+The generic mounting type describes the category; exact placement references a concrete `SurfacePatch` where applicable.
 
 ## Cable routing domain
 
@@ -171,7 +280,7 @@ Initial node types:
 - `ENDPOINT`
 - `BEND`
 - `JUNCTION`
-- `TRANSITION`
+- `SURFACE_TRANSITION`
 - `ENTRY`
 - `EXIT`
 - `RISER`
@@ -186,13 +295,13 @@ Important properties:
 
 - `fromNodeId`;
 - `toNodeId`;
+- `surfacePatchId` when surface-bound;
 - `layingMethod`;
-- `mountingSurface` or route plane;
 - calculated geometric length;
 - optional physical channel reference;
 - conduit requirement/default metadata.
 
-A single cable may transition across different segment methods, for example tray -> ceiling conduit -> wall chase -> device.
+A single cable may transition across different methods and different patches, for example tray -> ceiling -> beam side -> beam underside -> wall chase -> device.
 
 ### Laying methods / route channels
 
@@ -217,11 +326,11 @@ Engineering relationships between consecutive segments may include:
 - custom bend;
 - vertical rise;
 - vertical drop;
-- surface transition;
+- surface/patch transition;
 - room transition;
 - floor transition.
 
-These can be inferred where deterministic, but must remain representable in the domain.
+When the user taps/crosses an adjacent edge during route drawing, the route operation remains active and a `SURFACE_TRANSITION` is created/reused at the shared boundary.
 
 ## CableRun
 
@@ -240,7 +349,7 @@ Representative properties:
 - termination allowance;
 - calculated total length.
 
-The total cable length is derived from route geometry plus configured reserve and termination allowances.
+The total cable length is derived from exact route geometry plus configured reserve and termination allowances.
 
 ## Junctions and distribution nodes
 
@@ -255,9 +364,7 @@ Initial junction types:
 - `TERMINAL_BOX`
 - `PANEL_ENTRY`
 - `FLOOR_BOX`
-- `CEILING_BOX`
-
-Junction metadata may include box type, dimensions, accessibility, mounting surface and installation height.
+- `CEILING_BOX`.
 
 ## Conduit and shared physical channels
 
@@ -276,18 +383,11 @@ Representative conduit properties:
 - calculated fill percentage;
 - route/segment association.
 
-This enables future conduit fill validation, BOM calculation and shared-route optimization.
-
 ## Editor routing UX
 
-The same room supports multiple views over the same data:
-
-- Plan;
-- Ceiling;
-- Floor;
-- Wall elevation.
-
 Routing mode creates route nodes and segments from taps/drag operations. The UI should automatically infer common bends and convert intersecting/branching topology into junction semantics when possible.
+
+Surface navigation is continuous while routing: selecting an adjacent patch does not terminate the active drawing operation.
 
 Route rendering must distinguish laying methods using more than color alone, for example line pattern plus icon/legend, so printed and monochrome documentation remains understandable.
 
@@ -309,7 +409,21 @@ Calculation rules must be versioned and isolated from UI code.
 
 SQLite/Drift stores structured project information. Heavy files remain in the filesystem. A user may keep hundreds or thousands of local projects; `project_id` acts as the logical partition key and indexes are designed around project/floor/room access patterns.
 
-Route nodes, route segments, cable runs, conduit runs and junctions are persisted as normalized entities rather than a single route JSON blob so that geometry, BOM and validation can query them efficiently.
+Spatial and routing entities are normalized rather than stored as one large JSON blob.
+
+Expected spatial entities include:
+
+```text
+room_surface
+surface_patch
+surface_edge
+surface_adjacency
+spatial_feature
+```
+
+Route nodes, route segments, cable runs, conduit runs and junctions are also persisted as normalized entities.
+
+All edits to shared geometry, including feature/patch changes, participate in `SpatialRevision` so engineering layers can detect that their base geometry changed.
 
 ## Cloud sharing
 
@@ -327,12 +441,14 @@ Project PII sharing is controlled separately from technical documentation sharin
 
 1. Create project.
 2. Create floor and room with exact dimensions and semantic room type.
-3. Add walls/openings and room height.
-4. Add sockets/switches/lights/equipment with installation height and mounting surface.
-5. Create a circuit and physical cable run.
-6. Route cable with explicit bend/transition nodes through ceiling/floor/wall.
-7. Support at least one junction branch and optional conduit assignment.
-8. Calculate route/cable length and basic protection/cable recommendation.
-9. Generate BOM.
-10. Generate labels/QR.
-11. Export professional PDF.
+3. Add walls/openings, room height and simple surface patches.
+4. Navigate between floor/walls/ceiling by approaching and tapping adjacent edges.
+5. Represent at least one non-flat feature such as a beam, soffit, step or sloped patch.
+6. Add sockets/switches/lights/equipment with installation height and exact mounting patch.
+7. Create a circuit and physical cable run.
+8. Route cable with explicit bend/transition nodes continuously across adjacent patches.
+9. Support at least one junction branch and optional conduit assignment.
+10. Calculate route/cable length and basic protection/cable recommendation.
+11. Generate BOM.
+12. Generate labels/QR.
+13. Export professional PDF.
