@@ -1,3 +1,4 @@
+import 'package:engineering_core/engineering_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -6,8 +7,9 @@ import 'room_editor_screen.dart';
 
 /// Persistent route boundary for the Room Editor.
 ///
-/// Project, floor, room and geometry are loaded from SQLite-backed repository
-/// streams. Only ephemeral editor state lives inside [RoomEditorScreen].
+/// Project, floor, room, geometry and component instances are loaded from
+/// SQLite-backed repository streams. Only ephemeral editor interaction state
+/// lives inside [RoomEditorScreen].
 class PersistedRoomEditorScreen extends ConsumerWidget {
   const PersistedRoomEditorScreen({
     super.key,
@@ -26,6 +28,7 @@ class PersistedRoomEditorScreen extends ConsumerWidget {
     final floorAsync = ref.watch(floorProvider(floorId));
     final roomAsync = ref.watch(roomProvider(roomId));
     final geometryAsync = ref.watch(roomGeometryProvider(roomId));
+    final componentsAsync = ref.watch(roomComponentsProvider(roomId));
 
     return projectAsync.when(
       loading: () => const _LoadingScaffold(),
@@ -54,10 +57,32 @@ class PersistedRoomEditorScreen extends ConsumerWidget {
                   loading: () => const _LoadingScaffold(),
                   error: (error, stackTrace) => _ErrorScaffold(error: error),
                   data:
-                      (geometry) => RoomEditorScreen(
-                        project: project,
-                        room: room,
-                        geometry: geometry,
+                      (geometry) => componentsAsync.when(
+                        loading: () => const _LoadingScaffold(),
+                        error:
+                            (error, stackTrace) =>
+                                _ErrorScaffold(error: error),
+                        data:
+                            (components) => RoomEditorScreen(
+                              project: project,
+                              room: room,
+                              geometry: geometry,
+                              components: components,
+                              onPlaceComponent: (
+                                definition,
+                                hostSurfacePatchId,
+                                localPosition,
+                              ) async {
+                                await ref
+                                    .read(componentPlacementServiceProvider)
+                                    .place(
+                                      roomId: room.id,
+                                      definition: definition,
+                                      hostSurfacePatchId: hostSurfacePatchId,
+                                      localPosition: localPosition,
+                                    );
+                              },
+                            ),
                       ),
                 );
               },
