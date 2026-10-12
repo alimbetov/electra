@@ -1,5 +1,14 @@
 enum MeasurementSystem { metric, imperial }
 
+enum RoomCategory {
+  residential,
+  wet,
+  technical,
+  commercial,
+  outdoor,
+  other,
+}
+
 enum RoomType {
   livingRoom,
   bedroom,
