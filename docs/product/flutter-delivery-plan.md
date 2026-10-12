@@ -372,6 +372,28 @@ A route across multiple surface patches reconstructs exactly after restart and p
 
 ## WP-FL10 — Routing junctions
 
+**Status: BASELINE CLOSED on `feat/flutter-routing-cablerun`. Full Flutter/core exact-SHA gate passed on `b828f3cd6d1cd8547486be526885535bfb659eb8` (42 mobile tests, 72 engineering-core tests).**
+
+### Implemented behavior
+
+- first-class surface-anchored junctions with stable code, type, installation notes and directed CableRun connections;
+- junction placement derives the exact local/world position from the selected incoming route endpoint;
+- incoming connections bind the last route node; outgoing connections bind the first node; geometric crossings create no connection;
+- one incoming/two outgoing runs form a persisted branch; direction, endpoint node, circuit and physical channel are explicit;
+- electrical boxes require one circuit; tray/conduit branches permit multiple circuits while checking the corresponding laying method;
+- validation rejects dangling/missing/invalid runs, duplicate run connections, cross-room links, mismatched endpoints, stale placement/circuit/channel metadata and already-owned run endpoints;
+- schema v8 adds `routing_junctions` and `junction_connections` with typed foreign keys; junction and complete connection replacement commit atomically;
+- creation timestamps survive edits, junction revisions advance, and failed writes preserve the previous topology;
+- room routing snapshots include junctions and expose live review state when route geometry, endpoints, circuits or channels change;
+- compact drawing symbols open a junction detail editor with a topology-derived branch schematic, incoming/outgoing assignment, circuit/route identifiers and navigation to the real route;
+- unavailable run connections can be removed from the editor; failed saves retain the draft;
+- tests cover exact close/reopen reconstruction of a 1→2 branch, atomic validation failure, connection replacement, live route-change review, v7-to-v8 migration and compact detail/navigation behavior.
+
+### Remaining boundary
+
+Connections currently meet on the same host surface. A cross-surface transition is represented inside a CableRoute before it terminates at the junction. Equipment-port binding, independent free placement before runs exist, physical box dimensions/entries, conductor sections, channel capacity, spare capacity and installation-status workflows are deferred. The branch schematic derives from connections; it is not separately persisted. Endpoint changes require explicit review and re-assignment rather than silently moving or re-wiring the saved junction.
+
+
 ### Scope
 
 - junction placement;
