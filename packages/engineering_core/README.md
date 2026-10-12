@@ -5,30 +5,96 @@ Pure Dart package containing the engineering domain. It must not depend on Flutt
 ## Planned modules
 
 ```text
-geometry/
-rooms/
+spatial/
+network/
 routing/
-electrical/
+rooms/
 equipment/
-panel/
-materials/
-labels/
 units/
 validation/
+
+electrical/
+low_voltage/
+cctv/
+fire_alarm/
+security/
+access_control/
+plumbing/
+heating/
+hvac/
+gas/
+drainage/
+solar/
+ev_charging/
 ```
+
+Only the electrical vertical is implemented first. The other discipline modules are reserved architectural extension points.
 
 ## Core rules
 
 - canonical geometry uses millimetres;
 - persisted engineering objects may have x/y/z semantics even when edited in a 2D UI;
+- shared project geometry is discipline-neutral;
+- engineering layers reference the same `Floor`, `Room`, `Wall` and `Opening` entities;
+- discipline, project phase and installation status are independent dimensions;
 - room height is resolved from project/floor defaults plus optional room overrides;
 - structural height and finished ceiling height are distinct concepts;
-- mounting surface and cable-routing surface are separate concepts;
+- mounting surface and physical routing surface are separate concepts;
 - engineering calculations are deterministic, versioned and testable offline;
-- equipment definitions are extensible and data-driven rather than hardcoded classes/enums for every appliance;
-- cable length is derived from route topology, not treated as source data;
-- circuits, physical cable runs, physical routes and conduits are separate concepts;
+- equipment definitions are extensible and data-driven;
+- physical run length is derived from route topology, not treated as authoritative source data;
 - domain and code identifiers use English language-neutral codes.
+
+## Spatial core
+
+```text
+Project
+Floor
+Room
+Zone
+Wall
+Opening
+Point3Mm
+BoundingBox
+MountingSurface
+HeightProfile
+SpatialRevision
+```
+
+The spatial core must not know whether a routed object is a cable, pipe or ventilation duct.
+
+## Engineering layers
+
+```text
+EngineeringLayer
+  -> discipline
+  -> revision
+  -> baseSpatialRevision
+```
+
+Reserved disciplines include:
+
+- `ARCHITECTURE`
+- `ELECTRICAL`
+- `LOW_VOLTAGE`
+- `CCTV`
+- `FIRE_ALARM`
+- `SECURITY`
+- `ACCESS_CONTROL`
+- `PLUMBING`
+- `HEATING`
+- `HVAC`
+- `GAS`
+- `DRAINAGE`
+- `SOLAR`
+- `EV_CHARGING`
+
+Object lifecycle dimensions remain separate:
+
+```text
+Phase = EXISTING | DEMOLITION | NEW | TEMPORARY
+InstallationStatus = PLANNED | APPROVED | INSTALLED | TESTED | COMMISSIONED
+```
 
 ## Room domain
 
@@ -50,35 +116,78 @@ Initial `RoomCategory` values:
 
 `RoomTypeDefinition` is data-driven and may provide recommended devices, environmental defaults and future rule-profile references.
 
-## Height model
+## Equipment and ports
 
 ```text
-Project defaults
-  -> Floor defaults
-    -> Room overrides
+DeviceDefinition
+  -> PortDefinition[]
+
+EquipmentItem
+  -> EquipmentPort[]
 ```
 
-Device installation height is independent from room height. For example, a wall socket can be at `z=300`, a switch at `z=900`, and a ceiling light at the resolved finished ceiling height.
+Representative port types:
 
-## Equipment model
+```text
+POWER
+CONTROL
+DATA
+ETHERNET
+ETHERNET_POE
+COLD_WATER
+HOT_WATER
+DRAIN
+SUPPLY
+RETURN
+REFRIGERANT_IN
+REFRIGERANT_OUT
+AIR_SUPPLY
+AIR_RETURN
+```
 
-Representative concepts:
+A device can therefore participate in several disciplines at once. For example an air-conditioner indoor unit can expose power, control, refrigerant and drain ports.
 
-- `MountingSurface`: WALL, CEILING, FLOOR, FURNITURE, FREE
-- `DeviceDefinition`: reusable catalog definition with defaults
-- `PointItem`: socket, switch, light, low-voltage point
-- `EquipmentItem`: oven, dishwasher, air conditioner, curtain motor, boiler, pump, etc.
+## Network core
 
-User-specific equipment should be expressible through custom definitions without changing the domain package.
+The generic network layer captures connectivity/topology without absorbing discipline-specific physics.
+
+```text
+EngineeringNetwork
+NetworkNode
+Endpoint
+Port
+Run
+RouteBinding
+```
+
+Representative topologies include:
+
+- `LINE`
+- `STAR`
+- `TREE`
+- `RING`
+- `BUS`
+
+Specialized runs remain strongly typed:
+
+```text
+Electrical  -> CableRun
+Plumbing    -> PipeRun
+Heating     -> HeatingLoop / PipeRun
+Ventilation -> DuctRun
+CCTV        -> CableRun / DataRun
+Fire alarm  -> FireLoop / CableRun
+```
+
+Do not replace these types with one generic JSON property bag.
 
 ## Routing graph
 
 ```text
-Circuit
-  -> CableRun
-      -> Route
-          -> RouteNode[]
-          -> RouteSegment[]
+Run
+  -> Route
+      -> RouteNode[]
+      -> RouteSegment[]
 ```
 
 ### RouteNode
@@ -97,27 +206,28 @@ A route node carries `xMm`, `yMm`, `zMm`.
 
 ### RouteSegment
 
-A route segment connects two nodes and carries physical installation semantics such as laying method/route channel.
+A route segment connects two nodes and provides reusable spatial geometry. A discipline-specific run references the route and adds physical properties.
 
-Representative laying methods:
+Examples:
 
-- `CEILING_FREE`
-- `CONDUIT`
-- `FLOOR_SCREED`
-- `WALL_CHASE`
-- `CABLE_TRAY`
-- `DUCT`
-- `SURFACE_MOUNTED`
-- `UNDERGROUND`
-- `CUSTOM`
-
-A single cable run may traverse multiple segment types.
+```text
+CableRunSegment -> cable/conduit properties
+PipeRunSegment  -> diameter/material/insulation
+DuctRunSegment  -> width/height/diameter/orientation
+```
 
 ### Junctions
 
-Junctions are first-class branching/distribution semantics rather than ordinary bends. Examples include junction boxes, distribution boxes, splitters, panel entries, floor boxes and ceiling boxes.
+Junction topology is shared, while junction semantics are discipline-specific:
 
-### Conduit
+```text
+Electrical -> junction box / splitter
+Plumbing   -> tee / manifold
+HVAC       -> branch / plenum
+Network    -> switch / splitter
+```
+
+## Electrical conduit
 
 `ConduitRun` represents a physical conduit/channel and may carry multiple `CableRun` instances.
 
@@ -126,29 +236,34 @@ ConduitRun
   -> CableRun[]
 ```
 
-This separation enables conduit-fill validation, shared-route analysis and material calculation.
+This enables conduit-fill validation, shared-route analysis and material calculation.
 
-## Derived cable length
+## Derived length
 
 ```text
 sum(RouteSegment geometric lengths)
-+ reserve
-+ termination allowance
-= CableRun calculated length
++ discipline-specific allowances
+= calculated physical run length
 ```
 
-Vertical rises and drops are explicit route geometry, so changes to room height or device installation height can trigger deterministic recalculation.
+Vertical rises and drops are explicit route geometry, so changes to room height or equipment installation height can trigger deterministic recalculation.
+
+## Collaboration compatibility
+
+Layer objects retain their `layerId`, `discipline`, `revision` and `baseSpatialRevision` so local projects can later be synchronized and shared across specialists without duplicating geometry.
 
 ## Testing expectations
 
 The engineering core should be testable without Flutter. Priority test areas:
 
-- geometry and coordinate transforms;
+- shared geometry and coordinate transforms;
 - room-height inheritance;
+- layer/spatial revision compatibility;
+- equipment port compatibility;
 - route node/segment topology;
-- bend and transition inference;
-- junction branching;
-- cable-length calculation;
-- conduit assignment/fill rules;
+- bend, transition and junction inference;
+- discipline-specific run lengths;
+- electrical conduit assignment/fill rules;
 - electrical calculations;
+- future pipe/duct topology contracts;
 - BOM derivation.
