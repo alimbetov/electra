@@ -31,14 +31,19 @@ void main() {
     expect(library.customDefinitions.map((e) => e.code), ['CUSTOM_MACHINE_A']);
   });
 
-  test('component definition can expose cross-discipline ports and electrical profile', () {
+  test(
+      'component definition can expose cross-discipline ports and electrical profile',
+      () {
     const definition = ComponentDefinition(
       id: 'ahu-1',
       code: 'AHU_GENERIC',
       displayName: 'Air Handling Unit',
       category: 'HVAC_EQUIPMENT',
       primaryDiscipline: Discipline.hvac,
-      compatibleDisciplines: [Discipline.electrical, Discipline.industrialAutomation],
+      compatibleDisciplines: [
+        Discipline.electrical,
+        Discipline.industrialAutomation
+      ],
       source: ComponentDefinitionSource.system,
       version: 1,
       ports: [
@@ -65,6 +70,7 @@ void main() {
 
     expect(definition.ports, hasLength(2));
     expect(definition.electricalLoadProfile?.phases, 3);
-    expect(definition.electricalLoadProfile?.dedicatedCircuitRecommended, isTrue);
+    expect(
+        definition.electricalLoadProfile?.dedicatedCircuitRecommended, isTrue);
   });
 }

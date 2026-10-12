@@ -2,7 +2,8 @@ import 'package:engineering_core/engineering_core.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('three-phase VFD-fed motor preserves supply and routing constraints', () {
+  test('three-phase VFD-fed motor preserves supply and routing constraints',
+      () {
     const motor = ComponentDefinition(
       id: 'motor-15kw',
       code: 'MOTOR_15KW_400V',

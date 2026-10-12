@@ -2,7 +2,8 @@ import 'package:engineering_core/engineering_core.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('panel proposal keeps functional protection requirement vendor-neutral', () {
+  test('panel proposal keeps functional protection requirement vendor-neutral',
+      () {
     const proposal = PanelGenerationProposal(
       id: 'proposal-1',
       panelId: 'DB-F02',

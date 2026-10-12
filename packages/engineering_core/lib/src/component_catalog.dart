@@ -158,11 +158,12 @@ class LayerComponentLibrary {
   final Discipline discipline;
   final List<ComponentDefinition> definitions;
 
-  Iterable<ComponentDefinition> get systemDefinitions =>
-      definitions.where((item) => item.source == ComponentDefinitionSource.system);
+  Iterable<ComponentDefinition> get systemDefinitions => definitions
+      .where((item) => item.source == ComponentDefinitionSource.system);
 
   Iterable<ComponentDefinition> get customDefinitions => definitions.where(
-        (item) => item.source == ComponentDefinitionSource.user ||
+        (item) =>
+            item.source == ComponentDefinitionSource.user ||
             item.source == ComponentDefinitionSource.project,
       );
 }

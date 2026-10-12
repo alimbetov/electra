@@ -64,15 +64,11 @@ class FloorWorkspaceScreen extends ConsumerWidget {
                             '${room.widthMm} × ${room.depthMm} mm',
                           ),
                           trailing: const Icon(Icons.chevron_right),
-                          onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'Room Editor is the next geometry gate after FL2.',
-                                ),
+                          onTap:
+                              () => context.go(
+                                '/projects/$projectId/floors/$floorId/'
+                                'rooms/${room.id}',
                               ),
-                            );
-                          },
                         ),
                       );
                     },

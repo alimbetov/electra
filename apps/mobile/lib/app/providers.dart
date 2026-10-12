@@ -1,10 +1,23 @@
+import '../application/electrical_circuit_repository.dart';
+import '../data/repositories/drift_electrical_circuit_repository.dart';
+import '../application/electrical_load_repository.dart';
+import '../data/repositories/drift_electrical_load_repository.dart';
+import '../application/catalog_preferences_repository.dart';
+import '../data/repositories/drift_catalog_preferences_repository.dart';
+
+import 'package:engineering_core/engineering_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../application/component_instance_repository.dart';
+import '../application/component_placement_service.dart';
+import '../application/geometry_repository.dart';
 import '../application/id_generator.dart';
 import '../application/project_hierarchy_service.dart';
 import '../application/project_repositories.dart';
 import '../data/database/app_database.dart';
 import '../data/database/drift_unit_of_work.dart';
+import '../data/repositories/drift_component_instance_repository.dart';
+import '../data/repositories/drift_geometry_repository.dart';
 import '../data/repositories/drift_project_hierarchy_repository.dart';
 import '../domain/project_models.dart';
 
@@ -31,6 +44,26 @@ final roomRepositoryProvider = Provider<RoomRepository>((ref) {
   return ref.watch(projectHierarchyRepositoryProvider);
 });
 
+final geometryRepositoryProvider = Provider<GeometryRepository>((ref) {
+  return DriftGeometryRepository(
+    ref.watch(databaseProvider),
+    originDeviceId: 'local-device',
+  );
+});
+
+final componentInstanceRepositoryProvider =
+    Provider<ComponentInstanceRepository>((ref) {
+      return DriftComponentInstanceRepository(
+        ref.watch(databaseProvider),
+        originDeviceId: 'local-device',
+      );
+    });
+
+final catalogPreferencesRepositoryProvider =
+    Provider<CatalogPreferencesRepository>((ref) {
+      return DriftCatalogPreferencesRepository(ref.watch(databaseProvider));
+    });
+
 final unitOfWorkProvider = Provider<LocalUnitOfWork>((ref) {
   return DriftUnitOfWork(ref.watch(databaseProvider));
 });
@@ -49,6 +82,16 @@ final projectHierarchyServiceProvider = Provider<ProjectHierarchyService>((
     unitOfWork: ref.watch(unitOfWorkProvider),
     idGenerator: ref.watch(idGeneratorProvider),
     originDeviceId: 'local-device',
+  );
+});
+
+final componentPlacementServiceProvider = Provider<ComponentPlacementService>((
+  ref,
+) {
+  return ComponentPlacementService(
+    components: ref.watch(componentInstanceRepositoryProvider),
+    geometry: ref.watch(geometryRepositoryProvider),
+    idGenerator: ref.watch(idGeneratorProvider),
   );
 });
 
@@ -87,3 +130,48 @@ final roomsProvider = StreamProvider.family<List<RoomRecord>, String>((
 final roomProvider = StreamProvider.family<RoomRecord?, String>((ref, roomId) {
   return ref.watch(roomRepositoryProvider).watchRoom(roomId);
 });
+
+final roomGeometryProvider =
+    StreamProvider.family<RoomGeometrySnapshot, String>((ref, roomId) {
+      return ref.watch(geometryRepositoryProvider).watchRoomGeometry(roomId);
+    });
+
+final roomComponentsProvider =
+    StreamProvider.family<List<ComponentInstance>, String>((ref, roomId) {
+      return ref
+          .watch(componentInstanceRepositoryProvider)
+          .watchRoomComponents(roomId);
+    });
+
+final electricalLoadRepositoryProvider = Provider<ElectricalLoadRepository>((
+  ref,
+) {
+  return DriftElectricalLoadRepository(
+    ref.watch(databaseProvider),
+    originDeviceId: 'local-device',
+  );
+});
+final roomElectricalLoadsProvider =
+    StreamProvider.family<List<EquipmentElectricalLoad>, String>(
+      (ref, roomId) =>
+          ref.watch(electricalLoadRepositoryProvider).watchRoomLoads(roomId),
+    );
+final roomConsumptionGroupsProvider =
+    StreamProvider.family<List<RoomConsumptionGroup>, String>(
+      (ref, roomId) =>
+          ref.watch(electricalLoadRepositoryProvider).watchRoomGroups(roomId),
+    );
+
+final electricalCircuitRepositoryProvider =
+    Provider<ElectricalCircuitRepository>(
+      (ref) => DriftElectricalCircuitRepository(
+        ref.watch(databaseProvider),
+        originDeviceId: 'local-device',
+      ),
+    );
+final roomElectricalCircuitsProvider =
+    StreamProvider.family<List<CircuitSnapshot>, String>(
+      (ref, roomId) => ref
+          .watch(electricalCircuitRepositoryProvider)
+          .watchRoomCircuits(roomId),
+    );
