@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../features/editor/room_editor_screen.dart';
+import '../features/editor/persisted_room_editor_screen.dart';
 import '../features/floors/floor_create_screen.dart';
 import '../features/floors/floor_workspace_screen.dart';
 import '../features/projects/project_create_screen.dart';
@@ -53,7 +53,7 @@ GoRouter createElectraRouter() => GoRouter(
                 GoRoute(
                   path: 'rooms/:roomId',
                   builder:
-                      (context, state) => RoomEditorScreen(
+                      (context, state) => PersistedRoomEditorScreen(
                         projectId: state.pathParameters['projectId']!,
                         floorId: state.pathParameters['floorId']!,
                         roomId: state.pathParameters['roomId']!,
