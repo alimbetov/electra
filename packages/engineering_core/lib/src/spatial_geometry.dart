@@ -69,7 +69,7 @@ final class SurfaceEdge {
   Segment2Mm get segment => Segment2Mm(start, end);
 }
 
-/// Explicit topological relationship between two patch edges.
+/// Explicit topological relationship between two physical patch edges.
 final class SurfaceAdjacency {
   SurfaceAdjacency({
     required this.id,
@@ -83,8 +83,10 @@ final class SurfaceAdjacency {
     )) {
       throw ArgumentError('SurfaceAdjacency identifiers must be non-empty.');
     }
-    if (fromPatchId == toPatchId && fromEdgeId == toEdgeId) {
-      throw ArgumentError('SurfaceAdjacency cannot connect an edge to itself.');
+    if (fromPatchId == toPatchId) {
+      throw ArgumentError(
+        'SurfaceAdjacency must connect two distinct surface patches.',
+      );
     }
   }
 
@@ -196,6 +198,7 @@ abstract final class SpatialGeometryValidator {
     final violations = <GeometryInvariantViolation>[];
     final patchById = <String, SurfacePatch>{};
     final edgeById = <String, SurfaceEdge>{};
+    final adjacencyIds = <String>{};
 
     for (final patch in patches) {
       if (patchById.containsKey(patch.id)) {
@@ -255,13 +258,36 @@ abstract final class SpatialGeometryValidator {
     }
 
     for (final adjacency in adjacencies) {
+      if (!adjacencyIds.add(adjacency.id)) {
+        violations.add(
+          GeometryInvariantViolation(
+            code: 'DUPLICATE_ADJACENCY_ID',
+            message: 'Surface adjacency identifiers must be unique.',
+            objectId: adjacency.id,
+          ),
+        );
+      }
+
       final from = edgeById[adjacency.fromEdgeId];
       final to = edgeById[adjacency.toEdgeId];
+      final fromPatch = patchById[adjacency.fromPatchId];
+      final toPatch = patchById[adjacency.toPatchId];
+
       if (from == null || to == null) {
         violations.add(
           GeometryInvariantViolation(
             code: 'ADJACENCY_EDGE_MISSING',
             message: 'Surface adjacency references a missing edge.',
+            objectId: adjacency.id,
+          ),
+        );
+        continue;
+      }
+      if (fromPatch == null || toPatch == null) {
+        violations.add(
+          GeometryInvariantViolation(
+            code: 'ADJACENCY_PATCH_MISSING',
+            message: 'Surface adjacency references a missing patch.',
             objectId: adjacency.id,
           ),
         );
@@ -273,6 +299,26 @@ abstract final class SpatialGeometryValidator {
           GeometryInvariantViolation(
             code: 'ADJACENCY_PATCH_EDGE_MISMATCH',
             message: 'Adjacency patch and edge references do not match.',
+            objectId: adjacency.id,
+          ),
+        );
+        continue;
+      }
+      if (fromPatch.roomId != toPatch.roomId) {
+        violations.add(
+          GeometryInvariantViolation(
+            code: 'ADJACENCY_ROOM_MISMATCH',
+            message: 'Adjacent surface patches must belong to the same room.',
+            objectId: adjacency.id,
+          ),
+        );
+      }
+      if (!_edgesCoincideInWorld(fromPatch, from, toPatch, to)) {
+        violations.add(
+          GeometryInvariantViolation(
+            code: 'ADJACENCY_WORLD_EDGE_MISMATCH',
+            message:
+                'Adjacent surface edges must represent the same world-space segment.',
             objectId: adjacency.id,
           ),
         );
@@ -322,6 +368,27 @@ abstract final class SpatialGeometryValidator {
     }
 
     return List.unmodifiable(violations);
+  }
+
+  static bool _edgesCoincideInWorld(
+    SurfacePatch fromPatch,
+    SurfaceEdge from,
+    SurfacePatch toPatch,
+    SurfaceEdge to,
+  ) {
+    final fromStart = fromPatch.worldPoint(from.start);
+    final fromEnd = fromPatch.worldPoint(from.end);
+    final toStart = toPatch.worldPoint(to.start);
+    final toEnd = toPatch.worldPoint(to.end);
+    final tolerance = fromPatch.frame.tolerance.linearMm >
+            toPatch.frame.tolerance.linearMm
+        ? fromPatch.frame.tolerance.linearMm
+        : toPatch.frame.tolerance.linearMm;
+
+    bool close(Point3D a, Point3D b) => a.distanceTo(b) <= tolerance;
+
+    return (close(fromStart, toStart) && close(fromEnd, toEnd)) ||
+        (close(fromStart, toEnd) && close(fromEnd, toStart));
   }
 
   static bool _orientationMatchesFrame(SurfacePatch patch) {
