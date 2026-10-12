@@ -156,6 +156,27 @@ void main() {
     expect(ranked.first.isCurrentPreview, isTrue);
   });
 
+  test('preview hysteresis keeps preview state inside release margin', () {
+    const resolver = SurfaceNavigationResolver(
+      thresholds: SurfaceNavigationThresholds(
+        previewDistanceMm: 300,
+        previewHysteresisMm: 80,
+      ),
+    );
+
+    final candidate = resolver.nearestCandidate(
+      pointer: const Point2Mm(3650, 1500),
+      activePatch: wallA(),
+      edges: [edgeRightA],
+      adjacencies: [adjacency],
+      currentPreviewEdgeId: 'edge-a-right',
+    );
+
+    expect(candidate, isNotNull);
+    expect(candidate!.distanceMm, 350);
+    expect(candidate.proximity, SurfaceEdgeProximity.preview);
+  });
+
   test('wall adjacency fixture remains physically valid in world space', () {
     expect(
       SpatialGeometryValidator.validatePatchTopology(
