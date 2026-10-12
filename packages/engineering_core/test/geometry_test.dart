@@ -23,6 +23,18 @@ void main() {
       );
     });
 
+    test('polygon rejects self-intersection', () {
+      expect(
+        () => Polygon2Mm(const [
+          Point2Mm(0, 0),
+          Point2Mm(2000, 2000),
+          Point2Mm(0, 2000),
+          Point2Mm(2000, 0),
+        ]),
+        throwsArgumentError,
+      );
+    });
+
     test('polygon area uses exact integer persisted coordinates', () {
       final polygon = Polygon2Mm(const [
         Point2Mm(0, 0),
@@ -33,6 +45,42 @@ void main() {
 
       expect(polygon.areaMm2, 12000000);
       expect(polygon.edges, hasLength(4));
+    });
+
+    test('polygon containment includes host boundary', () {
+      final host = Polygon2Mm(const [
+        Point2Mm(0, 0),
+        Point2Mm(4000, 0),
+        Point2Mm(4000, 3000),
+        Point2Mm(0, 3000),
+      ]);
+      final door = Polygon2Mm(const [
+        Point2Mm(500, 0),
+        Point2Mm(1400, 0),
+        Point2Mm(1400, 2100),
+        Point2Mm(500, 2100),
+      ]);
+
+      expect(host.containsPolygon(door), isTrue);
+      expect(host.containsPointInclusive(const Point2Mm(0, 1500)), isTrue);
+    });
+
+    test('polygon containment rejects geometry leaving a concave host', () {
+      final host = Polygon2Mm(const [
+        Point2Mm(0, 0),
+        Point2Mm(4000, 0),
+        Point2Mm(4000, 1000),
+        Point2Mm(1000, 1000),
+        Point2Mm(1000, 4000),
+        Point2Mm(0, 4000),
+      ]);
+      final crossing = Polygon2Mm(const [
+        Point2Mm(500, 500),
+        Point2Mm(3500, 500),
+        Point2Mm(500, 3500),
+      ]);
+
+      expect(host.containsPolygon(crossing), isFalse);
     });
 
     test('local coordinate frame round trips within tolerance', () {
