@@ -4,5 +4,7 @@ export 'src/engineering_decision.dart';
 export 'src/field_lifecycle.dart';
 export 'src/floor_routing_view.dart';
 export 'src/length.dart';
+export 'src/manufacturer_catalog.dart';
 export 'src/panel_assembly.dart';
+export 'src/panel_generation.dart';
 export 'src/routing_junction.dart';
