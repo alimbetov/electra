@@ -115,7 +115,7 @@ void main() {
         'idx_project_updated',
       ]),
     );
-    expect(database.schemaVersion, 8);
+    expect(database.schemaVersion, 9);
 
     await database.close();
   });

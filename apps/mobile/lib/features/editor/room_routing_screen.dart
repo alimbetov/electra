@@ -12,9 +12,11 @@ class RoomRoutingScreen extends ConsumerWidget {
     super.key,
     required this.roomId,
     required this.roomName,
+    this.initialRunId,
   });
   final String roomId;
   final String roomName;
+  final String? initialRunId;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final routing = ref.watch(roomRoutingProvider(roomId));
@@ -34,6 +36,7 @@ class RoomRoutingScreen extends ConsumerWidget {
               data:
                   (items) => CableRouteEditor(
                     snapshot: snapshot,
+                    initialRunId: initialRunId,
                     circuits: {
                       for (final item in items)
                         item.circuit.id: item.circuit.name,
@@ -61,10 +64,12 @@ class CableRouteEditor extends StatefulWidget {
     required this.circuits,
     required this.nextId,
     required this.onSave,
+    this.initialRunId,
     this.onSaveChannel,
     this.onSaveJunction,
   });
   final RoomRoutingSnapshot snapshot;
+  final String? initialRunId;
   final Map<String, String> circuits;
   final String Function() nextId;
   final Future<void> Function({
@@ -87,6 +92,18 @@ class _CableRouteEditorState extends State<CableRouteEditor> {
   final reserve = TextEditingController(text: '0');
   final allowance = TextEditingController(text: '0');
   bool saving = false;
+  @override
+  void initState() {
+    super.initState();
+    final run =
+        widget.snapshot.runs
+            .where((r) => r.id == widget.initialRunId)
+            .firstOrNull;
+    final route =
+        widget.snapshot.routes.where((r) => r.id == run?.routeId).firstOrNull;
+    if (run != null && route != null) begin(route: route, run: run);
+  }
+
   @override
   void dispose() {
     name.dispose();

@@ -342,6 +342,39 @@ class JunctionConnections extends Table {
   Set<Column<Object>> get primaryKey => {junctionId, runId};
 }
 
+@DataClassName('FloorRoutingPanelRow')
+class FloorRoutingPanels extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get floorId => text().references(Floors, #id)();
+  TextColumn get code => text()();
+  TextColumn get name => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+class FloorPanelFeeds extends Table {
+  TextColumn get panelId => text().references(FloorRoutingPanels, #id)();
+  TextColumn get runId => text().references(CableRuns, #id)();
+  TextColumn get endpointSignature => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {panelId, runId};
+}
+
+@DataClassName('FloorRoutingHandoffRow')
+class FloorRoutingHandoffs extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get floorId => text().references(Floors, #id)();
+  TextColumn get name => text()();
+  @ReferenceName('outgoingFloorHandoffs')
+  TextColumn get fromRunId => text().references(CableRuns, #id)();
+  @ReferenceName('incomingFloorHandoffs')
+  TextColumn get toRunId => text().references(CableRuns, #id)();
+  TextColumn get fromSignature => text()();
+  TextColumn get toSignature => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
 @DriftDatabase(
   tables: [
     Projects,
@@ -365,6 +398,9 @@ class JunctionConnections extends Table {
     CableRuns,
     RoutingJunctions,
     JunctionConnections,
+    FloorRoutingPanels,
+    FloorPanelFeeds,
+    FloorRoutingHandoffs,
   ],
 )
 final class AppDatabase extends _$AppDatabase {
@@ -372,7 +408,7 @@ final class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'electra'));
 
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -421,6 +457,11 @@ final class AppDatabase extends _$AppDatabase {
         if (from < 8) {
           await migrator.createTable(routingJunctions);
           await migrator.createTable(junctionConnections);
+        }
+        if (from < 9) {
+          await migrator.createTable(floorRoutingPanels);
+          await migrator.createTable(floorPanelFeeds);
+          await migrator.createTable(floorRoutingHandoffs);
         }
       }
       await _createIndexes();

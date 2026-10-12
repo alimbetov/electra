@@ -1,3 +1,5 @@
+import '../application/floor_routing_repository.dart';
+import '../data/repositories/drift_floor_routing_repository.dart';
 import '../application/cable_routing_repository.dart';
 import '../data/repositories/drift_cable_routing_repository.dart';
 import '../application/electrical_circuit_repository.dart';
@@ -188,3 +190,14 @@ final roomRoutingProvider = StreamProvider.family<RoomRoutingSnapshot, String>(
   (ref, roomId) =>
       ref.watch(cableRoutingRepositoryProvider).watchRoomRouting(roomId),
 );
+
+final floorRoutingRepositoryProvider = Provider<FloorRoutingRepository>(
+  (ref) => DriftFloorRoutingRepository(
+    ref.watch(databaseProvider),
+    originDeviceId: 'local-device',
+  ),
+);
+final floorRoutingProvider = StreamProvider.family<
+  FloorRoutingSnapshot,
+  String
+>((ref, floorId) => ref.watch(floorRoutingRepositoryProvider).watch(floorId));
