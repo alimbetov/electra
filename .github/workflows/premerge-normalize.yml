@@ -43,3 +43,5 @@ jobs:
           fi
           git commit -m "style(mobile): normalize foundation sources and lock dependencies"
           git push origin HEAD:feat/flutter-local-app-foundation
+
+# Temporary pre-merge normalization workflow; remove after it runs.
