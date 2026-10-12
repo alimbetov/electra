@@ -213,6 +213,11 @@ void main() {
       200,
       scrollable: find.byType(Scrollable).first,
     );
+    await Scrollable.ensureVisible(
+      tester.element(find.text('DB-01 · Panel')),
+      alignment: 0.5,
+    );
+    await tester.pumpAndSettle();
     await tester.tap(find.text('DB-01 · Panel'));
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(
@@ -226,6 +231,11 @@ void main() {
       200,
       scrollable: find.byType(Scrollable).first,
     );
+    await Scrollable.ensureVisible(
+      tester.element(find.text('Workshop')),
+      alignment: 0.5,
+    );
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Workshop'));
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(
@@ -233,6 +243,11 @@ void main() {
       100,
       scrollable: find.byType(Scrollable).first,
     );
+    await Scrollable.ensureVisible(
+      tester.element(find.byTooltip('Open room route')),
+      alignment: 0.5,
+    );
+    await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Open room route'));
     await tester.pump();
     expect(opened?.id, 'Workshop');
