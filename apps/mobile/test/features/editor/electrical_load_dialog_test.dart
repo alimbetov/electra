@@ -44,7 +44,10 @@ void main() {
       await tester.tap(find.text('Save load'));
       await tester.pump();
       expect(saved, isEmpty);
-      expect(find.textContaining('MISSING_POWER_OR_CURRENT'), findsOneWidget);
+      expect(
+        find.textContaining('Enter rated power or current.'),
+        findsOneWidget,
+      );
       await tester.enterText(
         find.widgetWithText(TextField, 'Rated power (W)'),
         '1500',

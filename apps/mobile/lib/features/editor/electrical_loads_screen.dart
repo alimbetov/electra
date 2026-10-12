@@ -186,6 +186,27 @@ class ElectricalLoadDialog extends StatefulWidget {
   State<ElectricalLoadDialog> createState() => _ElectricalLoadDialogState();
 }
 
+const _validationMessages = {
+  'INVALID_VOLTAGE': 'Enter a positive nominal voltage.',
+  'INVALID_POWER': 'Rated power must be a positive number.',
+  'INVALID_CURRENT': 'Rated current must be a positive number.',
+  'INVALID_FREQUENCY': 'Frequency must be a positive number.',
+  'INVALID_STARTING_FACTOR': 'Starting current factor must be positive.',
+  'MISSING_POWER_OR_CURRENT': 'Enter rated power or current.',
+  'INVALID_PHASES': 'Choose one, two or three phases.',
+  'SUPPLY_PHASE_MISMATCH': 'Match the phase count to the supply system.',
+  'INVALID_POWER_FACTOR': 'Power factor must be above zero and at most one.',
+  'INVALID_EFFICIENCY': 'Efficiency must be above zero and at most one.',
+};
+
+String _supplyLabel(SupplySystem supply) => switch (supply) {
+  SupplySystem.singlePhaseAc => 'Single-phase AC',
+  SupplySystem.threePhaseAc => 'Three-phase AC',
+  SupplySystem.directCurrent => 'DC',
+  SupplySystem.controlVoltage => 'Control voltage',
+  SupplySystem.custom => 'Custom',
+};
+
 class _ElectricalLoadDialogState extends State<ElectricalLoadDialog> {
   late final base =
       widget.existing?.profile ??
@@ -255,7 +276,12 @@ class _ElectricalLoadDialogState extends State<ElectricalLoadDialog> {
     );
     final violations = ElectricalLoadValidator.validate(profile);
     if (violations.isNotEmpty) {
-      setState(() => error = 'Check load parameters: ${violations.join(', ')}');
+      setState(
+        () =>
+            error = violations
+                .map((code) => _validationMessages[code] ?? code)
+                .join('\n'),
+      );
       return;
     }
     setState(() {
@@ -296,7 +322,7 @@ class _ElectricalLoadDialogState extends State<ElectricalLoadDialog> {
                       .map(
                         (value) => DropdownMenuItem(
                           value: value,
-                          child: Text(value.name),
+                          child: Text(_supplyLabel(value)),
                         ),
                       )
                       .toList(),

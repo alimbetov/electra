@@ -260,7 +260,7 @@ A component can be selected from the catalog, placed repeatedly, persisted and r
 
 ## WP-FL7 — Electrical loads
 
-**Status: IMPLEMENTED BASELINE; full exact-SHA CI gate pending.**
+**Status: BASELINE CLOSED. Full Flutter/core exact-SHA gate passed on `65c9ae32f2f5881cddc36657e5b6e7d26c2414c8`.**
 
 ### Implemented behavior
 
