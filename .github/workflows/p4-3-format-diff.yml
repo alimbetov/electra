@@ -1,24 +1,37 @@
-name: P4.3 Format Diff
+name: P4.3 Format Apply
 
 on:
   push:
     branches:
       - 'feat/flutter-elv2-profile-constraints'
 
+permissions:
+  contents: write
+
 jobs:
-  diff:
+  apply:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: apps/mobile
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
       - run: flutter pub get --enforce-lockfile
       - run: dart run build_runner build
-      - run: |
-          dart format lib/data/repositories/drift_engineering_placement_repository.dart test/data/engineering_placement_repository_test.dart
-          git diff -- lib/data/repositories/drift_engineering_placement_repository.dart test/data/engineering_placement_repository_test.dart
+      - run: dart format lib/data/repositories/drift_engineering_placement_repository.dart test/data/engineering_placement_repository_test.dart
+      - name: Commit formatter output
+        working-directory: .
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add apps/mobile/lib/data/repositories/drift_engineering_placement_repository.dart apps/mobile/test/data/engineering_placement_repository_test.dart
+          git diff --cached --quiet && exit 1
+          git commit -m "style(elv2): apply P4.3 formatter output"
+          git push origin HEAD:feat/flutter-elv2-profile-constraints
