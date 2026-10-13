@@ -16,6 +16,6 @@ P5 implementation currently adds:
 - deterministic impact ordering;
 - no mutation/adoption behavior.
 
-Normal-CI post-build formatting was reproduced after Drift generation so the application preview and acceptance test now match the workflow's exact formatting order.
+Normal-CI formatting is now stabilized for both the mobile preview/tests after Drift generation and the engineering-core revision model.
 
-The current user-authored head is the P5 exact-head candidate. P5 is complete only after both normal push and PR-triggered workflows pass Drift generation, formatting, analyze and the full mobile/core suites on that same SHA.
+The current user-authored head is the final P5 exact-head candidate. P5 is complete only after both normal push and PR-triggered workflows pass Drift generation, mobile/core formatting, analyze and the full test suites on that same SHA.
