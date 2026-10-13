@@ -1,7 +1,8 @@
 # Electra — Development roadmap
 
 The detailed scope and evidence live in [Flutter delivery plan](flutter-delivery-plan.md).
-Current delivery branch: `feat/flutter-routing-cablerun`.
+Electrical delivery branch: `feat/flutter-routing-cablerun`.
+ELV extension branch: `feat/flutter-engineering-systems-foundation`, based on the reviewed `docs/elv-engineering-systems-spec` requirements.
 Delivery is incremental: each baseline has an exact-commit Flutter/core CI gate.
 
 | Milestone | Outcome | Status |
@@ -25,6 +26,24 @@ The editor reports module/mm overflow and represents the exact physical row arra
 Recommended enclosure width, height and depth must account for device dimensions, DIN rails, terminals, cable ducts, clearances and reserved space.
 FL15 already supplies preliminary occupied/spare/total module capacity. This is not a physical enclosure dimension.
 Normative requirements, manufacturer selection and physical placement remain separate concerns.
+
+## ELV extension track
+
+The [ELV delivery plan](elv-delivery-plan.md) adopts specification revision `091e6d8` and retains implementation evidence.
+
+| Stage | Outcome | Status |
+|---|---|---|
+| ELV0 | Systems, sixteen family editions, shared device participation | Baseline closed |
+| ELV1 | Ports, connections, topology, passive mappings and assemblies | Implementation gate in progress |
+| ELV2 | Canonical discipline profiles and typed versioned catalogs | Next |
+| ELV3 | Cable resources, allocations, CableRun and shared routes | Planned |
+| ELV4 | Power, PoE, PSU, UPS, converters and backup graph | Planned |
+| ELV5 | Versioned CCTV/LAN/ACS/fire calculations | Planned |
+| ELV6 | Racks, cabinets, patching and physical capacity | Planned |
+| ELV7 | Jurisdiction profiles, normative rule packs and findings | Planned |
+| ELV8 | Manufacturer selection, snapshots, BOM and deliverables | Planned |
+
+All four discipline fixtures remain required throughout the track. National rule packs require verified sources and provenance. FL16 and ELV6 share enclosure infrastructure; ELV8 reuses electrical BOM/reporting foundations.
 
 ## Parallel baseline extensions
 

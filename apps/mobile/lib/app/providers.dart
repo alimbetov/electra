@@ -1,3 +1,7 @@
+import '../application/engineering_topology_repository.dart';
+import '../data/repositories/drift_engineering_topology_repository.dart';
+import '../application/engineering_system_repository.dart';
+import '../data/repositories/drift_engineering_system_repository.dart';
 import '../application/panel_generation_repository.dart';
 import '../data/repositories/drift_panel_generation_repository.dart';
 import '../application/manufacturer_repository.dart';
@@ -254,4 +258,28 @@ final panelGenerationRepositoryProvider = Provider<PanelGenerationRepository>(
 final projectPanelGenerationProvider =
     StreamProvider.family<ProjectPanelGenerationSnapshot, String>(
       (ref, id) => ref.watch(panelGenerationRepositoryProvider).watch(id),
+    );
+
+final engineeringSystemRepositoryProvider =
+    Provider<EngineeringSystemRepository>(
+      (ref) => DriftEngineeringSystemRepository(
+        ref.watch(databaseProvider),
+        originDeviceId: 'local-device',
+      ),
+    );
+final projectEngineeringSystemsProvider =
+    StreamProvider.family<ProjectEngineeringSystemsSnapshot, String>(
+      (ref, id) => ref.watch(engineeringSystemRepositoryProvider).watch(id),
+    );
+
+final engineeringTopologyRepositoryProvider =
+    Provider<EngineeringTopologyRepository>(
+      (ref) => DriftEngineeringTopologyRepository(
+        ref.watch(databaseProvider),
+        originDeviceId: 'local-device',
+      ),
+    );
+final projectEngineeringTopologyProvider =
+    StreamProvider.family<ProjectEngineeringTopologySnapshot, String>(
+      (ref, id) => ref.watch(engineeringTopologyRepositoryProvider).watch(id),
     );

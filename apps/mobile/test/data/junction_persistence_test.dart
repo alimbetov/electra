@@ -260,6 +260,31 @@ void main() {
       expect(snapshot.junctionIssues(snapshot.junctions.single), isNotEmpty);
       expect(snapshot.junctions.single.connections.length, 3);
       // v7 -> v8 upgrade preserves routing and creates first-class junction tables.
+      await database.customStatement('DROP TABLE engineering_port_connections');
+      await database.customStatement(
+        'DROP TABLE engineering_internal_mappings',
+      );
+      await database.customStatement(
+        'DROP TABLE engineering_component_assemblies',
+      );
+      await database.customStatement('DROP TABLE engineering_topology_groups');
+      await database.customStatement(
+        'DROP TABLE engineering_compatibility_profiles',
+      );
+      await database.customStatement(
+        'DROP TABLE engineering_topology_profiles',
+      );
+      await database.customStatement(
+        'DROP TABLE engineering_assembly_profiles',
+      );
+      await database.customStatement('DROP TABLE engineering_port_instances');
+      await database.customStatement(
+        'DROP TABLE component_engineering_memberships',
+      );
+      await database.customStatement('DROP TABLE project_engineering_systems');
+      await database.customStatement(
+        'DROP TABLE engineering_family_definitions',
+      );
       await database.customStatement('DROP TABLE panel_generation_configs');
       await database.customStatement('DROP TABLE circuit_product_selections');
       await database.customStatement('DROP TABLE manufacturer_policies');
@@ -284,7 +309,7 @@ void main() {
       snapshot = await repository.loadRoomRouting(room.id);
       expect(snapshot.runs.length, 3);
       expect(snapshot.junctions, isEmpty);
-      expect(database.schemaVersion, 13);
+      expect(database.schemaVersion, 15);
       await database.close();
       await directory.delete(recursive: true);
     },

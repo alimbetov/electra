@@ -466,6 +466,31 @@ void main() {
         throwsStateError,
       );
       // FL14 data remains readable across 12 -> 13 migration.
+      await database.customStatement('DROP TABLE engineering_port_connections');
+      await database.customStatement(
+        'DROP TABLE engineering_internal_mappings',
+      );
+      await database.customStatement(
+        'DROP TABLE engineering_component_assemblies',
+      );
+      await database.customStatement('DROP TABLE engineering_topology_groups');
+      await database.customStatement(
+        'DROP TABLE engineering_compatibility_profiles',
+      );
+      await database.customStatement(
+        'DROP TABLE engineering_topology_profiles',
+      );
+      await database.customStatement(
+        'DROP TABLE engineering_assembly_profiles',
+      );
+      await database.customStatement('DROP TABLE engineering_port_instances');
+      await database.customStatement(
+        'DROP TABLE component_engineering_memberships',
+      );
+      await database.customStatement('DROP TABLE project_engineering_systems');
+      await database.customStatement(
+        'DROP TABLE engineering_family_definitions',
+      );
       await database.customStatement('DROP TABLE panel_generation_configs');
       await database.customStatement('PRAGMA user_version = 12');
       await database.close();
@@ -481,7 +506,7 @@ void main() {
         (await database.select(database.electricalCircuits).get()).single.id,
         'circuit-1',
       );
-      expect(database.schemaVersion, 13);
+      expect(database.schemaVersion, 15);
       await panels.save(config());
       await panels.archive(project.id, 'generated-panel');
       data = await panels.load(project.id);
