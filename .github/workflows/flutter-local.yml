@@ -11,7 +11,7 @@ on:
       - 'packages/engineering_core/**'
       - 'docs/product/**'
       - 'docs/audit/**'
-      - '.github/workflows/flutter-local.yml'
+      - '.github/workflows/**'
 
 jobs:
   flutter-local:
