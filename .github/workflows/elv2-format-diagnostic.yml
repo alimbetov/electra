@@ -1,0 +1,24 @@
+name: ELV2 Format Diagnostic
+
+on:
+  push:
+    branches:
+      - feat/flutter-elv2-profile-constraints
+
+jobs:
+  format-diagnostic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Show formatted mobile P1 files
+        working-directory: apps/mobile
+        run: |
+          dart format --output=show \
+            lib/application/engineering_reference_revision_preview.dart \
+            lib/data/repositories/drift_engineering_reference_repository.dart \
+            test/application/engineering_reference_binding_constraints_test.dart \
+            test/application/engineering_reference_revision_preview_test.dart
