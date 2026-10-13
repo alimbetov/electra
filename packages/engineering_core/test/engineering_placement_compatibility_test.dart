@@ -210,6 +210,28 @@ void main() {
           PlacementFindingCode.legacyConstraintsUnspecified);
     });
 
+    test('malformed defined constraints are not classified as legacy', () {
+      final base = fixture().profile('OUTLET');
+      final malformed = ComponentEngineeringProfile(
+        code: base.code,
+        label: base.label,
+        engineeringClass: base.engineeringClass,
+        characteristics: base.characteristics,
+        capabilities: base.capabilities,
+        portTemplates: base.portTemplates,
+        portInterfaceCodes: base.portInterfaceCodes,
+        constraintsState: ProfileConstraintsState.defined,
+      );
+
+      final result = evaluate(malformed, compatibleContextFor('OUTLET'));
+
+      expect(result.status, PlacementCompatibilityStatus.unresolved);
+      expect(
+        result.findings.single.code,
+        PlacementFindingCode.profileConstraintsInvalid,
+      );
+    });
+
     test('checks all environment dimensions with structured findings', () {
       final base = fixture().profile('OUTLET');
       final constrained = ComponentEngineeringProfile.fromMap({
@@ -328,7 +350,8 @@ void main() {
       );
     });
 
-    test('rejects incompatible topology intent without inspecting graph state', () {
+    test('rejects incompatible topology intent without inspecting graph state',
+        () {
       final result = evaluate(
         fixture().profile('DETECTOR'),
         PlacementCandidateContext(
@@ -355,7 +378,8 @@ void main() {
       );
     });
 
-    test('finding order is deterministic and errors dominate unresolved state', () {
+    test('finding order is deterministic and errors dominate unresolved state',
+        () {
       final result = evaluate(
         fixture().profile('CAMERA'),
         const PlacementCandidateContext(
