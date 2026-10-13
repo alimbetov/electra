@@ -37,5 +37,6 @@ export 'src/engineering_topology_graph.dart';
 
 export 'src/engineering_reference_catalog.dart';
 export 'src/engineering_reference_constraints.dart';
+export 'src/engineering_reference_revision.dart';
 
 export 'src/engineering_reference_vocabulary.dart';
