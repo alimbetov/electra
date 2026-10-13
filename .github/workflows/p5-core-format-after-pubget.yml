@@ -1,0 +1,35 @@
+name: P5 Core Format After Pub Get
+
+on:
+  push:
+    branches:
+      - 'feat/flutter-elv2-profile-constraints'
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    if: ${{ github.actor != 'github-actions[bot]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Reproduce engineering-core CI formatting
+        working-directory: packages/engineering_core
+        run: |
+          dart pub get
+          dart format lib/src/engineering_reference_revision.dart
+      - name: Commit stable formatter output and remove helper
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git rm .github/workflows/p5-core-format-after-pubget.yml
+          git add packages/engineering_core/lib/src/engineering_reference_revision.dart
+          git commit -m "style(elv2): stabilize P5 core format after pub get"
+          git push origin HEAD:feat/flutter-elv2-profile-constraints
