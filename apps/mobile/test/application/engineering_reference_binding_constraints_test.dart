@@ -28,10 +28,7 @@ void main() {
     );
 
     expect(restored.profile.constraintsState, ProfileConstraintsState.defined);
-    expect(
-      restored.profile.constraints!.toMap(),
-      profile.constraints!.toMap(),
-    );
+    expect(restored.profile.constraints!.toMap(), profile.constraints!.toMap());
     expect(
       restored.profile.constraints!.mounting.allows(
         InstallationSurface.wall,
