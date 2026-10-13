@@ -1,0 +1,31 @@
+name: P4 Formatter Diagnostic
+
+on:
+  push:
+    branches:
+      - feat/flutter-elv2-profile-constraints
+    paths:
+      - 'apps/mobile/lib/application/engineering_placement_command.dart'
+      - 'apps/mobile/test/application/engineering_placement_command_test.dart'
+      - '.github/workflows/p4-format-diagnostic.yml'
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Format P4.1 files
+        run: |
+          dart format apps/mobile/lib/application/engineering_placement_command.dart
+          dart format apps/mobile/test/application/engineering_placement_command_test.dart
+      - name: Upload formatted files
+        uses: actions/upload-artifact@v4
+        with:
+          name: p4-formatted
+          path: |
+            apps/mobile/lib/application/engineering_placement_command.dart
+            apps/mobile/test/application/engineering_placement_command_test.dart
