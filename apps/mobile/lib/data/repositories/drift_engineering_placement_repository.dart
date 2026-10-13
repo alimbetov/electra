@@ -41,9 +41,8 @@ final class DriftEngineeringPlacementRepository
       final existing =
           await (database.select(database.engineeringPlacementOperations)
                 ..where(
-                  (candidate) => candidate.operationId.equals(
-                    command.operationId,
-                  ),
+                  (candidate) =>
+                      candidate.operationId.equals(command.operationId),
                 ))
               .getSingleOrNull();
 
@@ -53,8 +52,7 @@ final class DriftEngineeringPlacementRepository
             existing.commandFingerprint != fingerprint) {
           throw EngineeringPlacementFailure(
             code: EngineeringPlacementFailureCode.idempotencyConflict,
-            message:
-                'operationId is already bound to different placement semantics.',
+            message: 'operationId is already bound to different placement semantics.',
             details: {
               'operationId': command.operationId,
               'storedFingerprintVersion': existing.fingerprintVersion,
@@ -73,8 +71,7 @@ final class DriftEngineeringPlacementRepository
           case EngineeringPlacementOperationStatus.undone:
             throw EngineeringPlacementFailure(
               code: EngineeringPlacementFailureCode.operationUndone,
-              message:
-                  'The completed placement was undone. Normal retry cannot reactivate it.',
+              message: 'The completed placement was undone. Normal retry cannot reactivate it.',
               details: {'operationId': command.operationId},
             );
         }
@@ -82,8 +79,7 @@ final class DriftEngineeringPlacementRepository
 
       throw EngineeringPlacementFailure(
         code: EngineeringPlacementFailureCode.transactionFailed,
-        message:
-            'Atomic placement aggregate writes are not enabled until P4.3-P4.7 are installed.',
+        message: 'Atomic placement aggregate writes are not enabled until P4.3-P4.7 are installed.',
         details: {
           'operationId': command.operationId,
           'phase': 'P4.2',
