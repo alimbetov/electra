@@ -1,5 +1,21 @@
 import 'package:engineering_core/engineering_core.dart';
 
+const canonicalElvComponentDefinition = ComponentDefinition(
+  id: 'system-elv-canonical-device',
+  code: 'ELV_CANONICAL_DEVICE',
+  displayName: 'Canonical ELV device',
+  category: 'ELV_DEVICE',
+  primaryDiscipline: Discipline.lowVoltage,
+  compatibleDisciplines: [
+    Discipline.cctv,
+    Discipline.fireAlarm,
+    Discipline.security,
+    Discipline.accessControl,
+  ],
+  source: ComponentDefinitionSource.system,
+  version: 1,
+);
+
 const electricalSystemComponentLibrary = LayerComponentLibrary(
   discipline: Discipline.electrical,
   definitions: [
