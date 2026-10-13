@@ -25,14 +25,16 @@ void main() {
   test('schema 17 exposes mandatory placement operation ledger', () async {
     expect(database.schemaVersion, 17);
 
-    final rows = await database.customSelect(
-      "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'engineering_placement_operations'",
-    ).get();
+    final rows = await database
+        .customSelect(
+          "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'engineering_placement_operations'",
+        )
+        .get();
     expect(rows, hasLength(1));
 
-    final columns = await database.customSelect(
-      'PRAGMA table_info(engineering_placement_operations)',
-    ).get();
+    final columns = await database
+        .customSelect('PRAGMA table_info(engineering_placement_operations)')
+        .get();
     expect(
       columns.map((row) => row.read<String>('name')).toList(),
       containsAll(<String>[
@@ -128,11 +130,7 @@ void main() {
               'code',
               EngineeringPlacementFailureCode.transactionFailed,
             )
-            .having(
-              (failure) => failure.details['phase'],
-              'phase',
-              'P4.2',
-            ),
+            .having((failure) => failure.details['phase'], 'phase', 'P4.2'),
       ),
     );
 
@@ -157,84 +155,97 @@ void main() {
     expect(restored, isNotNull);
     expect(restored!.status, EngineeringPlacementOperationStatus.completed);
     expect(restored.fingerprintVersion, engineeringPlacementFingerprintVersion);
-    expect(restored.commandFingerprint, engineeringPlacementFingerprintV1(command));
+    expect(
+      restored.commandFingerprint,
+      engineeringPlacementFingerprintV1(command),
+    );
     expect(restored.result.portIds, result.portIds);
   });
 }
 
 Future<void> _seedPlacementParents(AppDatabase database) async {
   final now = DateTime.utc(2026, 10, 13, 19);
-  await database.into(database.projects).insert(
-    ProjectsCompanion.insert(
-      id: 'project-1',
-      name: 'P4 Project',
-      measurementSystem: 'metric',
-      defaultStructuralHeightMm: 3200,
-      defaultFinishedCeilingHeightMm: 3000,
-      createdAt: now,
-      updatedAt: now,
-      originDeviceId: 'p4-test-device',
-    ),
-  );
-  await database.into(database.floors).insert(
-    FloorsCompanion.insert(
-      id: 'floor-1',
-      projectId: 'project-1',
-      name: 'Floor 1',
-      createdAt: now,
-      updatedAt: now,
-      originDeviceId: 'p4-test-device',
-    ),
-  );
-  await database.into(database.rooms).insert(
-    RoomsCompanion.insert(
-      id: 'room-1',
-      floorId: 'floor-1',
-      name: 'Room 1',
-      roomType: 'technical',
-      roomCategory: 'technical',
-      widthMm: 6000,
-      depthMm: 5000,
-      createdAt: now,
-      updatedAt: now,
-      originDeviceId: 'p4-test-device',
-    ),
-  );
-  await database.into(database.surfacePatches).insert(
-    SurfacePatchesCompanion.insert(
-      id: 'patch-1',
-      roomId: 'room-1',
-      surfaceId: 'Wall A',
-      originXmm: 0,
-      originYmm: 0,
-      originZmm: 0,
-      uAxisX: 1,
-      uAxisY: 0,
-      uAxisZ: 0,
-      vAxisX: 0,
-      vAxisY: 0,
-      vAxisZ: 1,
-      orientation: 'vertical',
-      boundaryJson: '[]',
-      createdAt: now,
-      updatedAt: now,
-      originDeviceId: 'p4-test-device',
-    ),
-  );
-  await database.into(database.componentInstances).insert(
-    ComponentInstancesCompanion.insert(
-      id: 'component-1',
-      definitionId: canonicalElvComponentDefinitionId,
-      definitionVersion: canonicalElvComponentDefinitionVersion,
-      roomId: 'room-1',
-      hostSurfacePatchId: 'patch-1',
-      localXmm: 120,
-      localYmm: 80,
-      createdAt: now,
-      updatedAt: now,
-      originDeviceId: 'p4-test-device',
-    ),
-  );
+  await database
+      .into(database.projects)
+      .insert(
+        ProjectsCompanion.insert(
+          id: 'project-1',
+          name: 'P4 Project',
+          measurementSystem: 'metric',
+          defaultStructuralHeightMm: 3200,
+          defaultFinishedCeilingHeightMm: 3000,
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'p4-test-device',
+        ),
+      );
+  await database
+      .into(database.floors)
+      .insert(
+        FloorsCompanion.insert(
+          id: 'floor-1',
+          projectId: 'project-1',
+          name: 'Floor 1',
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'p4-test-device',
+        ),
+      );
+  await database
+      .into(database.rooms)
+      .insert(
+        RoomsCompanion.insert(
+          id: 'room-1',
+          floorId: 'floor-1',
+          name: 'Room 1',
+          roomType: 'technical',
+          roomCategory: 'technical',
+          widthMm: 6000,
+          depthMm: 5000,
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'p4-test-device',
+        ),
+      );
+  await database
+      .into(database.surfacePatches)
+      .insert(
+        SurfacePatchesCompanion.insert(
+          id: 'patch-1',
+          roomId: 'room-1',
+          surfaceId: 'Wall A',
+          originXmm: 0,
+          originYmm: 0,
+          originZmm: 0,
+          uAxisX: 1,
+          uAxisY: 0,
+          uAxisZ: 0,
+          vAxisX: 0,
+          vAxisY: 0,
+          vAxisZ: 1,
+          orientation: 'vertical',
+          boundaryJson: '[]',
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'p4-test-device',
+        ),
+      );
+  await database
+      .into(database.componentInstances)
+      .insert(
+        ComponentInstancesCompanion.insert(
+          id: 'component-1',
+          definitionId: canonicalElvComponentDefinitionId,
+          definitionVersion: canonicalElvComponentDefinitionVersion,
+          roomId: 'room-1',
+          hostSurfacePatchId: 'patch-1',
+          localXmm: 120,
+          localYmm: 80,
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'p4-test-device',
+        ),
+      );
 }
 
 Future<void> _seedOperation(
@@ -244,20 +255,22 @@ Future<void> _seedOperation(
   required String status,
 }) async {
   final now = DateTime.utc(2026, 10, 13, 19, 5);
-  await database.into(database.engineeringPlacementOperations).insert(
-    EngineeringPlacementOperationsCompanion.insert(
-      operationId: command.operationId,
-      projectId: command.projectId,
-      fingerprintVersion: engineeringPlacementFingerprintVersion,
-      commandFingerprint: engineeringPlacementFingerprintV1(command),
-      status: status,
-      componentId: result.componentId,
-      resultJson: engineeringPlacementResultJson(result),
-      createdAt: now,
-      updatedAt: now,
-      originDeviceId: 'p4-test-device',
-    ),
-  );
+  await database
+      .into(database.engineeringPlacementOperations)
+      .insert(
+        EngineeringPlacementOperationsCompanion.insert(
+          operationId: command.operationId,
+          projectId: command.projectId,
+          fingerprintVersion: engineeringPlacementFingerprintVersion,
+          commandFingerprint: engineeringPlacementFingerprintV1(command),
+          status: status,
+          componentId: result.componentId,
+          resultJson: engineeringPlacementResultJson(result),
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'p4-test-device',
+        ),
+      );
 }
 
 PlaceEngineeringProfileCommand _command({
