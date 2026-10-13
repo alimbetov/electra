@@ -9,11 +9,10 @@ import 'package:engineering_core/engineering_core.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 EngineeringReferenceCatalog fixture() => EngineeringReferenceCatalog.fromMap(
-      jsonDecode(
-        File('../../docs/examples/elv2-reference-catalog.json')
-            .readAsStringSync(),
-      ) as Map<String, dynamic>,
-    );
+  jsonDecode(
+    File('../../docs/examples/elv2-reference-catalog.json').readAsStringSync(),
+  ) as Map<String, dynamic>,
+);
 
 void main() {
   test(
@@ -36,9 +35,7 @@ void main() {
                 ...profile.toMap(),
                 'portTemplates': [
                   changedPort.toMap(),
-                  ...profile.portTemplates
-                      .skip(1)
-                      .map((port) => port.toMap()),
+                  ...profile.portTemplates.skip(1).map((port) => port.toMap()),
                 ],
               }
             else
