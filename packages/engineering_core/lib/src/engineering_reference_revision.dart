@@ -32,7 +32,7 @@ class ProfileRevisionChange {
 
 class ProfileRevisionImpact {
   ProfileRevisionImpact({required Iterable<ProfileRevisionChange> changes})
-    : changes = List.unmodifiable(changes);
+      : changes = List.unmodifiable(changes);
 
   final List<ProfileRevisionChange> changes;
 
