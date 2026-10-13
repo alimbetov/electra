@@ -1,0 +1,24 @@
+name: P4.3 Format Diff
+
+on:
+  push:
+    branches:
+      - 'feat/flutter-elv2-profile-constraints'
+
+jobs:
+  diff:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get --enforce-lockfile
+      - run: dart run build_runner build
+      - run: |
+          dart format lib/data/repositories/drift_engineering_placement_repository.dart test/data/engineering_placement_repository_test.dart
+          git diff -- lib/data/repositories/drift_engineering_placement_repository.dart test/data/engineering_placement_repository_test.dart
