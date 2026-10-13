@@ -33,5 +33,7 @@ abstract interface class EngineeringPlacementRepository {
     PlaceEngineeringProfileCommand command,
   );
 
-  Future<EngineeringPlacementOperationRecord?> findOperation(String operationId);
+  Future<EngineeringPlacementOperationRecord?> findOperation(
+    String operationId,
+  );
 }
