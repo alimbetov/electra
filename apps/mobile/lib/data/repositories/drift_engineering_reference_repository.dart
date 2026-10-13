@@ -160,11 +160,21 @@ class DriftEngineeringReferenceRepository
       throw StateError(
         'Resolve existing manually authored ports before profile instantiation.',
       );
+    final retired =
+        await (database.select(database.engineeringPortInstances)..where(
+          (r) => r.componentId.equals(componentId) & r.deletedAt.isNotNull(),
+        )).get();
+    final retiredIds = {for (final r in retired) r.code: r.id};
+    var templateIndex = 0;
     final ports = profile.instantiate(
       componentId: componentId,
       catalogId: catalog.id,
       version: catalog.version,
-      nextId: idGenerator.next,
+      nextId: () {
+        final code =
+            profile.portTemplates[templateIndex++].code.trim().toUpperCase();
+        return retiredIds[code] ?? idGenerator.next();
+      },
     );
     final topology = DriftEngineeringTopologyRepository(
       database,

@@ -965,6 +965,46 @@ void main() {
         'lock',
         'controller',
       });
+      // Explicit edition migration preserves port identities after retirement/release.
+      final cameraBinding = restoredBindings.bindings.singleWhere(
+        (b) => b.componentId == 'catalog-camera-device',
+      );
+      final cameraPort = data.ports.singleWhere(
+        (p) => p.id == cameraBinding.portIds.single,
+      );
+      await expectLater(
+        topology.savePort(
+          project.id,
+          EngineeringPort.fromMap({
+            ...cameraPort.toMap(),
+            'connector': 'silent edit',
+          }),
+        ),
+        throwsStateError,
+      );
+      await topology.archive(
+        project.id,
+        TopologyObjectKind.port,
+        cameraPort.id,
+      );
+      await references.unbind(project.id, cameraBinding.componentId);
+      await references.bind(
+        project.id,
+        cameraBinding.componentId,
+        catalogV2.id,
+        'CAMERA',
+      );
+      final migratedBinding = (await references.load(project.id)).bindings
+          .singleWhere((b) => b.componentId == cameraBinding.componentId);
+      expect(migratedBinding.catalogVersion, '2');
+      expect(migratedBinding.portIds, cameraBinding.portIds);
+      expect(
+        (await topology.load(project.id)).ports
+            .singleWhere((p) => p.id == cameraPort.id)
+            .templateProvenance!
+            .version,
+        '2',
+      );
       // Additive v14 -> v15 migration retains ELV0 network participation and placement identities.
       for (final table in [
         'engineering_port_connections',
