@@ -1,4 +1,3 @@
-import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:electra_mobile/application/engineering_placement_command.dart';
 import 'package:electra_mobile/application/engineering_placement_repository.dart';
@@ -25,16 +24,18 @@ void main() {
   test('schema 17 exposes mandatory placement operation ledger', () async {
     expect(database.schemaVersion, 17);
 
-    final rows = await database
-        .customSelect(
-          "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'engineering_placement_operations'",
-        )
-        .get();
+    final rows =
+        await database
+            .customSelect(
+              "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'engineering_placement_operations'",
+            )
+            .get();
     expect(rows, hasLength(1));
 
-    final columns = await database
-        .customSelect('PRAGMA table_info(engineering_placement_operations)')
-        .get();
+    final columns =
+        await database
+            .customSelect('PRAGMA table_info(engineering_placement_operations)')
+            .get();
     expect(
       columns.map((row) => row.read<String>('name')).toList(),
       containsAll(<String>[
