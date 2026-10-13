@@ -534,6 +534,33 @@ Protection proposals remain vendor-neutral and show inputs, reasoning, ruleset v
 
 ## WP-FL14 — Manufacturer catalogs
 
+**Status: BASELINE CLOSED on `feat/flutter-routing-cablerun`. Full Flutter/core exact-SHA gate passed on `1ac7bcf107bc4297de06d794134c98eae6816220` (55 mobile tests, 96 engineering-core tests).**
+
+### Implemented behavior
+
+- immutable manufacturer catalog versions store manufacturer, version, declared region, source and product variants with series/SKU, technical attributes, lifecycle, module/mm dimensions, mounting and AC/DC declaration;
+- catalogs support multi-variant manual entry and structured JSON import; all variants are validated before an atomic catalog/product write;
+- missing required voltage, breaking capacity or other declared constraints no longer pass the legacy matcher;
+- matching requires exact role/current/poles/curve/residual values where specified, adequate voltage and breaking capacity, explicit AC/DC compatibility and active lifecycle;
+- module-width and mounting constraints are enforced when required; nonfinite/malformed quantities are rejected;
+- project policy provides manufacturer allowlist, ranked preferences, preferred series and optional declared catalog region;
+- preferences rank technically compatible candidates only; they never relax or change the normative requirement;
+- schema v12 adds `manufacturer_catalogs`, `manufacturer_products`, `manufacturer_policies`, `circuit_product_selections`, typed foreign keys and per-catalog SKU uniqueness;
+- existing catalog versions cannot be silently edited, product IDs cannot be borrowed across versions and duplicate manufacturer/version/region imports are rejected;
+- selection is bound to the exact current protection fingerprint and current policy; stale requirements and incompatible products are rejected transactionally;
+- selection snapshots preserve manufacturer/series/SKU, catalog version/region/source and complete design-time technical attributes;
+- the same functional protection requirement can select another compatible manufacturer while the protection result/fingerprint/revision remains unchanged;
+- new catalog versions add candidates without replacing an existing selected SKU; catalog archival, requirement changes or policy changes expose explicit review state;
+- clearing selection archives its stored row and retains the technical snapshot;
+- FL12 adds separate commercial selection/catalog-product/policy nodes downstream from protection; engineering nodes never depend on the selected brand;
+- project/protection entry points open Catalogs, Policy and Selection tabs; rejected candidates explain missing or incompatible attributes, and failed writes preserve displayed choices/import drafts;
+- tests cover strict missing-data rejection, role/current/voltage/breaking/RCD/AC-DC/lifecycle matching, policy restrictions/ranking, codec round-trips, brand migration without normative recalculation, exact restart, immutable imports, catalog refresh/archive, live load invalidation, stale selection rejection, selection tombstones, compact UI and v11-to-v12 migration.
+
+### Remaining boundary
+
+No unverified vendor SKUs/specifications are bundled. Catalogs must be entered from documented datasheets or imported into the supported structured schema. Automatic vendor API/PDF/CSV ingestion, verified regional stock, prices, distributor integrations and live lifecycle synchronization are later capabilities. Matching checks the declared scalar technical attributes; manufacturer-specific coordination, breaking-capacity test-basis distinctions and cross-series assembly constraints need additional verified catalog data/rules. A compatible candidate is not a complete installation-compliance decision. BOM and physical panel placement consume these snapshots in FL16/FL17.
+
+
 ### Scope
 
 - product variants;
