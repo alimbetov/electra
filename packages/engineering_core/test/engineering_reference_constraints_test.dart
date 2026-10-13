@@ -45,6 +45,13 @@ EngineeringProfileConstraints cameraConstraints({
       ),
     );
 
+ComponentEngineeringProfile legacyProfile(String code) {
+  final map = Map<String, dynamic>.from(fixture().profile(code).toMap())
+    ..remove('constraints')
+    ..remove('constraintsState');
+  return ComponentEngineeringProfile.fromMap(map);
+}
+
 void main() {
   test('typed constraint contract roundtrips exact mounting pairs and IP value', () {
     final constraints = cameraConstraints(outdoor: true);
@@ -94,7 +101,7 @@ void main() {
   });
 
   test('legacy profile remains readable but cannot be published or instantiated', () {
-    final legacy = fixture().profile('CAMERA');
+    final legacy = legacyProfile('CAMERA');
 
     expect(legacy.constraintsState, ProfileConstraintsState.legacyUnspecified);
     expect(legacy.constraints, isNull);
@@ -112,12 +119,7 @@ void main() {
   });
 
   test('embedded constraints participate in self-contained revision impact', () {
-    final previousLegacy = fixture().profile('CAMERA');
-    final previous = ComponentEngineeringProfile.fromMap({
-      ...previousLegacy.toMap(),
-      'constraintsState': ProfileConstraintsState.defined.name,
-      'constraints': cameraConstraints().toMap(),
-    });
+    final previous = fixture().profile('CAMERA');
     final changedPort = EngineeringPort.fromMap({
       ...previous.portTemplates.first.toMap(),
       'capacity': previous.portTemplates.first.capacity + 1,
@@ -147,12 +149,7 @@ void main() {
   });
 
   test('port template ordering alone does not create a semantic revision', () {
-    final detectorLegacy = fixture().profile('DETECTOR');
-    final profile = ComponentEngineeringProfile.fromMap({
-      ...detectorLegacy.toMap(),
-      'constraintsState': ProfileConstraintsState.defined.name,
-      'constraints': cameraConstraints(loop: true).toMap(),
-    });
+    final profile = fixture().profile('DETECTOR');
     final reordered = ComponentEngineeringProfile.fromMap({
       ...profile.toMap(),
       'portTemplates': profile.portTemplates.reversed
