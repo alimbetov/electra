@@ -491,6 +491,36 @@ Changing one consumer invalidates only dependent circuit/cable/protection/panel 
 
 ## WP-FL13 — Protection requirements
 
+**Status: BASELINE CLOSED on `feat/flutter-routing-cablerun`. Full Flutter/core exact-SHA gate passed on `fed47059616a3926e1d1db7b2f2b4c3740b13d27` (52 mobile tests, 90 engineering-core tests).**
+
+### Implemented behavior
+
+- a first-class, versioned normative catalog stores document code/title, edition, jurisdiction, publisher, source, clause/section reference, document kind, notes and supported protection criteria;
+- initial catalog records include IEC 60364-4-43:2023 and IEC 60364-4-41:2005+AMD1:2017 publisher references, plus a distinct Schneider Electrical Installation Guide source revision with curated basic breaker criteria;
+- IEC records are reference metadata, not a claimed executable national ruleset; guidance and project-policy records are explicitly distinguished from standards;
+- engineers can add document editions through the catalog UI; existing document editions and project ruleset versions are immutable, with duplicate edition/version guards;
+- project rating options select a catalog document and inherit its source/jurisdiction; allowed nominal currents, trip characteristics, residual types and optional breaking-capacity floor are explicit versioned policy data;
+- circuit inputs declare conductor allowable current Iz, prospective fault current, poles, trip characteristic, residual applicability/parameters and supporting evidence;
+- the AC MCB/RCBO planner selects the smallest configured nominal satisfying Ib ≤ In ≤ declared Iz and requires breaking capacity at least the declared fault current/policy floor;
+- explicit residual protection produces an RCBO functional requirement only when residual current and type are present and permitted by the selected policy;
+- incomplete inputs, unsupported supply, reference-only documents and uncurated criteria cannot produce a ready device requirement; inconsistent quantities/options produce invalid proposals with no partial device;
+- proposals remain vendor-neutral and expose input values, reasons, warnings, calculation version, ruleset version, catalog edition, section and source;
+- schema v11 adds `normative_documents`, `protection_rulesets` and `circuit_protection_settings`, typed foreign keys and unique edition/version keys; bundled references are seeded idempotently;
+- FL12 graphs include only assigned normative/ruleset sources, so browsing or adding an unused catalog entry does not invalidate unrelated calculations;
+- protection-setting save and affected recalculation are atomic; missing/invalid protection inputs propagate review/error to the dependent panel basis;
+- functional confirmation is bound to the current exact dependency fingerprint; changed load/cable/input/ruleset context requires recalculation and explicit re-confirmation;
+- project workspace and circuit workspace open the protection UI with Normatives, Rulesets and Circuits tabs; failed form writes preserve drafts;
+- tests cover interval boundaries, MCB/RCBO requirements, nonfinite/incomplete/unsupported inputs, reference-only editions, provenance round-trips, immutable versions, exact restart, live confirmation invalidation, cross-project assignment rejection, stale-snapshot rejection, 390-px UI and v10-to-v11 migration.
+
+### Normative source basis
+
+Catalog publisher metadata is verified against [IEC 60364-4-43:2023](https://webstore.iec.ch/en/publication/28432) and [IEC 60364-4-41:2005+AMD1:2017](https://webstore.iec.ch/en/publication/60169). The implemented basic breaker comparisons are separately sourced to Schneider Electric's [Practical values for a protective scheme](https://www.electrical-installation.org/enw/index.php?title=Practical_values_for_a_protective_scheme&oldid=29756), section *Applications / Protection by circuit-breaker*. A guidance source is not represented as the licensed text or national adoption of an IEC document.
+
+### Remaining boundary
+
+The initial catalog does not contain a complete national regulatory dataset or licensed standard text. Reference metadata alone remains non-executable. Disconnection time, conductor sizing/corrections, I2/energy coordination, neutral switching, earthing, selectivity, motor/start coordination and automatic residual-policy applicability are not validated by these basic comparisons. Iz and prospective fault current are declared project inputs. The baseline supports single-phase/balanced three-phase AC MCB/RCBO functional proposals; DC, fuse/MCCB/SPD/motor-protection planning and manufacturer SKU resolution are later capabilities. Confirmation acknowledges a functional proposal rather than installation compliance. New verified criteria or national editions require explicit catalog curation and a new immutable version.
+
+
 ### Scope
 
 - functional protection requirements;
