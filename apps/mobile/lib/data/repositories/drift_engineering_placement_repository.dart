@@ -91,7 +91,9 @@ final class DriftEngineeringPlacementRepository
         }
       }
 
-      final component = await _componentWriter.insertCanonicalComponent(command);
+      final component = await _componentWriter.insertCanonicalComponent(
+        command,
+      );
 
       throw EngineeringPlacementFailure(
         code: EngineeringPlacementFailureCode.transactionFailed,
@@ -197,7 +199,8 @@ final class DriftEngineeringPlacementComponentWriter {
     final patch =
         await (database.select(database.surfacePatches)..where(
           (row) =>
-              row.id.equals(command.hostSurfacePatchId) & row.deletedAt.isNull(),
+              row.id.equals(command.hostSurfacePatchId) &
+              row.deletedAt.isNull(),
         )).getSingleOrNull();
     if (patch == null || patch.roomId != command.roomId) {
       throw EngineeringPlacementFailure(
@@ -221,9 +224,8 @@ final class DriftEngineeringPlacementComponentWriter {
     }
 
     final existing =
-        await (database.select(database.componentInstances)..where(
-          (row) => row.id.equals(componentId),
-        )).getSingleOrNull();
+        await (database.select(database.componentInstances)
+          ..where((row) => row.id.equals(componentId))).getSingleOrNull();
     if (existing != null) {
       throw EngineeringPlacementFailure(
         code: EngineeringPlacementFailureCode.componentConflict,
@@ -260,25 +262,27 @@ final class DriftEngineeringPlacementComponentWriter {
     }
 
     final now = _clock().toUtc();
-    await database.into(database.componentInstances).insert(
-      ComponentInstancesCompanion.insert(
-        id: componentId,
-        definitionId: canonicalDefinition.id,
-        definitionVersion: canonicalDefinition.version,
-        roomId: command.roomId,
-        hostSurfacePatchId: command.hostSurfacePatchId,
-        localXmm: command.localPosition.xMm,
-        localYmm: command.localPosition.yMm,
-        rotationRadians: Value(command.rotationRadians),
-        displayNameOverride: Value(command.normalizedDisplayNameOverride),
-        metadataOverridesJson: const Value('{}'),
-        revision: const Value(1),
-        createdAt: now,
-        updatedAt: now,
-        deletedAt: const Value(null),
-        originDeviceId: originDeviceId,
-      ),
-    );
+    await database
+        .into(database.componentInstances)
+        .insert(
+          ComponentInstancesCompanion.insert(
+            id: componentId,
+            definitionId: canonicalDefinition.id,
+            definitionVersion: canonicalDefinition.version,
+            roomId: command.roomId,
+            hostSurfacePatchId: command.hostSurfacePatchId,
+            localXmm: command.localPosition.xMm,
+            localYmm: command.localPosition.yMm,
+            rotationRadians: Value(command.rotationRadians),
+            displayNameOverride: Value(command.normalizedDisplayNameOverride),
+            metadataOverridesJson: const Value('{}'),
+            revision: const Value(1),
+            createdAt: now,
+            updatedAt: now,
+            deletedAt: const Value(null),
+            originDeviceId: originDeviceId,
+          ),
+        );
     return instance;
   }
 

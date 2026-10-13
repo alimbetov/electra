@@ -123,34 +123,38 @@ void main() {
     );
   });
 
-  test('P4.3 place inserts component only inside transaction then rolls back', () async {
-    final command = _command(operationId: 'op-new');
+  test(
+    'P4.3 place inserts component only inside transaction then rolls back',
+    () async {
+      final command = _command(operationId: 'op-new');
 
-    await expectLater(
-      repository.place(command),
-      throwsA(
-        isA<EngineeringPlacementFailure>()
-            .having(
-              (failure) => failure.code,
-              'code',
-              EngineeringPlacementFailureCode.transactionFailed,
-            )
-            .having((failure) => failure.details['phase'], 'phase', 'P4.3')
-            .having(
-              (failure) => failure.details['componentId'],
-              'componentId',
-              'component-p4-3',
-            ),
-      ),
-    );
+      await expectLater(
+        repository.place(command),
+        throwsA(
+          isA<EngineeringPlacementFailure>()
+              .having(
+                (failure) => failure.code,
+                'code',
+                EngineeringPlacementFailureCode.transactionFailed,
+              )
+              .having((failure) => failure.details['phase'], 'phase', 'P4.3')
+              .having(
+                (failure) => failure.details['componentId'],
+                'componentId',
+                'component-p4-3',
+              ),
+        ),
+      );
 
-    expect(
-      await database.select(database.engineeringPlacementOperations).get(),
-      isEmpty,
-    );
-    final components = await database.select(database.componentInstances).get();
-    expect(components.map((row) => row.id), ['component-1']);
-  });
+      expect(
+        await database.select(database.engineeringPlacementOperations).get(),
+        isEmpty,
+      );
+      final components =
+          await database.select(database.componentInstances).get();
+      expect(components.map((row) => row.id), ['component-1']);
+    },
+  );
 
   test('findOperation reconstructs immutable durable record', () async {
     final command = _command();
@@ -174,111 +178,131 @@ void main() {
     expect(restored.result.portIds, result.portIds);
   });
 
-  test('canonical ELV definition is frozen as one system physical identity', () {
-    expect(canonicalElvComponentDefinition.id, canonicalElvComponentDefinitionId);
-    expect(
-      canonicalElvComponentDefinition.code,
-      canonicalElvComponentDefinitionCode,
-    );
-    expect(
-      canonicalElvComponentDefinition.version,
-      canonicalElvComponentDefinitionVersion,
-    );
-    expect(
-      canonicalElvComponentDefinition.source,
-      ComponentDefinitionSource.system,
-    );
-    expect(canonicalElvComponentDefinition.primaryDiscipline, Discipline.lowVoltage);
-    expect(
-      canonicalElvComponentDefinition.compatibleDisciplines,
-      containsAll(<Discipline>[
-        Discipline.cctv,
-        Discipline.fireAlarm,
-        Discipline.security,
-        Discipline.accessControl,
-      ]),
-    );
-    expect(canonicalElvComponentDefinition.ports, isEmpty);
-  });
+  test(
+    'canonical ELV definition is frozen as one system physical identity',
+    () {
+      expect(
+        canonicalElvComponentDefinition.id,
+        canonicalElvComponentDefinitionId,
+      );
+      expect(
+        canonicalElvComponentDefinition.code,
+        canonicalElvComponentDefinitionCode,
+      );
+      expect(
+        canonicalElvComponentDefinition.version,
+        canonicalElvComponentDefinitionVersion,
+      );
+      expect(
+        canonicalElvComponentDefinition.source,
+        ComponentDefinitionSource.system,
+      );
+      expect(
+        canonicalElvComponentDefinition.primaryDiscipline,
+        Discipline.lowVoltage,
+      );
+      expect(
+        canonicalElvComponentDefinition.compatibleDisciplines,
+        containsAll(<Discipline>[
+          Discipline.cctv,
+          Discipline.fireAlarm,
+          Discipline.security,
+          Discipline.accessControl,
+        ]),
+      );
+      expect(canonicalElvComponentDefinition.ports, isEmpty);
+    },
+  );
 
-  test('P4.3 writer persists exact component identity geometry and audit', () async {
-    final writer = DriftEngineeringPlacementComponentWriter(
-      database,
-      originDeviceId: 'writer-device',
-      idGenerator: FixedSequenceIdGenerator(['component-new']),
-      clock: () => DateTime.utc(2026, 10, 13, 20, 45, 30),
-    );
+  test(
+    'P4.3 writer persists exact component identity geometry and audit',
+    () async {
+      final writer = DriftEngineeringPlacementComponentWriter(
+        database,
+        originDeviceId: 'writer-device',
+        idGenerator: FixedSequenceIdGenerator(['component-new']),
+        clock: () => DateTime.utc(2026, 10, 13, 20, 45, 30),
+      );
 
-    final instance = await database.transaction(
-      () => writer.insertCanonicalComponent(
-        _command(displayNameOverride: '  Camera A  '),
-      ),
-    );
-
-    expect(instance.id, 'component-new');
-    expect(instance.definitionId, canonicalElvComponentDefinitionId);
-    expect(instance.definitionVersion, canonicalElvComponentDefinitionVersion);
-    expect(instance.displayNameOverride, 'Camera A');
-
-    final row =
-        await (database.select(database.componentInstances)
-              ..where((candidate) => candidate.id.equals('component-new')))
-            .getSingle();
-    expect(row.definitionId, canonicalElvComponentDefinitionId);
-    expect(row.definitionVersion, canonicalElvComponentDefinitionVersion);
-    expect(row.roomId, 'room-1');
-    expect(row.hostSurfacePatchId, 'patch-1');
-    expect(row.localXmm, 120);
-    expect(row.localYmm, 80);
-    expect(row.rotationRadians, 0.25);
-    expect(row.displayNameOverride, 'Camera A');
-    expect(row.metadataOverridesJson, '{}');
-    expect(row.revision, 1);
-    expect(row.createdAt, DateTime.utc(2026, 10, 13, 20, 45, 30));
-    expect(row.updatedAt, row.createdAt);
-    expect(row.deletedAt, isNull);
-    expect(row.originDeviceId, 'writer-device');
-  });
-
-  test('P4.3 writer rejects room outside requested project before insert', () async {
-    final now = DateTime.utc(2026, 10, 13, 20);
-    await database.into(database.projects).insert(
-      ProjectsCompanion.insert(
-        id: 'project-2',
-        name: 'Other project',
-        measurementSystem: 'metric',
-        defaultStructuralHeightMm: 3200,
-        defaultFinishedCeilingHeightMm: 3000,
-        createdAt: now,
-        updatedAt: now,
-        originDeviceId: 'p4-test-device',
-      ),
-    );
-    final writer = DriftEngineeringPlacementComponentWriter(
-      database,
-      originDeviceId: 'writer-device',
-      idGenerator: FixedSequenceIdGenerator(['must-not-be-used']),
-    );
-
-    await expectLater(
-      database.transaction(
-        () => writer.insertCanonicalComponent(_command(projectId: 'project-2')),
-      ),
-      throwsA(
-        isA<EngineeringPlacementFailure>().having(
-          (failure) => failure.code,
-          'code',
-          EngineeringPlacementFailureCode.roomNotFound,
+      final instance = await database.transaction(
+        () => writer.insertCanonicalComponent(
+          _command(displayNameOverride: '  Camera A  '),
         ),
-      ),
-    );
-    expect(
-      await (database.select(database.componentInstances)..where(
-        (row) => row.id.equals('must-not-be-used'),
-      )).get(),
-      isEmpty,
-    );
-  });
+      );
+
+      expect(instance.id, 'component-new');
+      expect(instance.definitionId, canonicalElvComponentDefinitionId);
+      expect(
+        instance.definitionVersion,
+        canonicalElvComponentDefinitionVersion,
+      );
+      expect(instance.displayNameOverride, 'Camera A');
+
+      final row =
+          await (database.select(database.componentInstances)..where(
+            (candidate) => candidate.id.equals('component-new'),
+          )).getSingle();
+      expect(row.definitionId, canonicalElvComponentDefinitionId);
+      expect(row.definitionVersion, canonicalElvComponentDefinitionVersion);
+      expect(row.roomId, 'room-1');
+      expect(row.hostSurfacePatchId, 'patch-1');
+      expect(row.localXmm, 120);
+      expect(row.localYmm, 80);
+      expect(row.rotationRadians, 0.25);
+      expect(row.displayNameOverride, 'Camera A');
+      expect(row.metadataOverridesJson, '{}');
+      expect(row.revision, 1);
+      expect(row.createdAt, DateTime.utc(2026, 10, 13, 20, 45, 30));
+      expect(row.updatedAt, row.createdAt);
+      expect(row.deletedAt, isNull);
+      expect(row.originDeviceId, 'writer-device');
+    },
+  );
+
+  test(
+    'P4.3 writer rejects room outside requested project before insert',
+    () async {
+      final now = DateTime.utc(2026, 10, 13, 20);
+      await database
+          .into(database.projects)
+          .insert(
+            ProjectsCompanion.insert(
+              id: 'project-2',
+              name: 'Other project',
+              measurementSystem: 'metric',
+              defaultStructuralHeightMm: 3200,
+              defaultFinishedCeilingHeightMm: 3000,
+              createdAt: now,
+              updatedAt: now,
+              originDeviceId: 'p4-test-device',
+            ),
+          );
+      final writer = DriftEngineeringPlacementComponentWriter(
+        database,
+        originDeviceId: 'writer-device',
+        idGenerator: FixedSequenceIdGenerator(['must-not-be-used']),
+      );
+
+      await expectLater(
+        database.transaction(
+          () =>
+              writer.insertCanonicalComponent(_command(projectId: 'project-2')),
+        ),
+        throwsA(
+          isA<EngineeringPlacementFailure>().having(
+            (failure) => failure.code,
+            'code',
+            EngineeringPlacementFailureCode.roomNotFound,
+          ),
+        ),
+      );
+      expect(
+        await (database.select(database.componentInstances)
+          ..where((row) => row.id.equals('must-not-be-used'))).get(),
+        isEmpty,
+      );
+    },
+  );
 
   test('P4.3 writer rejects generated component identity collision', () async {
     final writer = DriftEngineeringPlacementComponentWriter(
@@ -303,34 +327,36 @@ void main() {
     );
   });
 
-  test('P4.3 writer rejects placement outside persisted surface geometry', () async {
-    final writer = DriftEngineeringPlacementComponentWriter(
-      database,
-      originDeviceId: 'writer-device',
-      idGenerator: FixedSequenceIdGenerator(['component-outside']),
-    );
+  test(
+    'P4.3 writer rejects placement outside persisted surface geometry',
+    () async {
+      final writer = DriftEngineeringPlacementComponentWriter(
+        database,
+        originDeviceId: 'writer-device',
+        idGenerator: FixedSequenceIdGenerator(['component-outside']),
+      );
 
-    await expectLater(
-      database.transaction(
-        () => writer.insertCanonicalComponent(
-          _command(localPosition: const Point2Mm(7000, 80)),
+      await expectLater(
+        database.transaction(
+          () => writer.insertCanonicalComponent(
+            _command(localPosition: const Point2Mm(7000, 80)),
+          ),
         ),
-      ),
-      throwsA(
-        isA<EngineeringPlacementFailure>().having(
-          (failure) => failure.code,
-          'code',
-          EngineeringPlacementFailureCode.placementForbidden,
+        throwsA(
+          isA<EngineeringPlacementFailure>().having(
+            (failure) => failure.code,
+            'code',
+            EngineeringPlacementFailureCode.placementForbidden,
+          ),
         ),
-      ),
-    );
-    expect(
-      await (database.select(database.componentInstances)..where(
-        (row) => row.id.equals('component-outside'),
-      )).get(),
-      isEmpty,
-    );
-  });
+      );
+      expect(
+        await (database.select(database.componentInstances)
+          ..where((row) => row.id.equals('component-outside'))).get(),
+        isEmpty,
+      );
+    },
+  );
 }
 
 Future<void> _seedPlacementParents(AppDatabase database) async {
