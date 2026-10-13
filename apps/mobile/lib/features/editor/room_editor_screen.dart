@@ -378,7 +378,10 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
                 Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder:
-                        (_) => CalculationsScreen(roomName: widget.room.name),
+                        (_) => CalculationsScreen(
+                          roomName: widget.room.name,
+                          projectId: widget.project.id,
+                        ),
                   ),
                 );
               } else if (value == 'reports') {

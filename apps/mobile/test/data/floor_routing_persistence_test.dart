@@ -347,6 +347,7 @@ void main() {
       snapshot = await floorRepository.load(floor.id);
       expect(snapshot.panels, isEmpty);
       expect(snapshot.handoffs, isEmpty);
+      await database.customStatement('DROP TABLE project_derived_results');
       await database.customStatement('DROP TABLE floor_panel_feeds');
       await database.customStatement('DROP TABLE floor_routing_handoffs');
       await database.customStatement('DROP TABLE floor_routing_panels');
@@ -360,7 +361,7 @@ void main() {
       snapshot = await floorRepository.load(floor.id);
       expect(snapshot.graph().runs.length, 2);
       expect(snapshot.panels, isEmpty);
-      expect(database.schemaVersion, 9);
+      expect(database.schemaVersion, 10);
       await DriftProjectHierarchyRepository(database).deleteProject(project.id);
       expect((await floorRepository.load(floor.id)).floor, isNull);
       await database.close();

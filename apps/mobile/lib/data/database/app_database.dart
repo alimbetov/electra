@@ -376,6 +376,24 @@ class FloorRoutingHandoffs extends Table with GeometryAuditColumns {
   Set<Column<Object>> get primaryKey => {id};
 }
 
+@DataClassName('ProjectDerivedResultRow')
+class ProjectDerivedResults extends Table with GeometryAuditColumns {
+  TextColumn get projectId => text().references(Projects, #id)();
+  TextColumn get nodeKey => text()();
+  TextColumn get fingerprint => text()();
+  TextColumn get inputsJson => text()();
+  TextColumn get dependenciesJson => text()();
+  TextColumn get resultJson => text()();
+  TextColumn get state => text()();
+  TextColumn get previousResultJson => text().nullable()();
+  TextColumn get changesJson => text().withDefault(const Constant('[]'))();
+  TextColumn get manualValue => text().nullable()();
+  TextColumn get manualReason => text().nullable()();
+  TextColumn get manualReviewedFingerprint => text().nullable()();
+  @override
+  Set<Column<Object>> get primaryKey => {projectId, nodeKey};
+}
+
 @DriftDatabase(
   tables: [
     Projects,
@@ -402,6 +420,7 @@ class FloorRoutingHandoffs extends Table with GeometryAuditColumns {
     FloorRoutingPanels,
     FloorPanelFeeds,
     FloorRoutingHandoffs,
+    ProjectDerivedResults,
   ],
 )
 final class AppDatabase extends _$AppDatabase {
@@ -409,7 +428,7 @@ final class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'electra'));
 
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -463,6 +482,9 @@ final class AppDatabase extends _$AppDatabase {
           await migrator.createTable(floorRoutingPanels);
           await migrator.createTable(floorPanelFeeds);
           await migrator.createTable(floorRoutingHandoffs);
+        }
+        if (from < 10) {
+          await migrator.createTable(projectDerivedResults);
         }
       }
       await _createIndexes();

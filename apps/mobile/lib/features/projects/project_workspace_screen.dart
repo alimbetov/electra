@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/adaptive_layout.dart';
 import '../../app/providers.dart';
+import '../calculations/project_recalculation_screen.dart';
 
 class ProjectWorkspaceScreen extends ConsumerWidget {
   const ProjectWorkspaceScreen({super.key, required this.projectId});
@@ -27,6 +28,19 @@ class ProjectWorkspaceScreen extends ConsumerWidget {
           error: (_, __) => const Text('Project'),
         ),
       ),
+      persistentFooterButtons: [
+        OutlinedButton.icon(
+          icon: const Icon(Icons.calculate),
+          label: const Text('Recalculate / What changed?'),
+          onPressed:
+              () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder:
+                      (_) => ProjectRecalculationScreen(projectId: projectId),
+                ),
+              ),
+        ),
+      ],
       body: ElectraAdaptiveBuilder(
         builder: (context, layout) {
           final width = layout.isExpanded ? 1100.0 : 760.0;

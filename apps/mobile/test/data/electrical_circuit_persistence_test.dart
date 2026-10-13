@@ -322,6 +322,7 @@ void main() {
       await DriftCatalogPreferencesRepository(
         database,
       ).setFavorite('motor', true);
+      await database.customStatement('DROP TABLE project_derived_results');
       await database.customStatement('DROP TABLE floor_panel_feeds');
       await database.customStatement('DROP TABLE floor_routing_handoffs');
       await database.customStatement('DROP TABLE floor_routing_panels');

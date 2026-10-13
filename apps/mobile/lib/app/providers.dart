@@ -1,3 +1,5 @@
+import '../application/dependency_recalculation_repository.dart';
+import '../data/repositories/drift_dependency_recalculation_repository.dart';
 import '../application/floor_routing_repository.dart';
 import '../data/repositories/drift_floor_routing_repository.dart';
 import '../application/cable_routing_repository.dart';
@@ -201,3 +203,16 @@ final floorRoutingProvider = StreamProvider.family<
   FloorRoutingSnapshot,
   String
 >((ref, floorId) => ref.watch(floorRoutingRepositoryProvider).watch(floorId));
+
+final dependencyRecalculationRepositoryProvider =
+    Provider<DependencyRecalculationRepository>(
+      (ref) => DriftDependencyRecalculationRepository(
+        ref.watch(databaseProvider),
+        originDeviceId: 'local-device',
+      ),
+    );
+final projectRecalculationProvider =
+    StreamProvider.family<ProjectRecalculationSnapshot, String>(
+      (ref, projectId) =>
+          ref.watch(dependencyRecalculationRepositoryProvider).watch(projectId),
+    );

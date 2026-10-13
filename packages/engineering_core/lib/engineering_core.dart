@@ -19,3 +19,5 @@ export 'src/cable_routing.dart';
 export 'src/surface_route_draft.dart';
 
 export 'src/floor_routing_graph.dart';
+
+export 'src/dependency_recalculation.dart';
