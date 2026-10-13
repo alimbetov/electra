@@ -275,6 +275,8 @@ abstract final class PanelGenerationEngine {
     }
     if (circuits.isEmpty)
       issues.add('Add at least one nonempty consumption group.');
+    if (phaseCurrents.values.any((v) => !v.isFinite))
+      issues.add('Aggregated panel current must be finite.');
     final incomingCurrent =
         issues.isEmpty ? phaseCurrents.values.reduce(math.max) : null;
     final incoming = ProtectionRequirementPlanner.propose(
@@ -307,10 +309,18 @@ abstract final class PanelGenerationEngine {
       }
       occupied = occupied! + width;
     }
-    final spare = occupied == null
-        ? null
-        : math.max(policy.minimumSpareModules,
-            (occupied * policy.reservePercent / 100).ceil());
+    int? spare;
+    if (occupied != null &&
+        policy.reservePercent.isFinite &&
+        policy.reservePercent >= 0 &&
+        policy.minimumSpareModules >= 0) {
+      final requested = occupied * (policy.reservePercent / 100);
+      if (requested.isFinite) {
+        spare = math.max(policy.minimumSpareModules, requested.ceil());
+      } else {
+        issues.add('Reserve estimate must be finite.');
+      }
+    }
     return DependencyProposal(values: {
       'panelId': policy.id,
       'proposalState': issues.isEmpty ? 'proposed' : 'needsInput',
@@ -322,7 +332,8 @@ abstract final class PanelGenerationEngine {
       'incomingDesignCurrentA': incomingCurrent,
       'estimatedModuleCount': occupied,
       'recommendedSpareModules': spare,
-      'recommendedCapacityModules': occupied == null ? null : occupied + spare!,
+      'recommendedCapacityModules':
+          occupied == null || spare == null ? null : occupied + spare,
       'warnings': warnings.toSet().toList(),
       'inputIssues': issues.toSet().toList()
     }, requiresReview: issues.isNotEmpty);

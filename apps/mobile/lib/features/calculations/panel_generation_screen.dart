@@ -146,7 +146,11 @@ class _PanelGenerationWorkspaceState extends State<PanelGenerationWorkspace> {
                       ),
                       OutlinedButton(
                         onPressed:
-                            busy || s.status(p) != 'Proposed'
+                            busy ||
+                                    ![
+                                      'Proposed',
+                                      'Review required',
+                                    ].contains(s.status(p))
                                 ? null
                                 : () => work(
                                   () => widget.onConfirm(
@@ -224,7 +228,8 @@ class PanelProposalDetails extends StatelessWidget {
                       [
                         ...(c['reasons'] as List),
                         ...(protection['reasons'] as List),
-                        'Current evidence: ${c['currentEvidence']}',
+                        for (final e in (c['currentEvidence'] as List?) ?? [])
+                          '${(e as Map)['loadId']}: ${e['currentA']} A · ${e['formula']}',
                       ].join('\n'),
                     ),
                   ),
@@ -241,7 +246,7 @@ class PanelProposalDetails extends StatelessWidget {
           title: const Text('Sources and limitations'),
           children: [
             Text(
-              'Ruleset: ${values['ruleset']}\nNormative source: ${values['normativeDocument']}',
+              'Ruleset: ${(values['ruleset'] as Map?)?['ruleId'] ?? '—'} · ${(values['ruleset'] as Map?)?['version'] ?? '—'}\nSource: ${(values['normativeDocument'] as Map?)?['standardCode'] ?? '—'} · ${(values['normativeDocument'] as Map?)?['version'] ?? '—'}\n${(values['normativeDocument'] as Map?)?['source'] ?? ''}',
             ),
             for (final warning in (values['warnings'] as List?) ?? [])
               Text('$warning'),

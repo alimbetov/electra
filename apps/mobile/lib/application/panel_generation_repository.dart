@@ -27,6 +27,8 @@ class ProjectPanelGenerationSnapshot {
       return 'Needs input';
     return panel.reviewedFingerprint == session.fingerprints[panel.key]
         ? 'Confirmed'
+        : panel.reviewedFingerprint != null
+        ? 'Review required'
         : 'Proposed';
   }
 }

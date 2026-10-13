@@ -340,7 +340,68 @@ void main() {
       );
       await panels.recalculate(project.id);
       data = await panels.load(project.id);
-      expect(data.status(data.panels.single), 'Proposed');
+      expect(data.status(data.panels.single), 'Review required');
+      final updatedComponents = DriftComponentInstanceRepository(
+        database,
+        originDeviceId: 'panel-test',
+      );
+      await updatedComponents.saveComponent(
+        const ComponentInstance(
+          id: 'second-load',
+          definitionId: 'motor',
+          definitionVersion: 1,
+          roomId: 'room-components',
+          hostSurfacePatchId: 'wall-components',
+          localPosition: Point2Mm(1500, 300),
+        ),
+      );
+      await loads.saveLoad(
+        const EquipmentElectricalLoad(
+          componentInstanceId: 'second-load',
+          consumptionGroupId: 'group-new',
+          profile: profile,
+          powerBasis: ElectricalPowerBasis.electricalInput,
+        ),
+      );
+      await panels.recalculate(project.id);
+      data = await panels.load(project.id);
+      expect(
+        (data
+                    .protection
+                    .recalculation
+                    .session
+                    .cache[key]!
+                    .proposal
+                    .values['circuits']
+                as List)
+            .length,
+        2,
+      );
+      expect(
+        data
+            .protection
+            .recalculation
+            .session
+            .cache[key]!
+            .proposal
+            .values['incomingDesignCurrentA'],
+        16,
+      );
+      await updatedComponents.removeComponent('second-load');
+      await panels.recalculate(project.id);
+      data = await panels.load(project.id);
+      expect(
+        (data
+                    .protection
+                    .recalculation
+                    .session
+                    .cache[key]!
+                    .proposal
+                    .values['circuits']
+                as List)
+            .length,
+        1,
+      );
       // Moving the source load changes the generated circuit provenance, not actual FL8 assignments.
       await loads.saveLoad(
         const EquipmentElectricalLoad(
