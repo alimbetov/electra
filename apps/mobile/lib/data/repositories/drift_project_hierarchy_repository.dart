@@ -1,3 +1,4 @@
+import '../elv_deletion_guards.dart';
 import 'package:drift/drift.dart';
 import 'package:engineering_core/engineering_core.dart';
 
@@ -63,21 +64,27 @@ final class DriftProjectHierarchyRepository
   }
 
   @override
-  Future<void> deleteProject(String projectId) async {
-    final row =
-        await (database.select(database.projects)
-          ..where((item) => item.id.equals(projectId))).getSingleOrNull();
-    if (row == null) return;
-    final now = DateTime.now().toUtc();
-    await (database.update(database.projects)
-      ..where((item) => item.id.equals(projectId))).write(
-      ProjectsCompanion(
-        revision: Value(row.revision + 1),
-        updatedAt: Value(now),
-        deletedAt: Value(now),
-      ),
-    );
-  }
+  Future<void> deleteProject(String projectId) =>
+      database.transaction(() async {
+        final row =
+            await (database.select(database.projects)
+              ..where((item) => item.id.equals(projectId))).getSingleOrNull();
+        if (row == null) return;
+        await guardHierarchyElvPorts(
+          database,
+          HierarchyElvScope.project,
+          projectId,
+        );
+        final now = DateTime.now().toUtc();
+        await (database.update(database.projects)
+          ..where((item) => item.id.equals(projectId))).write(
+          ProjectsCompanion(
+            revision: Value(row.revision + 1),
+            updatedAt: Value(now),
+            deletedAt: Value(now),
+          ),
+        );
+      });
 
   @override
   Stream<List<FloorRecord>> watchFloors(String projectId) {
@@ -137,11 +144,12 @@ final class DriftProjectHierarchyRepository
   }
 
   @override
-  Future<void> deleteFloor(String floorId) async {
+  Future<void> deleteFloor(String floorId) => database.transaction(() async {
     final row =
         await (database.select(database.floors)
           ..where((item) => item.id.equals(floorId))).getSingleOrNull();
     if (row == null) return;
+    await guardHierarchyElvPorts(database, HierarchyElvScope.floor, floorId);
     final now = DateTime.now().toUtc();
     await (database.update(database.floors)
       ..where((item) => item.id.equals(floorId))).write(
@@ -151,7 +159,7 @@ final class DriftProjectHierarchyRepository
         deletedAt: Value(now),
       ),
     );
-  }
+  });
 
   @override
   Stream<List<RoomRecord>> watchRooms(String floorId) {
@@ -208,11 +216,12 @@ final class DriftProjectHierarchyRepository
   }
 
   @override
-  Future<void> deleteRoom(String roomId) async {
+  Future<void> deleteRoom(String roomId) => database.transaction(() async {
     final row =
         await (database.select(database.rooms)
           ..where((item) => item.id.equals(roomId))).getSingleOrNull();
     if (row == null) return;
+    await guardHierarchyElvPorts(database, HierarchyElvScope.room, roomId);
     final now = DateTime.now().toUtc();
     await (database.update(database.rooms)
       ..where((item) => item.id.equals(roomId))).write(
@@ -222,7 +231,7 @@ final class DriftProjectHierarchyRepository
         deletedAt: Value(now),
       ),
     );
-  }
+  });
 
   ProjectRecord _projectFromRow(Project row) => ProjectRecord(
     id: row.id,

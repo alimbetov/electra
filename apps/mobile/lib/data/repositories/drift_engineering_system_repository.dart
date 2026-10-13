@@ -1,3 +1,4 @@
+import '../elv_deletion_guards.dart';
 import 'dart:convert';
 import 'package:drift/drift.dart';
 import 'package:engineering_core/engineering_core.dart';
@@ -192,6 +193,8 @@ class DriftEngineeringSystemRepository implements EngineeringSystemRepository {
           throw StateError(
             'Detach participants before changing the family edition.',
           );
+        if (old != null && old.familyId != system.familyId)
+          await guardSystemElvTopology(database, system.id);
         final normalized = EngineeringSystem.fromMap({
           ...system.toMap(),
           'code': system.code.trim().toUpperCase(),
@@ -275,35 +278,38 @@ class DriftEngineeringSystemRepository implements EngineeringSystemRepository {
             );
       });
   @override
-  Future<void> detach(String projectId, String systemId, String componentId) =>
-      database.transaction(() async {
-        await _activeSystem(projectId, systemId);
-        final old =
-            await (database.select(database.componentEngineeringMemberships)
-              ..where(
-                (r) =>
-                    r.systemId.equals(systemId) &
-                    r.componentId.equals(componentId) &
-                    r.deletedAt.isNull(),
-              )).getSingleOrNull();
-        if (old == null) return;
-        final now = DateTime.now().toUtc();
-        await (database.update(database.componentEngineeringMemberships)..where(
+  Future<void> detach(
+    String projectId,
+    String systemId,
+    String componentId,
+  ) => database.transaction(() async {
+    await _activeSystem(projectId, systemId);
+    await guardSystemElvTopology(database, systemId, componentId: componentId);
+    final old =
+        await (database.select(database.componentEngineeringMemberships)..where(
           (r) =>
-              r.systemId.equals(systemId) & r.componentId.equals(componentId),
-        )).write(
-          ComponentEngineeringMembershipsCompanion(
-            revision: Value(old.revision + 1),
-            updatedAt: Value(now),
-            deletedAt: Value(now),
-            originDeviceId: Value(originDeviceId),
-          ),
-        );
-      });
+              r.systemId.equals(systemId) &
+              r.componentId.equals(componentId) &
+              r.deletedAt.isNull(),
+        )).getSingleOrNull();
+    if (old == null) return;
+    final now = DateTime.now().toUtc();
+    await (database.update(database.componentEngineeringMemberships)..where(
+      (r) => r.systemId.equals(systemId) & r.componentId.equals(componentId),
+    )).write(
+      ComponentEngineeringMembershipsCompanion(
+        revision: Value(old.revision + 1),
+        updatedAt: Value(now),
+        deletedAt: Value(now),
+        originDeviceId: Value(originDeviceId),
+      ),
+    );
+  });
   @override
   Future<void> archiveSystem(String projectId, String systemId) =>
       database.transaction(() async {
         final snapshot = await _activeSystem(projectId, systemId);
+        await guardSystemElvTopology(database, systemId);
         if (snapshot.memberships.any((m) => m.systemId == systemId))
           throw StateError('Detach participants before archiving the system.');
         final row =

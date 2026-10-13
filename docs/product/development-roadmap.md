@@ -29,9 +29,21 @@ Normative requirements, manufacturer selection and physical placement remain sep
 
 ## ELV extension track
 
-The [ELV delivery plan](elv-delivery-plan.md) adopts the complete eight-document specification and defines ELV0–ELV8. ELV0 adds project systems, versioned family catalogs and many-to-many participation of existing devices. ELV1 is the next extension gate: persisted ports, binary connections, topology groups, internal connectivity and assemblies tested against CCTV, LAN, ACS and fire scenarios. ELV calculations require separately approved reference/rule packs; the Kazakhstan register is still under curation.
+The [ELV delivery plan](elv-delivery-plan.md) adopts specification revision `091e6d8` and retains implementation evidence.
 
-FL16 and ELV enclosure work share the physical containment foundation. Existing FL12–FL15 calculations continue to use their established electrical inputs.
+| Stage | Outcome | Status |
+|---|---|---|
+| ELV0 | Systems, sixteen family editions, shared device participation | Baseline closed |
+| ELV1 | Ports, connections, topology, passive mappings and assemblies | Implementation gate in progress |
+| ELV2 | Canonical discipline profiles and typed versioned catalogs | Next |
+| ELV3 | Cable resources, allocations, CableRun and shared routes | Planned |
+| ELV4 | Power, PoE, PSU, UPS, converters and backup graph | Planned |
+| ELV5 | Versioned CCTV/LAN/ACS/fire calculations | Planned |
+| ELV6 | Racks, cabinets, patching and physical capacity | Planned |
+| ELV7 | Jurisdiction profiles, normative rule packs and findings | Planned |
+| ELV8 | Manufacturer selection, snapshots, BOM and deliverables | Planned |
+
+All four discipline fixtures remain required throughout the track. National rule packs require verified sources and provenance. FL16 and ELV6 share enclosure infrastructure; ELV8 reuses electrical BOM/reporting foundations.
 
 ## Parallel baseline extensions
 

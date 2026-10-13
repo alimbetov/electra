@@ -3,13 +3,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/providers.dart';
 import '../../application/engineering_system_repository.dart';
+import 'engineering_topology_screen.dart';
 
 class EngineeringSystemsScreen extends ConsumerWidget {
   const EngineeringSystemsScreen({super.key, required this.projectId});
   final String projectId;
   @override
   Widget build(BuildContext context, WidgetRef ref) => Scaffold(
-    appBar: AppBar(title: const Text('Engineering systems')),
+    appBar: AppBar(
+      title: const Text('Engineering systems'),
+      actions: [
+        IconButton(
+          tooltip: 'Ports / topology',
+          icon: const Icon(Icons.account_tree_outlined),
+          onPressed:
+              () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder:
+                      (_) => EngineeringTopologyScreen(projectId: projectId),
+                ),
+              ),
+        ),
+      ],
+    ),
     body: ref
         .watch(projectEngineeringSystemsProvider(projectId))
         .when(
@@ -123,7 +139,7 @@ class _EngineeringSystemsWorkspaceState
           ],
         ),
         const Text(
-          'A placed device can participate in several systems. Assignments reuse its physical identity. Port connections, ELV calculations and system visibility in the room editor are subsequent stages.',
+          'A placed device can participate in several systems. Assignments reuse its physical identity. Manage ports and connections from Ports / topology. Discipline calculations and room-editor system visibility are subsequent stages.',
         ),
         if (error != null)
           Text(

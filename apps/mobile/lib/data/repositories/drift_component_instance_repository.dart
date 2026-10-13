@@ -1,3 +1,4 @@
+import '../elv_deletion_guards.dart';
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
@@ -48,6 +49,7 @@ final class DriftComponentInstanceRepository
             (row) => row.id.equals(instanceId) & row.deletedAt.isNull(),
           )).getSingleOrNull();
       if (row == null) throw StateError('Component $instanceId is not active.');
+      await guardComponentElvPorts(database, [instanceId]);
       final now = _clock();
       await (database.update(database.componentInstances)
         ..where((item) => item.id.equals(instanceId))).write(
@@ -155,6 +157,12 @@ final class DriftComponentInstanceRepository
             ..where((row) => row.roomId.equals(roomId))).get();
       final existingById = {for (final row in existingRows) row.id: row};
       final nextIds = next.map((instance) => instance.id).toSet();
+      await guardComponentElvPorts(
+        database,
+        existingRows
+            .where((r) => r.deletedAt == null && !nextIds.contains(r.id))
+            .map((r) => r.id),
+      );
       final now = _clock();
 
       for (final row in existingRows) {

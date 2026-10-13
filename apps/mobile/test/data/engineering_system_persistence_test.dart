@@ -315,6 +315,24 @@ void main() {
       expect(data.memberships.where((m) => m.systemId == cctv.id), isEmpty);
       expect(data.archivedSystems, isEmpty);
       // Preserve legacy placement across v13 -> v14 upgrade.
+      await database.customStatement('DROP TABLE engineering_port_connections');
+      await database.customStatement(
+        'DROP TABLE engineering_internal_mappings',
+      );
+      await database.customStatement(
+        'DROP TABLE engineering_component_assemblies',
+      );
+      await database.customStatement('DROP TABLE engineering_topology_groups');
+      await database.customStatement(
+        'DROP TABLE engineering_compatibility_profiles',
+      );
+      await database.customStatement(
+        'DROP TABLE engineering_topology_profiles',
+      );
+      await database.customStatement(
+        'DROP TABLE engineering_assembly_profiles',
+      );
+      await database.customStatement('DROP TABLE engineering_port_instances');
       await database.customStatement(
         'DROP TABLE component_engineering_memberships',
       );
@@ -330,7 +348,7 @@ void main() {
         originDeviceId: 'elv-migration',
       );
       data = await systems.load(project.id);
-      expect(database.schemaVersion, 14);
+      expect(database.schemaVersion, 15);
       expect(data.systems, isEmpty);
       expect(data.components.single.id, instance.id);
       expect(data.families.length, 16);

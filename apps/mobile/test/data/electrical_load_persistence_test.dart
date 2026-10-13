@@ -276,6 +276,24 @@ void main() {
       await DriftCatalogPreferencesRepository(
         database,
       ).setFavorite('motor', true);
+      await database.customStatement('DROP TABLE engineering_port_connections');
+      await database.customStatement(
+        'DROP TABLE engineering_internal_mappings',
+      );
+      await database.customStatement(
+        'DROP TABLE engineering_component_assemblies',
+      );
+      await database.customStatement('DROP TABLE engineering_topology_groups');
+      await database.customStatement(
+        'DROP TABLE engineering_compatibility_profiles',
+      );
+      await database.customStatement(
+        'DROP TABLE engineering_topology_profiles',
+      );
+      await database.customStatement(
+        'DROP TABLE engineering_assembly_profiles',
+      );
+      await database.customStatement('DROP TABLE engineering_port_instances');
       await database.customStatement(
         'DROP TABLE component_engineering_memberships',
       );

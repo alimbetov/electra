@@ -372,6 +372,24 @@ void main() {
         derived.session.cache['panel:panel']!.state,
         EngineeringDerivedState.error,
       );
+      await database.customStatement('DROP TABLE engineering_port_connections');
+      await database.customStatement(
+        'DROP TABLE engineering_internal_mappings',
+      );
+      await database.customStatement(
+        'DROP TABLE engineering_component_assemblies',
+      );
+      await database.customStatement('DROP TABLE engineering_topology_groups');
+      await database.customStatement(
+        'DROP TABLE engineering_compatibility_profiles',
+      );
+      await database.customStatement(
+        'DROP TABLE engineering_topology_profiles',
+      );
+      await database.customStatement(
+        'DROP TABLE engineering_assembly_profiles',
+      );
+      await database.customStatement('DROP TABLE engineering_port_instances');
       await database.customStatement(
         'DROP TABLE component_engineering_memberships',
       );
@@ -398,7 +416,7 @@ void main() {
       expect(snapshot.documents.length, 3);
       expect(snapshot.rulesets, isEmpty);
       expect(snapshot.circuits.single.settings.rulesetId, isNull);
-      expect(database.schemaVersion, 14);
+      expect(database.schemaVersion, 15);
       await database.close();
       await directory.delete(recursive: true);
     },

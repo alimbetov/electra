@@ -249,6 +249,18 @@ void main() {
       RoomGeometrySnapshot(roomId: room.id, patches: [patch]),
     );
 
+    await database.customStatement('DROP TABLE engineering_port_connections');
+    await database.customStatement('DROP TABLE engineering_internal_mappings');
+    await database.customStatement(
+      'DROP TABLE engineering_component_assemblies',
+    );
+    await database.customStatement('DROP TABLE engineering_topology_groups');
+    await database.customStatement(
+      'DROP TABLE engineering_compatibility_profiles',
+    );
+    await database.customStatement('DROP TABLE engineering_topology_profiles');
+    await database.customStatement('DROP TABLE engineering_assembly_profiles');
+    await database.customStatement('DROP TABLE engineering_port_instances');
     await database.customStatement(
       'DROP TABLE component_engineering_memberships',
     );
@@ -293,7 +305,7 @@ void main() {
             .get();
     final names = tables.map((row) => row.read<String>('name')).toSet();
 
-    expect(database.schemaVersion, 14);
+    expect(database.schemaVersion, 15);
     expect(names, contains('component_instances'));
     expect(restoredGeometry.patches, hasLength(1));
     expect(restoredGeometry.patches.single.id, patch.id);

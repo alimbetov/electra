@@ -540,6 +540,135 @@ class ComponentEngineeringMemberships extends Table with GeometryAuditColumns {
   Set<Column<Object>> get primaryKey => {systemId, componentId};
 }
 
+@DataClassName('EngineeringPortInstanceRow')
+class EngineeringPortInstances extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get projectId => text().references(Projects, #id)();
+  TextColumn get componentId => text().references(ComponentInstances, #id)();
+  TextColumn get code => text()();
+  TextColumn get payloadJson => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {componentId, code},
+  ];
+}
+
+@DataClassName('EngineeringCompatibilityProfileRow')
+class EngineeringCompatibilityProfiles extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get projectId => text().references(Projects, #id)();
+  TextColumn get code => text()();
+  TextColumn get profileVersion => text()();
+  TextColumn get payloadJson => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {projectId, code, profileVersion},
+  ];
+}
+
+@DataClassName('EngineeringTopologyProfileRow')
+class EngineeringTopologyProfiles extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get projectId => text().references(Projects, #id)();
+  TextColumn get code => text()();
+  TextColumn get profileVersion => text()();
+  TextColumn get payloadJson => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {projectId, code, profileVersion},
+  ];
+}
+
+@DataClassName('EngineeringAssemblyProfileRow')
+class EngineeringAssemblyProfiles extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get projectId => text().references(Projects, #id)();
+  TextColumn get code => text()();
+  TextColumn get profileVersion => text()();
+  TextColumn get payloadJson => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {projectId, code, profileVersion},
+  ];
+}
+
+@DataClassName('EngineeringTopologyGroupRow')
+class EngineeringTopologyGroups extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get projectId => text().references(Projects, #id)();
+  TextColumn get systemId =>
+      text().references(ProjectEngineeringSystems, #id)();
+  TextColumn get code => text()();
+  TextColumn get profileId =>
+      text().references(EngineeringTopologyProfiles, #id)();
+  TextColumn get startPortId =>
+      text().references(EngineeringPortInstances, #id)();
+  TextColumn get endPortId =>
+      text().nullable().references(EngineeringPortInstances, #id)();
+  TextColumn get payloadJson => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {systemId, code},
+  ];
+}
+
+@DataClassName('EngineeringPortConnectionRow')
+class EngineeringPortConnections extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get projectId => text().references(Projects, #id)();
+  TextColumn get systemId =>
+      text().references(ProjectEngineeringSystems, #id)();
+  TextColumn get fromPortId =>
+      text().references(EngineeringPortInstances, #id)();
+  TextColumn get toPortId => text().references(EngineeringPortInstances, #id)();
+  TextColumn get profileId =>
+      text().references(EngineeringCompatibilityProfiles, #id)();
+  TextColumn get groupId =>
+      text().nullable().references(EngineeringTopologyGroups, #id)();
+  TextColumn get payloadJson => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('EngineeringInternalMappingRow')
+class EngineeringInternalMappings extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get projectId => text().references(Projects, #id)();
+  TextColumn get componentId => text().references(ComponentInstances, #id)();
+  TextColumn get fromPortId =>
+      text().references(EngineeringPortInstances, #id)();
+  TextColumn get toPortId => text().references(EngineeringPortInstances, #id)();
+  TextColumn get payloadJson => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('EngineeringComponentAssemblyRow')
+class EngineeringComponentAssemblies extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get projectId => text().references(Projects, #id)();
+  TextColumn get code => text()();
+  TextColumn get profileId =>
+      text().references(EngineeringAssemblyProfiles, #id)();
+  TextColumn get payloadJson => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {projectId, code},
+  ];
+}
+
 @DriftDatabase(
   tables: [
     Projects,
@@ -578,6 +707,14 @@ class ComponentEngineeringMemberships extends Table with GeometryAuditColumns {
     EngineeringFamilyDefinitions,
     ProjectEngineeringSystems,
     ComponentEngineeringMemberships,
+    EngineeringPortInstances,
+    EngineeringCompatibilityProfiles,
+    EngineeringTopologyProfiles,
+    EngineeringAssemblyProfiles,
+    EngineeringTopologyGroups,
+    EngineeringPortConnections,
+    EngineeringInternalMappings,
+    EngineeringComponentAssemblies,
   ],
 )
 final class AppDatabase extends _$AppDatabase {
@@ -585,7 +722,7 @@ final class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'electra'));
 
   @override
-  int get schemaVersion => 14;
+  int get schemaVersion => 15;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -661,6 +798,16 @@ final class AppDatabase extends _$AppDatabase {
           await migrator.createTable(manufacturerProducts);
           await migrator.createTable(manufacturerPolicies);
           await migrator.createTable(circuitProductSelections);
+        }
+        if (from < 15) {
+          await migrator.createTable(engineeringPortInstances);
+          await migrator.createTable(engineeringCompatibilityProfiles);
+          await migrator.createTable(engineeringTopologyProfiles);
+          await migrator.createTable(engineeringAssemblyProfiles);
+          await migrator.createTable(engineeringTopologyGroups);
+          await migrator.createTable(engineeringPortConnections);
+          await migrator.createTable(engineeringInternalMappings);
+          await migrator.createTable(engineeringComponentAssemblies);
         }
       }
       await _createIndexes();

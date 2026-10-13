@@ -31,3 +31,6 @@ export 'src/manufacturer_catalog_codec.dart';
 export 'src/panel_generation_engine.dart';
 
 export 'src/engineering_system.dart';
+
+export 'src/engineering_topology.dart';
+export 'src/engineering_topology_graph.dart';
