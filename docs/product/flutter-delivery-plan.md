@@ -574,6 +574,28 @@ The same functional protection requirement can be mapped to different compatible
 
 ## WP-FL15 — Panel generation
 
+**Status: baseline closed.** Engineering implementation gate: `af08e7bba4094bd96b5650fafc175cc7e2deddaf` (58 mobile tests, 102 core tests; Drift generation, formatting and analyzers green).
+
+Implemented:
+
+- immutable input contracts and deterministic `PanelGenerationEngine`, with an audited SQLite floor-panel policy and exact-fingerprint confirmation;
+- all active floor consumption groups/load membership feed an FL12 `panelProposal:<id>` node; adding/removing groups, equipment or membership updates its fingerprint and proposal without overwriting existing FL8 circuit assignments;
+- compatible loads share a proposed outgoing circuit; dedicated equipment splits into its own circuit, with stable identities and source group/load/current-formula evidence;
+- FL8 current calculation and FL13 catalog-backed rulesets produce vendor-neutral outgoing and incoming MCB/RCBO requirements; explicit conductor Iz, fault current, residual applicability, poles/curve and evidence are required;
+- balanced three-phase currents contribute to all phases, fixed load phases are respected, remaining single-phase circuits are assigned deterministically by descending current to the least loaded phase; the incoming basis is the maximum phase current, with no second application of demand factor;
+- user-declared module widths by function/poles produce occupied, spare and recommended total module capacity; missing widths remain visible rather than inferred;
+- project entry point, policy editor, incoming/outgoing structure, phase-current summary, source explanations and stale/needs-input/proposed/confirmed/re-review states; failed saves retain input drafts;
+- restart and v12→v13 migration coverage; subscribed invalidation, populated second-group generation, removal, orphaned membership, stale confirmation rejection and proposal archival/restoration tests.
+
+Baseline boundaries:
+
+- one generated panel per floor; every active floor load must have an active consumption group. Room/floor routing source roots remain separate from generated electrical proposals;
+- outgoing circuits share explicitly declared protection conditions. Per-circuit overrides, grouping across rooms, circuit limit splitting, multiple panels and downstream/main board hierarchies need separate extensions;
+- generation stores a reviewable proposal; confirmation binds that exact result and does not automatically replace existing circuits, routes or selected manufacturer SKUs;
+- RCBO functions are supported through FL13; shared RCD groups, SPD, isolation/special motor functions, conductor sizing, selectivity and complete national regulatory verification are deferred;
+- phase allocation is a deterministic heuristic using conservative current sums, not an optimal power-flow/unbalance study. Unknown supply frequency is flagged for verification;
+- reserve percent is defined against occupied modules, with an independent minimum spare-module target. Capacity is preliminary; actual SKU dimensions, terminals, ducts, mounting clearances, DIN rows and recommended enclosure width/height/depth belong to FL16.
+
 ### Scope
 
 - consumption groups to generated circuits;

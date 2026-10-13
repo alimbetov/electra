@@ -162,6 +162,14 @@ class _PanelGenerationWorkspaceState extends State<PanelGenerationWorkspace> {
                       ),
                     ],
                   ),
+                  for (final issue
+                      in session.cache[p.key]?.proposal.issues ?? <String>[])
+                    Text(
+                      issue,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
                   if (session.cache[p.key] != null)
                     PanelProposalDetails(
                       values: session.cache[p.key]!.proposal.values,
