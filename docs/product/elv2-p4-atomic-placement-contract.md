@@ -6,6 +6,8 @@ Parent: [ELV2 technical specification](elv2-profile-constraints-technical-specif
 Pre-placement UI: [P3 palette contract](elv2-p3-palette-contract.md)  
 Decision engine: [P2 placement compatibility contract](elv2-p2-placement-compatibility-contract.md)
 
+> Revision note: v1.1 hardens canonical command fingerprinting, durable operation state, concurrent duplicate handling, transaction postconditions, and undo/redo durability semantics before P4 implementation starts.
+
 ## 1. Purpose
 
 P4 turns the read-only P3 preview into one durable engineering operation. A successful command creates exactly one placed physical component, establishes its engineering-system membership, freezes the exact canonical catalog/profile binding, instantiates persisted ELV1 ports, persists the durable operation identity/result, and records one aggregate editor-history action. A failed command leaves no partial engineering state.
