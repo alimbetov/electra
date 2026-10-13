@@ -37,6 +37,104 @@ Future<void> chooseCameraPreview(WidgetTester tester) async {
 }
 
 void main() {
+  testWidgets(
+    'legacy and deprecated editions remain inspectable and explicit',
+    (tester) async {
+      for (final deprecated in [false, true]) {
+        final catalog = paletteCatalog();
+        final legacy = EngineeringReferenceCatalog.fromMap({
+          ...catalog.toMap(),
+          'profiles': [
+            {
+              ...catalog.profile('CAMERA').toMap(),
+              'constraintsState': 'legacyUnspecified',
+              'constraints': null,
+              'deprecated': deprecated,
+            },
+          ],
+        });
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: EngineeringProfilePalette(
+                key: ValueKey(deprecated),
+                snapshot: paletteSnapshot(catalog: legacy),
+                projectId: 'p1',
+                initialSystemId: 'CCTV',
+              ),
+            ),
+          ),
+        );
+        await tester.tap(find.text(legacy.profile('CAMERA').label));
+        await tester.pumpAndSettle();
+        expect(
+          find.textContaining('Preview remains UNRESOLVED'),
+          findsOneWidget,
+        );
+        final preview = tester.widget<FilledButton>(
+          find.widgetWithText(FilledButton, 'Preview on surface'),
+        );
+        expect(preview.onPressed == null, deprecated);
+        await tester.tap(find.text('Back'));
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+      }
+    },
+  );
+  testWidgets(
+    'missing pinned topology cannot be overwritten by candidate input',
+    (tester) async {
+      final system = EngineeringSystem.fromMap({
+        ...paletteSnapshot().systems.systems.first.toMap(),
+        'topologyProfile': {'id': 'missing', 'version': '2'},
+      });
+      PlacementCandidateContext? candidate;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder:
+                  (context) => TextButton(
+                    onPressed: () async {
+                      candidate = await showDialog<PlacementCandidateContext>(
+                        context: context,
+                        builder:
+                            (_) => CandidateConditionsDialog(
+                              initial: knownCandidate('CAMERA'),
+                              system: system,
+                            ),
+                      );
+                    },
+                    child: const Text('Open'),
+                  ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const ValueKey('candidate-Intended topology shape')),
+        findsNothing,
+      );
+      expect(find.textContaining('unresolved edition'), findsOneWidget);
+      await tester.tap(find.text('Apply to preview'));
+      await tester.pumpAndSettle();
+      expect(candidate!.topologyShape, isNull);
+      final catalog = paletteCatalog();
+      expect(
+        const PlacementCompatibilityEngine()
+            .evaluate(
+              profile: catalog.profile('CAMERA'),
+              catalogId: catalog.id,
+              catalogVersion: catalog.version,
+              context: candidate!,
+            )
+            .status,
+        PlacementCompatibilityStatus.unresolved,
+      );
+    },
+  );
   for (final pair
       in {
         'CCTV': 'CAMERA',

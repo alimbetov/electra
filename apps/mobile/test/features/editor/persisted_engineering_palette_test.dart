@@ -200,11 +200,23 @@ void main() {
         isEmpty,
       );
       expect(
-        tester.widget<IconButton>(find.byTooltip('Undo placement')).onPressed,
+        tester
+            .widget<IconButton>(
+              find.byWidgetPredicate(
+                (w) => w is IconButton && w.tooltip == 'Undo placement',
+              ),
+            )
+            .onPressed,
         isNull,
       );
       expect(
-        tester.widget<IconButton>(find.byTooltip('Redo placement')).onPressed,
+        tester
+            .widget<IconButton>(
+              find.byWidgetPredicate(
+                (w) => w is IconButton && w.tooltip == 'Redo placement',
+              ),
+            )
+            .onPressed,
         isNull,
       );
       await tester.tap(find.text('Done'));
