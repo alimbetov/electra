@@ -1,0 +1,23 @@
+name: P4 Format Diff
+
+on:
+  push:
+    branches:
+      - feat/flutter-elv2-profile-constraints
+    paths:
+      - 'apps/mobile/lib/application/engineering_placement_command.dart'
+      - '.github/workflows/p4-format-diff.yml'
+
+jobs:
+  diff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Show formatter diff
+        run: |
+          dart format apps/mobile/lib/application/engineering_placement_command.dart
+          git diff -- apps/mobile/lib/application/engineering_placement_command.dart
