@@ -7,7 +7,7 @@ The eight source documents are adopted together: system specification, domain in
 
 | Stage | Outcome | Acceptance | Status |
 |---|---|---|---|
-| ELV0 | Family editions, project systems, non-owning participation of existing devices | One placed component belongs to LAN and CCTV without cloning; scope/deletion/version invariants and restart/migration tests pass | Implemented; exact-head CI gate required |
+| ELV0 | Family editions, project systems, non-owning participation of existing devices | One placed component belongs to LAN and CCTV without cloning; scope/deletion/version invariants and restart/migration tests pass | Baseline closed |
 | ELV1 | Persisted ports, binary external connections, topology groups, internal connectivity and assemblies | CCTV, LAN, ACS and fire scenarios express their topology without new discipline-specific root tables | Next |
 | ELV2 | Typed common and discipline catalogs, product port/capability templates and project snapshots | Catalog changes do not silently alter existing ports or project engineering data | Planned |
 | ELV3 | Physical cable resources/allocations, route/run adapter and shared carriers | Two logical connections can allocate separate resources of one cable; one run occupies common route geometry | Planned |
@@ -19,7 +19,7 @@ The eight source documents are adopted together: system specification, domain in
 
 ## ELV0 implemented slice
 
-- Extensible, immutable family reference editions; bundled technical classifications for power, CCTV, LAN, ACS, fire, BMS and custom systems. These are classification data, not national rule packs.
+- Extensible, immutable family reference editions; sixteen bundled technical classifications covering every family listed in the specification, including power, CCTV, LAN/Wi-Fi, ACS, fire/security, voice/intercom, RF, BMS/automation, IoT and custom systems. These are classification data, not national rule packs.
 - Project network instances with pinned family editions and optional versioned topology/normative profile references.
 - Audited SQLite many-to-many membership of placed components. No copied geometry, no implicit system ownership and no physical-object deletion on detachment.
 - Project screen for creating/editing systems and family editions, assigning/detaching existing devices, safe archival and explicit restoration.
@@ -44,3 +44,7 @@ Curate `KZ-ELV-BASELINE` rule by rule alongside infrastructure work. Every execu
 ## Relationship to the electrical roadmap
 
 FL16–FL20 remain electrical delivery milestones. Enclosure identity/capacity should be shared with ELV4 and FL16; ELV8 reuses FL17–FL19 BOM/estimate/report infrastructure. Do not build duplicate cabinet, route, report or recalculation subsystems. Electrical baseline closure does not imply that these ELV extensions are already delivered.
+
+## Validation
+
+Engineering implementation gate: `5dba722a2e6c42b2b9c86b5be352fdc575eb6203`. 61 mobile tests and 103 pure-Dart core tests passed; Drift generation, formatting and analyzers passed. Final branch-head changes use the same exact-SHA CI gate. This closes ELV0 only, not the full four-discipline acceptance scenario or Kazakhstan normative rule-pack curation.

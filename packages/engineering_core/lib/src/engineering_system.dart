@@ -108,9 +108,18 @@ final bundledEngineeringSystemFamilies =
     'POWER': 'Electrical power',
     'CCTV': 'CCTV',
     'LAN': 'LAN / structured cabling',
+    'WIFI': 'Wi-Fi infrastructure',
     'ACS': 'Access control',
     'FIRE': 'Fire alarm',
+    'INTRUSION': 'Intrusion / security alarm',
+    'INTERCOM': 'Intercom',
+    'VOICE': 'Public address / voice alarm',
+    'TELEPHONY': 'Telephony',
+    'RF': 'TV / RF',
     'BMS': 'Building automation',
+    'BUILDING_AUTOMATION': 'Building automation / control',
+    'INDUSTRIAL_AUTOMATION': 'Industrial automation',
+    'IOT': 'IoT / sensor networks',
     'CUSTOM': 'Custom engineering system'
   }.entries)
     EngineeringSystemFamily(

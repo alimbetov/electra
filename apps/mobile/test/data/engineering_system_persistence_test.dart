@@ -115,7 +115,7 @@ void main() {
         originDeviceId: 'elv-test',
       );
       var data = await systems.load(project.id);
-      expect(data.families.length, 7);
+      expect(data.families.length, 16);
       expect(data.components.single.id, instance.id);
       EngineeringSystem network(String id, String code, String familyCode) {
         final family = data.families.firstWhere((f) => f.code == familyCode);
@@ -303,6 +303,7 @@ void main() {
       await systems.archiveSystem(project.id, cctv.id);
       data = await systems.load(project.id);
       expect(data.systems.any((s) => s.id == cctv.id), isFalse);
+      expect(data.archivedSystems.single.id, cctv.id);
       expect(data.memberships.single.systemId, lan.id);
       final after = await DriftDependencyRecalculationRepository(
         database,
@@ -312,6 +313,7 @@ void main() {
       await systems.saveSystem(cctv);
       data = await systems.load(project.id);
       expect(data.memberships.where((m) => m.systemId == cctv.id), isEmpty);
+      expect(data.archivedSystems, isEmpty);
       // Preserve legacy placement across v13 -> v14 upgrade.
       await database.customStatement(
         'DROP TABLE component_engineering_memberships',
@@ -331,7 +333,7 @@ void main() {
       expect(database.schemaVersion, 14);
       expect(data.systems, isEmpty);
       expect(data.components.single.id, instance.id);
-      expect(data.families.length, 7);
+      expect(data.families.length, 16);
       await database.close();
       await directory.delete(recursive: true);
     },
