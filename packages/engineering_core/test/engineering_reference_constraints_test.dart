@@ -6,8 +6,7 @@ import 'package:test/test.dart';
 
 EngineeringReferenceCatalog fixture() => EngineeringReferenceCatalog.fromMap(
       jsonDecode(
-        File('../../docs/examples/elv2-reference-catalog.json')
-            .readAsStringSync(),
+        File('../../docs/examples/elv2-reference-catalog.json').readAsStringSync(),
       ) as Map<String, dynamic>,
     );
 
@@ -16,21 +15,26 @@ EngineeringProfileConstraints cameraConstraints({
   bool loop = false,
 }) =>
     EngineeringProfileConstraints(
-      discipline: ReferenceDiscipline.cctv,
       mounting: MountingConstraintProfile(
-        allowedSurfaces: const [
-          InstallationSurface.wall,
-          InstallationSurface.ceiling,
+        options: const [
+          MountingOption(
+            surface: InstallationSurface.wall,
+            method: MountingMethod.bracket,
+          ),
+          MountingOption(
+            surface: InstallationSurface.ceiling,
+            method: MountingMethod.surface,
+          ),
         ],
-        allowedMethods: const [MountingMethod.bracket, MountingMethod.surface],
         minimumClearanceMm: 50,
       ),
       environment: EnvironmentConstraintProfile(
-        allowedClasses: [
-          EnvironmentClass.indoor,
-          if (outdoor) EnvironmentClass.outdoor,
+        allowedExposure: [
+          EnvironmentExposure.indoor,
+          if (outdoor) EnvironmentExposure.exposedOutdoor,
         ],
-        minimumIpRating: outdoor ? 'IP66' : 'IP20',
+        allowedClimate: const [EnvironmentClimate.conditioned],
+        minimumIpRating: IpProtectionClass.parse(outdoor ? 'IP66' : 'IP20'),
         minimumTemperatureC: outdoor ? -40 : 0,
         maximumTemperatureC: 50,
       ),
@@ -42,30 +46,40 @@ EngineeringProfileConstraints cameraConstraints({
     );
 
 void main() {
-  test('typed placement and topology constraints roundtrip without free-form values',
-      () {
-    final profile = cameraConstraints(outdoor: true);
-    expect(profile.validate(), isEmpty);
+  test('typed constraint contract roundtrips exact mounting pairs and IP value', () {
+    final constraints = cameraConstraints(outdoor: true);
+    expect(constraints.validate(), isEmpty);
 
     final restored = EngineeringProfileConstraints.fromMap(
-      jsonDecode(jsonEncode(profile.toMap())) as Map<String, dynamic>,
+      jsonDecode(jsonEncode(constraints.toMap())) as Map<String, dynamic>,
     );
 
-    expect(restored.discipline, ReferenceDiscipline.cctv);
     expect(
-      restored.mounting.allowedSurfaces,
-      containsAll([InstallationSurface.wall, InstallationSurface.ceiling]),
+      restored.mounting.allows(
+        InstallationSurface.wall,
+        MountingMethod.bracket,
+      ),
+      isTrue,
     );
-    expect(restored.environment.allowedClasses, contains(EnvironmentClass.outdoor));
-    expect(restored.environment.minimumIpRating, 'IP66');
-    expect(restored.topology.allowedShapes, [TopologyShape.star]);
-    expect(restored.topology.allowedRoles, [TopologyParticipation.endpoint]);
+    expect(
+      restored.mounting.allows(
+        InstallationSurface.wall,
+        MountingMethod.surface,
+      ),
+      isFalse,
+    );
+    expect(
+      restored.environment.allowedExposure,
+      contains(EnvironmentExposure.exposedOutdoor),
+    );
+    expect(restored.environment.minimumIpRating?.value, 'IP66');
   });
 
-  test('invalid environment and topology policies are rejected before publication',
-      () {
+  test('invalid IP, environment range and topology policy are rejected', () {
+    expect(() => IpProtectionClass.parse('hello'), throwsFormatException);
+
     final invalidEnvironment = EnvironmentConstraintProfile(
-      allowedClasses: const [EnvironmentClass.indoor],
+      allowedExposure: const [EnvironmentExposure.indoor],
       minimumTemperatureC: 40,
       maximumTemperatureC: 10,
     );
@@ -79,33 +93,51 @@ void main() {
     expect(invalidTopology.validate(), isNotEmpty);
   });
 
-  test('revision impact tells engineer whether placement or connections are affected',
-      () {
-    final previous = fixture().profile('CAMERA');
+  test('legacy profile remains readable but cannot be published or instantiated', () {
+    final legacy = fixture().profile('CAMERA');
+
+    expect(legacy.constraintsState, ProfileConstraintsState.legacyUnspecified);
+    expect(legacy.constraints, isNull);
+    expect(legacy.validate(), isEmpty);
+    expect(legacy.validateForPublication(), isNotEmpty);
+    expect(
+      () => legacy.instantiate(
+        componentId: 'camera',
+        catalogId: 'legacy',
+        version: '1',
+        nextId: () => 'p1',
+      ),
+      throwsStateError,
+    );
+  });
+
+  test('embedded constraints participate in self-contained revision impact', () {
+    final previousLegacy = fixture().profile('CAMERA');
+    final previous = ComponentEngineeringProfile.fromMap({
+      ...previousLegacy.toMap(),
+      'constraintsState': ProfileConstraintsState.defined.name,
+      'constraints': cameraConstraints().toMap(),
+    });
     final changedPort = EngineeringPort.fromMap({
       ...previous.portTemplates.first.toMap(),
       'capacity': previous.portTemplates.first.capacity + 1,
     });
     final candidate = ComponentEngineeringProfile.fromMap({
       ...previous.toMap(),
-      'portTemplates': [
-        changedPort.toMap(),
-        ...previous.portTemplates.skip(1).map((p) => p.toMap()),
-      ],
+      'constraints': cameraConstraints(outdoor: true, loop: true).toMap(),
+      'portTemplates': [changedPort.toMap()],
     });
 
     final impact = compareEngineeringProfileRevisions(
       previous: previous,
       candidate: candidate,
-      previousConstraints: cameraConstraints(),
-      candidateConstraints: cameraConstraints(outdoor: true, loop: true),
     );
 
     expect(impact.changed, isTrue);
     expect(impact.affectsConnections, isTrue);
     expect(impact.affectsPlacement, isTrue);
     expect(
-      impact.changes.map((c) => c.kind),
+      impact.changes.map((change) => change.kind),
       containsAll([
         ProfileRevisionChangeKind.ports,
         ProfileRevisionChangeKind.environment,
@@ -114,15 +146,24 @@ void main() {
     );
   });
 
-  test('unchanged revision produces an empty impact', () {
-    final profile = fixture().profile('OUTLET');
-    final impact = compareEngineeringProfileRevisions(
-      previous: profile,
-      candidate: ComponentEngineeringProfile.fromMap(profile.toMap()),
-    );
+  test('port template ordering alone does not create a semantic revision', () {
+    final detectorLegacy = fixture().profile('DETECTOR');
+    final profile = ComponentEngineeringProfile.fromMap({
+      ...detectorLegacy.toMap(),
+      'constraintsState': ProfileConstraintsState.defined.name,
+      'constraints': cameraConstraints(loop: true).toMap(),
+    });
+    final reordered = ComponentEngineeringProfile.fromMap({
+      ...profile.toMap(),
+      'portTemplates': profile.portTemplates.reversed
+          .map((port) => port.toMap())
+          .toList(),
+    });
 
-    expect(impact.changed, isFalse);
-    expect(impact.affectsConnections, isFalse);
-    expect(impact.affectsPlacement, isFalse);
+    expect(
+      compareEngineeringProfileRevisions(previous: profile, candidate: reordered)
+          .changed,
+      isFalse,
+    );
   });
 }
