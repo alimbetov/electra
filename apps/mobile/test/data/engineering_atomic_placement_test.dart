@@ -78,6 +78,105 @@ void main() {
   });
   tearDown(() => db.close());
 
+  test(
+    'postconditions reject corruption inside the transaction and roll back',
+    () async {
+      final before = await aggregateRows(db);
+      final writer = DriftEngineeringPlacementRepository(
+        db,
+        originDeviceId: 'fault',
+        fault: (point, _) async {
+          if (point == EngineeringPlacementFailurePoint.afterBinding) {
+            await db
+                .update(db.componentReferenceBindings)
+                .write(
+                  const ComponentReferenceBindingsCompanion(
+                    profileCode: Value('CORRUPTED'),
+                  ),
+                );
+          }
+        },
+      );
+      await expectLater(
+        writer.place(atomicCommand('CAMERA')),
+        throwsA(isA<EngineeringPlacementFailure>()),
+      );
+      expect(await aggregateRows(db), before);
+    },
+  );
+
+  test(
+    'deprecated and historical unspecified profiles cannot pass the commit boundary',
+    () async {
+      final row =
+          await (db.select(db.engineeringReferenceCatalogs)
+            ..where((r) => r.id.equals('catalog-1'))).getSingle();
+      final original = jsonDecode(row.payloadJson) as Map<String, dynamic>;
+      for (final legacy in [false, true]) {
+        final profiles =
+            (original['profiles'] as List)
+                .cast<Map<String, dynamic>>()
+                .map(
+                  (p) =>
+                      p['code'] != 'CAMERA'
+                          ? p
+                          : {
+                            ...p,
+                            if (!legacy) 'deprecated': true,
+                            if (legacy) ...{
+                              'constraintsState': 'legacyUnspecified',
+                              'constraints': null,
+                            },
+                          },
+                )
+                .toList();
+        await (db.update(db.engineeringReferenceCatalogs)
+          ..where((r) => r.id.equals('catalog-1'))).write(
+          EngineeringReferenceCatalogsCompanion(
+            payloadJson: Value(
+              canonicalEngineeringJson({...original, 'profiles': profiles}),
+            ),
+          ),
+        );
+        final before = await aggregateRows(db);
+        await expectLater(
+          repo.place(atomicCommand('CAMERA')),
+          throwsA(
+            isA<EngineeringPlacementFailure>().having(
+              (e) => e.code,
+              'code',
+              legacy
+                  ? EngineeringPlacementFailureCode.placementUnresolved
+                  : EngineeringPlacementFailureCode.profileDeprecated,
+            ),
+          ),
+        );
+        expect(await aggregateRows(db), before);
+      }
+    },
+  );
+
+  test(
+    'failed history transition rolls back retirement and keeps COMPLETED ledger',
+    () async {
+      final result = await repo.place(atomicCommand('CAMERA'));
+      final before = await aggregateRows(db);
+      final failing = DriftEngineeringPlacementRepository(
+        db,
+        originDeviceId: 'fault',
+        fault: (point, _) {
+          if (point == EngineeringPlacementFailurePoint.beforeCommit)
+            throw StateError('undo fault');
+        },
+      );
+      await expectLater(
+        failing.undo(result.operationId),
+        throwsA(isA<EngineeringPlacementFailure>()),
+      );
+      expect(await aggregateRows(db), before);
+    },
+  );
+
   for (final code in ['CAMERA', 'OUTLET', 'READER', 'LOCK', 'DETECTOR']) {
     test(
       '$code persists one exact aggregate and replays without writes',

@@ -257,7 +257,21 @@ final class DriftEngineeringPlacementAggregate {
     );
     final expected = ports.map((p) => p.id).toSet();
     final actual = rows.map((p) => p.id).toSet();
-    if (component.roomId != command.roomId ||
+    if (component.localXmm != command.localPosition.xMm ||
+        component.localYmm != command.localPosition.yMm ||
+        component.rotationRadians != command.rotationRadians ||
+        component.displayNameOverride !=
+            command.normalizedDisplayNameOverride ||
+        row.projectId != command.projectId ||
+        row.catalogId != command.catalogId ||
+        row.profileCode != command.profileCode ||
+        rows.any(
+          (r) =>
+              r.projectId != command.projectId ||
+              r.componentId != componentId ||
+              r.code != ports.singleWhere((p) => p.id == r.id).code,
+        ) ||
+        component.roomId != command.roomId ||
         component.hostSurfacePatchId != command.hostSurfacePatchId ||
         component.definitionId != canonicalElvComponentDefinitionId ||
         component.definitionVersion != canonicalElvComponentDefinitionVersion ||
