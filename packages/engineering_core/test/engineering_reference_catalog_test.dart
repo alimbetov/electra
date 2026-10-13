@@ -6,7 +6,8 @@ import 'package:test/test.dart';
 
 EngineeringReferenceCatalog fixture() => EngineeringReferenceCatalog.fromMap(
       jsonDecode(
-        File('../../docs/examples/elv2-reference-catalog.json').readAsStringSync(),
+        File('../../docs/examples/elv2-reference-catalog.json')
+            .readAsStringSync(),
       ) as Map<String, dynamic>,
     );
 
@@ -29,7 +30,8 @@ void main() {
       final restored = EngineeringReferenceCatalog.fromMap(
         jsonDecode(jsonEncode(catalog.toMap())) as Map<String, dynamic>,
       );
-      expect(restored.profile('LOCK').characteristics, isA<AcsCharacteristics>());
+      expect(
+          restored.profile('LOCK').characteristics, isA<AcsCharacteristics>());
       expect(
         (restored.profile('OUTLET').characteristics as LanCharacteristics)
             .category,
@@ -50,7 +52,8 @@ void main() {
             version: catalog.version,
             nextId: () => 'port-${id++}',
           );
-      expect(ports.map((port) => port.componentId), everyElement('placed-detector'));
+      expect(ports.map((port) => port.componentId),
+          everyElement('placed-detector'));
       expect(
         ports.first.templateProvenance!.id,
         '${catalog.id}/DETECTOR/IN',
@@ -111,11 +114,11 @@ void main() {
       );
       expect(
         () => catalog.profile('DETECTOR').instantiate(
-          componentId: 'detector',
-          catalogId: catalog.id,
-          version: catalog.version,
-          nextId: () => 'duplicate',
-        ),
+              componentId: 'detector',
+              catalogId: catalog.id,
+              version: catalog.version,
+              nextId: () => 'duplicate',
+            ),
         throwsStateError,
       );
     },
@@ -123,15 +126,13 @@ void main() {
 
   test('historical catalog remains readable but cannot be newly published', () {
     final map = fixture().toMap();
-    final profiles = (map['profiles'] as List)
-        .cast<Map<String, dynamic>>()
-        .map((profile) {
-          final copy = Map<String, dynamic>.from(profile)
-            ..remove('constraints')
-            ..remove('constraintsState');
-          return copy;
-        })
-        .toList();
+    final profiles =
+        (map['profiles'] as List).cast<Map<String, dynamic>>().map((profile) {
+      final copy = Map<String, dynamic>.from(profile)
+        ..remove('constraints')
+        ..remove('constraintsState');
+      return copy;
+    }).toList();
     final legacy = EngineeringReferenceCatalog.fromMap({
       ...map,
       'id': 'legacy-v0',
@@ -144,7 +145,8 @@ void main() {
     expect(
       legacy.profiles.every(
         (profile) =>
-            profile.constraintsState == ProfileConstraintsState.legacyUnspecified,
+            profile.constraintsState ==
+            ProfileConstraintsState.legacyUnspecified,
       ),
       isTrue,
     );
