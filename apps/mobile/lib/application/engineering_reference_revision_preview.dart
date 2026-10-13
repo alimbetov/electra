@@ -39,8 +39,8 @@ class CatalogRevisionPreview {
     required this.candidateVersion,
     required Iterable<BoundProfileRevisionImpact> bindingImpacts,
     required Iterable<String> removedProfileCodes,
-  })  : bindingImpacts = List.unmodifiable(bindingImpacts),
-        removedProfileCodes = List.unmodifiable(removedProfileCodes);
+  }) : bindingImpacts = List.unmodifiable(bindingImpacts),
+       removedProfileCodes = List.unmodifiable(removedProfileCodes);
 
   final String catalogCode;
   final String candidateCatalogId;
@@ -51,12 +51,12 @@ class CatalogRevisionPreview {
   int get affectedBindingCount => bindingImpacts.length;
 
   Set<String> get affectedConnectionIds => {
-        for (final impact in bindingImpacts) ...impact.connectionIds,
-      };
+    for (final impact in bindingImpacts) ...impact.connectionIds,
+  };
 
   Set<String> get affectedTopologyGroupIds => {
-        for (final impact in bindingImpacts) ...impact.topologyGroupIds,
-      };
+    for (final impact in bindingImpacts) ...impact.topologyGroupIds,
+  };
 
   bool get affectsPlacement =>
       bindingImpacts.any((impact) => impact.profileImpact.affectsPlacement);
@@ -72,7 +72,8 @@ CatalogRevisionPreview previewCatalogRevision({
 }) {
   final sameCode = references.catalogs
       .where(
-        (catalog) => catalog.code == candidate.code && catalog.id != candidate.id,
+        (catalog) =>
+            catalog.code == candidate.code && catalog.id != candidate.id,
       )
       .toList();
   final byId = {for (final catalog in sameCode) catalog.id: catalog};
@@ -100,26 +101,28 @@ CatalogRevisionPreview previewCatalogRevision({
     if (!profileImpact.changed) continue;
 
     final ports = binding.portIds.toSet();
-    final connections = topology.connections
-        .where(
-          (connection) =>
-              ports.contains(connection.fromPortId) ||
-              ports.contains(connection.toPortId),
-        )
-        .map((connection) => connection.id)
-        .toSet()
-        .toList()
-      ..sort();
-    final groups = topology.groups
-        .where(
-          (group) =>
-              ports.contains(group.startPortId) ||
-              (group.endPortId != null && ports.contains(group.endPortId)),
-        )
-        .map((group) => group.id)
-        .toSet()
-        .toList()
-      ..sort();
+    final connections =
+        topology.connections
+            .where(
+              (connection) =>
+                  ports.contains(connection.fromPortId) ||
+                  ports.contains(connection.toPortId),
+            )
+            .map((connection) => connection.id)
+            .toSet()
+            .toList()
+          ..sort();
+    final groups =
+        topology.groups
+            .where(
+              (group) =>
+                  ports.contains(group.startPortId) ||
+                  (group.endPortId != null && ports.contains(group.endPortId)),
+            )
+            .map((group) => group.id)
+            .toSet()
+            .toList()
+          ..sort();
 
     impacts.add(
       BoundProfileRevisionImpact(
