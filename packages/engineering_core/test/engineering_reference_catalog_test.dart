@@ -1,75 +1,152 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:engineering_core/engineering_core.dart';
 import 'package:test/test.dart';
 
 EngineeringReferenceCatalog fixture() => EngineeringReferenceCatalog.fromMap(
-    jsonDecode(File('../../docs/examples/elv2-reference-catalog.json')
-        .readAsStringSync()) as Map<String, dynamic>);
+      jsonDecode(
+        File('../../docs/examples/elv2-reference-catalog.json').readAsStringSync(),
+      ) as Map<String, dynamic>,
+    );
+
 void main() {
   test(
-      'four disciplines roundtrip typed characteristics and instantiate exact provenance',
-      () {
-    final c = fixture();
-    expect(c.validate(), isEmpty);
-    expect(c.profiles.map((p) => p.discipline).toSet(),
-        ReferenceDiscipline.values.toSet());
-    final restored = EngineeringReferenceCatalog.fromMap(
-        jsonDecode(jsonEncode(c.toMap())) as Map<String, dynamic>);
-    expect(restored.profile('LOCK').characteristics, isA<AcsCharacteristics>());
-    expect(
+    'four disciplines roundtrip typed profiles constraints and exact provenance',
+    () {
+      final catalog = fixture();
+      expect(catalog.validate(), isEmpty);
+      expect(catalog.validateForPublication(), isEmpty);
+      expect(
+        catalog.profiles.map((profile) => profile.discipline).toSet(),
+        ReferenceDiscipline.values.toSet(),
+      );
+      expect(
+        catalog.profiles.every((profile) => profile.hasDefinedConstraints),
+        isTrue,
+      );
+
+      final restored = EngineeringReferenceCatalog.fromMap(
+        jsonDecode(jsonEncode(catalog.toMap())) as Map<String, dynamic>,
+      );
+      expect(restored.profile('LOCK').characteristics, isA<AcsCharacteristics>());
+      expect(
         (restored.profile('OUTLET').characteristics as LanCharacteristics)
             .category,
-        CopperCategory.cat6);
-    var id = 0;
-    final ports = c.profile('DETECTOR').instantiate(
-        componentId: 'placed-detector',
-        catalogId: c.id,
-        version: c.version,
-        nextId: () => 'port-${id++}');
-    expect(ports.map((p) => p.componentId), everyElement('placed-detector'));
-    expect(ports.first.templateProvenance!.id, '${c.id}/DETECTOR/IN');
-    expect(ports.first.templateProvenance!.version, '1');
-    expect(ports.first.voltage, isNull);
-    expect(() => c.profiles.clear(), throwsUnsupportedError);
-    expect(() => c.profile('CAMERA').portTemplates.clear(),
-        throwsUnsupportedError);
-  });
+        CopperCategory.cat6,
+      );
+      expect(
+        restored.profile('CAMERA').constraints!.mounting.allows(
+              InstallationSurface.wall,
+              MountingMethod.bracket,
+            ),
+        isTrue,
+      );
+
+      var id = 0;
+      final ports = catalog.profile('DETECTOR').instantiate(
+            componentId: 'placed-detector',
+            catalogId: catalog.id,
+            version: catalog.version,
+            nextId: () => 'port-${id++}',
+          );
+      expect(ports.map((port) => port.componentId), everyElement('placed-detector'));
+      expect(
+        ports.first.templateProvenance!.id,
+        '${catalog.id}/DETECTOR/IN',
+      );
+      expect(ports.first.templateProvenance!.version, '1');
+      expect(ports.first.voltage, isNull);
+      expect(() => catalog.profiles.clear(), throwsUnsupportedError);
+      expect(
+        () => catalog.profile('CAMERA').portTemplates.clear(),
+        throwsUnsupportedError,
+      );
+    },
+  );
+
   test(
-      'invalid discipline and quantities are rejected without label-dependent calculations',
-      () {
-    final p = fixture().profile('CAMERA');
-    final wrong = ComponentEngineeringProfile.fromMap(
-        {...p.toMap(), 'engineeringClass': 'detector'});
-    expect(wrong.validate(), isNotEmpty);
-    expect(const FireCharacteristics(alarmCurrentA: double.nan).validate(),
-        isNotEmpty);
-    final renamed = ComponentEngineeringProfile.fromMap(
-        {...p.toMap(), 'label': 'Another manufacturer marketing label'});
-    expect(renamed.characteristics.toMap(), p.characteristics.toMap());
-    expect(renamed.portTemplates.map((p) => p.toMap()),
-        p.portTemplates.map((p) => p.toMap()));
-  });
+    'invalid discipline and quantities are rejected without label dependent rules',
+    () {
+      final profile = fixture().profile('CAMERA');
+      final wrong = ComponentEngineeringProfile.fromMap({
+        ...profile.toMap(),
+        'engineeringClass': 'detector',
+      });
+      expect(wrong.validate(), isNotEmpty);
+      expect(
+        const FireCharacteristics(alarmCurrentA: double.nan).validate(),
+        isNotEmpty,
+      );
+      final renamed = ComponentEngineeringProfile.fromMap({
+        ...profile.toMap(),
+        'label': 'Another manufacturer marketing label',
+      });
+      expect(renamed.characteristics.toMap(), profile.characteristics.toMap());
+      expect(
+        renamed.portTemplates.map((port) => port.toMap()),
+        profile.portTemplates.map((port) => port.toMap()),
+      );
+    },
+  );
+
   test(
-      'deprecated editions remain readable but cannot instantiate and duplicate ids cannot publish',
-      () {
-    final c = fixture(), p = fixture().profile('CAMERA');
-    final deprecated =
-        ComponentEngineeringProfile.fromMap({...p.toMap(), 'deprecated': true});
-    expect(deprecated.validate(), isEmpty);
-    expect(
+    'deprecated profiles remain readable but cannot instantiate duplicate ports',
+    () {
+      final catalog = fixture();
+      final profile = catalog.profile('CAMERA');
+      final deprecated = ComponentEngineeringProfile.fromMap({
+        ...profile.toMap(),
+        'deprecated': true,
+      });
+      expect(deprecated.validate(), isEmpty);
+      expect(
         () => deprecated.instantiate(
-            componentId: 'camera',
-            catalogId: c.id,
-            version: c.version,
-            nextId: () => 'id'),
-        throwsStateError);
+          componentId: 'camera',
+          catalogId: catalog.id,
+          version: catalog.version,
+          nextId: () => 'id',
+        ),
+        throwsStateError,
+      );
+      expect(
+        () => catalog.profile('DETECTOR').instantiate(
+          componentId: 'detector',
+          catalogId: catalog.id,
+          version: catalog.version,
+          nextId: () => 'duplicate',
+        ),
+        throwsStateError,
+      );
+    },
+  );
+
+  test('historical catalog remains readable but cannot be newly published', () {
+    final map = fixture().toMap();
+    final profiles = (map['profiles'] as List)
+        .cast<Map<String, dynamic>>()
+        .map((profile) {
+          final copy = Map<String, dynamic>.from(profile)
+            ..remove('constraints')
+            ..remove('constraintsState');
+          return copy;
+        })
+        .toList();
+    final legacy = EngineeringReferenceCatalog.fromMap({
+      ...map,
+      'id': 'legacy-v0',
+      'version': '0',
+      'profiles': profiles,
+    });
+
+    expect(legacy.validate(), isEmpty);
+    expect(legacy.validateForPublication(), isNotEmpty);
     expect(
-        () => c.profile('DETECTOR').instantiate(
-            componentId: 'detector',
-            catalogId: c.id,
-            version: c.version,
-            nextId: () => 'duplicate'),
-        throwsStateError);
+      legacy.profiles.every(
+        (profile) =>
+            profile.constraintsState == ProfileConstraintsState.legacyUnspecified,
+      ),
+      isTrue,
+    );
   });
 }
