@@ -85,6 +85,13 @@ class DriftEngineeringReferenceRepository
         );
       return;
     }
+    final topology = DriftEngineeringTopologyRepository(
+      database,
+      originDeviceId: originDeviceId,
+    );
+    for (final profile in catalog.connectionProfiles(projectId)) {
+      await topology.saveConnectionProfile(profile);
+    }
     final now = DateTime.now().toUtc();
     await database
         .into(database.engineeringReferenceCatalogs)
@@ -170,6 +177,7 @@ class DriftEngineeringReferenceRepository
       componentId: componentId,
       catalogId: catalog.id,
       version: catalog.version,
+      vocabulary: catalog.vocabulary,
       nextId: () {
         final code =
             profile.portTemplates[templateIndex++].code.trim().toUpperCase();

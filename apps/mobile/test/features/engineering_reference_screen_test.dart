@@ -42,6 +42,44 @@ void main() {
     expect(find.textContaining('Fictional acceptance'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+  testWidgets(
+    'compact vocabulary shows typed interfaces and underlying definitions',
+    (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final typed = EngineeringReferenceCatalog.fromMap(
+        jsonDecode(
+              File(
+                '../../docs/examples/elv2-interface-catalog.json',
+              ).readAsStringSync(),
+            )
+            as Map<String, dynamic>,
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: ReferenceVocabularyView(catalog: typed),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('Interfaces and compatibility'));
+      await tester.pumpAndSettle();
+      expect(find.text('Fictional POE-IN'), findsOneWidget);
+      expect(find.textContaining('44.0–52.0 V'), findsOneWidget);
+      expect(find.textContaining('CCTV'), findsOneWidget);
+      await tester.ensureVisible(find.text('Reference definitions'));
+      await tester.tap(find.text('Reference definitions'));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Fictional RJ45').last);
+      expect(find.textContaining('8 contacts'), findsOneWidget);
+      expect(find.textContaining('1000.0 Mbps'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
   testWidgets('import error preserves exact edition JSON draft', (
     tester,
   ) async {

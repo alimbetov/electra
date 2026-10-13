@@ -126,6 +126,9 @@ class _EngineeringReferenceWorkspaceState
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   Text('Source: ${c.source}'),
+                  if (!c.vocabulary.isEmpty)
+                    ReferenceVocabularyView(catalog: c),
+
                   for (final p in c.profiles.where(
                     (p) => discipline == null || p.discipline == discipline,
                   ))
@@ -340,4 +343,75 @@ class _ReferenceProfileBindDialogState
       ),
     ],
   );
+}
+
+class ReferenceVocabularyView extends StatelessWidget {
+  const ReferenceVocabularyView({super.key, required this.catalog});
+  final EngineeringReferenceCatalog catalog;
+  @override
+  Widget build(BuildContext context) {
+    final v = catalog.vocabulary;
+    Widget entry(
+      String label,
+      String details, {
+      bool deprecated = false,
+    }) => ListTile(
+      dense: true,
+      contentPadding: EdgeInsets.zero,
+      title: Text(label),
+      subtitle: Text(
+        '$details${deprecated ? '\nDeprecated; retained for existing projects' : ''}',
+      ),
+    );
+    return ExpansionTile(
+      tilePadding: EdgeInsets.zero,
+      title: const Text('Interfaces and compatibility'),
+      subtitle: Text(
+        '${v.interfaces.length} interfaces · ${v.compatibility.length} connection definitions',
+      ),
+      children: [
+        for (final i in v.interfaces)
+          entry(
+            i.identity.label,
+            '${i.kind.name} · ${i.direction.name} · capacity ${i.capacity}\nConnector: ${v.connectors.singleWhere((c) => c.code == i.connectorCode).identity.label}\nProtocol: ${v.protocols.singleWhere((p) => p.code == i.protocolCode).identity.label}\nMedium: ${v.media.singleWhere((m) => m.code == i.mediaCode).identity.label}${i.voltageCode == null ? '\nVoltage: needs input' : '\nVoltage: ${v.voltages.singleWhere((p) => p.code == i.voltageCode).domain.minimumV}–${v.voltages.singleWhere((p) => p.code == i.voltageCode).domain.maximumV} V'}',
+            deprecated: i.identity.deprecated,
+          ),
+        for (final rule in v.compatibility)
+          entry(
+            rule.identity.label,
+            '${v.interface(rule.fromInterfaceCode).identity.label} → ${v.interface(rule.toInterfaceCode).identity.label}\n${rule.familyCodes.join(', ')} · ${rule.layer.name} · ${rule.flow.name}',
+            deprecated: rule.identity.deprecated,
+          ),
+        ExpansionTile(
+          title: const Text('Reference definitions'),
+          children: [
+            for (final c in v.connectors)
+              entry(
+                c.identity.label,
+                'Connector · ${c.connectorClass.name}${c.contactCount == null ? '' : ' · ${c.contactCount} contacts'}',
+                deprecated: c.identity.deprecated,
+              ),
+            for (final p in v.protocols)
+              entry(
+                p.identity.label,
+                'Protocol · ${p.portKinds.map((k) => k.name).join(', ')}${p.dataRateMbps == null ? '' : ' · ${p.dataRateMbps} Mbps'}',
+                deprecated: p.identity.deprecated,
+              ),
+            for (final m in v.media)
+              entry(
+                m.identity.label,
+                'Medium · ${m.kind.name} · ${m.connectionMedium.name}',
+                deprecated: m.identity.deprecated,
+              ),
+            for (final d in v.voltages)
+              entry(
+                d.identity.label,
+                'Voltage · ${d.domain.currentKind.name.toUpperCase()} · ${d.domain.minimumV}–${d.domain.maximumV} V',
+                deprecated: d.identity.deprecated,
+              ),
+          ],
+        ),
+      ],
+    );
+  }
 }

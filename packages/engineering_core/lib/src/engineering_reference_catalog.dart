@@ -1,3 +1,4 @@
+import 'engineering_reference_vocabulary.dart';
 import 'engineering_system.dart';
 import 'engineering_topology.dart';
 
@@ -169,9 +170,11 @@ class ComponentEngineeringProfile {
       required this.characteristics,
       required Iterable<CanonicalCapability> capabilities,
       required Iterable<EngineeringPort> portTemplates,
-      this.deprecated = false})
+      this.deprecated = false,
+      Map<String, String> portInterfaceCodes = const {}})
       : capabilities = List.unmodifiable(capabilities),
-        portTemplates = List.unmodifiable(portTemplates);
+        portTemplates = List.unmodifiable(portTemplates),
+        portInterfaceCodes = Map.unmodifiable(portInterfaceCodes);
   final String code, label;
   final CanonicalComponentClass engineeringClass;
   final DisciplineCharacteristics characteristics;
@@ -180,6 +183,7 @@ class ComponentEngineeringProfile {
   /// Template placeholder identities are replaced by persisted instance identities.
   final List<EngineeringPort> portTemplates;
   final bool deprecated;
+  final Map<String, String> portInterfaceCodes;
   ReferenceDiscipline get discipline => characteristics.discipline;
   List<String> validate() => [
         if (code.trim().isEmpty || label.trim().isEmpty)
@@ -194,6 +198,9 @@ class ComponentEngineeringProfile {
             portTemplates.length)
           'Duplicate port template code.',
         for (final p in portTemplates) ...p.validate(),
+        if (portInterfaceCodes.keys
+            .any((c) => !portTemplates.any((p) => p.code == c)))
+          "Interface binding references an unknown port template.",
         if (!switch (discipline) {
           ReferenceDiscipline.cctv => [
               CanonicalComponentClass.camera,
@@ -224,7 +231,8 @@ class ComponentEngineeringProfile {
       {required String componentId,
       required String catalogId,
       required String version,
-      required String Function() nextId}) {
+      required String Function() nextId,
+      EngineeringReferenceVocabulary? vocabulary}) {
     if (deprecated ||
         validate().isNotEmpty ||
         componentId.trim().isEmpty ||
@@ -232,7 +240,14 @@ class ComponentEngineeringProfile {
         version.trim().isEmpty)
       throw StateError(
           'Resolve an active valid profile and exact provenance before instantiation.');
-    final ports = portTemplates
+    if (portInterfaceCodes.isNotEmpty && vocabulary == null)
+      throw StateError("Resolve the catalog vocabulary before instantiation.");
+    final resolved = portTemplates.map((p) =>
+        portInterfaceCodes.containsKey(p.code)
+            ? vocabulary!.resolve(p, portInterfaceCodes[p.code]!,
+                catalogId: catalogId, version: version)
+            : p);
+    final ports = resolved
         .map((p) => EngineeringPort.fromMap({
               ...p.toMap(),
               'id': nextId(),
@@ -255,6 +270,8 @@ class ComponentEngineeringProfile {
         'characteristics': characteristics.toMap(),
         'capabilities': capabilities.map((c) => c.name).toList(),
         'portTemplates': portTemplates.map((p) => p.toMap()).toList(),
+        if (portInterfaceCodes.isNotEmpty)
+          'portInterfaceCodes': portInterfaceCodes,
         'deprecated': deprecated
       };
   factory ComponentEngineeringProfile.fromMap(Map<String, dynamic> m) =>
@@ -269,7 +286,10 @@ class ComponentEngineeringProfile {
               .map((c) => CanonicalCapability.values.byName(c as String)),
           portTemplates: (m['portTemplates'] as List)
               .map((p) => EngineeringPort.fromMap(p as Map<String, dynamic>)),
-          deprecated: m['deprecated'] as bool? ?? false);
+          deprecated: m['deprecated'] as bool? ?? false,
+          portInterfaceCodes: (m['portInterfaceCodes'] as Map<String, dynamic>?)
+                  ?.cast<String, String>() ??
+              {});
 }
 
 class EngineeringReferenceCatalog {
@@ -279,19 +299,49 @@ class EngineeringReferenceCatalog {
       required this.version,
       required this.source,
       required Iterable<ComponentEngineeringProfile> profiles,
-      this.jurisdiction})
-      : profiles = List.unmodifiable(profiles);
+      this.jurisdiction,
+      EngineeringReferenceVocabulary? vocabulary})
+      : profiles = List.unmodifiable(profiles),
+        vocabulary = vocabulary ?? EngineeringReferenceVocabulary();
   final String id, code, version, source;
   final String? jurisdiction;
   final List<ComponentEngineeringProfile> profiles;
+  final EngineeringReferenceVocabulary vocabulary;
   List<String> validate() => [
         if ([id, code, version, source].any((v) => v.trim().isEmpty))
           'Catalog identity, code, version and provenance are required.',
         if (profiles.isEmpty) 'Provide at least one engineering profile.',
         if (profiles.map((p) => p.code).toSet().length != profiles.length)
           'Profile codes must be unique.',
-        for (final p in profiles) ...p.validate()
+        ...vocabulary.validate(),
+        for (final p in profiles) ...p.validate(),
+        ..._referenceErrors()
       ];
+  List<String> _referenceErrors() {
+    final errors = <String>[];
+    if (vocabulary.validate().isNotEmpty) return errors;
+    for (final p in profiles) {
+      for (final template in p.portTemplates) {
+        final code = p.portInterfaceCodes[template.code];
+        if (code == null) continue;
+        try {
+          vocabulary.resolve(template, code,
+              catalogId: id, version: version, newInstantiation: false);
+        } catch (e) {
+          errors.add('Profile ${p.code} port ${template.code}: $e');
+        }
+      }
+    }
+    return errors;
+  }
+
+  List<ConnectionCompatibilityProfile> connectionProfiles(String projectId) =>
+      vocabulary.connectionProfiles(
+          projectId: projectId,
+          catalogId: id,
+          catalogCode: code,
+          version: version,
+          source: source);
   ComponentEngineeringProfile profile(String code) =>
       profiles.singleWhere((p) => p.code == code);
   Map<String, Object?> toMap() => {
@@ -300,6 +350,7 @@ class EngineeringReferenceCatalog {
         'version': version,
         'source': source,
         'jurisdiction': jurisdiction,
+        if (!vocabulary.isEmpty) 'vocabulary': vocabulary.toMap(),
         'profiles': profiles.map((p) => p.toMap()).toList()
       };
   factory EngineeringReferenceCatalog.fromMap(Map<String, dynamic> m) =>
@@ -309,6 +360,10 @@ class EngineeringReferenceCatalog {
           version: m['version'] as String,
           source: m['source'] as String,
           jurisdiction: m['jurisdiction'] as String?,
+          vocabulary: m['vocabulary'] == null
+              ? null
+              : EngineeringReferenceVocabulary.fromMap(
+                  m['vocabulary'] as Map<String, dynamic>),
           profiles: (m['profiles'] as List).map((p) =>
               ComponentEngineeringProfile.fromMap(p as Map<String, dynamic>)));
 }
