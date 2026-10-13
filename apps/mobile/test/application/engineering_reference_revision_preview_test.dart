@@ -10,8 +10,11 @@ import 'package:flutter_test/flutter_test.dart';
 
 EngineeringReferenceCatalog fixture() => EngineeringReferenceCatalog.fromMap(
   jsonDecode(
-    File('../../docs/examples/elv2-reference-catalog.json').readAsStringSync(),
-  ) as Map<String, dynamic>,
+        File(
+          '../../docs/examples/elv2-reference-catalog.json',
+        ).readAsStringSync(),
+      )
+      as Map<String, dynamic>,
 );
 
 void main() {
@@ -115,10 +118,11 @@ void main() {
       ...previous.toMap(),
       'id': '${previous.id}-v2',
       'version': '2',
-      'profiles': previous.profiles
-          .where((profile) => profile.code != 'CAMERA')
-          .map((profile) => profile.toMap())
-          .toList(),
+      'profiles':
+          previous.profiles
+              .where((profile) => profile.code != 'CAMERA')
+              .map((profile) => profile.toMap())
+              .toList(),
     });
     final systems = ProjectEngineeringSystemsSnapshot(
       project: null,
