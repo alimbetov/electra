@@ -6,150 +6,78 @@
   "vocabulary": {
     "connectors": [
       {
-        "identity": {
-          "code": "RJ45",
-          "label": "Fictional RJ45"
-        },
+        "identity": {"code": "RJ45", "label": "Fictional RJ45"},
         "connectorClass": "rj45",
-        "mediaCodes": [
-          "COPPER"
-        ],
+        "mediaCodes": ["COPPER"],
         "contactCount": 8
       },
       {
-        "identity": {
-          "code": "TERMINAL",
-          "label": "Fictional TERMINAL"
-        },
+        "identity": {"code": "TERMINAL", "label": "Fictional TERMINAL"},
         "connectorClass": "screwTerminal",
-        "mediaCodes": [
-          "CONTROL",
-          "DC"
-        ],
+        "mediaCodes": ["CONTROL", "DC"],
         "contactCount": 2
       }
     ],
     "protocols": [
       {
-        "identity": {
-          "code": "ETH",
-          "label": "Fictional ETH"
-        },
-        "portKinds": [
-          "data",
-          "dataPower"
-        ],
+        "identity": {"code": "ETH", "label": "Fictional ETH"},
+        "portKinds": ["data", "dataPower"],
         "dataRateMbps": 1000
       },
       {
-        "identity": {
-          "code": "ACCESS",
-          "label": "Fictional ACCESS"
-        },
-        "portKinds": [
-          "bus"
-        ],
+        "identity": {"code": "ACCESS", "label": "Fictional ACCESS"},
+        "portKinds": ["bus"],
         "dataRateMbps": null
       },
       {
-        "identity": {
-          "code": "POWER",
-          "label": "Fictional POWER"
-        },
-        "portKinds": [
-          "power"
-        ],
+        "identity": {"code": "POWER", "label": "Fictional POWER"},
+        "portKinds": ["power"],
         "dataRateMbps": null
       },
       {
-        "identity": {
-          "code": "LOOP",
-          "label": "Fictional LOOP"
-        },
-        "portKinds": [
-          "bus"
-        ],
+        "identity": {"code": "LOOP", "label": "Fictional LOOP"},
+        "portKinds": ["bus"],
         "dataRateMbps": null
       }
     ],
     "voltages": [
       {
-        "identity": {
-          "code": "POE-SOURCE",
-          "label": "Fictional POE-SOURCE"
-        },
-        "domain": {
-          "currentKind": "dc",
-          "minimumV": 48,
-          "maximumV": 50
-        }
+        "identity": {"code": "POE-SOURCE", "label": "Fictional POE-SOURCE"},
+        "domain": {"currentKind": "dc", "minimumV": 48, "maximumV": 50}
       },
       {
-        "identity": {
-          "code": "POE-SINK",
-          "label": "Fictional POE-SINK"
-        },
-        "domain": {
-          "currentKind": "dc",
-          "minimumV": 44,
-          "maximumV": 52
-        }
+        "identity": {"code": "POE-SINK", "label": "Fictional POE-SINK"},
+        "domain": {"currentKind": "dc", "minimumV": 44, "maximumV": 52}
       },
       {
-        "identity": {
-          "code": "DC-SOURCE",
-          "label": "Fictional DC-SOURCE"
-        },
-        "domain": {
-          "currentKind": "dc",
-          "minimumV": 12,
-          "maximumV": 12
-        }
+        "identity": {"code": "DC-SOURCE", "label": "Fictional DC-SOURCE"},
+        "domain": {"currentKind": "dc", "minimumV": 12, "maximumV": 12}
       },
       {
-        "identity": {
-          "code": "DC-SINK",
-          "label": "Fictional DC-SINK"
-        },
-        "domain": {
-          "currentKind": "dc",
-          "minimumV": 10,
-          "maximumV": 14
-        }
+        "identity": {"code": "DC-SINK", "label": "Fictional DC-SINK"},
+        "domain": {"currentKind": "dc", "minimumV": 10, "maximumV": 14}
       }
     ],
     "media": [
       {
-        "identity": {
-          "code": "COPPER",
-          "label": "Fictional COPPER"
-        },
+        "identity": {"code": "COPPER", "label": "Fictional COPPER"},
         "kind": "balancedCopper",
         "connectionMedium": "wired"
       },
       {
-        "identity": {
-          "code": "CONTROL",
-          "label": "Fictional CONTROL"
-        },
+        "identity": {"code": "CONTROL", "label": "Fictional CONTROL"},
         "kind": "multicoreControl",
         "connectionMedium": "wired"
       },
       {
-        "identity": {
-          "code": "DC",
-          "label": "Fictional DC"
-        },
+        "identity": {"code": "DC", "label": "Fictional DC"},
         "kind": "dcPower",
         "connectionMedium": "wired"
       }
     ],
     "interfaces": [
       {
-        "identity": {
-          "code": "POE-OUT",
-          "label": "Fictional POE-OUT"
-        },
+        "identity": {"code": "POE-OUT", "label": "Fictional POE-OUT"},
         "kind": "dataPower",
         "direction": "bidirectional",
         "capacity": 1,
@@ -161,10 +89,7 @@
         "powerLimitW": 20
       },
       {
-        "identity": {
-          "code": "POE-IN",
-          "label": "Fictional POE-IN"
-        },
+        "identity": {"code": "POE-IN", "label": "Fictional POE-IN"},
         "kind": "dataPower",
         "direction": "bidirectional",
         "capacity": 1,
@@ -176,10 +101,7 @@
         "powerDemandW": 8
       },
       {
-        "identity": {
-          "code": "LAN",
-          "label": "Fictional LAN"
-        },
+        "identity": {"code": "LAN", "label": "Fictional LAN"},
         "kind": "data",
         "direction": "bidirectional",
         "capacity": 1,
@@ -188,10 +110,7 @@
         "mediaCode": "COPPER"
       },
       {
-        "identity": {
-          "code": "ACCESS-BUS",
-          "label": "Fictional ACCESS-BUS"
-        },
+        "identity": {"code": "ACCESS-BUS", "label": "Fictional ACCESS-BUS"},
         "kind": "bus",
         "direction": "bidirectional",
         "capacity": 1,
@@ -200,10 +119,7 @@
         "mediaCode": "CONTROL"
       },
       {
-        "identity": {
-          "code": "DC-OUT",
-          "label": "Fictional DC-OUT"
-        },
+        "identity": {"code": "DC-OUT", "label": "Fictional DC-OUT"},
         "kind": "power",
         "direction": "output",
         "capacity": 1,
@@ -215,10 +131,7 @@
         "powerLimitW": 10
       },
       {
-        "identity": {
-          "code": "DC-IN",
-          "label": "Fictional DC-IN"
-        },
+        "identity": {"code": "DC-IN", "label": "Fictional DC-IN"},
         "kind": "power",
         "direction": "input",
         "capacity": 1,
@@ -230,10 +143,7 @@
         "powerDemandW": 6
       },
       {
-        "identity": {
-          "code": "LOOP-OUT",
-          "label": "Fictional LOOP-OUT"
-        },
+        "identity": {"code": "LOOP-OUT", "label": "Fictional LOOP-OUT"},
         "kind": "bus",
         "direction": "output",
         "capacity": 1,
@@ -242,10 +152,7 @@
         "mediaCode": "CONTROL"
       },
       {
-        "identity": {
-          "code": "LOOP-IN",
-          "label": "Fictional LOOP-IN"
-        },
+        "identity": {"code": "LOOP-IN", "label": "Fictional LOOP-IN"},
         "kind": "bus",
         "direction": "input",
         "capacity": 1,
@@ -256,13 +163,8 @@
     ],
     "compatibility": [
       {
-        "identity": {
-          "code": "CCTV-POE",
-          "label": "Fictional CCTV-POE"
-        },
-        "familyCodes": [
-          "CCTV"
-        ],
+        "identity": {"code": "CCTV-POE", "label": "Fictional CCTV-POE"},
+        "familyCodes": ["CCTV"],
         "fromInterfaceCode": "POE-OUT",
         "toInterfaceCode": "POE-IN",
         "medium": "wired",
@@ -270,13 +172,8 @@
         "flow": "bidirectional"
       },
       {
-        "identity": {
-          "code": "LAN-LINK",
-          "label": "Fictional LAN-LINK"
-        },
-        "familyCodes": [
-          "LAN"
-        ],
+        "identity": {"code": "LAN-LINK", "label": "Fictional LAN-LINK"},
+        "familyCodes": ["LAN"],
         "fromInterfaceCode": "LAN",
         "toInterfaceCode": "LAN",
         "medium": "wired",
@@ -284,13 +181,8 @@
         "flow": "bidirectional"
       },
       {
-        "identity": {
-          "code": "ACS-BUS",
-          "label": "Fictional ACS-BUS"
-        },
-        "familyCodes": [
-          "ACS"
-        ],
+        "identity": {"code": "ACS-BUS", "label": "Fictional ACS-BUS"},
+        "familyCodes": ["ACS"],
         "fromInterfaceCode": "ACCESS-BUS",
         "toInterfaceCode": "ACCESS-BUS",
         "medium": "wired",
@@ -298,13 +190,8 @@
         "flow": "bidirectional"
       },
       {
-        "identity": {
-          "code": "ACS-POWER",
-          "label": "Fictional ACS-POWER"
-        },
-        "familyCodes": [
-          "ACS"
-        ],
+        "identity": {"code": "ACS-POWER", "label": "Fictional ACS-POWER"},
+        "familyCodes": ["ACS"],
         "fromInterfaceCode": "DC-OUT",
         "toInterfaceCode": "DC-IN",
         "medium": "wired",
@@ -312,13 +199,8 @@
         "flow": "directed"
       },
       {
-        "identity": {
-          "code": "FIRE-LOOP",
-          "label": "Fictional FIRE-LOOP"
-        },
-        "familyCodes": [
-          "FIRE"
-        ],
+        "identity": {"code": "FIRE-LOOP", "label": "Fictional FIRE-LOOP"},
+        "familyCodes": ["FIRE"],
         "fromInterfaceCode": "LOOP-OUT",
         "toInterfaceCode": "LOOP-IN",
         "medium": "wired",
@@ -332,290 +214,174 @@
       "code": "POE_SWITCH",
       "label": "Fictional POE_SWITCH",
       "engineeringClass": "switchDevice",
-      "characteristics": {
-        "discipline": "cctv"
-      },
-      "capabilities": [
-        "ethernet",
-        "poeSource"
-      ],
+      "characteristics": {"discipline": "cctv"},
+      "capabilities": ["ethernet", "poeSource"],
       "portTemplates": [
-        {
-          "id": "template-ETH",
-          "componentId": "template",
-          "code": "ETH",
-          "kind": "dataPower",
-          "direction": "bidirectional",
-          "capacity": 1
-        }
+        {"id": "template-ETH", "componentId": "template", "code": "ETH", "kind": "dataPower", "direction": "bidirectional", "capacity": 1}
       ],
-      "portInterfaceCodes": {
-        "ETH": "POE-OUT"
+      "portInterfaceCodes": {"ETH": "POE-OUT"},
+      "constraintsState": "defined",
+      "constraints": {
+        "mounting": {"options": [{"surface": "rack", "method": "rackUnit"}], "enclosureRequired": false},
+        "environment": {"allowedExposure": ["indoor"], "allowedClimate": ["conditioned"], "minimumIpRating": "IP20"},
+        "topology": {"allowedShapes": ["star"], "allowedRoles": ["hub", "source"], "branchingAllowed": true, "closedLoopRequired": false, "nodeOrderMatters": false}
       }
     },
     {
       "code": "CAMERA",
       "label": "Fictional CAMERA",
       "engineeringClass": "camera",
-      "characteristics": {
-        "discipline": "cctv",
-        "codec": "h265",
-        "bitrateMbps": 4,
-        "powerDemandW": 8
-      },
-      "capabilities": [
-        "videoSource",
-        "poeConsumer"
-      ],
+      "characteristics": {"discipline": "cctv", "codec": "h265", "bitrateMbps": 4, "powerDemandW": 8},
+      "capabilities": ["videoSource", "poeConsumer"],
       "portTemplates": [
-        {
-          "id": "template-ETH",
-          "componentId": "template",
-          "code": "ETH",
-          "kind": "dataPower",
-          "direction": "bidirectional",
-          "capacity": 1
-        }
+        {"id": "template-ETH", "componentId": "template", "code": "ETH", "kind": "dataPower", "direction": "bidirectional", "capacity": 1}
       ],
-      "portInterfaceCodes": {
-        "ETH": "POE-IN"
+      "portInterfaceCodes": {"ETH": "POE-IN"},
+      "constraintsState": "defined",
+      "constraints": {
+        "mounting": {"options": [{"surface": "wall", "method": "bracket"}, {"surface": "ceiling", "method": "surface"}], "enclosureRequired": false},
+        "environment": {"allowedExposure": ["indoor", "protectedOutdoor"], "allowedClimate": ["conditioned", "unconditioned"], "minimumIpRating": "IP44"},
+        "topology": {"allowedShapes": ["star"], "allowedRoles": ["endpoint", "sink"], "branchingAllowed": false, "closedLoopRequired": false, "nodeOrderMatters": false}
       }
     },
     {
       "code": "OUTLET",
       "label": "Fictional OUTLET",
       "engineeringClass": "outlet",
-      "characteristics": {
-        "discipline": "lan",
-        "category": "cat6",
-        "speedMbps": 1000
-      },
-      "capabilities": [
-        "ethernet"
-      ],
+      "characteristics": {"discipline": "lan", "category": "cat6", "speedMbps": 1000},
+      "capabilities": ["ethernet"],
       "portTemplates": [
-        {
-          "id": "template-ETH",
-          "componentId": "template",
-          "code": "ETH",
-          "kind": "data",
-          "direction": "bidirectional",
-          "capacity": 1
-        }
+        {"id": "template-ETH", "componentId": "template", "code": "ETH", "kind": "data", "direction": "bidirectional", "capacity": 1}
       ],
-      "portInterfaceCodes": {
-        "ETH": "LAN"
+      "portInterfaceCodes": {"ETH": "LAN"},
+      "constraintsState": "defined",
+      "constraints": {
+        "mounting": {"options": [{"surface": "wall", "method": "flush"}, {"surface": "wall", "method": "surface"}], "enclosureRequired": false},
+        "environment": {"allowedExposure": ["indoor"], "allowedClimate": ["conditioned", "unconditioned"], "minimumIpRating": "IP20"},
+        "topology": {"allowedShapes": ["star"], "allowedRoles": ["endpoint"], "branchingAllowed": false, "closedLoopRequired": false, "nodeOrderMatters": false}
       }
     },
     {
       "code": "PATCH",
       "label": "Fictional PATCH",
       "engineeringClass": "patchPanel",
-      "characteristics": {
-        "discipline": "lan",
-        "category": "cat6"
-      },
-      "capabilities": [
-        "passivePatching"
-      ],
+      "characteristics": {"discipline": "lan", "category": "cat6"},
+      "capabilities": ["passivePatching"],
       "portTemplates": [
-        {
-          "id": "template-REAR",
-          "componentId": "template",
-          "code": "REAR",
-          "kind": "data",
-          "direction": "bidirectional",
-          "capacity": 1
-        },
-        {
-          "id": "template-FRONT",
-          "componentId": "template",
-          "code": "FRONT",
-          "kind": "data",
-          "direction": "bidirectional",
-          "capacity": 1
-        }
+        {"id": "template-REAR", "componentId": "template", "code": "REAR", "kind": "data", "direction": "bidirectional", "capacity": 1},
+        {"id": "template-FRONT", "componentId": "template", "code": "FRONT", "kind": "data", "direction": "bidirectional", "capacity": 1}
       ],
-      "portInterfaceCodes": {
-        "REAR": "LAN",
-        "FRONT": "LAN"
+      "portInterfaceCodes": {"REAR": "LAN", "FRONT": "LAN"},
+      "constraintsState": "defined",
+      "constraints": {
+        "mounting": {"options": [{"surface": "rack", "method": "rackUnit"}], "enclosureRequired": false},
+        "environment": {"allowedExposure": ["indoor"], "allowedClimate": ["conditioned"], "minimumIpRating": "IP20"},
+        "topology": {"allowedShapes": ["path", "star"], "allowedRoles": ["passive"], "branchingAllowed": false, "closedLoopRequired": false, "nodeOrderMatters": false}
       }
     },
     {
       "code": "LAN_SWITCH",
       "label": "Fictional LAN_SWITCH",
       "engineeringClass": "switchDevice",
-      "characteristics": {
-        "discipline": "lan",
-        "speedMbps": 1000
-      },
-      "capabilities": [
-        "ethernet"
-      ],
+      "characteristics": {"discipline": "lan", "speedMbps": 1000},
+      "capabilities": ["ethernet"],
       "portTemplates": [
-        {
-          "id": "template-ETH",
-          "componentId": "template",
-          "code": "ETH",
-          "kind": "data",
-          "direction": "bidirectional",
-          "capacity": 1
-        }
+        {"id": "template-ETH", "componentId": "template", "code": "ETH", "kind": "data", "direction": "bidirectional", "capacity": 1}
       ],
-      "portInterfaceCodes": {
-        "ETH": "LAN"
+      "portInterfaceCodes": {"ETH": "LAN"},
+      "constraintsState": "defined",
+      "constraints": {
+        "mounting": {"options": [{"surface": "rack", "method": "rackUnit"}], "enclosureRequired": false},
+        "environment": {"allowedExposure": ["indoor"], "allowedClimate": ["conditioned"], "minimumIpRating": "IP20"},
+        "topology": {"allowedShapes": ["star"], "allowedRoles": ["hub"], "branchingAllowed": true, "closedLoopRequired": false, "nodeOrderMatters": false}
       }
     },
     {
       "code": "CONTROLLER",
       "label": "Fictional CONTROLLER",
       "engineeringClass": "controller",
-      "characteristics": {
-        "discipline": "acs",
-        "controllerChannels": 1
-      },
+      "characteristics": {"discipline": "acs", "controllerChannels": 1},
       "capabilities": [],
       "portTemplates": [
-        {
-          "id": "template-BUS",
-          "componentId": "template",
-          "code": "BUS",
-          "kind": "bus",
-          "direction": "bidirectional",
-          "capacity": 1
-        },
-        {
-          "id": "template-PWR",
-          "componentId": "template",
-          "code": "PWR",
-          "kind": "power",
-          "direction": "output",
-          "capacity": 1
-        }
+        {"id": "template-BUS", "componentId": "template", "code": "BUS", "kind": "bus", "direction": "bidirectional", "capacity": 1},
+        {"id": "template-PWR", "componentId": "template", "code": "PWR", "kind": "power", "direction": "output", "capacity": 1}
       ],
-      "portInterfaceCodes": {
-        "BUS": "ACCESS-BUS",
-        "PWR": "DC-OUT"
+      "portInterfaceCodes": {"BUS": "ACCESS-BUS", "PWR": "DC-OUT"},
+      "constraintsState": "defined",
+      "constraints": {
+        "mounting": {"options": [{"surface": "enclosure", "method": "insideEnclosure"}, {"surface": "enclosure", "method": "dinRail"}], "enclosureRequired": true},
+        "environment": {"allowedExposure": ["indoor"], "allowedClimate": ["conditioned", "unconditioned"], "minimumIpRating": "IP20"},
+        "topology": {"allowedShapes": ["star", "tree"], "allowedRoles": ["controller", "hub", "source"], "branchingAllowed": true, "closedLoopRequired": false, "nodeOrderMatters": false}
       }
     },
     {
       "code": "READER",
       "label": "Fictional READER",
       "engineeringClass": "reader",
-      "characteristics": {
-        "discipline": "acs",
-        "operatingCurrentA": 0.1
-      },
-      "capabilities": [
-        "accessReader"
-      ],
+      "characteristics": {"discipline": "acs", "operatingCurrentA": 0.1},
+      "capabilities": ["accessReader"],
       "portTemplates": [
-        {
-          "id": "template-BUS",
-          "componentId": "template",
-          "code": "BUS",
-          "kind": "bus",
-          "direction": "bidirectional",
-          "capacity": 1
-        }
+        {"id": "template-BUS", "componentId": "template", "code": "BUS", "kind": "bus", "direction": "bidirectional", "capacity": 1}
       ],
-      "portInterfaceCodes": {
-        "BUS": "ACCESS-BUS"
+      "portInterfaceCodes": {"BUS": "ACCESS-BUS"},
+      "constraintsState": "defined",
+      "constraints": {
+        "mounting": {"options": [{"surface": "wall", "method": "surface"}], "enclosureRequired": false},
+        "environment": {"allowedExposure": ["indoor", "protectedOutdoor"], "allowedClimate": ["conditioned", "unconditioned"], "minimumIpRating": "IP44"},
+        "topology": {"allowedShapes": ["star"], "allowedRoles": ["endpoint"], "branchingAllowed": false, "closedLoopRequired": false, "nodeOrderMatters": false}
       }
     },
     {
       "code": "LOCK",
       "label": "Fictional LOCK",
       "engineeringClass": "lock",
-      "characteristics": {
-        "discipline": "acs",
-        "lockBehavior": "failSafe",
-        "operatingCurrentA": 0.5
-      },
-      "capabilities": [
-        "accessActuator"
-      ],
+      "characteristics": {"discipline": "acs", "lockBehavior": "failSafe", "operatingCurrentA": 0.5},
+      "capabilities": ["accessActuator"],
       "portTemplates": [
-        {
-          "id": "template-PWR",
-          "componentId": "template",
-          "code": "PWR",
-          "kind": "power",
-          "direction": "input",
-          "capacity": 1
-        }
+        {"id": "template-PWR", "componentId": "template", "code": "PWR", "kind": "power", "direction": "input", "capacity": 1}
       ],
-      "portInterfaceCodes": {
-        "PWR": "DC-IN"
+      "portInterfaceCodes": {"PWR": "DC-IN"},
+      "constraintsState": "defined",
+      "constraints": {
+        "mounting": {"options": [{"surface": "wall", "method": "surface"}, {"surface": "enclosure", "method": "insideEnclosure"}], "enclosureRequired": false},
+        "environment": {"allowedExposure": ["indoor"], "allowedClimate": ["conditioned", "unconditioned"], "minimumIpRating": "IP20"},
+        "topology": {"allowedShapes": ["star"], "allowedRoles": ["endpoint", "sink"], "branchingAllowed": false, "closedLoopRequired": false, "nodeOrderMatters": false}
       }
     },
     {
       "code": "FACP",
       "label": "Fictional FACP",
       "engineeringClass": "controller",
-      "characteristics": {
-        "discipline": "fire"
-      },
-      "capabilities": [
-        "addressable"
-      ],
+      "characteristics": {"discipline": "fire"},
+      "capabilities": ["addressable"],
       "portTemplates": [
-        {
-          "id": "template-OUT",
-          "componentId": "template",
-          "code": "OUT",
-          "kind": "bus",
-          "direction": "output",
-          "capacity": 1
-        },
-        {
-          "id": "template-RETURN",
-          "componentId": "template",
-          "code": "RETURN",
-          "kind": "bus",
-          "direction": "input",
-          "capacity": 1
-        }
+        {"id": "template-OUT", "componentId": "template", "code": "OUT", "kind": "bus", "direction": "output", "capacity": 1},
+        {"id": "template-RETURN", "componentId": "template", "code": "RETURN", "kind": "bus", "direction": "input", "capacity": 1}
       ],
-      "portInterfaceCodes": {
-        "OUT": "LOOP-OUT",
-        "RETURN": "LOOP-IN"
+      "portInterfaceCodes": {"OUT": "LOOP-OUT", "RETURN": "LOOP-IN"},
+      "constraintsState": "defined",
+      "constraints": {
+        "mounting": {"options": [{"surface": "wall", "method": "surface"}, {"surface": "enclosure", "method": "insideEnclosure"}], "enclosureRequired": false},
+        "environment": {"allowedExposure": ["indoor"], "allowedClimate": ["conditioned", "unconditioned"], "minimumIpRating": "IP20"},
+        "topology": {"allowedShapes": ["loop"], "allowedRoles": ["controller", "source", "sink"], "branchingAllowed": false, "closedLoopRequired": true, "nodeOrderMatters": true, "maximumDegree": 2}
       }
     },
     {
       "code": "DETECTOR",
       "label": "Fictional DETECTOR",
       "engineeringClass": "detector",
-      "characteristics": {
-        "discipline": "fire",
-        "addressConsumption": 1,
-        "standbyCurrentA": 0.001,
-        "alarmCurrentA": 0.005
-      },
-      "capabilities": [
-        "addressable"
-      ],
+      "characteristics": {"discipline": "fire", "addressConsumption": 1, "standbyCurrentA": 0.001, "alarmCurrentA": 0.005},
+      "capabilities": ["addressable"],
       "portTemplates": [
-        {
-          "id": "template-IN",
-          "componentId": "template",
-          "code": "IN",
-          "kind": "bus",
-          "direction": "input",
-          "capacity": 1
-        },
-        {
-          "id": "template-OUT",
-          "componentId": "template",
-          "code": "OUT",
-          "kind": "bus",
-          "direction": "output",
-          "capacity": 1
-        }
+        {"id": "template-IN", "componentId": "template", "code": "IN", "kind": "bus", "direction": "input", "capacity": 1},
+        {"id": "template-OUT", "componentId": "template", "code": "OUT", "kind": "bus", "direction": "output", "capacity": 1}
       ],
-      "portInterfaceCodes": {
-        "IN": "LOOP-IN",
-        "OUT": "LOOP-OUT"
+      "portInterfaceCodes": {"IN": "LOOP-IN", "OUT": "LOOP-OUT"},
+      "constraintsState": "defined",
+      "constraints": {
+        "mounting": {"options": [{"surface": "ceiling", "method": "surface"}], "enclosureRequired": false},
+        "environment": {"allowedExposure": ["indoor"], "allowedClimate": ["conditioned", "unconditioned"], "minimumIpRating": "IP20"},
+        "topology": {"allowedShapes": ["loop"], "allowedRoles": ["endpoint", "passive"], "branchingAllowed": false, "closedLoopRequired": true, "nodeOrderMatters": true, "maximumDegree": 2}
       }
     }
   ]
