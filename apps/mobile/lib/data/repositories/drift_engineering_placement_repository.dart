@@ -9,6 +9,7 @@ import '../../application/id_generator.dart';
 import '../../domain/system_component_catalog.dart';
 import '../database/app_database.dart';
 import '../database/geometry_codec.dart';
+import 'drift_engineering_placement_membership_writer.dart';
 
 final class DriftEngineeringPlacementRepository
     implements EngineeringPlacementRepository {
@@ -24,11 +25,17 @@ final class DriftEngineeringPlacementRepository
          idGenerator: idGenerator ?? UuidV7IdGenerator(),
          clock: clock,
          canonicalDefinition: canonicalDefinition,
+       ),
+       _membershipWriter = DriftEngineeringPlacementMembershipWriter(
+         database,
+         originDeviceId: originDeviceId,
+         clock: clock,
        );
 
   final AppDatabase database;
   final String originDeviceId;
   final DriftEngineeringPlacementComponentWriter _componentWriter;
+  final DriftEngineeringPlacementMembershipWriter _membershipWriter;
 
   @override
   Future<EngineeringPlacementOperationRecord?> findOperation(
@@ -94,15 +101,21 @@ final class DriftEngineeringPlacementRepository
       final component = await _componentWriter.insertCanonicalComponent(
         command,
       );
+      final membership = await _membershipWriter.insertCanonicalMembership(
+        command,
+        componentId: component.id,
+      );
 
       throw EngineeringPlacementFailure(
         code: EngineeringPlacementFailureCode.transactionFailed,
         message:
-            'Canonical component created inside the placement transaction, but aggregate writes remain incomplete until P4.4-P4.7.',
+            'Canonical component and system membership were created inside the placement transaction, but aggregate writes remain incomplete until P4.5-P4.7.',
         details: {
           'operationId': command.operationId,
           'componentId': component.id,
-          'phase': 'P4.3',
+          'systemId': membership.systemId,
+          'membershipRole': membership.role,
+          'phase': 'P4.4',
           'transactionOwner': 'DriftEngineeringPlacementRepository',
         },
       );

@@ -24,7 +24,8 @@ final class DriftEngineeringPlacementMembershipWriter {
     if (command.normalizedMembershipRole != canonicalElvMembershipRole) {
       throw EngineeringPlacementFailure(
         code: EngineeringPlacementFailureCode.invalidCommand,
-        message: 'Canonical engineering placement membership role must be DEVICE.',
+        message:
+            'Canonical engineering placement membership role must be DEVICE.',
         details: {
           'expectedRole': canonicalElvMembershipRole,
           'actualRole': command.membershipRole,
@@ -168,16 +169,12 @@ final class DriftEngineeringPlacementMembershipWriter {
     final family = EngineeringSystemFamily.fromMap(
       jsonDecode(row.payloadJson) as Map<String, dynamic>,
     );
-    final coherent =
-        family.id == row.id && family.version == row.familyVersion;
+    final coherent = family.id == row.id && family.version == row.familyVersion;
     if (!coherent || family.validate().isNotEmpty) {
       throw EngineeringPlacementFailure(
         code: EngineeringPlacementFailureCode.systemNotFound,
         message: 'Persisted engineering-system family edition is inconsistent.',
-        details: {
-          'familyId': row.id,
-          'familyVersion': row.familyVersion,
-        },
+        details: {'familyId': row.id, 'familyVersion': row.familyVersion},
       );
     }
     return family;
@@ -231,7 +228,8 @@ final class DriftEngineeringPlacementMembershipWriter {
     if (profile == null) {
       throw EngineeringPlacementFailure(
         code: EngineeringPlacementFailureCode.profileNotFound,
-        message: 'Exact engineering profile is unavailable in the pinned edition.',
+        message:
+            'Exact engineering profile is unavailable in the pinned edition.',
         details: {
           'catalogId': command.catalogId,
           'catalogVersion': command.catalogVersion,
@@ -262,18 +260,20 @@ final class DriftEngineeringPlacementMembershipWriter {
         await (database.select(database.rooms)..where(
           (row) => row.id.equals(component.roomId) & row.deletedAt.isNull(),
         )).getSingleOrNull();
-    final floor = room == null
-        ? null
-        : await (database.select(database.floors)..where(
-            (row) => row.id.equals(room.floorId) & row.deletedAt.isNull(),
-          )).getSingleOrNull();
+    final floor =
+        room == null
+            ? null
+            : await (database.select(database.floors)..where(
+              (row) => row.id.equals(room.floorId) & row.deletedAt.isNull(),
+            )).getSingleOrNull();
     if (room == null ||
         floor == null ||
         floor.projectId != command.projectId ||
         component.roomId != command.roomId) {
       throw EngineeringPlacementFailure(
         code: EngineeringPlacementFailureCode.membershipConflict,
-        message: 'Component and engineering system must belong to the same project.',
+        message:
+            'Component and engineering system must belong to the same project.',
         details: {
           'componentId': componentId,
           'expectedProjectId': command.projectId,

@@ -1,8 +1,10 @@
+import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:electra_mobile/application/engineering_placement_command.dart';
 import 'package:electra_mobile/application/engineering_placement_repository.dart';
 import 'package:electra_mobile/application/id_generator.dart';
 import 'package:electra_mobile/data/database/app_database.dart';
+import 'package:electra_mobile/data/repositories/drift_engineering_placement_membership_writer.dart';
 import 'package:electra_mobile/data/repositories/drift_engineering_placement_repository.dart';
 import 'package:electra_mobile/domain/system_component_catalog.dart';
 import 'package:engineering_core/engineering_core.dart';
@@ -21,6 +23,7 @@ void main() {
       clock: () => DateTime.utc(2026, 10, 13, 20, 30),
     );
     await _seedPlacementParents(database);
+    await _seedPlacementSystemAndCatalog(database);
   });
 
   tearDown(() => database.close());
@@ -124,7 +127,7 @@ void main() {
   });
 
   test(
-    'P4.3 place inserts component only inside transaction then rolls back',
+    'P4.4 place inserts component and membership inside one transaction then rolls back',
     () async {
       final command = _command(operationId: 'op-new');
 
@@ -137,7 +140,7 @@ void main() {
                 'code',
                 EngineeringPlacementFailureCode.transactionFailed,
               )
-              .having((failure) => failure.details['phase'], 'phase', 'P4.3')
+              .having((failure) => failure.details['phase'], 'phase', 'P4.4')
               .having(
                 (failure) => failure.details['componentId'],
                 'componentId',
@@ -153,6 +156,10 @@ void main() {
       final components =
           await database.select(database.componentInstances).get();
       expect(components.map((row) => row.id), ['component-1']);
+      expect(
+        await database.select(database.componentEngineeringMemberships).get(),
+        isEmpty,
+      );
     },
   );
 
@@ -360,6 +367,114 @@ void main() {
       );
     },
   );
+
+  test(
+    'P4.4 writer persists exact DEVICE membership identity and audit',
+    () async {
+      final writer = DriftEngineeringPlacementMembershipWriter(
+        database,
+        originDeviceId: 'membership-device',
+        clock: () => DateTime.utc(2026, 10, 13, 21, 10, 15),
+      );
+
+      final membership = await database.transaction(
+        () => writer.insertCanonicalMembership(
+          _command(),
+          componentId: 'component-1',
+        ),
+      );
+
+      expect(membership.systemId, 'system-1');
+      expect(membership.componentId, 'component-1');
+      expect(membership.role, canonicalElvMembershipRole);
+      final row =
+          await database
+              .select(database.componentEngineeringMemberships)
+              .getSingle();
+      expect(row.systemId, 'system-1');
+      expect(row.componentId, 'component-1');
+      expect(row.role, canonicalElvMembershipRole);
+      expect(row.revision, 1);
+      expect(
+        row.createdAt.isAtSameMomentAs(DateTime.utc(2026, 10, 13, 21, 10, 15)),
+        isTrue,
+      );
+      expect(row.updatedAt.isAtSameMomentAs(row.createdAt), isTrue);
+      expect(row.deletedAt, isNull);
+      expect(row.originDeviceId, 'membership-device');
+    },
+  );
+
+  test('P4.4 writer rejects profile and system discipline mismatch', () async {
+    await _seedEngineeringSystem(
+      database,
+      id: 'system-lan',
+      code: 'LAN-01',
+      familyCode: 'LAN',
+    );
+    final writer = DriftEngineeringPlacementMembershipWriter(
+      database,
+      originDeviceId: 'membership-device',
+    );
+
+    await expectLater(
+      database.transaction(
+        () => writer.insertCanonicalMembership(
+          _command(systemId: 'system-lan'),
+          componentId: 'component-1',
+        ),
+      ),
+      throwsA(
+        isA<EngineeringPlacementFailure>().having(
+          (failure) => failure.code,
+          'code',
+          EngineeringPlacementFailureCode.systemDisciplineMismatch,
+        ),
+      ),
+    );
+    expect(
+      await database.select(database.componentEngineeringMemberships).get(),
+      isEmpty,
+    );
+  });
+
+  test(
+    'P4.4 writer rejects existing membership identity without repair',
+    () async {
+      final writer = DriftEngineeringPlacementMembershipWriter(
+        database,
+        originDeviceId: 'membership-device',
+        clock: () => DateTime.utc(2026, 10, 13, 21, 20),
+      );
+      await database.transaction(
+        () => writer.insertCanonicalMembership(
+          _command(),
+          componentId: 'component-1',
+        ),
+      );
+
+      await expectLater(
+        database.transaction(
+          () => writer.insertCanonicalMembership(
+            _command(),
+            componentId: 'component-1',
+          ),
+        ),
+        throwsA(
+          isA<EngineeringPlacementFailure>().having(
+            (failure) => failure.code,
+            'code',
+            EngineeringPlacementFailureCode.membershipConflict,
+          ),
+        ),
+      );
+      final rows =
+          await database.select(database.componentEngineeringMemberships).get();
+      expect(rows, hasLength(1));
+      expect(rows.single.revision, 1);
+      expect(rows.single.role, canonicalElvMembershipRole);
+    },
+  );
 }
 
 Future<void> _seedPlacementParents(AppDatabase database) async {
@@ -447,6 +562,82 @@ Future<void> _seedPlacementParents(AppDatabase database) async {
       );
 }
 
+Future<void> _seedPlacementSystemAndCatalog(AppDatabase database) async {
+  await _seedEngineeringSystem(
+    database,
+    id: 'system-1',
+    code: 'CCTV-01',
+    familyCode: 'CCTV',
+  );
+  final now = DateTime.utc(2026, 10, 13, 19, 2);
+  final catalog = EngineeringReferenceCatalog(
+    id: 'catalog-1',
+    code: 'ELV-P4-TEST',
+    version: '1.0.0',
+    source: 'P4 deterministic fixture',
+    profiles: [
+      ComponentEngineeringProfile(
+        code: 'CAMERA',
+        label: 'Camera',
+        engineeringClass: CanonicalComponentClass.camera,
+        characteristics: const CctvCharacteristics(),
+        capabilities: const [],
+        portTemplates: const [],
+      ),
+    ],
+  );
+  await database
+      .into(database.engineeringReferenceCatalogs)
+      .insert(
+        EngineeringReferenceCatalogsCompanion.insert(
+          id: catalog.id,
+          projectId: 'project-1',
+          code: catalog.code,
+          catalogVersion: catalog.version,
+          payloadJson: canonicalEngineeringJson(catalog.toMap()),
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'p4-test-device',
+        ),
+      );
+}
+
+Future<void> _seedEngineeringSystem(
+  AppDatabase database, {
+  required String id,
+  required String code,
+  required String familyCode,
+}) async {
+  final family =
+      await (database.select(database.engineeringFamilyDefinitions)..where(
+        (row) => row.code.equals(familyCode) & row.deletedAt.isNull(),
+      )).getSingle();
+  final system = EngineeringSystem(
+    id: id,
+    projectId: 'project-1',
+    code: code,
+    name: code,
+    familyId: family.id,
+    familyVersion: family.familyVersion,
+  );
+  final now = DateTime.utc(2026, 10, 13, 19, 1);
+  await database
+      .into(database.projectEngineeringSystems)
+      .insert(
+        ProjectEngineeringSystemsCompanion.insert(
+          id: system.id,
+          projectId: system.projectId,
+          code: system.code,
+          familyId: system.familyId,
+          payloadJson: canonicalEngineeringJson(system.toMap()),
+          revision: const Value(1),
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'p4-test-device',
+        ),
+      );
+}
+
 Future<void> _seedOperation(
   AppDatabase database, {
   required PlaceEngineeringProfileCommand command,
@@ -475,13 +666,14 @@ Future<void> _seedOperation(
 PlaceEngineeringProfileCommand _command({
   String operationId = 'op-1',
   String projectId = 'project-1',
+  String systemId = 'system-1',
   Point2Mm localPosition = const Point2Mm(120, 80),
   String? displayNameOverride = 'Camera A',
 }) => PlaceEngineeringProfileCommand(
   operationId: operationId,
   projectId: projectId,
   roomId: 'room-1',
-  systemId: 'system-1',
+  systemId: systemId,
   membershipRole: canonicalElvMembershipRole,
   catalogId: 'catalog-1',
   catalogVersion: '1.0.0',
