@@ -20,10 +20,9 @@ void main() {
 
       final failures = command.validate();
       expect(failures, hasLength(3));
-      expect(
-        failures.map((failure) => failure.code).toSet(),
-        {EngineeringPlacementFailureCode.invalidCommand},
-      );
+      expect(failures.map((failure) => failure.code).toSet(), {
+        EngineeringPlacementFailureCode.invalidCommand,
+      });
     });
 
     test('rejects non-finite engineering evidence', () {
@@ -120,10 +119,7 @@ void main() {
 
     details['field'] = 'changed';
     expect(failure.details['field'], 'profileCode');
-    expect(
-      () => failure.details['other'] = 'value',
-      throwsUnsupportedError,
-    );
+    expect(() => failure.details['other'] = 'value', throwsUnsupportedError);
   });
 }
 
