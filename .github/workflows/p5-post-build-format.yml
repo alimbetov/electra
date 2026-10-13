@@ -1,0 +1,36 @@
+name: P5 Post-build Format
+
+on:
+  push:
+    branches:
+      - 'feat/flutter-elv2-profile-constraints'
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    if: ${{ github.actor != 'github-actions[bot]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Reproduce normal CI generation and formatting
+        working-directory: apps/mobile
+        run: |
+          flutter pub get --enforce-lockfile
+          dart run build_runner build
+          dart format lib/application/engineering_reference_revision_preview.dart test/application/engineering_reference_revision_preview_test.dart
+      - name: Commit stable formatter output and remove helper
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git rm .github/workflows/p5-post-build-format.yml
+          git add apps/mobile/lib/application/engineering_reference_revision_preview.dart apps/mobile/test/application/engineering_reference_revision_preview_test.dart
+          git commit -m "style(elv2): stabilize P5 post-build formatting"
+          git push origin HEAD:feat/flutter-elv2-profile-constraints
