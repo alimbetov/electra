@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   integrate:
-    if: github.actor != 'github-actions[bot]'
+    if: ${{ github.actor != 'github-actions[bot]' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -288,7 +288,6 @@ Future<void> _seedEngineeringSystem(
           text = text.replace(old, new, 1)
           old = """  systemId: 'system-1',\n"""
           new = """  systemId: systemId,\n"""
-          # Replace only in _command body after its signature.
           command_pos = text.find('PlaceEngineeringProfileCommand _command')
           before, after = text[:command_pos], text[command_pos:]
           if old not in after:
