@@ -102,7 +102,8 @@ class MountingConstraintProfile {
   Set<MountingMethod> get allowedMethods =>
       options.map((option) => option.method).toSet();
 
-  bool allows(InstallationSurface surface, MountingMethod method) => options.any(
+  bool allows(InstallationSurface surface, MountingMethod method) =>
+      options.any(
         (option) => option.surface == surface && option.method == method,
       );
 
@@ -130,8 +131,7 @@ class MountingConstraintProfile {
           (value) => MountingOption.fromMap(value as Map<String, dynamic>),
         ),
         enclosureRequired: map['enclosureRequired'] as bool? ?? false,
-        minimumClearanceMm:
-            (map['minimumClearanceMm'] as num?)?.toDouble(),
+        minimumClearanceMm: (map['minimumClearanceMm'] as num?)?.toDouble(),
       );
     }
 
@@ -182,8 +182,7 @@ class EnvironmentConstraintProfile {
           'Environment exposure classes must be unique.',
         if (allowedMoisture.toSet().length != allowedMoisture.length)
           'Environment moisture classes must be unique.',
-        if (allowedContamination.toSet().length !=
-            allowedContamination.length)
+        if (allowedContamination.toSet().length != allowedContamination.length)
           'Environment contamination classes must be unique.',
         if (allowedClimate.toSet().length != allowedClimate.length)
           'Environment climate classes must be unique.',
@@ -230,10 +229,8 @@ class EnvironmentConstraintProfile {
         minimumIpRating: map['minimumIpRating'] == null
             ? null
             : IpProtectionClass.parse(map['minimumIpRating'] as String),
-        minimumTemperatureC:
-            (map['minimumTemperatureC'] as num?)?.toDouble(),
-        maximumTemperatureC:
-            (map['maximumTemperatureC'] as num?)?.toDouble(),
+        minimumTemperatureC: (map['minimumTemperatureC'] as num?)?.toDouble(),
+        maximumTemperatureC: (map['maximumTemperatureC'] as num?)?.toDouble(),
       );
     }
 
@@ -260,10 +257,8 @@ class EnvironmentConstraintProfile {
       minimumIpRating: map['minimumIpRating'] == null
           ? null
           : IpProtectionClass.parse(map['minimumIpRating'] as String),
-      minimumTemperatureC:
-          (map['minimumTemperatureC'] as num?)?.toDouble(),
-      maximumTemperatureC:
-          (map['maximumTemperatureC'] as num?)?.toDouble(),
+      minimumTemperatureC: (map['minimumTemperatureC'] as num?)?.toDouble(),
+      maximumTemperatureC: (map['maximumTemperatureC'] as num?)?.toDouble(),
     );
   }
 }
@@ -312,10 +307,9 @@ class TopologyConstraintProfile {
       TopologyConstraintProfile(
         allowedShapes: (map['allowedShapes'] as List)
             .map((value) => TopologyShape.values.byName(value as String)),
-        allowedRoles: (map['allowedRoles'] as List)
-            .map(
-              (value) => TopologyParticipation.values.byName(value as String),
-            ),
+        allowedRoles: (map['allowedRoles'] as List).map(
+          (value) => TopologyParticipation.values.byName(value as String),
+        ),
         branchingAllowed: map['branchingAllowed'] as bool? ?? true,
         closedLoopRequired: map['closedLoopRequired'] as bool? ?? false,
         nodeOrderMatters: map['nodeOrderMatters'] as bool? ?? false,
