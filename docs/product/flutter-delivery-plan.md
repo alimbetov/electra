@@ -333,6 +333,30 @@ A persisted consumption group can create a persisted circuit proposal without ma
 
 ## WP-FL9 — Routing
 
+**Status: BASELINE CLOSED on `feat/flutter-routing-cablerun`. Full Flutter/core exact-SHA gate passed on `534ac9e162e56ad19004cbaa37dc6adea4405701`. Branch starts at the verified FL8 `d1c0f90d3fc90fea5f4275221d7c94b7b2232b0c`.**
+
+### Implemented behavior
+
+- typed `CableRoute`, ordered nodes/segments, physical channels and circuit-bound `CableRun`;
+- canonical local anchors and rounded world points are persisted in integer millimetres;
+- transition nodes bind one physical point to two local frames and an explicit adjacency;
+- shared finite edges must coincide in world space and be real patch boundaries;
+- segments cannot leave their host polygon, cross/touch openings or teleport between surfaces;
+- non-branching chain validation reports duplicate IDs, zero lengths, missing references and stale world coordinates;
+- geometric length is the sum of segment lengths projected from exact local anchors; world quantization is not used to shorten sloped segments;
+- physical length adds only explicit reserve percentage and integer-mm termination allowance, both initially zero;
+- schema v7: `physical_channels`, `cable_routes`, `cable_route_nodes`, `cable_route_segments`, `cable_runs` and query indexes;
+- route/graph/CableRun replacement is one transaction, preserves creation times, advances revisions and tombstones removed nodes/segments;
+- IDs cannot be borrowed from another route; circuit/channel references must be active in the same room and channel kind must match the laying method;
+- coherent routing snapshots watch geometry, topology, channels, circuits and routing revisions; invalidated routes expose review instead of a misleading cached length;
+- Route tool opens the room routing workspace; points, fold crossing, draft undo, per-segment methods/channels, allowance edits and saved-run editing are supported;
+- tests cover perpendicular and sloped surfaces, beam folds, invalid topology/openings, graph replacement, watches, close/reopen, v6-to-v7 migration and compact editor interaction.
+
+### Remaining boundary
+
+Each CableRun follows a non-branching route. Routing junctions/branch relationships are FL10. Automatic route finding, collision policy for structural features, equipment-port endpoint binding and cable/conduit capacity/sizing are later capabilities. Openings are excluded including their boundaries; clearance and penetration rules are not inferred. Global world coordinates round the primary local projection to integer mm; exact local anchors remain canonical for length and transition coincidence.
+
+
 ### Scope
 
 - routes;
@@ -348,6 +372,28 @@ A route across multiple surface patches reconstructs exactly after restart and p
 
 ## WP-FL10 — Routing junctions
 
+**Status: BASELINE CLOSED on `feat/flutter-routing-cablerun`. Full Flutter/core exact-SHA gate passed on `b828f3cd6d1cd8547486be526885535bfb659eb8` (42 mobile tests, 72 engineering-core tests).**
+
+### Implemented behavior
+
+- first-class surface-anchored junctions with stable code, type, installation notes and directed CableRun connections;
+- junction placement derives the exact local/world position from the selected incoming route endpoint;
+- incoming connections bind the last route node; outgoing connections bind the first node; geometric crossings create no connection;
+- one incoming/two outgoing runs form a persisted branch; direction, endpoint node, circuit and physical channel are explicit;
+- electrical boxes require one circuit; tray/conduit branches permit multiple circuits while checking the corresponding laying method;
+- validation rejects dangling/missing/invalid runs, duplicate run connections, cross-room links, mismatched endpoints, stale placement/circuit/channel metadata and already-owned run endpoints;
+- schema v8 adds `routing_junctions` and `junction_connections` with typed foreign keys; junction and complete connection replacement commit atomically;
+- creation timestamps survive edits, junction revisions advance, and failed writes preserve the previous topology;
+- room routing snapshots include junctions and expose live review state when route geometry, endpoints, circuits or channels change;
+- compact drawing symbols open a junction detail editor with a topology-derived branch schematic, incoming/outgoing assignment, circuit/route identifiers and navigation to the real route;
+- unavailable run connections can be removed from the editor; failed saves retain the draft;
+- tests cover exact close/reopen reconstruction of a 1→2 branch, atomic validation failure, connection replacement, live route-change review, v7-to-v8 migration and compact detail/navigation behavior.
+
+### Remaining boundary
+
+Connections currently meet on the same host surface. A cross-surface transition is represented inside a CableRoute before it terminates at the junction. Equipment-port binding, independent free placement before runs exist, physical box dimensions/entries, conductor sections, channel capacity, spare capacity and installation-status workflows are deferred. The branch schematic derives from connections; it is not separately persisted. Endpoint changes require explicit review and re-assignment rather than silently moving or re-wiring the saved junction.
+
+
 ### Scope
 
 - junction placement;
@@ -361,6 +407,33 @@ A route across multiple surface patches reconstructs exactly after restart and p
 A one-in/two-out branch is represented as a first-class junction rather than a drawing-only line crossing.
 
 ## WP-FL11 — Floor Routing View
+
+**Status: BASELINE CLOSED on `feat/flutter-routing-cablerun`. Full Flutter/core exact-SHA gate passed on `c151c3641ff46de4c17106ad8d983397c3e28cb7` (46 mobile tests, 78 engineering-core tests).**
+
+### Implemented behavior
+
+- coherent floor routing snapshots resolve the active project, floor, rooms, CableRun, routes, channels and junctions from canonical SQLite records;
+- source panels have stable floor-owned identity, code/name and explicit outgoing feed assignments to route-start endpoints;
+- physical room handoffs declare directed transport continuity from one run end to another run start; they require active runs on the same floor, different rooms and matching tray/conduit laying methods;
+- handoffs describe physical transport, not an electrical splice or an additional measured segment; different room circuits remain separate;
+- endpoint signatures bind source feeds and handoffs to run/route/node identity, local/world coordinates, circuit, laying method and physical channel;
+- changed endpoints, missing circuits/channels, invalid routes and unavailable rooms expose review diagnostics instead of silently reconnecting the graph;
+- the derived graph combines valid in-room junction branches and declared room handoffs; geometric crossings do not add edges;
+- upstream/downstream traversal returns all reachable runs and valid source panels; cycles terminate deterministically and cyclic edges are excluded with diagnostics;
+- duplicate handoffs, foreign-floor sources, reused panel ownership and cyclic handoff proposals are rejected;
+- schema v9 adds `floor_routing_panels`, `floor_panel_feeds`, `floor_routing_handoffs`, typed foreign keys and floor query indexes;
+- panel/feed replacement is atomic; creation timestamps survive edits, revisions advance and panel/handoff removal uses tombstones;
+- live snapshots refresh after local database changes, including route changes and project/room deletion;
+- the floor workspace opens a pan/zoom logical topology canvas with overview, tray, conduit and selected-branch modes, channel filters and downstream panel selection;
+- room groups reveal runs/junctions on demand; selected runs open directly in the room route editor, while junctions open their real detail editor;
+- project/floor/room context remains in navigation and returning preserves floor selection;
+- compact editor forms retain drafts on failed saves and support repair of unavailable source feeds;
+- tests cover source-to-room-endpoint tracing, branching, stale signatures, cycles, filters, source ownership, exact SQLite restart, atomic rejection, live invalidation after initial subscription, project deletion, v8-to-v9 migration and 390-px navigation.
+
+### Remaining boundary
+
+The canvas is a logical topology view: rooms do not yet have a shared floor placement transform or a measured floor outline. Handoffs do not add cable length or prove electrical continuity between different circuits. Source panel records declare routing ownership and do not replace the later PanelAssembly sizing/placement workflow. Physical inter-room segments, riser geometry, device-port endpoints, control/instrumentation discipline filtering, installation sequence/status overlays and floor drawing/BOM exports remain later capabilities. Display modes are limited to data supported by the current persisted model.
+
 
 ### Scope
 
@@ -377,6 +450,33 @@ An engineer can trace a selected branch from floor panel to room endpoint withou
 
 ## WP-FL12 — Dependency recalculation
 
+**Status: BASELINE CLOSED on `feat/flutter-routing-cablerun`. Full Flutter/core exact-SHA gate passed on `4d220a8fb305c01b07a51af0046da00cc21c72df` (49 mobile tests, 84 engineering-core tests).**
+
+### Implemented behavior
+
+- a typed-key dependency DAG connects consumer inputs, patch geometry, physical channels, circuits, route lengths, CableRun basis, protection inputs and floor source-panel basis;
+- fingerprints use exact canonical sorted JSON of the flattened semantic dependency closure and calculation versions; SQL audit revisions and display names do not invalidate numerical proposals;
+- circuit current evaluators run only for affected nodes; route geometry is independent from consumer current inputs, while cable basis combines circuit current, route length and explicit allowances;
+- protection-input records depend on their circuit and its cables; panel basis depends on reachable cables and their protection inputs;
+- before a checkpoint, coherent read snapshots derive stale/review state from current canonical inputs without overwriting the saved proposal;
+- recalculation reloads canonical inputs and writes only affected records in a single SQLite transaction, in dependency order;
+- independent records retain their result JSON, revision and update timestamp;
+- missing dependencies and evaluator failures block dependent totals, preserve independent results and permit explicit retry;
+- cycles, duplicate node keys and duplicate dependency references are rejected;
+- records retain the previous proposal, latest source-field before/after explanation, direct dependency fingerprints and calculation version;
+- schema v10 adds project-owned `project_derived_results` with audit columns, proposal state, semantic inputs and independent manual-decision fields;
+- removed active graph nodes are archived using tombstones; same-ID restoration preserves the old manual decision and requires a new review;
+- manual decisions require a value and reason, remain separate from automatic numeric proposals and are bound to reviewed input fingerprints;
+- changed inputs invalidate a manual review and propagate review state through dependants; recalculation never silently replaces the manual value or confirms an FL8 circuit;
+- project and room Calculation entry points open a live review workspace with affected/review filters, optional source inputs, `What changed?`, previous output, dependencies and explicit manual-review controls;
+- failed recalculation/manual writes retain visible previous proposals and form drafts;
+- tests prove the 2300-to-4600-W load change affects only its consumer/circuit/cable/protection/panel subgraph, with independent records unchanged; they also cover no-op revision edits, missing consumers, errors/retry, cycle rejection, manual-review propagation, restart, live invalidation after initial subscription, compact UI and v9-to-v10 migration.
+
+### Remaining boundary
+
+This stage checkpoints proposals; it does not automatically confirm an engineering decision. Protection records expose design-current input and remain `reviewRequired` until FL13 rules are implemented, with no invented breaker rating. Panel results expose per-circuit currents and remain proposals; panel rating, phase balance and equipment selection are later capabilities. Manual decisions are recorded engineering notes/values and do not replace the canonical numeric calculator inputs. The latest checkpoint preserves one previous output and its explanation, rather than a full historical event ledger. Exact closure fingerprints prioritize reproducibility over compact hashing, and project snapshot loading is still project-wide even though persisted updates and node evaluation are limited to the affected subgraph.
+
+
 ### Scope
 
 - derived-state dependency graph;
@@ -391,6 +491,36 @@ Changing one consumer invalidates only dependent circuit/cable/protection/panel 
 
 ## WP-FL13 — Protection requirements
 
+**Status: BASELINE CLOSED on `feat/flutter-routing-cablerun`. Full Flutter/core exact-SHA gate passed on `fed47059616a3926e1d1db7b2f2b4c3740b13d27` (52 mobile tests, 90 engineering-core tests).**
+
+### Implemented behavior
+
+- a first-class, versioned normative catalog stores document code/title, edition, jurisdiction, publisher, source, clause/section reference, document kind, notes and supported protection criteria;
+- initial catalog records include IEC 60364-4-43:2023 and IEC 60364-4-41:2005+AMD1:2017 publisher references, plus a distinct Schneider Electrical Installation Guide source revision with curated basic breaker criteria;
+- IEC records are reference metadata, not a claimed executable national ruleset; guidance and project-policy records are explicitly distinguished from standards;
+- engineers can add document editions through the catalog UI; existing document editions and project ruleset versions are immutable, with duplicate edition/version guards;
+- project rating options select a catalog document and inherit its source/jurisdiction; allowed nominal currents, trip characteristics, residual types and optional breaking-capacity floor are explicit versioned policy data;
+- circuit inputs declare conductor allowable current Iz, prospective fault current, poles, trip characteristic, residual applicability/parameters and supporting evidence;
+- the AC MCB/RCBO planner selects the smallest configured nominal satisfying Ib ≤ In ≤ declared Iz and requires breaking capacity at least the declared fault current/policy floor;
+- explicit residual protection produces an RCBO functional requirement only when residual current and type are present and permitted by the selected policy;
+- incomplete inputs, unsupported supply, reference-only documents and uncurated criteria cannot produce a ready device requirement; inconsistent quantities/options produce invalid proposals with no partial device;
+- proposals remain vendor-neutral and expose input values, reasons, warnings, calculation version, ruleset version, catalog edition, section and source;
+- schema v11 adds `normative_documents`, `protection_rulesets` and `circuit_protection_settings`, typed foreign keys and unique edition/version keys; bundled references are seeded idempotently;
+- FL12 graphs include only assigned normative/ruleset sources, so browsing or adding an unused catalog entry does not invalidate unrelated calculations;
+- protection-setting save and affected recalculation are atomic; missing/invalid protection inputs propagate review/error to the dependent panel basis;
+- functional confirmation is bound to the current exact dependency fingerprint; changed load/cable/input/ruleset context requires recalculation and explicit re-confirmation;
+- project workspace and circuit workspace open the protection UI with Normatives, Rulesets and Circuits tabs; failed form writes preserve drafts;
+- tests cover interval boundaries, MCB/RCBO requirements, nonfinite/incomplete/unsupported inputs, reference-only editions, provenance round-trips, immutable versions, exact restart, live confirmation invalidation, cross-project assignment rejection, stale-snapshot rejection, 390-px UI and v10-to-v11 migration.
+
+### Normative source basis
+
+Catalog publisher metadata is verified against [IEC 60364-4-43:2023](https://webstore.iec.ch/en/publication/28432) and [IEC 60364-4-41:2005+AMD1:2017](https://webstore.iec.ch/en/publication/60169). The implemented basic breaker comparisons are separately sourced to Schneider Electric's [Practical values for a protective scheme](https://www.electrical-installation.org/enw/index.php?title=Practical_values_for_a_protective_scheme&oldid=29756), section *Applications / Protection by circuit-breaker*. A guidance source is not represented as the licensed text or national adoption of an IEC document.
+
+### Remaining boundary
+
+The initial catalog does not contain a complete national regulatory dataset or licensed standard text. Reference metadata alone remains non-executable. Disconnection time, conductor sizing/corrections, I2/energy coordination, neutral switching, earthing, selectivity, motor/start coordination and automatic residual-policy applicability are not validated by these basic comparisons. Iz and prospective fault current are declared project inputs. The baseline supports single-phase/balanced three-phase AC MCB/RCBO functional proposals; DC, fuse/MCCB/SPD/motor-protection planning and manufacturer SKU resolution are later capabilities. Confirmation acknowledges a functional proposal rather than installation compliance. New verified criteria or national editions require explicit catalog curation and a new immutable version.
+
+
 ### Scope
 
 - functional protection requirements;
@@ -404,6 +534,33 @@ Protection proposals remain vendor-neutral and show inputs, reasoning, ruleset v
 
 ## WP-FL14 — Manufacturer catalogs
 
+**Status: BASELINE CLOSED on `feat/flutter-routing-cablerun`. Full Flutter/core exact-SHA gate passed on `1ac7bcf107bc4297de06d794134c98eae6816220` (55 mobile tests, 96 engineering-core tests).**
+
+### Implemented behavior
+
+- immutable manufacturer catalog versions store manufacturer, version, declared region, source and product variants with series/SKU, technical attributes, lifecycle, module/mm dimensions, mounting and AC/DC declaration;
+- catalogs support multi-variant manual entry and structured JSON import; all variants are validated before an atomic catalog/product write;
+- missing required voltage, breaking capacity or other declared constraints no longer pass the legacy matcher;
+- matching requires exact role/current/poles/curve/residual values where specified, adequate voltage and breaking capacity, explicit AC/DC compatibility and active lifecycle;
+- module-width and mounting constraints are enforced when required; nonfinite/malformed quantities are rejected;
+- project policy provides manufacturer allowlist, ranked preferences, preferred series and optional declared catalog region;
+- preferences rank technically compatible candidates only; they never relax or change the normative requirement;
+- schema v12 adds `manufacturer_catalogs`, `manufacturer_products`, `manufacturer_policies`, `circuit_product_selections`, typed foreign keys and per-catalog SKU uniqueness;
+- existing catalog versions cannot be silently edited, product IDs cannot be borrowed across versions and duplicate manufacturer/version/region imports are rejected;
+- selection is bound to the exact current protection fingerprint and current policy; stale requirements and incompatible products are rejected transactionally;
+- selection snapshots preserve manufacturer/series/SKU, catalog version/region/source and complete design-time technical attributes;
+- the same functional protection requirement can select another compatible manufacturer while the protection result/fingerprint/revision remains unchanged;
+- new catalog versions add candidates without replacing an existing selected SKU; catalog archival, requirement changes or policy changes expose explicit review state;
+- clearing selection archives its stored row and retains the technical snapshot;
+- FL12 adds separate commercial selection/catalog-product/policy nodes downstream from protection; engineering nodes never depend on the selected brand;
+- project/protection entry points open Catalogs, Policy and Selection tabs; rejected candidates explain missing or incompatible attributes, and failed writes preserve displayed choices/import drafts;
+- tests cover strict missing-data rejection, role/current/voltage/breaking/RCD/AC-DC/lifecycle matching, policy restrictions/ranking, codec round-trips, brand migration without normative recalculation, exact restart, immutable imports, catalog refresh/archive, live load invalidation, stale selection rejection, selection tombstones, compact UI and v11-to-v12 migration.
+
+### Remaining boundary
+
+No unverified vendor SKUs/specifications are bundled. Catalogs must be entered from documented datasheets or imported into the supported structured schema. Automatic vendor API/PDF/CSV ingestion, verified regional stock, prices, distributor integrations and live lifecycle synchronization are later capabilities. Matching checks the declared scalar technical attributes; manufacturer-specific coordination, breaking-capacity test-basis distinctions and cross-series assembly constraints need additional verified catalog data/rules. A compatible candidate is not a complete installation-compliance decision. BOM and physical panel placement consume these snapshots in FL16/FL17.
+
+
 ### Scope
 
 - product variants;
@@ -416,6 +573,28 @@ Protection proposals remain vendor-neutral and show inputs, reasoning, ruleset v
 The same functional protection requirement can be mapped to different compatible manufacturer products without changing engineering logic.
 
 ## WP-FL15 — Panel generation
+
+**Status: baseline closed.** Engineering implementation gate: `af08e7bba4094bd96b5650fafc175cc7e2deddaf` (58 mobile tests, 102 core tests; Drift generation, formatting and analyzers green).
+
+Implemented:
+
+- immutable input contracts and deterministic `PanelGenerationEngine`, with an audited SQLite floor-panel policy and exact-fingerprint confirmation;
+- all active floor consumption groups/load membership feed an FL12 `panelProposal:<id>` node; adding/removing groups, equipment or membership updates its fingerprint and proposal without overwriting existing FL8 circuit assignments;
+- compatible loads share a proposed outgoing circuit; dedicated equipment splits into its own circuit, with stable identities and source group/load/current-formula evidence;
+- FL8 current calculation and FL13 catalog-backed rulesets produce vendor-neutral outgoing and incoming MCB/RCBO requirements; explicit conductor Iz, fault current, residual applicability, poles/curve and evidence are required;
+- balanced three-phase currents contribute to all phases, fixed load phases are respected, remaining single-phase circuits are assigned deterministically by descending current to the least loaded phase; the incoming basis is the maximum phase current, with no second application of demand factor;
+- user-declared module widths by function/poles produce occupied, spare and recommended total module capacity; missing widths remain visible rather than inferred;
+- project entry point, policy editor, incoming/outgoing structure, phase-current summary, source explanations and stale/needs-input/proposed/confirmed/re-review states; failed saves retain input drafts;
+- restart and v12→v13 migration coverage; subscribed invalidation, populated second-group generation, removal, orphaned membership, stale confirmation rejection and proposal archival/restoration tests.
+
+Baseline boundaries:
+
+- one generated panel per floor; every active floor load must have an active consumption group. Room/floor routing source roots remain separate from generated electrical proposals;
+- outgoing circuits share explicitly declared protection conditions. Per-circuit overrides, grouping across rooms, circuit limit splitting, multiple panels and downstream/main board hierarchies need separate extensions;
+- generation stores a reviewable proposal; confirmation binds that exact result and does not automatically replace existing circuits, routes or selected manufacturer SKUs;
+- RCBO functions are supported through FL13; shared RCD groups, SPD, isolation/special motor functions, conductor sizing, selectivity and complete national regulatory verification are deferred;
+- phase allocation is a deterministic heuristic using conservative current sums, not an optimal power-flow/unbalance study. Unknown supply frequency is flagged for verification;
+- reserve percent is defined against occupied modules, with an independent minimum spare-module target. Capacity is preliminary; actual SKU dimensions, terminals, ducts, mounting clearances, DIN rows and recommended enclosure width/height/depth belong to FL16.
 
 ### Scope
 

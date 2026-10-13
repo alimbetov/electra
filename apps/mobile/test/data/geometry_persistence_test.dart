@@ -197,6 +197,25 @@ void main() {
     var database = openDatabase();
     final roomId = await createRoom(database);
 
+    await database.customStatement('DROP TABLE panel_generation_configs');
+    await database.customStatement('DROP TABLE circuit_product_selections');
+    await database.customStatement('DROP TABLE manufacturer_policies');
+    await database.customStatement('DROP TABLE manufacturer_products');
+    await database.customStatement('DROP TABLE manufacturer_catalogs');
+    await database.customStatement('DROP TABLE circuit_protection_settings');
+    await database.customStatement('DROP TABLE protection_rulesets');
+    await database.customStatement('DROP TABLE normative_documents');
+    await database.customStatement('DROP TABLE project_derived_results');
+    await database.customStatement('DROP TABLE floor_panel_feeds');
+    await database.customStatement('DROP TABLE floor_routing_handoffs');
+    await database.customStatement('DROP TABLE floor_routing_panels');
+    await database.customStatement('DROP TABLE junction_connections');
+    await database.customStatement('DROP TABLE routing_junctions');
+    await database.customStatement('DROP TABLE cable_runs');
+    await database.customStatement('DROP TABLE cable_route_segments');
+    await database.customStatement('DROP TABLE cable_route_nodes');
+    await database.customStatement('DROP TABLE cable_routes');
+    await database.customStatement('DROP TABLE physical_channels');
     await database.customStatement('DROP TABLE circuit_load_assignments');
     await database.customStatement('DROP TABLE electrical_circuits');
     await database.customStatement('DROP TABLE equipment_electrical_loads');
@@ -222,7 +241,7 @@ void main() {
     final names = tables.map((row) => row.read<String>('name')).toSet();
 
     expect(restoredRoom?.name, 'Workshop');
-    expect(database.schemaVersion, 6);
+    expect(database.schemaVersion, 13);
     expect(
       names,
       containsAll([

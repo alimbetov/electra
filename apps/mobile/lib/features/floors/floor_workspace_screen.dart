@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/adaptive_layout.dart';
 import '../../app/providers.dart';
+import 'floor_routing_screen.dart';
 
 class FloorWorkspaceScreen extends ConsumerWidget {
   const FloorWorkspaceScreen({
@@ -32,6 +33,22 @@ class FloorWorkspaceScreen extends ConsumerWidget {
           error: (_, __) => const Text('Floor'),
         ),
       ),
+      persistentFooterButtons: [
+        OutlinedButton.icon(
+          icon: const Icon(Icons.route),
+          label: const Text('Floor routing'),
+          onPressed:
+              () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder:
+                      (_) => FloorRoutingScreen(
+                        projectId: projectId,
+                        floorId: floorId,
+                      ),
+                ),
+              ),
+        ),
+      ],
       body: ElectraAdaptiveBuilder(
         builder: (context, layout) {
           final width = layout.isExpanded ? 1100.0 : 760.0;

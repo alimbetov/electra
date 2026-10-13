@@ -15,3 +15,17 @@ export 'src/spatial_geometry.dart';
 export 'src/surface_navigation.dart';
 export 'src/electrical_load.dart';
 export 'src/electrical_circuit.dart';
+export 'src/cable_routing.dart';
+export 'src/surface_route_draft.dart';
+
+export 'src/floor_routing_graph.dart';
+
+export 'src/dependency_recalculation.dart';
+
+export 'src/protection_requirements.dart';
+
+export 'src/normative_catalog.dart';
+
+export 'src/manufacturer_catalog_codec.dart';
+
+export 'src/panel_generation_engine.dart';

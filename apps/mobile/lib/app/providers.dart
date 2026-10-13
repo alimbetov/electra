@@ -1,3 +1,15 @@
+import '../application/panel_generation_repository.dart';
+import '../data/repositories/drift_panel_generation_repository.dart';
+import '../application/manufacturer_repository.dart';
+import '../data/repositories/drift_manufacturer_repository.dart';
+import '../application/protection_repository.dart';
+import '../data/repositories/drift_protection_repository.dart';
+import '../application/dependency_recalculation_repository.dart';
+import '../data/repositories/drift_dependency_recalculation_repository.dart';
+import '../application/floor_routing_repository.dart';
+import '../data/repositories/drift_floor_routing_repository.dart';
+import '../application/cable_routing_repository.dart';
+import '../data/repositories/drift_cable_routing_repository.dart';
 import '../application/electrical_circuit_repository.dart';
 import '../data/repositories/drift_electrical_circuit_repository.dart';
 import '../application/electrical_load_repository.dart';
@@ -174,4 +186,72 @@ final roomElectricalCircuitsProvider =
       (ref, roomId) => ref
           .watch(electricalCircuitRepositoryProvider)
           .watchRoomCircuits(roomId),
+    );
+
+final cableRoutingRepositoryProvider = Provider<CableRoutingRepository>(
+  (ref) => DriftCableRoutingRepository(
+    ref.watch(databaseProvider),
+    originDeviceId: 'local-device',
+  ),
+);
+final roomRoutingProvider = StreamProvider.family<RoomRoutingSnapshot, String>(
+  (ref, roomId) =>
+      ref.watch(cableRoutingRepositoryProvider).watchRoomRouting(roomId),
+);
+
+final floorRoutingRepositoryProvider = Provider<FloorRoutingRepository>(
+  (ref) => DriftFloorRoutingRepository(
+    ref.watch(databaseProvider),
+    originDeviceId: 'local-device',
+  ),
+);
+final floorRoutingProvider = StreamProvider.family<
+  FloorRoutingSnapshot,
+  String
+>((ref, floorId) => ref.watch(floorRoutingRepositoryProvider).watch(floorId));
+
+final dependencyRecalculationRepositoryProvider =
+    Provider<DependencyRecalculationRepository>(
+      (ref) => DriftDependencyRecalculationRepository(
+        ref.watch(databaseProvider),
+        originDeviceId: 'local-device',
+      ),
+    );
+final projectRecalculationProvider =
+    StreamProvider.family<ProjectRecalculationSnapshot, String>(
+      (ref, projectId) =>
+          ref.watch(dependencyRecalculationRepositoryProvider).watch(projectId),
+    );
+
+final protectionRepositoryProvider = Provider<ProtectionRepository>(
+  (ref) => DriftProtectionRepository(
+    ref.watch(databaseProvider),
+    originDeviceId: 'local-device',
+  ),
+);
+final projectProtectionProvider = StreamProvider.family<
+  ProjectProtectionSnapshot,
+  String
+>((ref, projectId) => ref.watch(protectionRepositoryProvider).watch(projectId));
+
+final manufacturerRepositoryProvider = Provider<ManufacturerRepository>(
+  (ref) => DriftManufacturerRepository(
+    ref.watch(databaseProvider),
+    originDeviceId: 'local-device',
+  ),
+);
+final projectManufacturerProvider =
+    StreamProvider.family<ProjectManufacturerSnapshot, String>(
+      (ref, id) => ref.watch(manufacturerRepositoryProvider).watch(id),
+    );
+
+final panelGenerationRepositoryProvider = Provider<PanelGenerationRepository>(
+  (ref) => DriftPanelGenerationRepository(
+    ref.watch(databaseProvider),
+    originDeviceId: 'local-device',
+  ),
+);
+final projectPanelGenerationProvider =
+    StreamProvider.family<ProjectPanelGenerationSnapshot, String>(
+      (ref, id) => ref.watch(panelGenerationRepositoryProvider).watch(id),
     );

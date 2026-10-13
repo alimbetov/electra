@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/providers.dart';
+import '../calculations/protection_screen.dart';
 import '../../domain/system_component_catalog.dart';
 
 String _supplyName(SupplySystem supply) => switch (supply) {
@@ -201,7 +202,30 @@ class ElectricalCircuitsScreen extends ConsumerWidget {
       );
     }
     return Scaffold(
-      appBar: AppBar(title: Text('$roomName · Circuits')),
+      appBar: AppBar(
+        title: Text('$roomName · Circuits'),
+        actions: [
+          IconButton(
+            tooltip: 'Protection / Normatives',
+            icon: const Icon(Icons.shield_outlined),
+            onPressed: () async {
+              final room = await ref
+                  .read(roomRepositoryProvider)
+                  .findRoom(roomId);
+              if (room == null) return;
+              final floor = await ref
+                  .read(floorRepositoryProvider)
+                  .findFloor(room.floorId);
+              if (floor == null || !context.mounted) return;
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => ProtectionScreen(projectId: floor.projectId),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
       body: body,
     );
   }

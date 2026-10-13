@@ -14,6 +14,7 @@ import 'component_catalog_sheet.dart';
 import 'editor_interaction.dart';
 import 'electrical_loads_screen.dart';
 import 'electrical_circuits_screen.dart';
+import 'room_routing_screen.dart';
 
 typedef ComponentPlacementCallback =
     Future<void> Function(
@@ -104,6 +105,18 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
   }
 
   void changeTool(EditorTool value) {
+    if (value == EditorTool.route) {
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder:
+              (_) => RoomRoutingScreen(
+                roomId: widget.room.id,
+                roomName: widget.room.name,
+              ),
+        ),
+      );
+      return;
+    }
     setState(() {
       tool = value;
       if (value != EditorTool.architecturalFeature) {
@@ -331,7 +344,17 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
           PopupMenuButton<String>(
             tooltip: 'Project tools',
             onSelected: (value) {
-              if (value == 'circuits') {
+              if (value == 'routes') {
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder:
+                        (_) => RoomRoutingScreen(
+                          roomId: widget.room.id,
+                          roomName: widget.room.name,
+                        ),
+                  ),
+                );
+              } else if (value == 'circuits') {
                 Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder:
@@ -355,7 +378,10 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
                 Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder:
-                        (_) => CalculationsScreen(roomName: widget.room.name),
+                        (_) => CalculationsScreen(
+                          roomName: widget.room.name,
+                          projectId: widget.project.id,
+                        ),
                   ),
                 );
               } else if (value == 'reports') {
@@ -368,6 +394,7 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
             },
             itemBuilder:
                 (_) => const [
+                  PopupMenuItem(value: 'routes', child: Text('Cable routing')),
                   PopupMenuItem(value: 'circuits', child: Text('Circuits')),
                   PopupMenuItem(
                     value: 'loads',

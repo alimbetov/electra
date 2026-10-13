@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:engineering_core/engineering_core.dart'
+    show bundledNormativeDocuments;
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 
@@ -238,6 +241,265 @@ class CircuitLoadAssignments extends Table {
   Set<Column<Object>> get primaryKey => {componentInstanceId};
 }
 
+@DataClassName('PhysicalChannelRow')
+class PhysicalChannels extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get roomId => text().references(Rooms, #id)();
+  TextColumn get name => text()();
+  TextColumn get kind => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('CableRouteRow')
+class CableRoutes extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get roomId => text().references(Rooms, #id)();
+  TextColumn get name => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('CableRouteNodeRow')
+class CableRouteNodes extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get routeId => text().references(CableRoutes, #id)();
+  IntColumn get sequence => integer()();
+  TextColumn get kind => text()();
+  @ReferenceName('primaryRouteNodes')
+  TextColumn get patchId => text().references(SurfacePatches, #id)();
+  IntColumn get localXmm => integer()();
+  IntColumn get localYmm => integer()();
+  IntColumn get worldXmm => integer()();
+  IntColumn get worldYmm => integer()();
+  IntColumn get worldZmm => integer()();
+  @ReferenceName('secondaryRouteNodes')
+  TextColumn get otherPatchId =>
+      text().nullable().references(SurfacePatches, #id)();
+  IntColumn get otherLocalXmm => integer().nullable()();
+  IntColumn get otherLocalYmm => integer().nullable()();
+  TextColumn get adjacencyId =>
+      text().nullable().references(SurfaceAdjacencies, #id)();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('CableRouteSegmentRow')
+class CableRouteSegments extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get routeId => text().references(CableRoutes, #id)();
+  IntColumn get sequence => integer()();
+  @ReferenceName('outgoingRouteSegments')
+  TextColumn get fromNodeId => text().references(CableRouteNodes, #id)();
+  @ReferenceName('incomingRouteSegments')
+  TextColumn get toNodeId => text().references(CableRouteNodes, #id)();
+  TextColumn get surfacePatchId => text().references(SurfacePatches, #id)();
+  TextColumn get layingMethod => text()();
+  TextColumn get physicalChannelId =>
+      text().nullable().references(PhysicalChannels, #id)();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('CableRunRow')
+class CableRuns extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get roomId => text().references(Rooms, #id)();
+  TextColumn get name => text()();
+  TextColumn get circuitId => text().references(ElectricalCircuits, #id)();
+  TextColumn get routeId => text().references(CableRoutes, #id)();
+  RealColumn get reservePercent => real().withDefault(const Constant(0))();
+  IntColumn get terminationAllowanceMm =>
+      integer().withDefault(const Constant(0))();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('RoutingJunctionRow')
+class RoutingJunctions extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get roomId => text().references(Rooms, #id)();
+  TextColumn get patchId => text().references(SurfacePatches, #id)();
+  TextColumn get code => text()();
+  TextColumn get kind => text()();
+  IntColumn get localXmm => integer()();
+  IntColumn get localYmm => integer()();
+  IntColumn get worldXmm => integer()();
+  IntColumn get worldYmm => integer()();
+  IntColumn get worldZmm => integer()();
+  TextColumn get notes => text().nullable()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('JunctionConnectionRow')
+class JunctionConnections extends Table {
+  TextColumn get junctionId => text().references(RoutingJunctions, #id)();
+  TextColumn get runId => text().references(CableRuns, #id)();
+  TextColumn get nodeId => text().references(CableRouteNodes, #id)();
+  TextColumn get direction => text()();
+  TextColumn get circuitId => text().references(ElectricalCircuits, #id)();
+  TextColumn get channelId =>
+      text().nullable().references(PhysicalChannels, #id)();
+  @override
+  Set<Column<Object>> get primaryKey => {junctionId, runId};
+}
+
+@DataClassName('FloorRoutingPanelRow')
+class FloorRoutingPanels extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get floorId => text().references(Floors, #id)();
+  TextColumn get code => text()();
+  TextColumn get name => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('FloorPanelFeedRow')
+class FloorPanelFeeds extends Table {
+  TextColumn get panelId => text().references(FloorRoutingPanels, #id)();
+  TextColumn get runId => text().references(CableRuns, #id)();
+  TextColumn get endpointSignature => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {panelId, runId};
+}
+
+@DataClassName('FloorRoutingHandoffRow')
+class FloorRoutingHandoffs extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get floorId => text().references(Floors, #id)();
+  TextColumn get name => text()();
+  @ReferenceName('outgoingFloorHandoffs')
+  TextColumn get fromRunId => text().references(CableRuns, #id)();
+  @ReferenceName('incomingFloorHandoffs')
+  TextColumn get toRunId => text().references(CableRuns, #id)();
+  TextColumn get fromSignature => text()();
+  TextColumn get toSignature => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('ProjectDerivedResultRow')
+class ProjectDerivedResults extends Table with GeometryAuditColumns {
+  TextColumn get projectId => text().references(Projects, #id)();
+  TextColumn get nodeKey => text()();
+  TextColumn get fingerprint => text()();
+  TextColumn get inputsJson => text()();
+  TextColumn get dependenciesJson => text()();
+  TextColumn get resultJson => text()();
+  TextColumn get state => text()();
+  TextColumn get previousResultJson => text().nullable()();
+  TextColumn get changesJson => text().withDefault(const Constant('[]'))();
+  TextColumn get manualValue => text().nullable()();
+  TextColumn get manualReason => text().nullable()();
+  TextColumn get manualReviewedFingerprint => text().nullable()();
+  @override
+  Set<Column<Object>> get primaryKey => {projectId, nodeKey};
+}
+
+@DataClassName('NormativeDocumentRow')
+class NormativeDocuments extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get standardCode => text()();
+  TextColumn get version => text()();
+  TextColumn get jurisdiction => text()();
+  TextColumn get payloadJson => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {standardCode, version, jurisdiction},
+  ];
+}
+
+@DataClassName('ProtectionRulesetRow')
+class ProtectionRulesets extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get projectId => text().references(Projects, #id)();
+  TextColumn get normativeDocumentId =>
+      text().references(NormativeDocuments, #id)();
+  TextColumn get ruleId => text()();
+  TextColumn get version => text()();
+  TextColumn get payloadJson => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {projectId, ruleId, version},
+  ];
+}
+
+@DataClassName('CircuitProtectionSettingRow')
+class CircuitProtectionSettings extends Table with GeometryAuditColumns {
+  TextColumn get circuitId => text().references(ElectricalCircuits, #id)();
+  TextColumn get rulesetId =>
+      text().nullable().references(ProtectionRulesets, #id)();
+  TextColumn get inputsJson => text()();
+  TextColumn get reviewedFingerprint => text().nullable()();
+  @override
+  Set<Column<Object>> get primaryKey => {circuitId};
+}
+
+@DataClassName('ManufacturerCatalogRow')
+class ManufacturerCatalogs extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get manufacturer => text()();
+  TextColumn get catalogVersion => text()();
+  TextColumn get region => text().nullable()();
+  TextColumn get sourceReference => text()();
+  TextColumn get payloadJson => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('ManufacturerProductRow')
+class ManufacturerProducts extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get catalogId => text().references(ManufacturerCatalogs, #id)();
+  TextColumn get sku => text()();
+  TextColumn get payloadJson => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {catalogId, sku},
+  ];
+}
+
+@DataClassName('ManufacturerPolicyRow')
+class ManufacturerPolicies extends Table with GeometryAuditColumns {
+  TextColumn get projectId => text().references(Projects, #id)();
+  TextColumn get payloadJson => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {projectId};
+}
+
+@DataClassName('CircuitProductSelectionRow')
+class CircuitProductSelections extends Table with GeometryAuditColumns {
+  TextColumn get circuitId => text().references(ElectricalCircuits, #id)();
+  TextColumn get productId => text().references(ManufacturerProducts, #id)();
+  TextColumn get requirementFingerprint => text()();
+  TextColumn get policyJson => text()();
+  TextColumn get snapshotJson => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {circuitId};
+}
+
+@DataClassName('PanelGenerationConfigRow')
+class PanelGenerationConfigs extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get projectId => text().references(Projects, #id)();
+  TextColumn get floorId => text().references(Floors, #id)();
+  TextColumn get payloadJson => text()();
+  TextColumn get reviewedFingerprint => text().nullable()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {floorId},
+  ];
+}
+
 @DriftDatabase(
   tables: [
     Projects,
@@ -254,6 +516,25 @@ class CircuitLoadAssignments extends Table {
     EquipmentElectricalLoads,
     ElectricalCircuits,
     CircuitLoadAssignments,
+    PhysicalChannels,
+    CableRoutes,
+    CableRouteNodes,
+    CableRouteSegments,
+    CableRuns,
+    RoutingJunctions,
+    JunctionConnections,
+    FloorRoutingPanels,
+    FloorPanelFeeds,
+    FloorRoutingHandoffs,
+    ProjectDerivedResults,
+    NormativeDocuments,
+    ProtectionRulesets,
+    CircuitProtectionSettings,
+    ManufacturerCatalogs,
+    ManufacturerProducts,
+    ManufacturerPolicies,
+    CircuitProductSelections,
+    PanelGenerationConfigs,
   ],
 )
 final class AppDatabase extends _$AppDatabase {
@@ -261,7 +542,7 @@ final class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'electra'));
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 13;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -300,15 +581,86 @@ final class AppDatabase extends _$AppDatabase {
           await migrator.createTable(electricalCircuits);
           await migrator.createTable(circuitLoadAssignments);
         }
+        if (from < 7) {
+          await migrator.createTable(physicalChannels);
+          await migrator.createTable(cableRoutes);
+          await migrator.createTable(cableRouteNodes);
+          await migrator.createTable(cableRouteSegments);
+          await migrator.createTable(cableRuns);
+        }
+        if (from < 8) {
+          await migrator.createTable(routingJunctions);
+          await migrator.createTable(junctionConnections);
+        }
+        if (from < 9) {
+          await migrator.createTable(floorRoutingPanels);
+          await migrator.createTable(floorPanelFeeds);
+          await migrator.createTable(floorRoutingHandoffs);
+        }
+        if (from < 10) {
+          await migrator.createTable(projectDerivedResults);
+        }
+        if (from < 11) {
+          await migrator.createTable(normativeDocuments);
+          await migrator.createTable(protectionRulesets);
+          await migrator.createTable(circuitProtectionSettings);
+        }
+        if (from < 13) {
+          await migrator.createTable(panelGenerationConfigs);
+        }
+        if (from < 12) {
+          await migrator.createTable(manufacturerCatalogs);
+          await migrator.createTable(manufacturerProducts);
+          await migrator.createTable(manufacturerPolicies);
+          await migrator.createTable(circuitProductSelections);
+        }
       }
       await _createIndexes();
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');
+      final now = DateTime.now().toUtc();
+      for (final doc in bundledNormativeDocuments) {
+        await into(normativeDocuments).insert(
+          NormativeDocumentsCompanion.insert(
+            id: doc.id,
+            standardCode: doc.standardCode,
+            version: doc.version,
+            jurisdiction: doc.jurisdiction,
+            payloadJson: jsonEncode(doc.toMap()),
+            createdAt: now,
+            updatedAt: now,
+            originDeviceId: 'bundled-fl13-catalog',
+          ),
+          mode: InsertMode.insertOrIgnore,
+        );
+      }
     },
   );
 
   Future<void> _createIndexes() async {
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_floor_routing_panel ON floor_routing_panels(floor_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_floor_routing_handoff ON floor_routing_handoffs(floor_id)',
+    );
+
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_cable_route_room ON cable_routes(room_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_route_node_order ON cable_route_nodes(route_id, sequence)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_route_segment_order ON cable_route_segments(route_id, sequence)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_cable_run_circuit ON cable_runs(circuit_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_channel_room ON physical_channels(room_id)',
+    );
     await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_electrical_circuit_room ON electrical_circuits(room_id)',
     );
