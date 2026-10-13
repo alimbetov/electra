@@ -1,0 +1,38 @@
+name: P4.3 Audit Instant Fix
+
+on:
+  push:
+    branches:
+      - 'feat/flutter-elv2-profile-constraints'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Replace DateTime representation assertion with same-instant assertion
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('apps/mobile/test/data/engineering_placement_repository_test.dart')
+          text = path.read_text()
+          old = """      expect(row.createdAt, DateTime.utc(2026, 10, 13, 20, 45, 30));\n      expect(row.updatedAt, row.createdAt);\n"""
+          new = """      expect(\n        row.createdAt.isAtSameMomentAs(\n          DateTime.utc(2026, 10, 13, 20, 45, 30),\n        ),\n        isTrue,\n      );\n      expect(row.updatedAt.isAtSameMomentAs(row.createdAt), isTrue);\n"""
+          if old not in text:
+              raise SystemExit('Expected P4.3 audit assertion not found')
+          path.write_text(text.replace(old, new, 1))
+          PY
+          dart format apps/mobile/test/data/engineering_placement_repository_test.dart
+      - name: Commit test correction
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add apps/mobile/test/data/engineering_placement_repository_test.dart
+          git commit -m "test(elv2): compare P4.3 audit timestamps by instant"
+          git push origin HEAD:feat/flutter-elv2-profile-constraints
