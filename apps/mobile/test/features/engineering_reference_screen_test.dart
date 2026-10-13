@@ -70,7 +70,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Fictional POE-IN'), findsOneWidget);
       expect(find.textContaining('44.0–52.0 V'), findsOneWidget);
-      expect(find.textContaining('CCTV'), findsOneWidget);
+      expect(find.textContaining('CCTV · dataPower'), findsOneWidget);
       await tester.ensureVisible(find.text('Reference definitions'));
       await tester.tap(find.text('Reference definitions'));
       await tester.pumpAndSettle();
