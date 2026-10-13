@@ -1,8 +1,8 @@
 # Electra — ELV Delivery Plan
 
-Status: Specification adopted; ELV1 implementation gate in progress  
+Status: ELV1 baseline merged; ELV2 first slice in progress
 Specification branch: `docs/elv-engineering-systems-spec` (revision `091e6d8`)  
-Implementation branch: `feat/flutter-engineering-systems-foundation`  
+Implementation branch: `feat/flutter-elv2-reference-catalogs`
 Scope: implementation roadmap after ELV1 connectivity foundation
 
 ## 1. Purpose
@@ -1256,7 +1256,7 @@ Four executable acceptance fixtures cover CCTV independent data/power tracing, L
 
 Retirement and hierarchy/device deletion guards prevent dangling topology. Detaching system membership with referenced ports is blocked. Restore keeps identity and creation time; profile editions cannot be modified in place. ELV1 edits preserve existing FL12 electrical fingerprints. Legacy circuits, CableRuns and generated panels retain their existing identity and persistence; ELV1 does not implicitly convert them to port connections. Physical cable/run adaptation belongs to ELV3 and enclosure integration to ELV6/FL16.
 
-Verification includes restart, v14→v15 migration, project isolation, notifications, edition pinning, compact workspace and failed-write draft retention. Exact-head Flutter CI must pass before marking ELV1 closed. Local core validation: 110 tests and analysis passed.
+Verification includes restart, v14→v15 migration, project isolation, notifications, edition pinning, compact workspace and failed-write draft retention. ELV1 exact-head Flutter CI passed at `1ab81088ec7476d2b1cc262736cf05c8292be590`, run `38355779555`; merged to main through PR #5. Local core validation: 110 tests and analysis passed.
 
 The current ELV2–ELV8 numbering follows the expanded specification above, replacing the earlier abbreviated implementation plan. FL16–FL20 continue alongside this track; enclosure, dependency and BOM infrastructure must be shared.
 
@@ -1271,3 +1271,5 @@ Implementation branch: `feat/flutter-elv2-reference-catalogs`, following merged 
 - Additive schema 16, preservation of electrical/ELV1 data and legacy migration fixtures; four-discipline restart, edition immutability, project isolation and partial-write rollback tests.
 
 This slice starts ELV2; it does not claim completion of every reference category in sections 5–11. Dedicated connector/protocol/media/voltage/environment/lens/coverage/PoE class catalogs, profile-derived compatibility/topology roles, reference upgrade impact preview and the editor creation palette remain subsequent ELV2 work. No normative engineering defaults or executable discipline calculations are introduced.
+
+ELV2 first-slice implementation gate `ecd96a5b3a0e5bf703d733c238fa066696e55a5f`: run `38357683735` passed Drift generation, both analyzers and formatting, **66 mobile + 113 core tests**. Follow-up exact-head checks also cover explicit edition adoption with retained port IDs. PR #6 remains draft because the full ELV2 catalog scope is still open.
