@@ -1259,3 +1259,15 @@ Retirement and hierarchy/device deletion guards prevent dangling topology. Detac
 Verification includes restart, v14→v15 migration, project isolation, notifications, edition pinning, compact workspace and failed-write draft retention. Exact-head Flutter CI must pass before marking ELV1 closed. Local core validation: 110 tests and analysis passed.
 
 The current ELV2–ELV8 numbering follows the expanded specification above, replacing the earlier abbreviated implementation plan. FL16–FL20 continue alongside this track; enclosure, dependency and BOM infrastructure must be shared.
+
+### ELV2 first implementation slice
+
+Implementation branch: `feat/flutter-elv2-reference-catalogs`, following merged ELV0/ELV1 PR #5.
+
+- Product-neutral component classes/capabilities and typed CCTV stream/power, LAN copper/speed/PoE, ACS electrical/lock/controller, and fire address/standby/alarm characteristics.
+- Immutable project catalog snapshots and exact component-profile bindings. Every generated port records catalog/profile/template edition provenance. Catalog updates never replace project bindings.
+- Atomic template instantiation into the existing ELV1 port table. Existing manually authored ports require explicit resolution; profile-owned characteristics cannot be silently edited. Retirement/release/rebinding is explicit and preserves old catalog editions.
+- Catalog JSON import, discipline filtering, profile selection for existing placed equipment, provenance display and binding release. `docs/examples/elv2-reference-catalog.json` is a fictional five-profile acceptance example, not a vendor catalog or national rule pack.
+- Additive schema 16, preservation of electrical/ELV1 data and legacy migration fixtures; four-discipline restart, edition immutability, project isolation and partial-write rollback tests.
+
+This slice starts ELV2; it does not claim completion of every reference category in sections 5–11. Dedicated connector/protocol/media/voltage/environment/lens/coverage/PoE class catalogs, profile-derived compatibility/topology roles, reference upgrade impact preview and the editor creation palette remain subsequent ELV2 work. No normative engineering defaults or executable discipline calculations are introduced.

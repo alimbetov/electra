@@ -1,3 +1,5 @@
+import '../application/engineering_reference_repository.dart';
+import '../data/repositories/drift_engineering_reference_repository.dart';
 import '../application/engineering_topology_repository.dart';
 import '../data/repositories/drift_engineering_topology_repository.dart';
 import '../application/engineering_system_repository.dart';
@@ -282,4 +284,17 @@ final engineeringTopologyRepositoryProvider =
 final projectEngineeringTopologyProvider =
     StreamProvider.family<ProjectEngineeringTopologySnapshot, String>(
       (ref, id) => ref.watch(engineeringTopologyRepositoryProvider).watch(id),
+    );
+
+final engineeringReferenceRepositoryProvider =
+    Provider<EngineeringReferenceRepository>(
+      (ref) => DriftEngineeringReferenceRepository(
+        ref.watch(databaseProvider),
+        originDeviceId: 'local-device',
+        idGenerator: ref.watch(idGeneratorProvider),
+      ),
+    );
+final projectEngineeringReferencesProvider =
+    StreamProvider.family<ProjectEngineeringReferences, String>(
+      (ref, id) => ref.watch(engineeringReferenceRepositoryProvider).watch(id),
     );

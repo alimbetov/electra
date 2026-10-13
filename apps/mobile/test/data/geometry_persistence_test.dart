@@ -244,6 +244,8 @@ void main() {
     await database.customStatement('DROP TABLE surface_edges');
     await database.customStatement('DROP TABLE surface_patches');
     await database.customStatement('DROP TABLE component_catalog_preferences');
+    await database.customStatement('DROP TABLE component_reference_bindings');
+    await database.customStatement('DROP TABLE engineering_reference_catalogs');
     await database.customStatement('PRAGMA user_version = 1');
     await database.close();
 
@@ -258,7 +260,7 @@ void main() {
     final names = tables.map((row) => row.read<String>('name')).toSet();
 
     expect(restoredRoom?.name, 'Workshop');
-    expect(database.schemaVersion, 15);
+    expect(database.schemaVersion, 16);
     expect(
       names,
       containsAll([

@@ -442,6 +442,10 @@ void main() {
       await database.customStatement('DROP TABLE protection_rulesets');
       await database.customStatement('DROP TABLE normative_documents');
       await database.customStatement('DROP TABLE project_derived_results');
+      await database.customStatement('DROP TABLE component_reference_bindings');
+      await database.customStatement(
+        'DROP TABLE engineering_reference_catalogs',
+      );
       await database.customStatement('PRAGMA user_version = 9');
       await database.close();
       database = openDatabase();
@@ -451,7 +455,7 @@ void main() {
       );
       snapshot = await repository.load(project.id);
       expect(snapshot.session.cache, isEmpty);
-      expect(database.schemaVersion, 15);
+      expect(database.schemaVersion, 16);
       expect(
         (await DriftElectricalCircuitRepository(
           database,

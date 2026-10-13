@@ -492,6 +492,10 @@ void main() {
         'DROP TABLE engineering_family_definitions',
       );
       await database.customStatement('DROP TABLE panel_generation_configs');
+      await database.customStatement('DROP TABLE component_reference_bindings');
+      await database.customStatement(
+        'DROP TABLE engineering_reference_catalogs',
+      );
       await database.customStatement('PRAGMA user_version = 12');
       await database.close();
       database = openDatabase();
@@ -506,7 +510,7 @@ void main() {
         (await database.select(database.electricalCircuits).get()).single.id,
         'circuit-1',
       );
-      expect(database.schemaVersion, 15);
+      expect(database.schemaVersion, 16);
       await panels.save(config());
       await panels.archive(project.id, 'generated-panel');
       data = await panels.load(project.id);

@@ -291,6 +291,8 @@ void main() {
     await database.customStatement('DROP TABLE consumption_groups');
     await database.customStatement('DROP TABLE component_instances');
     await database.customStatement('DROP TABLE component_catalog_preferences');
+    await database.customStatement('DROP TABLE component_reference_bindings');
+    await database.customStatement('DROP TABLE engineering_reference_catalogs');
     await database.customStatement('PRAGMA user_version = 2');
     await database.close();
 
@@ -305,7 +307,7 @@ void main() {
             .get();
     final names = tables.map((row) => row.read<String>('name')).toSet();
 
-    expect(database.schemaVersion, 15);
+    expect(database.schemaVersion, 16);
     expect(names, contains('component_instances'));
     expect(restoredGeometry.patches, hasLength(1));
     expect(restoredGeometry.patches.single.id, patch.id);

@@ -558,6 +558,10 @@ void main() {
       await database.customStatement('DROP TABLE manufacturer_policies');
       await database.customStatement('DROP TABLE manufacturer_products');
       await database.customStatement('DROP TABLE manufacturer_catalogs');
+      await database.customStatement('DROP TABLE component_reference_bindings');
+      await database.customStatement(
+        'DROP TABLE engineering_reference_catalogs',
+      );
       await database.customStatement('PRAGMA user_version = 11');
       await database.close();
       database = openDatabase();
@@ -569,7 +573,7 @@ void main() {
       expect(data.catalogs, isEmpty);
       expect(data.selections, isEmpty);
       expect(data.protection.rulesets.length, 1);
-      expect(database.schemaVersion, 15);
+      expect(database.schemaVersion, 16);
       await database.close();
       await directory.delete(recursive: true);
     },

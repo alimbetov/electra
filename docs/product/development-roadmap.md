@@ -34,8 +34,8 @@ The [ELV delivery plan](elv-delivery-plan.md) adopts specification revision `091
 | Stage | Outcome | Status |
 |---|---|---|
 | ELV0 | Systems, sixteen family editions, shared device participation | Baseline closed |
-| ELV1 | Ports, connections, topology, passive mappings and assemblies | Implementation gate in progress |
-| ELV2 | Canonical discipline profiles and typed versioned catalogs | Next |
+| ELV1 | Ports, connections, topology, passive mappings and assemblies | Baseline closed; merged PR #5 |
+| ELV2 | Canonical discipline profiles and typed versioned catalogs | First slice in progress |
 | ELV3 | Cable resources, allocations, CableRun and shared routes | Planned |
 | ELV4 | Power, PoE, PSU, UPS, converters and backup graph | Planned |
 | ELV5 | Versioned CCTV/LAN/ACS/fire calculations | Planned |

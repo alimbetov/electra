@@ -497,6 +497,10 @@ void main() {
       await database.customStatement('DROP TABLE cable_route_nodes');
       await database.customStatement('DROP TABLE cable_routes');
       await database.customStatement('DROP TABLE physical_channels');
+      await database.customStatement('DROP TABLE component_reference_bindings');
+      await database.customStatement(
+        'DROP TABLE engineering_reference_catalogs',
+      );
       await database.customStatement('PRAGMA user_version = 6');
       await database.close();
       database = openDatabase();

@@ -540,6 +540,33 @@ class ComponentEngineeringMemberships extends Table with GeometryAuditColumns {
   Set<Column<Object>> get primaryKey => {systemId, componentId};
 }
 
+@DataClassName('EngineeringReferenceCatalogRow')
+class EngineeringReferenceCatalogs extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get projectId => text().references(Projects, #id)();
+  TextColumn get code => text()();
+  TextColumn get catalogVersion => text()();
+  TextColumn get payloadJson => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {projectId, code, catalogVersion},
+  ];
+}
+
+@DataClassName('ComponentReferenceBindingRow')
+class ComponentReferenceBindings extends Table with GeometryAuditColumns {
+  TextColumn get componentId => text().references(ComponentInstances, #id)();
+  TextColumn get projectId => text().references(Projects, #id)();
+  TextColumn get catalogId =>
+      text().references(EngineeringReferenceCatalogs, #id)();
+  TextColumn get profileCode => text()();
+  TextColumn get payloadJson => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {componentId};
+}
+
 @DataClassName('EngineeringPortInstanceRow')
 class EngineeringPortInstances extends Table with GeometryAuditColumns {
   TextColumn get id => text()();
@@ -707,6 +734,8 @@ class EngineeringComponentAssemblies extends Table with GeometryAuditColumns {
     EngineeringFamilyDefinitions,
     ProjectEngineeringSystems,
     ComponentEngineeringMemberships,
+    EngineeringReferenceCatalogs,
+    ComponentReferenceBindings,
     EngineeringPortInstances,
     EngineeringCompatibilityProfiles,
     EngineeringTopologyProfiles,
@@ -722,7 +751,7 @@ final class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'electra'));
 
   @override
-  int get schemaVersion => 15;
+  int get schemaVersion => 16;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -798,6 +827,10 @@ final class AppDatabase extends _$AppDatabase {
           await migrator.createTable(manufacturerProducts);
           await migrator.createTable(manufacturerPolicies);
           await migrator.createTable(circuitProductSelections);
+        }
+        if (from < 16) {
+          await migrator.createTable(engineeringReferenceCatalogs);
+          await migrator.createTable(componentReferenceBindings);
         }
         if (from < 15) {
           await migrator.createTable(engineeringPortInstances);

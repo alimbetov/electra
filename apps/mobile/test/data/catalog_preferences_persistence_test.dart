@@ -103,6 +103,10 @@ void main() {
       await database.customStatement(
         'DROP TABLE component_catalog_preferences',
       );
+      await database.customStatement('DROP TABLE component_reference_bindings');
+      await database.customStatement(
+        'DROP TABLE engineering_reference_catalogs',
+      );
       await database.customStatement('PRAGMA user_version = 3');
       await database.close();
       database = AppDatabase(NativeDatabase(file));

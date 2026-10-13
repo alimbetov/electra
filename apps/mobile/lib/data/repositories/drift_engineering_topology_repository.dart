@@ -301,6 +301,18 @@ class DriftEngineeringTopologyRepository
     if (old != null && _payload(old)['componentId'] != p.componentId)
       throw StateError('Port identity cannot move between components.');
     if (_same(old, p.toMap())) return;
+    final binding =
+        await (database.select(database.componentReferenceBindings)..where(
+          (r) => r.componentId.equals(p.componentId) & r.deletedAt.isNull(),
+        )).getSingleOrNull();
+    if (binding != null &&
+        old != null &&
+        canonicalEngineeringJson(_payload(old)) !=
+            canonicalEngineeringJson(p.toMap()))
+      throw StateError(
+        'Profile-instantiated ports are frozen. Release the binding before changing their characteristics.',
+      );
+
     if (snapshot.connections.any(
           (c) => c.fromPortId == p.id || c.toPortId == p.id,
         ) ||
