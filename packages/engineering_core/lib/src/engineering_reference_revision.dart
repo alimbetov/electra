@@ -1,4 +1,5 @@
 import 'engineering_reference_catalog.dart';
+import 'engineering_topology.dart';
 
 enum ProfileRevisionChangeKind {
   discipline,
