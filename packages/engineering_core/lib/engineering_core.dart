@@ -29,3 +29,5 @@ export 'src/normative_catalog.dart';
 export 'src/manufacturer_catalog_codec.dart';
 
 export 'src/panel_generation_engine.dart';
+
+export 'src/engineering_system.dart';

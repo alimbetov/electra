@@ -8,6 +8,7 @@ import '../calculations/project_recalculation_screen.dart';
 import '../calculations/protection_screen.dart';
 import '../calculations/manufacturer_screen.dart';
 import '../calculations/panel_generation_screen.dart';
+import '../calculations/engineering_systems_screen.dart';
 
 class ProjectWorkspaceScreen extends ConsumerWidget {
   const ProjectWorkspaceScreen({super.key, required this.projectId});
@@ -32,6 +33,17 @@ class ProjectWorkspaceScreen extends ConsumerWidget {
         ),
       ),
       persistentFooterButtons: [
+        OutlinedButton.icon(
+          icon: const Icon(Icons.hub_outlined),
+          label: const Text('Engineering systems'),
+          onPressed:
+              () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder:
+                      (_) => EngineeringSystemsScreen(projectId: projectId),
+                ),
+              ),
+        ),
         OutlinedButton.icon(
           icon: const Icon(Icons.view_module_outlined),
           label: const Text('Generate panel'),

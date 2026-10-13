@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:engineering_core/engineering_core.dart'
-    show bundledNormativeDocuments;
+    show bundledNormativeDocuments, bundledEngineeringSystemFamilies;
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 
@@ -500,6 +500,46 @@ class PanelGenerationConfigs extends Table with GeometryAuditColumns {
   ];
 }
 
+@DataClassName('EngineeringFamilyDefinitionRow')
+class EngineeringFamilyDefinitions extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get code => text()();
+  TextColumn get familyVersion => text()();
+  TextColumn get payloadJson => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {code, familyVersion},
+  ];
+}
+
+@DataClassName('ProjectEngineeringSystemRow')
+class ProjectEngineeringSystems extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get projectId => text().references(Projects, #id)();
+  TextColumn get code => text()();
+  TextColumn get familyId =>
+      text().references(EngineeringFamilyDefinitions, #id)();
+  TextColumn get payloadJson => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {projectId, code},
+  ];
+}
+
+@DataClassName('ComponentEngineeringMembershipRow')
+class ComponentEngineeringMemberships extends Table with GeometryAuditColumns {
+  TextColumn get systemId =>
+      text().references(ProjectEngineeringSystems, #id)();
+  TextColumn get componentId => text().references(ComponentInstances, #id)();
+  TextColumn get role => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {systemId, componentId};
+}
+
 @DriftDatabase(
   tables: [
     Projects,
@@ -535,6 +575,9 @@ class PanelGenerationConfigs extends Table with GeometryAuditColumns {
     ManufacturerPolicies,
     CircuitProductSelections,
     PanelGenerationConfigs,
+    EngineeringFamilyDefinitions,
+    ProjectEngineeringSystems,
+    ComponentEngineeringMemberships,
   ],
 )
 final class AppDatabase extends _$AppDatabase {
@@ -542,7 +585,7 @@ final class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'electra'));
 
   @override
-  int get schemaVersion => 13;
+  int get schemaVersion => 14;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -605,6 +648,11 @@ final class AppDatabase extends _$AppDatabase {
           await migrator.createTable(protectionRulesets);
           await migrator.createTable(circuitProtectionSettings);
         }
+        if (from < 14) {
+          await migrator.createTable(engineeringFamilyDefinitions);
+          await migrator.createTable(projectEngineeringSystems);
+          await migrator.createTable(componentEngineeringMemberships);
+        }
         if (from < 13) {
           await migrator.createTable(panelGenerationConfigs);
         }
@@ -620,6 +668,20 @@ final class AppDatabase extends _$AppDatabase {
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');
       final now = DateTime.now().toUtc();
+      for (final family in bundledEngineeringSystemFamilies) {
+        await into(engineeringFamilyDefinitions).insert(
+          EngineeringFamilyDefinitionsCompanion.insert(
+            id: family.id,
+            code: family.code,
+            familyVersion: family.version,
+            payloadJson: jsonEncode(family.toMap()),
+            createdAt: now,
+            updatedAt: now,
+            originDeviceId: 'bundled-elv0-catalog',
+          ),
+          mode: InsertMode.insertOrIgnore,
+        );
+      }
       for (final doc in bundledNormativeDocuments) {
         await into(normativeDocuments).insert(
           NormativeDocumentsCompanion.insert(

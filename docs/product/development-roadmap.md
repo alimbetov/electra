@@ -1,7 +1,8 @@
 # Electra — Development roadmap
 
 The detailed scope and evidence live in [Flutter delivery plan](flutter-delivery-plan.md).
-Current delivery branch: `feat/flutter-routing-cablerun`.
+Electrical delivery branch: `feat/flutter-routing-cablerun`.
+ELV extension branch: `feat/flutter-engineering-systems-foundation`, based on the reviewed `docs/elv-engineering-systems-spec` requirements.
 Delivery is incremental: each baseline has an exact-commit Flutter/core CI gate.
 
 | Milestone | Outcome | Status |
@@ -25,6 +26,12 @@ The editor reports module/mm overflow and represents the exact physical row arra
 Recommended enclosure width, height and depth must account for device dimensions, DIN rails, terminals, cable ducts, clearances and reserved space.
 FL15 already supplies preliminary occupied/spare/total module capacity. This is not a physical enclosure dimension.
 Normative requirements, manufacturer selection and physical placement remain separate concerns.
+
+## ELV extension track
+
+The [ELV delivery plan](elv-delivery-plan.md) adopts the complete eight-document specification and defines ELV0–ELV8. ELV0 adds project systems, versioned family catalogs and many-to-many participation of existing devices. ELV1 is the next extension gate: persisted ports, binary connections, topology groups, internal connectivity and assemblies tested against CCTV, LAN, ACS and fire scenarios. ELV calculations require separately approved reference/rule packs; the Kazakhstan register is still under curation.
+
+FL16 and ELV enclosure work share the physical containment foundation. Existing FL12–FL15 calculations continue to use their established electrical inputs.
 
 ## Parallel baseline extensions
 
