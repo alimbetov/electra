@@ -1,4 +1,6 @@
 import 'dart:async';
+import '../../application/engineering_placement_command.dart';
+import '../../application/id_generator.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -38,6 +40,7 @@ class RoomEditorScreen extends StatefulWidget {
     this.engineeringReferenceMessage,
     this.engineeringTopologyProfiles = const [],
     this.onPlaceComponent,
+    this.onPlaceEngineeringProfile,
     this.catalogPreferences,
     this.onUndoPlacement,
     this.onRedoPlacement,
@@ -53,6 +56,10 @@ class RoomEditorScreen extends StatefulWidget {
   final String? engineeringReferenceMessage;
   final List<TopologyProfile> engineeringTopologyProfiles;
   final ComponentPlacementCallback? onPlaceComponent;
+  final Future<EngineeringPlacementResult> Function(
+    PlaceEngineeringProfileCommand,
+  )?
+  onPlaceEngineeringProfile;
   final CatalogPreferencesRepository? catalogPreferences;
   final Future<void> Function()? onUndoPlacement;
   final Future<void> Function()? onRedoPlacement;
@@ -81,8 +88,11 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
   PlacementCandidateContext? candidateContext;
   Point2Mm? candidatePoint;
   bool candidateLocked = false;
+  PlaceEngineeringProfileCommand? pendingEngineeringCommand;
+  final engineeringOperationIds = UuidV7IdGenerator();
 
   void clearEngineeringPreview() {
+    pendingEngineeringCommand = null;
     engineeringChoice = null;
     candidateContext = null;
     candidatePoint = null;
@@ -90,6 +100,7 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
   }
 
   void resetCandidate() {
+    pendingEngineeringCommand = null;
     candidatePoint = null;
     candidateLocked = false;
     final patch = activePatch, choice = engineeringChoice;
@@ -195,7 +206,7 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
     Point2Mm point, {
     bool lock = false,
   }) {
-    if (candidateLocked && !lock) return;
+    if (placingComponent || candidateLocked && !lock) return;
     final next = patch.boundary.containsPointInclusive(point) ? point : null;
     if (next == candidatePoint &&
         candidateContext?.surfaceId == patch.id &&
@@ -210,6 +221,7 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
   }
 
   Future<void> editCandidateConditions() async {
+    if (placingComponent) return;
     final choice = engineeringChoice, initial = candidateContext;
     if (choice == null || initial == null) return;
     final value = await showDialog<PlacementCandidateContext>(
@@ -227,7 +239,58 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
         candidateContext?.surfaceId != value.surfaceId ||
         candidateContext != initial)
       return;
-    setState(() => candidateContext = value);
+    setState(() {
+      candidateContext = value;
+      pendingEngineeringCommand = null;
+    });
+  }
+
+  Future<void> commitEngineeringCandidate() async {
+    final place = widget.onPlaceEngineeringProfile;
+    final choice = engineeringChoice,
+        context = candidateContext,
+        point = candidatePoint;
+    if (place == null ||
+        choice == null ||
+        context == null ||
+        point == null ||
+        placingComponent ||
+        placementPreview?.compatible != true)
+      return;
+    final command =
+        pendingEngineeringCommand ??= PlaceEngineeringProfileCommand(
+          operationId: engineeringOperationIds.next(),
+          projectId: widget.project.id,
+          roomId: widget.room.id,
+          systemId: choice.system.id,
+          membershipRole: canonicalElvMembershipRole,
+          catalogId: choice.catalog.id,
+          catalogVersion: choice.catalog.version,
+          profileCode: choice.profile.code,
+          hostSurfacePatchId: context.surfaceId,
+          localPosition: point,
+          rotationRadians: 0,
+          placementContext: context,
+          displayNameOverride: choice.profile.label,
+        );
+    setState(() => placingComponent = true);
+    try {
+      await place(command);
+      if (mounted) setState(resetCandidate);
+    } catch (error) {
+      if (mounted)
+        ScaffoldMessenger.of(this.context).showSnackBar(
+          SnackBar(
+            content: Text(
+              error is EngineeringPlacementFailure
+                  ? '${error.code.name}: ${error.message} ${error.findings.map((f) => f.explanation).join(' ')}'
+                  : 'Placement failed: $error',
+            ),
+          ),
+        );
+    } finally {
+      if (mounted) setState(() => placingComponent = false);
+    }
   }
 
   Widget previewDetails() => ListView(
@@ -641,6 +704,16 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
                       hasCandidate: candidatePoint != null,
                       onContext: editCandidateConditions,
                       onDetails: openPreviewDetails,
+                      canPlace:
+                          widget.onPlaceEngineeringProfile != null &&
+                          placementPreview?.compatible == true &&
+                          candidatePoint != null &&
+                          !placingComponent,
+                      isSaving: placingComponent,
+                      onPlace:
+                          widget.onPlaceEngineeringProfile == null
+                              ? null
+                              : commitEngineeringCandidate,
                     ),
             candidatePoint: candidatePoint,
             candidateStatus:

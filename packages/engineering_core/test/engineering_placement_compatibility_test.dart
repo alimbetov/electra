@@ -85,6 +85,21 @@ PlacementCompatibilityResult evaluate(
     );
 
 void main() {
+  test('reviewed evidence roundtrips exactly and missing facts stay unknown',
+      () {
+    for (final code in ['CAMERA', 'OUTLET', 'READER', 'DETECTOR']) {
+      final context = compatibleContextFor(code);
+      final restored = PlacementCandidateContext.fromMap(
+          jsonDecode(jsonEncode(context.toMap())) as Map<String, dynamic>);
+      expect(restored.toMap(), context.toMap());
+      expect(evaluate(fixture().profile(code), restored).compatible, isTrue);
+    }
+    final unknown = PlacementCandidateContext.fromMap(
+        {'projectId': 'p', 'roomId': 'r', 'surfaceId': 's'});
+    expect(unknown.installationSurface, isNull);
+    expect(unknown.topologyShape, isNull);
+  });
+
   group('PlacementCompatibilityEngine', () {
     test('uses one discipline-agnostic engine for CCTV LAN ACS and Fire', () {
       final catalog = fixture();

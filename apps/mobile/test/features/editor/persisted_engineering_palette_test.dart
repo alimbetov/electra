@@ -22,11 +22,12 @@ import 'dart:convert';
 import 'package:electra_mobile/data/repositories/drift_engineering_reference_repository.dart';
 import 'package:electra_mobile/data/repositories/drift_engineering_system_repository.dart';
 import 'package:electra_mobile/features/editor/room_editor_screen.dart';
-import 'engineering_profile_palette_test.dart' show chooseCameraPreview;
+import 'engineering_profile_palette_test.dart'
+    show chooseCameraPreview, pickCandidate;
 
 void main() {
   testWidgets(
-    'persisted editor P3 preview changes no SQLite rows or placement history',
+    'persisted editor keeps preview read-only and commits one undoable canonical aggregate',
     (tester) async {
       final fixture = await tester.runAsync(() async {
         final directory = await Directory.systemTemp.createTemp(
@@ -222,6 +223,94 @@ void main() {
       await tester.tap(find.text('Done'));
       await tester.pumpAndSettle();
       expect(await changes(), before);
+      await chooseCameraPreview(tester);
+      final canvas = tester.getRect(find.byType(InteractiveViewer));
+      final mapped = SurfaceViewportTransform(
+        boundary: patch.boundary,
+        viewportWidth: canvas.width,
+        viewportHeight: canvas.height,
+      ).localToViewport(const Point2Mm(1500, 600));
+      await tester.tapAt(canvas.topLeft + Offset(mapped.x, mapped.y));
+      await tester.pumpAndSettle();
+      expect(
+        tester
+            .widget<FilledButton>(
+              find.widgetWithText(FilledButton, 'Place profile'),
+            )
+            .onPressed,
+        isNull,
+      );
+      await tester.tap(find.text('Candidate conditions'));
+      await tester.pumpAndSettle();
+      await pickCandidate(tester, 'Installation surface', 'wall');
+      await pickCandidate(tester, 'Mounting method', 'bracket');
+      await tester.ensureVisible(
+        find.byKey(const ValueKey('candidate-Available clearance (mm)')),
+      );
+      await tester.enterText(
+        find.byKey(const ValueKey('candidate-Available clearance (mm)')),
+        '50',
+      );
+      await pickCandidate(tester, 'Exposure', 'indoor');
+      await pickCandidate(tester, 'Climate', 'conditioned');
+      await tester.ensureVisible(
+        find.byKey(const ValueKey('candidate-Ambient temperature (°C)')),
+      );
+      await tester.enterText(
+        find.byKey(const ValueKey('candidate-Ambient temperature (°C)')),
+        '20',
+      );
+      await tester.ensureVisible(find.byKey(const ValueKey('candidate-IP')));
+      await tester.enterText(
+        find.byKey(const ValueKey('candidate-IP')),
+        'IP54',
+      );
+      await pickCandidate(tester, 'Intended topology shape', 'star');
+      await pickCandidate(tester, 'Intended topology role', 'endpoint');
+      await tester.tap(find.text('Apply to preview'));
+      await tester.pumpAndSettle();
+      expect(find.text('COMPATIBLE'), findsWidgets);
+      await tester.tap(find.text('Place profile'));
+      await tester.pumpAndSettle();
+      final placed =
+          (await database.select(database.componentInstances).get()).single;
+      expect(
+        await database.select(database.componentReferenceBindings).get(),
+        hasLength(1),
+      );
+      expect(
+        await database.select(database.engineeringPortInstances).get(),
+        hasLength(1),
+      );
+      expect(
+        await database.select(database.componentEngineeringMemberships).get(),
+        hasLength(1),
+      );
+      expect(
+        await database.select(database.engineeringPlacementOperations).get(),
+        hasLength(1),
+      );
+      await tester.tap(find.byTooltip('Undo placement'));
+      await tester.pumpAndSettle();
+      expect(
+        (await database.select(database.componentInstances).get())
+            .single
+            .deletedAt,
+        isNotNull,
+      );
+      expect(
+        (await database.select(database.engineeringPortInstances).get())
+            .single
+            .deletedAt,
+        isNotNull,
+      );
+      await tester.tap(find.byTooltip('Redo placement'));
+      await tester.pumpAndSettle();
+      final restored =
+          (await database.select(database.componentInstances).get()).single;
+      expect(restored.id, placed.id);
+      expect(restored.deletedAt, isNull);
+      expect(restored.revision, 3);
       await tester.pumpWidget(const SizedBox());
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);

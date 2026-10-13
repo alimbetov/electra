@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/providers.dart';
 import '../../application/component_placement_history.dart';
+import '../../application/engineering_placement_repository.dart';
 import 'room_editor_screen.dart';
 
 /// Persistent route boundary for the Room Editor.
@@ -129,6 +130,22 @@ class _PersistedRoomEditorScreenState
                               canRedoPlacement: history.canRedo,
                               onUndoPlacement: () => changeHistory(true),
                               onRedoPlacement: () => changeHistory(false),
+                              onPlaceEngineeringProfile: (command) async {
+                                final placementHistory = history;
+                                final repository = ref.read(
+                                  engineeringPlacementRepositoryProvider,
+                                );
+                                final result = await repository.place(command);
+                                placementHistory.recordEngineering(
+                                  EngineeringPlacementHistoryEntry(
+                                    command: command,
+                                    result: result,
+                                  ),
+                                  repository,
+                                );
+                                if (mounted) setState(() {});
+                                return result;
+                              },
                               onPlaceComponent: (
                                 definition,
                                 hostSurfacePatchId,

@@ -40,6 +40,42 @@ final class PlaceEngineeringProfileCommand {
   final PlacementCandidateContext placementContext;
   final String? displayNameOverride;
 
+  Map<String, Object?> toMap() => {
+    'operationId': operationId,
+    'projectId': projectId,
+    'roomId': roomId,
+    'systemId': systemId,
+    'membershipRole': normalizedMembershipRole,
+    'catalogId': catalogId,
+    'catalogVersion': catalogVersion,
+    'profileCode': profileCode,
+    'hostSurfacePatchId': hostSurfacePatchId,
+    'xMm': localPosition.xMm,
+    'yMm': localPosition.yMm,
+    'rotationRadians': rotationRadians,
+    'placementContext': placementContext.toMap(),
+    'displayNameOverride': normalizedDisplayNameOverride,
+  };
+
+  factory PlaceEngineeringProfileCommand.fromMap(Map<String, dynamic> m) =>
+      PlaceEngineeringProfileCommand(
+        operationId: m['operationId'] as String,
+        projectId: m['projectId'] as String,
+        roomId: m['roomId'] as String,
+        systemId: m['systemId'] as String,
+        membershipRole: m['membershipRole'] as String,
+        catalogId: m['catalogId'] as String,
+        catalogVersion: m['catalogVersion'] as String,
+        profileCode: m['profileCode'] as String,
+        hostSurfacePatchId: m['hostSurfacePatchId'] as String,
+        localPosition: Point2Mm(m['xMm'] as int, m['yMm'] as int),
+        rotationRadians: (m['rotationRadians'] as num).toDouble(),
+        placementContext: PlacementCandidateContext.fromMap(
+          m['placementContext'] as Map<String, dynamic>,
+        ),
+        displayNameOverride: m['displayNameOverride'] as String?,
+      );
+
   List<EngineeringPlacementFailure> validate() {
     final failures = <EngineeringPlacementFailure>[];
     void requireNonEmpty(String value, String field) {
@@ -125,6 +161,13 @@ final class PlaceEngineeringProfileCommand {
       }
     }
 
+    if ((placementContext.availableClearanceMm ?? 0) < 0) {
+      failures.add(
+        EngineeringPlacementFailure.invalidCommand(
+          'Clearance must be nonnegative.',
+        ),
+      );
+    }
     return List.unmodifiable(failures);
   }
 

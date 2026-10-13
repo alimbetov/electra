@@ -29,6 +29,8 @@ final class EngineeringPlacementOperationRecord {
 }
 
 abstract interface class EngineeringPlacementRepository {
+  Future<void> undo(String operationId);
+  Future<void> redo(EngineeringPlacementHistoryEntry entry);
   Future<EngineeringPlacementResult> place(
     PlaceEngineeringProfileCommand command,
   );
@@ -36,4 +38,13 @@ abstract interface class EngineeringPlacementRepository {
   Future<EngineeringPlacementOperationRecord?> findOperation(
     String operationId,
   );
+}
+
+final class EngineeringPlacementHistoryEntry {
+  const EngineeringPlacementHistoryEntry({
+    required this.command,
+    required this.result,
+  });
+  final PlaceEngineeringProfileCommand command;
+  final EngineeringPlacementResult result;
 }

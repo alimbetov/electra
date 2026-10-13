@@ -291,6 +291,7 @@ class ComponentEngineeringProfile {
     required String catalogId,
     required String version,
     required String Function() nextId,
+    String Function(String templateCode)? idForTemplate,
     EngineeringReferenceVocabulary? vocabulary,
   }) {
     if (deprecated ||
@@ -320,7 +321,8 @@ class ComponentEngineeringProfile {
         .map(
           (port) => EngineeringPort.fromMap({
             ...port.toMap(),
-            'id': nextId(),
+            'id':
+                idForTemplate?.call(port.code.trim().toUpperCase()) ?? nextId(),
             'componentId': componentId,
             'templateProvenance': EngineeringProfileReference(
               id: '$catalogId/$code/${port.code}',

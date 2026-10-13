@@ -20,7 +20,58 @@ final class DriftEngineeringPlacementMembershipWriter {
   Future<ComponentSystemMembership> insertCanonicalMembership(
     PlaceEngineeringProfileCommand command, {
     required String componentId,
+    DateTime? committedAt,
   }) async {
+    await resolve(command);
+
+    await _validateComponentProjectOwnership(command, componentId);
+
+    final existing =
+        await (database.select(database.componentEngineeringMemberships)..where(
+          (row) =>
+              row.systemId.equals(command.systemId) &
+              row.componentId.equals(componentId),
+        )).getSingleOrNull();
+    if (existing != null) {
+      throw EngineeringPlacementFailure(
+        code: EngineeringPlacementFailureCode.membershipConflict,
+        message:
+            'Canonical placement cannot reuse, restore or overwrite an existing membership identity.',
+        details: {
+          'systemId': command.systemId,
+          'componentId': componentId,
+          'existingRole': existing.role,
+          'existingDeleted': existing.deletedAt != null,
+        },
+      );
+    }
+
+    final now = committedAt ?? _clock().toUtc();
+    await database
+        .into(database.componentEngineeringMemberships)
+        .insert(
+          ComponentEngineeringMembershipsCompanion.insert(
+            systemId: command.systemId,
+            componentId: componentId,
+            role: command.normalizedMembershipRole,
+            revision: const Value(1),
+            createdAt: now,
+            updatedAt: now,
+            deletedAt: const Value(null),
+            originDeviceId: originDeviceId,
+          ),
+        );
+
+    return ComponentSystemMembership(
+      systemId: command.systemId,
+      componentId: componentId,
+      role: command.normalizedMembershipRole,
+    );
+  }
+
+  Future<ResolvedEngineeringPlacement> resolve(
+    PlaceEngineeringProfileCommand command,
+  ) async {
     if (command.normalizedMembershipRole != canonicalElvMembershipRole) {
       throw EngineeringPlacementFailure(
         code: EngineeringPlacementFailureCode.invalidCommand,
@@ -76,7 +127,8 @@ final class DriftEngineeringPlacementMembershipWriter {
       );
     }
     final family = _decodeFamily(familyRow);
-    final profileDiscipline = await _resolveProfileDiscipline(command);
+    final (catalog, profile) = await resolveProfile(command);
+    final profileDiscipline = profile.discipline;
     final expectedFamilyCode = switch (profileDiscipline) {
       ReferenceDiscipline.cctv => 'CCTV',
       ReferenceDiscipline.lan => 'LAN',
@@ -102,48 +154,11 @@ final class DriftEngineeringPlacementMembershipWriter {
       );
     }
 
-    await _validateComponentProjectOwnership(command, componentId);
-
-    final existing =
-        await (database.select(database.componentEngineeringMemberships)..where(
-          (row) =>
-              row.systemId.equals(command.systemId) &
-              row.componentId.equals(componentId),
-        )).getSingleOrNull();
-    if (existing != null) {
-      throw EngineeringPlacementFailure(
-        code: EngineeringPlacementFailureCode.membershipConflict,
-        message:
-            'Canonical placement cannot reuse, restore or overwrite an existing membership identity.',
-        details: {
-          'systemId': command.systemId,
-          'componentId': componentId,
-          'existingRole': existing.role,
-          'existingDeleted': existing.deletedAt != null,
-        },
-      );
-    }
-
-    final now = _clock().toUtc();
-    await database
-        .into(database.componentEngineeringMemberships)
-        .insert(
-          ComponentEngineeringMembershipsCompanion.insert(
-            systemId: command.systemId,
-            componentId: componentId,
-            role: command.normalizedMembershipRole,
-            revision: const Value(1),
-            createdAt: now,
-            updatedAt: now,
-            deletedAt: const Value(null),
-            originDeviceId: originDeviceId,
-          ),
-        );
-
-    return ComponentSystemMembership(
-      systemId: command.systemId,
-      componentId: componentId,
-      role: command.normalizedMembershipRole,
+    return ResolvedEngineeringPlacement(
+      system: system,
+      family: family,
+      catalog: catalog,
+      profile: profile,
     );
   }
 
@@ -180,9 +195,8 @@ final class DriftEngineeringPlacementMembershipWriter {
     return family;
   }
 
-  Future<ReferenceDiscipline> _resolveProfileDiscipline(
-    PlaceEngineeringProfileCommand command,
-  ) async {
+  Future<(EngineeringReferenceCatalog, ComponentEngineeringProfile)>
+  resolveProfile(PlaceEngineeringProfileCommand command) async {
     final row =
         await (database.select(database.engineeringReferenceCatalogs)..where(
           (candidate) =>
@@ -237,7 +251,7 @@ final class DriftEngineeringPlacementMembershipWriter {
         },
       );
     }
-    return profile.discipline;
+    return (catalog, profile);
   }
 
   Future<void> _validateComponentProjectOwnership(
@@ -284,4 +298,17 @@ final class DriftEngineeringPlacementMembershipWriter {
       );
     }
   }
+}
+
+final class ResolvedEngineeringPlacement {
+  const ResolvedEngineeringPlacement({
+    required this.system,
+    required this.family,
+    required this.catalog,
+    required this.profile,
+  });
+  final EngineeringSystem system;
+  final EngineeringSystemFamily family;
+  final EngineeringReferenceCatalog catalog;
+  final ComponentEngineeringProfile profile;
 }

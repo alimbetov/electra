@@ -1,6 +1,8 @@
+import '../support/engineering_placement_fixture.dart';
+import 'package:electra_mobile/data/repositories/drift_engineering_placement_aggregate.dart';
 import 'package:drift/drift.dart' hide isNotNull, isNull;
 import 'package:drift/native.dart';
-import 'package:electra_mobile/application/engineering_placement_command.dart';
+import 'package:electra_mobile/application/engineering_placementplacementCommand.dart';
 import 'package:electra_mobile/application/engineering_placement_repository.dart';
 import 'package:electra_mobile/application/id_generator.dart';
 import 'package:electra_mobile/data/database/app_database.dart';
@@ -22,8 +24,8 @@ void main() {
       idGenerator: FixedSequenceIdGenerator(['component-p4-3']),
       clock: () => DateTime.utc(2026, 10, 13, 20, 30),
     );
-    await _seedPlacementParents(database);
-    await _seedPlacementSystemAndCatalog(database);
+    await seedPlacementParents(database);
+    await seedPlacementSystemAndCatalog(database);
   });
 
   tearDown(() => database.close());
@@ -61,9 +63,9 @@ void main() {
   });
 
   test('completed same-fingerprint retry returns stored result', () async {
-    final command = _command();
-    final expected = _result();
-    await _seedOperation(
+    final command = placementCommand();
+    final expected = placementResult();
+    await seedPlacementOperation(
       database,
       command: command,
       result: expected,
@@ -83,15 +85,15 @@ void main() {
   });
 
   test('same operation id with changed semantics is rejected', () async {
-    final original = _command();
-    await _seedOperation(
+    final original = placementCommand();
+    await seedPlacementOperation(
       database,
       command: original,
-      result: _result(),
+      result: placementResult(),
       status: 'COMPLETED',
     );
 
-    final changed = _command(localPosition: const Point2Mm(999, 80));
+    final changed = placementCommand(localPosition: const Point2Mm(999, 80));
 
     await expectLater(
       repository.place(changed),
@@ -106,11 +108,11 @@ void main() {
   });
 
   test('normal retry of UNDONE operation is rejected', () async {
-    final command = _command();
-    await _seedOperation(
+    final command = placementCommand();
+    await seedPlacementOperation(
       database,
       command: command,
-      result: _result(),
+      result: placementResult(),
       status: 'UNDONE',
     );
 
@@ -129,7 +131,20 @@ void main() {
   test(
     'P4.4 place inserts component and membership inside one transaction then rolls back',
     () async {
-      final command = _command(operationId: 'op-new');
+      final command = placementCommand(operationId: 'op-new');
+      repository = DriftEngineeringPlacementRepository(
+        database,
+        originDeviceId: 'p4-test-device',
+        idGenerator: FixedSequenceIdGenerator(['component-p4-3']),
+        fault: (point, _) {
+          if (point == EngineeringPlacementFailurePoint.afterMembership)
+            throw EngineeringPlacementFailure(
+              code: EngineeringPlacementFailureCode.transactionFailed,
+              message: 'Injected after membership',
+              details: {'phase': 'P4.4', 'componentId': 'component-p4-3'},
+            );
+        },
+      );
 
       await expectLater(
         repository.place(command),
@@ -164,9 +179,9 @@ void main() {
   );
 
   test('findOperation reconstructs immutable durable record', () async {
-    final command = _command();
-    final result = _result();
-    await _seedOperation(
+    final command = placementCommand();
+    final result = placementResult();
+    await seedPlacementOperation(
       database,
       command: command,
       result: result,
@@ -233,7 +248,7 @@ void main() {
 
       final instance = await database.transaction(
         () => writer.insertCanonicalComponent(
-          _command(displayNameOverride: '  Camera A  '),
+          placementCommand(displayNameOverride: '  Camera A  '),
         ),
       );
 
@@ -295,8 +310,9 @@ void main() {
 
       await expectLater(
         database.transaction(
-          () =>
-              writer.insertCanonicalComponent(_command(projectId: 'project-2')),
+          () => writer.insertCanonicalComponent(
+            placementCommand(projectId: 'project-2'),
+          ),
         ),
         throwsA(
           isA<EngineeringPlacementFailure>().having(
@@ -322,7 +338,9 @@ void main() {
     );
 
     await expectLater(
-      database.transaction(() => writer.insertCanonicalComponent(_command())),
+      database.transaction(
+        () => writer.insertCanonicalComponent(placementCommand()),
+      ),
       throwsA(
         isA<EngineeringPlacementFailure>().having(
           (failure) => failure.code,
@@ -349,7 +367,7 @@ void main() {
       await expectLater(
         database.transaction(
           () => writer.insertCanonicalComponent(
-            _command(localPosition: const Point2Mm(7000, 80)),
+            placementCommand(localPosition: const Point2Mm(7000, 80)),
           ),
         ),
         throwsA(
@@ -379,7 +397,7 @@ void main() {
 
       final membership = await database.transaction(
         () => writer.insertCanonicalMembership(
-          _command(),
+          placementCommand(),
           componentId: 'component-1',
         ),
       );
@@ -406,7 +424,7 @@ void main() {
   );
 
   test('P4.4 writer rejects profile and system discipline mismatch', () async {
-    await _seedEngineeringSystem(
+    await seedEngineeringSystem(
       database,
       id: 'system-lan',
       code: 'LAN-01',
@@ -420,7 +438,7 @@ void main() {
     await expectLater(
       database.transaction(
         () => writer.insertCanonicalMembership(
-          _command(systemId: 'system-lan'),
+          placementCommand(systemId: 'system-lan'),
           componentId: 'component-1',
         ),
       ),
@@ -448,7 +466,7 @@ void main() {
       );
       await database.transaction(
         () => writer.insertCanonicalMembership(
-          _command(),
+          placementCommand(),
           componentId: 'component-1',
         ),
       );
@@ -456,7 +474,7 @@ void main() {
       await expectLater(
         database.transaction(
           () => writer.insertCanonicalMembership(
-            _command(),
+            placementCommand(),
             componentId: 'component-1',
           ),
         ),
@@ -476,241 +494,3 @@ void main() {
     },
   );
 }
-
-Future<void> _seedPlacementParents(AppDatabase database) async {
-  final now = DateTime.utc(2026, 10, 13, 19);
-  await database
-      .into(database.projects)
-      .insert(
-        ProjectsCompanion.insert(
-          id: 'project-1',
-          name: 'P4 Project',
-          measurementSystem: 'metric',
-          defaultStructuralHeightMm: 3200,
-          defaultFinishedCeilingHeightMm: 3000,
-          createdAt: now,
-          updatedAt: now,
-          originDeviceId: 'p4-test-device',
-        ),
-      );
-  await database
-      .into(database.floors)
-      .insert(
-        FloorsCompanion.insert(
-          id: 'floor-1',
-          projectId: 'project-1',
-          name: 'Floor 1',
-          createdAt: now,
-          updatedAt: now,
-          originDeviceId: 'p4-test-device',
-        ),
-      );
-  await database
-      .into(database.rooms)
-      .insert(
-        RoomsCompanion.insert(
-          id: 'room-1',
-          floorId: 'floor-1',
-          name: 'Room 1',
-          roomType: 'technical',
-          roomCategory: 'technical',
-          widthMm: 6000,
-          depthMm: 5000,
-          createdAt: now,
-          updatedAt: now,
-          originDeviceId: 'p4-test-device',
-        ),
-      );
-  await database
-      .into(database.surfacePatches)
-      .insert(
-        SurfacePatchesCompanion.insert(
-          id: 'patch-1',
-          roomId: 'room-1',
-          surfaceId: 'Wall A',
-          originXmm: 0,
-          originYmm: 0,
-          originZmm: 0,
-          uAxisX: 1,
-          uAxisY: 0,
-          uAxisZ: 0,
-          vAxisX: 0,
-          vAxisY: 0,
-          vAxisZ: 1,
-          orientation: 'vertical',
-          boundaryJson: '[[0,0],[6000,0],[6000,3000],[0,3000]]',
-          createdAt: now,
-          updatedAt: now,
-          originDeviceId: 'p4-test-device',
-        ),
-      );
-  await database
-      .into(database.componentInstances)
-      .insert(
-        ComponentInstancesCompanion.insert(
-          id: 'component-1',
-          definitionId: canonicalElvComponentDefinitionId,
-          definitionVersion: canonicalElvComponentDefinitionVersion,
-          roomId: 'room-1',
-          hostSurfacePatchId: 'patch-1',
-          localXmm: 120,
-          localYmm: 80,
-          createdAt: now,
-          updatedAt: now,
-          originDeviceId: 'p4-test-device',
-        ),
-      );
-}
-
-Future<void> _seedPlacementSystemAndCatalog(AppDatabase database) async {
-  await _seedEngineeringSystem(
-    database,
-    id: 'system-1',
-    code: 'CCTV-01',
-    familyCode: 'CCTV',
-  );
-  final now = DateTime.utc(2026, 10, 13, 19, 2);
-  final catalog = EngineeringReferenceCatalog(
-    id: 'catalog-1',
-    code: 'ELV-P4-TEST',
-    version: '1.0.0',
-    source: 'P4 deterministic fixture',
-    profiles: [
-      ComponentEngineeringProfile(
-        code: 'CAMERA',
-        label: 'Camera',
-        engineeringClass: CanonicalComponentClass.camera,
-        characteristics: const CctvCharacteristics(),
-        capabilities: const [],
-        portTemplates: const [],
-      ),
-    ],
-  );
-  await database
-      .into(database.engineeringReferenceCatalogs)
-      .insert(
-        EngineeringReferenceCatalogsCompanion.insert(
-          id: catalog.id,
-          projectId: 'project-1',
-          code: catalog.code,
-          catalogVersion: catalog.version,
-          payloadJson: canonicalEngineeringJson(catalog.toMap()),
-          createdAt: now,
-          updatedAt: now,
-          originDeviceId: 'p4-test-device',
-        ),
-      );
-}
-
-Future<void> _seedEngineeringSystem(
-  AppDatabase database, {
-  required String id,
-  required String code,
-  required String familyCode,
-}) async {
-  final family =
-      await (database.select(database.engineeringFamilyDefinitions)..where(
-        (row) => row.code.equals(familyCode) & row.deletedAt.isNull(),
-      )).getSingle();
-  final system = EngineeringSystem(
-    id: id,
-    projectId: 'project-1',
-    code: code,
-    name: code,
-    familyId: family.id,
-    familyVersion: family.familyVersion,
-  );
-  final now = DateTime.utc(2026, 10, 13, 19, 1);
-  await database
-      .into(database.projectEngineeringSystems)
-      .insert(
-        ProjectEngineeringSystemsCompanion.insert(
-          id: system.id,
-          projectId: system.projectId,
-          code: system.code,
-          familyId: system.familyId,
-          payloadJson: canonicalEngineeringJson(system.toMap()),
-          revision: const Value(1),
-          createdAt: now,
-          updatedAt: now,
-          originDeviceId: 'p4-test-device',
-        ),
-      );
-}
-
-Future<void> _seedOperation(
-  AppDatabase database, {
-  required PlaceEngineeringProfileCommand command,
-  required EngineeringPlacementResult result,
-  required String status,
-}) async {
-  final now = DateTime.utc(2026, 10, 13, 19, 5);
-  await database
-      .into(database.engineeringPlacementOperations)
-      .insert(
-        EngineeringPlacementOperationsCompanion.insert(
-          operationId: command.operationId,
-          projectId: command.projectId,
-          fingerprintVersion: engineeringPlacementFingerprintVersion,
-          commandFingerprint: engineeringPlacementFingerprintV1(command),
-          status: status,
-          componentId: result.componentId,
-          resultJson: engineeringPlacementResultJson(result),
-          createdAt: now,
-          updatedAt: now,
-          originDeviceId: 'p4-test-device',
-        ),
-      );
-}
-
-PlaceEngineeringProfileCommand _command({
-  String operationId = 'op-1',
-  String projectId = 'project-1',
-  String systemId = 'system-1',
-  Point2Mm localPosition = const Point2Mm(120, 80),
-  String? displayNameOverride = 'Camera A',
-}) => PlaceEngineeringProfileCommand(
-  operationId: operationId,
-  projectId: projectId,
-  roomId: 'room-1',
-  systemId: systemId,
-  membershipRole: canonicalElvMembershipRole,
-  catalogId: 'catalog-1',
-  catalogVersion: '1.0.0',
-  profileCode: 'CAMERA',
-  hostSurfacePatchId: 'patch-1',
-  localPosition: localPosition,
-  rotationRadians: 0.25,
-  placementContext: PlacementCandidateContext(
-    projectId: projectId,
-    roomId: 'room-1',
-    surfaceId: 'patch-1',
-    installationSurface: InstallationSurface.wall,
-    mountingMethod: MountingMethod.bracket,
-    environmentExposure: EnvironmentExposure.indoor,
-    environmentMoisture: EnvironmentMoisture.dry,
-    environmentContamination: EnvironmentContamination.normal,
-    environmentClimate: EnvironmentClimate.conditioned,
-    ambientTemperatureC: 20,
-    actualIpRating: IpProtectionClass.parse('IP54'),
-    hasEnclosure: false,
-    availableClearanceMm: 50,
-    topologyShape: TopologyShape.star,
-    topologyRole: TopologyParticipation.endpoint,
-  ),
-  displayNameOverride: displayNameOverride,
-);
-
-EngineeringPlacementResult _result() => EngineeringPlacementResult(
-  operationId: 'op-1',
-  componentId: 'component-1',
-  systemId: 'system-1',
-  membershipRole: canonicalElvMembershipRole,
-  catalogId: 'catalog-1',
-  catalogVersion: '1.0.0',
-  profileCode: 'CAMERA',
-  bindingComponentId: 'component-1',
-  portIds: const ['port-1'],
-  placementStatus: PlacementCompatibilityStatus.compatible,
-  committedAt: DateTime.utc(2026, 10, 13, 19, 5),
-);

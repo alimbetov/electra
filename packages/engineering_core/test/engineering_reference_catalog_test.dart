@@ -12,6 +12,32 @@ EngineeringReferenceCatalog fixture() => EngineeringReferenceCatalog.fromMap(
     );
 
 void main() {
+  test('template-code identity mapping survives port template reorder', () {
+    final catalog = fixture();
+    final original = catalog.profile('DETECTOR');
+    final reordered = ComponentEngineeringProfile.fromMap({
+      ...original.toMap(),
+      'portTemplates':
+          original.portTemplates.reversed.map((p) => p.toMap()).toList()
+    });
+    List<EngineeringPort> instantiate(ComponentEngineeringProfile profile) =>
+        profile.instantiate(
+          componentId: 'detector',
+          catalogId: catalog.id,
+          version: catalog.version,
+          nextId: () =>
+              throw StateError('Index-based ID allocation must not run'),
+          idForTemplate: (code) => 'stable-$code',
+        );
+    final before = {
+      for (final port in instantiate(original)) port.code: port.toMap()
+    };
+    final after = {
+      for (final port in instantiate(reordered)) port.code: port.toMap()
+    };
+    expect(after, before);
+  });
+
   test(
     'four disciplines roundtrip typed profiles constraints and exact provenance',
     () {

@@ -39,11 +39,16 @@ class EngineeringPlacementFeedback extends StatelessWidget {
     required this.hasCandidate,
     required this.onContext,
     required this.onDetails,
+    this.onPlace,
+    this.canPlace = false,
+    this.isSaving = false,
   });
   final CanonicalProfileChoice choice;
   final PlacementCompatibilityResult? result;
   final bool hasCandidate;
   final VoidCallback onContext, onDetails;
+  final VoidCallback? onPlace;
+  final bool canPlace, isSaving;
   @override
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.only(bottom: 4),
@@ -73,6 +78,12 @@ class EngineeringPlacementFeedback extends StatelessWidget {
               onPressed: onDetails,
               icon: const Icon(Icons.info_outline),
             ),
+            if (onPlace != null)
+              FilledButton.icon(
+                onPressed: canPlace ? onPlace : null,
+                icon: const Icon(Icons.add_location_alt_outlined),
+                label: Text(isSaving ? 'Saving…' : 'Place profile'),
+              ),
           ],
         ),
         const Text(

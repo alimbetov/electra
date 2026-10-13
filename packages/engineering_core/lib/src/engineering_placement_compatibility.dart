@@ -77,6 +77,52 @@ class PlacementCandidateContext {
   final double? availableClearanceMm;
   final TopologyShape? topologyShape;
   final TopologyParticipation? topologyRole;
+
+  Map<String, Object?> toMap() => {
+        'projectId': projectId,
+        'roomId': roomId,
+        'surfaceId': surfaceId,
+        'installationSurface': installationSurface?.name,
+        'mountingMethod': mountingMethod?.name,
+        'environmentExposure': environmentExposure?.name,
+        'environmentMoisture': environmentMoisture?.name,
+        'environmentContamination': environmentContamination?.name,
+        'environmentClimate': environmentClimate?.name,
+        'ambientTemperatureC': ambientTemperatureC,
+        'actualIpRating': actualIpRating?.value,
+        'hasEnclosure': hasEnclosure,
+        'availableClearanceMm': availableClearanceMm,
+        'topologyShape': topologyShape?.name,
+        'topologyRole': topologyRole?.name,
+      };
+
+  factory PlacementCandidateContext.fromMap(Map<String, dynamic> m) {
+    T? name<T extends Enum>(List<T> values, String field) =>
+        m[field] == null ? null : values.byName(m[field] as String);
+    return PlacementCandidateContext(
+      projectId: m['projectId'] as String,
+      roomId: m['roomId'] as String,
+      surfaceId: m['surfaceId'] as String,
+      installationSurface:
+          name(InstallationSurface.values, 'installationSurface'),
+      mountingMethod: name(MountingMethod.values, 'mountingMethod'),
+      environmentExposure:
+          name(EnvironmentExposure.values, 'environmentExposure'),
+      environmentMoisture:
+          name(EnvironmentMoisture.values, 'environmentMoisture'),
+      environmentContamination:
+          name(EnvironmentContamination.values, 'environmentContamination'),
+      environmentClimate: name(EnvironmentClimate.values, 'environmentClimate'),
+      ambientTemperatureC: (m['ambientTemperatureC'] as num?)?.toDouble(),
+      actualIpRating: m['actualIpRating'] == null
+          ? null
+          : IpProtectionClass.parse(m['actualIpRating'] as String),
+      hasEnclosure: m['hasEnclosure'] as bool?,
+      availableClearanceMm: (m['availableClearanceMm'] as num?)?.toDouble(),
+      topologyShape: name(TopologyShape.values, 'topologyShape'),
+      topologyRole: name(TopologyParticipation.values, 'topologyRole'),
+    );
+  }
 }
 
 class PlacementFinding {
