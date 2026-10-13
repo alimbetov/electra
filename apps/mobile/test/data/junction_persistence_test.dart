@@ -299,6 +299,10 @@ void main() {
       await database.customStatement('DROP TABLE floor_routing_panels');
       await database.customStatement('DROP TABLE junction_connections');
       await database.customStatement('DROP TABLE routing_junctions');
+      await database.customStatement('DROP TABLE component_reference_bindings');
+      await database.customStatement(
+        'DROP TABLE engineering_reference_catalogs',
+      );
       await database.customStatement('PRAGMA user_version = 7');
       await database.close();
       database = openDatabase();
@@ -309,7 +313,7 @@ void main() {
       snapshot = await repository.loadRoomRouting(room.id);
       expect(snapshot.runs.length, 3);
       expect(snapshot.junctions, isEmpty);
-      expect(database.schemaVersion, 15);
+      expect(database.schemaVersion, 16);
       await database.close();
       await directory.delete(recursive: true);
     },

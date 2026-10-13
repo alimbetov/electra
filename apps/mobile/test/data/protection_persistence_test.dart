@@ -405,6 +405,10 @@ void main() {
       await database.customStatement('DROP TABLE circuit_protection_settings');
       await database.customStatement('DROP TABLE protection_rulesets');
       await database.customStatement('DROP TABLE normative_documents');
+      await database.customStatement('DROP TABLE component_reference_bindings');
+      await database.customStatement(
+        'DROP TABLE engineering_reference_catalogs',
+      );
       await database.customStatement('PRAGMA user_version = 10');
       await database.close();
       database = openDatabase();
@@ -416,7 +420,7 @@ void main() {
       expect(snapshot.documents.length, 3);
       expect(snapshot.rulesets, isEmpty);
       expect(snapshot.circuits.single.settings.rulesetId, isNull);
-      expect(database.schemaVersion, 15);
+      expect(database.schemaVersion, 16);
       await database.close();
       await directory.delete(recursive: true);
     },

@@ -1,8 +1,8 @@
 # Electra — ELV Delivery Plan
 
-Status: Specification adopted; ELV1 implementation gate in progress  
+Status: ELV1 baseline merged; ELV2 reference vocabulary and compatibility slice in progress
 Specification branch: `docs/elv-engineering-systems-spec` (revision `091e6d8`)  
-Implementation branch: `feat/flutter-engineering-systems-foundation`  
+Implementation branch: `feat/flutter-elv2-reference-catalogs`
 Scope: implementation roadmap after ELV1 connectivity foundation
 
 ## 1. Purpose
@@ -1256,6 +1256,33 @@ Four executable acceptance fixtures cover CCTV independent data/power tracing, L
 
 Retirement and hierarchy/device deletion guards prevent dangling topology. Detaching system membership with referenced ports is blocked. Restore keeps identity and creation time; profile editions cannot be modified in place. ELV1 edits preserve existing FL12 electrical fingerprints. Legacy circuits, CableRuns and generated panels retain their existing identity and persistence; ELV1 does not implicitly convert them to port connections. Physical cable/run adaptation belongs to ELV3 and enclosure integration to ELV6/FL16.
 
-Verification includes restart, v14→v15 migration, project isolation, notifications, edition pinning, compact workspace and failed-write draft retention. Exact-head Flutter CI must pass before marking ELV1 closed. Local core validation: 110 tests and analysis passed.
+Verification includes restart, v14→v15 migration, project isolation, notifications, edition pinning, compact workspace and failed-write draft retention. ELV1 exact-head Flutter CI passed at `1ab81088ec7476d2b1cc262736cf05c8292be590`, run `38355779555`; merged to main through PR #5. Local core validation: 110 tests and analysis passed.
 
 The current ELV2–ELV8 numbering follows the expanded specification above, replacing the earlier abbreviated implementation plan. FL16–FL20 continue alongside this track; enclosure, dependency and BOM infrastructure must be shared.
+
+### ELV2 first implementation slice
+
+Implementation branch: `feat/flutter-elv2-reference-catalogs`, following merged ELV0/ELV1 PR #5.
+
+- Product-neutral component classes/capabilities and typed CCTV stream/power, LAN copper/speed/PoE, ACS electrical/lock/controller, and fire address/standby/alarm characteristics.
+- Immutable project catalog snapshots and exact component-profile bindings. Every generated port records catalog/profile/template edition provenance. Catalog updates never replace project bindings.
+- Atomic template instantiation into the existing ELV1 port table. Existing manually authored ports require explicit resolution; profile-owned characteristics cannot be silently edited. Retirement/release/rebinding is explicit and preserves old catalog editions.
+- Catalog JSON import, discipline filtering, profile selection for existing placed equipment, provenance display and binding release. `docs/examples/elv2-reference-catalog.json` is a fictional five-profile acceptance example, not a vendor catalog or national rule pack.
+- Additive schema 16, preservation of electrical/ELV1 data and legacy migration fixtures; four-discipline restart, edition immutability, project isolation and partial-write rollback tests.
+
+This slice starts ELV2; it does not claim completion of every reference category in sections 5–11. The second slice below adds connector/protocol/media/voltage/interface catalogs and profile-derived connection compatibility. Environment/lens/coverage/PoE class catalogs, topology roles, reference upgrade impact preview and the editor creation palette remain subsequent ELV2 work. No normative engineering defaults or executable discipline calculations are introduced.
+
+ELV2 first-slice implementation gate `ecd96a5b3a0e5bf703d733c238fa066696e55a5f`: run `38357683735` passed Drift generation, both analyzers and formatting, **66 mobile + 113 core tests**. Follow-up exact-head checks also cover explicit edition adoption with retained port IDs. PR #6 remains draft because the full ELV2 catalog scope is still open.
+
+
+### ELV2 reference vocabulary and compatibility slice
+
+The same implementation branch now adds immutable typed connector, protocol, signal-medium, voltage-domain, interface and ordered compatibility definitions. All entries belong to the root catalog edition and retain its source. Component port templates select interface codes; instantiated ELV1 ports freeze their resolved technical values plus exact interface, protocol and template provenance. Display labels never drive compatibility.
+
+Catalog import materializes declared compatibility pairs in the existing ELV1 compatibility table in the same transaction as the catalog snapshot. A failure in any generated profile rolls back the entire import. Connections require the ordered interface editions as well as connector/protocol, family, medium, layer, direction and electrical-domain checks. Equal connectors do not imply compatible protocols; protocol conversion requires an explicit future converter model. Missing voltage stays unresolved. Deprecated definitions remain readable in old snapshots but cannot instantiate new ports or generate new compatibility choices.
+
+`docs/examples/elv2-interface-catalog.json` is an importable fictional ten-component example covering PoE camera/switch, LAN outlet/patch/switch, ACS controller/reader/lock and fire controller/detector source/return. Quantities are illustrative. Import through the existing reference workspace, assign placed components to discipline systems, then bind the chosen component profiles. Passive patch and detector continuation mappings are explicitly authored ELV1 records; this slice does not infer internal links from a label or component class.
+
+The reference workspace displays definitions and declared compatible pairs. Persisted catalog/port/profile JSON is extended additively; schema stays at 16, and legacy snapshots without vocabulary serialize unchanged. Tests cover four-discipline traces and SQLite restart, atomic failed import, idempotent legacy reimport, exact-edition mismatch rejection, explicit adoption guards, deprecation, malformed cross-references and compact UI.
+
+Local validation for this slice: core analysis and **123 tests** pass. Flutter persistence/widget tests, generation, formatting and both analyzers are gated by the exact PR-head CI run. The full ELV2 stage remains open for the remaining section 5 reference categories, richer discipline profiles, topology-role derivation, upgrade impact review and editor creation palette. ELV3 has not started.

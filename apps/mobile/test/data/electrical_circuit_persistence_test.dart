@@ -371,6 +371,10 @@ void main() {
       await database.customStatement(
         'ALTER TABLE equipment_electrical_loads DROP COLUMN power_basis',
       );
+      await database.customStatement('DROP TABLE component_reference_bindings');
+      await database.customStatement(
+        'DROP TABLE engineering_reference_catalogs',
+      );
       await database.customStatement('PRAGMA user_version = 5');
       await database.close();
       database = openDatabase();

@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:electra_mobile/data/repositories/drift_engineering_reference_repository.dart';
 import 'package:electra_mobile/data/repositories/drift_dependency_recalculation_repository.dart';
 import 'package:electra_mobile/data/repositories/drift_engineering_system_repository.dart';
 import 'package:electra_mobile/data/repositories/drift_engineering_topology_repository.dart';
@@ -775,6 +777,144 @@ void main() {
             ..where((r) => r.id.equals(horizontal.id))).getSingle();
       expect(restoredRow.createdAt, beforeRow.createdAt);
       expect(restoredRow.revision, beforeRow.revision + 2);
+      // ELV2 binds five vendor-neutral profiles across four systems atomically.
+      var references = DriftEngineeringReferenceRepository(
+        database,
+        originDeviceId: 'elv2-test',
+        idGenerator: FixedSequenceIdGenerator([
+          'catalog-camera',
+          'catalog-outlet',
+          'catalog-reader',
+          'catalog-lock',
+          'catalog-detector-in',
+          'catalog-detector-out',
+        ]),
+      );
+      final referenceCatalog = EngineeringReferenceCatalog.fromMap(
+        jsonDecode(
+              await File(
+                '../../docs/examples/elv2-reference-catalog.json',
+              ).readAsString(),
+            )
+            as Map<String, dynamic>,
+      );
+      await references.importCatalog(project.id, referenceCatalog);
+      final profileSystems = {
+        'CAMERA': 'cctv',
+        'OUTLET': 'lan',
+        'READER': 'acs',
+        'LOCK': 'acs',
+        'DETECTOR': 'fire',
+      };
+      for (final entry in profileSystems.entries) {
+        final id = 'catalog-${entry.key.toLowerCase()}-device';
+        await components.saveComponent(
+          ComponentInstance(
+            id: id,
+            definitionId: 'product-neutral',
+            definitionVersion: 1,
+            roomId: room.id,
+            hostSurfacePatchId: patch.id,
+            localPosition: const Point2Mm(1000, 300),
+          ),
+        );
+        await networks.assign(
+          project.id,
+          ComponentSystemMembership(
+            systemId: entry.value,
+            componentId: id,
+            role: 'PROFILED_DEVICE',
+          ),
+        );
+        await references.bind(project.id, id, referenceCatalog.id, entry.key);
+      }
+      final bound = await references.load(project.id);
+      expect(bound.bindings.length, 5);
+      await expectLater(
+        references.importCatalog(
+          project.id,
+          EngineeringReferenceCatalog.fromMap({
+            ...referenceCatalog.toMap(),
+            'source': 'changed in place',
+          }),
+        ),
+        throwsStateError,
+      );
+      final catalogV2 = EngineeringReferenceCatalog.fromMap({
+        ...referenceCatalog.toMap(),
+        'id': 'fictional-elv2-v2',
+        'version': '2',
+      });
+      await references.importCatalog(project.id, catalogV2);
+      await expectLater(
+        references.bind(
+          project.id,
+          'catalog-camera-device',
+          catalogV2.id,
+          'CAMERA',
+        ),
+        throwsStateError,
+      );
+      await expectLater(
+        references.bind(
+          other.id,
+          'catalog-camera-device',
+          referenceCatalog.id,
+          'CAMERA',
+        ),
+        throwsStateError,
+      );
+      await expectLater(
+        references.unbind(project.id, 'catalog-camera-device'),
+        throwsStateError,
+      );
+      await expectLater(
+        components.removeComponent('catalog-camera-device'),
+        throwsStateError,
+      );
+      final portRows =
+          await database.select(database.engineeringPortInstances).get();
+      // Rollback restores any ports inserted before a later generated identity collides.
+      final faulty = DriftEngineeringReferenceRepository(
+        database,
+        originDeviceId: 'elv2-rollback',
+        idGenerator: FixedSequenceIdGenerator([
+          'rollback-new',
+          'catalog-detector-in',
+        ]),
+      );
+      await components.saveComponent(
+        ComponentInstance(
+          id: 'rollback-device',
+          definitionId: 'product-neutral',
+          definitionVersion: 1,
+          roomId: room.id,
+          hostSurfacePatchId: patch.id,
+          localPosition: const Point2Mm(1000, 300),
+        ),
+      );
+      await networks.assign(
+        project.id,
+        const ComponentSystemMembership(
+          systemId: 'fire',
+          componentId: 'rollback-device',
+          role: 'TEST',
+        ),
+      );
+      await expectLater(
+        faulty.bind(
+          project.id,
+          'rollback-device',
+          referenceCatalog.id,
+          'DETECTOR',
+        ),
+        throwsStateError,
+      );
+      expect(
+        (await database.select(database.engineeringPortInstances).get()).length,
+        portRows.length,
+      );
+      expect((await references.load(project.id)).bindings.length, 5);
       await database.close();
       database = openDatabase();
       topology = DriftEngineeringTopologyRepository(
@@ -782,6 +922,21 @@ void main() {
         originDeviceId: 'elv1-restart',
       );
       data = await topology.load(project.id);
+      references = DriftEngineeringReferenceRepository(
+        database,
+        originDeviceId: 'elv2-restart',
+        idGenerator: FixedSequenceIdGenerator([]),
+      );
+      final restoredBindings = await references.load(project.id);
+      expect(restoredBindings.catalogs.length, 2);
+      expect(
+        restoredBindings.bindings.map((b) => b.toMap()),
+        bound.bindings.map((b) => b.toMap()),
+      );
+      expect(
+        restoredBindings.bindings.every((b) => b.catalogVersion == '1'),
+        isTrue,
+      );
       expect(data.graph().findings(), isEmpty);
       expect(
         data.connections.firstWhere((c) => c.id == cameraLink.id).profileId,
@@ -810,6 +965,46 @@ void main() {
         'lock',
         'controller',
       });
+      // Explicit edition migration preserves port identities after retirement/release.
+      final cameraBinding = restoredBindings.bindings.singleWhere(
+        (b) => b.componentId == 'catalog-camera-device',
+      );
+      final cameraPort = data.ports.singleWhere(
+        (p) => p.id == cameraBinding.portIds.single,
+      );
+      await expectLater(
+        topology.savePort(
+          project.id,
+          EngineeringPort.fromMap({
+            ...cameraPort.toMap(),
+            'connector': 'silent edit',
+          }),
+        ),
+        throwsStateError,
+      );
+      await topology.archive(
+        project.id,
+        TopologyObjectKind.port,
+        cameraPort.id,
+      );
+      await references.unbind(project.id, cameraBinding.componentId);
+      await references.bind(
+        project.id,
+        cameraBinding.componentId,
+        catalogV2.id,
+        'CAMERA',
+      );
+      final migratedBinding = (await references.load(project.id)).bindings
+          .singleWhere((b) => b.componentId == cameraBinding.componentId);
+      expect(migratedBinding.catalogVersion, '2');
+      expect(migratedBinding.portIds, cameraBinding.portIds);
+      expect(
+        (await topology.load(project.id)).ports
+            .singleWhere((p) => p.id == cameraPort.id)
+            .templateProvenance!
+            .version,
+        '2',
+      );
       // Additive v14 -> v15 migration retains ELV0 network participation and placement identities.
       for (final table in [
         'engineering_port_connections',
@@ -823,6 +1018,10 @@ void main() {
       ]) {
         await database.customStatement('DROP TABLE $table');
       }
+      await database.customStatement('DROP TABLE component_reference_bindings');
+      await database.customStatement(
+        'DROP TABLE engineering_reference_catalogs',
+      );
       await database.customStatement('PRAGMA user_version = 14');
       await database.close();
       database = openDatabase();
@@ -831,7 +1030,7 @@ void main() {
         originDeviceId: 'elv1-migration',
       );
       data = await topology.load(project.id);
-      expect(database.schemaVersion, 15);
+      expect(database.schemaVersion, 16);
       expect(data.ports, isEmpty);
       expect(data.connections, isEmpty);
       expect(data.systems.systems.length, 5);
@@ -839,7 +1038,7 @@ void main() {
         data.systems.memberships.where((m) => m.componentId == 'switch').length,
         3,
       );
-      expect(data.systems.components.length, deviceIds.length + 1);
+      expect(data.systems.components.length, deviceIds.length + 7);
       await database.close();
       await directory.delete(recursive: true);
     },

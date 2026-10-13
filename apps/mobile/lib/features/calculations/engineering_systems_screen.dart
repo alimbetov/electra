@@ -1,3 +1,4 @@
+import 'engineering_reference_screen.dart';
 import 'package:engineering_core/engineering_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,6 +14,17 @@ class EngineeringSystemsScreen extends ConsumerWidget {
     appBar: AppBar(
       title: const Text('Engineering systems'),
       actions: [
+        IconButton(
+          tooltip: "Reference catalogs",
+          icon: const Icon(Icons.library_books_outlined),
+          onPressed:
+              () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder:
+                      (_) => EngineeringReferenceScreen(projectId: projectId),
+                ),
+              ),
+        ),
         IconButton(
           tooltip: 'Ports / topology',
           icon: const Icon(Icons.account_tree_outlined),

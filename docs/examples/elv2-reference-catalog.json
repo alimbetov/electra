@@ -1,0 +1,163 @@
+{
+  "id": "fictional-elv2-v1",
+  "code": "TEST-ELV2",
+  "version": "1",
+  "source": "Fictional acceptance example; quantities are illustrative, not vendor or normative ratings",
+  "profiles": [
+    {
+      "code": "CAMERA",
+      "label": "Fictional camera",
+      "engineeringClass": "camera",
+      "characteristics": {
+        "discipline": "cctv",
+        "codec": "h265",
+        "bitrateMbps": 4,
+        "powerDemandW": 8
+      },
+      "capabilities": [
+        "videoSource",
+        "poeConsumer"
+      ],
+      "portTemplates": [
+        {
+          "id": "template-ETH",
+          "componentId": "template",
+          "code": "ETH",
+          "kind": "dataPower",
+          "direction": "bidirectional",
+          "capacity": 1,
+          "connector": "TEST-CONNECTOR",
+          "protocol": {
+            "id": "TEST-CCTV",
+            "version": "1"
+          }
+        }
+      ]
+    },
+    {
+      "code": "OUTLET",
+      "label": "Fictional outlet",
+      "engineeringClass": "outlet",
+      "characteristics": {
+        "discipline": "lan",
+        "category": "cat6",
+        "speedMbps": 1000
+      },
+      "capabilities": [
+        "ethernet"
+      ],
+      "portTemplates": [
+        {
+          "id": "template-ETH",
+          "componentId": "template",
+          "code": "ETH",
+          "kind": "data",
+          "direction": "bidirectional",
+          "capacity": 1,
+          "connector": "TEST-CONNECTOR",
+          "protocol": {
+            "id": "TEST-LAN",
+            "version": "1"
+          }
+        }
+      ]
+    },
+    {
+      "code": "READER",
+      "label": "Fictional reader",
+      "engineeringClass": "reader",
+      "characteristics": {
+        "discipline": "acs",
+        "operatingCurrentA": 0.1
+      },
+      "capabilities": [
+        "accessReader"
+      ],
+      "portTemplates": [
+        {
+          "id": "template-BUS",
+          "componentId": "template",
+          "code": "BUS",
+          "kind": "bus",
+          "direction": "bidirectional",
+          "capacity": 1,
+          "connector": "TEST-CONNECTOR",
+          "protocol": {
+            "id": "TEST-ACS",
+            "version": "1"
+          }
+        }
+      ]
+    },
+    {
+      "code": "LOCK",
+      "label": "Fictional lock",
+      "engineeringClass": "lock",
+      "characteristics": {
+        "discipline": "acs",
+        "lockBehavior": "failSafe",
+        "operatingCurrentA": 0.5
+      },
+      "capabilities": [
+        "accessActuator"
+      ],
+      "portTemplates": [
+        {
+          "id": "template-PWR",
+          "componentId": "template",
+          "code": "PWR",
+          "kind": "power",
+          "direction": "input",
+          "capacity": 1,
+          "connector": "TEST-CONNECTOR",
+          "protocol": {
+            "id": "TEST-ACS",
+            "version": "1"
+          }
+        }
+      ]
+    },
+    {
+      "code": "DETECTOR",
+      "label": "Fictional detector",
+      "engineeringClass": "detector",
+      "characteristics": {
+        "discipline": "fire",
+        "addressConsumption": 1,
+        "standbyCurrentA": 0.001,
+        "alarmCurrentA": 0.005
+      },
+      "capabilities": [
+        "addressable"
+      ],
+      "portTemplates": [
+        {
+          "id": "template-IN",
+          "componentId": "template",
+          "code": "IN",
+          "kind": "bus",
+          "direction": "input",
+          "capacity": 1,
+          "connector": "TEST-CONNECTOR",
+          "protocol": {
+            "id": "TEST-FIRE",
+            "version": "1"
+          }
+        },
+        {
+          "id": "template-OUT",
+          "componentId": "template",
+          "code": "OUT",
+          "kind": "bus",
+          "direction": "output",
+          "capacity": 1,
+          "connector": "TEST-CONNECTOR",
+          "protocol": {
+            "id": "TEST-FIRE",
+            "version": "1"
+          }
+        }
+      ]
+    }
+  ]
+}

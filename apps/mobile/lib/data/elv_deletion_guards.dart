@@ -5,6 +5,14 @@ Future<void> guardComponentElvPorts(
   AppDatabase database,
   Iterable<String> componentIds,
 ) async {
+  final bindings =
+      await (database.select(database.componentReferenceBindings)..where(
+        (r) => r.componentId.isIn(componentIds) & r.deletedAt.isNull(),
+      )).get();
+  if (bindings.isNotEmpty)
+    throw StateError(
+      "Release engineering profile bindings before deleting equipment.",
+    );
   final rows =
       await (database.select(database.engineeringPortInstances)..where(
         (r) => r.componentId.isIn(componentIds) & r.deletedAt.isNull(),
@@ -20,6 +28,16 @@ Future<void> guardSystemElvTopology(
   String systemId, {
   String? componentId,
 }) async {
+  if (componentId != null) {
+    final binding =
+        await (database.select(database.componentReferenceBindings)..where(
+          (r) => r.componentId.equals(componentId) & r.deletedAt.isNull(),
+        )).getSingleOrNull();
+    if (binding != null)
+      throw StateError(
+        'Release the profile binding before changing system participation.',
+      );
+  }
   final ports =
       componentId == null
           ? <String>[]
@@ -63,6 +81,18 @@ Future<void> guardHierarchyElvPorts(
     HierarchyElvScope.floor => 'f.id',
     HierarchyElvScope.room => 'r.id',
   };
+  final binding =
+      await database
+          .customSelect(
+            'SELECT b.component_id FROM component_reference_bindings b JOIN component_instances ci ON ci.id=b.component_id JOIN rooms r ON ci.room_id=r.id JOIN floors f ON r.floor_id=f.id WHERE b.deleted_at IS NULL AND $column = ? LIMIT 1',
+            variables: [Variable.withString(id)],
+            readsFrom: database.allTables.toSet(),
+          )
+          .getSingleOrNull();
+  if (binding != null)
+    throw StateError(
+      'Release engineering profile bindings before deleting their hierarchy.',
+    );
   final row =
       await database
           .customSelect(

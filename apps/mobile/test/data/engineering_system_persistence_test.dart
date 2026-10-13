@@ -340,6 +340,10 @@ void main() {
       await database.customStatement(
         'DROP TABLE engineering_family_definitions',
       );
+      await database.customStatement('DROP TABLE component_reference_bindings');
+      await database.customStatement(
+        'DROP TABLE engineering_reference_catalogs',
+      );
       await database.customStatement('PRAGMA user_version = 13');
       await database.close();
       database = openDatabase();
@@ -348,7 +352,7 @@ void main() {
         originDeviceId: 'elv-migration',
       );
       data = await systems.load(project.id);
-      expect(database.schemaVersion, 15);
+      expect(database.schemaVersion, 16);
       expect(data.systems, isEmpty);
       expect(data.components.single.id, instance.id);
       expect(data.families.length, 16);

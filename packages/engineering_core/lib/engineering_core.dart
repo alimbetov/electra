@@ -34,3 +34,7 @@ export 'src/engineering_system.dart';
 
 export 'src/engineering_topology.dart';
 export 'src/engineering_topology_graph.dart';
+
+export 'src/engineering_reference_catalog.dart';
+
+export 'src/engineering_reference_vocabulary.dart';

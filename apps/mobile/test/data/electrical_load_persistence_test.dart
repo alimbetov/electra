@@ -324,6 +324,10 @@ void main() {
       await database.customStatement('DROP TABLE electrical_circuits');
       await database.customStatement('DROP TABLE equipment_electrical_loads');
       await database.customStatement('DROP TABLE consumption_groups');
+      await database.customStatement('DROP TABLE component_reference_bindings');
+      await database.customStatement(
+        'DROP TABLE engineering_reference_catalogs',
+      );
       await database.customStatement('PRAGMA user_version = 4');
       await database.close();
       database = openDatabase();

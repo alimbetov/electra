@@ -176,6 +176,11 @@ class EngineeringTopologyGraph {
           !_sameRef(b.protocol, profile.protocolB))
         issue('INTERFACE_PROTOCOL',
             'Connector or protocol edition differs from this profile.');
+      if (profile.interfaceA != null &&
+          (!_sameRef(a.interfaceProvenance, profile.interfaceA) ||
+              !_sameRef(b.interfaceProvenance, profile.interfaceB)))
+        issue('INTERFACE_EDITION',
+            'Resolve the exact ordered interface editions from the selected catalog compatibility profile.');
       if (profile.flow == CompatibilityFlow.directed) {
         if (a.direction == PortDirection.input ||
             b.direction == PortDirection.output)

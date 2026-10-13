@@ -113,13 +113,15 @@ class EngineeringPort {
       this.powerDirection,
       this.powerLimitW,
       this.powerDemandW,
-      this.templateProvenance});
+      this.templateProvenance,
+      this.interfaceProvenance});
   final String id, componentId, code;
   final EngineeringPortKind kind;
   final PortDirection direction;
   final int capacity;
   final String? connector;
   final EngineeringProfileReference? protocol, templateProvenance;
+  final EngineeringProfileReference? interfaceProvenance;
   final PortVoltageDomain? voltage;
   final PortDirection? powerDirection;
   final double? powerLimitW, powerDemandW;
@@ -128,6 +130,8 @@ class EngineeringPort {
           'Port identity, owner and code are required.',
         if (capacity <= 0) 'Port capacity must be positive.',
         if (voltage != null && !voltage!.valid) 'Invalid voltage domain.',
+        if (interfaceProvenance != null && !interfaceProvenance!.valid)
+          'Interface provenance needs an identity and edition.',
         if (protocol != null && !protocol!.valid ||
             templateProvenance != null && !templateProvenance!.valid)
           'Profile provenance needs an identity and edition.',
@@ -148,6 +152,8 @@ class EngineeringPort {
         'powerDirection': powerDirection?.name,
         'powerLimitW': powerLimitW,
         'powerDemandW': powerDemandW,
+        if (interfaceProvenance != null)
+          'interfaceProvenance': interfaceProvenance!.toMap(),
         'templateProvenance': templateProvenance?.toMap()
       };
   factory EngineeringPort.fromMap(Map<String, dynamic> m) => EngineeringPort(
@@ -170,6 +176,10 @@ class EngineeringPort {
           : PortDirection.values.byName(m['powerDirection'] as String),
       powerLimitW: (m['powerLimitW'] as num?)?.toDouble(),
       powerDemandW: (m['powerDemandW'] as num?)?.toDouble(),
+      interfaceProvenance: m['interfaceProvenance'] == null
+          ? null
+          : EngineeringProfileReference.fromMap(
+              m['interfaceProvenance'] as Map<String, dynamic>),
       templateProvenance: m['templateProvenance'] == null
           ? null
           : EngineeringProfileReference.fromMap(
@@ -190,7 +200,9 @@ class ConnectionCompatibilityProfile {
       required this.connectorA,
       required this.connectorB,
       required this.protocolA,
-      required this.protocolB})
+      required this.protocolB,
+      this.interfaceA,
+      this.interfaceB})
       : familyCodes = List.unmodifiable(familyCodes.toList()..sort()),
         media = List.unmodifiable(media);
   final ProfileIdentity identity;
@@ -202,8 +214,13 @@ class ConnectionCompatibilityProfile {
   final CompatibilityFlow flow;
   final EngineeringPortKind kindA, kindB;
   final EngineeringProfileReference protocolA, protocolB;
+  final EngineeringProfileReference? interfaceA, interfaceB;
   List<String> validate() => [
         ...identity.validate(),
+        if ((interfaceA == null) != (interfaceB == null) ||
+            interfaceA?.valid == false ||
+            interfaceB?.valid == false)
+          "Declare both exact interface editions or neither.",
         if (media.isEmpty || media.toSet().length != media.length)
           'Declare allowed connection media.',
         if (familyCodes.isEmpty ||
@@ -228,6 +245,8 @@ class ConnectionCompatibilityProfile {
         'connectorA': connectorA,
         'connectorB': connectorB,
         'protocolA': protocolA.toMap(),
+        if (interfaceA != null) 'interfaceA': interfaceA!.toMap(),
+        if (interfaceB != null) 'interfaceB': interfaceB!.toMap(),
         'protocolB': protocolB.toMap()
       };
   factory ConnectionCompatibilityProfile.fromMap(Map<String, dynamic> m) =>
@@ -246,6 +265,14 @@ class ConnectionCompatibilityProfile {
           connectorB: m['connectorB'] as String,
           protocolA: EngineeringProfileReference.fromMap(
               m['protocolA'] as Map<String, dynamic>),
+          interfaceA: m['interfaceA'] == null
+              ? null
+              : EngineeringProfileReference.fromMap(
+                  m['interfaceA'] as Map<String, dynamic>),
+          interfaceB: m['interfaceB'] == null
+              ? null
+              : EngineeringProfileReference.fromMap(
+                  m['interfaceB'] as Map<String, dynamic>),
           protocolB: EngineeringProfileReference.fromMap(
               m['protocolB'] as Map<String, dynamic>));
 }

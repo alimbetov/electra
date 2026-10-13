@@ -242,6 +242,10 @@ class _EngineeringTopologyWorkspaceState
                                 Text(
                                   '${p.voltage!.currentKind.name.toUpperCase()} ${p.voltage!.minimumV}–${p.voltage!.maximumV} V · power ${p.powerDirection?.name ?? 'unresolved'}',
                                 ),
+                              if (p.interfaceProvenance != null)
+                                Text(
+                                  "Interface edition: ${p.interfaceProvenance!.id} / ${p.interfaceProvenance!.version}",
+                                ),
                               if (p.templateProvenance != null)
                                 Text(
                                   'Frozen template: ${p.templateProvenance!.id} / ${p.templateProvenance!.version}',
@@ -753,6 +757,8 @@ class _EngineeringTopologyDialogState extends State<EngineeringTopologyDialog> {
           powerLimitW: optionalNumber('Source port rating W'),
           powerDemandW: optionalNumber('Endpoint demand W'),
           templateProvenance: reference('Template ID', 'Template edition'),
+          interfaceProvenance:
+              (widget.initial as EngineeringPort?)?.interfaceProvenance,
         );
       case TopologyFormKind.connection:
         return EngineeringConnection(

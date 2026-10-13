@@ -384,6 +384,10 @@ void main() {
       await database.customStatement('DROP TABLE floor_panel_feeds');
       await database.customStatement('DROP TABLE floor_routing_handoffs');
       await database.customStatement('DROP TABLE floor_routing_panels');
+      await database.customStatement('DROP TABLE component_reference_bindings');
+      await database.customStatement(
+        'DROP TABLE engineering_reference_catalogs',
+      );
       await database.customStatement('PRAGMA user_version = 8');
       await database.close();
       database = openDatabase();
@@ -394,7 +398,7 @@ void main() {
       snapshot = await floorRepository.load(floor.id);
       expect(snapshot.graph().runs.length, 2);
       expect(snapshot.panels, isEmpty);
-      expect(database.schemaVersion, 15);
+      expect(database.schemaVersion, 16);
       await DriftProjectHierarchyRepository(database).deleteProject(project.id);
       expect((await floorRepository.load(floor.id)).floor, isNull);
       await database.close();
