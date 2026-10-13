@@ -13,6 +13,7 @@ enum ProfileRevisionChangeKind {
   topology,
   lifecycle,
   constraintsState,
+  removed,
 }
 
 class ProfileRevisionChange {
@@ -41,6 +42,18 @@ class ProfileRevisionImpact {
   bool get affectsPlacement =>
       changes.any((change) => change.placementRelevant);
 }
+
+ProfileRevisionImpact removedEngineeringProfileImpact(String profileCode) =>
+    ProfileRevisionImpact(
+      changes: [
+        ProfileRevisionChange(
+          kind: ProfileRevisionChangeKind.removed,
+          summary: 'Profile $profileCode was removed from the candidate edition.',
+          connectionRelevant: true,
+          placementRelevant: true,
+        ),
+      ],
+    );
 
 ProfileRevisionImpact compareEngineeringProfileRevisions({
   required ComponentEngineeringProfile previous,
