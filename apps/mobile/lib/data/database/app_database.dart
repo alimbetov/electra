@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:engineering_core/engineering_core.dart'
+    show bundledNormativeDocuments;
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 
@@ -394,6 +397,49 @@ class ProjectDerivedResults extends Table with GeometryAuditColumns {
   Set<Column<Object>> get primaryKey => {projectId, nodeKey};
 }
 
+@DataClassName('NormativeDocumentRow')
+class NormativeDocuments extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get standardCode => text()();
+  TextColumn get version => text()();
+  TextColumn get jurisdiction => text()();
+  TextColumn get payloadJson => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {standardCode, version, jurisdiction},
+  ];
+}
+
+@DataClassName('ProtectionRulesetRow')
+class ProtectionRulesets extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get projectId => text().references(Projects, #id)();
+  TextColumn get normativeDocumentId =>
+      text().references(NormativeDocuments, #id)();
+  TextColumn get ruleId => text()();
+  TextColumn get version => text()();
+  TextColumn get payloadJson => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {projectId, ruleId, version},
+  ];
+}
+
+@DataClassName('CircuitProtectionSettingRow')
+class CircuitProtectionSettings extends Table with GeometryAuditColumns {
+  TextColumn get circuitId => text().references(ElectricalCircuits, #id)();
+  TextColumn get rulesetId =>
+      text().nullable().references(ProtectionRulesets, #id)();
+  TextColumn get inputsJson => text()();
+  TextColumn get reviewedFingerprint => text().nullable()();
+  @override
+  Set<Column<Object>> get primaryKey => {circuitId};
+}
+
 @DriftDatabase(
   tables: [
     Projects,
@@ -421,6 +467,9 @@ class ProjectDerivedResults extends Table with GeometryAuditColumns {
     FloorPanelFeeds,
     FloorRoutingHandoffs,
     ProjectDerivedResults,
+    NormativeDocuments,
+    ProtectionRulesets,
+    CircuitProtectionSettings,
   ],
 )
 final class AppDatabase extends _$AppDatabase {
@@ -428,7 +477,7 @@ final class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'electra'));
 
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 11;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -486,11 +535,32 @@ final class AppDatabase extends _$AppDatabase {
         if (from < 10) {
           await migrator.createTable(projectDerivedResults);
         }
+        if (from < 11) {
+          await migrator.createTable(normativeDocuments);
+          await migrator.createTable(protectionRulesets);
+          await migrator.createTable(circuitProtectionSettings);
+        }
       }
       await _createIndexes();
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');
+      final now = DateTime.now().toUtc();
+      for (final doc in bundledNormativeDocuments) {
+        await into(normativeDocuments).insert(
+          NormativeDocumentsCompanion.insert(
+            id: doc.id,
+            standardCode: doc.standardCode,
+            version: doc.version,
+            jurisdiction: doc.jurisdiction,
+            payloadJson: jsonEncode(doc.toMap()),
+            createdAt: now,
+            updatedAt: now,
+            originDeviceId: 'bundled-fl13-catalog',
+          ),
+          mode: InsertMode.insertOrIgnore,
+        );
+      }
     },
   );
 

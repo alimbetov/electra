@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:drift/drift.dart';
 import 'package:engineering_core/engineering_core.dart';
 import '../../application/dependency_recalculation_repository.dart';
@@ -88,6 +89,26 @@ class DriftDependencyRecalculationRepository
       );
     }
 
+    final normRows =
+        await (database.select(database.normativeDocuments)
+          ..where((r) => r.deletedAt.isNull())).get();
+    final norms = {
+      for (final row in normRows)
+        row.id: NormativeDocument.fromMap(
+          jsonDecode(row.payloadJson) as Map<String, dynamic>,
+        ),
+    };
+    final ruleRows =
+        await (database.select(database.protectionRulesets)..where(
+          (r) => r.projectId.equals(projectId) & r.deletedAt.isNull(),
+        )).get();
+    final rules = {
+      for (final row in ruleRows)
+        row.id: ProtectionRuleset.fromMap(
+          jsonDecode(row.payloadJson) as Map<String, dynamic>,
+        ),
+    };
+    // Only assigned rules are graph sources; merely browsing the catalog changes no result.
     final floors =
         await (database.select(database.floors)
               ..where(
@@ -257,24 +278,66 @@ class DriftDependencyRecalculationRepository
               );
             },
           );
+          final settingRow =
+              await (database.select(database.circuitProtectionSettings)..where(
+                (r) => r.circuitId.equals(c.id) & r.deletedAt.isNull(),
+              )).getSingleOrNull();
+          final settings =
+              settingRow == null
+                  ? CircuitProtectionInputs(circuitId: c.id)
+                  : CircuitProtectionInputs.fromMap(
+                    jsonDecode(settingRow.inputsJson) as Map<String, dynamic>,
+                  );
+          final ruleset = rules[settings.rulesetId],
+              norm = norms[ruleset?.normativeDocumentId];
+          if (ruleset != null) {
+            if (norm != null)
+              add(
+                'normative:${norm.id}',
+                norm.title,
+                'fl13-normative-v1',
+                norm.toMap(),
+                [],
+                (_) => DependencyProposal(values: norm.toMap()),
+              );
+            add(
+              'ruleset:${ruleset.id}',
+              ruleset.reference.id,
+              'fl13-ruleset-v1',
+              ruleset.toMap(),
+              ['normative:${ruleset.normativeDocumentId}'],
+              (_) => DependencyProposal(values: ruleset.toMap()),
+            );
+          }
           add(
             'protection:${c.id}',
-            '${c.name} · Protection inputs',
-            'fl12-protection-input-v1',
-            {},
+            '${c.name} · Protection requirement',
+            ProtectionRequirementPlanner.algorithmVersion,
+            settings.toMap(),
             [
               'circuit:${c.id}',
               for (final run in routing.runs.where((r) => r.circuitId == c.id))
                 'cable:${run.id}',
+              if (settings.rulesetId != null) 'ruleset:${settings.rulesetId}',
             ],
-            (deps) => DependencyProposal(
-              values: {
-                'designCurrentA':
-                    deps['circuit:${c.id}']!.values['designCurrentA'],
-                'capability': 'Functional protection rules are pending FL13.',
-              },
-              requiresReview: true,
-            ),
+            (deps) {
+              final proposal = ProtectionRequirementPlanner.propose(
+                settings: settings,
+                ruleset: ruleset,
+                normativeDocument: norm,
+                designCurrentA:
+                    (deps['circuit:${c.id}']!.values['designCurrentA'] as num?)
+                        ?.toDouble(),
+                nominalVoltageV: c.inputs.nominalVoltageV,
+                phases: c.inputs.phases,
+                supplySystem: c.inputs.supplySystem,
+              );
+              return DependencyProposal(
+                values: proposal.toMap(),
+                issues: proposal.issues,
+                requiresReview: !proposal.ready,
+              );
+            },
           );
         }
         for (final route in routing.routes) {

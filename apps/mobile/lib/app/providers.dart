@@ -1,3 +1,5 @@
+import '../application/protection_repository.dart';
+import '../data/repositories/drift_protection_repository.dart';
 import '../application/dependency_recalculation_repository.dart';
 import '../data/repositories/drift_dependency_recalculation_repository.dart';
 import '../application/floor_routing_repository.dart';
@@ -216,3 +218,14 @@ final projectRecalculationProvider =
       (ref, projectId) =>
           ref.watch(dependencyRecalculationRepositoryProvider).watch(projectId),
     );
+
+final protectionRepositoryProvider = Provider<ProtectionRepository>(
+  (ref) => DriftProtectionRepository(
+    ref.watch(databaseProvider),
+    originDeviceId: 'local-device',
+  ),
+);
+final projectProtectionProvider = StreamProvider.family<
+  ProjectProtectionSnapshot,
+  String
+>((ref, projectId) => ref.watch(protectionRepositoryProvider).watch(projectId));

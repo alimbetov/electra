@@ -276,6 +276,9 @@ void main() {
       await DriftCatalogPreferencesRepository(
         database,
       ).setFavorite('motor', true);
+      await database.customStatement('DROP TABLE circuit_protection_settings');
+      await database.customStatement('DROP TABLE protection_rulesets');
+      await database.customStatement('DROP TABLE normative_documents');
       await database.customStatement('DROP TABLE project_derived_results');
       await database.customStatement('DROP TABLE floor_panel_feeds');
       await database.customStatement('DROP TABLE floor_routing_handoffs');

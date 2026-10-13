@@ -260,6 +260,9 @@ void main() {
       expect(snapshot.junctionIssues(snapshot.junctions.single), isNotEmpty);
       expect(snapshot.junctions.single.connections.length, 3);
       // v7 -> v8 upgrade preserves routing and creates first-class junction tables.
+      await database.customStatement('DROP TABLE circuit_protection_settings');
+      await database.customStatement('DROP TABLE protection_rulesets');
+      await database.customStatement('DROP TABLE normative_documents');
       await database.customStatement('DROP TABLE project_derived_results');
       await database.customStatement('DROP TABLE floor_panel_feeds');
       await database.customStatement('DROP TABLE floor_routing_handoffs');
@@ -276,7 +279,7 @@ void main() {
       snapshot = await repository.loadRoomRouting(room.id);
       expect(snapshot.runs.length, 3);
       expect(snapshot.junctions, isEmpty);
-      expect(database.schemaVersion, 10);
+      expect(database.schemaVersion, 11);
       await database.close();
       await directory.delete(recursive: true);
     },

@@ -21,3 +21,7 @@ export 'src/surface_route_draft.dart';
 export 'src/floor_routing_graph.dart';
 
 export 'src/dependency_recalculation.dart';
+
+export 'src/protection_requirements.dart';
+
+export 'src/normative_catalog.dart';

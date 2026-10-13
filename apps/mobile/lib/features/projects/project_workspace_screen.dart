@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../app/adaptive_layout.dart';
 import '../../app/providers.dart';
 import '../calculations/project_recalculation_screen.dart';
+import '../calculations/protection_screen.dart';
 
 class ProjectWorkspaceScreen extends ConsumerWidget {
   const ProjectWorkspaceScreen({super.key, required this.projectId});
@@ -29,6 +30,17 @@ class ProjectWorkspaceScreen extends ConsumerWidget {
         ),
       ),
       persistentFooterButtons: [
+        OutlinedButton.icon(
+          icon: const Icon(Icons.shield_outlined),
+          label: const Text('Protection / Normatives'),
+          onPressed:
+              () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => ProtectionScreen(projectId: projectId),
+                ),
+              ),
+        ),
+
         OutlinedButton.icon(
           icon: const Icon(Icons.calculate),
           label: const Text('Recalculate / What changed?'),
