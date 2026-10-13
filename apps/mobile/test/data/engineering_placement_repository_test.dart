@@ -31,16 +31,18 @@ void main() {
   test('schema 17 exposes mandatory placement operation ledger', () async {
     expect(database.schemaVersion, 17);
 
-    final rows = await database
-        .customSelect(
-          "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'engineering_placement_operations'",
-        )
-        .get();
+    final rows =
+        await database
+            .customSelect(
+              "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'engineering_placement_operations'",
+            )
+            .get();
     expect(rows, hasLength(1));
 
-    final columns = await database
-        .customSelect('PRAGMA table_info(engineering_placement_operations)')
-        .get();
+    final columns =
+        await database
+            .customSelect('PRAGMA table_info(engineering_placement_operations)')
+            .get();
     expect(
       columns.map((row) => row.read<String>('name')).toList(),
       containsAll(<String>[
@@ -124,38 +126,42 @@ void main() {
     );
   });
 
-  test('P4.4 place inserts component and membership inside one transaction then rolls back', () async {
-    final command = _command(operationId: 'op-new');
+  test(
+    'P4.4 place inserts component and membership inside one transaction then rolls back',
+    () async {
+      final command = _command(operationId: 'op-new');
 
-    await expectLater(
-      repository.place(command),
-      throwsA(
-        isA<EngineeringPlacementFailure>()
-            .having(
-              (failure) => failure.code,
-              'code',
-              EngineeringPlacementFailureCode.transactionFailed,
-            )
-            .having((failure) => failure.details['phase'], 'phase', 'P4.4')
-            .having(
-              (failure) => failure.details['componentId'],
-              'componentId',
-              'component-p4-3',
-            ),
-      ),
-    );
+      await expectLater(
+        repository.place(command),
+        throwsA(
+          isA<EngineeringPlacementFailure>()
+              .having(
+                (failure) => failure.code,
+                'code',
+                EngineeringPlacementFailureCode.transactionFailed,
+              )
+              .having((failure) => failure.details['phase'], 'phase', 'P4.4')
+              .having(
+                (failure) => failure.details['componentId'],
+                'componentId',
+                'component-p4-3',
+              ),
+        ),
+      );
 
-    expect(
-      await database.select(database.engineeringPlacementOperations).get(),
-      isEmpty,
-    );
-    final components = await database.select(database.componentInstances).get();
-    expect(components.map((row) => row.id), ['component-1']);
-    expect(
-      await database.select(database.componentEngineeringMemberships).get(),
-      isEmpty,
-    );
-  });
+      expect(
+        await database.select(database.engineeringPlacementOperations).get(),
+        isEmpty,
+      );
+      final components =
+          await database.select(database.componentInstances).get();
+      expect(components.map((row) => row.id), ['component-1']);
+      expect(
+        await database.select(database.componentEngineeringMemberships).get(),
+        isEmpty,
+      );
+    },
+  );
 
   test('findOperation reconstructs immutable durable record', () async {
     final command = _command();
@@ -240,9 +246,9 @@ void main() {
       expect(instance.displayNameOverride, 'Camera A');
 
       final row =
-          await (database.select(database.componentInstances)
-                ..where((candidate) => candidate.id.equals('component-new')))
-              .getSingle();
+          await (database.select(database.componentInstances)..where(
+            (candidate) => candidate.id.equals('component-new'),
+          )).getSingle();
       expect(row.definitionId, canonicalElvComponentDefinitionId);
       expect(row.definitionVersion, canonicalElvComponentDefinitionVersion);
       expect(row.roomId, 'room-1');
@@ -301,9 +307,8 @@ void main() {
         ),
       );
       expect(
-        await (database.select(
-          database.componentInstances,
-        )..where((row) => row.id.equals('must-not-be-used'))).get(),
+        await (database.select(database.componentInstances)
+          ..where((row) => row.id.equals('must-not-be-used'))).get(),
         isEmpty,
       );
     },
@@ -356,9 +361,8 @@ void main() {
         ),
       );
       expect(
-        await (database.select(
-          database.componentInstances,
-        )..where((row) => row.id.equals('component-outside'))).get(),
+        await (database.select(database.componentInstances)
+          ..where((row) => row.id.equals('component-outside'))).get(),
         isEmpty,
       );
     },
@@ -383,9 +387,10 @@ void main() {
       expect(membership.systemId, 'system-1');
       expect(membership.componentId, 'component-1');
       expect(membership.role, canonicalElvMembershipRole);
-      final row = await database
-          .select(database.componentEngineeringMemberships)
-          .getSingle();
+      final row =
+          await database
+              .select(database.componentEngineeringMemberships)
+              .getSingle();
       expect(row.systemId, 'system-1');
       expect(row.componentId, 'component-1');
       expect(row.role, canonicalElvMembershipRole);
@@ -463,9 +468,8 @@ void main() {
           ),
         ),
       );
-      final rows = await database
-          .select(database.componentEngineeringMemberships)
-          .get();
+      final rows =
+          await database.select(database.componentEngineeringMemberships).get();
       expect(rows, hasLength(1));
       expect(rows.single.revision, 1);
       expect(rows.single.role, canonicalElvMembershipRole);
@@ -606,9 +610,8 @@ Future<void> _seedEngineeringSystem(
 }) async {
   final family =
       await (database.select(database.engineeringFamilyDefinitions)..where(
-            (row) => row.code.equals(familyCode) & row.deletedAt.isNull(),
-          ))
-          .getSingle();
+        (row) => row.code.equals(familyCode) & row.deletedAt.isNull(),
+      )).getSingle();
   final system = EngineeringSystem(
     id: id,
     projectId: 'project-1',
