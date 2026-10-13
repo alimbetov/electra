@@ -1,0 +1,33 @@
+name: P4 Build Format Diff
+
+on:
+  push:
+    branches:
+      - feat/flutter-elv2-profile-constraints
+    paths:
+      - 'apps/mobile/lib/application/engineering_placement_command.dart'
+      - '.github/workflows/p4-build-format-diff.yml'
+
+jobs:
+  diff:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get --enforce-lockfile
+      - name: Build runner source diff
+        run: |
+          dart run build_runner build
+          echo '--- AFTER BUILD RUNNER ---'
+          git diff -- lib/application/engineering_placement_command.dart || true
+      - name: Formatter diff
+        run: |
+          dart format lib/application/engineering_placement_command.dart
+          echo '--- AFTER FORMATTER ---'
+          git diff -- lib/application/engineering_placement_command.dart || true
