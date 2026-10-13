@@ -1,0 +1,32 @@
+name: ELV2 P2 Core Format Diagnostic
+
+on:
+  push:
+    branches:
+      - feat/flutter-elv2-profile-constraints
+
+jobs:
+  format-core:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Install core dependencies
+        working-directory: packages/engineering_core
+        run: dart pub get
+      - name: Format P2 files
+        working-directory: packages/engineering_core
+        run: |
+          dart format \
+            lib/src/engineering_placement_compatibility.dart \
+            test/engineering_placement_compatibility_test.dart
+      - name: Upload formatted P2 files
+        uses: actions/upload-artifact@v4
+        with:
+          name: elv2-p2-formatted-core
+          path: |
+            packages/engineering_core/lib/src/engineering_placement_compatibility.dart
+            packages/engineering_core/test/engineering_placement_compatibility_test.dart
