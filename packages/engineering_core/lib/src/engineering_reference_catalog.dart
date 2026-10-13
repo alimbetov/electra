@@ -96,7 +96,9 @@ class CctvCharacteristics extends DisciplineCharacteristics {
   ReferenceDiscipline get discipline => ReferenceDiscipline.cctv;
 
   @override
-  List<String> validate() => [..._quantities([bitrateMbps, powerDemandW])];
+  List<String> validate() => [
+        ..._quantities([bitrateMbps, powerDemandW])
+      ];
 
   @override
   Map<String, Object?> toMap() => {
@@ -118,7 +120,9 @@ class LanCharacteristics extends DisciplineCharacteristics {
   ReferenceDiscipline get discipline => ReferenceDiscipline.lan;
 
   @override
-  List<String> validate() => [..._quantities([speedMbps, poeBudgetW])];
+  List<String> validate() => [
+        ..._quantities([speedMbps, poeBudgetW])
+      ];
 
   @override
   Map<String, Object?> toMap() => {
@@ -222,7 +226,8 @@ class ComponentEngineeringProfile {
 
   ReferenceDiscipline get discipline => characteristics.discipline;
   bool get hasDefinedConstraints =>
-      constraintsState == ProfileConstraintsState.defined && constraints != null;
+      constraintsState == ProfileConstraintsState.defined &&
+      constraints != null;
 
   List<String> validate() => [
         if (code.trim().isEmpty || label.trim().isEmpty)
@@ -336,7 +341,8 @@ class ComponentEngineeringProfile {
         'label': label,
         'engineeringClass': engineeringClass.name,
         'characteristics': characteristics.toMap(),
-        'capabilities': capabilities.map((capability) => capability.name).toList(),
+        'capabilities':
+            capabilities.map((capability) => capability.name).toList(),
         'portTemplates': portTemplates.map((port) => port.toMap()).toList(),
         if (portInterfaceCodes.isNotEmpty)
           'portInterfaceCodes': portInterfaceCodes,
@@ -369,10 +375,9 @@ class ComponentEngineeringProfile {
         (value) => EngineeringPort.fromMap(value as Map<String, dynamic>),
       ),
       deprecated: map['deprecated'] as bool? ?? false,
-      portInterfaceCodes:
-          (map['portInterfaceCodes'] as Map<String, dynamic>?)
-                  ?.cast<String, String>() ??
-              {},
+      portInterfaceCodes: (map['portInterfaceCodes'] as Map<String, dynamic>?)
+              ?.cast<String, String>() ??
+          {},
       constraintsState: state,
       constraints: rawConstraints == null
           ? null
