@@ -504,6 +504,127 @@ class DriftDependencyRecalculationRepository
         );
       }
     }
+    final circuitIds =
+        nodes.keys
+            .where((k) => k.startsWith('circuit:'))
+            .map((k) => k.substring(8))
+            .toList();
+    final selections =
+        await (database.select(database.circuitProductSelections)..where(
+          (r) => r.circuitId.isIn(circuitIds) & r.deletedAt.isNull(),
+        )).get();
+    if (selections.isNotEmpty) {
+      final policyRow =
+          await (database.select(database.manufacturerPolicies)..where(
+            (r) => r.projectId.equals(projectId) & r.deletedAt.isNull(),
+          )).getSingleOrNull();
+      final policy =
+          policyRow == null
+              ? const ProjectManufacturerPolicy()
+              : ManufacturerCatalogCodec.decodePolicy(
+                jsonDecode(policyRow.payloadJson) as Map<String, dynamic>,
+              );
+      final policyMap = ManufacturerCatalogCodec.policy(policy);
+      add(
+        'manufacturerPolicy:$projectId',
+        'Manufacturer policy',
+        'fl14-policy-v1',
+        policyMap,
+        [],
+        (_) => DependencyProposal(values: policyMap),
+      );
+      // Protection fingerprints are computed before commercial selection nodes are appended.
+      final normative = RecalculationSession(nodes: nodes.values, cache: cache);
+      for (final selected in selections) {
+        final row =
+            await (database.select(
+              database.manufacturerProducts,
+            )..where((r) => r.id.equals(selected.productId))).getSingleOrNull();
+        final catalog =
+            row == null
+                ? null
+                : await (database.select(database.manufacturerCatalogs)
+                  ..where((r) => r.id.equals(row.catalogId))).getSingleOrNull();
+        final available =
+            row != null &&
+            row.deletedAt == null &&
+            catalog != null &&
+            catalog.deletedAt == null;
+        final commercialInputs = <String, Object?>{
+          'available': available,
+          'catalogId': catalog?.id,
+          'catalogVersion': catalog?.catalogVersion,
+          'region': catalog?.region,
+          'source': catalog?.sourceReference,
+          'product': row == null ? null : jsonDecode(row.payloadJson),
+        };
+        add(
+          'catalogProduct:${selected.productId}',
+          'Catalog product ${row?.sku ?? selected.productId}',
+          'fl14-product-source-v1',
+          commercialInputs,
+          [],
+          (_) => DependencyProposal(
+            values: commercialInputs,
+            issues:
+                available
+                    ? []
+                    : ['Selected catalog product is archived or unavailable.'],
+          ),
+        );
+        final input = <String, Object?>{
+          'productId': selected.productId,
+          'snapshot': jsonDecode(selected.snapshotJson),
+          'reviewedRequirementFingerprint': selected.requirementFingerprint,
+          'reviewedPolicy': jsonDecode(selected.policyJson),
+        };
+        add(
+          'product:${selected.circuitId}',
+          '${nodes["circuit:${selected.circuitId}"]!.label} · Manufacturer selection',
+          ManufacturerProductMatcher.algorithmVersion,
+          input,
+          [
+            'protection:${selected.circuitId}',
+            'catalogProduct:${selected.productId}',
+            'manufacturerPolicy:$projectId',
+          ],
+          (deps) {
+            final requirement = ManufacturerCatalogCodec.protectionRequirement(
+              deps['protection:${selected.circuitId}']!.values,
+            );
+            final selectedSnapshot =
+                jsonDecode(selected.snapshotJson) as Map<String, dynamic>;
+            final product = ManufacturerCatalogCodec.decodeProduct(
+              selectedSnapshot['product'] as Map<String, dynamic>,
+            );
+            final problems =
+                requirement == null
+                    ? ['Functional requirement is unavailable.']
+                    : ManufacturerProductMatcher.match(
+                      requirement,
+                      product,
+                      policy: policy,
+                      catalogRegion: catalog?.region,
+                    ).issues;
+            final needsReview =
+                selected.requirementFingerprint !=
+                    normative
+                        .fingerprints['protection:${selected.circuitId}'] ||
+                canonicalEngineeringJson(jsonDecode(selected.policyJson)) !=
+                    canonicalEngineeringJson(policyMap);
+            return DependencyProposal(
+              values: {
+                'selectedProduct': selectedSnapshot,
+                'compatible': problems.isEmpty,
+                'reviewRequired': needsReview,
+              },
+              issues: problems,
+              requiresReview: needsReview,
+            );
+          },
+        );
+      }
+    }
     return ProjectRecalculationSnapshot(
       project: project,
       session: RecalculationSession(

@@ -1,3 +1,5 @@
+import '../application/manufacturer_repository.dart';
+import '../data/repositories/drift_manufacturer_repository.dart';
 import '../application/protection_repository.dart';
 import '../data/repositories/drift_protection_repository.dart';
 import '../application/dependency_recalculation_repository.dart';
@@ -229,3 +231,14 @@ final projectProtectionProvider = StreamProvider.family<
   ProjectProtectionSnapshot,
   String
 >((ref, projectId) => ref.watch(protectionRepositoryProvider).watch(projectId));
+
+final manufacturerRepositoryProvider = Provider<ManufacturerRepository>(
+  (ref) => DriftManufacturerRepository(
+    ref.watch(databaseProvider),
+    originDeviceId: 'local-device',
+  ),
+);
+final projectManufacturerProvider =
+    StreamProvider.family<ProjectManufacturerSnapshot, String>(
+      (ref, id) => ref.watch(manufacturerRepositoryProvider).watch(id),
+    );

@@ -4,13 +4,28 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/providers.dart';
 import '../../application/protection_repository.dart';
 import 'project_recalculation_screen.dart';
+import 'manufacturer_screen.dart';
 
 class ProtectionScreen extends ConsumerWidget {
   const ProtectionScreen({super.key, required this.projectId});
   final String projectId;
   @override
   Widget build(BuildContext context, WidgetRef ref) => Scaffold(
-    appBar: AppBar(title: const Text('Protection / Normative catalog')),
+    appBar: AppBar(
+      title: const Text('Protection / Normative catalog'),
+      actions: [
+        IconButton(
+          tooltip: 'Manufacturer catalogs',
+          icon: const Icon(Icons.inventory_2_outlined),
+          onPressed:
+              () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => ManufacturerScreen(projectId: projectId),
+                ),
+              ),
+        ),
+      ],
+    ),
     body: ref
         .watch(projectProtectionProvider(projectId))
         .when(

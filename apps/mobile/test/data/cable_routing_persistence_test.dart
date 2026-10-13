@@ -453,6 +453,10 @@ void main() {
       );
 
       // A v6 fixture retains existing circuits and geometry when v7 tables are created.
+      await database.customStatement('DROP TABLE circuit_product_selections');
+      await database.customStatement('DROP TABLE manufacturer_policies');
+      await database.customStatement('DROP TABLE manufacturer_products');
+      await database.customStatement('DROP TABLE manufacturer_catalogs');
       await database.customStatement('DROP TABLE circuit_protection_settings');
       await database.customStatement('DROP TABLE protection_rulesets');
       await database.customStatement('DROP TABLE normative_documents');

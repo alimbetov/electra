@@ -25,3 +25,5 @@ export 'src/dependency_recalculation.dart';
 export 'src/protection_requirements.dart';
 
 export 'src/normative_catalog.dart';
+
+export 'src/manufacturer_catalog_codec.dart';

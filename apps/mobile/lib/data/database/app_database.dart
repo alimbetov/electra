@@ -440,6 +440,51 @@ class CircuitProtectionSettings extends Table with GeometryAuditColumns {
   Set<Column<Object>> get primaryKey => {circuitId};
 }
 
+@DataClassName('ManufacturerCatalogRow')
+class ManufacturerCatalogs extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get manufacturer => text()();
+  TextColumn get catalogVersion => text()();
+  TextColumn get region => text().nullable()();
+  TextColumn get sourceReference => text()();
+  TextColumn get payloadJson => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('ManufacturerProductRow')
+class ManufacturerProducts extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get catalogId => text().references(ManufacturerCatalogs, #id)();
+  TextColumn get sku => text()();
+  TextColumn get payloadJson => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {catalogId, sku},
+  ];
+}
+
+@DataClassName('ManufacturerPolicyRow')
+class ManufacturerPolicies extends Table with GeometryAuditColumns {
+  TextColumn get projectId => text().references(Projects, #id)();
+  TextColumn get payloadJson => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {projectId};
+}
+
+@DataClassName('CircuitProductSelectionRow')
+class CircuitProductSelections extends Table with GeometryAuditColumns {
+  TextColumn get circuitId => text().references(ElectricalCircuits, #id)();
+  TextColumn get productId => text().references(ManufacturerProducts, #id)();
+  TextColumn get requirementFingerprint => text()();
+  TextColumn get policyJson => text()();
+  TextColumn get snapshotJson => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {circuitId};
+}
+
 @DriftDatabase(
   tables: [
     Projects,
@@ -470,6 +515,10 @@ class CircuitProtectionSettings extends Table with GeometryAuditColumns {
     NormativeDocuments,
     ProtectionRulesets,
     CircuitProtectionSettings,
+    ManufacturerCatalogs,
+    ManufacturerProducts,
+    ManufacturerPolicies,
+    CircuitProductSelections,
   ],
 )
 final class AppDatabase extends _$AppDatabase {
@@ -477,7 +526,7 @@ final class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'electra'));
 
   @override
-  int get schemaVersion => 11;
+  int get schemaVersion => 12;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -539,6 +588,12 @@ final class AppDatabase extends _$AppDatabase {
           await migrator.createTable(normativeDocuments);
           await migrator.createTable(protectionRulesets);
           await migrator.createTable(circuitProtectionSettings);
+        }
+        if (from < 12) {
+          await migrator.createTable(manufacturerCatalogs);
+          await migrator.createTable(manufacturerProducts);
+          await migrator.createTable(manufacturerPolicies);
+          await migrator.createTable(circuitProductSelections);
         }
       }
       await _createIndexes();

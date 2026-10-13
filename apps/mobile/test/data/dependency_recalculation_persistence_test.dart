@@ -408,6 +408,10 @@ void main() {
             .values['designCurrentA'],
         5,
       );
+      await database.customStatement('DROP TABLE circuit_product_selections');
+      await database.customStatement('DROP TABLE manufacturer_policies');
+      await database.customStatement('DROP TABLE manufacturer_products');
+      await database.customStatement('DROP TABLE manufacturer_catalogs');
       await database.customStatement('DROP TABLE circuit_protection_settings');
       await database.customStatement('DROP TABLE protection_rulesets');
       await database.customStatement('DROP TABLE normative_documents');
@@ -421,7 +425,7 @@ void main() {
       );
       snapshot = await repository.load(project.id);
       expect(snapshot.session.cache, isEmpty);
-      expect(database.schemaVersion, 11);
+      expect(database.schemaVersion, 12);
       expect(
         (await DriftElectricalCircuitRepository(
           database,
