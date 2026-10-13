@@ -450,6 +450,33 @@ An engineer can trace a selected branch from floor panel to room endpoint withou
 
 ## WP-FL12 — Dependency recalculation
 
+**Status: BASELINE CLOSED on `feat/flutter-routing-cablerun`. Full Flutter/core exact-SHA gate passed on `4d220a8fb305c01b07a51af0046da00cc21c72df` (49 mobile tests, 84 engineering-core tests).**
+
+### Implemented behavior
+
+- a typed-key dependency DAG connects consumer inputs, patch geometry, physical channels, circuits, route lengths, CableRun basis, protection inputs and floor source-panel basis;
+- fingerprints use exact canonical sorted JSON of the flattened semantic dependency closure and calculation versions; SQL audit revisions and display names do not invalidate numerical proposals;
+- circuit current evaluators run only for affected nodes; route geometry is independent from consumer current inputs, while cable basis combines circuit current, route length and explicit allowances;
+- protection-input records depend on their circuit and its cables; panel basis depends on reachable cables and their protection inputs;
+- before a checkpoint, coherent read snapshots derive stale/review state from current canonical inputs without overwriting the saved proposal;
+- recalculation reloads canonical inputs and writes only affected records in a single SQLite transaction, in dependency order;
+- independent records retain their result JSON, revision and update timestamp;
+- missing dependencies and evaluator failures block dependent totals, preserve independent results and permit explicit retry;
+- cycles, duplicate node keys and duplicate dependency references are rejected;
+- records retain the previous proposal, latest source-field before/after explanation, direct dependency fingerprints and calculation version;
+- schema v10 adds project-owned `project_derived_results` with audit columns, proposal state, semantic inputs and independent manual-decision fields;
+- removed active graph nodes are archived using tombstones; same-ID restoration preserves the old manual decision and requires a new review;
+- manual decisions require a value and reason, remain separate from automatic numeric proposals and are bound to reviewed input fingerprints;
+- changed inputs invalidate a manual review and propagate review state through dependants; recalculation never silently replaces the manual value or confirms an FL8 circuit;
+- project and room Calculation entry points open a live review workspace with affected/review filters, optional source inputs, `What changed?`, previous output, dependencies and explicit manual-review controls;
+- failed recalculation/manual writes retain visible previous proposals and form drafts;
+- tests prove the 2300-to-4600-W load change affects only its consumer/circuit/cable/protection/panel subgraph, with independent records unchanged; they also cover no-op revision edits, missing consumers, errors/retry, cycle rejection, manual-review propagation, restart, live invalidation after initial subscription, compact UI and v9-to-v10 migration.
+
+### Remaining boundary
+
+This stage checkpoints proposals; it does not automatically confirm an engineering decision. Protection records expose design-current input and remain `reviewRequired` until FL13 rules are implemented, with no invented breaker rating. Panel results expose per-circuit currents and remain proposals; panel rating, phase balance and equipment selection are later capabilities. Manual decisions are recorded engineering notes/values and do not replace the canonical numeric calculator inputs. The latest checkpoint preserves one previous output and its explanation, rather than a full historical event ledger. Exact closure fingerprints prioritize reproducibility over compact hashing, and project snapshot loading is still project-wide even though persisted updates and node evaluation are limited to the affected subgraph.
+
+
 ### Scope
 
 - derived-state dependency graph;
