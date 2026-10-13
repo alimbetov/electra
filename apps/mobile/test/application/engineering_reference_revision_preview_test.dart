@@ -11,11 +11,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 EngineeringReferenceCatalog fixture() => EngineeringReferenceCatalog.fromMap(
   jsonDecode(
-        File(
-          '../../docs/examples/elv2-reference-catalog.json',
-        ).readAsStringSync(),
-      )
-      as Map<String, dynamic>,
+    File('../../docs/examples/elv2-reference-catalog.json').readAsStringSync(),
+  ) as Map<String, dynamic>,
 );
 
 ProjectEngineeringSystemsSnapshot systems() =>
@@ -110,70 +107,70 @@ EngineeringReferenceCatalog candidateWithCamera(
   'version': '2',
   'profiles': [
     for (final profile in previous.profiles)
-      if (profile.code == 'CAMERA') {...profile.toMap(), ...cameraPatch} else profile.toMap(),
+      if (profile.code == 'CAMERA')
+        {...profile.toMap(), ...cameraPatch}
+      else
+        profile.toMap(),
   ],
 });
 
 void main() {
-  test(
-    'connection-only revision joins exact component connection and group without fabricating placement result',
-    () {
-      final previous = fixture();
-      final camera = previous.profile('CAMERA');
-      final changedPort = EngineeringPort.fromMap({
-        ...camera.portTemplates.first.toMap(),
-        'capacity': camera.portTemplates.first.capacity + 1,
-      });
-      final candidate = candidateWithCamera(previous, {
-        'portTemplates': [changedPort.toMap()],
-      });
-      final references = ProjectEngineeringReferences(
-        systems: systems(),
-        catalogs: [previous],
-        bindings: [cameraBinding(previous)],
-      );
-      final preview = previewCatalogRevision(
-        references: references,
-        topology: topology(
-          connections: const [
-            EngineeringConnection(
-              id: 'link-17',
-              systemId: 'cctv',
-              fromPortId: 'camera-port',
-              toPortId: 'switch-port',
-              profileId: 'ethernet',
-              medium: ConnectionMedium.wired,
-            ),
-          ],
-          groups: const [
-            TopologyGroup(
-              id: 'group-3',
-              systemId: 'cctv',
-              code: 'G3',
-              profileId: 'star',
-              startPortId: 'camera-port',
-            ),
-          ],
-        ),
-        candidate: candidate,
-      );
+  test('connection-only revision joins exact component connection and group without fabricating placement result', () {
+    final previous = fixture();
+    final camera = previous.profile('CAMERA');
+    final changedPort = EngineeringPort.fromMap({
+      ...camera.portTemplates.first.toMap(),
+      'capacity': camera.portTemplates.first.capacity + 1,
+    });
+    final candidate = candidateWithCamera(previous, {
+      'portTemplates': [changedPort.toMap()],
+    });
+    final references = ProjectEngineeringReferences(
+      systems: systems(),
+      catalogs: [previous],
+      bindings: [cameraBinding(previous)],
+    );
+    final preview = previewCatalogRevision(
+      references: references,
+      topology: topology(
+        connections: const [
+          EngineeringConnection(
+            id: 'link-17',
+            systemId: 'cctv',
+            fromPortId: 'camera-port',
+            toPortId: 'switch-port',
+            profileId: 'ethernet',
+            medium: ConnectionMedium.wired,
+          ),
+        ],
+        groups: const [
+          TopologyGroup(
+            id: 'group-3',
+            systemId: 'cctv',
+            code: 'G3',
+            profileId: 'star',
+            startPortId: 'camera-port',
+          ),
+        ],
+      ),
+      candidate: candidate,
+    );
 
-      expect(preview.affectedBindingCount, 1);
-      expect(preview.affectedConnectionIds, {'link-17'});
-      expect(preview.affectedTopologyGroupIds, {'group-3'});
-      expect(preview.affectsConnections, isTrue);
-      expect(preview.affectsPlacement, isFalse);
-      expect(preview.adoptionBlocked, isFalse);
-      expect(preview.bindingImpacts.single.placementResult, isNull);
-      expect(preview.bindingImpacts.single.placementBlockerReason, isNull);
-      expect(
-        preview.bindingImpacts.single.profileImpact.changes.map(
-          (change) => change.kind,
-        ),
-        contains(ProfileRevisionChangeKind.ports),
-      );
-    },
-  );
+    expect(preview.affectedBindingCount, 1);
+    expect(preview.affectedConnectionIds, {'link-17'});
+    expect(preview.affectedTopologyGroupIds, {'group-3'});
+    expect(preview.affectsConnections, isTrue);
+    expect(preview.affectsPlacement, isFalse);
+    expect(preview.adoptionBlocked, isFalse);
+    expect(preview.bindingImpacts.single.placementResult, isNull);
+    expect(preview.bindingImpacts.single.placementBlockerReason, isNull);
+    expect(
+      preview.bindingImpacts.single.profileImpact.changes.map(
+        (change) => change.kind,
+      ),
+      contains(ProfileRevisionChangeKind.ports),
+    );
+  });
 
   test('removed profile is an affected binding and adoption blocker', () {
     final previous = fixture();
@@ -181,11 +178,10 @@ void main() {
       ...previous.toMap(),
       'id': '${previous.id}-v2',
       'version': '2',
-      'profiles':
-          previous.profiles
-              .where((profile) => profile.code != 'CAMERA')
-              .map((profile) => profile.toMap())
-              .toList(),
+      'profiles': previous.profiles
+          .where((profile) => profile.code != 'CAMERA')
+          .map((profile) => profile.toMap())
+          .toList(),
     });
     final references = ProjectEngineeringReferences(
       systems: systems(),
@@ -263,38 +259,38 @@ void main() {
     expect(preview.adoptionBlocked, isTrue);
   });
 
-  test(
-    'placement-relevant historical binding without reviewed evidence stays unresolved and blocking',
-    () {
-      final previous = fixture();
-      final camera = previous.profile('CAMERA');
-      final candidate = candidateWithCamera(previous, {
-        'constraints': {
-          ...camera.constraints!.toMap(),
-          'mounting': {
-            ...camera.constraints!.mounting.toMap(),
-            'minimumClearanceMm': 60,
-          },
+  test('placement-relevant historical binding without reviewed evidence stays unresolved and blocking', () {
+    final previous = fixture();
+    final camera = previous.profile('CAMERA');
+    final candidate = candidateWithCamera(previous, {
+      'constraints': {
+        ...camera.constraints!.toMap(),
+        'mounting': {
+          ...camera.constraints!.mounting.toMap(),
+          'minimumClearanceMm': 60,
         },
-      });
-      final references = ProjectEngineeringReferences(
-        systems: systems(),
-        catalogs: [previous],
-        bindings: [cameraBinding(previous)],
-      );
+      },
+    });
+    final references = ProjectEngineeringReferences(
+      systems: systems(),
+      catalogs: [previous],
+      bindings: [cameraBinding(previous)],
+    );
 
-      final impact = previewCatalogRevision(
-        references: references,
-        topology: topology(),
-        candidate: candidate,
-      ).bindingImpacts.single;
+    final impact = previewCatalogRevision(
+      references: references,
+      topology: topology(),
+      candidate: candidate,
+    ).bindingImpacts.single;
 
-      expect(impact.profileImpact.affectsPlacement, isTrue);
-      expect(impact.placementResult, isNull);
-      expect(impact.placementBlockerReason, contains('no reviewed placement evidence'));
-      expect(impact.adoptionBlocked, isTrue);
-    },
-  );
+    expect(impact.profileImpact.affectsPlacement, isTrue);
+    expect(impact.placementResult, isNull);
+    expect(
+      impact.placementBlockerReason,
+      contains('no reviewed placement evidence'),
+    );
+    expect(impact.adoptionBlocked, isTrue);
+  });
 
   test('deprecated candidate profile cannot appear safe', () {
     final previous = fixture();
@@ -344,7 +340,10 @@ void main() {
     );
 
     expect(preview.candidateValidationErrors, isNotEmpty);
-    expect(preview.bindingImpacts.single.candidateProfileValidationErrors, isNotEmpty);
+    expect(
+      preview.bindingImpacts.single.candidateProfileValidationErrors,
+      isNotEmpty,
+    );
     expect(preview.adoptionBlocked, isTrue);
   });
 
@@ -402,9 +401,9 @@ void main() {
       candidate: candidate,
     );
 
-    expect(
-      preview.bindingImpacts.map((impact) => impact.componentId),
-      ['camera-1', 'camera-2'],
-    );
+    expect(preview.bindingImpacts.map((impact) => impact.componentId), [
+      'camera-1',
+      'camera-2',
+    ]);
   });
 }
