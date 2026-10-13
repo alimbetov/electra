@@ -6,7 +6,8 @@ import 'package:test/test.dart';
 
 EngineeringReferenceCatalog fixture() => EngineeringReferenceCatalog.fromMap(
       jsonDecode(
-        File('../../docs/examples/elv2-reference-catalog.json').readAsStringSync(),
+        File('../../docs/examples/elv2-reference-catalog.json')
+            .readAsStringSync(),
       ) as Map<String, dynamic>,
     );
 
@@ -53,7 +54,8 @@ ComponentEngineeringProfile legacyProfile(String code) {
 }
 
 void main() {
-  test('typed constraint contract roundtrips exact mounting pairs and IP value', () {
+  test('typed constraint contract roundtrips exact mounting pairs and IP value',
+      () {
     final constraints = cameraConstraints(outdoor: true);
     expect(constraints.validate(), isEmpty);
 
@@ -100,7 +102,9 @@ void main() {
     expect(invalidTopology.validate(), isNotEmpty);
   });
 
-  test('legacy profile remains readable but cannot be published or instantiated', () {
+  test(
+      'legacy profile remains readable but cannot be published or instantiated',
+      () {
     final legacy = legacyProfile('CAMERA');
 
     expect(legacy.constraintsState, ProfileConstraintsState.legacyUnspecified);
@@ -118,7 +122,8 @@ void main() {
     );
   });
 
-  test('embedded constraints participate in self-contained revision impact', () {
+  test('embedded constraints participate in self-contained revision impact',
+      () {
     final previous = fixture().profile('CAMERA');
     final changedPort = EngineeringPort.fromMap({
       ...previous.portTemplates.first.toMap(),
@@ -152,13 +157,13 @@ void main() {
     final profile = fixture().profile('DETECTOR');
     final reordered = ComponentEngineeringProfile.fromMap({
       ...profile.toMap(),
-      'portTemplates': profile.portTemplates.reversed
-          .map((port) => port.toMap())
-          .toList(),
+      'portTemplates':
+          profile.portTemplates.reversed.map((port) => port.toMap()).toList(),
     });
 
     expect(
-      compareEngineeringProfileRevisions(previous: profile, candidate: reordered)
+      compareEngineeringProfileRevisions(
+              previous: profile, candidate: reordered)
           .changed,
       isFalse,
     );
