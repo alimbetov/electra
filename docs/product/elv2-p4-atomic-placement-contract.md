@@ -1,5 +1,6 @@
 # ELV2-P4 — atomic canonical placement
 
+Status: implementation contract v1.1  
 Branch: `feat/flutter-elv2-profile-constraints`  
 Parent: [ELV2 technical specification](elv2-profile-constraints-technical-specification.md)  
 Pre-placement UI: [P3 palette contract](elv2-p3-palette-contract.md)  
@@ -7,20 +8,26 @@ Decision engine: [P2 placement compatibility contract](elv2-p2-placement-compati
 
 ## 1. Purpose
 
-P4 turns the read-only P3 preview into one durable engineering operation. A successful command creates exactly one placed physical component, establishes its engineering-system membership, freezes the exact canonical catalog/profile binding, instantiates persisted ELV1 ports, and records one editor-history action. A failed command leaves no partial engineering state.
+P4 turns the read-only P3 preview into one durable engineering operation. A successful command creates exactly one placed physical component, establishes its engineering-system membership, freezes the exact canonical catalog/profile binding, instantiates persisted ELV1 ports, persists the durable operation identity/result, and records one aggregate editor-history action. A failed command leaves no partial engineering state.
 
-Target transaction:
+P4 covers **new canonical placement only**. Catalog revision impact, replacement and adoption remain P5/P6.
+
+Target flow:
 
 ```text
 PlaceEngineeringProfileCommand
         │
+        ├── validate command shape
+        ├── resolve durable operationId state
         ├── resolve exact project / room / surface
         ├── resolve exact EngineeringSystem
         ├── resolve exact catalog edition + profile
-        ├── reconstruct candidate evidence
+        ├── reconstruct commit-time candidate evidence
         └── P2 revalidation
                 ↓
         BEGIN DATABASE TRANSACTION
+                ↓
+        claim operationId / verify fingerprint
                 ↓
         create physical ComponentInstance
                 ↓
@@ -30,18 +37,18 @@ PlaceEngineeringProfileCommand
                 ↓
         instantiate persisted EngineeringPorts
                 ↓
-        validate postconditions
+        validate aggregate postconditions
                 ↓
-        persist idempotency result
+        persist completed operation result
+                ↓
+        persist one history payload if history is durable
                 ↓
         COMMIT
                 ↓
-        append one editor history command
+        expose one successful editor action
 ```
 
-If any durable step fails, the database transaction rolls back every row created by the operation. No component, membership, binding or subset of ports may survive a failed placement.
-
-P4 covers **new canonical placement only**. Catalog revision migration/adoption remains P5/P6.
+If any durable step fails, the transaction rolls back every row created by the operation. No component, membership, binding, subset of ports, completed operation record or durable history record may survive a failed placement.
 
 ---
 
@@ -49,16 +56,20 @@ P4 covers **new canonical placement only**. Catalog revision migration/adoption 
 
 The implementation MUST preserve the following rules.
 
-1. **One physical component.** One placement command creates at most one `ComponentInstance`.
-2. **One atomic engineering operation.** Component, membership, frozen binding and ports are one commit boundary.
-3. **Revalidate at commit.** A P3 preview result is not authorization to persist; P2 runs again immediately before mutation.
-4. **Exact provenance.** The command identifies exact catalog id/version/profile code and the binding freezes the corresponding profile snapshot.
-5. **No silent latest lookup.** P4 never substitutes a newer catalog/profile edition during commit.
-6. **ELV1 persisted graph remains authoritative.** Ports instantiated by P4 are real persisted ELV1 ports, not transient profile metadata.
-7. **Rollback is total.** Any exception before commit produces zero new durable rows from the operation.
-8. **Retry is idempotent.** Re-submitting the same operation identity cannot create duplicates.
-9. **Undo/redo is aggregate-level.** The user performs one placement operation, therefore history records one reversible engineering command, not four unrelated mutations.
-10. **No ELV3 leakage.** P4 does not create cables, cable runs, pathways or route objects.
+1. **One physical component.** One logical placement operation creates at most one `ComponentInstance`.
+2. **One atomic engineering aggregate.** Component, membership, frozen binding, ports and durable idempotency result share one commit boundary.
+3. **Revalidate at commit.** A P3 preview is evidence shown to the user, not authorization to persist. P2 runs again against commit-time state.
+4. **Exact provenance.** P4 uses the exact catalog id/version/profile code selected in P3 and freezes that profile snapshot.
+5. **No silent latest lookup.** P4 never substitutes a newer catalog/profile/system/topology edition.
+6. **ELV1 graph remains authoritative.** Ports created by P4 are persisted ELV1 graph objects.
+7. **Rollback is total.** Any failure before commit produces zero new durable aggregate rows.
+8. **Retry is durable and idempotent.** The same operation identity with the same semantic command converges to one result, including after restart.
+9. **Command identity is semantic.** Idempotency compares a canonical command fingerprint, not arbitrary JSON serialization order.
+10. **Concurrency is explicit.** Two simultaneous submissions of the same `operationId` cannot create two aggregates.
+11. **Undo/redo is aggregate-level.** The user sees one placement action, not separate component/membership/binding/port mutations.
+12. **History cannot weaken atomicity.** A successful durable placement must not depend on a best-effort post-commit history append that can be silently lost.
+13. **No hidden repair.** Corrupt or conflicting existing state is rejected; P4 does not silently normalize existing memberships, bindings or ports.
+14. **No ELV3 leakage.** P4 does not create cables, cable runs, pathways, route objects or cable compatibility rules.
 
 ---
 
@@ -66,20 +77,21 @@ The implementation MUST preserve the following rules.
 
 ### 3.1 In scope
 
-- atomic placement application command;
+- one atomic placement application command;
 - exact project/room/surface/system/catalog/profile resolution;
-- P2 compatibility revalidation at commit time;
+- commit-time P2 compatibility revalidation;
 - physical `ComponentInstance` creation;
 - engineering-system membership creation;
 - immutable `ComponentReferenceBinding` creation;
 - persisted ELV1 port instantiation from profile templates;
-- provenance preservation for template/interface/catalog/profile edition;
-- rollback on any failure;
-- deterministic failure injection for tests;
-- idempotent retry by stable operation identity;
-- single undo/redo history action;
+- exact template/interface/catalog/profile provenance;
+- durable `operationId` claim/result persistence;
+- canonical command fingerprinting;
+- concurrency-safe idempotency;
+- deterministic rollback/failure injection;
+- one aggregate undo/redo action;
 - CCTV/LAN/ACS/Fire acceptance scenarios;
-- persistence/restart verification;
+- database restart verification;
 - exact-SHA push + PR CI gates.
 
 ### 3.2 Out of scope
@@ -89,16 +101,20 @@ The implementation MUST preserve the following rules.
 - migration of connected ports;
 - revision impact preview;
 - connection creation as part of placement;
-- topology-group mutation beyond membership facts required by current ELV1 model;
+- topology-group mutation beyond current membership facts;
+- whole-graph loop/degree/branch validation that requires existing connections;
 - cables, `CableRun`, routes and pathways;
 - PoE, PSU, UPS or battery calculations;
-- normative override workflow for forbidden/unresolved placement.
+- normative override workflow for forbidden/unresolved placement;
+- manufacturer-equipment BOM selection.
 
 ---
 
-## 4. P4.1 — Atomic command contract
+# P4.1 — Atomic command contract
 
-Introduce an application-level command equivalent to:
+## 4. Command
+
+Introduce an application-level immutable command equivalent to:
 
 ```text
 PlaceEngineeringProfileCommand
@@ -116,6 +132,8 @@ PlaceEngineeringProfileCommand
 - displayNameOverride?
 ```
 
+The command contains user intent and candidate evidence. It does not contain trusted copies of system discipline, catalog/profile objects, interface definitions or database rows. Those are resolved from persistence.
+
 ### 4.1 Operation identity
 
 `operationId` is a stable client-generated UUID/string for one logical placement attempt.
@@ -123,24 +141,27 @@ PlaceEngineeringProfileCommand
 Rules:
 
 - non-empty and immutable;
-- unique per logical user operation;
-- retrying after transport/UI uncertainty reuses the same value;
-- a different intended placement uses a new value;
-- `operationId` is not derived from component id, coordinates or profile code.
+- generated before the first mutation request;
+- reused when retrying the same logical placement after UI/process uncertainty;
+- a materially different intended placement uses a new value;
+- never derived solely from component id, coordinates, display name or profile code;
+- never reused by normal redo as if redo were a network retry; redo has explicit history semantics defined in P4.10.
 
-### 4.2 Placement context
+### 4.2 Placement context identity
 
-The command carries the exact `PlacementCandidateContext` that was reviewed in P3, but P4 MUST verify that its identity fields agree with the command/project state:
+The command carries the `PlacementCandidateContext` reviewed in P3, but P4 verifies identity against durable state:
 
 ```text
 context.projectId == command.projectId
 context.roomId == command.roomId
-context.surfaceId corresponds to hostSurfacePatchId.surfaceId
+context.surfaceId == resolved hostSurfacePatch.surfaceId
+resolved hostSurfacePatch.roomId == command.roomId
+resolved system.projectId == command.projectId
 ```
 
-The context is evidence, not authority. Project/system/catalog/geometry state is resolved again from persistence.
+The context is evidence, not authority. Geometry, project, system, catalog/profile and pinned topology facts are resolved again.
 
-### 4.3 Result contract
+### 4.3 Result
 
 Return an immutable result equivalent to:
 
@@ -152,22 +173,27 @@ EngineeringPlacementResult
 - catalogId
 - catalogVersion
 - profileCode
-- bindingId or binding identity
+- binding identity
 - portIds[]
 - placementStatus
+- committedAt
 ```
 
-The same `operationId` retry MUST return the same durable result after the first successful commit.
+For a completed operation, the result is persisted or reconstructable from exact aggregate ids without ambiguity.
 
-### 4.4 Failure model
+A retry of the same semantic command MUST return the same logical result and exact ids.
 
-Use typed/application-level failures where practical. Minimum semantic categories:
+### 4.4 Typed failure model
+
+Minimum semantic categories:
 
 ```text
+INVALID_COMMAND
 PROJECT_NOT_FOUND
 ROOM_NOT_FOUND
 SURFACE_PATCH_NOT_FOUND
 SYSTEM_NOT_FOUND
+SYSTEM_PROJECT_MISMATCH
 SYSTEM_DISCIPLINE_MISMATCH
 CATALOG_EDITION_NOT_FOUND
 PROFILE_NOT_FOUND
@@ -179,93 +205,153 @@ MEMBERSHIP_CONFLICT
 BINDING_CONFLICT
 PORT_CONFLICT
 IDEMPOTENCY_CONFLICT
+OPERATION_IN_PROGRESS
+HISTORY_CONFLICT
 TRANSACTION_FAILED
 ```
 
-UI text must not be the source of failure classification.
+A failure may carry structured detail such as P2 findings, conflicting ids or expected/actual provenance. UI text is presentation only and must not be the source of classification.
 
 ---
 
-## 5. P4.2 — Repository transaction boundary
+# P4.2 — Repository transaction boundary
 
-### 5.1 Single owner
+## 5. Single transaction owner
 
-P4 requires one transaction owner in the data/application boundary, for example:
+P4 requires one dedicated transaction owner, for example:
 
 ```text
 EngineeringPlacementRepository.place(command)
 ```
 
-or an application service backed by one Drift repository.
+or an application service backed by one Drift transaction-scoped repository.
 
-It MUST open exactly one top-level `AppDatabase.transaction` covering all durable P4 mutations.
+It MUST open exactly one top-level `AppDatabase.transaction` covering all durable P4 writes.
 
-The current component repository already uses independent transactions for `saveComponent`; P4 MUST NOT compose several public repository methods if that creates separate commit boundaries. P4 should instead use transaction-scoped internal operations or a dedicated atomic repository that writes through the same database transaction.
+Existing public repositories such as component/reference/system repositories may continue to own transactions for their standalone use cases, but P4 MUST NOT compose independently committing public methods. Instead use one of:
 
-### 5.2 Transaction sequence
+```text
+A. dedicated atomic repository writes tables directly
+B. transaction-scoped internal DAO primitives with no nested independent commit boundary
+C. explicit unit-of-work passed to internal repository methods
+```
+
+The implementation must document which option is chosen.
+
+## 6. Transaction sequence
 
 Inside one transaction:
 
 ```text
-1. claim/check operationId
-2. re-read project/room/surface/system/catalog/profile
-3. run all persistence preconditions
-4. create component
-5. create membership
-6. create frozen binding
-7. instantiate all ports
-8. assert postconditions
-9. persist successful operation result
-10. return
+1. validate/claim operationId
+2. compare canonical command fingerprint
+3. if COMPLETED -> return stored/reconstructed result
+4. if conflicting fingerprint -> IDEMPOTENCY_CONFLICT
+5. resolve current project/room/surface/system/catalog/profile
+6. verify geometry + discipline + persistence preconditions
+7. reconstruct commit-time PlacementCandidateContext
+8. run P2 and enforce commit policy
+9. create component
+10. create membership
+11. create frozen binding skeleton / planned port ids
+12. create all ports
+13. finalize binding exact portIds
+14. assert aggregate postconditions
+15. persist COMPLETED operation result
+16. persist durable history payload when history storage is database-backed
+17. commit
 ```
 
-P2 domain revalidation may run immediately before the transaction if every referenced durable fact is then rechecked inside it. Preferred implementation is to resolve the commit snapshot and evaluate P2 within the same transaction before the first insert.
+No mutation happens before idempotency conflict detection and commit-time compatibility checks are complete.
 
-### 5.3 No externally visible partial state
+## 7. Transaction observation
 
-Watch streams may emit only after commit. No caller may observe an active component without its required binding/ports as a successful P4 result.
+- Drift/watch observers must not observe a successful active component without required P4 membership/binding/ports.
+- The application must not publish success or add an in-memory history entry until the database transaction commits.
+- A post-commit event may refresh UI, but must not perform required durable aggregate writes.
+
+## 8. Transaction postconditions
+
+Before commit, assert at minimum:
+
+```text
+1 active component with result.componentId
+1 active membership (componentId, systemId)
+1 active binding for componentId
+N active ports where N == profile.portTemplates.length
+set(binding.portIds) == set(persisted port ids)
+all ports.componentId == componentId
+all port provenance resolves to the frozen profile/catalog edition
+completed operation result references exactly these ids
+```
+
+A postcondition failure causes rollback, not repair.
 
 ---
 
-## 6. P4.3 — Component creation
+# P4.3 — Component creation
 
-P4 creates a normal physical `ComponentInstance` compatible with the existing geometry model.
+## 9. Physical component
+
+P4 creates a normal `ComponentInstance` compatible with the existing geometry model. It MUST NOT introduce an ELV-only parallel physical entity.
 
 Required checks:
 
-- project and room are active;
-- surface patch exists, is active and belongs to the room;
-- component local point belongs to the selected patch according to existing `ComponentPlacementValidator`/geometry invariants;
-- component id is newly generated deterministically for the operation or persisted in the idempotency record before retry ambiguity;
-- no manufacturer SKU becomes the canonical engineering source of truth;
-- geometry remains one physical instance even if future systems share it.
+- project exists and is active;
+- room exists, is active and belongs to the project;
+- host surface patch exists, is active and belongs to the room;
+- local point satisfies existing `ComponentPlacementValidator`/geometry invariants;
+- rotation is finite and accepted by current component contract;
+- generated component id is stable for the operation;
+- manufacturer SKU/display label is not canonical engineering identity.
 
-The component definition/version strategy MUST use the existing component-instance contract without creating a parallel ELV-only physical entity. If a synthetic/canonical definition is required for ELV placement, it must be deterministic and documented rather than encoded from display text.
+## 10. Component identity
+
+Preferred rule:
+
+```text
+componentId = deterministic namespace-derived id from operationId
+```
+
+or another durable one-time identity stored in the claimed operation row before ambiguity can occur.
+
+The same semantic retry must resolve the same component id.
+
+If a generated id already exists but is not owned by the same successful operation/fingerprint, fail `COMPONENT_CONFLICT`.
+
+## 11. Component definition/version
+
+P4 must reuse the existing component-instance definition/version contract. If ELV placement requires a canonical/synthetic physical definition, it must have a documented deterministic identity and version; it must not be synthesized from translated labels or manufacturer names.
 
 ---
 
-## 7. P4.4 — Engineering-system membership
+# P4.4 — Engineering-system membership
 
-After component creation, create the persisted membership that associates the physical component with the selected `EngineeringSystem`.
+## 12. Membership invariants
 
-Invariants:
+Create exactly one persisted active membership associating the placed component with the selected `EngineeringSystem`.
+
+Required invariants:
 
 - system belongs to the same project;
-- system is active/resolvable;
-- system discipline/family resolves to the exact discipline of the selected canonical profile;
-- duplicate active membership for the same component/system is forbidden;
-- no membership may remain without its component after rollback;
-- cross-discipline placement fails before binding/ports are committed.
+- exact system family/version resolves successfully;
+- resolved system discipline equals `profile.discipline`;
+- duplicate active `(componentId, systemId)` membership is forbidden;
+- rollback leaves no membership without its component;
+- P4 does not create extra cross-discipline memberships implicitly;
+- existing conflicting membership state is rejected rather than repaired.
 
-If current membership persistence uses the engineering-system repository/table directly, P4 must reuse that schema rather than inventing a second relation.
+P4 reuses the current engineering-system membership schema/table.
 
 ---
 
-## 8. P4.5 — Frozen binding
+# P4.5 — Frozen binding
+
+## 13. Binding snapshot
 
 Create exactly one active `ComponentReferenceBinding` for the new component.
 
-The binding MUST freeze:
+The binding freezes:
 
 ```text
 componentId
@@ -273,210 +359,334 @@ catalogId
 catalogVersion
 profileCode
 full ComponentEngineeringProfile snapshot
-constraints state + constraints snapshot
+constraintsState
+constraints snapshot
 portIds[]
 ```
 
-Rules:
+Required rules:
 
-- exact profile edition from the command is used;
-- no latest-version lookup;
-- `legacyUnspecified` cannot be used for successful new placement;
-- deprecated profile cannot be used for successful new placement;
-- profile discipline must match system discipline;
+- use exact command edition; no latest lookup;
+- profile must be publication-valid for new placement;
+- `legacyUnspecified` cannot succeed;
+- deprecated profile cannot succeed;
+- profile discipline must match the resolved system discipline;
 - one active binding per component;
-- rollback removes the binding if any subsequent port operation fails.
+- final `portIds` exactly equal persisted P4 port ids;
+- rollback removes all binding effects.
 
-The final stored `portIds` must exactly match the persisted ports created in P4.6.
+The binding is the future P5/P6 provenance anchor. P4 therefore must not store only a profile code and rely on current catalog contents later.
 
 ---
 
-## 9. P4.6 — Persisted port instantiation
+# P4.6 — Persisted port instantiation
 
-Instantiate ports from `ComponentEngineeringProfile.portTemplates` using existing ELV1 semantics.
+## 14. Port instantiation
 
-For every template:
+For every `ComponentEngineeringProfile.portTemplates` entry create exactly one persisted `EngineeringPort` with the placed component id.
 
-- create one persisted `EngineeringPort` with the placed `componentId`;
-- preserve template code/kind/direction/capacity/protocol/connector/electrical metadata;
-- preserve exact template provenance;
-- resolve and freeze exact interface provenance from `portInterfaceCodes` and the selected catalog vocabulary;
-- generate stable unique persisted port ids;
-- prohibit duplicate active port ids/codes for the component;
-- prohibit silent replacement of manually authored conflicting active ports.
+Preserve at minimum:
 
-### 9.1 Port identity
+- template code;
+- kind;
+- direction;
+- capacity;
+- connector;
+- protocol/version;
+- electrical metadata already carried by the template;
+- template provenance;
+- exact interface code/version/provenance resolved from `portInterfaceCodes` and the selected catalog vocabulary.
 
-For a first placement attempt, generated port ids MUST be deterministic for the durable operation or persisted once before ambiguity, so an idempotent retry returns the same ids.
+No manually authored active port may be silently overwritten or adopted merely because its code matches a template.
 
-Recommended identity basis:
+## 15. Stable port identity
+
+Persisted port identity MUST be deterministic for the operation and template semantic identity.
+
+Recommended basis:
 
 ```text
-operationId + normalized port template code
+operationId + normalized template code
 ```
 
-or another collision-safe deterministic scheme owned by P4.
+Requirements:
 
-Do not use list index alone; template reordering is not semantic identity.
+- template list order does not affect identity;
+- duplicate normalized template codes fail before mutation;
+- same operation retry returns same port ids;
+- different operation ids cannot accidentally converge to the same port ids;
+- identity generation algorithm is covered by tests and treated as persisted contract once P4 ships.
 
-### 9.2 All-or-nothing
+## 16. Interface provenance
 
-If a profile has N templates, success requires exactly N active persisted ports and the binding must list exactly those N ids.
+If `portInterfaceCodes` references an interface code, P4 must resolve that interface in the exact selected catalog vocabulary before insertion.
 
-Example Fire detector:
+Failure to resolve exact interface provenance is `PORT_CONFLICT`/invalid catalog state and rolls back the whole operation.
+
+## 17. All-or-nothing port set
+
+If profile has N templates, success requires exactly N active ports.
+
+Example:
 
 ```text
-DETECTOR
+Fire DETECTOR
   IN
   OUT
 ```
 
-If `IN` succeeds and `OUT` fails, neither port, the binding, membership nor component may remain after rollback.
+If `IN` is inserted and `OUT` fails, transaction rollback removes both plus binding, membership, component and operation completion record.
 
 ---
 
-## 10. P4.7 — P2 revalidation at commit
+# P4.7 — P2 revalidation at commit
 
-P3 preview is advisory/read-only. P4 MUST call `PlacementCompatibilityEngine` again with the exact profile edition and commit-time candidate evidence.
+## 18. Revalidation rule
 
-Commit policy:
+P4 MUST invoke the existing `PlacementCompatibilityEngine` again using:
+
+- exact resolved profile edition;
+- current durable project/room/surface identity;
+- current pinned topology evidence where applicable;
+- candidate environmental/mounting facts explicitly supplied by the command and still applicable to that surface.
+
+P3 result is never reused as a trusted boolean.
+
+## 19. Commit policy
 
 ```text
-COMPATIBLE  -> may proceed
-WARNING     -> may proceed only when P2 actually emits an explicit warning rule and product policy permits it
+COMPATIBLE  -> commit may proceed
+WARNING     -> commit only if a separately defined product policy explicitly permits that warning class
 FORBIDDEN   -> zero mutation
 UNRESOLVED  -> zero mutation
 ```
 
-Current P2 emits no warning rules, so P4 should be implemented without inventing warning exceptions.
+At current P2 state, no warning exception is invented by P4.
 
-Revalidation MUST detect at least:
+Required stale-state checks include:
 
-- stale/deprecated profile;
-- catalog/profile mismatch;
-- mounting mismatch;
-- environment mismatch;
-- incomplete required evidence;
-- topology shape/role mismatch;
-- missing pinned topology evidence where P3 already treats it as unresolved.
+- profile became deprecated/unavailable;
+- exact catalog edition missing;
+- system/family edition no longer resolves;
+- system/profile discipline mismatch;
+- surface/room/project mismatch;
+- mounting/environment evidence mismatch;
+- required evidence missing;
+- pinned topology evidence missing or mismatched;
+- topology shape/role incompatible.
 
-A previously compatible P3 preview does not bypass P4 validation.
+Whole-graph connection-dependent validation remains outside pre-placement P4.
 
 ---
 
-## 11. P4.8 — Rollback and failure injection
+# P4.8 — Rollback and failure injection
 
-Atomicity MUST be proven with deterministic failure injection in repository/integration tests.
+## 20. Deterministic failure seam
 
-Provide a test-only fault seam equivalent to:
+Provide a test-only injected fault interface equivalent to:
 
 ```text
 EngineeringPlacementFailurePoint
+- afterOperationClaim
 - afterComponent
 - afterMembership
 - afterBinding
-- beforePort(index/code)
-- afterPort(index/code)
+- beforePort(code)
+- afterPort(code)
+- beforeOperationComplete
+- beforeHistoryPersist
 - beforeCommit
 ```
 
-The production path must not depend on a debug flag stored in project data. Injection is constructor/test dependency behavior only.
+Injection is a constructor/test dependency only. No debug flag is stored in project data or enabled in production flow.
 
-For every injected point assert:
+## 21. Rollback proof
+
+For every injected point, after the failed transaction assert final durable state:
 
 ```text
-component count delta = 0
-membership count delta = 0
-binding count delta = 0
-port count delta = 0
-idempotency success record delta = 0
-history delta = 0
+new active components        = 0
+new active memberships       = 0
+new active bindings          = 0
+new active ports             = 0
+new COMPLETED operations     = 0
+new durable history records  = 0
 ```
 
-Database `total_changes()` may increase internally during a rolled-back SQLite transaction; acceptance must verify final durable state, not assume SQLite's cumulative counter rolls back.
+An operation claim/state written in the same rolled-back transaction must also disappear. If implementation deliberately persists a non-transactional failure audit, that audit must be explicitly outside aggregate/idempotency semantics and cannot block safe retry.
 
-Also test natural failures:
+SQLite `total_changes()` is not rollback evidence because it is cumulative. Assert actual table state.
 
-- invalid surface geometry;
+## 22. Natural failure matrix
+
+Also prove rollback for:
+
+- invalid geometry/surface point;
+- wrong project/room/surface relation;
 - wrong discipline;
-- missing catalog/profile;
-- pre-existing conflicting port;
-- duplicate binding/membership conflict.
+- missing system/catalog/profile/interface;
+- deprecated/legacy profile;
+- P2 forbidden/unresolved;
+- existing active binding conflict;
+- existing membership conflict;
+- existing/manual port conflict;
+- malformed profile/template duplicate;
+- postcondition failure.
 
 ---
 
-## 12. P4.9 — Idempotent retry
+# P4.9 — Durable idempotent retry and concurrency
 
-### 12.1 Required behavior
+## 23. Operation state machine
 
-For the same `operationId` and semantically identical command:
-
-```text
-first call  -> creates aggregate and returns result
-second call -> creates nothing and returns the same result
-```
-
-No duplicate component, membership, binding, ports or history action.
-
-### 12.2 Conflict behavior
-
-If an existing `operationId` is reused with materially different command data, fail with `IDEMPOTENCY_CONFLICT`.
-
-Material fields include at least:
+Durable placement operation state MUST be explicit. Recommended state model:
 
 ```text
-projectId
-roomId
-systemId
-catalogId/version/profileCode
-hostSurfacePatchId
-position/rotation
-placement evidence relevant to P2
+ABSENT
+  ↓ claim
+IN_PROGRESS
+  ↓ same transaction success
+COMPLETED
 ```
 
-### 12.3 Persistence strategy
+Because SQLite writes are serialized and the claim lives inside the placement transaction, a rolled-back operation returns effectively to `ABSENT`.
 
-Idempotency must survive restart. An in-memory set is insufficient.
+Do not persist a durable `FAILED` state that permanently poisons `operationId` unless retry semantics for that state are explicitly defined. For P4, rollback + retry is preferred.
+
+## 24. Operation table
 
 Preferred minimal additive persistence:
 
 ```text
 EngineeringPlacementOperations
-- operationId PK
-- commandFingerprint
-- status
-- resultJson / aggregate ids
+- operationId PRIMARY KEY
+- commandFingerprint NOT NULL
+- status NOT NULL
+- componentId?
+- systemId?
+- binding identity?
+- resultJson?
 - createdAt
+- completedAt?
 ```
 
-A successful operation row is committed in the same transaction as the placement aggregate. If an existing suitable durable operation/audit table can express the same contract without ambiguity, reuse it.
+The exact schema can be normalized, but it must support deterministic same-command replay after restart.
 
-Do not persist a successful idempotency result outside the placement transaction.
+## 25. Canonical command fingerprint
+
+Fingerprinting MUST NOT hash arbitrary `jsonEncode(command)` output unless canonical ordering/number encoding is guaranteed.
+
+Define one canonical projection of material command fields:
+
+```text
+fingerprintVersion
+projectId
+roomId
+systemId
+catalogId
+catalogVersion
+profileCode
+hostSurfacePatchId
+localPosition.xMm
+localPosition.yMm
+normalized rotationRadians
+canonical PlacementCandidateContext material evidence
+normalized displayNameOverride if it is considered semantic
+```
+
+Rules:
+
+- stable field order;
+- stable enum names;
+- explicit null representation;
+- finite numeric values only;
+- one documented numeric normalization strategy;
+- fingerprint algorithm/version persisted or implied by an immutable schema version;
+- changes to fingerprint semantics require migration/version handling, not silent reinterpretation.
+
+## 26. Retry behavior
+
+For same `operationId` + same fingerprint:
+
+```text
+COMPLETED -> return same EngineeringPlacementResult, zero mutation
+ABSENT    -> execute normally
+```
+
+For same `operationId` + different fingerprint:
+
+```text
+IDEMPOTENCY_CONFLICT
+```
+
+## 27. Concurrent same-operation behavior
+
+Two concurrent calls with same `operationId` MUST converge safely.
+
+Acceptable outcomes:
+
+```text
+A succeeds; B subsequently observes COMPLETED and returns same result
+```
+
+or, if the implementation can observe an active claim:
+
+```text
+A owns claim; B returns OPERATION_IN_PROGRESS/retries; final durable aggregate count remains one
+```
+
+Unacceptable:
+
+```text
+2 components
+2 memberships
+2 bindings
+2 port sets
+```
+
+Database PK/unique constraints should enforce the operation claim even if application-level locking fails.
+
+## 28. Retry after crash/restart
+
+Because successful operation result commits with the aggregate, after process/database restart the same operation must still return the same ids without additional writes.
+
+There must be no committed state where aggregate rows exist but completed operation identity does not, or vice versa.
 
 ---
 
-## 13. P4.10 — Single undo/redo command
+# P4.10 — Single undo/redo command
 
-The editor must treat successful P4 placement as one history action.
+## 29. History boundary
 
-Conceptual command:
+The editor exposes one history action for one successful P4 aggregate:
 
 ```text
 PlaceEngineeringProfileHistoryCommand
-  do   -> invoke/restore the complete aggregate
-  undo -> remove/retire complete aggregate consistently
-  redo -> restore the same logical placement exactly once
 ```
 
-### 13.1 History boundary
+It contains enough durable identifiers/snapshot information to undo and redo exactly the P4-created aggregate.
 
-History entry is appended only after the atomic placement transaction succeeds.
+A failed/forbidden/unresolved placement creates no history action.
 
-A failed/forbidden/unresolved placement creates no undo entry.
+## 30. Atomicity of history registration
 
-### 13.2 Undo semantics
+Two supported designs are acceptable:
 
-Undo must remove/retire the aggregate in a dependency-safe order under one transaction:
+### Design A — durable database history
+
+Persist the P4 history payload in the same database transaction as the aggregate and completed operation result. After commit, the editor loads/exposes that durable history entry.
+
+### Design B — existing in-memory editor history
+
+If project history is intentionally in-memory/session-only, the database transaction commits first and the in-memory history entry is appended synchronously before the UI reports the operation as fully handled. The contract must document recovery behavior if the process terminates after DB commit but before the in-memory append. Restart acceptance must not depend on in-memory history being durable.
+
+P4 MUST NOT claim cross-restart undo durability unless the current history subsystem actually persists it.
+
+This distinction avoids a false atomicity guarantee across two different storage systems.
+
+## 31. Undo semantics
+
+Undo operates on the complete aggregate in one transaction and dependency-safe order:
 
 ```text
 ports
@@ -485,111 +695,150 @@ membership
 component
 ```
 
-No orphan active row may remain.
+Soft-delete/retire vs physical delete follows existing repository conventions.
 
-Because P4 creates no connections, undo should not yet need connected-port migration logic. If a later user action connects a P4-created port, existing deletion guards must prevent unsafe undo or the editor must invalidate that historical undo path. P4 must not bypass ELV deletion guards.
+Before undo:
 
-### 13.3 Redo semantics
+- enforce existing ELV deletion guards;
+- if any P4-created port is now connected or otherwise referenced, unsafe undo is blocked with a structured history conflict;
+- never cascade-delete later engineering work silently.
 
-Redo restores one aggregate with the same logical provenance. It must not duplicate ports/bindings/memberships. Reusing the original operation identity requires an explicit history-aware restore policy; if idempotency records mark the operation already completed, redo must use the persisted aggregate/history contract rather than accidentally no-oping or duplicating it.
+The completed placement operation record remains historical evidence; undo must not erase the fact that the original operation existed.
 
-The implementation must define and test this interaction explicitly.
+## 32. Redo semantics
+
+Redo is **not** a normal retry of the original already-COMPLETED `operationId`.
+
+Recommended contract:
+
+```text
+originalOperationId remains historical identity
+redoExecutionId = new execution identity owned by history
+restored aggregate preserves original profile/catalog provenance
+```
+
+Redo may restore the same component/port ids only if current persistence/soft-delete rules safely support reactivation and uniqueness. Otherwise it creates deterministic replacement runtime ids while the history payload preserves logical provenance. The chosen policy MUST be documented and tested before P4 is marked complete.
+
+Redo must:
+
+- re-check deletion/uniqueness preconditions;
+- revalidate placement if current project geometry/system state can invalidate restoration;
+- restore exactly one aggregate;
+- never no-op merely because original `operationId` is completed;
+- never create duplicates.
+
+## 33. History invalidation
+
+If subsequent work creates connections/references to the placed ports or otherwise makes destructive undo unsafe, history must either:
+
+- mark that undo action unavailable with an explainable reason, or
+- let repository guards reject undo and surface the structured conflict.
+
+P4 must not bypass guards to preserve a simplistic undo stack.
 
 ---
 
-## 14. P4.11 — Four-discipline acceptance
+# P4.11 — Four-discipline acceptance
 
-Use the canonical fictional acceptance catalog and execute the same P4 command path for all disciplines.
+## 34. Generic path
+
+Use one generic P4 service for all fixtures. Discipline may determine profile data, but orchestration must not branch on CCTV/LAN/ACS/Fire.
 
 ### CCTV
 
 ```text
 CAMERA
-wall + bracket or ceiling + surface
-expected persisted ports: ETH
+wall + bracket OR ceiling + surface
+expected ports: ETH
 ```
 
-Assert physical component, CCTV membership, frozen CAMERA binding and exact ETH interface/template provenance.
+Assert component, CCTV membership, frozen CAMERA binding, exact ETH template/interface provenance.
 
 ### LAN
 
 ```text
 OUTLET
-wall + flush/surface
-expected persisted ports: ETH
+wall + flush OR wall + surface
+expected ports: ETH
 ```
 
-Assert LAN membership and exact Cat6/profile provenance without discipline-specific P4 branches.
+Assert LAN membership and exact Cat6/profile provenance.
 
 ### ACS
 
 ```text
 READER
 wall + surface
-expected persisted ports: BUS
+expected ports: BUS
 ```
 
-Assert ACS membership and exact bus/interface provenance.
+Assert ACS membership and exact BUS/interface provenance.
 
 ### Fire
 
 ```text
 DETECTOR
 ceiling + surface
-expected persisted ports: IN, OUT
+expected ports: IN, OUT
 ```
 
 Assert both ports are persisted atomically and topology intent is compatible with the selected system profile.
 
-The P4 implementation MUST remain discipline-agnostic. CCTV/LAN/ACS/Fire are fixtures proving the generic contract, not switch branches in the placement service.
+Required architectural assertion:
+
+```text
+no switch/case on discipline inside atomic placement orchestration
+```
 
 ---
 
-## 15. P4.12 — Restart acceptance
+# P4.12 — Restart acceptance
 
-A successful placement must survive database close/reopen with exact reconstruction.
+## 35. Restart flow
 
-Test flow:
+For every discipline fixture, or one table-driven suite covering all four:
 
 ```text
 create project/room/surface/system/catalog
         ↓
-P4 place component
+P4 place
         ↓
-assert component + membership + binding + ports
+assert aggregate + operation result
         ↓
 close database
         ↓
 reopen database
         ↓
-load project state
+load state
         ↓
-assert exact same aggregate/provenance/port ids
+assert exact aggregate/provenance
         ↓
-retry same operationId
+retry same operationId + same command
         ↓
-assert no duplicates and same result
+assert same result + zero duplicates
 ```
 
-Restart assertions include:
+Restart assertions:
 
 - same component id and geometry;
-- same system membership;
+- same membership;
 - same catalog id/version/profile code;
 - same frozen profile/constraints snapshot;
-- same port ids and template/interface provenance;
-- idempotency record reconstructs the same result;
-- no extra active rows.
+- same port ids;
+- same template/interface provenance;
+- same completed operation result/fingerprint;
+- no extra active rows;
+- no dependency on in-memory idempotency state.
 
-At least one full restart case is required for each discipline before P4 is complete, or one table-driven restart suite that covers all four canonical fixtures.
+If history is session-only, restart tests do not require undo stack survival; they only require durable engineering aggregate/idempotency reconstruction.
 
 ---
 
-## 16. P4.13 — Exact-SHA CI gate
+# P4.13 — Exact-SHA CI gate
 
-P4 is complete only when both push and PR-triggered workflows pass on the exact same branch head SHA.
+## 36. Required gate
 
-Required gates:
+P4 is complete only when push and PR-triggered workflows pass on the exact same branch head SHA.
 
 ```text
 Drift generation                  PASS
@@ -606,159 +855,218 @@ Engineering Core:
   tests                           PASS
 ```
 
-The PR description must record the exact P4 SHA and test counts/evidence.
+PR #7 records:
 
-Do not mark PR #7 ready and do not begin ELV3 after P4. P5–P7 remain required.
+- exact P4 SHA;
+- push run;
+- PR-triggered run;
+- mobile/core test counts;
+- P4 acceptance evidence.
+
+PR #7 remains draft after P4 because P5–P7 remain required. ELV3 does not start after P4.
 
 ---
 
-## 17. Data-model guidance
+# Data model and database constraints
 
-### 17.1 Prefer minimal additive schema
+## 37. Minimal additive schema
 
-Existing persistence already contains component instances, engineering systems/memberships, reference bindings and ports. P4 should reuse these tables.
+Reuse existing component, engineering-system/membership, reference-binding and engineering-port tables.
 
-A schema migration is justified only for durable idempotency/history metadata that cannot be represented safely by current structures.
+A schema migration is expected only where necessary for durable placement operation/idempotency metadata and, if chosen, durable history metadata.
 
-### 17.2 Constraints
+## 38. Database-enforced invariants
 
-Where Drift schema allows, add uniqueness/index protection for invariants that must survive programming mistakes/concurrency, for example:
+Prefer DB constraints/indexes for invariants that must survive concurrency/programming errors:
 
-- unique successful `operationId`;
+- `EngineeringPlacementOperations.operationId` unique/PK;
 - one active binding per component;
-- one active component/system membership pair;
-- unique active port identity per component;
-- stable operation fingerprint.
+- one active `(componentId, systemId)` membership;
+- unique active port identity;
+- unique active normalized port code per component where ELV1 contract requires it.
 
-If soft-delete prevents a simple SQL unique index, enforce the invariant transactionally and document why a partial index/table redesign is not used.
+If current soft-delete design prevents a simple unique constraint, document the transactional enforcement and add explicit concurrent/conflict tests.
 
-### 17.3 Concurrency
+## 39. Foreign-key / ownership expectations
 
-Two concurrent submissions with the same `operationId` must converge to one durable aggregate or one succeeds while the other reads that result. They must not create two aggregates.
+Where existing schema supports it, enforce or transactionally prove:
 
-Two different operations attempting the same generated component id/port ids must fail safely under database constraints/transaction logic.
+```text
+component.roomId -> active room
+membership.componentId -> component
+binding.componentId -> component
+ports.componentId -> component
+operation result ids -> created aggregate
+```
+
+P4 must not depend on eventual cleanup jobs to restore referential correctness.
 
 ---
 
-## 18. Test specification
+# Test specification
 
-### 18.1 Application/domain tests
+## 40. Contract/application tests
 
-- command validation;
-- command fingerprint stability;
+- required command-field validation;
+- canonical fingerprint stability;
+- fingerprint insensitive to map insertion order;
+- fingerprint sensitive to material field changes;
+- finite numeric normalization;
 - exact profile/system discipline match;
-- P2 compatible/forbidden/unresolved commit policy;
-- same operation retry returns same result;
-- changed command with same operation id conflicts;
-- deterministic port identities independent of template list ordering where template code identity is unchanged.
+- P2 COMPATIBLE/FORBIDDEN/UNRESOLVED policy;
+- malformed/deprecated/legacy profile rejection;
+- deterministic component/port identities;
+- port identity independent of template list ordering when semantic template codes are unchanged.
 
-### 18.2 Repository/SQLite tests
+## 41. SQLite/repository tests
 
-- successful aggregate transaction;
-- failure after component -> rollback;
-- failure after membership -> rollback;
-- failure after binding -> rollback;
-- failure on first/middle/last port -> rollback;
-- failure before commit -> rollback;
-- conflicting manual port -> rollback;
-- duplicate membership/binding protection;
-- concurrent/simulated duplicate operation id behavior;
+- happy-path aggregate transaction;
+- operation claim + completion in same commit;
+- same-operation retry returns same result;
+- same id + changed fingerprint conflicts;
+- simulated concurrent same-operation calls converge to one aggregate;
+- failure after operation claim rollback;
+- failure after component rollback;
+- failure after membership rollback;
+- failure after binding rollback;
+- failure before/after first/middle/last port rollback;
+- failure before operation completion rollback;
+- failure before durable history persist rollback if applicable;
+- failure before commit rollback;
+- manual port conflict rollback;
+- binding/membership conflict rollback;
+- exact interface provenance failure rollback;
 - restart idempotency.
 
-### 18.3 Editor/history tests
+## 42. Editor/history tests
 
-- COMPATIBLE preview can invoke P4;
-- FORBIDDEN/UNRESOLVED cannot invoke mutation;
-- one success produces one undo entry;
-- undo removes entire aggregate;
-- redo restores one aggregate once;
+- COMPATIBLE preview can submit P4 command;
+- P4 still revalidates independently;
+- FORBIDDEN/UNRESOLVED produces no mutation/history;
+- one success produces one visible undo action;
+- undo removes/retires whole aggregate;
+- undo is blocked after unsafe downstream connection/reference appears;
+- redo restores exactly one aggregate according to documented redo identity policy;
+- redo does not use completed `operationId` as a normal idempotent retry;
 - failed P4 creates no history entry;
-- existing electrical placement history remains unaffected.
+- existing electrical history behavior remains unaffected.
 
-### 18.4 Four-discipline acceptance
+## 43. Four-discipline acceptance
 
-Table-driven tests cover CCTV CAMERA, LAN OUTLET, ACS READER and Fire DETECTOR through the same P4 service.
+Table-driven acceptance covers:
+
+```text
+CCTV CAMERA
+LAN OUTLET
+ACS READER
+Fire DETECTOR
+```
+
+through the same P4 application/repository path.
 
 ---
 
-## 19. Acceptance criteria
+# Acceptance criteria
 
 ### AC-P4-01 Atomic command
-One application command represents one canonical engineering placement.
+One immutable application command represents one canonical engineering placement.
 
 ### AC-P4-02 Single transaction
-Component, membership, binding, ports and successful idempotency result share one database commit boundary.
+Component, membership, binding, ports and completed idempotency result share one database commit boundary.
 
-### AC-P4-03 Revalidation
-P2 is rerun at commit; stale P3 preview cannot bypass current constraints.
+### AC-P4-03 Exact resolution
+Project/room/surface/system/catalog/profile are resolved by exact persisted identity; no latest/label fallback exists.
 
-### AC-P4-04 Zero mutation on rejection
-FORBIDDEN, UNRESOLVED, deprecated, missing edition and discipline mismatch create no durable placement state.
+### AC-P4-04 Commit-time revalidation
+P2 is rerun using current durable state; stale P3 preview cannot bypass constraints.
 
-### AC-P4-05 Physical component
-Exactly one valid `ComponentInstance` is created for success.
+### AC-P4-05 Zero mutation on rejection
+FORBIDDEN, UNRESOLVED, deprecated, legacy, missing edition and discipline mismatch leave zero new aggregate rows.
 
-### AC-P4-06 Membership
-Exactly one correct active system membership is created.
+### AC-P4-06 Physical component
+Exactly one valid `ComponentInstance` exists after success.
 
-### AC-P4-07 Frozen binding
+### AC-P4-07 Membership
+Exactly one correct active system membership exists after success.
+
+### AC-P4-08 Frozen binding
 Exactly one binding freezes the exact catalog/profile/constraints snapshot.
 
-### AC-P4-08 Ports
-Exactly the profile-template port set is persisted with exact provenance.
+### AC-P4-09 Ports
+Exactly the profile-template port set exists with exact template/interface provenance.
 
-### AC-P4-09 Rollback
-Every injected failure point leaves zero partial aggregate rows.
+### AC-P4-10 Aggregate postconditions
+Binding `portIds`, persisted ports and completed operation result reference the same exact aggregate ids.
 
-### AC-P4-10 Idempotency
-Same operation + same command returns the same result without new rows.
+### AC-P4-11 Rollback
+Every injected/natural failure leaves zero partial aggregate/completed-operation rows.
 
-### AC-P4-11 Idempotency conflict
+### AC-P4-12 Canonical fingerprint
+Idempotency uses a versioned canonical semantic fingerprint, not incidental JSON/map ordering.
+
+### AC-P4-13 Idempotent retry
+Same operation id + same fingerprint returns the same result without new rows, including after restart.
+
+### AC-P4-14 Idempotency conflict
 Same operation id + changed material command is rejected.
 
-### AC-P4-12 Restart idempotency
-Idempotent behavior survives database reopen.
+### AC-P4-15 Concurrent duplicate safety
+Concurrent same-operation submissions converge to one durable aggregate.
 
-### AC-P4-13 Single history action
-Successful placement creates one reversible editor action.
+### AC-P4-16 Single history action
+Successful placement appears as one reversible editor action.
 
-### AC-P4-14 Safe undo/redo
-Undo/redo never leaves or creates orphan/duplicate engineering rows.
+### AC-P4-17 Safe undo
+Undo is one transaction, preserves referential integrity and respects downstream ELV guards.
 
-### AC-P4-15 Four disciplines
-CCTV/LAN/ACS/Fire pass through one discipline-agnostic service.
+### AC-P4-18 Safe redo
+Redo has explicit history-aware identity semantics and restores exactly one aggregate without relying on normal completed-operation retry.
 
-### AC-P4-16 No ELV3 coupling
-No cable/pathway/route model is introduced.
+### AC-P4-19 Restart reconstruction
+Component/membership/binding/ports/idempotency/provenance reconstruct exactly after DB reopen.
 
-### AC-P4-17 Exact-SHA evidence
-Push and PR workflows are green on the exact P4 head SHA.
+### AC-P4-20 Four disciplines
+CCTV/LAN/ACS/Fire pass through one discipline-agnostic orchestration path.
+
+### AC-P4-21 No ELV3 coupling
+No cable/pathway/route type or rule is introduced.
+
+### AC-P4-22 Exact-SHA evidence
+Push and PR workflows are green on the exact same P4 head SHA.
 
 ---
 
-## 20. Definition of Done
+# Definition of Done
 
 P4 is done only when all items below are true:
 
-- [ ] `PlaceEngineeringProfileCommand` contract implemented;
-- [ ] stable `operationId` and durable command fingerprint implemented;
-- [ ] one top-level Drift transaction owns all P4 writes;
-- [ ] exact commit-time project/room/surface/system/catalog/profile checks implemented;
+- [ ] `PlaceEngineeringProfileCommand` implemented and immutable;
+- [ ] typed result/failure contracts implemented;
+- [ ] durable `operationId` implemented;
+- [ ] versioned canonical command fingerprint implemented;
+- [ ] one top-level Drift transaction owns all durable P4 aggregate writes;
+- [ ] operation claim/conflict/completion occurs inside the transaction;
+- [ ] exact project/room/surface/system/catalog/profile resolution implemented;
 - [ ] P2 commit-time revalidation implemented;
-- [ ] physical component created through existing geometry invariants;
+- [ ] physical component uses existing geometry invariants;
 - [ ] engineering-system membership persisted;
 - [ ] frozen `ComponentReferenceBinding` persisted;
-- [ ] exact profile ports persisted with template/interface provenance;
+- [ ] deterministic exact profile ports persisted;
+- [ ] exact template/interface provenance persisted;
 - [ ] binding portIds equal persisted port ids;
-- [ ] zero durable mutation for FORBIDDEN/UNRESOLVED/deprecated/wrong-discipline cases;
-- [ ] deterministic test failure injection implemented;
+- [ ] aggregate postconditions asserted before commit;
+- [ ] zero durable mutation for rejected placement;
+- [ ] deterministic test fault injection implemented;
 - [ ] rollback proven after every durable stage;
 - [ ] same-operation retry proven idempotent;
-- [ ] changed-command reuse of operation id proven conflicting;
+- [ ] changed-command same-id conflict proven;
+- [ ] concurrent same-operation convergence proven;
 - [ ] idempotency survives restart;
 - [ ] one editor history action per successful placement;
+- [ ] history storage durability semantics documented honestly;
 - [ ] undo removes/retires whole aggregate safely;
-- [ ] redo restores whole aggregate once;
+- [ ] downstream references block unsafe undo;
+- [ ] redo identity/reactivation strategy documented and tested;
 - [ ] CCTV CAMERA acceptance green;
 - [ ] LAN OUTLET acceptance green;
 - [ ] ACS READER acceptance green;
@@ -772,32 +1080,34 @@ P4 is done only when all items below are true:
 
 ---
 
-## 21. Recommended implementation sequence
+# Recommended implementation sequence
 
 ```text
-P4.1  Atomic command/result/failure contracts
+P4.1  Command/result/failure contracts
+      + operationId + canonical fingerprint contract
   ↓
-P4.2  Dedicated transaction owner + durable idempotency strategy
+P4.2  Operation table/schema + dedicated transaction owner
+      + database uniqueness/concurrency guards
   ↓
-P4.3  Physical ComponentInstance creation using existing geometry validation
+P4.3  Component identity + ComponentInstance creation
   ↓
 P4.4  EngineeringSystem membership persistence
   ↓
 P4.5  Frozen ComponentReferenceBinding snapshot
   ↓
-P4.6  Deterministic persisted port instantiation + provenance
+P4.6  Deterministic persisted ports + exact provenance
   ↓
-P4.7  P2 commit-time revalidation and rejection policy
+P4.7  Commit-time state reconstruction + P2 revalidation
   ↓
-P4.8  Fault injection + rollback matrix
+P4.8  Fault injection + rollback/postcondition matrix
   ↓
-P4.9  Retry/concurrency/restart idempotency
+P4.9  Retry + concurrent duplicate + restart idempotency
   ↓
-P4.10 Single aggregate undo/redo history action
+P4.10 History durability decision + single undo/redo aggregate action
   ↓
 P4.11 CCTV/LAN/ACS/Fire acceptance
   ↓
-P4.12 Database restart acceptance
+P4.12 Full DB restart acceptance
   ↓
 P4.13 Exact-head push + PR CI and PR evidence
 ```
