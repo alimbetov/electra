@@ -65,6 +65,12 @@ class _PersistedRoomEditorScreenState
     final roomAsync = ref.watch(roomProvider(roomId));
     final geometryAsync = ref.watch(roomGeometryProvider(roomId));
     final componentsAsync = ref.watch(roomComponentsProvider(roomId));
+    final referencesAsync = ref.watch(
+      projectEngineeringReferencesProvider(projectId),
+    );
+    final topologyAsync = ref.watch(
+      projectEngineeringTopologyProvider(projectId),
+    );
 
     return projectAsync.when(
       loading: () => const _LoadingScaffold(),
@@ -104,6 +110,18 @@ class _PersistedRoomEditorScreenState
                               room: room,
                               geometry: geometry,
                               components: components,
+                              engineeringReferences:
+                                  referencesAsync.asData?.value,
+                              engineeringReferenceMessage:
+                                  referencesAsync.hasError
+                                      ? 'Unable to load reference catalogs: ${referencesAsync.error}'
+                                      : 'Loading engineering reference catalogs…',
+                              engineeringTopologyProfiles:
+                                  topologyAsync
+                                      .asData
+                                      ?.value
+                                      .topologyProfiles ??
+                                  const [],
                               catalogPreferences: ref.watch(
                                 catalogPreferencesRepositoryProvider,
                               ),

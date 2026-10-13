@@ -4,6 +4,10 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../application/geometry_repository.dart';
+import '../../application/engineering_profile_palette.dart';
+import '../../application/engineering_reference_repository.dart';
+import 'engineering_profile_palette.dart';
+import 'engineering_placement_preview.dart';
 import '../../application/catalog_preferences_repository.dart';
 import '../../domain/models.dart';
 import '../../domain/project_models.dart';
@@ -30,6 +34,9 @@ class RoomEditorScreen extends StatefulWidget {
     required this.room,
     required this.geometry,
     this.components = const [],
+    this.engineeringReferences,
+    this.engineeringReferenceMessage,
+    this.engineeringTopologyProfiles = const [],
     this.onPlaceComponent,
     this.catalogPreferences,
     this.onUndoPlacement,
@@ -42,6 +49,9 @@ class RoomEditorScreen extends StatefulWidget {
   final RoomRecord room;
   final RoomGeometrySnapshot geometry;
   final List<ComponentInstance> components;
+  final ProjectEngineeringReferences? engineeringReferences;
+  final String? engineeringReferenceMessage;
+  final List<TopologyProfile> engineeringTopologyProfiles;
   final ComponentPlacementCallback? onPlaceComponent;
   final CatalogPreferencesRepository? catalogPreferences;
   final Future<void> Function()? onUndoPlacement;
@@ -66,6 +76,185 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
   SurfaceEdgeCandidate? navigationCandidate;
   String? currentPreviewEdgeId;
   ComponentDefinition? activeComponentDefinition;
+
+  CanonicalProfileChoice? engineeringChoice;
+  PlacementCandidateContext? candidateContext;
+  Point2Mm? candidatePoint;
+  bool candidateLocked = false;
+
+  void clearEngineeringPreview() {
+    engineeringChoice = null;
+    candidateContext = null;
+    candidatePoint = null;
+    candidateLocked = false;
+  }
+
+  void resetCandidate() {
+    candidatePoint = null;
+    candidateLocked = false;
+    final patch = activePatch, choice = engineeringChoice;
+    candidateContext =
+        patch == null || choice == null
+            ? null
+            : emptyPaletteContext(
+              projectId: widget.project.id,
+              roomId: widget.room.id,
+              surfaceId: patch.id,
+              topologyShape: resolvePaletteTopology(
+                choice.system,
+                widget.engineeringTopologyProfiles,
+              ),
+            );
+  }
+
+  @override
+  void didUpdateWidget(covariant RoomEditorScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final choice = engineeringChoice;
+    if (choice == null) return;
+    if (oldWidget.project.id != widget.project.id ||
+        oldWidget.room.id != widget.room.id ||
+        !isCurrentPaletteChoice(
+          choice,
+          widget.engineeringReferences,
+          widget.project.id,
+        )) {
+      clearEngineeringPreview();
+    } else if (oldWidget.geometry != widget.geometry ||
+        oldWidget.engineeringTopologyProfiles !=
+            widget.engineeringTopologyProfiles) {
+      resetCandidate();
+    }
+  }
+
+  PlacementCompatibilityResult? get placementPreview {
+    final choice = engineeringChoice, context = candidateContext;
+    if (choice == null || context == null) return null;
+    return const PlacementCompatibilityEngine().evaluate(
+      profile: choice.profile,
+      catalogId: choice.catalog.id,
+      catalogVersion: choice.catalog.version,
+      context: context,
+    );
+  }
+
+  Future<void> openEngineeringPalette() async {
+    final snapshot = widget.engineeringReferences;
+    if (snapshot == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            widget.engineeringReferenceMessage ??
+                'Reference catalogs are not available.',
+          ),
+        ),
+      );
+      return;
+    }
+    final choice = await EngineeringProfilePalette.show(
+      context,
+      snapshot: snapshot,
+      projectId: widget.project.id,
+      initialSystemId: engineeringChoice?.system.id,
+    );
+    if (!mounted || choice == null) return;
+    if (!isCurrentPaletteChoice(
+      choice,
+      widget.engineeringReferences,
+      widget.project.id,
+    )) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'The system or catalog changed. Select the profile again.',
+          ),
+        ),
+      );
+      return;
+    }
+    setState(() {
+      engineeringChoice = choice;
+      activeComponentDefinition = null;
+      tool = EditorTool.equipment;
+      discipline = switch (choice.profile.discipline) {
+        ReferenceDiscipline.cctv => Discipline.cctv,
+        ReferenceDiscipline.lan => Discipline.lowVoltage,
+        ReferenceDiscipline.acs => Discipline.accessControl,
+        ReferenceDiscipline.fire => Discipline.fireAlarm,
+      };
+      navigationCandidate = null;
+      currentPreviewEdgeId = null;
+      measurementStart = null;
+      measurement = null;
+      resetCandidate();
+    });
+  }
+
+  void previewCandidate(
+    SurfacePatch patch,
+    Point2Mm point, {
+    bool lock = false,
+  }) {
+    if (candidateLocked && !lock) return;
+    final next = patch.boundary.containsPointInclusive(point) ? point : null;
+    if (next == candidatePoint &&
+        candidateContext?.surfaceId == patch.id &&
+        (!lock || candidateLocked))
+      return;
+    setState(() {
+      if (next != candidatePoint || candidateContext?.surfaceId != patch.id)
+        resetCandidate();
+      candidatePoint = next;
+      candidateLocked = lock && next != null;
+    });
+  }
+
+  Future<void> editCandidateConditions() async {
+    final choice = engineeringChoice, initial = candidateContext;
+    if (choice == null || initial == null) return;
+    final value = await showDialog<PlacementCandidateContext>(
+      context: context,
+      builder:
+          (_) => CandidateConditionsDialog(
+            initial: initial,
+            system: choice.system,
+            topologyProfiles: widget.engineeringTopologyProfiles,
+          ),
+    );
+    if (!mounted ||
+        value == null ||
+        engineeringChoice?.identity != choice.identity ||
+        candidateContext?.surfaceId != value.surfaceId ||
+        candidateContext != initial)
+      return;
+    setState(() => candidateContext = value);
+  }
+
+  Widget previewDetails() => ListView(
+    padding: const EdgeInsets.all(16),
+    children: [
+      const Text(
+        'Pre-placement review',
+        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+      ),
+      if (candidatePoint == null)
+        const Text('Select a location to evaluate the candidate.'),
+      if (candidatePoint != null && placementPreview != null)
+        PlacementFindingsView(result: placementPreview!),
+      if (engineeringChoice != null)
+        CanonicalProfileDetails(choice: engineeringChoice!),
+    ],
+  );
+  void openPreviewDetails() => showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    showDragHandle: true,
+    builder:
+        (_) => FractionallySizedBox(
+          heightFactor: .78,
+          child: SafeArea(child: previewDetails()),
+        ),
+  );
 
   bool placingComponent = false;
 
@@ -96,6 +285,7 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
   void selectPatch(String patchId) {
     setState(() {
       activePatchId = patchId;
+      resetCandidate();
       selection = null;
       measurementStart = null;
       measurement = null;
@@ -106,6 +296,7 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
 
   void changeTool(EditorTool value) {
     if (value == EditorTool.route) {
+      setState(clearEngineeringPreview);
       Navigator.of(context).push(
         MaterialPageRoute<void>(
           builder:
@@ -131,6 +322,7 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
       }
       if (value != EditorTool.equipment) {
         activeComponentDefinition = null;
+        clearEngineeringPreview();
       }
     });
   }
@@ -147,6 +339,10 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
   );
 
   void handleSurfacePointer(SurfacePatch patch, Point2Mm localPoint) {
+    if (tool == EditorTool.equipment && engineeringChoice != null) {
+      previewCandidate(patch, localPoint);
+      return;
+    }
     if (tool != EditorTool.select) return;
     final candidate = _resolveNavigationCandidate(patch, localPoint);
     final keepPreview = switch (candidate?.proximity) {
@@ -199,6 +395,7 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
       setState(() {
         tool = EditorTool.equipment;
         activeComponentDefinition = selected;
+        clearEngineeringPreview();
         navigationCandidate = null;
         currentPreviewEdgeId = null;
         measurementStart = null;
@@ -231,6 +428,7 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
   void finishComponentPlacement() {
     setState(() {
       activeComponentDefinition = null;
+      clearEngineeringPreview();
       tool = EditorTool.select;
     });
   }
@@ -284,7 +482,9 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
           measurementStart = null;
         });
       case EditorTool.equipment:
-        if (activeComponentDefinition != null) {
+        if (engineeringChoice != null) {
+          previewCandidate(patch, localPoint, lock: true);
+        } else if (activeComponentDefinition != null) {
           unawaited(placeActiveComponent(patch, localPoint));
         }
       case EditorTool.point:
@@ -298,20 +498,23 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
   Widget build(BuildContext context) {
     final patch = activePatch;
     final previewPatch = adjacentPreviewPatch;
-    final inspector = _Inspector(
-      project: widget.project,
-      room: widget.room,
-      geometry: widget.geometry,
-      activePatch: patch,
-      discipline: discipline,
-      selection: selection,
-      measurement: measurement,
-      measurementStart: measurementStart,
-      navigationCandidate: navigationCandidate,
-      adjacentPreviewPatch: previewPatch,
-      components: widget.components,
-      activeComponentDefinition: activeComponentDefinition,
-    );
+    final inspector =
+        engineeringChoice != null
+            ? previewDetails()
+            : _Inspector(
+              project: widget.project,
+              room: widget.room,
+              geometry: widget.geometry,
+              activePatch: patch,
+              discipline: discipline,
+              selection: selection,
+              measurement: measurement,
+              measurementStart: measurementStart,
+              navigationCandidate: navigationCandidate,
+              adjacentPreviewPatch: previewPatch,
+              components: widget.components,
+              activeComponentDefinition: activeComponentDefinition,
+            );
 
     return Scaffold(
       appBar: AppBar(
@@ -429,6 +632,19 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
             placingComponent: placingComponent,
             onSurfaceTap: handleSurfaceTap,
             onSurfacePointer: handleSurfacePointer,
+            engineeringFeedback:
+                engineeringChoice == null
+                    ? null
+                    : EngineeringPlacementFeedback(
+                      choice: engineeringChoice!,
+                      result: placementPreview,
+                      hasCandidate: candidatePoint != null,
+                      onContext: editCandidateConditions,
+                      onDetails: openPreviewDetails,
+                    ),
+            candidatePoint: candidatePoint,
+            candidateStatus:
+                candidatePoint == null ? null : placementPreview?.status,
           );
 
           return Column(
@@ -438,9 +654,14 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
                 discipline: discipline,
                 onToolChanged: changeTool,
                 onDisciplineChanged:
-                    (value) => setState(() => discipline = value),
+                    (value) => setState(() {
+                      discipline = value;
+                      clearEngineeringPreview();
+                    }),
                 activeComponentDefinition: activeComponentDefinition,
                 onOpenComponentCatalog: openComponentCatalog,
+                onOpenEngineeringPalette: openEngineeringPalette,
+                engineeringProfileLabel: engineeringChoice?.profile.label,
                 onFinishComponentPlacement: finishComponentPlacement,
                 onFeatureChanged:
                     (value) => setState(() {
@@ -464,6 +685,7 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
                           children: [
                             Expanded(child: editor),
                             _CompactContextBar(
+                              engineeringPreview: engineeringChoice != null,
                               tool: tool,
                               selection: selection,
                               measurement: measurement,
@@ -513,6 +735,8 @@ class _EditorToolbar extends StatelessWidget {
     required this.activeComponentDefinition,
     required this.onOpenComponentCatalog,
     required this.onFinishComponentPlacement,
+    required this.onOpenEngineeringPalette,
+    this.engineeringProfileLabel,
   });
 
   final EditorTool tool;
@@ -523,6 +747,8 @@ class _EditorToolbar extends StatelessWidget {
   final ComponentDefinition? activeComponentDefinition;
   final VoidCallback onOpenComponentCatalog;
   final VoidCallback onFinishComponentPlacement;
+  final VoidCallback onOpenEngineeringPalette;
+  final String? engineeringProfileLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -541,7 +767,18 @@ class _EditorToolbar extends StatelessWidget {
                   activeComponentDefinition?.displayName ?? 'Catalog',
                 ),
               ),
-              if (activeComponentDefinition != null) ...[
+              const SizedBox(width: 6),
+              OutlinedButton.icon(
+                onPressed: onOpenEngineeringPalette,
+                icon: const Icon(Icons.schema_outlined, size: 18),
+                label: Text(
+                  engineeringProfileLabel == null
+                      ? 'ELV profiles'
+                      : 'ELV: $engineeringProfileLabel',
+                ),
+              ),
+              if (activeComponentDefinition != null ||
+                  engineeringProfileLabel != null) ...[
                 const SizedBox(width: 6),
                 TextButton(
                   onPressed: onFinishComponentPlacement,
@@ -619,6 +856,9 @@ class _EditorCanvasShell extends StatelessWidget {
     required this.placingComponent,
     required this.onSurfaceTap,
     required this.onSurfacePointer,
+    this.engineeringFeedback,
+    this.candidatePoint,
+    this.candidateStatus,
   });
 
   final RoomGeometrySnapshot geometry;
@@ -637,6 +877,9 @@ class _EditorCanvasShell extends StatelessWidget {
   final bool placingComponent;
   final void Function(SurfacePatch patch, Point2Mm localPoint) onSurfaceTap;
   final void Function(SurfacePatch patch, Point2Mm localPoint) onSurfacePointer;
+  final Widget? engineeringFeedback;
+  final Point2Mm? candidatePoint;
+  final PlacementCompatibilityStatus? candidateStatus;
 
   @override
   Widget build(BuildContext context) {
@@ -651,6 +894,7 @@ class _EditorCanvasShell extends StatelessWidget {
                 : 'Active surface: ${patch.surfaceId} · ceiling $ceilingHeightMm mm',
             style: Theme.of(context).textTheme.titleMedium,
           ),
+          if (engineeringFeedback != null) engineeringFeedback!,
           if (tool == EditorTool.equipment &&
               activeComponentDefinition != null &&
               patch != null)
@@ -735,6 +979,15 @@ class _EditorCanvasShell extends StatelessWidget {
                                         toLocal(details.localPosition),
                                       ),
                                   child: CustomPaint(
+                                    foregroundPainter:
+                                        candidatePoint == null ||
+                                                candidateStatus == null
+                                            ? null
+                                            : EngineeringCandidatePainter(
+                                              patch: patch,
+                                              point: candidatePoint!,
+                                              status: candidateStatus!,
+                                            ),
                                     painter: _RoomSurfacePainter(
                                       patch: patch,
                                       openings: geometry.openings
@@ -772,16 +1025,17 @@ class _EditorCanvasShell extends StatelessWidget {
                       ),
             ),
           ),
-          _ToolContextBar(
-            tool: tool,
-            selection: selection,
-            measurement: measurement,
-            measurementStart: measurementStart,
-            navigationCandidate: navigationCandidate,
-            adjacentPreviewPatch: adjacentPreviewPatch,
-            activeComponentDefinition: activeComponentDefinition,
-            placingComponent: placingComponent,
-          ),
+          if (engineeringFeedback == null)
+            _ToolContextBar(
+              tool: tool,
+              selection: selection,
+              measurement: measurement,
+              measurementStart: measurementStart,
+              navigationCandidate: navigationCandidate,
+              adjacentPreviewPatch: adjacentPreviewPatch,
+              activeComponentDefinition: activeComponentDefinition,
+              placingComponent: placingComponent,
+            ),
         ],
       ),
     );
@@ -860,6 +1114,7 @@ class _ToolContextBar extends StatelessWidget {
 
 class _CompactContextBar extends StatelessWidget {
   const _CompactContextBar({
+    this.engineeringPreview = false,
     required this.tool,
     required this.selection,
     required this.measurement,
@@ -880,12 +1135,14 @@ class _CompactContextBar extends StatelessWidget {
   final ComponentDefinition? activeComponentDefinition;
   final bool placingComponent;
   final VoidCallback onOpen;
+  final bool engineeringPreview;
 
   @override
   Widget build(BuildContext context) {
     final target =
         adjacentPreviewPatch?.surfaceId ?? navigationCandidate?.adjacentPatchId;
     final summary = switch (tool) {
+      EditorTool.equipment when engineeringPreview => 'Pre-placement review',
       EditorTool.equipment when placingComponent => 'Saving component…',
       EditorTool.equipment when activeComponentDefinition != null =>
         'Place ${activeComponentDefinition!.displayName}',
