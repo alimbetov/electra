@@ -70,12 +70,13 @@ CatalogRevisionPreview previewCatalogRevision({
   required ProjectEngineeringTopologySnapshot topology,
   required EngineeringReferenceCatalog candidate,
 }) {
-  final sameCode = references.catalogs
-      .where(
-        (catalog) =>
-            catalog.code == candidate.code && catalog.id != candidate.id,
-      )
-      .toList();
+  final sameCode =
+      references.catalogs
+          .where(
+            (catalog) =>
+                catalog.code == candidate.code && catalog.id != candidate.id,
+          )
+          .toList();
   final byId = {for (final catalog in sameCode) catalog.id: catalog};
   final candidateProfiles = {
     for (final profile in candidate.profiles) profile.code: profile,
