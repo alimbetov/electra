@@ -1,0 +1,22 @@
+name: P4.2 Format Diff
+
+on:
+  push:
+    branches:
+      - 'feat/flutter-elv2-profile-constraints'
+
+jobs:
+  diff:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: |
+          dart format lib/application/engineering_placement_repository.dart lib/data/repositories/drift_engineering_placement_repository.dart test/data/engineering_placement_repository_test.dart
+          git diff -- lib/application/engineering_placement_repository.dart lib/data/repositories/drift_engineering_placement_repository.dart test/data/engineering_placement_repository_test.dart
