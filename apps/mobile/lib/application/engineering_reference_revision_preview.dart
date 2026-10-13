@@ -49,14 +49,18 @@ class CatalogRevisionPreview {
   final List<String> removedProfileCodes;
 
   int get affectedBindingCount => bindingImpacts.length;
+
   Set<String> get affectedConnectionIds => {
         for (final impact in bindingImpacts) ...impact.connectionIds,
       };
+
   Set<String> get affectedTopologyGroupIds => {
         for (final impact in bindingImpacts) ...impact.topologyGroupIds,
       };
+
   bool get affectsPlacement =>
       bindingImpacts.any((impact) => impact.profileImpact.affectsPlacement);
+
   bool get affectsConnections =>
       bindingImpacts.any((impact) => impact.profileImpact.affectsConnections);
 }
@@ -65,11 +69,11 @@ CatalogRevisionPreview previewCatalogRevision({
   required ProjectEngineeringReferences references,
   required ProjectEngineeringTopologySnapshot topology,
   required EngineeringReferenceCatalog candidate,
-  Map<String, EngineeringProfileConstraints> previousConstraints = const {},
-  Map<String, EngineeringProfileConstraints> candidateConstraints = const {},
 }) {
   final sameCode = references.catalogs
-      .where((catalog) => catalog.code == candidate.code && catalog.id != candidate.id)
+      .where(
+        (catalog) => catalog.code == candidate.code && catalog.id != candidate.id,
+      )
       .toList();
   final byId = {for (final catalog in sameCode) catalog.id: catalog};
   final candidateProfiles = {
@@ -92,12 +96,6 @@ CatalogRevisionPreview previewCatalogRevision({
     final profileImpact = compareEngineeringProfileRevisions(
       previous: previousProfile,
       candidate: candidateProfile,
-      previousConstraints: previousConstraints[
-        _constraintKey(previousCatalog.id, binding.profileCode)
-      ],
-      candidateConstraints: candidateConstraints[
-        _constraintKey(candidate.id, binding.profileCode)
-      ],
     );
     if (!profileImpact.changed) continue;
 
@@ -141,7 +139,9 @@ CatalogRevisionPreview previewCatalogRevision({
 
   impacts.sort((a, b) {
     final byComponent = a.componentId.compareTo(b.componentId);
-    return byComponent != 0 ? byComponent : a.profileCode.compareTo(b.profileCode);
+    return byComponent != 0
+        ? byComponent
+        : a.profileCode.compareTo(b.profileCode);
   });
   final removedSorted = removed.toList()..sort();
 
@@ -153,6 +153,3 @@ CatalogRevisionPreview previewCatalogRevision({
     removedProfileCodes: removedSorted,
   );
 }
-
-String _constraintKey(String catalogId, String profileCode) =>
-    '$catalogId::$profileCode';
