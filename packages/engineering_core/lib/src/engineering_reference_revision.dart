@@ -36,8 +36,10 @@ class ProfileRevisionImpact {
   final List<ProfileRevisionChange> changes;
 
   bool get changed => changes.isNotEmpty;
-  bool get affectsConnections => changes.any((change) => change.connectionRelevant);
-  bool get affectsPlacement => changes.any((change) => change.placementRelevant);
+  bool get affectsConnections =>
+      changes.any((change) => change.connectionRelevant);
+  bool get affectsPlacement =>
+      changes.any((change) => change.placementRelevant);
 }
 
 ProfileRevisionImpact compareEngineeringProfileRevisions({
@@ -92,7 +94,8 @@ ProfileRevisionImpact compareEngineeringProfileRevisions({
       connection: true,
     );
   }
-  if (!_sameStringMap(previous.portInterfaceCodes, candidate.portInterfaceCodes)) {
+  if (!_sameStringMap(
+      previous.portInterfaceCodes, candidate.portInterfaceCodes)) {
     add(
       ProfileRevisionChangeKind.interfaces,
       'Port interface bindings changed.',
