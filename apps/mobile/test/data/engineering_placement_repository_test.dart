@@ -28,16 +28,18 @@ void main() {
   test('schema 17 exposes mandatory placement operation ledger', () async {
     expect(database.schemaVersion, 17);
 
-    final rows = await database
-        .customSelect(
-          "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'engineering_placement_operations'",
-        )
-        .get();
+    final rows =
+        await database
+            .customSelect(
+              "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'engineering_placement_operations'",
+            )
+            .get();
     expect(rows, hasLength(1));
 
-    final columns = await database
-        .customSelect('PRAGMA table_info(engineering_placement_operations)')
-        .get();
+    final columns =
+        await database
+            .customSelect('PRAGMA table_info(engineering_placement_operations)')
+            .get();
     expect(
       columns.map((row) => row.read<String>('name')).toList(),
       containsAll(<String>[
@@ -148,9 +150,8 @@ void main() {
         await database.select(database.engineeringPlacementOperations).get(),
         isEmpty,
       );
-      final components = await database
-          .select(database.componentInstances)
-          .get();
+      final components =
+          await database.select(database.componentInstances).get();
       expect(components.map((row) => row.id), ['component-1']);
     },
   );
@@ -238,9 +239,9 @@ void main() {
       expect(instance.displayNameOverride, 'Camera A');
 
       final row =
-          await (database.select(database.componentInstances)
-                ..where((candidate) => candidate.id.equals('component-new')))
-              .getSingle();
+          await (database.select(database.componentInstances)..where(
+            (candidate) => candidate.id.equals('component-new'),
+          )).getSingle();
       expect(row.definitionId, canonicalElvComponentDefinitionId);
       expect(row.definitionVersion, canonicalElvComponentDefinitionVersion);
       expect(row.roomId, 'room-1');
@@ -299,9 +300,8 @@ void main() {
         ),
       );
       expect(
-        await (database.select(
-          database.componentInstances,
-        )..where((row) => row.id.equals('must-not-be-used'))).get(),
+        await (database.select(database.componentInstances)
+          ..where((row) => row.id.equals('must-not-be-used'))).get(),
         isEmpty,
       );
     },
@@ -354,9 +354,8 @@ void main() {
         ),
       );
       expect(
-        await (database.select(
-          database.componentInstances,
-        )..where((row) => row.id.equals('component-outside'))).get(),
+        await (database.select(database.componentInstances)
+          ..where((row) => row.id.equals('component-outside'))).get(),
         isEmpty,
       );
     },
