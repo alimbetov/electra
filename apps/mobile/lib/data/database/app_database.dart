@@ -696,6 +696,23 @@ class EngineeringComponentAssemblies extends Table with GeometryAuditColumns {
   ];
 }
 
+@DataClassName('EngineeringPlacementOperationRow')
+class EngineeringPlacementOperations extends Table {
+  TextColumn get operationId => text()();
+  TextColumn get projectId => text().references(Projects, #id)();
+  IntColumn get fingerprintVersion => integer()();
+  TextColumn get commandFingerprint => text()();
+  TextColumn get status => text()();
+  TextColumn get componentId => text().references(ComponentInstances, #id)();
+  TextColumn get resultJson => text()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+  TextColumn get originDeviceId => text()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {operationId};
+}
+
 @DriftDatabase(
   tables: [
     Projects,
@@ -744,6 +761,7 @@ class EngineeringComponentAssemblies extends Table with GeometryAuditColumns {
     EngineeringPortConnections,
     EngineeringInternalMappings,
     EngineeringComponentAssemblies,
+    EngineeringPlacementOperations,
   ],
 )
 final class AppDatabase extends _$AppDatabase {
@@ -751,7 +769,7 @@ final class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'electra'));
 
   @override
-  int get schemaVersion => 16;
+  int get schemaVersion => 17;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -841,6 +859,9 @@ final class AppDatabase extends _$AppDatabase {
           await migrator.createTable(engineeringPortConnections);
           await migrator.createTable(engineeringInternalMappings);
           await migrator.createTable(engineeringComponentAssemblies);
+        }
+        if (from < 17) {
+          await migrator.createTable(engineeringPlacementOperations);
         }
       }
       await _createIndexes();
@@ -954,6 +975,10 @@ final class AppDatabase extends _$AppDatabase {
     await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_component_instance_definition '
       'ON component_instances(definition_id, definition_version)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_engineering_placement_operation_project '
+      'ON engineering_placement_operations(project_id, status)',
     );
   }
 }
