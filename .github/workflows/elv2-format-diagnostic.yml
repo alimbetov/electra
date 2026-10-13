@@ -1,0 +1,39 @@
+name: ELV2 Format Diagnostic
+
+on:
+  push:
+    branches:
+      - feat/flutter-elv2-profile-constraints
+
+jobs:
+  format-diagnostic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Install mobile dependencies
+        working-directory: apps/mobile
+        run: flutter pub get --enforce-lockfile
+      - name: Generate Drift code
+        working-directory: apps/mobile
+        run: dart run build_runner build
+      - name: Format mobile P1 files
+        working-directory: apps/mobile
+        run: |
+          dart format \
+            lib/application/engineering_reference_revision_preview.dart \
+            lib/data/repositories/drift_engineering_reference_repository.dart \
+            test/application/engineering_reference_binding_constraints_test.dart \
+            test/application/engineering_reference_revision_preview_test.dart
+      - name: Upload formatted files
+        uses: actions/upload-artifact@v4
+        with:
+          name: elv2-formatted-mobile-ci-context
+          path: |
+            apps/mobile/lib/application/engineering_reference_revision_preview.dart
+            apps/mobile/lib/data/repositories/drift_engineering_reference_repository.dart
+            apps/mobile/test/application/engineering_reference_binding_constraints_test.dart
+            apps/mobile/test/application/engineering_reference_revision_preview_test.dart
