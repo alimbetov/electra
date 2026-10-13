@@ -1,6 +1,5 @@
 import '../support/engineering_placement_fixture.dart';
 import 'package:electra_mobile/data/repositories/drift_engineering_placement_aggregate.dart';
-import 'package:drift/drift.dart' hide isNotNull, isNull;
 import 'package:drift/native.dart';
 import 'package:electra_mobile/application/engineering_placement_command.dart';
 import 'package:electra_mobile/application/engineering_placement_repository.dart';
