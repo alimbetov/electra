@@ -21,9 +21,9 @@ final class DriftEngineeringPlacementRepository
     String operationId,
   ) async {
     final row =
-        await (database.select(database.engineeringPlacementOperations)
-              ..where((candidate) => candidate.operationId.equals(operationId)))
-            .getSingleOrNull();
+        await (database.select(database.engineeringPlacementOperations)..where(
+          (candidate) => candidate.operationId.equals(operationId),
+        )).getSingleOrNull();
     return row == null ? null : _operationFromRow(row);
   }
 
@@ -40,11 +40,9 @@ final class DriftEngineeringPlacementRepository
     return database.transaction(() async {
       final existing =
           await (database.select(database.engineeringPlacementOperations)
-                ..where(
-                  (candidate) =>
-                      candidate.operationId.equals(command.operationId),
-                ))
-              .getSingleOrNull();
+            ..where(
+              (candidate) => candidate.operationId.equals(command.operationId),
+            )).getSingleOrNull();
 
       if (existing != null) {
         if (existing.fingerprintVersion !=
@@ -52,7 +50,8 @@ final class DriftEngineeringPlacementRepository
             existing.commandFingerprint != fingerprint) {
           throw EngineeringPlacementFailure(
             code: EngineeringPlacementFailureCode.idempotencyConflict,
-            message: 'operationId is already bound to different placement semantics.',
+            message:
+                'operationId is already bound to different placement semantics.',
             details: {
               'operationId': command.operationId,
               'storedFingerprintVersion': existing.fingerprintVersion,
@@ -71,7 +70,8 @@ final class DriftEngineeringPlacementRepository
           case EngineeringPlacementOperationStatus.undone:
             throw EngineeringPlacementFailure(
               code: EngineeringPlacementFailureCode.operationUndone,
-              message: 'The completed placement was undone. Normal retry cannot reactivate it.',
+              message:
+                  'The completed placement was undone. Normal retry cannot reactivate it.',
               details: {'operationId': command.operationId},
             );
         }
@@ -79,7 +79,8 @@ final class DriftEngineeringPlacementRepository
 
       throw EngineeringPlacementFailure(
         code: EngineeringPlacementFailureCode.transactionFailed,
-        message: 'Atomic placement aggregate writes are not enabled until P4.3-P4.7 are installed.',
+        message:
+            'Atomic placement aggregate writes are not enabled until P4.3-P4.7 are installed.',
         details: {
           'operationId': command.operationId,
           'phase': 'P4.2',
@@ -95,9 +96,10 @@ final class DriftEngineeringPlacementRepository
     final status = switch (row.status) {
       'COMPLETED' => EngineeringPlacementOperationStatus.completed,
       'UNDONE' => EngineeringPlacementOperationStatus.undone,
-      _ => throw StateError(
-        'Unsupported engineering placement operation status: ${row.status}',
-      ),
+      _ =>
+        throw StateError(
+          'Unsupported engineering placement operation status: ${row.status}',
+        ),
     };
     return EngineeringPlacementOperationRecord(
       operationId: row.operationId,
