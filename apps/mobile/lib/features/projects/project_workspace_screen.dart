@@ -7,6 +7,7 @@ import '../../app/providers.dart';
 import '../calculations/project_recalculation_screen.dart';
 import '../calculations/protection_screen.dart';
 import '../calculations/manufacturer_screen.dart';
+import '../calculations/panel_generation_screen.dart';
 
 class ProjectWorkspaceScreen extends ConsumerWidget {
   const ProjectWorkspaceScreen({super.key, required this.projectId});
@@ -31,6 +32,16 @@ class ProjectWorkspaceScreen extends ConsumerWidget {
         ),
       ),
       persistentFooterButtons: [
+        OutlinedButton.icon(
+          icon: const Icon(Icons.view_module_outlined),
+          label: const Text('Generate panel'),
+          onPressed:
+              () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => PanelGenerationScreen(projectId: projectId),
+                ),
+              ),
+        ),
         OutlinedButton.icon(
           icon: const Icon(Icons.inventory_2_outlined),
           label: const Text('Manufacturer catalogs'),

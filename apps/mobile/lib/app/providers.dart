@@ -1,3 +1,5 @@
+import '../application/panel_generation_repository.dart';
+import '../data/repositories/drift_panel_generation_repository.dart';
 import '../application/manufacturer_repository.dart';
 import '../data/repositories/drift_manufacturer_repository.dart';
 import '../application/protection_repository.dart';
@@ -241,4 +243,15 @@ final manufacturerRepositoryProvider = Provider<ManufacturerRepository>(
 final projectManufacturerProvider =
     StreamProvider.family<ProjectManufacturerSnapshot, String>(
       (ref, id) => ref.watch(manufacturerRepositoryProvider).watch(id),
+    );
+
+final panelGenerationRepositoryProvider = Provider<PanelGenerationRepository>(
+  (ref) => DriftPanelGenerationRepository(
+    ref.watch(databaseProvider),
+    originDeviceId: 'local-device',
+  ),
+);
+final projectPanelGenerationProvider =
+    StreamProvider.family<ProjectPanelGenerationSnapshot, String>(
+      (ref, id) => ref.watch(panelGenerationRepositoryProvider).watch(id),
     );

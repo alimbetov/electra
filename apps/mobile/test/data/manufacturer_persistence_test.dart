@@ -528,6 +528,7 @@ void main() {
         engine.session.cache.keys.any((k) => k.startsWith('product:')),
         isFalse,
       );
+      await database.customStatement('DROP TABLE panel_generation_configs');
       await database.customStatement('DROP TABLE circuit_product_selections');
       await database.customStatement('DROP TABLE manufacturer_policies');
       await database.customStatement('DROP TABLE manufacturer_products');
@@ -543,7 +544,7 @@ void main() {
       expect(data.catalogs, isEmpty);
       expect(data.selections, isEmpty);
       expect(data.protection.rulesets.length, 1);
-      expect(database.schemaVersion, 12);
+      expect(database.schemaVersion, 13);
       await database.close();
       await directory.delete(recursive: true);
     },

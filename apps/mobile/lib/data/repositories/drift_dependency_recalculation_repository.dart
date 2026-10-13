@@ -122,6 +122,8 @@ class DriftDependencyRecalculationRepository
         originDeviceId: originDeviceId,
       ).load(floor.id);
       final floorGraph = snapshot.graph();
+      final generationGroups = <RoomConsumptionGroup>[];
+      final generationLoads = <EquipmentElectricalLoad>[];
       for (final room in snapshot.rooms) {
         final routing = snapshot.routing[room.id]!;
         final circuitRows =
@@ -161,6 +163,13 @@ class DriftDependencyRecalculationRepository
           database,
           originDeviceId: originDeviceId,
         ).loadRoomLoads(room.id);
+        generationLoads.addAll(activeLoads);
+        generationGroups.addAll(
+          await DriftElectricalLoadRepository(
+            database,
+            originDeviceId: originDeviceId,
+          ).loadRoomGroups(room.id),
+        );
         final ids = {
           ...activeLoads.map((l) => l.componentInstanceId),
           ...circuits.expand((c) => c.loadIds),
@@ -434,6 +443,72 @@ class DriftDependencyRecalculationRepository
             },
           );
         }
+      }
+      final generationRows =
+          await (database.select(database.panelGenerationConfigs)..where(
+            (r) =>
+                r.floorId.equals(floor.id) &
+                r.projectId.equals(projectId) &
+                r.deletedAt.isNull(),
+          )).get();
+      for (final row in generationRows) {
+        final policy = PanelGenerationPolicy.fromMap(
+          jsonDecode(row.payloadJson) as Map<String, dynamic>,
+        );
+        final ruleset = rules[policy.rulesetId],
+            norm = norms[ruleset?.normativeDocumentId];
+        if (ruleset != null) {
+          if (norm != null)
+            add(
+              'normative:${norm.id}',
+              norm.title,
+              'fl13-normative-v1',
+              norm.toMap(),
+              [],
+              (_) => DependencyProposal(values: norm.toMap()),
+            );
+          add(
+            'ruleset:${ruleset.id}',
+            ruleset.reference.id,
+            'fl13-ruleset-v1',
+            ruleset.toMap(),
+            ['normative:${ruleset.normativeDocumentId}'],
+            (_) => DependencyProposal(values: ruleset.toMap()),
+          );
+        }
+        final groups =
+            generationGroups.toList()..sort((a, b) => a.id.compareTo(b.id));
+        final loads =
+            generationLoads.toList()..sort(
+              (a, b) => a.componentInstanceId.compareTo(b.componentInstanceId),
+            );
+        add(
+          'panelProposal:${row.id}',
+          policy.name,
+          PanelGenerationEngine.algorithmVersion,
+          {
+            'policy': policy.toMap(),
+            'groups': [
+              for (final g in groups)
+                {'id': g.id, 'roomId': g.roomId, 'name': g.name},
+            ],
+            'membership': [
+              for (final l in loads)
+                {'id': l.componentInstanceId, 'groupId': l.consumptionGroupId},
+            ],
+          },
+          [
+            'ruleset:${policy.rulesetId}',
+            for (final l in loads) 'consumer:${l.componentInstanceId}',
+          ],
+          (_) => PanelGenerationEngine.generate(
+            policy: policy,
+            groups: groups,
+            loads: loads,
+            ruleset: ruleset,
+            normativeDocument: norm,
+          ),
+        );
       }
       for (final panel in snapshot.panels) {
         final downstream = <String>{};

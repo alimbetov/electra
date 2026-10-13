@@ -485,6 +485,21 @@ class CircuitProductSelections extends Table with GeometryAuditColumns {
   Set<Column<Object>> get primaryKey => {circuitId};
 }
 
+@DataClassName('PanelGenerationConfigRow')
+class PanelGenerationConfigs extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get projectId => text().references(Projects, #id)();
+  TextColumn get floorId => text().references(Floors, #id)();
+  TextColumn get payloadJson => text()();
+  TextColumn get reviewedFingerprint => text().nullable()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {floorId},
+  ];
+}
+
 @DriftDatabase(
   tables: [
     Projects,
@@ -519,6 +534,7 @@ class CircuitProductSelections extends Table with GeometryAuditColumns {
     ManufacturerProducts,
     ManufacturerPolicies,
     CircuitProductSelections,
+    PanelGenerationConfigs,
   ],
 )
 final class AppDatabase extends _$AppDatabase {
@@ -526,7 +542,7 @@ final class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'electra'));
 
   @override
-  int get schemaVersion => 12;
+  int get schemaVersion => 13;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -588,6 +604,9 @@ final class AppDatabase extends _$AppDatabase {
           await migrator.createTable(normativeDocuments);
           await migrator.createTable(protectionRulesets);
           await migrator.createTable(circuitProtectionSettings);
+        }
+        if (from < 13) {
+          await migrator.createTable(panelGenerationConfigs);
         }
         if (from < 12) {
           await migrator.createTable(manufacturerCatalogs);

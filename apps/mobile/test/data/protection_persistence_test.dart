@@ -372,6 +372,7 @@ void main() {
         derived.session.cache['panel:panel']!.state,
         EngineeringDerivedState.error,
       );
+      await database.customStatement('DROP TABLE panel_generation_configs');
       await database.customStatement('DROP TABLE circuit_product_selections');
       await database.customStatement('DROP TABLE manufacturer_policies');
       await database.customStatement('DROP TABLE manufacturer_products');
@@ -390,7 +391,7 @@ void main() {
       expect(snapshot.documents.length, 3);
       expect(snapshot.rulesets, isEmpty);
       expect(snapshot.circuits.single.settings.rulesetId, isNull);
-      expect(database.schemaVersion, 12);
+      expect(database.schemaVersion, 13);
       await database.close();
       await directory.delete(recursive: true);
     },
