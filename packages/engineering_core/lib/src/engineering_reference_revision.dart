@@ -32,7 +32,7 @@ class ProfileRevisionChange {
 
 class ProfileRevisionImpact {
   ProfileRevisionImpact({required Iterable<ProfileRevisionChange> changes})
-      : changes = List.unmodifiable(changes);
+    : changes = List.unmodifiable(changes);
 
   final List<ProfileRevisionChange> changes;
 
@@ -48,7 +48,8 @@ ProfileRevisionImpact removedEngineeringProfileImpact(String profileCode) =>
       changes: [
         ProfileRevisionChange(
           kind: ProfileRevisionChangeKind.removed,
-          summary: 'Profile $profileCode was removed from the candidate edition.',
+          summary:
+              'Profile $profileCode was removed from the candidate edition.',
           connectionRelevant: true,
           placementRelevant: true,
         ),
@@ -108,7 +109,9 @@ ProfileRevisionImpact compareEngineeringProfileRevisions({
     );
   }
   if (!_sameStringMap(
-      previous.portInterfaceCodes, candidate.portInterfaceCodes)) {
+    previous.portInterfaceCodes,
+    candidate.portInterfaceCodes,
+  )) {
     add(
       ProfileRevisionChangeKind.interfaces,
       'Port interface bindings changed.',
