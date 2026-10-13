@@ -109,10 +109,11 @@ final class PlaceEngineeringProfileCommand {
       );
     }
 
-    for (final entry in <String, double?>{
-      'ambientTemperatureC': placementContext.ambientTemperatureC,
-      'availableClearanceMm': placementContext.availableClearanceMm,
-    }.entries) {
+    for (final entry
+        in <String, double?>{
+          'ambientTemperatureC': placementContext.ambientTemperatureC,
+          'availableClearanceMm': placementContext.availableClearanceMm,
+        }.entries) {
       final value = entry.value;
       if (value != null && !value.isFinite) {
         failures.add(
