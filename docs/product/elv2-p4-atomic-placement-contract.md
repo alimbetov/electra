@@ -1,6 +1,6 @@
 # ELV2-P4 — atomic canonical placement
 
-Status: implementation contract v1.1  
+Status: implementation contract v1.1 — approved baseline for implementation  
 Branch: `feat/flutter-elv2-profile-constraints`  
 Parent: [ELV2 technical specification](elv2-profile-constraints-technical-specification.md)  
 Pre-placement UI: [P3 palette contract](elv2-p3-palette-contract.md)  
