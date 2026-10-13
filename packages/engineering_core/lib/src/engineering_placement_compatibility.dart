@@ -157,8 +157,7 @@ class PlacementCompatibilityEngine {
       );
     }
 
-    if (profile.constraintsState == ProfileConstraintsState.legacyUnspecified ||
-        profile.constraints == null) {
+    if (profile.constraintsState == ProfileConstraintsState.legacyUnspecified) {
       findings.add(
         const PlacementFinding(
           code: PlacementFindingCode.legacyConstraintsUnspecified,
@@ -178,7 +177,26 @@ class PlacementCompatibilityEngine {
       );
     }
 
-    final constraints = profile.constraints!;
+    final constraints = profile.constraints;
+    if (constraints == null) {
+      findings.add(
+        const PlacementFinding(
+          code: PlacementFindingCode.profileConstraintsInvalid,
+          severity: PlacementFindingSeverity.unresolved,
+          dimension: PlacementFindingDimension.profile,
+          explanation:
+              'Defined constraint state requires a constraints payload.',
+          remediationHint: 'Repair the catalog edition before placement.',
+        ),
+      );
+      return PlacementCompatibilityResult(
+        profileCode: profile.code,
+        catalogId: catalogId,
+        catalogVersion: catalogVersion,
+        findings: findings,
+      );
+    }
+
     final constraintErrors = constraints.validate();
     if (constraintErrors.isNotEmpty) {
       findings.add(
@@ -232,7 +250,8 @@ class PlacementCompatibilityEngine {
         dimension: PlacementFindingDimension.mounting,
         explanation:
             'The selected surface and mounting method are not an allowed pair.',
-        expected: constraint.options.map((option) => option.identity).join(', '),
+        expected:
+            constraint.options.map((option) => option.identity).join(', '),
         actual: '${surface.name}:${method.name}',
         remediationHint: 'Choose one of the canonical mounting combinations.',
       );
@@ -244,7 +263,8 @@ class PlacementCompatibilityEngine {
           code: PlacementFindingCode.enclosurePresenceUnresolved,
           severity: PlacementFindingSeverity.unresolved,
           dimension: PlacementFindingDimension.mounting,
-          explanation: 'The profile requires an enclosure but enclosure presence is unknown.',
+          explanation:
+              'The profile requires an enclosure but enclosure presence is unknown.',
           expected: 'enclosure present',
           remediationHint: 'Select or confirm the enclosing equipment context.',
         );
@@ -253,7 +273,8 @@ class PlacementCompatibilityEngine {
           code: PlacementFindingCode.enclosureRequired,
           severity: PlacementFindingSeverity.error,
           dimension: PlacementFindingDimension.mounting,
-          explanation: 'The profile requires placement inside or with an enclosure.',
+          explanation:
+              'The profile requires placement inside or with an enclosure.',
           expected: 'enclosure present',
           actual: 'no enclosure',
           remediationHint: 'Place the component in a compatible enclosure.',
@@ -269,19 +290,23 @@ class PlacementCompatibilityEngine {
           code: PlacementFindingCode.clearanceUnresolved,
           severity: PlacementFindingSeverity.unresolved,
           dimension: PlacementFindingDimension.mounting,
-          explanation: 'Available clearance is required to prove compatibility.',
+          explanation:
+              'Available clearance is required to prove compatibility.',
           expected: '>= $requiredClearance mm',
           remediationHint: 'Provide the available installation clearance.',
         );
-      } else if (!actualClearance.isFinite || actualClearance < requiredClearance) {
+      } else if (!actualClearance.isFinite ||
+          actualClearance < requiredClearance) {
         yield PlacementFinding(
           code: PlacementFindingCode.clearanceInsufficient,
           severity: PlacementFindingSeverity.error,
           dimension: PlacementFindingDimension.mounting,
-          explanation: 'Available clearance does not satisfy the profile minimum.',
+          explanation:
+              'Available clearance does not satisfy the profile minimum.',
           expected: '>= $requiredClearance mm',
           actual: '$actualClearance mm',
-          remediationHint: 'Choose a location with sufficient installation clearance.',
+          remediationHint:
+              'Choose a location with sufficient installation clearance.',
         );
       }
     }
@@ -304,7 +329,8 @@ class PlacementCompatibilityEngine {
         code: PlacementFindingCode.environmentExposureNotAllowed,
         severity: PlacementFindingSeverity.error,
         dimension: PlacementFindingDimension.environment,
-        explanation: 'The candidate exposure class is not allowed by the profile.',
+        explanation:
+            'The candidate exposure class is not allowed by the profile.',
         expected: _names(constraint.allowedExposure),
         actual: exposure.name,
       );
@@ -341,7 +367,8 @@ class PlacementCompatibilityEngine {
           code: PlacementFindingCode.ambientTemperatureUnresolved,
           severity: PlacementFindingSeverity.unresolved,
           dimension: PlacementFindingDimension.environment,
-          explanation: 'Ambient temperature is required to prove compatibility.',
+          explanation:
+              'Ambient temperature is required to prove compatibility.',
           expected: '$minTemperature..$maxTemperature C',
         );
       } else if (!actual.isFinite) {
@@ -349,7 +376,8 @@ class PlacementCompatibilityEngine {
           code: PlacementFindingCode.ambientTemperatureInvalid,
           severity: PlacementFindingSeverity.error,
           dimension: PlacementFindingDimension.environment,
-          explanation: 'Ambient temperature must be a finite engineering value.',
+          explanation:
+              'Ambient temperature must be a finite engineering value.',
           actual: '$actual',
         );
       } else if (actual < minTemperature) {
@@ -381,7 +409,8 @@ class PlacementCompatibilityEngine {
           code: PlacementFindingCode.ipProtectionUnresolved,
           severity: PlacementFindingSeverity.unresolved,
           dimension: PlacementFindingDimension.environment,
-          explanation: 'Actual IP protection is required to prove compatibility.',
+          explanation:
+              'Actual IP protection is required to prove compatibility.',
           expected: '>= ${requiredIp.value}',
         );
       } else {
@@ -410,7 +439,8 @@ class PlacementCompatibilityEngine {
     }
   }
 
-  Iterable<PlacementFinding> _evaluateOptionalEnvironmentDimension<T extends Enum>({
+  Iterable<PlacementFinding>
+      _evaluateOptionalEnvironmentDimension<T extends Enum>({
     required List<T> allowed,
     required T? actual,
     required PlacementFindingCode unresolvedCode,
@@ -431,7 +461,8 @@ class PlacementCompatibilityEngine {
         code: mismatchCode,
         severity: PlacementFindingSeverity.error,
         dimension: PlacementFindingDimension.environment,
-        explanation: 'The candidate $label class is not allowed by the profile.',
+        explanation:
+            'The candidate $label class is not allowed by the profile.',
         expected: _names(allowed),
         actual: actual.name,
       );
@@ -448,7 +479,8 @@ class PlacementCompatibilityEngine {
         code: PlacementFindingCode.topologyShapeUnresolved,
         severity: PlacementFindingSeverity.unresolved,
         dimension: PlacementFindingDimension.topology,
-        explanation: 'Selected system topology shape is required before placement.',
+        explanation:
+            'Selected system topology shape is required before placement.',
         expected: _names(constraint.allowedShapes),
       );
     } else if (!constraint.allowedShapes.contains(shape)) {
@@ -456,7 +488,8 @@ class PlacementCompatibilityEngine {
         code: PlacementFindingCode.topologyShapeNotAllowed,
         severity: PlacementFindingSeverity.error,
         dimension: PlacementFindingDimension.topology,
-        explanation: 'The selected topology shape is not allowed by the profile.',
+        explanation:
+            'The selected topology shape is not allowed by the profile.',
         expected: _names(constraint.allowedShapes),
         actual: shape.name,
       );
@@ -468,7 +501,8 @@ class PlacementCompatibilityEngine {
         code: PlacementFindingCode.topologyRoleUnresolved,
         severity: PlacementFindingSeverity.unresolved,
         dimension: PlacementFindingDimension.topology,
-        explanation: 'Intended topology participation role is required before placement.',
+        explanation:
+            'Intended topology participation role is required before placement.',
         expected: _names(constraint.allowedRoles),
       );
     } else if (!constraint.allowedRoles.contains(role)) {
@@ -476,7 +510,8 @@ class PlacementCompatibilityEngine {
         code: PlacementFindingCode.topologyRoleNotAllowed,
         severity: PlacementFindingSeverity.error,
         dimension: PlacementFindingDimension.topology,
-        explanation: 'The intended topology role is not allowed by the profile.',
+        explanation:
+            'The intended topology role is not allowed by the profile.',
         expected: _names(constraint.allowedRoles),
         actual: role.name,
       );
@@ -504,7 +539,8 @@ _IpComparison _compareIp(
       water == _IpComparison.insufficient) {
     return _IpComparison.insufficient;
   }
-  if (ingress == _IpComparison.unresolved || water == _IpComparison.unresolved) {
+  if (ingress == _IpComparison.unresolved ||
+      water == _IpComparison.unresolved) {
     return _IpComparison.unresolved;
   }
   return _IpComparison.sufficient;
