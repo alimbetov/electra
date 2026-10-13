@@ -313,7 +313,7 @@ void main() {
       snapshot = await repository.loadRoomRouting(room.id);
       expect(snapshot.runs.length, 3);
       expect(snapshot.junctions, isEmpty);
-      expect(database.schemaVersion, 16);
+      expect(database.schemaVersion, 17);
       await database.close();
       await directory.delete(recursive: true);
     },
