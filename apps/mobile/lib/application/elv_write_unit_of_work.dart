@@ -1,5 +1,7 @@
 import 'package:engineering_core/engineering_core.dart';
 
+import 'elv_cable_dependency_inspector.dart';
+
 abstract interface class ElvCommandLedgerStore {
   Future<ElvCommandLedgerEntry?> find(String projectId, String commandId);
   Future<void> save(ElvCommandLedgerEntry entry);
@@ -38,10 +40,6 @@ abstract interface class ElvWriteSession {
 abstract interface class ElvCableWriteStore {
   Future<bool> projectExists(String projectId);
   Future<Cable?> findCable(String projectId, String cableId);
-  Future<CableDefinition> resolveDefinition(
-    String projectId,
-    CableDefinitionRef ref,
-  );
   Future<bool> activeLabelExists(String projectId, String normalizedLabel);
   Future<bool> insertCable(Cable cable);
   Future<bool> updateDefinition({
@@ -57,15 +55,19 @@ abstract interface class ElvCableWriteStore {
   });
 }
 
-abstract interface class ElvCableDependencyStore {
-  Future<bool> hasResourceSelectionHistory(String projectId, String cableId);
-  Future<bool> hasConsumingAllocation(String projectId, String cableId);
-  Future<bool> hasCanonicalRunHistory(String projectId, String cableId);
-  Future<List<String>> blockingDependencyIds(String projectId, String cableId);
+abstract interface class ElvReferenceReadStore {
+  Future<CableDefinition> resolveCableDefinition(
+    String projectId,
+    CableDefinitionRef ref,
+  );
 }
+
+abstract interface class ElvCableDependencyStore
+    implements ElvCableDependencyInspector {}
 
 abstract interface class ElvCableWriteSession extends ElvWriteSession {
   ElvCableWriteStore get cables;
+  ElvReferenceReadStore get references;
   ElvCableDependencyStore get cableDependencies;
 }
 
