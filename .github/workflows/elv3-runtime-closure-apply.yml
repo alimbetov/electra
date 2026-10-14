@@ -6,6 +6,7 @@ on:
       - feat/elv3-runtime-closure
     paths:
       - 'scripts/ci/apply-elv3-runtime-rc1-rc2.py'
+      - 'scripts/ci/apply-elv3-runtime-rc1-rc2-fix.py'
       - '.github/workflows/elv3-runtime-closure-apply.yml'
   workflow_dispatch:
 
@@ -24,7 +25,9 @@ jobs:
           fetch-depth: 0
 
       - name: Apply deterministic RC1-RC2 patch
-        run: python3 scripts/ci/apply-elv3-runtime-rc1-rc2.py
+        run: |
+          python3 scripts/ci/apply-elv3-runtime-rc1-rc2.py
+          python3 scripts/ci/apply-elv3-runtime-rc1-rc2-fix.py
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -42,7 +45,7 @@ jobs:
 
       - name: Generate Drift code
         working-directory: apps/mobile
-        run: dart run build_runner build --delete-conflicting-outputs
+        run: dart run build_runner build
 
       - name: Analyze mobile app
         working-directory: apps/mobile
@@ -84,6 +87,7 @@ jobs:
                   apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart \
                   apps/mobile/lib/data/repositories/drift_elv_cable_run_repository.dart \
                   apps/mobile/lib/data/repositories/drift_elv_cable_write_unit_of_work.dart \
+                  apps/mobile/test/data/elv_p1_cable_persistence_test.dart \
                   apps/mobile/test/data/elv_p3_runtime_closure_test.dart
           git diff --cached --quiet && exit 0
           git commit -m 'feat(elv3): close P3 runtime persistence baseline'
