@@ -37,16 +37,31 @@ The [ELV delivery plan](elv-delivery-plan.md) is the active product roadmap. His
 | ELV0 | Systems, sixteen family editions, shared device participation | Baseline closed |
 | ELV1 | Ports, connections, topology, passive mappings and assemblies | CLOSED / ACCEPTED |
 | ELV2 | Canonical discipline profiles, versioned catalogs, placement and explicit adoption | CLOSED / ACCEPTED |
-| ELV3 | Cable resources, allocations, CableRun ownership, shared routes/pathways and physical compatibility | P0 DESIGN CLOSED / P1 NEXT |
+| ELV3 | Cable resources, allocations, cable-run realization, reusable routing/pathway infrastructure and physical compatibility | P0 REOPENED / ARCHITECTURE REMEDIATION |
 | ELV4 | Power, PoE, PSU, UPS, converters and backup graph | Planned |
 | ELV5 | Versioned CCTV/LAN/ACS/fire calculations | Planned |
 | ELV6 | Racks, cabinets, patching and physical capacity | Planned |
 | ELV7 | Jurisdiction profiles, normative rule packs and findings | Planned |
 | ELV8 | Manufacturer selection, snapshots, BOM and deliverables | Planned |
 
-ELV3-P0 is closed with explicit ownership/cardinality, cable-resource allocation, PhysicalChannel facts, lifecycle/provenance, staged electrical CableRun migration, four-discipline walkthrough, persistence proposal and hard design audit. The canonical physical chain is `EngineeringConnection -> CableAllocation -> Cable -> CableRun -> CableRoute -> RouteSegment -> PhysicalChannel`. The next implementation stage is `ELV3-P1` for exact/versioned `CableDefinition` and project-owned physical `Cable` identity.
+ELV3-P0 was reopened after a project-wide system-architecture audit found conflicts between the first P0 closure and the accepted common-domain architecture. `ELV3-P1` is on HOLD until `docs/product/elv3-p0-system-architecture-remediation.md` closes the remediation gate.
 
-All four discipline fixtures remain required throughout the track. National rule packs require verified sources and provenance. FL16 and ELV6 share enclosure infrastructure; ELV8 reuses electrical BOM/reporting foundations.
+The corrected target direction is:
+
+```text
+EngineeringConnection
+  -> CableAllocation
+  -> Cable
+  -> one active CableRun per design revision
+  -> ordered CableTraversal[]
+  -> reusable Route/geometry infrastructure
+  -> PhysicalCarrier
+  -> PathwayContext
+```
+
+`CableDefinition` must consume the accepted ELV2 reference-snapshot/version governance rather than creating a parallel catalog system. Legacy electrical routing remains valid through a compatibility/adoption path; physical Cable identity must not be invented from `ElectricalCircuit` records. ELV3 owns technical physical compatibility, while ELV7 owns jurisdictional/normative compliance.
+
+All four discipline fixtures plus a fiber fixture remain required throughout the track. National rule packs require verified sources and provenance. FL16 and ELV6 share enclosure infrastructure; ELV8 reuses electrical BOM/reporting foundations.
 
 ## Parallel baseline extensions
 
