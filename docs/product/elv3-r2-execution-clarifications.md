@@ -35,11 +35,9 @@ Rules:
 - changing selected resources requires releasing the allocation and creating a new DRAFT allocation identity;
 - RELEASED/ARCHIVED keeps selection evidence and terminations, but has zero consuming claims.
 
-This prevents history rewriting and makes restart semantics deterministic.
-
 ## C4 — exact P5 project profile set
 
-Replace any ambiguous per-role/implicit profile precedence with one explicit project-owned active profile set.
+P5 uses one explicit project-owned active profile set.
 
 ```text
 ProjectPhysicalCompatibilityProfileSet {
@@ -64,21 +62,21 @@ Invariants:
 - at most one ACTIVE set per project;
 - refs resolve to exact same-project immutable ELV2 catalog editions;
 - no implicit latest lookup;
-- sequence is stable presentation/evidence order, not rule precedence;
-- profileContentHash uses SHA-256 over UTF-8 canonical JSON with schema marker `electra.physical-compatibility-profile.v1`;
-- changing the active set is an explicit atomic command and invalidates dependent P5/P6 findings;
-- evaluation considers every applicable profile in the active set.
+- sequence is evidence/display order, not rule precedence;
+- profileContentHash = SHA-256 over UTF-8 canonical JSON with marker `electra.physical-compatibility-profile.v1`;
+- active-set change is explicit/atomic and invalidates dependent P5/P6 findings;
+- every applicable profile participates.
 
-Combination semantics are deterministic:
+Combination semantics:
 
-- categorical allowed sets combine by intersection;
-- required minimum intrinsic values combine by maximum of minima;
-- permitted maximum intrinsic values combine by minimum of maxima;
-- any empty categorical intersection or irreconcilable typed rule combination produces `UNRESOLVED_PROFILE_CONFLICT`, never hidden priority;
-- a direct intrinsic prohibition from any applicable profile yields FORBIDDEN if the rule inputs are complete;
-- normative/jurisdictional rules are not accepted in this profile type and remain ELV7.
+- categorical allowed sets -> intersection;
+- required minima -> maximum of minima;
+- permitted maxima -> minimum of maxima;
+- empty intersection/irreconcilable typed rules -> `UNRESOLVED_PROFILE_CONFLICT`;
+- direct intrinsic prohibition -> FORBIDDEN when inputs are complete;
+- normative/jurisdictional rules are rejected from this profile type and remain ELV7.
 
-P5 persistence names are frozen:
+Persistence names:
 
 ```text
 ProjectPhysicalCompatibilityProfileSets
@@ -86,8 +84,6 @@ ProjectPhysicalCompatibilityProfileRefs
 ```
 
 ## C5 — DesignRevisionPhysicalSnapshot wire/hash contract
-
-Snapshot integrity uses one versioned deterministic representation:
 
 ```text
 schema marker = "electra.design-revision-physical-snapshot.v1"
@@ -101,16 +97,9 @@ payloadSha256 = SHA-256(canonical bytes)
 stored form = lowercase 64-character hexadecimal
 ```
 
-Rules:
-
-- unordered collections inside the snapshot are sorted by stable canonical identity before serialization;
-- ordered engineering sequences such as traversal order remain ordered and are never sorted away;
-- frozen snapshot verification after reopen recomputes the hash and blocks on mismatch;
-- schema marker change requires an explicit new reader/version, never silent reinterpretation.
+Unordered collections are sorted by stable identity before serialization; ordered engineering sequences remain ordered. Restart recomputes the hash and blocks on mismatch. Schema marker changes require explicit versioned readers.
 
 ## C6 — resource-selection evidence hash
-
-`CableAllocationResourceSelections` persist both the original typed selection evidence and the exact resolved atomic set used at reservation time.
 
 ```text
 schema marker = "electra.cable-resource-selection.v1"
@@ -123,15 +112,67 @@ canonical value = {
 selectionSha256 = SHA-256(UTF-8(canonicalEngineeringJson(canonical value)))
 ```
 
-The stored atomic set and hash are immutable after RESERVE. Restart must resolve the current immutable CableDefinition edition again and prove the resolved atom set/hash is identical; mismatch is `ELV_RESTART_RECONSTRUCTION_FAILED`/integrity failure, not a silent remap.
+Stored selection and resolved atoms are immutable after RESERVE. Restart re-resolves the immutable CableDefinition edition and must reproduce the same atom set/hash; mismatch is a blocking reconstruction/integrity failure.
+
+## C7 — exact P1 CableDefinition semantic shape
+
+P1 CableDefinition extends ELV2 reference data and MUST use canonical ELV2 dictionary codes instead of opaque project strings.
+
+```text
+CableDefinition {
+  code
+  label
+  deprecated
+
+  mediaCode
+  categoryCode?
+  conductorMaterialCode?
+  shieldingCode?
+  firePerformanceCode?
+  environmentClassCodes[]
+  installationClassCodes[]
+  technicalClassCodes[]
+
+  conductorCount?
+  pairCount?
+  fiberCount?
+  conductorCrossSectionMm2?
+  characteristicImpedanceOhm?
+  dcResistanceOhmPerKm?
+  capacitanceNfPerKm?
+  inductanceMhPerKm?
+  voltageRatingV?
+  outerDiameterMm?
+  occupiedAreaMm2?
+  minimumBendRadiusMm?
+  maximumPullingForceN?
+
+  resourceDefinitions[]
+}
+```
+
+Rules:
+
+- `code` normalized/unique within exact catalog edition;
+- `mediaCode` is required and resolves to ELV2 common signal/cable-media reference vocabulary; it is not a manufacturer SKU;
+- optional category/material/shield/fire/environment/installation/technical-class codes resolve through accepted ELV2 reference dictionaries/vocabulary for that catalog/project context;
+- counts are integers >= 0; at least one resource model consistent with media is declared;
+- numeric physical facts must be finite and > 0 when present, except values whose physical domain explicitly permits zero;
+- `occupiedAreaMm2` is required for non-circular constructions when P6 fill is expected; circular cable may derive area from `outerDiameterMm`;
+- resourceDefinitions are the authoritative allocatable resource graph from R2-04;
+- manufacturer products may map to this definition later in ELV8 but never replace its identity;
+- P1 does not embed jurisdictional acceptance thresholds in CableDefinition.
+
+This shape is aligned with `docs/product/elv-reference-data-catalogs.md` cable catalog attributes and reuses ELV2 governance rather than creating a new vocabulary.
 
 ## Closure
 
 ```text
-C1 frozen revision write guard        CLOSED
-C2 zero-length interface handoff       CLOSED
-C3 immutable selection evidence        CLOSED
-C4 deterministic P5 profile set        CLOSED
-C5 snapshot wire/hash contract         CLOSED
-C6 selection evidence hash             CLOSED
+C1 frozen revision write guard         CLOSED
+C2 zero-length interface handoff        CLOSED
+C3 immutable selection evidence         CLOSED
+C4 deterministic P5 profile set         CLOSED
+C5 snapshot wire/hash contract          CLOSED
+C6 selection evidence hash              CLOSED
+C7 CableDefinition semantic shape       CLOSED
 ```
