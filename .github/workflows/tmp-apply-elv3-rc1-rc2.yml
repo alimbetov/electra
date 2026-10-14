@@ -37,30 +37,32 @@ jobs:
           from pathlib import Path
           path = Path('apps/mobile/lib/data/database/app_database.dart')
           text = path.read_text()
-
-          registry = '''    ElvCables,
-              CableAllocations,
-              CableAllocationResourceSelections,
-              CableResourceClaims,
-              CableTerminationMappings,
-              CommandExecutionRecords,
-          '''.replace('\n      ', '\n')
-          compact_registry = '''    ElvCables, CableAllocations, CableAllocationResourceSelections,
-              CableResourceClaims, CableTerminationMappings, CommandExecutionRecords,
-          '''.replace('\n      ', '\n')
+          registry = (
+              "    ElvCables,\n"
+              "    CableAllocations,\n"
+              "    CableAllocationResourceSelections,\n"
+              "    CableResourceClaims,\n"
+              "    CableTerminationMappings,\n"
+              "    CommandExecutionRecords,\n"
+          )
+          compact_registry = (
+              "    ElvCables, CableAllocations, CableAllocationResourceSelections,\n"
+              "    CableResourceClaims, CableTerminationMappings, CommandExecutionRecords,\n"
+          )
           if text.count(registry) != 1:
               raise SystemExit(f'expected current ELV registry once, got {text.count(registry)}')
           text = text.replace(registry, compact_registry, 1)
-
-          formatted_index = '''    await customStatement(
-              'CREATE INDEX IF NOT EXISTS idx_elv_termination_allocation ON cable_termination_mappings(allocation_id)',
-            );
-          '''.replace('\n      ', '\n')
-          compact_index = "    await customStatement('CREATE INDEX IF NOT EXISTS idx_elv_termination_allocation ON cable_termination_mappings(allocation_id)');\n"
+          formatted_index = (
+              "    await customStatement(\n"
+              "      'CREATE INDEX IF NOT EXISTS idx_elv_termination_allocation ON cable_termination_mappings(allocation_id)',\n"
+              "    );\n"
+          )
+          compact_index = (
+              "    await customStatement('CREATE INDEX IF NOT EXISTS idx_elv_termination_allocation ON cable_termination_mappings(allocation_id)');\n"
+          )
           if text.count(formatted_index) != 1:
               raise SystemExit(f'expected formatted termination index once, got {text.count(formatted_index)}')
-          text = text.replace(formatted_index, compact_index, 1)
-          path.write_text(text)
+          path.write_text(text.replace(formatted_index, compact_index, 1))
           PY
 
       - name: Apply immutable RC1-RC2 patch
