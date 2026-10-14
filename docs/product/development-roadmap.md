@@ -37,28 +37,24 @@ The [ELV delivery plan](elv-delivery-plan.md) is the active product roadmap. His
 | ELV0 | Systems, sixteen family editions, shared device participation | Baseline closed |
 | ELV1 | Ports, connections, topology, passive mappings and assemblies | CLOSED / ACCEPTED |
 | ELV2 | Canonical discipline profiles, versioned catalogs, placement and explicit adoption | CLOSED / ACCEPTED |
-| ELV3 | Cable resources, allocation/termination, cable-run traversal, reusable routing/carriers/pathways and physical compatibility | FINAL SPEC HARDENED / READY FOR EXECUTION — P1 NEXT |
+| ELV3 | Cable resources, allocation/termination, cable-run traversal, reusable routing/carriers/pathways and physical compatibility | READINESS REOPENED / R2 REMEDIATION REQUIRED / P1 HOLD |
 | ELV4 | Power, PoE, PSU, UPS, converters and backup graph | Planned |
 | ELV5 | Versioned CCTV/LAN/ACS/fire calculations | Planned |
 | ELV6 | Racks, cabinets, patching and physical capacity | Planned |
 | ELV7 | Jurisdiction profiles, normative rule packs and findings | Planned |
 | ELV8 | Manufacturer selection, snapshots, BOM and deliverables | Planned |
 
-ELV3-P0 was reopened after a project-wide system-architecture audit found conflicts in the first closure. P0-R1 through P0-R10 remediated those conflicts. A later adversarial implementation review found seven remaining specification ambiguities; PRE-P1 hardening closed them and a final audit now authorizes P1.
+ELV3-P0 remains architecturally remediated and accepted. PRE-P1 hardening closed the first implementation ambiguities, but a second adversarial P1–P9 technical audit found additional integrity gaps in frozen design-revision reproducibility, bend-radius input completeness, resource atomization/termination policy, route handoff identity and exact P6 calculation semantics. P1 is therefore on HOLD until the R2 remediation set is closed and the second audit is rerun.
 
-The single execution entry point is `docs/product/elv3-authoritative-spec-index.md`.
+Current readiness authority:
 
-Authoritative implementation documents:
+- `docs/audit/elv3-p1-p9-second-technical-audit.md`.
 
-- `docs/product/elv3-implementation-specification-v2.md`;
-- `docs/product/elv3-pre-p1-final-hardening.md`;
-- `docs/adr/ADR-029-elv3-reusable-route-traversal.md`;
-- `docs/adr/ADR-030-project-design-revision-identity.md`;
-- `docs/audit/elv3-implementation-spec-readiness-audit.md`.
+The prior `docs/audit/elv3-implementation-spec-readiness-audit.md` is SUPERSEDED and is not implementation authorization.
 
-The first `docs/product/elv3-implementation-specification.md` is SUPERSEDED and must not be implemented.
+The single execution-document entry point remains `docs/product/elv3-authoritative-spec-index.md`, but its current READY status is suspended by the second technical audit until remediation updates the authoritative contracts.
 
-The accepted ELV3 physical direction is:
+The accepted ELV3 physical direction itself remains:
 
 ```text
 EngineeringConnection
@@ -74,38 +70,26 @@ EngineeringConnection
   -> sealed PathwayContext host
 ```
 
-Frozen clarifications before execution:
+Second-audit remediation gate before P1:
 
 ```text
-CableDefinition provenance
-  = catalogId + catalogVersion + definitionCode + contentHash
-  using existing ELV2 EngineeringReferenceCatalog governance
-
-CableAllocation lifecycle
-  = strict DRAFT -> RESERVED -> ACTIVE -> RELEASED -> ARCHIVED
-
-one continuous EngineeringConnection
-  = at most one RESERVED/ACTIVE physical Cable in ELV3 P1-P9
-
-routing
-  = one existing/evolved CableRoute graph; no second ELV route graph
-
-design revision identity
-  = ProjectDesignRevision.id, never Projects.revision
-
-PathwayContext
-  = sealed Room/Floor/SurfaceVoid/Vertical/Project host model
-
-P5 profiles
-  = exact ELV2 PhysicalCompatibilityProfile editions
-
-P6 segregation
-  = factual evidence; ELV7 owns jurisdictional thresholds/compliance
+R2-01 frozen design revision source-of-truth strategy
+R2-02 bend-radius evidence strategy
+R2-03 exact CableDefinition canonical hash/wire compatibility
+R2-04 resource atom/composite expansion contract
+R2-05 termination requirement policy
+R2-06 canonical reusable route handoff identity
+R2-07 ProjectDesignRevision command/state process
+R2-08 remove P1->P5 catalog phase leakage
+R2-09 remove P3 table-name contradiction
+R2-10 exact P6 formulas and occupancy granularity
+R2-11 PathwayContext containment invariants
+R2-12 P8 failure matrix
 ```
 
-Legacy electrical routing remains valid through coexistence/adoption semantics; physical Cable identity is never invented from `ElectricalCircuit` alone.
+After those items close, rerun the P1–P9 technical audit. Only a new PASS may restore `READY FOR EXECUTION / P1 AUTHORIZED`.
 
-ELV3 implementation sequence is fixed as:
+The intended implementation sequence remains:
 
 ```text
 P1 Cable identity / exact ELV2 CableDefinitionRef
@@ -119,7 +103,7 @@ P8 Restart / rollback / idempotency verticals
 P9 Hard audit / exact-SHA closure
 ```
 
-Every phase closes on its own exact branch SHA before the next phase begins.
+Every phase closes on its own exact branch SHA before the next phase begins after execution authorization is restored.
 
 All four discipline fixtures plus a fiber fixture remain required throughout the track. National rule packs require verified sources and provenance. FL16 and ELV6 share enclosure infrastructure; ELV8 reuses electrical BOM/reporting foundations.
 
