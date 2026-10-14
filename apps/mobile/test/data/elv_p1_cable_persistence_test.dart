@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:drift/native.dart';
 import 'package:electra_mobile/application/elv_cable_command.dart';
 import 'package:electra_mobile/application/elv_cable_command_service.dart';
@@ -60,7 +59,9 @@ EngineeringReferenceCatalog _catalog() => EngineeringReferenceCatalog(
 
 Future<void> _seed(AppDatabase db) async {
   final now = DateTime.utc(2026, 10, 14, 6);
-  await db.into(db.projects).insert(
+  await db
+      .into(db.projects)
+      .insert(
         ProjectsCompanion.insert(
           id: 'project-1',
           name: 'ELV3 P1',
@@ -73,7 +74,9 @@ Future<void> _seed(AppDatabase db) async {
         ),
       );
   final catalog = _catalog();
-  await db.into(db.engineeringReferenceCatalogs).insert(
+  await db
+      .into(db.engineeringReferenceCatalogs)
+      .insert(
         EngineeringReferenceCatalogsCompanion.insert(
           id: catalog.id,
           projectId: 'project-1',
@@ -89,10 +92,7 @@ Future<void> _seed(AppDatabase db) async {
 
 DefaultElvCableCommandService _service(AppDatabase db) =>
     DefaultElvCableCommandService(
-      unitOfWork: DriftElvCableWriteUnitOfWork(
-        db,
-        originDeviceId: 'test',
-      ),
+      unitOfWork: DriftElvCableWriteUnitOfWork(db, originDeviceId: 'test'),
       originDeviceId: 'test',
       now: () => DateTime.utc(2026, 10, 14, 6, 30),
     );
@@ -114,75 +114,86 @@ CreateCableCommand _create({
 }
 
 void main() {
-  test('P1 create persists exact definition reference and replays idempotently', () async {
-    final db = AppDatabase(NativeDatabase.memory());
-    addTearDown(db.close);
-    await _seed(db);
+  test(
+    'P1 create persists exact definition reference and replays idempotently',
+    () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      await _seed(db);
 
-    final service = _service(db);
-    final first = await service.create(_create());
-    expect(first, isA<ElvCommandSuccess<Cable>>());
+      final service = _service(db);
+      final first = await service.create(_create());
+      expect(first, isA<ElvCommandSuccess<Cable>>());
 
-    final replay = await service.create(_create());
-    expect(replay, isA<ElvCommandSuccess<Cable>>());
+      final replay = await service.create(_create());
+      expect(replay, isA<ElvCommandSuccess<Cable>>());
 
-    final cables = await DriftElvCableRepository(db).loadProjectCables('project-1');
-    expect(cables, hasLength(1));
-    expect(cables.single.definitionRef.definitionCode, 'CAT6-UUTP');
-    expect(cables.single.definitionRef.definitionContentHash, hasLength(64));
+      final cables = await DriftElvCableRepository(
+        db,
+      ).loadProjectCables('project-1');
+      expect(cables, hasLength(1));
+      expect(cables.single.definitionRef.definitionCode, 'CAT6-UUTP');
+      expect(cables.single.definitionRef.definitionContentHash, hasLength(64));
 
-    final ledgerRows = await db.select(db.commandExecutionRecords).get();
-    expect(ledgerRows, hasLength(1));
-    expect(ledgerRows.single.outcomeKind, 'SUCCESS');
-  });
+      final ledgerRows = await db.select(db.commandExecutionRecords).get();
+      expect(ledgerRows, hasLength(1));
+      expect(ledgerRows.single.outcomeKind, 'SUCCESS');
+    },
+  );
 
-  test('same commandId with changed payload is rejected as idempotency conflict', () async {
-    final db = AppDatabase(NativeDatabase.memory());
-    addTearDown(db.close);
-    await _seed(db);
-    final service = _service(db);
+  test(
+    'same commandId with changed payload is rejected as idempotency conflict',
+    () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      await _seed(db);
+      final service = _service(db);
 
-    expect(await service.create(_create()), isA<ElvCommandSuccess<Cable>>());
-    final changed = await service.create(_create(label: 'C-02'));
-    expect(changed, isA<ElvCommandFailureResult<Cable>>());
-    expect(
-      (changed as ElvCommandFailureResult<Cable>).failure.code,
-      'ELV_IDEMPOTENCY_CONFLICT',
-    );
-  });
+      expect(await service.create(_create()), isA<ElvCommandSuccess<Cable>>());
+      final changed = await service.create(_create(label: 'C-02'));
+      expect(changed, isA<ElvCommandFailureResult<Cable>>());
+      expect(
+        (changed as ElvCommandFailureResult<Cable>).failure.code,
+        'ELV_IDEMPOTENCY_CONFLICT',
+      );
+    },
+  );
 
-  test('active normalized label is unique while archived label can be reused', () async {
-    final db = AppDatabase(NativeDatabase.memory());
-    addTearDown(db.close);
-    await _seed(db);
-    final service = _service(db);
+  test(
+    'active normalized label is unique while archived label can be reused',
+    () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      await _seed(db);
+      final service = _service(db);
 
-    final created = await service.create(_create());
-    expect(created, isA<ElvCommandSuccess<Cable>>());
+      final created = await service.create(_create());
+      expect(created, isA<ElvCommandSuccess<Cable>>());
 
-    final duplicate = await service.create(
-      _create(commandId: 'cmd-create-2', cableId: 'cable-2', label: ' c-01 '),
-    );
-    expect(
-      (duplicate as ElvCommandFailureResult<Cable>).failure.code,
-      'ELV_CABLE_LABEL_CONFLICT',
-    );
+      final duplicate = await service.create(
+        _create(commandId: 'cmd-create-2', cableId: 'cable-2', label: ' c-01 '),
+      );
+      expect(
+        (duplicate as ElvCommandFailureResult<Cable>).failure.code,
+        'ELV_CABLE_LABEL_CONFLICT',
+      );
 
-    final archived = await service.archive(
-      const ArchiveCableCommand(
-        commandId: 'cmd-archive-1',
-        projectId: 'project-1',
-        cableId: 'cable-1',
-        expectedRevision: 1,
-      ),
-    );
-    expect(archived, isA<ElvCommandSuccess<Cable>>());
+      final archived = await service.archive(
+        const ArchiveCableCommand(
+          commandId: 'cmd-archive-1',
+          projectId: 'project-1',
+          cableId: 'cable-1',
+          expectedRevision: 1,
+        ),
+      );
+      expect(archived, isA<ElvCommandSuccess<Cable>>());
 
-    final reused = await service.create(
-      _create(commandId: 'cmd-create-3', cableId: 'cable-3', label: 'C-01'),
-    );
-    expect(reused, isA<ElvCommandSuccess<Cable>>());
-  });
+      final reused = await service.create(
+        _create(commandId: 'cmd-create-3', cableId: 'cable-3', label: 'C-01'),
+      );
+      expect(reused, isA<ElvCommandSuccess<Cable>>());
+    },
+  );
 
   test('P1 state and command outcome survive database reopen', () async {
     final dir = await Directory.systemTemp.createTemp('electra-elv3-p1-');
@@ -191,7 +202,10 @@ void main() {
 
     var db = AppDatabase(NativeDatabase(file));
     await _seed(db);
-    expect(await _service(db).create(_create()), isA<ElvCommandSuccess<Cable>>());
+    expect(
+      await _service(db).create(_create()),
+      isA<ElvCommandSuccess<Cable>>(),
+    );
     await db.close();
 
     db = AppDatabase(NativeDatabase(file));

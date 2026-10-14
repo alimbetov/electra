@@ -1,0 +1,155 @@
+name: Temporary ELV3 RC4-RC7 Closure
+
+on:
+  push:
+    branches:
+      - feat/elv3-runtime-closure
+    paths:
+      - '.github/workflows/tmp-elv3-rc4-rc7.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  close:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/elv3-runtime-closure
+          fetch-depth: 0
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Sync verified P4 source
+        run: |
+          git fetch origin feat/elv3-runtime-closure
+          git reset --hard origin/feat/elv3-runtime-closure
+          grep -q 'schemaVersion => 21' apps/mobile/lib/data/database/app_database.dart
+
+      - name: Apply RC4-RC7 patches and API alignment
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('apps/mobile/lib/data/database/app_database.dart')
+          s = p.read_text()
+          formatted = """    await customStatement(\n      'CREATE INDEX IF NOT EXISTS idx_elv_traversal_carrier_assignment_run ON traversal_carrier_assignments(cable_run_id)',\n    );\n"""
+          compact = "    await customStatement('CREATE INDEX IF NOT EXISTS idx_elv_traversal_carrier_assignment_run ON traversal_carrier_assignments(cable_run_id)');\n"
+          if formatted not in s:
+              raise SystemExit('formatted P4 traversal assignment index anchor not found')
+          p.write_text(s.replace(formatted, compact, 1))
+          PY
+          python3 scripts/ci/apply-elv3-runtime-rc4.py
+          python3 scripts/ci/apply-elv3-runtime-rc5.py
+          python3 scripts/ci/apply-elv3-runtime-rc6.py
+          python3 scripts/ci/apply-elv3-runtime-rc7.py
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          def replace(path, old, new):
+              p = Path(path)
+              s = p.read_text()
+              if old not in s:
+                  raise SystemExit(f'anchor not found in {path}: {old!r}')
+              p.write_text(s.replace(old, new, 1))
+
+          def regex_replace(path, pattern, replacement):
+              p = Path(path)
+              s = p.read_text()
+              updated, count = re.subn(pattern, replacement, s, count=1, flags=re.MULTILINE)
+              if count != 1:
+                  raise SystemExit(f'regex anchor count={count} in {path}: {pattern!r}')
+              p.write_text(updated)
+
+          replace(
+              'apps/mobile/lib/data/repositories/drift_elv_command_history_repository.dart',
+              "import '../../application/elv_command_history_repository.dart';\n",
+              "import '../../application/elv_command_history_repository.dart';\nimport '../../application/elv_physical_routing_workspace_service.dart';\n",
+          )
+          replace(
+              'apps/mobile/test/data/elv_p7_runtime_closure_test.dart',
+              "import 'package:electra_mobile/application/elv_command_history_repository.dart';\n",
+              "import 'package:electra_mobile/application/elv_command_history_repository.dart';\nimport 'package:electra_mobile/application/elv_physical_routing_workspace_service.dart';\n",
+          )
+          replace(
+              'apps/mobile/test/data/elv_p7_runtime_closure_test.dart',
+              "import 'package:drift/drift.dart';\n",
+              "import 'package:drift/drift.dart' show Value;\n",
+          )
+          replace(
+              'apps/mobile/test/data/elv_p8_vertical_matrix_test.dart',
+              "import 'package:drift/drift.dart';\n",
+              "import 'package:drift/drift.dart' show Value, Variable;\n",
+          )
+          replace(
+              'apps/mobile/test/data/elv_p5_runtime_closure_test.dart',
+              "import 'package:drift/native.dart';\n",
+              "import 'package:drift/drift.dart' show Value;\nimport 'package:drift/native.dart';\n",
+          )
+
+          regex_replace(
+              'apps/mobile/test/data/elv_p5_runtime_closure_test.dart',
+              r"(mediaCode:\s*'COPPER',)",
+              r"\1\n      cableCategoryCode: null,",
+          )
+          regex_replace(
+              'apps/mobile/test/data/elv_p5_runtime_closure_test.dart',
+              r"(carrierKind:\s*'CONDUIT',)",
+              r"cableOuterDiameterMm: 6.0,\n      \1",
+          )
+          regex_replace(
+              'apps/mobile/test/data/elv_p5_runtime_closure_test.dart',
+              r"(carrierUsableAreaMm2:\s*100,)",
+              r"\1\n      installationClassCode: null,",
+          )
+          replace(
+              'apps/mobile/test/data/elv_p7_runtime_closure_test.dart',
+              'medium: ConnectionMedium.copper',
+              'medium: ConnectionMedium.wired',
+          )
+          PY
+
+      - name: Install dependencies
+        working-directory: apps/mobile
+        run: flutter pub get --enforce-lockfile
+      - name: Generate Drift code
+        working-directory: apps/mobile
+        run: dart run build_runner build --delete-conflicting-outputs
+      - name: Format
+        working-directory: apps/mobile
+        run: dart format lib test
+      - name: Analyze
+        working-directory: apps/mobile
+        run: flutter analyze
+      - name: Test RC4-RC7 runtime closure
+        working-directory: apps/mobile
+        run: |
+          flutter test --reporter expanded \
+            test/data/elv_p5_runtime_closure_test.dart \
+            test/data/elv_p6_runtime_closure_test.dart \
+            test/data/elv_p7_runtime_closure_test.dart \
+            test/data/elv_p8_vertical_matrix_test.dart
+      - name: Commit RC4-RC7 source
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add apps/mobile/lib/data/database/app_database.dart \
+                  apps/mobile/lib/application/elv_physical_calculation_service.dart \
+                  apps/mobile/lib/data/repositories/drift_elv_physical_compatibility_repository.dart \
+                  apps/mobile/lib/data/repositories/drift_elv_command_history_repository.dart \
+                  apps/mobile/lib/data/repositories/drift_elv_physical_routing_workspace_data_source.dart \
+                  apps/mobile/lib/data/repositories/drift_elv_physical_trace_service.dart \
+                  apps/mobile/test/data/elv_p5_runtime_closure_test.dart \
+                  apps/mobile/test/data/elv_p6_runtime_closure_test.dart \
+                  apps/mobile/test/data/elv_p7_runtime_closure_test.dart \
+                  apps/mobile/test/data/elv_p8_vertical_matrix_test.dart
+          git diff --cached --quiet && { echo 'No source changes produced'; exit 1; }
+          git commit -m 'feat(elv3): close RC4-RC7 persisted runtime verticals'
+          git reset --hard HEAD
+          git pull --rebase origin feat/elv3-runtime-closure
+          git push origin HEAD:feat/elv3-runtime-closure

@@ -1,4 +1,5 @@
 enum CanonicalCableRunState { active, superseded, archived }
+
 enum CableTraversalDirection { forward, reverse }
 
 final class CanonicalCableRun {
@@ -26,7 +27,8 @@ final class CanonicalCableRun {
 
   List<String> validate() => [
         if (id.trim().isEmpty) 'Canonical cable run id is required.',
-        if (projectId.trim().isEmpty) 'Canonical cable run projectId is required.',
+        if (projectId.trim().isEmpty)
+          'Canonical cable run projectId is required.',
         if (cableId.trim().isEmpty) 'Canonical cable run cableId is required.',
         if (designRevisionId.trim().isEmpty)
           'Canonical cable run designRevisionId is required.',
@@ -60,7 +62,8 @@ final class CableRunTraversal {
   List<String> validate() => [
         if (id.trim().isEmpty) 'Traversal id is required.',
         if (cableRunId.trim().isEmpty) 'Traversal cableRunId is required.',
-        if (routeSegmentId.trim().isEmpty) 'Traversal routeSegmentId is required.',
+        if (routeSegmentId.trim().isEmpty)
+          'Traversal routeSegmentId is required.',
         if (sequence < 1) 'Traversal sequence must be 1-based.',
         if (carrierCompartmentId != null && physicalCarrierId == null)
           'Carrier compartment requires a physical carrier.',
@@ -69,7 +72,9 @@ final class CableRunTraversal {
 
 List<String> validateTraversalChain(Iterable<CableRunTraversal> traversals) {
   final list = traversals.toList(growable: false);
-  final errors = <String>[for (final traversal in list) ...traversal.validate()];
+  final errors = <String>[
+    for (final traversal in list) ...traversal.validate()
+  ];
   if (list.isEmpty) {
     errors.add('Traversal chain must not be empty.');
     return errors;
@@ -77,7 +82,8 @@ List<String> validateTraversalChain(Iterable<CableRunTraversal> traversals) {
   final sorted = [...list]..sort((a, b) => a.sequence.compareTo(b.sequence));
   for (var i = 0; i < sorted.length; i++) {
     if (sorted[i].sequence != i + 1) {
-      errors.add('Traversal sequence must be unique and gap-free starting at 1.');
+      errors
+          .add('Traversal sequence must be unique and gap-free starting at 1.');
       break;
     }
   }

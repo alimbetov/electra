@@ -1,0 +1,139 @@
+# rerun after engineering_core runtime repair
+name: Temporary Apply ELV3 RC1-RC2
+
+on:
+  push:
+    branches:
+      - feat/elv3-runtime-closure
+    paths:
+      - '.github/workflows/tmp-apply-elv3-rc1-rc2.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: feat/elv3-runtime-closure
+          fetch-depth: 0
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install mobile dependencies
+        working-directory: apps/mobile
+        run: flutter pub get --enforce-lockfile
+
+      - name: Adapt current Drift formatting for immutable patch
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('apps/mobile/lib/data/database/app_database.dart')
+          text = path.read_text()
+          registry = (
+              "    ElvCables,\n"
+              "    CableAllocations,\n"
+              "    CableAllocationResourceSelections,\n"
+              "    CableResourceClaims,\n"
+              "    CableTerminationMappings,\n"
+              "    CommandExecutionRecords,\n"
+          )
+          compact_registry = (
+              "    ElvCables, CableAllocations, CableAllocationResourceSelections,\n"
+              "    CableResourceClaims, CableTerminationMappings, CommandExecutionRecords,\n"
+          )
+          if text.count(registry) != 1:
+              raise SystemExit(f'expected current ELV registry once, got {text.count(registry)}')
+          text = text.replace(registry, compact_registry, 1)
+          formatted_index = (
+              "    await customStatement(\n"
+              "      'CREATE INDEX IF NOT EXISTS idx_elv_termination_allocation ON cable_termination_mappings(allocation_id)',\n"
+              "    );\n"
+          )
+          compact_index = (
+              "    await customStatement('CREATE INDEX IF NOT EXISTS idx_elv_termination_allocation ON cable_termination_mappings(allocation_id)');\n"
+          )
+          if text.count(formatted_index) != 1:
+              raise SystemExit(f'expected formatted termination index once, got {text.count(formatted_index)}')
+          path.write_text(text.replace(formatted_index, compact_index, 1))
+          PY
+
+      - name: Apply immutable RC1-RC2 patch
+        shell: bash
+        run: |
+          mkdir -p scripts/ci
+          curl -fsSL \
+            https://raw.githubusercontent.com/alimbetov/electra/e8db15e64c8e53cc23e5e6567ecb37ffff414c87/scripts/ci/apply-elv3-runtime-rc1-rc2.py \
+            -o scripts/ci/apply-elv3-runtime-rc1-rc2.py
+          python3 scripts/ci/apply-elv3-runtime-rc1-rc2.py
+          rm scripts/ci/apply-elv3-runtime-rc1-rc2.py
+          sed -i "/import 'package:drift\/drift.dart'/d" apps/mobile/test/data/elv_p3_runtime_closure_test.dart
+
+      - name: Generate Drift code
+        working-directory: apps/mobile
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Format mobile source
+        working-directory: apps/mobile
+        run: dart format lib test
+
+      - name: Analyze mobile app
+        working-directory: apps/mobile
+        run: flutter analyze
+
+      - name: Test RC1-RC2 and capture result
+        id: rc_test
+        working-directory: apps/mobile
+        shell: bash
+        run: |
+          set +e
+          flutter test --reporter expanded test/data/elv_p3_runtime_closure_test.dart > ../../rc1-rc2-test.log 2>&1
+          status=$?
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Commit RC1-RC2 diagnostic on failure
+        if: steps.rc_test.outputs.status != '0'
+        shell: bash
+        run: |
+          {
+            echo '# Temporary ELV3 RC1-RC2 diagnostics'
+            echo
+            echo '```text'
+            cat rc1-rc2-test.log
+            echo '```'
+          } > docs/audit/elv3-rc1-rc2-diagnostics.tmp.md
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/audit/elv3-rc1-rc2-diagnostics.tmp.md
+          git commit -m 'chore(ci): capture RC1-RC2 test diagnostics'
+          git push origin HEAD:feat/elv3-runtime-closure
+
+      - name: Commit resulting source
+        if: steps.rc_test.outputs.status == '0'
+        shell: bash
+        run: |
+          rm -f rc1-rc2-test.log
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add apps/mobile/lib/data/database/app_database.dart \
+                  apps/mobile/lib/data/repositories/drift_elv_runtime_support.dart \
+                  apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart \
+                  apps/mobile/lib/data/repositories/drift_elv_cable_run_repository.dart \
+                  apps/mobile/lib/data/repositories/drift_elv_cable_write_unit_of_work.dart \
+                  apps/mobile/test/data/elv_p3_runtime_closure_test.dart
+          git diff --cached --quiet && { echo 'No source changes produced'; exit 1; }
+          git commit -m 'feat(elv3): implement RC1-RC2 P3 runtime closure'
+          git push origin HEAD:feat/elv3-runtime-closure
+
+      - name: Fail when RC1-RC2 test failed
+        if: steps.rc_test.outputs.status != '0'
+        run: exit 1

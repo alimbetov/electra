@@ -13,31 +13,30 @@ final class DriftElvCableRepository implements ElvCableRepository {
 
   @override
   Future<List<Cable>> loadProjectCables(String projectId) async {
-    final rows = await (database.select(database.elvCables)
-          ..where((row) => row.projectId.equals(projectId) & row.deletedAt.isNull()))
-        .get();
+    final rows =
+        await (database.select(database.elvCables)..where(
+          (row) => row.projectId.equals(projectId) & row.deletedAt.isNull(),
+        )).get();
     return rows.map(_cableFromRow).toList(growable: false);
   }
 
   @override
   Future<Cable?> findCable(String projectId, String cableId) async {
-    final row = await (database.select(database.elvCables)
-          ..where(
-            (candidate) =>
-                candidate.projectId.equals(projectId) &
-                candidate.id.equals(cableId) &
-                candidate.deletedAt.isNull(),
-          ))
-        .getSingleOrNull();
+    final row =
+        await (database.select(database.elvCables)..where(
+          (candidate) =>
+              candidate.projectId.equals(projectId) &
+              candidate.id.equals(cableId) &
+              candidate.deletedAt.isNull(),
+        )).getSingleOrNull();
     return row == null ? null : _cableFromRow(row);
   }
 
   @override
   Stream<List<Cable>> watchProjectCables(String projectId) =>
-      (database.select(database.elvCables)
-            ..where((row) => row.projectId.equals(projectId) & row.deletedAt.isNull()))
-          .watch()
-          .map((rows) => rows.map(_cableFromRow).toList(growable: false));
+      (database.select(database.elvCables)..where(
+        (row) => row.projectId.equals(projectId) & row.deletedAt.isNull(),
+      )).watch().map((rows) => rows.map(_cableFromRow).toList(growable: false));
 
   @override
   Future<CableDefinition> resolveDefinition(
@@ -45,15 +44,14 @@ final class DriftElvCableRepository implements ElvCableRepository {
     CableDefinitionRef ref,
   ) async {
     final normalized = ref.normalized();
-    final row = await (database.select(database.engineeringReferenceCatalogs)
-          ..where(
-            (candidate) =>
-                candidate.projectId.equals(projectId) &
-                candidate.id.equals(normalized.catalogId) &
-                candidate.catalogVersion.equals(normalized.catalogVersion) &
-                candidate.deletedAt.isNull(),
-          ))
-        .getSingleOrNull();
+    final row =
+        await (database.select(database.engineeringReferenceCatalogs)..where(
+          (candidate) =>
+              candidate.projectId.equals(projectId) &
+              candidate.id.equals(normalized.catalogId) &
+              candidate.catalogVersion.equals(normalized.catalogVersion) &
+              candidate.deletedAt.isNull(),
+        )).getSingleOrNull();
     if (row == null) {
       throw StateError('Cable definition catalog edition not found.');
     }

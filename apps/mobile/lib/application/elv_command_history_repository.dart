@@ -36,23 +36,21 @@ final class ElvCommandHistoryRecord {
       state == ElvCommandHistoryRecordState.undone;
 
   List<String> validate() => [
-        if (projectId.trim().isEmpty) 'History projectId is required.',
-        if (sequence < 1) 'History sequence must be >= 1.',
-        if (commandId.trim().isEmpty) 'History commandId is required.',
-        if (forwardCommandType.trim().isEmpty)
-          'Forward command type is required.',
-        if (forwardPayloadSha256.trim().isEmpty)
-          'Forward payload hash is required.',
-        if (preconditionFingerprint.trim().isEmpty)
-          'Precondition fingerprint is required.',
-        if (undoClass == ElvCommandUndoClass.reversible &&
-            (inverseCommandType == null ||
-                inverseCommandType!.trim().isEmpty))
-          'Reversible history requires inverse command type.',
-        if (undoClass == ElvCommandUndoClass.reversible &&
-            (inversePayloadJson == null || inversePayloadJson!.trim().isEmpty))
-          'Reversible history requires inverse payload.',
-      ];
+    if (projectId.trim().isEmpty) 'History projectId is required.',
+    if (sequence < 1) 'History sequence must be >= 1.',
+    if (commandId.trim().isEmpty) 'History commandId is required.',
+    if (forwardCommandType.trim().isEmpty) 'Forward command type is required.',
+    if (forwardPayloadSha256.trim().isEmpty)
+      'Forward payload hash is required.',
+    if (preconditionFingerprint.trim().isEmpty)
+      'Precondition fingerprint is required.',
+    if (undoClass == ElvCommandUndoClass.reversible &&
+        (inverseCommandType == null || inverseCommandType!.trim().isEmpty))
+      'Reversible history requires inverse command type.',
+    if (undoClass == ElvCommandUndoClass.reversible &&
+        (inversePayloadJson == null || inversePayloadJson!.trim().isEmpty))
+      'Reversible history requires inverse payload.',
+  ];
 }
 
 abstract interface class ElvCommandHistoryRepository {

@@ -55,16 +55,15 @@ final class PhysicalRoutingWorkspaceState {
     String? selectedCableRunId,
     bool? canEdit,
     List<PhysicalRoutingBlockingIssue>? blockingIssues,
-  }) =>
-      PhysicalRoutingWorkspaceState(
-        projectId: projectId,
-        designContext: designContext,
-        activeStage: activeStage ?? this.activeStage,
-        canEdit: canEdit ?? this.canEdit,
-        selectedConnectionId: selectedConnectionId ?? this.selectedConnectionId,
-        selectedCableId: selectedCableId ?? this.selectedCableId,
-        selectedAllocationId: selectedAllocationId ?? this.selectedAllocationId,
-        selectedCableRunId: selectedCableRunId ?? this.selectedCableRunId,
-        blockingIssues: blockingIssues ?? this.blockingIssues,
-      );
+  }) => PhysicalRoutingWorkspaceState(
+    projectId: projectId,
+    designContext: designContext,
+    activeStage: activeStage ?? this.activeStage,
+    canEdit: canEdit ?? this.canEdit,
+    selectedConnectionId: selectedConnectionId ?? this.selectedConnectionId,
+    selectedCableId: selectedCableId ?? this.selectedCableId,
+    selectedAllocationId: selectedAllocationId ?? this.selectedAllocationId,
+    selectedCableRunId: selectedCableRunId ?? this.selectedCableRunId,
+    blockingIssues: blockingIssues ?? this.blockingIssues,
+  );
 }

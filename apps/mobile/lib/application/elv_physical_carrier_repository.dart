@@ -29,9 +29,7 @@ abstract interface class ElvPhysicalCarrierRepository {
     UpdatePhysicalCarrierCommand command,
   );
 
-  Future<ElvCommandResult<void>> archive(
-    ArchivePhysicalCarrierCommand command,
-  );
+  Future<ElvCommandResult<void>> archive(ArchivePhysicalCarrierCommand command);
 
   Future<ElvCommandResult<PhysicalCarrierCompartment>> createCompartment(
     CreateCarrierCompartmentCommand command,

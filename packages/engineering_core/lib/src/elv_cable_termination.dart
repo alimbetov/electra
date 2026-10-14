@@ -4,14 +4,14 @@ final class CableTerminationMapping {
   CableTerminationMapping({
     required this.id,
     required this.allocationId,
-    required this.resourceIdentity,
+    required String resourceIdentity,
     required this.end,
     required this.endpointPortId,
-    this.endpointTerminalRef,
-    this.terminationRole,
-  }) : resourceIdentity = resourceIdentity.trim().toUpperCase(),
-       endpointTerminalRef = _normalizeNullable(endpointTerminalRef),
-       terminationRole = _normalizeNullable(terminationRole);
+    String? endpointTerminalRef,
+    String? terminationRole,
+  })  : resourceIdentity = resourceIdentity.trim().toUpperCase(),
+        endpointTerminalRef = _normalizeNullable(endpointTerminalRef),
+        terminationRole = _normalizeNullable(terminationRole);
 
   final String id;
   final String allocationId;
@@ -65,7 +65,8 @@ List<String> validateTerminationSet(
   ];
   final keys = list.map((mapping) => mapping.uniquenessKey).toList();
   if (keys.toSet().length != keys.length) {
-    errors.add('Termination mappings must be unique per allocation/resource/end.');
+    errors.add(
+        'Termination mappings must be unique per allocation/resource/end.');
   }
   return errors;
 }

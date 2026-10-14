@@ -2,7 +2,9 @@ import 'package:engineering_core/engineering_core.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('installed length applies reserve before run-total termination allowance', () {
+  test(
+      'installed length applies reserve before run-total termination allowance',
+      () {
     const run = CanonicalCableRun(
       id: 'RUN-1',
       projectId: 'PRJ-1',
@@ -46,7 +48,7 @@ void main() {
         CableCarrierUsage(key: key, cableId: 'CABLE-1', occupiedAreaMm2: 20),
         CableCarrierUsage(key: key, cableId: 'CABLE-2', occupiedAreaMm2: 30),
       ],
-      usableAreaByKey: const {key: 100},
+      usableAreaByKey: {key: 100},
     ).single;
     expect(evidence.cableIds, ['CABLE-1', 'CABLE-2']);
     expect(evidence.occupiedAreaMm2, 50);

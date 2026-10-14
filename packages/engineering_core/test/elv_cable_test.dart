@@ -10,7 +10,8 @@ void main() {
         '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
   );
 
-  test('cable identity is project scoped and label normalization is stable', () {
+  test('cable identity is project scoped and label normalization is stable',
+      () {
     const cable = Cable(
       id: 'cable-1',
       projectId: 'project-1',
@@ -50,7 +51,8 @@ void main() {
     expect(normalized.catalogId, 'catalog-1');
     expect(normalized.catalogVersion, '1');
     expect(normalized.definitionCode, 'CAT6');
-    expect(normalized.definitionContentHash, normalized.definitionContentHash.toLowerCase());
+    expect(normalized.definitionContentHash,
+        normalized.definitionContentHash.toLowerCase());
     expect(normalized.validate(), isEmpty);
   });
 }

@@ -37,7 +37,9 @@ final class DriftElvPhysicalCalculationResultStore
       'blockingCodes': result.blockingCodes,
     };
 
-    await database.into(database.projectDerivedResults).insertOnConflictUpdate(
+    await database
+        .into(database.projectDerivedResults)
+        .insertOnConflictUpdate(
           ProjectDerivedResultsCompanion.insert(
             projectId: projectId,
             nodeKey: nodeKey,
@@ -64,14 +66,13 @@ final class DriftElvPhysicalCalculationResultStore
     String projectId,
     String nodeKey,
   ) async {
-    final row = await (database.select(database.projectDerivedResults)
-          ..where(
-            (candidate) =>
-                candidate.projectId.equals(projectId) &
-                candidate.nodeKey.equals(nodeKey) &
-                candidate.deletedAt.isNull(),
-          ))
-        .getSingleOrNull();
+    final row =
+        await (database.select(database.projectDerivedResults)..where(
+          (candidate) =>
+              candidate.projectId.equals(projectId) &
+              candidate.nodeKey.equals(nodeKey) &
+              candidate.deletedAt.isNull(),
+        )).getSingleOrNull();
     if (row == null) return null;
 
     final map = jsonDecode(row.resultJson) as Map<String, dynamic>;
@@ -99,19 +100,17 @@ final class DriftElvPhysicalCalculationResultStore
     final keys = nodeKeys.toSet();
     if (keys.isEmpty) return;
 
-    await (database.update(database.projectDerivedResults)
-          ..where(
-            (row) =>
-                row.projectId.equals(projectId) &
-                row.nodeKey.isIn(keys) &
-                row.deletedAt.isNull(),
-          ))
-        .write(
-          ProjectDerivedResultsCompanion(
-            state: const Value('STALE'),
-            updatedAt: Value(DateTime.now().toUtc()),
-            originDeviceId: Value(originDeviceId),
-          ),
-        );
+    await (database.update(database.projectDerivedResults)..where(
+      (row) =>
+          row.projectId.equals(projectId) &
+          row.nodeKey.isIn(keys) &
+          row.deletedAt.isNull(),
+    )).write(
+      ProjectDerivedResultsCompanion(
+        state: const Value('STALE'),
+        updatedAt: Value(DateTime.now().toUtc()),
+        originDeviceId: Value(originDeviceId),
+      ),
+    );
   }
 }

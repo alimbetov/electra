@@ -18,12 +18,12 @@ final class CreateCableAllocationDraftCommand {
   final String? transitionRef;
 
   Map<String, Object?> normalizedPayload() => {
-        'projectId': projectId.trim(),
-        'allocationId': allocationId.trim(),
-        'engineeringConnectionId': engineeringConnectionId.trim(),
-        'cableId': cableId.trim(),
-        'transitionRef': transitionRef?.trim(),
-      };
+    'projectId': projectId.trim(),
+    'allocationId': allocationId.trim(),
+    'engineeringConnectionId': engineeringConnectionId.trim(),
+    'cableId': cableId.trim(),
+    'transitionRef': transitionRef?.trim(),
+  };
 }
 
 final class ReserveCableResourcesCommand {
@@ -42,11 +42,11 @@ final class ReserveCableResourcesCommand {
   final CableResourceSelection selection;
 
   Map<String, Object?> normalizedPayload() => {
-        'projectId': projectId.trim(),
-        'allocationId': allocationId.trim(),
-        'expectedRevision': expectedRevision,
-        'selection': selection.toMap(),
-      };
+    'projectId': projectId.trim(),
+    'allocationId': allocationId.trim(),
+    'expectedRevision': expectedRevision,
+    'selection': selection.toMap(),
+  };
 }
 
 final class ReplaceCableTerminationSetCommand {
@@ -65,22 +65,22 @@ final class ReplaceCableTerminationSetCommand {
   final List<CableTerminationMapping> completeMappings;
 
   Map<String, Object?> normalizedPayload() => {
-        'projectId': projectId.trim(),
-        'allocationId': allocationId.trim(),
-        'expectedRevision': expectedRevision,
-        'completeMappings': completeMappings
-            .map(
-              (mapping) => {
-                'id': mapping.id.trim(),
-                'resourceIdentity': mapping.resourceIdentity,
-                'end': mapping.end.name,
-                'endpointPortId': mapping.endpointPortId.trim(),
-                'endpointTerminalRef': mapping.endpointTerminalRef,
-                'terminationRole': mapping.terminationRole,
-              },
-            )
-            .toList(growable: false),
-      };
+    'projectId': projectId.trim(),
+    'allocationId': allocationId.trim(),
+    'expectedRevision': expectedRevision,
+    'completeMappings': completeMappings
+        .map(
+          (mapping) => {
+            'id': mapping.id.trim(),
+            'resourceIdentity': mapping.resourceIdentity,
+            'end': mapping.end.name,
+            'endpointPortId': mapping.endpointPortId.trim(),
+            'endpointTerminalRef': mapping.endpointTerminalRef,
+            'terminationRole': mapping.terminationRole,
+          },
+        )
+        .toList(growable: false),
+  };
 }
 
 final class ActivateCableAllocationCommand {
@@ -97,10 +97,10 @@ final class ActivateCableAllocationCommand {
   final int expectedRevision;
 
   Map<String, Object?> normalizedPayload() => {
-        'projectId': projectId.trim(),
-        'allocationId': allocationId.trim(),
-        'expectedRevision': expectedRevision,
-      };
+    'projectId': projectId.trim(),
+    'allocationId': allocationId.trim(),
+    'expectedRevision': expectedRevision,
+  };
 }
 
 final class ReleaseCableResourcesCommand {
@@ -117,10 +117,10 @@ final class ReleaseCableResourcesCommand {
   final int expectedRevision;
 
   Map<String, Object?> normalizedPayload() => {
-        'projectId': projectId.trim(),
-        'allocationId': allocationId.trim(),
-        'expectedRevision': expectedRevision,
-      };
+    'projectId': projectId.trim(),
+    'allocationId': allocationId.trim(),
+    'expectedRevision': expectedRevision,
+  };
 }
 
 final class ArchiveCableAllocationCommand {
@@ -137,8 +137,8 @@ final class ArchiveCableAllocationCommand {
   final int expectedRevision;
 
   Map<String, Object?> normalizedPayload() => {
-        'projectId': projectId.trim(),
-        'allocationId': allocationId.trim(),
-        'expectedRevision': expectedRevision,
-      };
+    'projectId': projectId.trim(),
+    'allocationId': allocationId.trim(),
+    'expectedRevision': expectedRevision,
+  };
 }

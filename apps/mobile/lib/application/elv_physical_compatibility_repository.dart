@@ -8,11 +8,11 @@ abstract interface class ElvPhysicalCompatibilityRepository {
     String projectId,
   );
 
-  Future<ElvCommandResult<ProjectPhysicalCompatibilityProfileSet>> createProfileSet(
-    CreatePhysicalCompatibilityProfileSetCommand command,
-  );
+  Future<ElvCommandResult<ProjectPhysicalCompatibilityProfileSet>>
+  createProfileSet(CreatePhysicalCompatibilityProfileSetCommand command);
 
-  Future<ElvCommandResult<ProjectPhysicalCompatibilityProfileSet>> replaceActiveProfileSet(
+  Future<ElvCommandResult<ProjectPhysicalCompatibilityProfileSet>>
+  replaceActiveProfileSet(
     ReplaceActivePhysicalCompatibilityProfileSetCommand command,
   );
 

@@ -2,7 +2,6 @@ import 'dart:math' as math;
 
 import 'elv_cable_reference.dart';
 import 'elv_cable_run.dart';
-import 'elv_physical_carrier.dart';
 
 abstract final class ElvPhysicalProcessCodes {
   static const installedLength = 'ELV-ROUTE-01';
@@ -76,7 +75,8 @@ ElvPhysicalCalculationResult<double> calculateInstalledLength({
       blockingCodes: const ['ELV_ROUTE_GEOMETRY_MISSING'],
     );
   }
-  final invalid = traversals.any((item) => !item.lengthMm.isFinite || item.lengthMm < 0);
+  final invalid =
+      traversals.any((item) => !item.lengthMm.isFinite || item.lengthMm < 0);
   if (invalid) {
     return ElvPhysicalCalculationResult<double>(
       processCode: ElvPhysicalProcessCodes.installedLength,
@@ -92,9 +92,10 @@ ElvPhysicalCalculationResult<double> calculateInstalledLength({
     );
   }
 
-  final geometricLengthMm = traversals.fold<double>(0, (sum, item) => sum + item.lengthMm);
-  final installedLengthMm =
-      geometricLengthMm * (1 + run.reservePercent / 100) + run.terminationAllowanceMm;
+  final geometricLengthMm =
+      traversals.fold<double>(0, (sum, item) => sum + item.lengthMm);
+  final installedLengthMm = geometricLengthMm * (1 + run.reservePercent / 100) +
+      run.terminationAllowanceMm;
   return ElvPhysicalCalculationResult<double>(
     processCode: ElvPhysicalProcessCodes.installedLength,
     algorithmVersion: 'elv.route.length.v1',
@@ -143,7 +144,8 @@ final class CarrierUsageKey {
       other.carrierCompartmentId == carrierCompartmentId;
 
   @override
-  int get hashCode => Object.hash(routeSegmentId, physicalCarrierId, carrierCompartmentId);
+  int get hashCode =>
+      Object.hash(routeSegmentId, physicalCarrierId, carrierCompartmentId);
 }
 
 final class CableCarrierUsage {
@@ -186,7 +188,8 @@ List<CarrierOccupancyEvidence> calculateCarrierOccupancy({
   }
 
   final results = <CarrierOccupancyEvidence>[];
-  final keys = byKey.keys.toList()..sort((a, b) => a.stableKey.compareTo(b.stableKey));
+  final keys = byKey.keys.toList()
+    ..sort((a, b) => a.stableKey.compareTo(b.stableKey));
   for (final key in keys) {
     final usable = usableAreaByKey[key];
     if (usable == null || !usable.isFinite || usable <= 0) continue;

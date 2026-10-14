@@ -24,51 +24,52 @@ final class TerminationPolicy {
     required this.terminalRequired,
     Iterable<String> allowedRoles = const [],
   }) : allowedRoles = List.unmodifiable(
-         allowedRoles.map((value) => value.trim().toUpperCase()),
-       );
+          allowedRoles.map((value) => value.trim().toUpperCase()),
+        );
 
   final TerminationPolicyMode mode;
   final bool terminalRequired;
   final List<String> allowedRoles;
 
   List<String> validate() => [
-    if (allowedRoles.any((value) => value.isEmpty))
-      'Termination roles must not be empty.',
-    if (allowedRoles.toSet().length != allowedRoles.length)
-      'Termination roles must be unique.',
-  ];
+        if (allowedRoles.any((value) => value.isEmpty))
+          'Termination roles must not be empty.',
+        if (allowedRoles.toSet().length != allowedRoles.length)
+          'Termination roles must be unique.',
+      ];
 
   Map<String, Object?> toMap() => {
-    'mode': mode.name,
-    'terminalRequired': terminalRequired,
-    'allowedRoles': allowedRoles,
-  };
+        'mode': mode.name,
+        'terminalRequired': terminalRequired,
+        'allowedRoles': allowedRoles,
+      };
 
-  factory TerminationPolicy.fromMap(Map<String, dynamic> map) => TerminationPolicy(
-    mode: TerminationPolicyMode.values.byName(map['mode'] as String),
-    terminalRequired: map['terminalRequired'] as bool,
-    allowedRoles: (map['allowedRoles'] as List? ?? const []).cast<String>(),
-  );
+  factory TerminationPolicy.fromMap(Map<String, dynamic> map) =>
+      TerminationPolicy(
+        mode: TerminationPolicyMode.values.byName(map['mode'] as String),
+        terminalRequired: map['terminalRequired'] as bool,
+        allowedRoles: (map['allowedRoles'] as List? ?? const []).cast<String>(),
+      );
 }
 
 final class CableResourceDefinition {
   CableResourceDefinition({
-    required this.identity,
+    required String identity,
     required this.kind,
     required this.allocatable,
     required this.atomic,
     required this.terminationPolicy,
-    this.parentResourceId,
+    String? parentResourceId,
     Iterable<String> childResourceIds = const [],
     Iterable<String> groupMembership = const [],
-  }) : identity = identity.trim().toUpperCase(),
-       parentResourceId = parentResourceId?.trim().toUpperCase(),
-       childResourceIds = List.unmodifiable(
-         childResourceIds.map((value) => value.trim().toUpperCase()),
-       ),
-       groupMembership = List.unmodifiable(
-         groupMembership.map((value) => value.trim().toUpperCase()),
-       );
+  })  : identity = identity.trim().toUpperCase(),
+        parentResourceId = parentResourceId?.trim().toUpperCase(),
+        childResourceIds = List.unmodifiable(
+          childResourceIds.map((value) => value.trim().toUpperCase()),
+        ),
+        groupMembership = List.unmodifiable(
+          groupMembership.map((value) => value.trim().toUpperCase()),
+        );
 
   final String identity;
   final CableResourceKind kind;
@@ -80,34 +81,36 @@ final class CableResourceDefinition {
   final TerminationPolicy terminationPolicy;
 
   List<String> validateLocal() => [
-    if (identity.isEmpty) 'Cable resource identity is required.',
-    if (kind == CableResourceKind.wholeCable && identity != '__WHOLE_CABLE__')
-      'WHOLE_CABLE identity must be __WHOLE_CABLE__.',
-    if (kind != CableResourceKind.wholeCable && identity == '__WHOLE_CABLE__')
-      '__WHOLE_CABLE__ is reserved for WHOLE_CABLE.',
-    if (atomic && childResourceIds.isNotEmpty)
-      'Atomic cable resource cannot have child resources.',
-    if (childResourceIds.any((value) => value.isEmpty))
-      'Child resource identities must not be empty.',
-    if (childResourceIds.toSet().length != childResourceIds.length)
-      'Child resource identities must be unique.',
-    if (groupMembership.any((value) => value.isEmpty))
-      'Resource group codes must not be empty.',
-    if (groupMembership.toSet().length != groupMembership.length)
-      'Resource group codes must be unique.',
-    ...terminationPolicy.validate(),
-  ];
+        if (identity.isEmpty) 'Cable resource identity is required.',
+        if (kind == CableResourceKind.wholeCable &&
+            identity != '__WHOLE_CABLE__')
+          'WHOLE_CABLE identity must be __WHOLE_CABLE__.',
+        if (kind != CableResourceKind.wholeCable &&
+            identity == '__WHOLE_CABLE__')
+          '__WHOLE_CABLE__ is reserved for WHOLE_CABLE.',
+        if (atomic && childResourceIds.isNotEmpty)
+          'Atomic cable resource cannot have child resources.',
+        if (childResourceIds.any((value) => value.isEmpty))
+          'Child resource identities must not be empty.',
+        if (childResourceIds.toSet().length != childResourceIds.length)
+          'Child resource identities must be unique.',
+        if (groupMembership.any((value) => value.isEmpty))
+          'Resource group codes must not be empty.',
+        if (groupMembership.toSet().length != groupMembership.length)
+          'Resource group codes must be unique.',
+        ...terminationPolicy.validate(),
+      ];
 
   Map<String, Object?> toMap() => {
-    'identity': identity,
-    'kind': kind.name,
-    'allocatable': allocatable,
-    'atomic': atomic,
-    'parentResourceId': parentResourceId,
-    'childResourceIds': childResourceIds,
-    'groupMembership': groupMembership,
-    'terminationPolicy': terminationPolicy.toMap(),
-  };
+        'identity': identity,
+        'kind': kind.name,
+        'allocatable': allocatable,
+        'atomic': atomic,
+        'parentResourceId': parentResourceId,
+        'childResourceIds': childResourceIds,
+        'groupMembership': groupMembership,
+        'terminationPolicy': terminationPolicy.toMap(),
+      };
 
   factory CableResourceDefinition.fromMap(Map<String, dynamic> map) =>
       CableResourceDefinition(

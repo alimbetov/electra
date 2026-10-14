@@ -50,7 +50,9 @@ EngineeringReferenceCatalog _catalog() {
 
 Future<void> _seed(AppDatabase db) async {
   final now = DateTime.utc(2026, 10, 14);
-  await db.into(db.projects).insert(
+  await db
+      .into(db.projects)
+      .insert(
         ProjectsCompanion.insert(
           id: 'project',
           name: 'Project',
@@ -63,7 +65,9 @@ Future<void> _seed(AppDatabase db) async {
         ),
       );
   final catalog = _catalog();
-  await db.into(db.engineeringReferenceCatalogs).insert(
+  await db
+      .into(db.engineeringReferenceCatalogs)
+      .insert(
         EngineeringReferenceCatalogsCompanion.insert(
           id: catalog.id,
           projectId: 'project',
@@ -97,39 +101,50 @@ CreateCableCommand _command(String commandId, String cableId) {
 }
 
 void main() {
-  test('two SQLite connections cannot commit same active normalized label', () async {
-    final dir = await Directory.systemTemp.createTemp('electra-elv3-p1-race-');
-    addTearDown(() => dir.delete(recursive: true));
-    final file = File('${dir.path}/race.sqlite');
+  test(
+    'two SQLite connections cannot commit same active normalized label',
+    () async {
+      final dir = await Directory.systemTemp.createTemp(
+        'electra-elv3-p1-race-',
+      );
+      addTearDown(() => dir.delete(recursive: true));
+      final file = File('${dir.path}/race.sqlite');
 
-    final seed = AppDatabase(NativeDatabase(file));
-    await _seed(seed);
-    await seed.close();
+      final seed = AppDatabase(NativeDatabase(file));
+      await _seed(seed);
+      await seed.close();
 
-    final a = AppDatabase(NativeDatabase(file));
-    final b = AppDatabase(NativeDatabase(file));
-    await a.customStatement('PRAGMA busy_timeout = 5000');
-    await b.customStatement('PRAGMA busy_timeout = 5000');
+      final a = AppDatabase(NativeDatabase(file));
+      final b = AppDatabase(NativeDatabase(file));
+      await a.customStatement('PRAGMA busy_timeout = 5000');
+      await b.customStatement('PRAGMA busy_timeout = 5000');
 
-    final results = await Future.wait([
-      _service(a, 'A').create(_command('cmd-a', 'cable-a')),
-      _service(b, 'B').create(_command('cmd-b', 'cable-b')),
-    ]);
+      final results = await Future.wait([
+        _service(a, 'A').create(_command('cmd-a', 'cable-a')),
+        _service(b, 'B').create(_command('cmd-b', 'cable-b')),
+      ]);
 
-    expect(results.whereType<ElvCommandSuccess<Cable>>(), hasLength(1));
-    expect(results.whereType<ElvCommandFailureResult<Cable>>(), hasLength(1));
-    expect(
-      results.whereType<ElvCommandFailureResult<Cable>>().single.failure.code,
-      'ELV_CABLE_LABEL_CONFLICT',
-    );
+      expect(results.whereType<ElvCommandSuccess<Cable>>(), hasLength(1));
+      expect(results.whereType<ElvCommandFailureResult<Cable>>(), hasLength(1));
+      expect(
+        results.whereType<ElvCommandFailureResult<Cable>>().single.failure.code,
+        'ELV_CABLE_LABEL_CONFLICT',
+      );
 
-    await a.close();
-    await b.close();
+      await a.close();
+      await b.close();
 
-    final verify = AppDatabase(NativeDatabase(file));
-    final cables = await DriftElvCableRepository(verify).loadProjectCables('project');
-    expect(cables.where((cable) => cable.lifecycleState == CableLifecycleState.active),
-        hasLength(1));
-    await verify.close();
-  });
+      final verify = AppDatabase(NativeDatabase(file));
+      final cables = await DriftElvCableRepository(
+        verify,
+      ).loadProjectCables('project');
+      expect(
+        cables.where(
+          (cable) => cable.lifecycleState == CableLifecycleState.active,
+        ),
+        hasLength(1),
+      );
+      await verify.close();
+    },
+  );
 }

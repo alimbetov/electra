@@ -30,8 +30,9 @@ void main() {
         ElvVerticalDiscipline.values.toSet(),
       );
       expect(
-        ElvVerticalFixturePlans.all
-            .where((plan) => plan.normativeComplianceExpected),
+        ElvVerticalFixturePlans.all.where(
+          (plan) => plan.normativeComplianceExpected,
+        ),
         isEmpty,
       );
       expect(ElvVerticalFixturePlans.acs.connectionCount, 4);
@@ -78,7 +79,8 @@ void main() {
   String connectionId,
   String runId,
   List<String> traversalIds,
-}) _buildCctvFoundation(FixedSequenceIdGenerator ids) {
+})
+_buildCctvFoundation(FixedSequenceIdGenerator ids) {
   final project = buildElvTestProject(ids);
   final connection = buildElvTestConnection(ids, role: 'CCTV_ETH_POE');
   final routing = buildElvTestRouting(ids);

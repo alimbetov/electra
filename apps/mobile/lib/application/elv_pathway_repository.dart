@@ -15,7 +15,5 @@ abstract interface class ElvPathwayRepository {
     UpdatePathwayContextCommand command,
   );
 
-  Future<ElvCommandResult<void>> archive(
-    ArchivePathwayContextCommand command,
-  );
+  Future<ElvCommandResult<void>> archive(ArchivePathwayContextCommand command);
 }

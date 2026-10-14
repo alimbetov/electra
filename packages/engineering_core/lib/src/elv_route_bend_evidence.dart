@@ -20,7 +20,8 @@ final class RouteBendEvidence {
   List<String> validate() => [
         if (id.trim().isEmpty) 'Bend evidence id is required.',
         if (projectId.trim().isEmpty) 'Bend evidence projectId is required.',
-        if (routeNodeId.trim().isEmpty) 'Bend evidence routeNodeId is required.',
+        if (routeNodeId.trim().isEmpty)
+          'Bend evidence routeNodeId is required.',
         if (!radiusMm.isFinite || radiusMm <= 0)
           'Bend evidence radius must be positive and finite.',
         if (provenance.trim().isEmpty) 'Bend evidence provenance is required.',

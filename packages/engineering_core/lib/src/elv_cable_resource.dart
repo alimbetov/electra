@@ -51,8 +51,10 @@ CableResourceSelection cableResourceSelectionFromMap(Map<String, dynamic> map) {
     'RESOURCE_SET' => ResourceSetSelection(
         (map['resourceIdentities'] as List? ?? const []).cast<String>(),
       ),
-    'DEFINITION_GROUP' => DefinitionGroupSelection(map['groupIdentity'] as String),
-    final kind => throw FormatException('Unknown cable resource selection kind: $kind'),
+    'DEFINITION_GROUP' =>
+      DefinitionGroupSelection(map['groupIdentity'] as String),
+    final kind =>
+      throw FormatException('Unknown cable resource selection kind: $kind'),
   };
 }
 
@@ -175,12 +177,8 @@ abstract final class CableResourceResolver {
     );
   }
 
-  static Set<String> _wholeCableClaims(CableDefinition definition) => {
-        '__WHOLE_CABLE__',
-        for (final resource in definition.resourceDefinitions)
-          if (resource.atomic && resource.kind != CableResourceKind.wholeCable)
-            resource.identity,
-      };
+  static Set<String> _wholeCableClaims(CableDefinition definition) =>
+      const {'__WHOLE_CABLE__'};
 
   static Set<String> _resolveAtomicDescendants(
     CableResourceDefinition resource,
@@ -195,7 +193,8 @@ abstract final class CableResourceResolver {
 
   static CableResourceSelection _normalizeSelection(
     CableResourceSelection selection,
-  ) => switch (selection) {
+  ) =>
+      switch (selection) {
         WholeCableSelection() => const WholeCableSelection(),
         ResourceSetSelection(:final resourceIdentities) =>
           ResourceSetSelection((resourceIdentities.toSet().toList()..sort())),

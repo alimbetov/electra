@@ -25,7 +25,8 @@ final class FloorHost extends PathwayContextHost {
 }
 
 final class SurfaceVoidHost extends PathwayContextHost {
-  const SurfaceVoidHost({required this.floorId, required this.spatialFeatureId});
+  const SurfaceVoidHost(
+      {required this.floorId, required this.spatialFeatureId});
   final String floorId;
   final String spatialFeatureId;
 }
@@ -77,17 +78,21 @@ abstract final class PathwayContextValidator {
     if (context.id.trim().isEmpty || context.projectId.trim().isEmpty) {
       errors.add('Pathway context identity and project are required.');
     }
-    if (context.revision < 1) errors.add('Pathway context revision must be >= 1.');
+    if (context.revision < 1)
+      errors.add('Pathway context revision must be >= 1.');
     final validHost = switch (context.kind) {
       PathwayContextKind.roomLocal => context.host is RoomHost,
       PathwayContextKind.floorCommon => context.host is FloorHost,
-      PathwayContextKind.ceilingVoid || PathwayContextKind.underfloor =>
+      PathwayContextKind.ceilingVoid ||
+      PathwayContextKind.underfloor =>
         context.host is SurfaceVoidHost,
-      PathwayContextKind.riser || PathwayContextKind.shaft =>
+      PathwayContextKind.riser ||
+      PathwayContextKind.shaft =>
         context.host is VerticalHost,
       PathwayContextKind.projectShared => context.host is ProjectHost,
     };
-    if (!validHost) errors.add('Pathway context kind/host combination is invalid.');
+    if (!validHost)
+      errors.add('Pathway context kind/host combination is invalid.');
 
     if (context.host case final VerticalHost host) {
       if (host.fromFloorId == host.toFloorId) {
@@ -108,7 +113,7 @@ abstract final class PathwayContextValidator {
         }
       }
       final visited = <String>{context.id};
-      var cursor = parentId;
+      String? cursor = parentId;
       while (cursor != null) {
         if (!visited.add(cursor)) {
           errors.add('Pathway context hierarchy must be acyclic.');

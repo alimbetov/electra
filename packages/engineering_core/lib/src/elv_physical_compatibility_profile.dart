@@ -96,10 +96,11 @@ final class AllowedInstallationClassRule extends PhysicalCompatibilityRule {
 
 final class AllowedEnvironmentClassRule extends PhysicalCompatibilityRule {
   AllowedEnvironmentClassRule({
-    required super.selector,
+    required PhysicalCompatibilitySelector selector,
     required this.dimension,
     required Iterable<String> allowedCodes,
-  }) : allowedCodes = _codes(allowedCodes);
+  })  : allowedCodes = _codes(allowedCodes),
+        super(selector);
   final String dimension;
   final List<String> allowedCodes;
   @override
@@ -146,7 +147,7 @@ final class DirectIntrinsicProhibitionRule extends PhysicalCompatibilityRule {
 
 final class PhysicalCompatibilityProfile {
   PhysicalCompatibilityProfile({
-    required this.code,
+    required String code,
     required this.label,
     required Iterable<PhysicalCompatibilityRule> rules,
     this.deprecated = false,

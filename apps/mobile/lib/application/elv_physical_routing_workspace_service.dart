@@ -22,10 +22,7 @@ abstract interface class ElvPhysicalRoutingWorkspaceService {
     String connectionId,
   );
 
-  Future<PhysicalTraceResult> traceCable(
-    String projectId,
-    String cableId,
-  );
+  Future<PhysicalTraceResult> traceCable(String projectId, String cableId);
 }
 
 enum ElvCommandUndoClass { reversible, irreversibleHistory }

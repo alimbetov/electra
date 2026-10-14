@@ -1,6 +1,6 @@
 final class FixedSequenceIdGenerator {
   FixedSequenceIdGenerator([Iterable<String> values = const []])
-      : _values = List<String>.from(values);
+    : _values = List<String>.from(values);
 
   final List<String> _values;
   int _index = 0;

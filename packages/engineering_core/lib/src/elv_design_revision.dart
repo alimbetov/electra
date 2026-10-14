@@ -66,9 +66,21 @@ abstract final class ProjectDesignRevisionStateMachine {
     ProjectDesignRevisionState to,
   ) =>
       switch ((from, to)) {
-        (ProjectDesignRevisionState.working, ProjectDesignRevisionState.frozen) => true,
-        (ProjectDesignRevisionState.frozen, ProjectDesignRevisionState.superseded) => true,
-        (ProjectDesignRevisionState.superseded, ProjectDesignRevisionState.archived) => true,
+        (
+          ProjectDesignRevisionState.working,
+          ProjectDesignRevisionState.frozen
+        ) =>
+          true,
+        (
+          ProjectDesignRevisionState.frozen,
+          ProjectDesignRevisionState.superseded
+        ) =>
+          true,
+        (
+          ProjectDesignRevisionState.superseded,
+          ProjectDesignRevisionState.archived
+        ) =>
+          true,
         _ => false,
       };
 }

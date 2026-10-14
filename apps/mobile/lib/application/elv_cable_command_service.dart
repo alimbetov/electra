@@ -53,7 +53,10 @@ final class DefaultElvCableCommandService implements ElvCableCommandService {
             ),
           );
         }
-        if (await session.cables.findCable(command.projectId, command.cableId) !=
+        if (await session.cables.findCable(
+              command.projectId,
+              command.cableId,
+            ) !=
             null) {
           return _idConflict(session.commandLedger, command);
         }
@@ -412,11 +415,11 @@ final class DefaultElvCableCommandService implements ElvCableCommandService {
   ) =>
       commandId.trim().isEmpty || projectId.trim().isEmpty
           ? const ElvCommandFailureResult(
-              ElvFailure(
-                code: 'ELV_COMMAND_INVALID',
-                category: ElvFailureCategory.commandEnvelope,
-              ),
-            )
+            ElvFailure(
+              code: 'ELV_COMMAND_INVALID',
+              category: ElvFailureCategory.commandEnvelope,
+            ),
+          )
           : null;
 
   Future<ElvCommandResult<Cable>?> _replayCable(
@@ -452,37 +455,35 @@ final class DefaultElvCableCommandService implements ElvCableCommandService {
   Future<ElvCommandFailureResult<Cable>> _idConflict(
     ElvCommandLedgerStore ledger,
     CreateCableCommand command,
-  ) =>
-      _reject(
-        ledger,
-        commandId: command.commandId,
-        projectId: command.projectId,
-        commandType: 'CREATE_CABLE',
-        schema: 'electra.command.create-cable.v1',
-        payload: command.normalizedPayload(),
-        failure: const ElvFailure(
-          code: 'ELV_CABLE_ID_CONFLICT',
-          category: ElvFailureCategory.validation,
-          entityType: 'Cable',
-        ),
-      );
+  ) => _reject(
+    ledger,
+    commandId: command.commandId,
+    projectId: command.projectId,
+    commandType: 'CREATE_CABLE',
+    schema: 'electra.command.create-cable.v1',
+    payload: command.normalizedPayload(),
+    failure: const ElvFailure(
+      code: 'ELV_CABLE_ID_CONFLICT',
+      category: ElvFailureCategory.validation,
+      entityType: 'Cable',
+    ),
+  );
 
   Future<ElvCommandFailureResult<Cable>> _labelConflict(
     ElvCommandLedgerStore ledger,
     CreateCableCommand command,
-  ) =>
-      _reject(
-        ledger,
-        commandId: command.commandId,
-        projectId: command.projectId,
-        commandType: 'CREATE_CABLE',
-        schema: 'electra.command.create-cable.v1',
-        payload: command.normalizedPayload(),
-        failure: const ElvFailure(
-          code: 'ELV_CABLE_LABEL_CONFLICT',
-          category: ElvFailureCategory.validation,
-        ),
-      );
+  ) => _reject(
+    ledger,
+    commandId: command.commandId,
+    projectId: command.projectId,
+    commandType: 'CREATE_CABLE',
+    schema: 'electra.command.create-cable.v1',
+    payload: command.normalizedPayload(),
+    failure: const ElvFailure(
+      code: 'ELV_CABLE_LABEL_CONFLICT',
+      category: ElvFailureCategory.validation,
+    ),
+  );
 
   Future<ElvCommandFailureResult<Cable>> _revisionConflict(
     ElvCommandLedgerStore ledger, {
@@ -493,21 +494,20 @@ final class DefaultElvCableCommandService implements ElvCableCommandService {
     required Map<String, Object?> payload,
     required int expectedRevision,
     required int actualRevision,
-  }) =>
-      _reject(
-        ledger,
-        projectId: projectId,
-        commandId: commandId,
-        commandType: commandType,
-        schema: schema,
-        payload: payload,
-        failure: ElvFailure(
-          code: 'ELV_REVISION_CONFLICT',
-          category: ElvFailureCategory.revisionConflict,
-          expectedRevision: expectedRevision,
-          actualRevision: actualRevision,
-        ),
-      );
+  }) => _reject(
+    ledger,
+    projectId: projectId,
+    commandId: commandId,
+    commandType: commandType,
+    schema: schema,
+    payload: payload,
+    failure: ElvFailure(
+      code: 'ELV_REVISION_CONFLICT',
+      category: ElvFailureCategory.revisionConflict,
+      expectedRevision: expectedRevision,
+      actualRevision: actualRevision,
+    ),
+  );
 
   Future<ElvCommandFailureResult<Cable>> _reject(
     ElvCommandLedgerStore ledger, {
@@ -572,34 +572,33 @@ final class DefaultElvCableCommandService implements ElvCableCommandService {
     String schema,
     String commandType,
     Map<String, Object?> payload,
-  ) =>
-      sha256HexUtf8(
-        canonicalEngineeringJsonV1({
-          'schema': schema,
-          'commandType': commandType,
-          'payload': payload,
-        }),
-      );
+  ) => sha256HexUtf8(
+    canonicalEngineeringJsonV1({
+      'schema': schema,
+      'commandType': commandType,
+      'payload': payload,
+    }),
+  );
 
   Map<String, Object?> _failureToMap(ElvFailure failure) => {
-        'code': failure.code,
-        'category': failure.category.name,
-        'entityType': failure.entityType,
-        'entityId': failure.entityId,
-        'field': failure.field,
-        'expectedRevision': failure.expectedRevision,
-        'actualRevision': failure.actualRevision,
-        'details': failure.details,
-      };
+    'code': failure.code,
+    'category': failure.category.name,
+    'entityType': failure.entityType,
+    'entityId': failure.entityId,
+    'field': failure.field,
+    'expectedRevision': failure.expectedRevision,
+    'actualRevision': failure.actualRevision,
+    'details': failure.details,
+  };
 
   ElvFailure _failureFromMap(Map<String, dynamic> map) => ElvFailure(
-        code: map['code'] as String,
-        category: ElvFailureCategory.values.byName(map['category'] as String),
-        entityType: map['entityType'] as String?,
-        entityId: map['entityId'] as String?,
-        field: map['field'] as String?,
-        expectedRevision: map['expectedRevision'] as int?,
-        actualRevision: map['actualRevision'] as int?,
-        details: map['details'] as Map<String, dynamic>? ?? const {},
-      );
+    code: map['code'] as String,
+    category: ElvFailureCategory.values.byName(map['category'] as String),
+    entityType: map['entityType'] as String?,
+    entityId: map['entityId'] as String?,
+    field: map['field'] as String?,
+    expectedRevision: map['expectedRevision'] as int?,
+    actualRevision: map['actualRevision'] as int?,
+    details: map['details'] as Map<String, dynamic>? ?? const {},
+  );
 }
