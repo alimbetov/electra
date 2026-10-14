@@ -88,13 +88,39 @@ jobs:
         working-directory: apps/mobile
         run: flutter analyze
 
-      - name: Test RC1-RC2
+      - name: Test RC1-RC2 and capture result
+        id: rc_test
         working-directory: apps/mobile
-        run: flutter test test/data/elv_p3_runtime_closure_test.dart
-
-      - name: Commit resulting source
         shell: bash
         run: |
+          set +e
+          flutter test --reporter expanded test/data/elv_p3_runtime_closure_test.dart > ../../rc1-rc2-test.log 2>&1
+          status=$?
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Commit RC1-RC2 diagnostic on failure
+        if: steps.rc_test.outputs.status != '0'
+        shell: bash
+        run: |
+          {
+            echo '# Temporary ELV3 RC1-RC2 diagnostics'
+            echo
+            echo '```text'
+            cat rc1-rc2-test.log
+            echo '```'
+          } > docs/audit/elv3-rc1-rc2-diagnostics.tmp.md
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/audit/elv3-rc1-rc2-diagnostics.tmp.md
+          git commit -m 'chore(ci): capture RC1-RC2 test diagnostics'
+          git push origin HEAD:feat/elv3-runtime-closure
+
+      - name: Commit resulting source
+        if: steps.rc_test.outputs.status == '0'
+        shell: bash
+        run: |
+          rm -f rc1-rc2-test.log
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add apps/mobile/lib/data/database/app_database.dart \
@@ -106,3 +132,7 @@ jobs:
           git diff --cached --quiet && { echo 'No source changes produced'; exit 1; }
           git commit -m 'feat(elv3): implement RC1-RC2 P3 runtime closure'
           git push origin HEAD:feat/elv3-runtime-closure
+
+      - name: Fail when RC1-RC2 test failed
+        if: steps.rc_test.outputs.status != '0'
+        run: exit 1
