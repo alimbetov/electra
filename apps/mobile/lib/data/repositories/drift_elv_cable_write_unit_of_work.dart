@@ -312,10 +312,14 @@ final class _P2AwareCableDependencyStore implements ElvCableDependencyStore {
   }
 
   @override
-  Future<bool> hasCanonicalRunHistory(String projectId, String cableId) async {
-    // P3 replaces this branch with canonical run persistence.
-    return false;
-  }
+  Future<bool> hasCanonicalRunHistory(String projectId, String cableId) async =>
+      await (database.select(database.canonicalCableRuns)..where(
+        (row) =>
+            row.projectId.equals(projectId) &
+            row.cableId.equals(cableId) &
+            row.deletedAt.isNull(),
+      )).getSingleOrNull() !=
+      null;
 
   @override
   Future<bool> hasConsumingAllocation(String projectId, String cableId) async =>

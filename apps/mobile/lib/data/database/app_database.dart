@@ -797,6 +797,132 @@ class CommandExecutionRecords extends Table {
   Set<Column<Object>> get primaryKey => {projectId, commandId};
 }
 
+@DataClassName('ProjectDesignRevisionRow')
+class ProjectDesignRevisions extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get projectId => text().references(Projects, #id)();
+  TextColumn get code => text()();
+  IntColumn get sequence => integer()();
+  TextColumn get state => text()();
+  @ReferenceName('basedOnProjectDesignRevision')
+  TextColumn get basedOnRevisionId =>
+      text().nullable().references(ProjectDesignRevisions, #id)();
+  IntColumn get snapshotSchemaVersion => integer().nullable()();
+  TextColumn get snapshotHash => text().nullable()();
+  DateTimeColumn get frozenAt => dateTime().nullable()();
+  DateTimeColumn get supersededAt => dateTime().nullable()();
+  DateTimeColumn get archivedAt => dateTime().nullable()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {projectId, code},
+    {projectId, sequence},
+  ];
+}
+
+@DataClassName('DesignRevisionPhysicalSnapshotRow')
+class DesignRevisionPhysicalSnapshots extends Table {
+  TextColumn get designRevisionId =>
+      text().references(ProjectDesignRevisions, #id)();
+  TextColumn get projectId => text().references(Projects, #id)();
+  IntColumn get schemaVersion => integer()();
+  TextColumn get payloadJson => text()();
+  TextColumn get payloadSha256 => text()();
+  DateTimeColumn get createdAt => dateTime()();
+  TextColumn get originDeviceId => text()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {designRevisionId};
+}
+
+@DataClassName('CanonicalCableRunRow')
+class CanonicalCableRuns extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get projectId => text().references(Projects, #id)();
+  TextColumn get cableId => text().references(ElvCables, #id)();
+  TextColumn get designRevisionId =>
+      text().references(ProjectDesignRevisions, #id)();
+  @ReferenceName('basedOnCanonicalCableRun')
+  TextColumn get basedOnCableRunId =>
+      text().nullable().references(CanonicalCableRuns, #id)();
+  TextColumn get lifecycleState => text()();
+  RealColumn get reservePercent => real().withDefault(const Constant(0))();
+  IntColumn get terminationAllowanceMm =>
+      integer().withDefault(const Constant(0))();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('CableRunTraversalRow')
+class CableRunTraversals extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get cableRunId => text().references(CanonicalCableRuns, #id)();
+  IntColumn get sequence => integer()();
+  TextColumn get routeSegmentId => text().references(CableRouteSegments, #id)();
+  TextColumn get direction => text()();
+  TextColumn get physicalCarrierId => text().nullable()();
+  TextColumn get carrierCompartmentId => text().nullable()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {cableRunId, sequence},
+  ];
+}
+
+@DataClassName('RouteHandoffRow')
+class RouteHandoffs extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get projectId => text().references(Projects, #id)();
+  @ReferenceName('handoffFromRouteNode')
+  TextColumn get fromRouteNodeId => text().references(CableRouteNodes, #id)();
+  @ReferenceName('handoffToRouteNode')
+  TextColumn get toRouteNodeId => text().references(CableRouteNodes, #id)();
+  TextColumn get kind => text()();
+  BoolColumn get bidirectional => boolean().withDefault(const Constant(true))();
+  TextColumn get adjacencyRef => text().nullable()();
+  TextColumn get evidenceJson => text().withDefault(const Constant('{}'))();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('RouteBendEvidenceRow')
+class RouteBendEvidence extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get projectId => text().references(Projects, #id)();
+  TextColumn get routeNodeId => text().references(CableRouteNodes, #id)();
+  RealColumn get radiusMm => real()();
+  TextColumn get evidenceKind => text()();
+  TextColumn get sourceRef => text().nullable()();
+  TextColumn get provenance => text()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('LegacyRouteAdoptionRow')
+class LegacyRouteAdoptions extends Table {
+  TextColumn get legacySourceIdentity => text()();
+  TextColumn get projectId => text().references(Projects, #id)();
+  TextColumn get designRevisionId =>
+      text().references(ProjectDesignRevisions, #id)();
+  TextColumn get cableId => text().references(ElvCables, #id)();
+  TextColumn get canonicalCableRunId =>
+      text().references(CanonicalCableRuns, #id)();
+  DateTimeColumn get createdAt => dateTime()();
+  TextColumn get originDeviceId => text()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {legacySourceIdentity};
+}
+
 @DriftDatabase(
   tables: [
     Projects,
@@ -852,6 +978,13 @@ class CommandExecutionRecords extends Table {
     CableResourceClaims,
     CableTerminationMappings,
     CommandExecutionRecords,
+    ProjectDesignRevisions,
+    DesignRevisionPhysicalSnapshots,
+    CanonicalCableRuns,
+    CableRunTraversals,
+    RouteHandoffs,
+    RouteBendEvidence,
+    LegacyRouteAdoptions,
   ],
 )
 final class AppDatabase extends _$AppDatabase {
@@ -859,7 +992,7 @@ final class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'electra'));
 
   @override
-  int get schemaVersion => 19;
+  int get schemaVersion => 20;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -952,6 +1085,15 @@ final class AppDatabase extends _$AppDatabase {
           await migrator.createTable(cableAllocationResourceSelections);
           await migrator.createTable(cableResourceClaims);
           await migrator.createTable(cableTerminationMappings);
+        }
+        if (from < 20) {
+          await migrator.createTable(projectDesignRevisions);
+          await migrator.createTable(designRevisionPhysicalSnapshots);
+          await migrator.createTable(canonicalCableRuns);
+          await migrator.createTable(cableRunTraversals);
+          await migrator.createTable(routeHandoffs);
+          await migrator.createTable(routeBendEvidence);
+          await migrator.createTable(legacyRouteAdoptions);
         }
       }
       await _createIndexes();
@@ -1084,6 +1226,30 @@ final class AppDatabase extends _$AppDatabase {
     );
     await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_elv_termination_allocation ON cable_termination_mappings(allocation_id)',
+    );
+    await customStatement(
+      "CREATE UNIQUE INDEX IF NOT EXISTS ux_elv_design_revision_working ON project_design_revisions(project_id) WHERE state = 'WORKING' AND deleted_at IS NULL",
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_elv_design_revision_project ON project_design_revisions(project_id, sequence)',
+    );
+    await customStatement(
+      "CREATE UNIQUE INDEX IF NOT EXISTS ux_elv_active_run_per_cable_revision ON canonical_cable_runs(cable_id, design_revision_id) WHERE lifecycle_state = 'ACTIVE' AND deleted_at IS NULL",
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_elv_run_revision ON canonical_cable_runs(project_id, design_revision_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_elv_traversal_run_order ON cable_run_traversals(cable_run_id, sequence)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_elv_traversal_segment ON cable_run_traversals(route_segment_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_elv_handoff_project ON route_handoffs(project_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_elv_bend_project ON route_bend_evidence(project_id, route_node_id)',
     );
   }
 }
