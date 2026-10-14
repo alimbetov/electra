@@ -1,0 +1,11 @@
+# Flutter / Dart generated state
+**/.dart_tool/
+**/build/
+
+# IDE / OS
+.DS_Store
+.idea/
+*.iml
+
+# Keep intentionally source-controlled generated Drift output under lib/**.
+# Runtime/intermediate build products remain ignored by the directory rules above.

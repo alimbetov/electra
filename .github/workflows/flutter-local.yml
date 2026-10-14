@@ -5,12 +5,15 @@ on:
     branches:
       - main
       - 'feat/flutter-*'
+      - 'audit/elv2-*'
   pull_request:
     paths:
       - 'apps/mobile/**'
       - 'packages/engineering_core/**'
       - 'docs/product/**'
       - 'docs/audit/**'
+      - 'scripts/**'
+      - '.gitignore'
       - '.github/workflows/**'
 
 jobs:
@@ -22,6 +25,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Reject tracked generated artifacts
+        working-directory: .
+        run: bash scripts/ci/check-no-generated-artifacts.sh
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
