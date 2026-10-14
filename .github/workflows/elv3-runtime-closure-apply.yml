@@ -43,13 +43,13 @@ jobs:
         working-directory: apps/mobile
         run: flutter pub get --enforce-lockfile
 
-      - name: Format mobile source and tests
-        working-directory: apps/mobile
-        run: dart format lib test
-
       - name: Generate Drift code
         working-directory: apps/mobile
         run: dart run build_runner build
+
+      - name: Format mobile source, tests, and generated Drift output
+        working-directory: apps/mobile
+        run: dart format lib test
 
       - name: Analyze mobile app
         working-directory: apps/mobile
