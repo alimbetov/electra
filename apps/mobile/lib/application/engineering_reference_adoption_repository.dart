@@ -6,6 +6,27 @@ const engineeringReferenceAdoptionFingerprintVersion = 1;
 const engineeringReferenceAdoptionLedgerPrefix = 'adopt:';
 const engineeringReferenceAdoptionCompletedStatus = 'ADOPTION_COMPLETED';
 
+String _canonicalAdoptionPortCode(String value) => value.trim().toUpperCase();
+
+List<String> _explicitPortMappingValidationErrors(
+  Map<String, String> rawMappings,
+) {
+  final errors = <String>[];
+  final sources = <String>{};
+  final targets = <String>{};
+  for (final entry in rawMappings.entries) {
+    final source = _canonicalAdoptionPortCode(entry.key);
+    final target = _canonicalAdoptionPortCode(entry.value);
+    if (!sources.add(source)) {
+      errors.add('Duplicate normalized explicit mapping source code: $source.');
+    }
+    if (!targets.add(target)) {
+      errors.add('Duplicate normalized explicit mapping target code: $target.');
+    }
+  }
+  return errors;
+}
+
 final class EngineeringReferenceAdoptionCommand {
   EngineeringReferenceAdoptionCommand({
     required this.operationId,
@@ -27,9 +48,14 @@ final class EngineeringReferenceAdoptionCommand {
        reviewedTopologyGroupIds = List.unmodifiable(
          reviewedTopologyGroupIds.toSet().toList()..sort(),
        ),
+       _explicitPortMappingErrors = List.unmodifiable(
+         _explicitPortMappingValidationErrors(explicitPortMappings),
+       ),
        explicitPortMappings = Map.unmodifiable({
          for (final entry in explicitPortMappings.entries)
-           entry.key.trim().toUpperCase(): entry.value.trim().toUpperCase(),
+           _canonicalAdoptionPortCode(entry.key): _canonicalAdoptionPortCode(
+             entry.value,
+           ),
        });
 
   final String operationId;
@@ -45,8 +71,10 @@ final class EngineeringReferenceAdoptionCommand {
   final List<String> reviewedConnectionIds;
   final List<String> reviewedTopologyGroupIds;
   final Map<String, String> explicitPortMappings;
+  final List<String> _explicitPortMappingErrors;
 
   List<String> validate() => [
+    ..._explicitPortMappingErrors,
     if (operationId.trim().isEmpty) 'operationId is required.',
     if (projectId.trim().isEmpty) 'projectId is required.',
     if (componentId.trim().isEmpty) 'componentId is required.',

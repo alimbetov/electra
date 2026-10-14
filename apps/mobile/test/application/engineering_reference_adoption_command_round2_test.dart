@@ -19,12 +19,7 @@ EngineeringReferenceAdoptionCommand _command({
 
 void main() {
   test('duplicate normalized mapping source is rejected before collapse', () {
-    final command = _command(
-      mappings: const {
-        'eth': 'DATA',
-        ' ETH ': 'DATA2',
-      },
-    );
+    final command = _command(mappings: const {'eth': 'DATA', ' ETH ': 'DATA2'});
 
     expect(
       command.validate(),
@@ -33,12 +28,7 @@ void main() {
   });
 
   test('duplicate normalized mapping target is rejected', () {
-    final command = _command(
-      mappings: const {
-        'eth': ' data ',
-        'aux': 'DATA',
-      },
-    );
+    final command = _command(mappings: const {'eth': ' data ', 'aux': 'DATA'});
 
     expect(
       command.validate(),
@@ -47,17 +37,9 @@ void main() {
   });
 
   test('ambiguous source order cannot become valid migration semantics', () {
-    final first = _command(
-      mappings: const {
-        'eth': 'DATA',
-        ' ETH ': 'DATA2',
-      },
-    );
+    final first = _command(mappings: const {'eth': 'DATA', ' ETH ': 'DATA2'});
     final reversed = _command(
-      mappings: const {
-        ' ETH ': 'DATA2',
-        'eth': 'DATA',
-      },
+      mappings: const {' ETH ': 'DATA2', 'eth': 'DATA'},
     );
 
     expect(first.validate(), isNotEmpty);
