@@ -72,6 +72,14 @@ abstract interface class ElvCableWriteSession extends ElvWriteSession {
   ElvCableDependencyStore get cableDependencies;
 }
 
+enum ElvAllocationMutationOutcome {
+  success,
+  revisionConflict,
+  resourceOverlap,
+  immutableEvidenceConflict,
+  storageConflict,
+}
+
 abstract interface class ElvAllocationWriteStore
     implements ElvCableAllocationRepository {
   Future<Cable?> findCable(String projectId, String cableId);
@@ -85,25 +93,25 @@ abstract interface class ElvAllocationWriteStore
     String? excludingAllocationId,
   });
   Future<bool> insertDraft(CableAllocation allocation);
-  Future<bool> reserve({
+  Future<ElvAllocationMutationOutcome> reserve({
     required CableAllocation allocation,
     required int expectedRevision,
     required CableAllocationResourceSelectionEvidence evidence,
   });
-  Future<bool> replaceTerminations({
+  Future<ElvAllocationMutationOutcome> replaceTerminations({
     required CableAllocation allocation,
     required int expectedRevision,
     required List<CableTerminationMapping> mappings,
   });
-  Future<bool> activate({
+  Future<ElvAllocationMutationOutcome> activate({
     required CableAllocation allocation,
     required int expectedRevision,
   });
-  Future<bool> release({
+  Future<ElvAllocationMutationOutcome> release({
     required CableAllocation allocation,
     required int expectedRevision,
   });
-  Future<bool> archive({
+  Future<ElvAllocationMutationOutcome> archive({
     required CableAllocation allocation,
     required int expectedRevision,
   });
