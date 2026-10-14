@@ -125,7 +125,7 @@ replacement = """      final topologyAtCommit = await DriftEngineeringTopologyRe
 assert needle in text
 text = text.replace(needle, replacement, 1)
 
-insert_before = """  Future<void> _validateCandidateGraph(
+insert_before = """  void _validateCandidateGraph(
 """
 helper = """  void _assertExactSameEditionAggregate({
     required EngineeringReferenceAdoptionCommand command,
