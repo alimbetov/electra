@@ -73,16 +73,43 @@ jobs:
         run: dart format lib test
 
       - name: Analyze engineering core
+        id: analyze
         working-directory: packages/engineering_core
-        run: dart analyze
+        shell: bash
+        run: |
+          set +e
+          dart analyze > core-analyze.log 2>&1
+          status=$?
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Commit analyzer diagnostics
+        if: steps.analyze.outputs.status != '0'
+        shell: bash
+        run: |
+          {
+            echo '# Temporary ELV3 engineering_core analyzer diagnostics'
+            echo
+            echo '```text'
+            cat packages/engineering_core/core-analyze.log
+            echo '```'
+          } > docs/audit/elv3-core-analyze-diagnostics.tmp.md
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/audit/elv3-core-analyze-diagnostics.tmp.md
+          git commit -m 'chore(ci): capture engineering core analyzer diagnostics'
+          git push origin HEAD:feat/elv3-runtime-closure
 
       - name: Test engineering core
+        if: steps.analyze.outputs.status == '0'
         working-directory: packages/engineering_core
         run: dart test
 
       - name: Commit core repairs
+        if: steps.analyze.outputs.status == '0'
         shell: bash
         run: |
+          rm -f packages/engineering_core/core-analyze.log
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add packages/engineering_core/lib/src/elv_cable_reference.dart \
@@ -92,3 +119,7 @@ jobs:
           git diff --cached --quiet && { echo 'No core changes produced'; exit 1; }
           git commit -m 'fix(elv3): repair engineering core constructor invariants'
           git push origin HEAD:feat/elv3-runtime-closure
+
+      - name: Fail when analyzer failed
+        if: steps.analyze.outputs.status != '0'
+        run: exit 1
