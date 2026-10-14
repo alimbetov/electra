@@ -671,6 +671,57 @@ class ElvCables extends Table with GeometryAuditColumns {
   Set<Column<Object>> get primaryKey => {id};
 }
 
+@DataClassName('CableAllocationRow')
+class CableAllocations extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get projectId => text().references(Projects, #id)();
+  TextColumn get engineeringConnectionId => text().references(EngineeringPortConnections, #id)();
+  TextColumn get cableId => text().references(ElvCables, #id)();
+  TextColumn get lifecycleState => text()();
+  TextColumn get transitionRef => text().nullable()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('CableAllocationResourceSelectionRow')
+class CableAllocationResourceSelections extends Table {
+  TextColumn get allocationId => text().references(CableAllocations, #id)();
+  TextColumn get cableDefinitionRefJson => text()();
+  TextColumn get selectionJson => text()();
+  TextColumn get resolvedAtomsJson => text()();
+  TextColumn get selectionSha256 => text()();
+  DateTimeColumn get createdAt => dateTime()();
+  TextColumn get originDeviceId => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {allocationId};
+}
+
+@DataClassName('CableResourceClaimRow')
+class CableResourceClaims extends Table {
+  TextColumn get allocationId => text().references(CableAllocations, #id)();
+  TextColumn get cableId => text().references(ElvCables, #id)();
+  TextColumn get resourceAtom => text()();
+  DateTimeColumn get createdAt => dateTime()();
+  TextColumn get originDeviceId => text()();
+  @override
+  Set<Column<Object>> get primaryKey => {allocationId, resourceAtom};
+}
+
+@DataClassName('CableTerminationMappingRow')
+class CableTerminationMappings extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get allocationId => text().references(CableAllocations, #id)();
+  TextColumn get resourceIdentity => text()();
+  TextColumn get endRole => text()();
+  TextColumn get endpointPortId => text().references(EngineeringPortInstances, #id)();
+  TextColumn get endpointTerminalRef => text().nullable()();
+  TextColumn get terminationRole => text().nullable()();
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [{allocationId, resourceIdentity, endRole}];
+}
+
 @DataClassName('CommandExecutionRecordRow')
 class CommandExecutionRecords extends Table {
   TextColumn get projectId => text().references(Projects, #id)();
@@ -705,14 +756,15 @@ class CommandExecutionRecords extends Table {
     EngineeringAssemblyProfiles, EngineeringTopologyGroups,
     EngineeringPortConnections, EngineeringInternalMappings,
     EngineeringComponentAssemblies, EngineeringPlacementOperations,
-    ElvCables, CommandExecutionRecords,
+    ElvCables, CableAllocations, CableAllocationResourceSelections,
+    CableResourceClaims, CableTerminationMappings, CommandExecutionRecords,
   ],
 )
 final class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? driftDatabase(name: 'electra'));
 
   @override
-  int get schemaVersion => 18;
+  int get schemaVersion => 19;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -795,6 +847,12 @@ final class AppDatabase extends _$AppDatabase {
           await migrator.createTable(elvCables);
           await migrator.createTable(commandExecutionRecords);
         }
+        if (from < 19) {
+          await migrator.createTable(cableAllocations);
+          await migrator.createTable(cableAllocationResourceSelections);
+          await migrator.createTable(cableResourceClaims);
+          await migrator.createTable(cableTerminationMappings);
+        }
       }
       await _createIndexes();
     },
@@ -859,5 +917,11 @@ final class AppDatabase extends _$AppDatabase {
     await customStatement('CREATE INDEX IF NOT EXISTS idx_elv_cable_project ON elv_cables(project_id)');
     await customStatement('CREATE INDEX IF NOT EXISTS idx_elv_cable_definition_catalog ON elv_cables(definition_catalog_id)');
     await customStatement("CREATE UNIQUE INDEX IF NOT EXISTS ux_elv_cable_active_label ON elv_cables(project_id, normalized_label) WHERE lifecycle_state = 'ACTIVE' AND deleted_at IS NULL");
+    await customStatement('CREATE INDEX IF NOT EXISTS idx_elv_allocation_project ON cable_allocations(project_id)');
+    await customStatement('CREATE INDEX IF NOT EXISTS idx_elv_allocation_cable ON cable_allocations(cable_id)');
+    await customStatement('CREATE INDEX IF NOT EXISTS idx_elv_allocation_connection ON cable_allocations(engineering_connection_id)');
+    await customStatement("CREATE UNIQUE INDEX IF NOT EXISTS ux_elv_connection_consuming_allocation ON cable_allocations(project_id, engineering_connection_id) WHERE lifecycle_state IN ('RESERVED','ACTIVE') AND deleted_at IS NULL");
+    await customStatement('CREATE UNIQUE INDEX IF NOT EXISTS ux_elv_resource_claim ON cable_resource_claims(cable_id, resource_atom)');
+    await customStatement('CREATE INDEX IF NOT EXISTS idx_elv_termination_allocation ON cable_termination_mappings(allocation_id)');
   }
 }
