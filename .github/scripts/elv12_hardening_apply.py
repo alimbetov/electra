@@ -1,0 +1,93 @@
+from pathlib import Path
+
+
+def replace_exact(path: str, old: str, new: str) -> None:
+    p = Path(path)
+    text = p.read_text()
+    count = text.count(old)
+    if count != 1:
+        raise SystemExit(f"{path}: expected exactly one match, found {count}")
+    p.write_text(text.replace(old, new, 1))
+
+
+replace_exact(
+    "docs/product/elv-delivery-plan.md",
+    "Status: ELV1 baseline merged; ELV2 reference vocabulary and compatibility slice in progress\nSpecification branch: `docs/elv-engineering-systems-spec` (revision `091e6d8`)  \nImplementation branch: `feat/flutter-elv2-reference-catalogs`\nScope: implementation roadmap after ELV1 connectivity foundation",
+    "Status: ELV1 CLOSED; ELV2 CLOSED; ELV3 READY FOR DESIGN / ANALYSIS\nAccepted baseline: `main@f05b1e558a93b40928429ca86d91f4daa0cf4ef0`  \nPre-ELV3 hardening: `feat/flutter-elv12-pre-elv3-hardening`\nScope: implementation roadmap after accepted ELV1/ELV2 baseline",
+)
+
+replace_exact(
+    "docs/product/elv-canonical-discipline-model.md",
+    "Status: Draft 0.1  \nBranch: `docs/elv-engineering-systems-spec`",
+    "Status: ACCEPTED ARCHITECTURE — ELV1/ELV2 baseline  \nAccepted baseline: `main@f05b1e558a93b40928429ca86d91f4daa0cf4ef0`  \nNext stage: `ELV3-P0` physical-routing design/audit",
+)
+
+db = Path("apps/mobile/lib/data/database/app_database.dart")
+text = db.read_text()
+replacements = [
+    (
+        "  TextColumn get startPortId =>\n      text().references(EngineeringPortInstances, #id)();\n  TextColumn get endPortId =>\n      text().nullable().references(EngineeringPortInstances, #id)();",
+        "  @ReferenceName('topologyGroupsStartingAtPort')\n  TextColumn get startPortId =>\n      text().references(EngineeringPortInstances, #id)();\n  @ReferenceName('topologyGroupsEndingAtPort')\n  TextColumn get endPortId =>\n      text().nullable().references(EngineeringPortInstances, #id)();",
+    ),
+    (
+        "  TextColumn get fromPortId =>\n      text().references(EngineeringPortInstances, #id)();\n  TextColumn get toPortId => text().references(EngineeringPortInstances, #id)();\n  TextColumn get profileId =>",
+        "  @ReferenceName('outgoingEngineeringPortConnections')\n  TextColumn get fromPortId =>\n      text().references(EngineeringPortInstances, #id)();\n  @ReferenceName('incomingEngineeringPortConnections')\n  TextColumn get toPortId => text().references(EngineeringPortInstances, #id)();\n  TextColumn get profileId =>",
+    ),
+    (
+        "  TextColumn get fromPortId =>\n      text().references(EngineeringPortInstances, #id)();\n  TextColumn get toPortId => text().references(EngineeringPortInstances, #id)();\n  TextColumn get payloadJson => text()();\n  @override\n  Set<Column<Object>> get primaryKey => {id};\n}\n\n@DataClassName('EngineeringComponentAssemblyRow')",
+        "  @ReferenceName('outgoingEngineeringInternalMappings')\n  TextColumn get fromPortId =>\n      text().references(EngineeringPortInstances, #id)();\n  @ReferenceName('incomingEngineeringInternalMappings')\n  TextColumn get toPortId => text().references(EngineeringPortInstances, #id)();\n  TextColumn get payloadJson => text()();\n  @override\n  Set<Column<Object>> get primaryKey => {id};\n}\n\n@DataClassName('EngineeringComponentAssemblyRow')",
+    ),
+]
+for old, new in replacements:
+    count = text.count(old)
+    if count != 1:
+        raise SystemExit(f"app_database.dart: expected one match, found {count}")
+    text = text.replace(old, new, 1)
+db.write_text(text)
+
+Path("docs/audit/elv12-pre-elv3-governance-checklist.md").write_text(
+    """# ELV1/ELV2 Pre-ELV3 Governance Checklist
+
+Status: OWNER ACTION REQUIRED  
+Observed baseline: `main@f05b1e558a93b40928429ca86d91f4daa0cf4ef0`  
+Hardening branch: `feat/flutter-elv12-pre-elv3-hardening`
+
+## Observed state
+
+The post-merge audit observed `main` with branch protection disabled and no required status checks enforced by repository settings. The connected GitHub integration available to this work can read protection/ruleset state but cannot modify repository administration settings.
+
+This document is therefore the explicit external-governance handoff required by H2. It does **not** claim that protection is already enabled.
+
+## Required owner settings for `main`
+
+Before ELV3 implementation begins, verify all of the following in GitHub repository settings:
+
+- [ ] Require a pull request before merging.
+- [ ] Require `Flutter Local Foundation` to pass before merging.
+- [ ] Require the branch to be up to date / merge the exact reviewed head.
+- [ ] Require conversation resolution when review threads exist.
+- [ ] Block force pushes to `main`.
+- [ ] Block deletion of `main`.
+- [ ] Review any administrator bypass and keep it only if intentionally required for repository recovery.
+
+## Engineering gate
+
+```text
+final feature SHA
+  -> exact-SHA CI GREEN
+  -> review
+  -> merge
+  -> post-merge main CI GREEN
+```
+
+No documentation-only commit may be added after the accepted exact-SHA gate without rerunning CI on the new SHA.
+
+## Closure rule
+
+H2 is complete only after the repository owner confirms that the settings above are enabled (or an equivalent repository ruleset enforces them). Until then, code hardening may merge, but ELV3 implementation entry remains governance-pending.
+"""
+)
+
+# Remove temporary apply machinery from the final tree.
+Path(".github/workflows/elv12-hardening-apply.yml").unlink(missing_ok=True)
+Path(".github/scripts/elv12_hardening_apply.py").unlink(missing_ok=True)
