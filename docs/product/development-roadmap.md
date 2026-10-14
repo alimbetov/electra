@@ -28,14 +28,14 @@ Delivery is incremental: each baseline has an exact-commit Flutter/core CI gate.
 | ELV0 | Systems, sixteen family editions, shared device participation | Baseline closed |
 | ELV1 | Ports, connections, topology, passive mappings and assemblies | CLOSED / ACCEPTED |
 | ELV2 | Canonical discipline profiles, versioned catalogs, placement and explicit adoption | CLOSED / ACCEPTED |
-| ELV3 | Cable resources, allocation/termination, cable-run traversal, reusable routing/carriers/pathways and physical compatibility | CODE REMEDIATION CLOSED / TECHNICAL RE-REVIEW PASS / P1 CODE AUTHORIZED |
+| ELV3 | Cable resources, allocation/termination, cable-run traversal, reusable routing/carriers/pathways and physical compatibility | CODE REMEDIATION CLOSED / P2-P5 HARDENED / P1 CODE AUTHORIZED |
 | ELV4 | Power, PoE, PSU, UPS, converters and backup graph | Planned |
 | ELV5 | Versioned CCTV/LAN/ACS/fire calculations | Planned |
 | ELV6 | Racks, cabinets, patching and physical capacity | Planned |
 | ELV7 | Jurisdiction profiles, normative rule packs and findings | Planned |
 | ELV8 | Manufacturer selection, snapshots, BOM and deliverables | Planned |
 
-ELV3 architecture/process specification remains accepted after P0, R2 and dual-review hardening. The code-implementation technical review later reopened readiness with CR-01..CR-16. Those findings are now closed by the authoritative code-remediation contracts, and a fresh implementation-level re-review reports zero open BLOCKER/HIGH code-design findings.
+ELV3 architecture/process specification remains accepted after P0, R2 and dual-review hardening. General code readiness was later reopened by CR-01..CR-16, then restored after remediation and re-review. A subsequent dedicated P2-P5 implementation review found and closed additional phase-local ambiguities in allocation claims/terminations, route project/handoff semantics, carrier lifecycle/dependencies and compatibility-profile applicability/combination.
 
 Architecture/process authority remains:
 
@@ -47,6 +47,7 @@ Architecture/process authority remains:
 Current code implementation authority:
 
 - `docs/product/elv3-code-implementation-index.md`;
+- `docs/product/elv3-code-p2-p5-hardening.md`;
 - `docs/product/elv3-code-remediation-final-clarifications.md`;
 - `docs/product/elv3-code-implementation-remediation-cr01-cr16.md`;
 - `docs/product/elv3-code-contract-p1-p3.md`;
@@ -55,42 +56,50 @@ Current code implementation authority:
 
 Latest code readiness evidence:
 
-- `docs/audit/elv3-code-implementation-technical-rereview.md` — PASS.
+- `docs/audit/elv3-code-implementation-technical-rereview.md` — general PASS;
+- `docs/audit/elv3-p2-p5-code-technical-review.md` — dedicated P2-P5 PASS.
 
-Historical finding evidence:
+Historical finding evidence remains in the earlier code technical review/audits and does not override the current hardened authority set.
 
-- `docs/audit/elv3-code-implementation-technical-review.md` — CR-01..CR-16 source review, superseded as authorization;
-- `docs/audit/elv3-code-level-readiness-audit.md` — earlier historical PASS.
-
-Closed code remediation set:
+Dedicated P2-P5 hardening now freezes:
 
 ```text
-CR-01 P1/P2 resource-definition ownership/compile order
-CR-02 single command orchestration owner
-CR-03 exact durable CommandExecutionRecords schema/codec
-CR-04 DB-enforced partial unique invariants
-CR-05 concrete phase-specific Drift write-unit-of-work strategy
-CR-06 two-connection SQLite race tests
-CR-07 shared route edit validates canonical + legacy electrical dependents
-CR-08 pure snapshot assembler + transaction-bound coordinator
-CR-09 typed carrier environment/installation facts
-CR-10 exact P5 sealed compatibility-rule hierarchy
-CR-11 persisted explicit P6 separation evidence
-CR-12 DRAFT termination memory-only candidate
-CR-13 CreateCableRun allocation prerequisite
-CR-14 common ELV command result/failure envelope
-CR-15 migration baseline schema 18→23
-CR-16 exact Cable downstream dependency inspector port
+P2
+  claim uniqueness = (cableId, atomic resource)
+  WHOLE_CABLE expands to all atomic descendants
+  claim resolution != termination-obligation resolution
+  exact allocation mutation lifecycle
+  final-allocation release blocked by current active run
+  topology endpoint dependency inspector
+
+P3
+  route project = CableRoute.room -> Room.floor -> Floor.project
+  RouteHandoff = exact world interface OR typed adjacency, no arbitrary tolerance
+  exact CableRouteGeometryCandidate for shared edits
+  run/allocation reverse dependency preserved
+
+P4
+  exact ACTIVE->ARCHIVED lifecycle for context/carrier/compartment
+  transaction-bound host/project ownership validation
+  archive dependency guards
+  factual compartment-area aggregate capacity
+
+P5
+  exact PhysicalCompatibilityProfile shape
+  typed selector applicability
+  exact v1 rule semantics
+  deterministic order-independent combiner
+  engine version elv.physical-compatibility.v1
+  stable status order FORBIDDEN->UNRESOLVED->WARNING->OK
+  profile-set mutations require WORKING design revision
 ```
 
-Additional remediation self-review clarifications closed phase-specific UoW compile isolation, ledger replay semantics, exact P6 separation persistence, resource graph publication validation and reuse of legacy route validators.
-
-Canonical implementation sequence is now:
+Canonical implementation sequence remains:
 
 ```text
 P1 Cable identity / CableDefinitionRef / P1 resource-definition types
   ↓ exact-SHA
-P2 Allocation / runtime resource selection + claims / A-B terminations
+P2 Allocation / runtime resource selection + atomic claims / terminations
   ↓ exact-SHA
 P3 ProjectDesignRevision / frozen snapshot / revision fork / CanonicalCableRun / traversal / route coexistence
   ↓ exact-SHA
@@ -107,7 +116,17 @@ P8 Restart / rollback / failure injection / persisted idempotency verticals
 P9 Architecture-vs-code hard audit / command-matrix audit / final exact-SHA closure
 ```
 
-P1 code implementation is AUTHORIZED. P2 may begin only after P1 closes on its own exact branch SHA with required green CI and acceptance evidence; the same sequential rule applies through P9.
+Current authorization:
+
+```text
+P1 implementation      AUTHORIZED
+P2 code specification  HARDENED / PASS
+P3 code specification  HARDENED / PASS
+P4 code specification  HARDENED / PASS
+P5 code specification  HARDENED / PASS
+```
+
+Implementation authorization remains sequential: P2 starts only after P1 exact-SHA gate, P3 only after P2 gate, P4 only after P3 gate, and P5 only after P4 gate.
 
 All four discipline fixtures plus a fiber fixture remain mandatory throughout the track. Legacy electrical routing regression is mandatory from P3 onward. National rule packs remain ELV7 concerns with verified provenance.
 
