@@ -1,0 +1,52 @@
+name: Temporary ELV3 RC3 P4
+
+on:
+  push:
+    branches:
+      - feat/elv3-runtime-closure
+    paths:
+      - '.github/workflows/tmp-elv3-rc3-p4.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/elv3-runtime-closure
+          fetch-depth: 0
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Apply RC3 patch
+        run: python3 scripts/ci/apply-elv3-runtime-rc3.py
+      - name: Install dependencies
+        working-directory: apps/mobile
+        run: flutter pub get --enforce-lockfile
+      - name: Generate Drift code
+        working-directory: apps/mobile
+        run: dart run build_runner build --delete-conflicting-outputs
+      - name: Format
+        working-directory: apps/mobile
+        run: dart format lib test
+      - name: Analyze
+        working-directory: apps/mobile
+        run: flutter analyze
+      - name: Test P4
+        working-directory: apps/mobile
+        run: flutter test --reporter expanded test/data/elv_p4_runtime_closure_test.dart
+      - name: Commit RC3 source
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add apps/mobile/lib/data/database/app_database.dart \
+                  apps/mobile/lib/data/repositories/drift_elv_pathway_repository.dart \
+                  apps/mobile/lib/data/repositories/drift_elv_physical_carrier_repository.dart \
+                  apps/mobile/test/data/elv_p4_runtime_closure_test.dart
+          git diff --cached --quiet && { echo 'No changes produced'; exit 1; }
+          git commit -m 'feat(elv3): implement RC3 P4 carrier persistence'
+          git push origin HEAD:feat/elv3-runtime-closure
