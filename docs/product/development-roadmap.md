@@ -37,16 +37,16 @@ The [ELV delivery plan](elv-delivery-plan.md) is the active product roadmap. His
 | ELV0 | Systems, sixteen family editions, shared device participation | Baseline closed |
 | ELV1 | Ports, connections, topology, passive mappings and assemblies | CLOSED / ACCEPTED |
 | ELV2 | Canonical discipline profiles, versioned catalogs, placement and explicit adoption | CLOSED / ACCEPTED |
-| ELV3 | Cable resources, allocation/termination, cable-run traversal, reusable routing/carriers/pathways and physical compatibility | DUAL-REVIEW HARDENED / MACRO PASS / PROCESS PASS / READY FOR EXECUTION — P1 AUTHORIZED |
+| ELV3 | Cable resources, allocation/termination, cable-run traversal, reusable routing/carriers/pathways and physical compatibility | CODE-LEVEL SPEC READY / DUAL-REVIEW PASS / P1 CODE AUTHORIZED |
 | ELV4 | Power, PoE, PSU, UPS, converters and backup graph | Planned |
 | ELV5 | Versioned CCTV/LAN/ACS/fire calculations | Planned |
 | ELV6 | Racks, cabinets, patching and physical capacity | Planned |
 | ELV7 | Jurisdiction profiles, normative rule packs and findings | Planned |
 | ELV8 | Manufacturer selection, snapshots, BOM and deliverables | Planned |
 
-ELV3-P0 is architecturally remediated and accepted. PRE-P1 and R2 hardening closed successive implementation ambiguities. A later two-role review then tested the specification independently from (A) project-wide architecture consistency and (B) command/process-flow consistency. Both reviews pass, and the reconciliation audit reports zero open BLOCKER/HIGH specification findings.
+ELV3-P0 is architecturally remediated and accepted. PRE-P1 and R2 hardening closed successive implementation ambiguities. A two-role review validated both project-wide architecture consistency and command/process-flow consistency. The specification is now additionally translated into code-level contracts tied to the actual repository layers, Dart type boundaries, Drift schema ownership, transaction shapes, test locations and exact-SHA gates.
 
-Current execution authority:
+Architecture/process execution authority:
 
 - `docs/product/elv3-authoritative-spec-index.md`;
 - `docs/product/elv3-dual-review-process-hardening.md`;
@@ -54,11 +54,19 @@ Current execution authority:
 - `docs/product/elv3-r2-final-readiness-remediation.md`;
 - `docs/product/elv3-implementation-specification-v2.md`.
 
+Code implementation entry point:
+
+- `docs/product/elv3-code-implementation-index.md`;
+- `docs/product/elv3-code-contract-p1-p3.md`;
+- `docs/product/elv3-code-contract-p4-p6.md`;
+- `docs/product/elv3-code-contract-p7-p9.md`.
+
 Latest readiness evidence:
 
 - `docs/audit/elv3-macro-architecture-consistency-audit.md`;
 - `docs/audit/elv3-process-flow-consistency-audit.md`;
-- `docs/audit/elv3-dual-review-reconciliation-audit.md`.
+- `docs/audit/elv3-dual-review-reconciliation-audit.md`;
+- `docs/audit/elv3-code-level-readiness-audit.md`.
 
 Older readiness audits remain historical evidence but are not the latest authorization source.
 
@@ -80,51 +88,76 @@ EngineeringConnection
   -> sealed PathwayContext host
 ```
 
-Additional dual-review frozen clarifications:
+Code-layer structure is frozen as:
+
+```text
+engineering_core
+  -> pure domain/value objects/validators/calculations
+
+apps/mobile/lib/application
+  -> commands/services/repository ports/workspace state
+
+apps/mobile/lib/data/repositories
+  -> Drift adapters/transactions/error translation
+
+app_database.dart
+  -> canonical tables/indexes/migrations
+
+presentation
+  -> command dispatch/rendering only
+```
+
+Canonical code/persistence groups include:
+
+```text
+P1  ElvCables + CommandExecutionRecords
+P2  CableAllocations + immutable selection evidence + temporary claims + terminations
+P3  ProjectDesignRevisions + frozen snapshots + CanonicalCableRuns + traversals + handoffs + bend evidence
+P4  PathwayContexts + PhysicalCarriers + compartments
+P5  exact project physical compatibility profile set/refs
+P6  revision-scoped derived calculation/evidence keys
+P7  one Physical Routing workspace
+P8  deterministic failure probes/restart verticals
+P9  implementation inventory + command-contract matrix + architecture-vs-code audit
+```
+
+Additional frozen implementation rules:
 
 ```text
 new WORKING revision
   = deterministic materialization from verified frozen snapshot
-  + new CanonicalCableRun/traversal ids
-  + basedOnCableRunId provenance
 
 physical writes after P3
   = require exactly one WORKING ProjectDesignRevision
-  = prohibited in the post-freeze/pre-next-working gap
 
 RerouteCableRun
   = traversal-chain change only
 
 EditReusableRouteGeometry
-  = separate shared-infrastructure command
-  + impact fingerprint over all dependent current runs
+  = separate shared-infrastructure command + impact fingerprint
 
 shared carrier/pathway mutation
-  = same impact-preview/fan-out discipline
-
-snapshot schemas
-  = phase-versioned; old frozen snapshots never backfilled from current state
-
-derived P5/P6 results
-  = design-revision-scoped cache/node identity
+  = impact-preview/fan-out discipline
 
 CableDefinitionRef
-  = immutable after resource-selection evidence or canonical run exists
+  = immutable after resource-selection evidence/canonical run history exists
 
 termination replacement
-  = complete set-atomic replacement for RESERVED/ACTIVE allocation
+  = complete set-atomic replacement
 
 command idempotency
-  = persisted (projectId, commandId) + canonical payload SHA-256 + logical outcome
+  = persisted (projectId, commandId) + canonical payload hash + logical result
+
+errors
+  = typed/deterministic; raw Drift/SQLite failures do not cross application boundary
 
 undo/redo
-  = explicit reversible vs irreversible command matrix
-  = frozen/migration/history commands corrected forward, never erased
+  = reversible command history only; freeze/revision/history operations move forward
 ```
 
 Legacy electrical routing remains valid through coexistence/adoption semantics; physical Cable identity is never invented from `ElectricalCircuit` alone.
 
-ELV3 implementation sequence is fixed:
+ELV3 implementation sequence remains fixed:
 
 ```text
 P1 Cable identity / exact ELV2 CableDefinitionRef
@@ -146,9 +179,9 @@ P8 Restart / rollback / failure injection / persisted idempotency verticals
 P9 Architecture-vs-code hard audit / command-matrix audit / final exact-SHA closure
 ```
 
-Every P1-P8 phase must maintain its command-contract matrix with inputs, expected revisions, state, read/write sets, validations, transition, invalidation keys, idempotency, rollback postcondition, undo class, restart assertion and error codes. P9 audits that matrix against code.
+Every P1-P8 phase must maintain its command-contract matrix with inputs, expected revisions, state, read/write sets, validations, transition, invalidation keys, idempotency, rollback postcondition, undo class, restart assertion, error codes and implementation/test locations. P9 audits that matrix against code.
 
-P1 is authorized. P2 may begin only after P1 closes on an exact branch SHA with its required green CI evidence; the same sequencing rule applies through P9.
+P1 code implementation is authorized. P2 may begin only after P1 closes on an exact branch SHA with required green CI evidence; the same sequencing rule applies through P9.
 
 All four discipline fixtures plus a fiber fixture remain required throughout the track. National rule packs require verified sources and provenance. FL16 and ELV6 share enclosure infrastructure; ELV8 reuses electrical BOM/reporting foundations.
 
