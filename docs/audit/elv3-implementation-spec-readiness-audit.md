@@ -1,226 +1,288 @@
-# Electra — ELV3 Implementation Specification Readiness Audit
+# Electra — ELV3 Final Implementation Readiness Audit
 
-Status: IMPLEMENTATION SPEC AUDIT / PASS  
+Status: FINAL ADVERSARIAL SPEC AUDIT / PASS  
 Branch: `feat/flutter-elv3-physical-routing-design`  
-Architecture baseline: `docs/product/elv3-p0-system-architecture-remediation.md`  
-Implementation specification: `docs/product/elv3-implementation-specification.md`
+Authority index: `docs/product/elv3-authoritative-spec-index.md`  
+Implementation specification: `docs/product/elv3-implementation-specification-v2.md`  
+Final hardening: `docs/product/elv3-pre-p1-final-hardening.md`
 
 ## 1. Objective
 
-Verify that ELV3 is no longer only an architecture/design contract and that P1–P9 are sufficiently specified to be implemented sequentially without inventing domain semantics during coding.
+Prove that ELV3 is ready for implementation without requiring developers to invent domain semantics, persistence ownership, lifecycle transitions or migration strategy during coding.
 
-This audit checks:
+This is a stricter audit than the previous readiness review. It was triggered after adversarial review found that the first implementation specification still left several architecture decisions open.
 
-- project-wide architecture consistency;
-- phase boundaries;
-- process/command logic;
-- lifecycle/state transitions;
-- transaction and concurrency boundaries;
-- persistence direction;
-- migration/coexistence strategy;
-- restart/idempotency/rollback/undo requirements;
-- dependency invalidation;
-- UI workflow boundary;
-- test/acceptance coverage;
-- exact-SHA closure requirements.
+Acceptance question:
 
-## 2. Architecture consistency
+> Can two independent implementation teams follow the authoritative specification and produce compatible domain/API/persistence behavior without choosing architecture themselves?
+
+Final answer: **YES**, subject to phase-by-phase exact-SHA implementation gates.
+
+## 2. Sources checked
+
+The audit checks the final contracts against the existing project code and accepted architecture, including:
+
+- ELV1 EngineeringConnection/Port topology;
+- ELV2 `EngineeringReferenceCatalog` and current component-only reference binding behavior;
+- Drift `EngineeringReferenceCatalogs`, `ComponentReferenceBindings`, legacy `CableRuns`, `CableRoutes`, `CableRouteNodes`, `CableRouteSegments`, `PhysicalChannels` and floor routing tables;
+- ADR-004 routing topology;
+- ADR-014 field/as-built lifecycle;
+- P0 remediation and P0-R10 architecture audit;
+- final PRE-P1 hardening decisions;
+- ADR-029 route reuse;
+- ADR-030 stable ProjectDesignRevision identity;
+- v2 P1-P9 implementation specification.
+
+## 3. Previously open findings and closure
+
+| ID | Finding | Severity | Final resolution | State |
+|---|---|---:|---|---|
+| F1 | CableDefinition binding did not exist concretely in ELV2 | BLOCKER | exact `CableDefinitionRef` into existing project `EngineeringReferenceCatalog`; no component binding reuse | CLOSED |
+| F2 | P3 allowed route strategy A or B | BLOCKER | ADR-029 selects evolution/reuse of existing CableRoute/Node/Segment graph + CableRunTraversal | CLOSED |
+| F3 | `designRevisionId` was undefined and could be confused with `Projects.revision` | BLOCKER | ADR-030 introduces stable `ProjectDesignRevision.id`; optimistic counter remains separate | CLOSED |
+| F4 | CableAllocation lifecycle allowed implementation-defined skipping | HIGH | strict transition graph frozen | CLOSED |
+| F5 | `transitionRef` referenced no defined transition aggregate | HIGH | multi-cable continuous realization is explicitly unsupported in P1-P9; placeholder removed | CLOSED |
+| F6 | `PathwayContext.spatialHost/reference` was open-ended | HIGH | sealed host hierarchy + exact kind-to-host mapping/persistence fields | CLOSED |
+| F7 | P5 profile ownership and P6/ELV7 segregation boundary ambiguous | HIGH | exact ELV2 `PhysicalCompatibilityProfile` ownership; P6 emits evidence only; ELV7 owns normative thresholds | CLOSED |
+| F8 | Canonical P3 table name could be selected during implementation | MEDIUM/HIGH | authority index freezes `CanonicalCableRuns` and related table names | CLOSED |
+
+No implementation-time domain decision remains in these areas.
+
+## 4. Architecture consistency
 
 PASS.
 
-The implementation specification preserves the remediated P0 model:
+Canonical chain:
 
 ```text
+ELV1
+EngineeringConnection -> Port
+
+ELV2
+EngineeringReferenceCatalog exact edition
+  -> CableDefinition
+  -> PhysicalCompatibilityProfile
+
+ELV3
 EngineeringConnection
   -> CableAllocation
-      -> CableResourceSelection
-      -> CableTerminationMapping[]
+      -> resource claims
+      -> A/B termination mappings
   -> Cable
+      -> exact CableDefinitionRef
   -> CableRun
-  -> CableTraversal[]
-  -> reusable Route / geometry
-  -> optional PhysicalCarrier
-  -> PathwayContext
+      -> ProjectDesignRevision
+      -> CableRunTraversal[]
+          -> existing/evolved CableRouteSegment
+          -> optional PhysicalCarrier/compartment
+  -> sealed PathwayContext
 ```
 
-It does not reintroduce:
+The model preserves `Connection != Cable != CableRun != Route != Carrier != PathwayContext`.
 
-- Cable == Connection;
-- multiple room-local CableRuns per physical Cable;
-- final-domain private Route per CableRun;
-- an independent ELV3 CableDefinition catalog lifecycle;
-- automatic electrical circuit -> Cable conversion;
-- shaft/riser as carrier kinds;
-- ELV3 legal/normative compliance claims.
-
-## 3. Phase completeness matrix
-
-| Phase | Domain | Commands/process | Persistence | Errors/states | Tests/restart | Gate | Result |
-|---|---|---|---|---|---|---|---|
-| P1 Cable identity | explicit | explicit | explicit | explicit | explicit | exact-SHA | PASS |
-| P2 Allocation/resources/termination | explicit | atomic | explicit | explicit | concurrency + restart | exact-SHA | PASS |
-| P3 CableRun/traversal | explicit | atomic reroute/adoption | explicit direction | explicit | undo/restart/regression | exact-SHA | PASS |
-| P4 Carrier/pathway | explicit | explicit | explicit | explicit | restart/dependency | exact-SHA | PASS |
-| P5 Compatibility | explicit result | deterministic evaluator | cache/evidence boundary | result states explicit | invalidation tests | exact-SHA | PASS |
-| P6 Physical calculations | stable process codes | deterministic process | derived evidence | result states | reproducibility | exact-SHA | PASS |
-| P7 Editor workflow | domain reused | command-driven UX | no direct row writes | blocked/stale UX | 5 fixtures + undo | exact-SHA | PASS |
-| P8 Vertical persistence | existing model | failure injection/retry | full vertical | conflict handling | mandatory restart | exact-SHA | PASS |
-| P9 Hard closure | audit contract | n/a | migration inventory | n/a | full regression | final SHA | PASS |
-
-## 4. Process logic audit
+## 5. ELV2 reference integration audit
 
 PASS.
 
-Required command families are explicit and form transactional boundaries instead of permitting widgets to orchestrate table mutations.
+The project currently has project-scoped/versioned `EngineeringReferenceCatalogs` and component-specific `ComponentReferenceBindings`. Final ELV3 does not pretend the component binding is a Cable binding.
 
-Key processes defined:
+P1 explicitly extends the reference catalog payload with typed `CableDefinition[]`. Cable persists:
 
 ```text
-CreateCable
-ChangeCableDefinitionBinding
-ArchiveCable
-Allocate/Reserve/Activate/Release resources
-Bind/Replace termination
-Create/Reroute/Supersede CableRun
-Attach/replace traversal chain
-Create/update PathwayContext
-Create/update PhysicalCarrier
-Attach/detach carrier
-AdoptLegacyElectricalRoute
+catalogId
+catalogVersion
+definitionCode
+definitionContentHash
 ```
 
-Each compound operation must define project checks, expected revision, structural validation, transaction, dependency invalidation, idempotency and undo/redo where engineer-visible.
+This is sufficient to reconstruct exact reference meaning after restart and avoids both a parallel catalog lifecycle and an invalid FK to component identity.
 
-## 5. State/lifecycle audit
+## 6. Route/persistence audit
 
 PASS.
 
-The specification defines sufficient state semantics to avoid implementation invention:
+The final decision is singular:
 
 ```text
-Cable
-ACTIVE -> ARCHIVED
+existing CableRoute / CableRouteNode / CableRouteSegment
+  = one evolved reusable geometry kernel
 
-CableAllocation
+CanonicalCableRun
+  -> CableRunTraversal[]
+      -> CableRouteSegment
+```
+
+Legacy `CableRuns(circuitId, routeId)` remains valid during coexistence. No second ELV route graph and no forced global migration are allowed.
+
+Exact P3 new table names are frozen:
+
+```text
+ProjectDesignRevisions
+CanonicalCableRuns
+CableRunTraversals
+LegacyRouteAdoptions
+```
+
+## 7. Revision/lifecycle audit
+
+PASS.
+
+`Projects.revision` remains optimistic concurrency only.
+
+Stable engineering revision:
+
+```text
+ProjectDesignRevision.id
+WORKING -> FROZEN -> SUPERSEDED -> ARCHIVED
+```
+
+Allocation lifecycle is exact:
+
+```text
 DRAFT -> RESERVED -> ACTIVE -> RELEASED -> ARCHIVED
-
-CableRun
-ACTIVE -> SUPERSEDED -> ARCHIVED
+DRAFT -> ARCHIVED
+RESERVED -> RELEASED
 ```
 
-Only RESERVED/ACTIVE allocations consume resources.
+No arbitrary state skipping remains.
 
-Exact implementation may omit unused transient states only if capacity semantics remain equivalent and documented.
-
-## 6. Concurrency and idempotency audit
-
-PASS.
-
-P2 requires that two overlapping resource claims cannot both commit.
-
-P3 requires one active run per Cable/design revision.
-
-P8 explicitly tests lost-response retry/idempotency and rollback at partial-write boundaries.
-
-The specification does not require one particular SQLite locking implementation prematurely; it requires a proven atomic outcome.
-
-## 7. Persistence audit
+## 8. Resource/concurrency audit
 
 PASS AT SPEC LEVEL.
 
-The phase plan prevents schema overreach:
+Normalized resource claims use one claim per atomic definition resource. `__WHOLE_CABLE__` is the reserved whole-cable atom.
+
+Required transaction guarantees:
+
+- WHOLE_CABLE cannot coexist with partial claims;
+- two claims for one atomic resource cannot both commit;
+- one connection cannot obtain a second RESERVED/ACTIVE Cable in P1-P9;
+- same command replay is idempotent;
+- same commandId with changed normalized payload conflicts.
+
+These are outcome contracts; SQL implementation details may differ only if the outcomes are proven by tests.
+
+## 9. Pathway/carrier audit
+
+PASS.
+
+No open `spatialHost` remains.
 
 ```text
-P1 Cables
-P2 CableAllocations + resources + terminations
-P3 CableRuns + traversals + legacy adoption/coexistence
-P4 PathwayContexts + PhysicalCarriers + compartments
-P5/P6 optional evidence/projections only
+ROOM_LOCAL     -> RoomHost
+FLOOR_COMMON   -> FloorHost
+CEILING_VOID   -> SurfaceVoidHost
+UNDERFLOOR     -> SurfaceVoidHost
+RISER          -> VerticalHost
+SHAFT          -> VerticalHost
+PROJECT_SHARED -> ProjectHost
 ```
 
-ELV2 reference governance remains authoritative for CableDefinition/Profile editions.
+This removes schema ambiguity and preserves multi-floor riser/shaft semantics without fake room ownership.
 
-## 8. Legacy electrical audit
-
-PASS.
-
-Existing electrical routing remains valid without mandatory migration.
-
-Canonical adoption is explicit, evidence-based, auditable and idempotent.
-
-Ambiguous legacy data blocks adoption rather than inventing physical Cable facts.
-
-## 9. UI/process separation audit
+## 10. ELV3 / ELV7 boundary audit
 
 PASS.
 
-P7 defines one shared Physical Routing workspace and explicitly prohibits widgets from writing multiple persistence tables directly.
+ELV3 may emit:
 
-The engineer workflow is progressive:
+```text
+actual separation distance
+same compartment flag
+barrier presence
+actual bend radius
+minimum intrinsic bend radius
+carrier usable area
+occupied cable area
+```
+
+ELV3 may enforce intrinsic physical/reference-definition limits.
+
+ELV3 may NOT own jurisdictional required separation/fill/fire thresholds or formal standard compliance. Those belong to ELV7 rule packs.
+
+`ELV-ROUTE-03` is explicitly segregation evidence basis, not compliance evaluation.
+
+## 11. Process logic audit
+
+PASS.
+
+P1-P9 define command boundaries, input identity, allowed lifecycle transitions, transaction semantics, errors, restart, failure injection, idempotency and undo/redo expectations.
+
+No widget may orchestrate multi-table source-of-truth mutations directly.
+
+The engineer workflow is deterministic:
 
 ```text
 Connection
- -> Cable
- -> Allocation
- -> Termination
- -> Route
- -> Carrier/Pathway
- -> Findings/Calculations
+ -> Cable exact definition
+ -> DRAFT allocation
+ -> reserve resources
+ -> A/B terminations
+ -> activate allocation
+ -> current WORKING design revision
+ -> CableRun
+ -> complete traversal chain
+ -> carrier/pathway
+ -> technical findings/evidence
 ```
 
-This is compatible with the project's progressive side-panel/editor approach and avoids per-discipline routing screens.
-
-## 10. Dependency/invalidation audit
+## 12. Cross-discipline audit
 
 PASS.
 
-The specification provides canonical affected-object keys and dependency direction through ELV4–ELV8.
+Five acceptance fixtures remain structurally distinct:
 
-Whole-project recalculation is not the default.
+- CCTV — whole Cat6, PoE endpoint semantics deferred to ELV4 power graph;
+- LAN — permanent link with InternalConnectivity boundary preserved;
+- ACS — four logical connections sharing one 8-core Cable via disjoint resources;
+- Fire — ELV1 loop identity separate from physical Cable sections and ELV7 normative claims;
+- Fiber — duplex fiber resource/termination semantics.
 
-Physical changes propagate only to dependent route/compatibility/calculation/report subgraphs.
+No discipline-specific routing aggregate is required.
 
-## 11. Acceptance coverage audit
+## 13. Remaining implementation freedom
 
-PASS.
+These are implementation details, not architecture gaps:
 
-Five mandatory fixtures cover materially distinct cases:
+1. Dart source-file layout and private helper names;
+2. numeric Drift schema-version assigned in sequence;
+3. equivalent SQL transaction statement shape proving required atomic outcomes;
+4. widget composition inside the frozen workflow;
+5. test fixture/helper organization;
+6. non-semantic indexes and later performance projections.
 
-- CCTV — whole Cat6 Cable + shared containment;
-- LAN — permanent link + InternalConnectivity boundary;
-- ACS — multiple independent allocations in one multicore Cable;
-- Fire — TopologyGroup separation + physical cable sections + ELV7 boundary;
-- Fiber — multi-fiber allocation/termination and overlap.
+The following are NOT free choices: identity, cardinality, lifecycle, route strategy, canonical table relationships, CableDefinition provenance, design revision identity, multi-cable policy, PathwayContext host semantics, P5 profile ownership and ELV7 boundary.
 
-P8 additionally requires restart, rollback, failure injection and idempotent retry.
+## 14. Governance note
 
-## 12. Remaining implementation choices
+The feature branch itself is not protected by GitHub required checks at the time of this audit. This does not change specification readiness, but implementation phases MUST enforce the documented exact-SHA gate operationally. No phase is accepted from a SHA different from the SHA whose workflows were reviewed.
 
-The following are implementation decisions, not missing product/domain requirements:
+Branch protection/ruleset may be added separately as repository governance hardening.
 
-1. exact Dart class/file naming;
-2. exact Drift schema-version numbers;
-3. concrete SQL/transaction mechanism used to serialize resource claims;
-4. exact adapter strategy selected in the P3 ADR for current CableRoute tables;
-5. exact existing ELV2 binding table/API name used by P1;
-6. concrete UI widget composition while preserving the specified workflow;
-7. test helper/fixture organization;
-8. performance optimizations/materialized occupancy projections after correctness.
-
-These decisions can be made inside their phase without changing canonical semantics.
-
-## 13. Readiness verdict
+## 15. Final verdict
 
 ```text
-P0 system architecture                         PASS / CLOSED
-P1-P9 implementation specification             PASS
-process logic                                  PASS
-project-wide ELV1-ELV8 consistency              PASS
-persistence/migration direction                PASS
-restart/rollback/idempotency requirements      PASS
-UI/application process boundary                PASS
-acceptance/test gates                          PASS
-P1 execution                                   AUTHORIZED
+P0 system architecture                    PASS / CLOSED
+F1-F8 final hardening                     PASS / CLOSED
+authoritative document precedence         PASS
+ELV1-ELV8 architecture alignment           PASS
+CableDefinition exact reference           PASS
+route evolution strategy                  PASS / SINGLE PATH
+design revision identity                  PASS
+allocation lifecycle                      PASS / DETERMINISTIC
+multi-cable ambiguity                     CLOSED / NOT SUPPORTED IN P1-P9
+PathwayContext persistence semantics       PASS / SEALED
+P5 profile ownership                      PASS
+ELV3 vs ELV7 segregation boundary         PASS
+process/command logic                     PASS
+restart/rollback/idempotency specification PASS
+cross-discipline acceptance               PASS
+implementation ambiguity                  NO OPEN BLOCKER/HIGH
+P1 execution                              AUTHORIZED
 ```
 
-The branch is now sufficient as the ELV3 master technical specification. Implementation must still be executed phase-by-phase; each phase requires its own exact-SHA evidence before the next phase proceeds.
+### READY FOR EXECUTION
+
+The branch is sufficient as the ELV3 master technical specification for sequential P1-P9 implementation.
+
+This verdict does **not** claim that runtime code exists or is correct. It claims that implementation can now begin without the implementation team making unresolved system-architecture decisions. Every phase remains gated by tests, restart evidence and exact-SHA CI before the next phase starts.
