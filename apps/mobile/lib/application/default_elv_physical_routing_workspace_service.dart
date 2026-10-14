@@ -11,6 +11,9 @@ final class PhysicalRoutingSelectionSnapshot {
     this.cableId,
     this.allocationId,
     this.cableRunId,
+    this.terminationSetComplete = false,
+    this.carrierAssignmentComplete = false,
+    this.commandMutationsAllowed = true,
     this.blockingIssues = const [],
   });
 
@@ -18,6 +21,9 @@ final class PhysicalRoutingSelectionSnapshot {
   final String? cableId;
   final String? allocationId;
   final String? cableRunId;
+  final bool terminationSetComplete;
+  final bool carrierAssignmentComplete;
+  final bool commandMutationsAllowed;
   final List<PhysicalRoutingBlockingIssue> blockingIssues;
 }
 
@@ -36,17 +42,31 @@ abstract interface class ElvWorkspaceCommandExecutor {
   Future<ElvCommandResult<Object?>> execute(ElvWorkspaceCommand command);
 }
 
+abstract interface class ElvWorkspaceCommandAuthorizer {
+  Future<bool> canExecute(ElvWorkspaceCommand command);
+}
+
+final class AllowAllElvWorkspaceCommandAuthorizer
+    implements ElvWorkspaceCommandAuthorizer {
+  const AllowAllElvWorkspaceCommandAuthorizer();
+
+  @override
+  Future<bool> canExecute(ElvWorkspaceCommand command) async => true;
+}
+
 final class DefaultElvPhysicalRoutingWorkspaceService
     implements ElvPhysicalRoutingWorkspaceService {
   const DefaultElvPhysicalRoutingWorkspaceService({
     required this.dataSource,
     required this.executor,
     required this.traceService,
+    this.authorizer = const AllowAllElvWorkspaceCommandAuthorizer(),
   });
 
   final ElvPhysicalRoutingWorkspaceDataSource dataSource;
   final ElvWorkspaceCommandExecutor executor;
   final ElvPhysicalTraceService traceService;
+  final ElvWorkspaceCommandAuthorizer authorizer;
 
   @override
   Future<PhysicalRoutingWorkspaceState> load({
@@ -80,6 +100,14 @@ final class DefaultElvPhysicalRoutingWorkspaceService
         ),
       );
     }
+    if (!await authorizer.canExecute(command)) {
+      return const ElvCommandFailureResult<Object?>(
+        ElvFailure(
+          code: 'ELV_WORKSPACE_COMMAND_FORBIDDEN',
+          category: ElvFailureCategory.validation,
+        ),
+      );
+    }
     return executor.execute(command);
   }
 
@@ -106,12 +134,16 @@ final class DefaultElvPhysicalRoutingWorkspaceService
       selection.connectionId,
       selection.cableId,
       selection.allocationId,
+      selection.terminationSetComplete,
       selection.cableRunId,
+      selection.carrierAssignmentComplete,
     )) {
-      (null, _, _, _) => PhysicalRoutingStage.logicalConnection,
-      (_, null, _, _) => PhysicalRoutingStage.cable,
-      (_, _, null, _) => PhysicalRoutingStage.allocation,
-      (_, _, _, null) => PhysicalRoutingStage.route,
+      (null, _, _, _, _, _) => PhysicalRoutingStage.logicalConnection,
+      (_, null, _, _, _, _) => PhysicalRoutingStage.cable,
+      (_, _, null, _, _, _) => PhysicalRoutingStage.allocation,
+      (_, _, _, false, _, _) => PhysicalRoutingStage.termination,
+      (_, _, _, true, null, _) => PhysicalRoutingStage.route,
+      (_, _, _, true, _, false) => PhysicalRoutingStage.carrier,
       _ => PhysicalRoutingStage.findings,
     };
     return PhysicalRoutingWorkspaceState(
@@ -122,7 +154,9 @@ final class DefaultElvPhysicalRoutingWorkspaceService
       selectedAllocationId: selection.allocationId,
       selectedCableRunId: selection.cableRunId,
       activeStage: stage,
-      canEdit: context.editingAllowed && context.workingDesignRevisionId != null,
+      canEdit: context.editingAllowed &&
+          context.workingDesignRevisionId != null &&
+          selection.commandMutationsAllowed,
       blockingIssues: selection.blockingIssues,
     );
   }
