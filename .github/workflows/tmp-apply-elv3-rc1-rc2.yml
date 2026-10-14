@@ -1,0 +1,72 @@
+name: Temporary Apply ELV3 RC1-RC2
+
+on:
+  push:
+    branches:
+      - feat/elv3-runtime-closure
+    paths:
+      - '.github/workflows/tmp-apply-elv3-rc1-rc2.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: feat/elv3-runtime-closure
+          fetch-depth: 0
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install mobile dependencies
+        working-directory: apps/mobile
+        run: flutter pub get --enforce-lockfile
+
+      - name: Apply immutable RC1-RC2 patch
+        shell: bash
+        run: |
+          mkdir -p scripts/ci
+          curl -fsSL \
+            https://raw.githubusercontent.com/alimbetov/electra/e8db15e64c8e53cc23e5e6567ecb37ffff414c87/scripts/ci/apply-elv3-runtime-rc1-rc2.py \
+            -o scripts/ci/apply-elv3-runtime-rc1-rc2.py
+          python3 scripts/ci/apply-elv3-runtime-rc1-rc2.py
+          rm scripts/ci/apply-elv3-runtime-rc1-rc2.py
+
+      - name: Generate Drift code
+        working-directory: apps/mobile
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Format mobile source
+        working-directory: apps/mobile
+        run: dart format lib test
+
+      - name: Analyze mobile app
+        working-directory: apps/mobile
+        run: flutter analyze
+
+      - name: Test RC1-RC2
+        working-directory: apps/mobile
+        run: flutter test test/data/elv_p3_runtime_closure_test.dart
+
+      - name: Commit resulting source
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add apps/mobile/lib/data/database/app_database.dart \
+                  apps/mobile/lib/data/repositories/drift_elv_runtime_support.dart \
+                  apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart \
+                  apps/mobile/lib/data/repositories/drift_elv_cable_run_repository.dart \
+                  apps/mobile/lib/data/repositories/drift_elv_cable_write_unit_of_work.dart \
+                  apps/mobile/test/data/elv_p3_runtime_closure_test.dart
+          git diff --cached --quiet && { echo 'No source changes produced'; exit 1; }
+          git commit -m 'feat(elv3): implement RC1-RC2 P3 runtime closure'
+          git push origin HEAD:feat/elv3-runtime-closure
