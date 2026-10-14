@@ -1,0 +1,51 @@
+name: ELV2 Round2 Identity Symmetry Apply
+
+on:
+  push:
+    branches:
+      - 'audit/elv2-hard-review-round-2'
+    paths:
+      - '.github/scripts/r2_identity_symmetry_apply.py'
+      - '.github/workflows/r2-identity-symmetry-apply.yml'
+
+jobs:
+  apply:
+    if: ${{ github.actor != 'github-actions[bot]' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: audit/elv2-hard-review-round-2
+          fetch-depth: 0
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Apply identity symmetry hardening
+        run: python3 .github/scripts/r2_identity_symmetry_apply.py
+      - name: Verify mobile targeted tests
+        working-directory: apps/mobile
+        run: |
+          flutter pub get --enforce-lockfile
+          dart run build_runner build
+          dart format lib/application/engineering_reference_adoption_repository.dart lib/application/engineering_reference_revision_preview.dart
+          flutter test test/application/engineering_reference_adoption_command_round2_test.dart test/application/engineering_reference_revision_preview_round2_test.dart test/application/engineering_reference_revision_preview_test.dart
+      - name: Verify core targeted tests
+        working-directory: packages/engineering_core
+        run: |
+          dart pub get
+          dart format lib/src/engineering_reference_catalog.dart test/engineering_reference_identity_round2_test.dart
+          dart test test/engineering_reference_identity_round2_test.dart test/engineering_reference_catalog_test.dart
+      - name: Remove temporary patcher
+        run: git rm .github/scripts/r2_identity_symmetry_apply.py .github/workflows/r2-identity-symmetry-apply.yml
+      - name: Commit remediation
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'fix(elv2): unify canonical reference code identity'
+          git push origin HEAD:audit/elv2-hard-review-round-2
