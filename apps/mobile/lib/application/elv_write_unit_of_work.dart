@@ -1,5 +1,6 @@
 import 'package:engineering_core/engineering_core.dart';
 
+import 'elv_cable_allocation_repository.dart';
 import 'elv_cable_dependency_inspector.dart';
 
 abstract interface class ElvCommandLedgerStore {
@@ -69,6 +70,50 @@ abstract interface class ElvCableWriteSession extends ElvWriteSession {
   ElvCableWriteStore get cables;
   ElvReferenceReadStore get references;
   ElvCableDependencyStore get cableDependencies;
+}
+
+abstract interface class ElvAllocationWriteStore
+    implements ElvCableAllocationRepository {
+  Future<Cable?> findCable(String projectId, String cableId);
+  Future<ElvConnectionEndpoints?> findConnection(
+    String projectId,
+    String connectionId,
+  );
+  Future<bool> connectionHasConsumingAllocation(
+    String projectId,
+    String connectionId, {
+    String? excludingAllocationId,
+  });
+  Future<bool> insertDraft(CableAllocation allocation);
+  Future<bool> reserve({
+    required CableAllocation allocation,
+    required int expectedRevision,
+    required CableAllocationResourceSelectionEvidence evidence,
+  });
+  Future<bool> replaceTerminations({
+    required CableAllocation allocation,
+    required int expectedRevision,
+    required List<CableTerminationMapping> mappings,
+  });
+  Future<bool> activate({
+    required CableAllocation allocation,
+    required int expectedRevision,
+  });
+  Future<bool> release({
+    required CableAllocation allocation,
+    required int expectedRevision,
+  });
+  Future<bool> archive({
+    required CableAllocation allocation,
+    required int expectedRevision,
+  });
+  Future<bool> hasActiveCanonicalRun(String projectId, String cableId);
+  Future<int> consumingAllocationCount(String projectId, String cableId);
+}
+
+abstract interface class ElvAllocationWriteSession extends ElvWriteSession {
+  ElvAllocationWriteStore get allocations;
+  ElvReferenceReadStore get references;
 }
 
 abstract interface class ElvWriteUnitOfWork<S extends ElvWriteSession> {
