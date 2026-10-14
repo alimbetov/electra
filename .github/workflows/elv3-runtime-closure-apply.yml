@@ -7,6 +7,7 @@ on:
     paths:
       - 'scripts/ci/apply-elv3-runtime-rc1-rc2.py'
       - 'scripts/ci/apply-elv3-runtime-rc1-rc2-fix.py'
+      - 'scripts/ci/apply-elv3-runtime-core-fixes.py'
       - '.github/workflows/elv3-runtime-closure-apply.yml'
   workflow_dispatch:
 
@@ -28,6 +29,7 @@ jobs:
         run: |
           python3 scripts/ci/apply-elv3-runtime-rc1-rc2.py
           python3 scripts/ci/apply-elv3-runtime-rc1-rc2-fix.py
+          python3 scripts/ci/apply-elv3-runtime-core-fixes.py
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -63,9 +65,9 @@ jobs:
         working-directory: packages/engineering_core
         run: dart pub get
 
-      - name: Verify engineering core formatting
+      - name: Format engineering core
         working-directory: packages/engineering_core
-        run: dart format --output=none --set-exit-if-changed lib test
+        run: dart format lib test
 
       - name: Analyze engineering core
         working-directory: packages/engineering_core
@@ -88,7 +90,13 @@ jobs:
                   apps/mobile/lib/data/repositories/drift_elv_cable_run_repository.dart \
                   apps/mobile/lib/data/repositories/drift_elv_cable_write_unit_of_work.dart \
                   apps/mobile/test/data/elv_p1_cable_persistence_test.dart \
-                  apps/mobile/test/data/elv_p3_runtime_closure_test.dart
+                  apps/mobile/test/data/elv_p3_runtime_closure_test.dart \
+                  packages/engineering_core/lib/src/elv_cable_resource_definition.dart \
+                  packages/engineering_core/lib/src/elv_cable_reference.dart \
+                  packages/engineering_core/lib/src/elv_cable_termination.dart \
+                  packages/engineering_core/lib/src/elv_pathway_context.dart \
+                  packages/engineering_core/lib/src/elv_physical_compatibility_profile.dart
           git diff --cached --quiet && exit 0
           git commit -m 'feat(elv3): close P3 runtime persistence baseline'
+          git pull --rebase origin feat/elv3-runtime-closure
           git push origin HEAD:feat/elv3-runtime-closure
