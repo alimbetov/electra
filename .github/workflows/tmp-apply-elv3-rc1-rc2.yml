@@ -84,16 +84,29 @@ jobs:
         run: dart format lib test
 
       - name: Analyze mobile app
+        id: analyze
+        continue-on-error: true
         working-directory: apps/mobile
-        run: flutter analyze
+        shell: bash
+        run: flutter analyze > ../../analyze-diagnostics.txt 2>&1
+
+      - name: Upload analyzer diagnostics
+        if: steps.analyze.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: rc1-rc2-analyzer-diagnostics
+          path: analyze-diagnostics.txt
 
       - name: Test RC1-RC2
+        if: steps.analyze.outcome == 'success'
         working-directory: apps/mobile
         run: flutter test test/data/elv_p3_runtime_closure_test.dart
 
       - name: Commit resulting source
+        if: steps.analyze.outcome == 'success'
         shell: bash
         run: |
+          rm -f analyze-diagnostics.txt
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add apps/mobile/lib/data/database/app_database.dart \
@@ -105,3 +118,7 @@ jobs:
           git diff --cached --quiet && { echo 'No source changes produced'; exit 1; }
           git commit -m 'feat(elv3): implement RC1-RC2 P3 runtime closure'
           git push origin HEAD:feat/elv3-runtime-closure
+
+      - name: Fail diagnostic run when analyze failed
+        if: steps.analyze.outcome == 'failure'
+        run: exit 1
