@@ -1,275 +1,334 @@
-# Electra — ELV3 P0.7 Four-Discipline Walkthrough
+# Electra — ELV3 P0.7 Cross-Discipline Walkthrough
 
-Status: DESIGN VALIDATION / P0.7  
+Status: REMEDIATED DESIGN VALIDATION / P0-R10 INPUT  
 Branch: `feat/flutter-elv3-physical-routing-design`  
-Depends on: P0.1–P0.6  
-Implementation status: NOT STARTED
+Authoritative parent: `docs/product/elv3-p0-system-architecture-remediation.md`  
+Implementation status: HOLD UNTIL FINAL AUDIT
 
 ## 1. Purpose
 
-P0.7 validates the frozen ELV3 model end-to-end against CCTV, LAN, ACS and Fire without introducing discipline-specific route entities.
+Validate the remediated ELV3 architecture against materially different physical-installation scenarios before persistence implementation.
 
-Validation chain:
+Mandatory fixtures:
+
+1. CCTV;
+2. LAN / structured cabling;
+3. access control (ACS);
+4. fire alarm;
+5. fiber backbone genericity.
+
+Pass condition: all scenarios use the same common physical model without discipline-specific Cable/CableRun/Route persistence.
+
+## 2. Canonical model under test
 
 ```text
 EngineeringConnection
- -> CableAllocation
- -> Cable
- -> CableRun
- -> CableRoute
- -> RouteSegment
- -> PhysicalChannel
- -> compatibility result
+  -> CableAllocation
+  -> Cable
+  -> one active CableRun per design revision
+  -> ordered CableTraversal[]
+  -> reusable Route / geometry
+  -> optional PhysicalCarrier
+  -> PathwayContext
 ```
 
-## 2. CCTV scenario
+Resource realization:
 
-### Input
+```text
+CableAllocation
+  -> CableResourceSelection
+  -> CableTerminationMapping[]
+```
+
+Reference identity:
+
+```text
+ELV2 ReferenceSnapshot/project binding
+  -> exact CableDefinition/Profile edition
+```
+
+## 3. CCTV
+
+### Scenario
 
 ```text
 Camera ETH/PoE port
-Switch ETH/PoE port
-Cat6-like balanced copper CableDefinition
-wall + tray + wall geometry
-```
-
-### Canonical realization
-
-```text
-Connection CCTV-CONN-001
-  -> Allocation WHOLE_CABLE
-  -> Cable CCTV-C-001
-      -> Run camera-room
-      -> Run corridor
-      -> Run telecom-room
-```
-
-Each run owns exactly one route. Tray segments reference an existing PhysicalChannel; wall surface segments may have no channel.
-
-### Expected physical checks
-
-- route geometry valid;
-- channel exists and belongs to compatible spatial context;
-- cable outer diameter known for fill basis;
-- bend-radius basis resolvable;
-- environment/install facts resolvable;
-- no double allocation of cable.
-
-### Explicitly deferred
-
-- PoE class/power budget;
-- switch power budget;
-- Ethernet channel certification;
-- bandwidth/storage.
-
-### Invalid cases
-
-1. same cable already partially allocated -> WHOLE_CABLE rejected;
-2. tray segment references missing channel -> route invalid/unresolved;
-3. selected channel environment incompatible -> compatibility FORBIDDEN/WARNING according to profile;
-4. route crossing opening without declared transition -> geometry invalid.
-
-Result: PASS.
-
-## 3. LAN scenario
-
-### Input
-
-```text
-DataOutlet.REAR
-PatchPanel.REAR
-PatchPanel.REAR <-> PatchPanel.FRONT InternalConnectivity
-balanced copper permanent-link cable
-```
-
-### Canonical realization
-
-```text
-EngineeringConnection outlet-rear -> patch-panel-rear
+  -> EngineeringConnection
   -> CableAllocation WHOLE_CABLE
-  -> Cable LAN-C-001
-  -> N CableRuns
+  -> Cable CCTV-C-001
+  -> CableRun CR-001
+      -> room wall traversal
+      -> corridor tray traversal
+      -> telecom-room conduit traversal
+  -> PoE switch port
 ```
 
-`InternalConnectivity` between patch panel rear/front remains ELV1 and does not create another physical permanent-link cable.
+### Expected architecture
 
-### Invalid cases
+- one physical Cable;
+- one active CableRun for the cable/revision;
+- several spatial traversals, not several CableRuns;
+- shared corridor tray is reusable route/carrier infrastructure;
+- PoE budget remains ELV4/ELV5;
+- ELV3 may validate physical geometry/carrier facts only.
 
-- creating a phantom second cable from rear to front: FORBIDDEN by model;
-- directly binding Cable to patch-panel front port while connection ends at rear: invalid endpoint derivation;
-- reusing the same physical cable for a second independent whole-cable LAN connection: overlap.
+### Verdict
 
-Result: PASS.
+PASS.
 
-## 4. ACS multi-core scenario
+## 4. LAN permanent link
 
-### Input
-
-One 8-conductor physical cable supports multiple logical functions:
+### Scenario
 
 ```text
-Reader bus
-Door contact
-REX
-Lock control/power
+Outlet.REAR
+  -> EngineeringConnection
+  -> WHOLE_CABLE allocation
+  -> Cable LAN-C-001
+  -> CableRun
+  -> shared tray/conduit traversals
+  -> PatchPanel.REAR
+
+PatchPanel.REAR
+  <-> InternalConnectivity
+PatchPanel.FRONT
 ```
 
-### Canonical realization
+### Expected architecture
+
+- permanent-link cable remains one Cable;
+- rear/front patch-panel mapping does not create a Cable;
+- patch cord, if modeled, is a separate physical connection/cable scope;
+- LAN length/performance limits belong to later calculation/normative profiles;
+- shared tray geometry is not duplicated per cable as canonical infrastructure.
+
+### Verdict
+
+PASS.
+
+## 5. LAN/fiber backbone
+
+### Scenario
+
+```text
+Cable F-001 / 12 fibers
+
+Connection A -> allocation fibers 1,2
+Connection B -> allocation fibers 3,4
+```
+
+Both logical links share one physical Cable and one CableRun path.
+
+Termination mappings identify the exact fiber termination endpoints where modeled.
+
+Expected failure:
+
+```text
+Connection C -> fibers 2,5
+```
+
+must fail with resource overlap because fiber 2 is already consumed.
+
+### Verdict
+
+PASS.
+
+## 6. Access control multi-core cable
+
+### Scenario
+
+```text
+Cable ACS-C-001 / 8 conductors
+
+Reader        -> conductors 1,2
+Door contact  -> conductors 3,4
+REX           -> conductors 5,6
+Lock          -> conductors 7,8
+```
+
+All allocations reference the same physical Cable.
 
 ```text
 Cable ACS-C-001
-Definition: 8 individually addressable conductors
-
-Allocation A1: Reader        -> CONDUCTOR {1,2}
-Allocation A2: Door contact  -> CONDUCTOR {3,4}
-Allocation A3: REX           -> CONDUCTOR {5,6}
-Allocation A4: Lock          -> CONDUCTOR {7,8}
+  -> one CableRun
+      -> several route traversals
 ```
 
-All four logical connections share the same physical Cable and therefore the same run chain.
+### Critical invariants
 
-### Critical invariants proven
+- four allocations do not create four CableRuns;
+- carrier occupancy counts one physical Cable;
+- resource overlap is prohibited transactionally;
+- conductor termination mapping may bind each conductor to exact terminals/ports;
+- lock power calculation remains ELV4/ELV5.
 
-- `Connection != Cable`;
-- N logical connections -> one physical Cable is valid;
-- channel occupancy counts the cable once, not four allocations;
-- deletion of one allocation does not delete the Cable while other allocations/runs remain;
-- overlap must be transactionally prevented.
+### Verdict
 
-### Invalid cases
+PASS.
+
+## 7. Fire alarm loop
+
+### Logical topology
 
 ```text
-A1 -> {1,2}
-A2 -> {2,3}
+FACP.L1-OUT
+ -> DET-01
+ -> DET-02
+ -> MCP-01
+ -> ISO-01
+ -> FACP.L1-IN
 ```
 
-=> `RESOURCE_OVERLAP`.
+Loop identity belongs to `TopologyGroup` / ELV1 semantics.
 
-A WHOLE_CABLE allocation on ACS-C-001 while A1–A4 exist => forbidden.
+### Physical realization
 
-Result: PASS and decisive validation of CableAllocation layer.
+A common installation may use separate cable sections between successive devices. Each physical section is its own `Cable` because there are explicit device terminations between sections.
 
-## 5. Fire scenario
-
-### Input
+Example:
 
 ```text
-FACP / loop controller
-addressable devices
-ELV1 loop topology
-fire-performance CableDefinition
-route through rooms/corridor/riser
+Connection FACP -> DET-01
+  -> Cable FA-C-001
+
+Connection DET-01 -> DET-02
+  -> Cable FA-C-002
+
+Connection DET-02 -> MCP-01
+  -> Cable FA-C-003
 ```
 
-### Canonical realization
+Each Cable owns at most one active CableRun in the revision.
 
-ELV1 owns loop graph and device order. ELV3 maps logical connections to physical cable resources and routing:
+This is preferable to pretending one continuous cable passes through device terminations unless the actual installation definition proves that construction.
+
+### Carrier/normative behavior
+
+ELV3 can persist route/carrier/pathway facts and technical physical findings.
+
+Formal claims such as mandatory fire separation or jurisdiction compliance require ELV7 versioned rule packs.
+
+### Verdict
+
+PASS.
+
+## 8. Explicit multi-cable transition scenario
+
+A single EngineeringConnection may use more than one physical cable only with a modeled physical transition.
+
+Example:
 
 ```text
-ELV1 connections
- -> explicit allocation(s)
- -> Cable FIRE-C-001 / additional cables as required by topology
- -> CableRuns
- -> routes
- -> physical channels
+Port A
+ -> Connection C1
+ -> Cable A
+ -> explicit splice/termination S1
+ -> Cable B
+ -> Port B
 ```
 
-A loop does not make `CableRun` own a fire network ID.
+Without `S1`, two allocations with sequence numbers are insufficient and must be rejected as incomplete realization.
 
-### Physical compatibility cases
+### Verdict
 
-- cable routed in accepted channel/environment -> COMPATIBLE;
-- missing factual evidence -> UNRESOLVED;
-- incompatible containment/fire/environment facts under selected profile -> FORBIDDEN;
-- questionable but not prohibited condition -> WARNING.
+PASS WITH EXPLICIT TRANSITION REQUIREMENT.
 
-### Explicitly deferred
+## 9. Shared shaft/riser scenario
 
-- loop current;
+```text
+PathwayContext SHAFT S-01
+  -> tray T-01
+  -> conduit C-01
+
+Cable A CableRun traversal -> T-01
+Cable B CableRun traversal -> T-01
+Cable C CableRun traversal -> C-01
+```
+
+Shaft is spatial context; tray/conduit are carriers. No fake room ownership and no per-floor CableRun split.
+
+### Verdict
+
+PASS.
+
+## 10. Electrical coexistence scenario
+
+Legacy electrical route:
+
+```text
+CableRun.circuitId = EC-01
+```
+
+remains legacy routing evidence.
+
+No canonical Cable is created until explicit adoption proves physical cable identity.
+
+Canonical ELV cable routing coexists without fake electrical circuits.
+
+### Verdict
+
+PASS.
+
+## 11. Cross-stage boundary validation
+
+### ELV3 owns
+
+- Cable physical identity;
+- resource allocation/termination;
+- CableRun/path traversal;
+- carrier/pathway factual data;
+- physical length/fill/bend/continuity basis;
+- technical physical compatibility evidence.
+
+### ELV4/ELV5 own
+
+- PoE/power conversion;
 - voltage drop;
-- battery/autonomy;
-- legal/jurisdiction compliance claim.
+- optical loss;
+- LAN channel performance;
+- CCTV bandwidth/storage;
+- ACS power/autonomy;
+- fire current/autonomy and discipline calculations.
 
-Result: PASS.
+### ELV7 owns
 
-## 6. Cross-floor / riser scenario
+- jurisdiction-specific thresholds;
+- formal normative/legal compliance;
+- standards rule packs and exceptions.
 
-A single cable may cross:
+### ELV8 owns
 
-```text
-room 101
- -> corridor
- -> riser/shaft
- -> floor 2 corridor
- -> room 205
-```
+- manufacturer selection;
+- BOM/schedules/deliverables consuming frozen engineering truth.
 
-Canonical representation:
+Boundary verdict: PASS.
 
-```text
-Cable C-001
-  Run R1 room 101
-  Run R2 corridor floor 1
-  Run R3 riser context
-  Run R4 corridor floor 2
-  Run R5 room 205
-```
+## 12. Required invalid fixtures
 
-Run endpoints are linked through explicit handoff/continuity records. Cable identity remains C-001 throughout.
-
-No room-local fake PhysicalChannel is required for a shared riser.
-
-## 7. Sequential multi-cable logical realization
-
-The model permits one EngineeringConnection to have multiple ordered allocations only when explicitly required.
+The regression suite must eventually prove rejection or explicit unresolved state for:
 
 ```text
-Connection C1
-  A1 sequence=1 -> Cable C-A
-  A2 sequence=2 -> Cable C-B
+resource overlap
+WHOLE_CABLE + partial allocation
+multi-cable connection without transition
+CableRun split only because room/floor changed
+carrier in fake room for shaft/riser
+legacy circuit auto-converted to invented Cable
+ELV3 claiming jurisdiction compliance without ELV7 profile
+cross-project references
+stale design-revision update
 ```
 
-This does not by itself prove physical splice semantics. The transition must be represented by an accepted termination/splice boundary or later explicit object. Silent concatenation based only on allocation sequence is forbidden.
+## 13. P0.7 remediation acceptance
 
-## 8. Occupancy/fill proof
+- [x] CCTV PASS.
+- [x] LAN permanent link PASS.
+- [x] fiber resource sharing PASS.
+- [x] ACS multicore PASS.
+- [x] Fire loop/section semantics PASS.
+- [x] explicit multi-cable transition requirement PASS.
+- [x] shaft/carrier layering PASS.
+- [x] electrical coexistence PASS.
+- [x] ELV3/4/5/7/8 boundary PASS.
 
-For channel occupancy:
-
-```text
-occupied cables = distinct Cable identities whose RouteSegments use the channel
-```
-
-Not:
-
-```text
-count(CableAllocation)
-count(EngineeringConnection)
-```
-
-Therefore ACS-C-001 with four allocations contributes one cable cross-section to the channel.
-
-## 9. Restart acceptance fixtures
-
-Each discipline requires a close/reopen test proving exact reconstruction of:
-
-- logical connection reference;
-- allocation selector;
-- Cable identity/label/definition edition;
-- run ordering and route identity;
-- route geometry;
-- PhysicalChannel references and facts;
-- compatibility inputs/staleness markers.
-
-## 10. P0.7 acceptance gate
-
-| Scenario | Result |
-|---|---|
-| CCTV whole-cable + mixed wall/tray routing | PASS |
-| LAN permanent link + patch panel InternalConnectivity | PASS |
-| ACS multi-core multi-connection allocation | PASS |
-| Fire loop physical realization | PASS |
-| cross-floor/riser continuity | PASS |
-| distinct-cable channel occupancy | PASS |
-| restart identity/provenance | CONTRACT DEFINED; implementation deferred |
-
-No discipline requires a separate CCTV/LAN/ACS/Fire routing entity.
+P0.7 is synchronized with the remediation architecture and is ready as an input to P0-R10.
