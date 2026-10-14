@@ -1,0 +1,87 @@
+name: Temporary ELV3 Core Repair
+
+on:
+  push:
+    branches:
+      - feat/elv3-runtime-closure
+    paths:
+      - '.github/workflows/tmp-elv3-core-repair.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: feat/elv3-runtime-closure
+          fetch-depth: 0
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Apply constructor normalization fixes
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace(path, old, new):
+              p = Path(path)
+              text = p.read_text()
+              if old not in text:
+                  raise SystemExit(f'Expected pattern not found in {path}: {old!r}')
+              p.write_text(text.replace(old, new, 1))
+
+          ref = 'packages/engineering_core/lib/src/elv_cable_reference.dart'
+          replace(ref, '    required this.code,\n', '    required String code,\n')
+          replace(ref, '    required this.mediaCode,\n', '    required String mediaCode,\n')
+          replace(ref, '    this.categoryCode,\n', '    String? categoryCode,\n')
+          replace(ref, '    this.conductorMaterialCode,\n', '    String? conductorMaterialCode,\n')
+          replace(ref, '    this.shieldingCode,\n', '    String? shieldingCode,\n')
+          replace(ref, '    this.firePerformanceCode,\n', '    String? firePerformanceCode,\n')
+
+          term = 'packages/engineering_core/lib/src/elv_cable_termination.dart'
+          replace(term, '    required this.resourceIdentity,\n', '    required String resourceIdentity,\n')
+          replace(term, '    this.endpointTerminalRef,\n', '    String? endpointTerminalRef,\n')
+          replace(term, '    this.terminationRole,\n', '    String? terminationRole,\n')
+
+          pathway = 'packages/engineering_core/lib/src/elv_pathway_context.dart'
+          replace(pathway, '      var cursor = parentId;\n', '      String? cursor = parentId;\n')
+
+          profile = 'packages/engineering_core/lib/src/elv_physical_compatibility_profile.dart'
+          replace(
+              profile,
+              '''  AllowedEnvironmentClassRule({\n    required super.selector,\n    required this.dimension,\n    required Iterable<String> allowedCodes,\n  }) : allowedCodes = _codes(allowedCodes);\n''',
+              '''  AllowedEnvironmentClassRule({\n    required PhysicalCompatibilitySelector selector,\n    required this.dimension,\n    required Iterable<String> allowedCodes,\n  }) : allowedCodes = _codes(allowedCodes),\n       super(selector);\n''',
+          )
+          replace(profile, '    required this.code,\n', '    required String code,\n')
+          PY
+
+      - name: Format engineering core
+        working-directory: packages/engineering_core
+        run: dart format lib test
+
+      - name: Analyze engineering core
+        working-directory: packages/engineering_core
+        run: dart analyze
+
+      - name: Test engineering core
+        working-directory: packages/engineering_core
+        run: dart test
+
+      - name: Commit repaired core
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add packages/engineering_core/lib packages/engineering_core/test
+          git diff --cached --quiet && exit 0
+          git commit -m 'fix(elv3): repair normalized core constructors'
+          git pull --rebase origin feat/elv3-runtime-closure
+          git push origin HEAD:feat/elv3-runtime-closure
