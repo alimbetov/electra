@@ -1,0 +1,7 @@
+{
+  "elements": {},
+  "imports": [
+    "package:flutter/material.dart",
+    "package:electra_mobile/features/calculations/project_recalculation_screen.dart"
+  ]
+}

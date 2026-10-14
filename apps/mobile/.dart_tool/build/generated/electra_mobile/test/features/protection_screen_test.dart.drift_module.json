@@ -1,0 +1,12 @@
+{
+  "elements": {},
+  "imports": [
+    "package:electra_mobile/application/dependency_recalculation_repository.dart",
+    "package:electra_mobile/application/protection_repository.dart",
+    "package:electra_mobile/features/calculations/protection_screen.dart",
+    "package:engineering_core/engineering_core.dart",
+    "package:flutter/material.dart",
+    "package:flutter_test/flutter_test.dart",
+    "asset:electra_mobile/test/features/recalculation_workspace_test.dart"
+  ]
+}

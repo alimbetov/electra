@@ -1,0 +1,12 @@
+{
+  "elements": {},
+  "imports": [
+    "package:electra_mobile/application/engineering_placement_command.dart",
+    "package:electra_mobile/application/engineering_reference_repository.dart",
+    "package:electra_mobile/application/engineering_reference_revision_preview.dart",
+    "package:electra_mobile/application/engineering_system_repository.dart",
+    "package:electra_mobile/application/engineering_topology_repository.dart",
+    "package:engineering_core/engineering_core.dart",
+    "package:flutter_test/flutter_test.dart"
+  ]
+}

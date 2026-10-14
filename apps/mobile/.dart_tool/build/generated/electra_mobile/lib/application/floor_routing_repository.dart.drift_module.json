@@ -1,0 +1,8 @@
+{
+  "elements": {},
+  "imports": [
+    "package:engineering_core/engineering_core.dart",
+    "package:electra_mobile/domain/project_models.dart",
+    "package:electra_mobile/application/cable_routing_repository.dart"
+  ]
+}

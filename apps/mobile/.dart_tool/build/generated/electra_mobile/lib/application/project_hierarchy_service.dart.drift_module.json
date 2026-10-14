@@ -1,0 +1,8 @@
+{
+  "elements": {},
+  "imports": [
+    "package:electra_mobile/domain/project_models.dart",
+    "package:electra_mobile/application/id_generator.dart",
+    "package:electra_mobile/application/project_repositories.dart"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "elements": {},
+  "imports": [
+    "package:drift/drift.dart",
+    "package:electra_mobile/application/engineering_placement_command.dart",
+    "package:electra_mobile/data/database/app_database.dart",
+    "package:electra_mobile/data/repositories/drift_engineering_placement_repository.dart",
+    "package:engineering_core/engineering_core.dart"
+  ]
+}

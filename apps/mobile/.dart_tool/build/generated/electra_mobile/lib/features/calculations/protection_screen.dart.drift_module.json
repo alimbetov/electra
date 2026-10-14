@@ -1,0 +1,12 @@
+{
+  "elements": {},
+  "imports": [
+    "package:engineering_core/engineering_core.dart",
+    "package:flutter/material.dart",
+    "package:flutter_riverpod/flutter_riverpod.dart",
+    "package:electra_mobile/app/providers.dart",
+    "package:electra_mobile/application/protection_repository.dart",
+    "package:electra_mobile/features/calculations/project_recalculation_screen.dart",
+    "package:electra_mobile/features/calculations/manufacturer_screen.dart"
+  ]
+}

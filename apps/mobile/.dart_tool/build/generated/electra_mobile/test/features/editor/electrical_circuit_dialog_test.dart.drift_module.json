@@ -1,0 +1,9 @@
+{
+  "elements": {},
+  "imports": [
+    "package:electra_mobile/features/editor/electrical_circuits_screen.dart",
+    "package:engineering_core/engineering_core.dart",
+    "package:flutter/material.dart",
+    "package:flutter_test/flutter_test.dart"
+  ]
+}

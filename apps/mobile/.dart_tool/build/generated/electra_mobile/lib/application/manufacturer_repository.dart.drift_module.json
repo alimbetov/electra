@@ -1,0 +1,7 @@
+{
+  "elements": {},
+  "imports": [
+    "package:engineering_core/engineering_core.dart",
+    "package:electra_mobile/application/protection_repository.dart"
+  ]
+}

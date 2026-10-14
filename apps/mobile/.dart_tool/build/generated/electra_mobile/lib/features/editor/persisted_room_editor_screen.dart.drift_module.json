@@ -1,0 +1,11 @@
+{
+  "elements": {},
+  "imports": [
+    "package:flutter/material.dart",
+    "package:flutter_riverpod/flutter_riverpod.dart",
+    "package:electra_mobile/app/providers.dart",
+    "package:electra_mobile/application/component_placement_history.dart",
+    "package:electra_mobile/application/engineering_placement_repository.dart",
+    "package:electra_mobile/features/editor/room_editor_screen.dart"
+  ]
+}

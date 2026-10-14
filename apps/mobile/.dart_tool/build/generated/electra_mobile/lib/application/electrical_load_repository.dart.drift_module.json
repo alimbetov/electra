@@ -1,0 +1,6 @@
+{
+  "elements": {},
+  "imports": [
+    "package:engineering_core/engineering_core.dart"
+  ]
+}

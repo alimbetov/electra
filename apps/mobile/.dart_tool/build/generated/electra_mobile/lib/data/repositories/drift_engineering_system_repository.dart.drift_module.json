@@ -1,0 +1,11 @@
+{
+  "elements": {},
+  "imports": [
+    "package:electra_mobile/data/elv_deletion_guards.dart",
+    "package:drift/drift.dart",
+    "package:engineering_core/engineering_core.dart",
+    "package:electra_mobile/application/engineering_system_repository.dart",
+    "package:electra_mobile/data/database/app_database.dart",
+    "package:electra_mobile/data/repositories/drift_project_hierarchy_repository.dart"
+  ]
+}

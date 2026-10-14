@@ -1,0 +1,10 @@
+{
+  "elements": {},
+  "imports": [
+    "package:flutter/material.dart",
+    "package:flutter_riverpod/flutter_riverpod.dart",
+    "package:go_router/go_router.dart",
+    "package:electra_mobile/app/adaptive_layout.dart",
+    "package:electra_mobile/app/providers.dart"
+  ]
+}

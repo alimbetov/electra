@@ -1,0 +1,9 @@
+{
+  "elements": {},
+  "imports": [
+    "package:drift/native.dart",
+    "package:electra_mobile/data/database/app_database.dart",
+    "package:electra_mobile/data/repositories/drift_catalog_preferences_repository.dart",
+    "package:flutter_test/flutter_test.dart"
+  ]
+}

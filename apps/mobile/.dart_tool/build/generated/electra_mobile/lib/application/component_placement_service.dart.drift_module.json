@@ -1,0 +1,9 @@
+{
+  "elements": {},
+  "imports": [
+    "package:engineering_core/engineering_core.dart",
+    "package:electra_mobile/application/component_instance_repository.dart",
+    "package:electra_mobile/application/geometry_repository.dart",
+    "package:electra_mobile/application/id_generator.dart"
+  ]
+}

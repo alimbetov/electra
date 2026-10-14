@@ -1,0 +1,1 @@
+{"valid_import":true,"imports":[{"uri":"package:drift/drift.dart","transitive":false},{"uri":"package:electra_mobile/application/catalog_preferences_repository.dart","transitive":false},{"uri":"package:electra_mobile/data/database/app_database.dart","transitive":false}],"elements":[]}

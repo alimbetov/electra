@@ -1,0 +1,20 @@
+{
+  "elements": {},
+  "imports": [
+    "package:drift/drift.dart",
+    "package:drift/native.dart",
+    "package:electra_mobile/application/component_placement_history.dart",
+    "package:electra_mobile/application/engineering_placement_command.dart",
+    "package:electra_mobile/application/engineering_placement_repository.dart",
+    "package:electra_mobile/application/engineering_reference_repository.dart",
+    "package:electra_mobile/application/id_generator.dart",
+    "package:electra_mobile/data/database/app_database.dart",
+    "package:electra_mobile/data/repositories/drift_component_instance_repository.dart",
+    "package:electra_mobile/data/repositories/drift_engineering_placement_aggregate.dart",
+    "package:electra_mobile/data/repositories/drift_engineering_placement_repository.dart",
+    "package:electra_mobile/data/repositories/drift_engineering_topology_repository.dart",
+    "package:engineering_core/engineering_core.dart",
+    "package:flutter_test/flutter_test.dart",
+    "asset:electra_mobile/test/support/engineering_placement_fixture.dart"
+  ]
+}

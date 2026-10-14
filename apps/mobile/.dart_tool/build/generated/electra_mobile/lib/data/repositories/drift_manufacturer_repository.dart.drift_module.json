@@ -1,0 +1,12 @@
+{
+  "elements": {},
+  "imports": [
+    "package:drift/drift.dart",
+    "package:engineering_core/engineering_core.dart",
+    "package:electra_mobile/application/manufacturer_repository.dart",
+    "package:electra_mobile/data/database/app_database.dart",
+    "package:electra_mobile/data/repositories/drift_protection_repository.dart",
+    "package:electra_mobile/data/repositories/drift_dependency_recalculation_repository.dart",
+    "package:electra_mobile/data/repositories/drift_project_hierarchy_repository.dart"
+  ]
+}

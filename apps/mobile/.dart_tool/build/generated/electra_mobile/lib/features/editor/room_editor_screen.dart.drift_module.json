@@ -1,0 +1,24 @@
+{
+  "elements": {},
+  "imports": [
+    "package:electra_mobile/application/engineering_placement_command.dart",
+    "package:electra_mobile/application/id_generator.dart",
+    "package:flutter/material.dart",
+    "package:electra_mobile/application/geometry_repository.dart",
+    "package:electra_mobile/application/engineering_profile_palette.dart",
+    "package:electra_mobile/application/engineering_reference_repository.dart",
+    "package:electra_mobile/features/editor/engineering_profile_palette.dart",
+    "package:electra_mobile/features/editor/engineering_placement_preview.dart",
+    "package:electra_mobile/application/catalog_preferences_repository.dart",
+    "package:electra_mobile/domain/models.dart",
+    "package:electra_mobile/domain/project_models.dart",
+    "package:electra_mobile/domain/system_component_catalog.dart",
+    "package:electra_mobile/features/calculations/calculations_screen.dart",
+    "package:electra_mobile/features/reports/reports_screen.dart",
+    "package:electra_mobile/features/editor/component_catalog_sheet.dart",
+    "package:electra_mobile/features/editor/editor_interaction.dart",
+    "package:electra_mobile/features/editor/electrical_loads_screen.dart",
+    "package:electra_mobile/features/editor/electrical_circuits_screen.dart",
+    "package:electra_mobile/features/editor/room_routing_screen.dart"
+  ]
+}

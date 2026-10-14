@@ -1,0 +1,1 @@
+{"valid_import":true,"imports":[{"uri":"package:electra_mobile/application/geometry_repository.dart","transitive":false},{"uri":"package:electra_mobile/features/editor/editor_interaction.dart","transitive":false},{"uri":"package:engineering_core/engineering_core.dart","transitive":false},{"uri":"package:flutter_test/flutter_test.dart","transitive":false}],"elements":[]}

@@ -1,0 +1,15 @@
+{
+  "elements": {},
+  "imports": [
+    "package:electra_mobile/data/repositories/drift_engineering_placement_aggregate.dart",
+    "package:drift/drift.dart",
+    "package:engineering_core/engineering_core.dart",
+    "package:electra_mobile/application/engineering_placement_command.dart",
+    "package:electra_mobile/application/engineering_placement_repository.dart",
+    "package:electra_mobile/application/id_generator.dart",
+    "package:electra_mobile/domain/system_component_catalog.dart",
+    "package:electra_mobile/data/database/app_database.dart",
+    "package:electra_mobile/data/database/geometry_codec.dart",
+    "package:electra_mobile/data/repositories/drift_engineering_placement_membership_writer.dart"
+  ]
+}

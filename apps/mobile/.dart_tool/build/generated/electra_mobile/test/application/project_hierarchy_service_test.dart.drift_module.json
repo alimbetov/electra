@@ -1,0 +1,11 @@
+{
+  "elements": {},
+  "imports": [
+    "package:electra_mobile/application/id_generator.dart",
+    "package:electra_mobile/application/project_hierarchy_service.dart",
+    "package:electra_mobile/application/project_repositories.dart",
+    "package:electra_mobile/domain/project_models.dart",
+    "package:engineering_core/engineering_core.dart",
+    "package:flutter_test/flutter_test.dart"
+  ]
+}

@@ -56,12 +56,15 @@ final class DriftEngineeringReferenceAdoptionRepository
       final ledgerKey = command.ledgerOperationId;
       final existingOperation =
           await (database.select(database.engineeringPlacementOperations)
-            ..where((row) => row.operationId.equals(ledgerKey))).getSingleOrNull();
+            ..where(
+              (row) => row.operationId.equals(ledgerKey),
+            )).getSingleOrNull();
       if (existingOperation != null) {
         if (existingOperation.commandFingerprint != command.fingerprint ||
             existingOperation.fingerprintVersion !=
                 engineeringReferenceAdoptionFingerprintVersion ||
-            existingOperation.status != engineeringReferenceAdoptionCompletedStatus) {
+            existingOperation.status !=
+                engineeringReferenceAdoptionCompletedStatus) {
           throw const EngineeringReferenceAdoptionFailure(
             EngineeringReferenceAdoptionFailureCode.idempotencyConflict,
             'The adoption operation id is already reserved by different semantics.',
@@ -73,19 +76,21 @@ final class DriftEngineeringReferenceAdoptionRepository
       }
 
       final componentProject =
-          await database.customSelect(
-            '''SELECT ci.id FROM component_instances ci
+          await database
+              .customSelect(
+                '''SELECT ci.id FROM component_instances ci
 JOIN rooms r ON r.id = ci.room_id
 JOIN floors f ON f.id = r.floor_id
 WHERE ci.id = ? AND ci.deleted_at IS NULL
   AND r.deleted_at IS NULL AND f.deleted_at IS NULL
   AND f.project_id = ?''',
-            variables: [
-              Variable.withString(command.componentId),
-              Variable.withString(command.projectId),
-            ],
-            readsFrom: database.allTables.toSet(),
-          ).getSingleOrNull();
+                variables: [
+                  Variable.withString(command.componentId),
+                  Variable.withString(command.projectId),
+                ],
+                readsFrom: database.allTables.toSet(),
+              )
+              .getSingleOrNull();
       if (componentProject == null) {
         throw const EngineeringReferenceAdoptionFailure(
           EngineeringReferenceAdoptionFailureCode.currentBindingUnavailable,
@@ -248,7 +253,8 @@ WHERE ci.id = ? AND ci.deleted_at IS NULL
                 (row.fromPortId.isIn(boundIds) | row.toPortId.isIn(boundIds)),
           )).get();
 
-      final currentConnectionIds = connections.map((row) => row.id).toList()..sort();
+      final currentConnectionIds =
+          connections.map((row) => row.id).toList()..sort();
       final currentGroupIds = groups.map((row) => row.id).toList()..sort();
       if (!_sameStrings(currentConnectionIds, command.reviewedConnectionIds) ||
           !_sameStrings(currentGroupIds, command.reviewedTopologyGroupIds)) {
@@ -359,7 +365,8 @@ WHERE ci.id = ? AND ci.deleted_at IS NULL
           if (!preservedUpdated) {
             preservedUpdated = true;
             _inject(
-              EngineeringReferenceAdoptionFailurePoint.afterFirstPreservedPortUpdate,
+              EngineeringReferenceAdoptionFailurePoint
+                  .afterFirstPreservedPortUpdate,
             );
           }
         } else {
@@ -379,7 +386,9 @@ WHERE ci.id = ? AND ci.deleted_at IS NULL
               );
           if (!newInserted) {
             newInserted = true;
-            _inject(EngineeringReferenceAdoptionFailurePoint.afterNewPortInsert);
+            _inject(
+              EngineeringReferenceAdoptionFailurePoint.afterNewPortInsert,
+            );
           }
         }
       }
@@ -398,7 +407,9 @@ WHERE ci.id = ? AND ci.deleted_at IS NULL
         );
         if (!retired) {
           retired = true;
-          _inject(EngineeringReferenceAdoptionFailurePoint.afterOldPortRetirement);
+          _inject(
+            EngineeringReferenceAdoptionFailurePoint.afterOldPortRetirement,
+          );
         }
       }
 
@@ -416,9 +427,7 @@ WHERE ci.id = ? AND ci.deleted_at IS NULL
         ComponentReferenceBindingsCompanion(
           catalogId: Value(candidateCatalog.id),
           profileCode: Value(candidateProfile.code),
-          payloadJson: Value(
-            canonicalEngineeringJson(adoptedBinding.toMap()),
-          ),
+          payloadJson: Value(canonicalEngineeringJson(adoptedBinding.toMap())),
           revision: Value(bindingRow.revision + 1),
           updatedAt: Value(now),
           deletedAt: const Value(null),
@@ -450,7 +459,8 @@ WHERE ci.id = ? AND ci.deleted_at IS NULL
             EngineeringPlacementOperationsCompanion.insert(
               operationId: ledgerKey,
               projectId: command.projectId,
-              fingerprintVersion: engineeringReferenceAdoptionFingerprintVersion,
+              fingerprintVersion:
+                  engineeringReferenceAdoptionFingerprintVersion,
               commandFingerprint: command.fingerprint,
               status: engineeringReferenceAdoptionCompletedStatus,
               componentId: command.componentId,
@@ -519,7 +529,9 @@ WHERE ci.id = ? AND ci.deleted_at IS NULL
   }) {
     final graph = EngineeringTopologyGraph(
       projectId: snapshot.systems.project?.id ?? '',
-      componentIds: snapshot.systems.components.map((component) => component.id),
+      componentIds: snapshot.systems.components.map(
+        (component) => component.id,
+      ),
       systems: snapshot.systems.systems,
       families: snapshot.systems.families,
       memberships: snapshot.systems.memberships,
@@ -572,9 +584,9 @@ WHERE ci.id = ? AND ci.deleted_at IS NULL
     for (final group in snapshot.groups.where(
       (item) => relevantGroupIds.contains(item.id),
     )) {
-      final findings = graph.groupFindings(group).where(
-        (finding) => !finding.draft,
-      );
+      final findings = graph
+          .groupFindings(group)
+          .where((finding) => !finding.draft);
       if (findings.isNotEmpty) {
         throw EngineeringReferenceAdoptionFailure(
           EngineeringReferenceAdoptionFailureCode.graphIncompatible,
@@ -609,10 +621,12 @@ WHERE ci.id = ? AND ci.deleted_at IS NULL
     if (durableBinding.catalogId != command.candidateCatalogId ||
         durableBinding.catalogVersion != command.candidateCatalogVersion ||
         durableBinding.profileCode != command.profileCode ||
-        durableBinding.portIds.toSet().length != durableBinding.portIds.length ||
+        durableBinding.portIds.toSet().length !=
+            durableBinding.portIds.length ||
         !_sameSets(durableBinding.portIds.toSet(), expectedIds) ||
         !_sameSets(durableIds, expectedIds) ||
-        activePorts.map((row) => row.code).toSet().length != activePorts.length) {
+        activePorts.map((row) => row.code).toSet().length !=
+            activePorts.length) {
       throw const EngineeringReferenceAdoptionFailure(
         EngineeringReferenceAdoptionFailureCode.transactionFailed,
         'Adoption aggregate postconditions failed.',
