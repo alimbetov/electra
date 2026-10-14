@@ -33,6 +33,27 @@ final class CableTerminationMapping {
 
   String get uniquenessKey =>
       '${allocationId.trim()}|$resourceIdentity|${end.name.toUpperCase()}';
+
+  Map<String, Object?> toMap() => {
+        'id': id,
+        'allocationId': allocationId,
+        'resourceIdentity': resourceIdentity,
+        'end': end.name,
+        'endpointPortId': endpointPortId,
+        'endpointTerminalRef': endpointTerminalRef,
+        'terminationRole': terminationRole,
+      };
+
+  factory CableTerminationMapping.fromMap(Map<String, dynamic> map) =>
+      CableTerminationMapping(
+        id: map['id'] as String,
+        allocationId: map['allocationId'] as String,
+        resourceIdentity: map['resourceIdentity'] as String,
+        end: CableTerminationEnd.values.byName(map['end'] as String),
+        endpointPortId: map['endpointPortId'] as String,
+        endpointTerminalRef: map['endpointTerminalRef'] as String?,
+        terminationRole: map['terminationRole'] as String?,
+      );
 }
 
 List<String> validateTerminationSet(
