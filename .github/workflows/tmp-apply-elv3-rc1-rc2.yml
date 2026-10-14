@@ -30,72 +30,68 @@ jobs:
         working-directory: apps/mobile
         run: flutter pub get --enforce-lockfile
 
-      - name: Adapt current Drift registry for immutable patch
+      - name: Adapt current Drift formatting for immutable patch
         shell: bash
         run: |
           python3 - <<'PY'
           from pathlib import Path
           path = Path('apps/mobile/lib/data/database/app_database.dart')
           text = path.read_text()
-          current = '''    ElvCables,
+
+          registry = '''    ElvCables,
               CableAllocations,
               CableAllocationResourceSelections,
               CableResourceClaims,
               CableTerminationMappings,
               CommandExecutionRecords,
           '''.replace('\n      ', '\n')
-          compact = '''    ElvCables, CableAllocations, CableAllocationResourceSelections,
+          compact_registry = '''    ElvCables, CableAllocations, CableAllocationResourceSelections,
               CableResourceClaims, CableTerminationMappings, CommandExecutionRecords,
           '''.replace('\n      ', '\n')
-          if text.count(current) != 1:
-              raise SystemExit(f'expected current ELV registry once, got {text.count(current)}')
-          path.write_text(text.replace(current, compact, 1))
+          if text.count(registry) != 1:
+              raise SystemExit(f'expected current ELV registry once, got {text.count(registry)}')
+          text = text.replace(registry, compact_registry, 1)
+
+          formatted_index = '''    await customStatement(
+              'CREATE INDEX IF NOT EXISTS idx_elv_termination_allocation ON cable_termination_mappings(allocation_id)',
+            );
+          '''.replace('\n      ', '\n')
+          compact_index = "    await customStatement('CREATE INDEX IF NOT EXISTS idx_elv_termination_allocation ON cable_termination_mappings(allocation_id)');\n"
+          if text.count(formatted_index) != 1:
+              raise SystemExit(f'expected formatted termination index once, got {text.count(formatted_index)}')
+          text = text.replace(formatted_index, compact_index, 1)
+          path.write_text(text)
           PY
 
       - name: Apply immutable RC1-RC2 patch
-        id: patch
-        continue-on-error: true
         shell: bash
         run: |
           mkdir -p scripts/ci
           curl -fsSL \
             https://raw.githubusercontent.com/alimbetov/electra/e8db15e64c8e53cc23e5e6567ecb37ffff414c87/scripts/ci/apply-elv3-runtime-rc1-rc2.py \
             -o scripts/ci/apply-elv3-runtime-rc1-rc2.py
-          python3 scripts/ci/apply-elv3-runtime-rc1-rc2.py > patch-diagnostics.txt 2>&1
+          python3 scripts/ci/apply-elv3-runtime-rc1-rc2.py
           rm scripts/ci/apply-elv3-runtime-rc1-rc2.py
 
-      - name: Upload patch diagnostics
-        if: steps.patch.outcome == 'failure'
-        uses: actions/upload-artifact@v4
-        with:
-          name: rc1-rc2-patch-diagnostics-v2
-          path: patch-diagnostics.txt
-
       - name: Generate Drift code
-        if: steps.patch.outcome == 'success'
         working-directory: apps/mobile
         run: dart run build_runner build --delete-conflicting-outputs
 
       - name: Format mobile source
-        if: steps.patch.outcome == 'success'
         working-directory: apps/mobile
         run: dart format lib test
 
       - name: Analyze mobile app
-        if: steps.patch.outcome == 'success'
         working-directory: apps/mobile
         run: flutter analyze
 
       - name: Test RC1-RC2
-        if: steps.patch.outcome == 'success'
         working-directory: apps/mobile
         run: flutter test test/data/elv_p3_runtime_closure_test.dart
 
       - name: Commit resulting source
-        if: steps.patch.outcome == 'success'
         shell: bash
         run: |
-          rm -f patch-diagnostics.txt
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add apps/mobile/lib/data/database/app_database.dart \
@@ -107,7 +103,3 @@ jobs:
           git diff --cached --quiet && { echo 'No source changes produced'; exit 1; }
           git commit -m 'feat(elv3): implement RC1-RC2 P3 runtime closure'
           git push origin HEAD:feat/elv3-runtime-closure
-
-      - name: Fail diagnostic run when patch failed
-        if: steps.patch.outcome == 'failure'
-        run: exit 1
