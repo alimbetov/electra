@@ -55,19 +55,7 @@ final class DefaultElvCableCommandService implements ElvCableCommandService {
           );
         }
         if (await session.cables.findCable(command.projectId, command.cableId) != null) {
-          return _reject(
-            session.commandLedger,
-            commandId: command.commandId,
-            projectId: command.projectId,
-            commandType: 'CREATE_CABLE',
-            schema: 'electra.command.create-cable.v1',
-            payload: command.normalizedPayload(),
-            failure: const ElvFailure(
-              code: 'ELV_CABLE_ID_CONFLICT',
-              category: ElvFailureCategory.validation,
-              entityType: 'Cable',
-            ),
-          );
+          return _idConflict(session.commandLedger, command);
         }
         CableDefinition definition;
         try {
@@ -133,17 +121,15 @@ final class DefaultElvCableCommandService implements ElvCableCommandService {
           command.projectId,
           cable.normalizedLabel,
         )) {
-          return _labelConflict(
-            session.commandLedger,
-            command,
-          );
+          return _labelConflict(session.commandLedger, command);
         }
         final inserted = await session.cables.insertCable(cable);
         if (!inserted) {
-          return _labelConflict(
-            session.commandLedger,
-            command,
-          );
+          final sameId =
+              await session.cables.findCable(command.projectId, command.cableId);
+          return sameId == null
+              ? _labelConflict(session.commandLedger, command)
+              : _idConflict(session.commandLedger, command);
         }
         await _recordSuccess(
           session.commandLedger,
@@ -422,6 +408,23 @@ final class DefaultElvCableCommandService implements ElvCableCommandService {
       _failureFromMap(map['failure'] as Map<String, dynamic>),
     );
   }
+
+  Future<ElvCommandFailureResult<Cable>> _idConflict(
+    ElvCommandLedgerStore ledger,
+    CreateCableCommand command,
+  ) => _reject(
+    ledger,
+    commandId: command.commandId,
+    projectId: command.projectId,
+    commandType: 'CREATE_CABLE',
+    schema: 'electra.command.create-cable.v1',
+    payload: command.normalizedPayload(),
+    failure: const ElvFailure(
+      code: 'ELV_CABLE_ID_CONFLICT',
+      category: ElvFailureCategory.validation,
+      entityType: 'Cable',
+    ),
+  );
 
   Future<ElvCommandFailureResult<Cable>> _labelConflict(
     ElvCommandLedgerStore ledger,
