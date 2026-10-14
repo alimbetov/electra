@@ -4,11 +4,11 @@ final class CableTerminationMapping {
   CableTerminationMapping({
     required this.id,
     required this.allocationId,
-    required this.resourceIdentity,
+    required String resourceIdentity,
     required this.end,
     required this.endpointPortId,
-    this.endpointTerminalRef,
-    this.terminationRole,
+    String? endpointTerminalRef,
+    String? terminationRole,
   })  : resourceIdentity = resourceIdentity.trim().toUpperCase(),
         endpointTerminalRef = _normalizeNullable(endpointTerminalRef),
         terminationRole = _normalizeNullable(terminationRole);

@@ -2,7 +2,6 @@ import 'dart:math' as math;
 
 import 'elv_cable_reference.dart';
 import 'elv_cable_run.dart';
-import 'elv_physical_carrier.dart';
 
 abstract final class ElvPhysicalProcessCodes {
   static const installedLength = 'ELV-ROUTE-01';

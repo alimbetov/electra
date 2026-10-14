@@ -55,15 +55,15 @@ final class CableDefinitionRef {
 
 final class CableDefinition {
   CableDefinition({
-    required this.code,
+    required String code,
     required this.label,
-    required this.mediaCode,
+    required String mediaCode,
     required Iterable<CableResourceDefinition> resourceDefinitions,
     this.deprecated = false,
-    this.categoryCode,
-    this.conductorMaterialCode,
-    this.shieldingCode,
-    this.firePerformanceCode,
+    String? categoryCode,
+    String? conductorMaterialCode,
+    String? shieldingCode,
+    String? firePerformanceCode,
     Iterable<String> environmentClassCodes = const [],
     Iterable<String> installationClassCodes = const [],
     Iterable<String> technicalClassCodes = const [],
@@ -298,13 +298,17 @@ bool _hasCycle(Map<String, CableResourceDefinition> byId) {
 
 Set<String> _atomicDescendants(
   String id,
-  Map<String, CableResourceDefinition> byId,
-) {
+  Map<String, CableResourceDefinition> byId, [
+  Set<String>? visiting,
+]) {
   final resource = byId[id];
   if (resource == null) return const {};
+  final path = visiting ?? <String>{};
+  if (!path.add(id)) return const {};
   if (resource.atomic) return {resource.identity};
-  return {
-    for (final child in resource.childResourceIds)
-      ..._atomicDescendants(child, byId),
-  };
+  final result = <String>{};
+  for (final child in resource.childResourceIds) {
+    result.addAll(_atomicDescendants(child, byId, {...path}));
+  }
+  return result;
 }

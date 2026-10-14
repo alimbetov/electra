@@ -113,7 +113,7 @@ abstract final class PathwayContextValidator {
         }
       }
       final visited = <String>{context.id};
-      var cursor = parentId;
+      String? cursor = parentId;
       while (cursor != null) {
         if (!visited.add(cursor)) {
           errors.add('Pathway context hierarchy must be acyclic.');

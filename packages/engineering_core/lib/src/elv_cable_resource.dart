@@ -177,12 +177,8 @@ abstract final class CableResourceResolver {
     );
   }
 
-  static Set<String> _wholeCableClaims(CableDefinition definition) => {
-        '__WHOLE_CABLE__',
-        for (final resource in definition.resourceDefinitions)
-          if (resource.atomic && resource.kind != CableResourceKind.wholeCable)
-            resource.identity,
-      };
+  static Set<String> _wholeCableClaims(CableDefinition definition) =>
+      const {'__WHOLE_CABLE__'};
 
   static Set<String> _resolveAtomicDescendants(
     CableResourceDefinition resource,
