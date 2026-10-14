@@ -2,12 +2,7 @@ import 'package:engineering_core/engineering_core.dart';
 
 import 'engineering_reference_repository.dart';
 
-enum EngineeringPortMigrationAction {
-  preserve,
-  add,
-  retire,
-  explicitRemap,
-}
+enum EngineeringPortMigrationAction { preserve, add, retire, explicitRemap }
 
 class EngineeringPortMigrationStep {
   const EngineeringPortMigrationStep({
@@ -100,9 +95,12 @@ EngineeringReferenceAdoptionPlan planEngineeringReferenceAdoption({
   }
 
   final boundIds = binding.portIds.toSet();
-  final activePorts = currentPorts.where((port) => boundIds.contains(port.id)).toList();
+  final activePorts =
+      currentPorts.where((port) => boundIds.contains(port.id)).toList();
   if (activePorts.length != boundIds.length) {
-    blockers.add('Current active ports do not match the frozen binding port set.');
+    blockers.add(
+      'Current active ports do not match the frozen binding port set.',
+    );
   }
   if (activePorts.map((port) => port.id).toSet().length != activePorts.length) {
     blockers.add('Current bound port identities are not unique.');
@@ -132,10 +130,14 @@ EngineeringReferenceAdoptionPlan planEngineeringReferenceAdoption({
 
   for (final entry in normalizedMappings.entries) {
     if (!oldByCode.containsKey(entry.key)) {
-      blockers.add('Explicit mapping references unknown old port ${entry.key}.');
+      blockers.add(
+        'Explicit mapping references unknown old port ${entry.key}.',
+      );
     }
     if (!candidateTemplates.containsKey(entry.value)) {
-      blockers.add('Explicit mapping references unknown candidate port ${entry.value}.');
+      blockers.add(
+        'Explicit mapping references unknown candidate port ${entry.value}.',
+      );
     }
     if (entry.key == entry.value) {
       blockers.add(
@@ -147,7 +149,8 @@ EngineeringReferenceAdoptionPlan planEngineeringReferenceAdoption({
   final mappedCandidateCodes = normalizedMappings.values.toSet();
   final steps = <EngineeringPortMigrationStep>[];
 
-  for (final entry in oldByCode.entries.toList()..sort((a, b) => a.key.compareTo(b.key))) {
+  for (final entry
+      in oldByCode.entries.toList()..sort((a, b) => a.key.compareTo(b.key))) {
     final oldCode = entry.key;
     final currentPort = entry.value;
     final hasDependencies = dependentPortIds.contains(currentPort.id);
@@ -221,8 +224,10 @@ EngineeringReferenceAdoptionPlan planEngineeringReferenceAdoption({
   }
 
   steps.sort((a, b) {
-    final left = '${a.currentCode ?? ''}|${a.candidateCode ?? ''}|${a.action.name}';
-    final right = '${b.currentCode ?? ''}|${b.candidateCode ?? ''}|${b.action.name}';
+    final left =
+        '${a.currentCode ?? ''}|${a.candidateCode ?? ''}|${a.action.name}';
+    final right =
+        '${b.currentCode ?? ''}|${b.candidateCode ?? ''}|${b.action.name}';
     return left.compareTo(right);
   });
 
@@ -250,8 +255,10 @@ bool _connectionRelevantPortChange(
     current.connector != candidateTemplate.connector ||
     current.protocol?.id != candidateTemplate.protocol?.id ||
     current.protocol?.version != candidateTemplate.protocol?.version ||
-    current.interfaceProvenance?.id != candidateTemplate.interfaceProvenance?.id ||
-    current.interfaceProvenance?.version != candidateTemplate.interfaceProvenance?.version ||
+    current.interfaceProvenance?.id !=
+        candidateTemplate.interfaceProvenance?.id ||
+    current.interfaceProvenance?.version !=
+        candidateTemplate.interfaceProvenance?.version ||
     current.voltage?.currentKind != candidateTemplate.voltage?.currentKind ||
     current.voltage?.minimumV != candidateTemplate.voltage?.minimumV ||
     current.voltage?.maximumV != candidateTemplate.voltage?.maximumV ||

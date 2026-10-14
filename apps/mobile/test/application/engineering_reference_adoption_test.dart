@@ -29,13 +29,15 @@ ComponentReferenceBinding bindingFor(
 
 List<EngineeringPort> currentPorts(EngineeringReferenceCatalog catalog) {
   var index = 0;
-  return catalog.profile('CAMERA').instantiate(
-    componentId: 'camera-1',
-    catalogId: catalog.id,
-    version: catalog.version,
-    vocabulary: catalog.vocabulary,
-    nextId: () => 'port-${++index}',
-  );
+  return catalog
+      .profile('CAMERA')
+      .instantiate(
+        componentId: 'camera-1',
+        catalogId: catalog.id,
+        version: catalog.version,
+        vocabulary: catalog.vocabulary,
+        nextId: () => 'port-${++index}',
+      );
 }
 
 EngineeringReferenceCatalog candidate(
@@ -48,7 +50,10 @@ EngineeringReferenceCatalog candidate(
   'profiles': [
     for (final profile in previous.profiles)
       if (profile.code == 'CAMERA')
-        {...profile.toMap(), 'portTemplates': templates.map((port) => port.toMap()).toList()}
+        {
+          ...profile.toMap(),
+          'portTemplates': templates.map((port) => port.toMap()).toList(),
+        }
       else
         profile.toMap(),
   ],
@@ -58,7 +63,8 @@ void main() {
   test('template reorder preserves exact existing port identity by code', () {
     final previous = fixture();
     final ports = currentPorts(previous);
-    final templates = previous.profile('CAMERA').portTemplates.reversed.toList();
+    final templates =
+        previous.profile('CAMERA').portTemplates.reversed.toList();
     final plan = planEngineeringReferenceAdoption(
       binding: bindingFor(previous, ports),
       currentPorts: ports,
@@ -67,11 +73,15 @@ void main() {
 
     expect(plan.canApply, isTrue);
     expect(
-      plan.steps.where((step) => step.action == EngineeringPortMigrationAction.preserve),
+      plan.steps.where(
+        (step) => step.action == EngineeringPortMigrationAction.preserve,
+      ),
       hasLength(ports.length),
     );
     expect(
-      plan.steps.where((step) => step.action != EngineeringPortMigrationAction.preserve),
+      plan.steps.where(
+        (step) => step.action != EngineeringPortMigrationAction.preserve,
+      ),
       isEmpty,
     );
     for (final step in plan.steps) {
@@ -105,11 +115,16 @@ void main() {
 
     expect(plan.canApply, isTrue);
     expect(
-      plan.steps.where((step) => step.action == EngineeringPortMigrationAction.add).single.candidateCode,
+      plan.steps
+          .where((step) => step.action == EngineeringPortMigrationAction.add)
+          .single
+          .candidateCode,
       'AUX',
     );
     expect(
-      plan.steps.where((step) => step.action == EngineeringPortMigrationAction.preserve),
+      plan.steps.where(
+        (step) => step.action == EngineeringPortMigrationAction.preserve,
+      ),
       hasLength(ports.length),
     );
   });
@@ -118,12 +133,16 @@ void main() {
     final previous = fixture();
     final ports = currentPorts(previous);
     final removed = ports.first;
-    final keepCodes = ports.skip(1).map((port) => port.code.toUpperCase()).toSet();
-    final templates = previous
-        .profile('CAMERA')
-        .portTemplates
-        .where((template) => keepCodes.contains(template.code.toUpperCase()))
-        .toList();
+    final keepCodes =
+        ports.skip(1).map((port) => port.code.toUpperCase()).toSet();
+    final templates =
+        previous
+            .profile('CAMERA')
+            .portTemplates
+            .where(
+              (template) => keepCodes.contains(template.code.toUpperCase()),
+            )
+            .toList();
 
     final plan = planEngineeringReferenceAdoption(
       binding: bindingFor(previous, ports),
@@ -177,33 +196,38 @@ void main() {
     expect(step.candidateCode, 'RENAMED');
   });
 
-  test('connected same-code technical change requires commit-time revalidation', () {
-    final previous = fixture();
-    final ports = currentPorts(previous);
-    final template = previous.profile('CAMERA').portTemplates.first;
-    final changed = EngineeringPort.fromMap({
-      ...template.toMap(),
-      'capacity': template.capacity + 1,
-    });
-    final templates = [
-      changed,
-      ...previous.profile('CAMERA').portTemplates.skip(1),
-    ];
+  test(
+    'connected same-code technical change requires commit-time revalidation',
+    () {
+      final previous = fixture();
+      final ports = currentPorts(previous);
+      final template = previous.profile('CAMERA').portTemplates.first;
+      final changed = EngineeringPort.fromMap({
+        ...template.toMap(),
+        'capacity': template.capacity + 1,
+      });
+      final templates = [
+        changed,
+        ...previous.profile('CAMERA').portTemplates.skip(1),
+      ];
 
-    final plan = planEngineeringReferenceAdoption(
-      binding: bindingFor(previous, ports),
-      currentPorts: ports,
-      candidateCatalog: candidate(previous, templates),
-      dependentPortIds: {ports.first.id},
-    );
+      final plan = planEngineeringReferenceAdoption(
+        binding: bindingFor(previous, ports),
+        currentPorts: ports,
+        candidateCatalog: candidate(previous, templates),
+        dependentPortIds: {ports.first.id},
+      );
 
-    expect(plan.canApply, isTrue);
-    expect(plan.requiresConnectionRevalidation, isTrue);
-    expect(
-      plan.steps.singleWhere((step) => step.currentPortId == ports.first.id).requiresConnectionRevalidation,
-      isTrue,
-    );
-  });
+      expect(plan.canApply, isTrue);
+      expect(plan.requiresConnectionRevalidation, isTrue);
+      expect(
+        plan.steps
+            .singleWhere((step) => step.currentPortId == ports.first.id)
+            .requiresConnectionRevalidation,
+        isTrue,
+      );
+    },
+  );
 
   test('invalid mapping and missing candidate profile fail closed', () {
     final previous = fixture();
@@ -212,10 +236,11 @@ void main() {
       ...previous.toMap(),
       'id': '${previous.id}-v2',
       'version': '2',
-      'profiles': previous.profiles
-          .where((profile) => profile.code != 'CAMERA')
-          .map((profile) => profile.toMap())
-          .toList(),
+      'profiles':
+          previous.profiles
+              .where((profile) => profile.code != 'CAMERA')
+              .map((profile) => profile.toMap())
+              .toList(),
     });
 
     final plan = planEngineeringReferenceAdoption(
