@@ -39,5 +39,9 @@ export 'src/engineering_placement_compatibility.dart';
 export 'src/engineering_reference_catalog.dart';
 export 'src/engineering_reference_constraints.dart';
 export 'src/engineering_reference_revision.dart';
-
 export 'src/engineering_reference_vocabulary.dart';
+
+export 'src/engineering_hash.dart';
+export 'src/elv_cable_resource_definition.dart';
+export 'src/elv_cable_reference.dart';
+export 'src/elv_cable.dart';
