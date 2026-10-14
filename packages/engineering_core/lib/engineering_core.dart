@@ -58,3 +58,5 @@ export 'src/elv_physical_carrier.dart';
 export 'src/elv_physical_compatibility_profile.dart';
 export 'src/elv_physical_profile_set.dart';
 export 'src/elv_physical_compatibility.dart';
+export 'src/elv_physical_calculations.dart';
+export 'src/elv_physical_evidence.dart';
