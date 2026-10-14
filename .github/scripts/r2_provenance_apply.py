@@ -115,13 +115,16 @@ helper = """  void _assertExactSameEditionAggregate({
     required EngineeringReferenceCatalog candidateCatalog,
     required ComponentEngineeringProfile candidateProfile,
   }) {
+    final currentPortIds = currentPorts.map((row) => row.id).toSet();
+    final bindingPortIds = binding.portIds.toSet();
     if (bindingRow.catalogId != candidateCatalog.id ||
         bindingRow.profileCode != binding.profileCode ||
         canonicalEngineeringJson(binding.profile.toMap()) !=
             canonicalEngineeringJson(candidateProfile.toMap()) ||
-        binding.portIds.toSet().length != binding.portIds.length ||
+        bindingPortIds.length != binding.portIds.length ||
         currentPorts.length != binding.portIds.length ||
-        currentPorts.map((row) => row.id).toSet() != binding.portIds.toSet()) {
+        currentPortIds.length != bindingPortIds.length ||
+        !currentPortIds.containsAll(bindingPortIds)) {
       throw const EngineeringReferenceAdoptionFailure(
         EngineeringReferenceAdoptionFailureCode.currentBindingUnavailable,
         'Same-edition no-op requires an exact current frozen aggregate.',
