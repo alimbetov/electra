@@ -98,7 +98,7 @@ void main() {
           )
           .map((item) => item.toMap())
           .toList(),
-      'internal': topology.internalLinks
+      'internalLinks': topology.internalLinks
           .where(
             (item) => binding.portIds.contains(item.fromPortId) ||
                 binding.portIds.contains(item.toPortId),
