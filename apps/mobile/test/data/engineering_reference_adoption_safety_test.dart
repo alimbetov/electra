@@ -55,7 +55,7 @@ void main() {
       final source = p6.sourceCatalog();
       final connectionProfile = source
           .connectionProfiles('project-1')
-          .singleWhere((profile) => profile.identity.code == 'CCTV-POE');
+          .singleWhere((profile) => profile.semanticCode == 'CCTV-POE');
       final topology = DriftEngineeringTopologyRepository(
         db,
         originDeviceId: 'p6-safety-topology',
@@ -101,9 +101,8 @@ void main() {
       );
       expect(await p6.adoptionState(db, cameraResult.componentId), before);
       final connection =
-          await (db.select(db.engineeringPortConnections)..where(
-            (row) => row.id.equals('cctv-live-link'),
-          )).getSingle();
+          await (db.select(db.engineeringPortConnections)
+            ..where((row) => row.id.equals('cctv-live-link'))).getSingle();
       expect(
         EngineeringConnection.fromMap(
           jsonDecode(connection.payloadJson) as Map<String, dynamic>,
