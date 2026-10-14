@@ -1,0 +1,96 @@
+name: Temporary ELV3 RC4-RC7 Closure
+
+on:
+  push:
+    branches:
+      - feat/elv3-runtime-closure
+    paths:
+      - '.github/workflows/tmp-elv3-rc4-rc7.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  close:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/elv3-runtime-closure
+          fetch-depth: 0
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Wait for verified RC3 P4 source
+        shell: bash
+        run: |
+          for attempt in $(seq 1 60); do
+            git fetch origin feat/elv3-runtime-closure
+            if git show origin/feat/elv3-runtime-closure:apps/mobile/lib/data/database/app_database.dart | grep -q 'schemaVersion => 21'; then
+              git reset --hard origin/feat/elv3-runtime-closure
+              echo 'P4/schema21 source is available.'
+              exit 0
+            fi
+            echo "P4 source not published yet (attempt $attempt/60)."
+            sleep 10
+          done
+          echo 'P4 source did not become available.' >&2
+          exit 1
+
+      - name: Apply RC4-RC7 patches
+        shell: bash
+        run: |
+          python3 scripts/ci/apply-elv3-runtime-rc4.py
+          sed -i "s#import 'package:drift/native.dart';#import 'package:drift/drift.dart' show Value;\nimport 'package:drift/native.dart';#" apps/mobile/test/data/elv_p5_runtime_closure_test.dart
+          python3 scripts/ci/apply-elv3-runtime-rc5.py
+          python3 scripts/ci/apply-elv3-runtime-rc6.py
+          python3 scripts/ci/apply-elv3-runtime-rc7.py
+
+      - name: Install dependencies
+        working-directory: apps/mobile
+        run: flutter pub get --enforce-lockfile
+
+      - name: Generate Drift code
+        working-directory: apps/mobile
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Format
+        working-directory: apps/mobile
+        run: dart format lib test
+
+      - name: Analyze
+        working-directory: apps/mobile
+        run: flutter analyze
+
+      - name: Test RC4-RC7 runtime closure
+        working-directory: apps/mobile
+        run: |
+          flutter test --reporter expanded \
+            test/data/elv_p5_runtime_closure_test.dart \
+            test/data/elv_p6_runtime_closure_test.dart \
+            test/data/elv_p7_runtime_closure_test.dart \
+            test/data/elv_p8_vertical_matrix_test.dart
+
+      - name: Commit RC4-RC7 source
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add apps/mobile/lib/data/database/app_database.dart \
+                  apps/mobile/lib/application/elv_physical_calculation_service.dart \
+                  apps/mobile/lib/data/repositories/drift_elv_physical_compatibility_repository.dart \
+                  apps/mobile/lib/data/repositories/drift_elv_command_history_repository.dart \
+                  apps/mobile/lib/data/repositories/drift_elv_physical_routing_workspace_data_source.dart \
+                  apps/mobile/lib/data/repositories/drift_elv_physical_trace_service.dart \
+                  apps/mobile/test/data/elv_p5_runtime_closure_test.dart \
+                  apps/mobile/test/data/elv_p6_runtime_closure_test.dart \
+                  apps/mobile/test/data/elv_p7_runtime_closure_test.dart \
+                  apps/mobile/test/data/elv_p8_vertical_matrix_test.dart
+          git diff --cached --quiet && { echo 'No source changes produced'; exit 1; }
+          git commit -m 'feat(elv3): close RC4-RC7 persisted runtime verticals'
+          git reset --hard HEAD
+          git pull --rebase origin feat/elv3-runtime-closure
+          git push origin HEAD:feat/elv3-runtime-closure
