@@ -48,3 +48,8 @@ export 'src/elv_cable.dart';
 export 'src/elv_cable_resource.dart';
 export 'src/elv_cable_allocation.dart';
 export 'src/elv_cable_termination.dart';
+export 'src/elv_design_revision.dart';
+export 'src/elv_cable_run.dart';
+export 'src/elv_route_handoff.dart';
+export 'src/elv_route_bend_evidence.dart';
+export 'src/elv_physical_snapshot.dart';
