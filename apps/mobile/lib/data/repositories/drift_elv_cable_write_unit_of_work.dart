@@ -29,22 +29,24 @@ final class DriftElvCableWriteUnitOfWork
 
 final class _DriftElvCableWriteSession implements ElvCableWriteSession {
   _DriftElvCableWriteSession(
-    this.database, {
+    AppDatabase database, {
     required String originDeviceId,
   })  : commandLedger = _DriftElvCommandLedgerStore(database),
         cables = _DriftElvCableWriteStore(
           database,
           originDeviceId: originDeviceId,
         ),
+        references = _DriftElvReferenceReadStore(database),
         cableDependencies = const _P1CableDependencyStore();
-
-  final AppDatabase database;
 
   @override
   final ElvCommandLedgerStore commandLedger;
 
   @override
   final ElvCableWriteStore cables;
+
+  @override
+  final ElvReferenceReadStore references;
 
   @override
   final ElvCableDependencyStore cableDependencies;
@@ -117,6 +119,38 @@ final class _DriftElvCommandLedgerStore implements ElvCommandLedgerStore {
       left.logicalResultJson == right.logicalResultJson;
 }
 
+final class _DriftElvReferenceReadStore implements ElvReferenceReadStore {
+  const _DriftElvReferenceReadStore(this.database);
+  final AppDatabase database;
+
+  @override
+  Future<CableDefinition> resolveCableDefinition(
+    String projectId,
+    CableDefinitionRef ref,
+  ) async {
+    final normalized = ref.normalized();
+    final row = await (database.select(database.engineeringReferenceCatalogs)
+          ..where(
+            (candidate) =>
+                candidate.projectId.equals(projectId) &
+                candidate.id.equals(normalized.catalogId) &
+                candidate.catalogVersion.equals(normalized.catalogVersion) &
+                candidate.deletedAt.isNull(),
+          ))
+        .getSingleOrNull();
+    if (row == null) throw StateError('Catalog edition not found.');
+    final catalog = EngineeringReferenceCatalog.fromMap(
+      jsonDecode(row.payloadJson) as Map<String, dynamic>,
+    );
+    final definition = catalog.cableDefinition(normalized.definitionCode);
+    if (cableDefinitionContentHashV1(definition) !=
+        normalized.definitionContentHash) {
+      throw StateError('Cable definition hash mismatch.');
+    }
+    return definition;
+  }
+}
+
 final class _DriftElvCableWriteStore implements ElvCableWriteStore {
   const _DriftElvCableWriteStore(
     this.database, {
@@ -144,33 +178,6 @@ final class _DriftElvCableWriteStore implements ElvCableWriteStore {
           ))
         .getSingleOrNull();
     return row == null ? null : _fromRow(row);
-  }
-
-  @override
-  Future<CableDefinition> resolveDefinition(
-    String projectId,
-    CableDefinitionRef ref,
-  ) async {
-    final normalized = ref.normalized();
-    final row = await (database.select(database.engineeringReferenceCatalogs)
-          ..where(
-            (candidate) =>
-                candidate.projectId.equals(projectId) &
-                candidate.id.equals(normalized.catalogId) &
-                candidate.catalogVersion.equals(normalized.catalogVersion) &
-                candidate.deletedAt.isNull(),
-          ))
-        .getSingleOrNull();
-    if (row == null) throw StateError('Catalog edition not found.');
-    final catalog = EngineeringReferenceCatalog.fromMap(
-      jsonDecode(row.payloadJson) as Map<String, dynamic>,
-    );
-    final definition = catalog.cableDefinition(normalized.definitionCode);
-    if (cableDefinitionContentHashV1(definition) !=
-        normalized.definitionContentHash) {
-      throw StateError('Cable definition hash mismatch.');
-    }
-    return definition;
   }
 
   @override
