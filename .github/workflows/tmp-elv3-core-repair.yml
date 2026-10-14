@@ -46,6 +46,11 @@ jobs:
           replace(ref, '    this.conductorMaterialCode,\n', '    String? conductorMaterialCode,\n')
           replace(ref, '    this.shieldingCode,\n', '    String? shieldingCode,\n')
           replace(ref, '    this.firePerformanceCode,\n', '    String? firePerformanceCode,\n')
+          replace(
+              ref,
+              '''Set<String> _atomicDescendants(\n  String id,\n  Map<String, CableResourceDefinition> byId,\n) {\n  final resource = byId[id];\n  if (resource == null) return const {};\n  if (resource.atomic) return {resource.identity};\n  return {\n    for (final child in resource.childResourceIds)\n      ..._atomicDescendants(child, byId),\n  };\n}\n''',
+              '''Set<String> _atomicDescendants(\n  String id,\n  Map<String, CableResourceDefinition> byId, [\n  Set<String>? visiting,\n]) {\n  final resource = byId[id];\n  if (resource == null) return const {};\n  final path = visiting ?? <String>{};\n  if (!path.add(id)) return const {};\n  if (resource.atomic) return {resource.identity};\n  final result = <String>{};\n  for (final child in resource.childResourceIds) {\n    result.addAll(_atomicDescendants(child, byId, {...path}));\n  }\n  return result;\n}\n''',
+          )
 
           term = 'packages/engineering_core/lib/src/elv_cable_termination.dart'
           replace(term, '    required this.resourceIdentity,\n', '    required String resourceIdentity,\n')
@@ -68,6 +73,13 @@ jobs:
 
           calculations_test = 'packages/engineering_core/test/elv_physical_calculations_test.dart'
           replace(calculations_test, '      usableAreaByKey: const {key: 100},\n', '      usableAreaByKey: {key: 100},\n')
+
+          resource = 'packages/engineering_core/lib/src/elv_cable_resource.dart'
+          replace(
+              resource,
+              '''  static Set<String> _wholeCableClaims(CableDefinition definition) => {\n        '__WHOLE_CABLE__',\n        for (final resource in definition.resourceDefinitions)\n          if (resource.atomic && resource.kind != CableResourceKind.wholeCable)\n            resource.identity,\n      };\n''',
+              '''  static Set<String> _wholeCableClaims(CableDefinition definition) =>\n      const {'__WHOLE_CABLE__'};\n''',
+          )
           PY
 
       - name: Install engineering core dependencies
@@ -94,5 +106,5 @@ jobs:
           git add packages/engineering_core/lib \
                   packages/engineering_core/test/elv_physical_calculations_test.dart
           git diff --cached --quiet && { echo 'No core changes produced'; exit 1; }
-          git commit -m 'fix(elv3): repair engineering core compile and analysis defects'
+          git commit -m 'fix(elv3): repair engineering core runtime invariants'
           git push origin HEAD:feat/elv3-runtime-closure
