@@ -636,8 +636,10 @@ class EngineeringTopologyGroups extends Table with GeometryAuditColumns {
   TextColumn get code => text()();
   TextColumn get profileId =>
       text().references(EngineeringTopologyProfiles, #id)();
+  @ReferenceName('topologyGroupsStartingAtPort')
   TextColumn get startPortId =>
       text().references(EngineeringPortInstances, #id)();
+  @ReferenceName('topologyGroupsEndingAtPort')
   TextColumn get endPortId =>
       text().nullable().references(EngineeringPortInstances, #id)();
   TextColumn get payloadJson => text()();
@@ -655,8 +657,10 @@ class EngineeringPortConnections extends Table with GeometryAuditColumns {
   TextColumn get projectId => text().references(Projects, #id)();
   TextColumn get systemId =>
       text().references(ProjectEngineeringSystems, #id)();
+  @ReferenceName('outgoingEngineeringPortConnections')
   TextColumn get fromPortId =>
       text().references(EngineeringPortInstances, #id)();
+  @ReferenceName('incomingEngineeringPortConnections')
   TextColumn get toPortId => text().references(EngineeringPortInstances, #id)();
   TextColumn get profileId =>
       text().references(EngineeringCompatibilityProfiles, #id)();
@@ -672,8 +676,10 @@ class EngineeringInternalMappings extends Table with GeometryAuditColumns {
   TextColumn get id => text()();
   TextColumn get projectId => text().references(Projects, #id)();
   TextColumn get componentId => text().references(ComponentInstances, #id)();
+  @ReferenceName('outgoingEngineeringInternalMappings')
   TextColumn get fromPortId =>
       text().references(EngineeringPortInstances, #id)();
+  @ReferenceName('incomingEngineeringInternalMappings')
   TextColumn get toPortId => text().references(EngineeringPortInstances, #id)();
   TextColumn get payloadJson => text()();
   @override

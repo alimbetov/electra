@@ -1,9 +1,9 @@
 # Electra — ELV Delivery Plan
 
-Status: ELV1 baseline merged; ELV2 reference vocabulary and compatibility slice in progress
-Specification branch: `docs/elv-engineering-systems-spec` (revision `091e6d8`)  
-Implementation branch: `feat/flutter-elv2-reference-catalogs`
-Scope: implementation roadmap after ELV1 connectivity foundation
+Status: ELV1 CLOSED; ELV2 CLOSED; ELV3 READY FOR DESIGN / ANALYSIS
+Accepted baseline: `main@f05b1e558a93b40928429ca86d91f4daa0cf4ef0`
+Pre-ELV3 hardening: `feat/flutter-elv12-pre-elv3-hardening`
+Scope: implementation roadmap after accepted ELV1/ELV2 baseline
 
 ## 1. Purpose
 
