@@ -7,6 +7,9 @@ on:
     paths:
       - '.github/workflows/tmp-elv3-core-repair.yml'
 
+permissions:
+  contents: write
+
 jobs:
   repair:
     runs-on: ubuntu-latest
@@ -15,6 +18,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: feat/elv3-runtime-closure
+          fetch-depth: 0
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -60,21 +64,31 @@ jobs:
           replace(profile, '    required this.code,\n', '    required String code,\n')
           PY
 
+      - name: Install engineering core dependencies
+        working-directory: packages/engineering_core
+        run: dart pub get --enforce-lockfile
+
       - name: Format engineering core
         working-directory: packages/engineering_core
         run: dart format lib test
 
-      - name: Capture core analyze output
+      - name: Analyze engineering core
         working-directory: packages/engineering_core
+        run: dart analyze
+
+      - name: Test engineering core
+        working-directory: packages/engineering_core
+        run: dart test
+
+      - name: Commit core repairs
         shell: bash
         run: |
-          set +e
-          dart analyze > core-analyze.log 2>&1
-          cat core-analyze.log
-          exit 0
-
-      - name: Upload core analyzer log
-        uses: actions/upload-artifact@v4
-        with:
-          name: elv3-core-analyze-log
-          path: packages/engineering_core/core-analyze.log
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add packages/engineering_core/lib/src/elv_cable_reference.dart \
+                  packages/engineering_core/lib/src/elv_cable_termination.dart \
+                  packages/engineering_core/lib/src/elv_pathway_context.dart \
+                  packages/engineering_core/lib/src/elv_physical_compatibility_profile.dart
+          git diff --cached --quiet && { echo 'No core changes produced'; exit 1; }
+          git commit -m 'fix(elv3): repair engineering core constructor invariants'
+          git push origin HEAD:feat/elv3-runtime-closure
