@@ -7,6 +7,9 @@ on:
       - 'feat/flutter-*'
       - 'feat/elv3-*'
       - 'audit/elv2-*'
+    paths-ignore:
+      - '.github/workflows/tmp-*.yml'
+      - 'scripts/ci/apply-elv3-runtime-rc*.py'
   pull_request:
     paths:
       - 'apps/mobile/**'
