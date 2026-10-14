@@ -43,7 +43,7 @@ abstract interface class ElvCableWriteStore {
     CableDefinitionRef ref,
   );
   Future<bool> activeLabelExists(String projectId, String normalizedLabel);
-  Future<void> insertCable(Cable cable);
+  Future<bool> insertCable(Cable cable);
   Future<bool> updateDefinition({
     required String projectId,
     required String cableId,
