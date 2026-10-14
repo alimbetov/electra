@@ -50,7 +50,10 @@ void main() {
       final selected = partitions.values.expand((atoms) => atoms).toList();
 
       expect(selected.toSet(), hasLength(8));
-      expect(selected.toSet(), containsAll(ElvTestCatalog.eightCore.resourceAtoms));
+      expect(
+        selected.toSet(),
+        containsAll(ElvTestCatalog.eightCore.resourceAtoms),
+      );
     });
 
     test('fiber fixture exposes overlap as a deterministic set conflict', () {

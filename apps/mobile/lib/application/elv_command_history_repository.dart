@@ -46,7 +46,8 @@ final class ElvCommandHistoryRecord {
         if (preconditionFingerprint.trim().isEmpty)
           'Precondition fingerprint is required.',
         if (undoClass == ElvCommandUndoClass.reversible &&
-            (inverseCommandType == null || inverseCommandType!.trim().isEmpty))
+            (inverseCommandType == null ||
+                inverseCommandType!.trim().isEmpty))
           'Reversible history requires inverse command type.',
         if (undoClass == ElvCommandUndoClass.reversible &&
             (inversePayloadJson == null || inversePayloadJson!.trim().isEmpty))

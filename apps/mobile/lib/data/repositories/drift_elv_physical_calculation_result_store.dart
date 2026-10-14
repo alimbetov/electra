@@ -107,11 +107,11 @@ final class DriftElvPhysicalCalculationResultStore
                 row.deletedAt.isNull(),
           ))
         .write(
-      ProjectDerivedResultsCompanion(
-        state: const Value('STALE'),
-        updatedAt: Value(DateTime.now().toUtc()),
-        originDeviceId: Value(originDeviceId),
-      ),
-    );
+          ProjectDerivedResultsCompanion(
+            state: const Value('STALE'),
+            updatedAt: Value(DateTime.now().toUtc()),
+            originDeviceId: Value(originDeviceId),
+          ),
+        );
   }
 }
