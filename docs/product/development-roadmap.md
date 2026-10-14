@@ -37,24 +37,30 @@ The [ELV delivery plan](elv-delivery-plan.md) is the active product roadmap. His
 | ELV0 | Systems, sixteen family editions, shared device participation | Baseline closed |
 | ELV1 | Ports, connections, topology, passive mappings and assemblies | CLOSED / ACCEPTED |
 | ELV2 | Canonical discipline profiles, versioned catalogs, placement and explicit adoption | CLOSED / ACCEPTED |
-| ELV3 | Cable resources, allocation/termination, cable-run traversal, reusable routing/carriers/pathways and physical compatibility | R2 HARDENED / THIRD AUDIT PASS / READY FOR EXECUTION — P1 AUTHORIZED |
+| ELV3 | Cable resources, allocation/termination, cable-run traversal, reusable routing/carriers/pathways and physical compatibility | DUAL-REVIEW HARDENED / MACRO PASS / PROCESS PASS / READY FOR EXECUTION — P1 AUTHORIZED |
 | ELV4 | Power, PoE, PSU, UPS, converters and backup graph | Planned |
 | ELV5 | Versioned CCTV/LAN/ACS/fire calculations | Planned |
 | ELV6 | Racks, cabinets, patching and physical capacity | Planned |
 | ELV7 | Jurisdiction profiles, normative rule packs and findings | Planned |
 | ELV8 | Manufacturer selection, snapshots, BOM and deliverables | Planned |
 
-ELV3-P0 is architecturally remediated and accepted. PRE-P1 hardening closed the first implementation ambiguities. A second adversarial audit reopened readiness and identified additional history, geometry, resource, termination and calculation gaps. R2 remediation plus final execution clarifications closed those findings, and the third adversarial audit reports zero open BLOCKER/HIGH specification findings.
+ELV3-P0 is architecturally remediated and accepted. PRE-P1 and R2 hardening closed successive implementation ambiguities. A later two-role review then tested the specification independently from (A) project-wide architecture consistency and (B) command/process-flow consistency. Both reviews pass, and the reconciliation audit reports zero open BLOCKER/HIGH specification findings.
 
 Current execution authority:
 
 - `docs/product/elv3-authoritative-spec-index.md`;
+- `docs/product/elv3-dual-review-process-hardening.md`;
 - `docs/product/elv3-r2-execution-clarifications.md`;
 - `docs/product/elv3-r2-final-readiness-remediation.md`;
-- `docs/product/elv3-implementation-specification-v2.md`;
-- `docs/audit/elv3-p1-p9-third-adversarial-audit.md`.
+- `docs/product/elv3-implementation-specification-v2.md`.
 
-Historical readiness audits that predate R2 are not authorization sources.
+Latest readiness evidence:
+
+- `docs/audit/elv3-macro-architecture-consistency-audit.md`;
+- `docs/audit/elv3-process-flow-consistency-audit.md`;
+- `docs/audit/elv3-dual-review-reconciliation-audit.md`.
+
+Older readiness audits remain historical evidence but are not the latest authorization source.
 
 The accepted ELV3 physical direction is:
 
@@ -74,44 +80,46 @@ EngineeringConnection
   -> sealed PathwayContext host
 ```
 
-Frozen implementation clarifications include:
+Additional dual-review frozen clarifications:
 
 ```text
-CableDefinition
-  = exact ELV2 semantic field contract + canonical dictionary codes
+new WORKING revision
+  = deterministic materialization from verified frozen snapshot
+  + new CanonicalCableRun/traversal ids
+  + basedOnCableRunId provenance
 
-CableDefinition provenance
-  = catalogId + catalogVersion + definitionCode + SHA-256 content hash
+physical writes after P3
+  = require exactly one WORKING ProjectDesignRevision
+  = prohibited in the post-freeze/pre-next-working gap
 
-CableAllocation
-  = strict lifecycle
-  + immutable selection evidence
-  + separate consuming claim rows
+RerouteCableRun
+  = traversal-chain change only
 
-one continuous EngineeringConnection
-  = at most one RESERVED/ACTIVE physical Cable in ELV3 P1-P9
+EditReusableRouteGeometry
+  = separate shared-infrastructure command
+  + impact fingerprint over all dependent current runs
 
-routing
-  = one existing/evolved CableRoute graph; no second ELV route graph
-  + canonical RouteHandoff for zero-length interface continuity
+shared carrier/pathway mutation
+  = same impact-preview/fan-out discipline
 
-bend radius
-  = explicit RouteBendEvidence only; never inferred from point geometry
+snapshot schemas
+  = phase-versioned; old frozen snapshots never backfilled from current state
 
-design revision
-  = ProjectDesignRevision.id, never Projects.revision
-  + immutable embedded DesignRevisionPhysicalSnapshot for FROZEN history
+derived P5/P6 results
+  = design-revision-scoped cache/node identity
 
-PathwayContext
-  = sealed host model + acyclic containment
+CableDefinitionRef
+  = immutable after resource-selection evidence or canonical run exists
 
-P5 profiles
-  = one explicit ACTIVE project profile set with exact ELV2 profile refs
+termination replacement
+  = complete set-atomic replacement for RESERVED/ACTIVE allocation
 
-P6
-  = exact installed-length/area formulas
-  + occupancy per route-segment/carrier/compartment
-  + factual segregation/congestion evidence; ELV7 owns jurisdictional thresholds
+command idempotency
+  = persisted (projectId, commandId) + canonical payload SHA-256 + logical outcome
+
+undo/redo
+  = explicit reversible vs irreversible command matrix
+  = frozen/migration/history commands corrected forward, never erased
 ```
 
 Legacy electrical routing remains valid through coexistence/adoption semantics; physical Cable identity is never invented from `ElectricalCircuit` alone.
@@ -123,22 +131,24 @@ P1 Cable identity / exact ELV2 CableDefinitionRef
   ↓ exact-SHA
 P2 Allocation / resource selections + atomic claims / A-B terminations
   ↓ exact-SHA
-P3 ProjectDesignRevision / frozen snapshot / CanonicalCableRun / traversal / handoff / legacy coexistence
+P3 ProjectDesignRevision / frozen snapshot / deterministic revision fork / CanonicalCableRun / traversal / handoff / legacy coexistence
   ↓ exact-SHA
 P4 sealed PathwayContext / PhysicalCarrier / compartments
   ↓ exact-SHA
 P5 exact technical physical compatibility profile set / findings
   ↓ exact-SHA
-P6 reproducible physical evidence/calculations
+P6 revision-scoped reproducible physical evidence/calculations
   ↓ exact-SHA
 P7 Engineer Physical Routing workspace
   ↓ exact-SHA
-P8 Restart / rollback / failure injection / idempotency verticals
+P8 Restart / rollback / failure injection / persisted idempotency verticals
   ↓ exact-SHA
-P9 Architecture-vs-code hard audit / final exact-SHA closure
+P9 Architecture-vs-code hard audit / command-matrix audit / final exact-SHA closure
 ```
 
-P1 is now authorized. P2 may begin only after P1 closes on an exact branch SHA with its required green CI evidence; the same sequencing rule applies through P9.
+Every P1-P8 phase must maintain its command-contract matrix with inputs, expected revisions, state, read/write sets, validations, transition, invalidation keys, idempotency, rollback postcondition, undo class, restart assertion and error codes. P9 audits that matrix against code.
+
+P1 is authorized. P2 may begin only after P1 closes on an exact branch SHA with its required green CI evidence; the same sequencing rule applies through P9.
 
 All four discipline fixtures plus a fiber fixture remain required throughout the track. National rule packs require verified sources and provenance. FL16 and ELV6 share enclosure infrastructure; ELV8 reuses electrical BOM/reporting foundations.
 
