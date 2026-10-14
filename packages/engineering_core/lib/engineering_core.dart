@@ -45,3 +45,6 @@ export 'src/engineering_hash.dart';
 export 'src/elv_cable_resource_definition.dart';
 export 'src/elv_cable_reference.dart';
 export 'src/elv_cable.dart';
+export 'src/elv_cable_resource.dart';
+export 'src/elv_cable_allocation.dart';
+export 'src/elv_cable_termination.dart';
