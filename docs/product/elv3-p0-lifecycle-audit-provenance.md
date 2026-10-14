@@ -1,201 +1,280 @@
-# Electra — ELV3 P0.5 Lifecycle, Deletion, Audit and Provenance Contract
+# Electra — ELV3 P0.5 Lifecycle, Revision, Audit and Command Contract
 
-Status: DESIGN CONTRACT / P0.5  
+Status: REMEDIATED DESIGN CONTRACT / P0-R9  
 Branch: `feat/flutter-elv3-physical-routing-design`  
-Depends on: P0.1–P0.4  
-Implementation status: NOT STARTED
+Authoritative parent: `docs/product/elv3-p0-system-architecture-remediation.md`  
+Implementation status: HOLD UNTIL P0-R10
 
 ## 1. Purpose
 
-P0.5 freezes lifecycle, deletion, audit and provenance semantics for ELV3 physical-routing entities before schema design.
+This document defines lifecycle, design-revision identity, audit/provenance and application command boundaries for ELV3.
 
-The design must guarantee that physical identity and engineering evidence survive restart, that destructive operations cannot silently orphan topology, and that later ELV7 normative evaluation can distinguish persisted facts from rules.
+It supersedes the first P0.5 where lifecycle was described without sufficient design-revision semantics and where `CableRun`/`CableRoute` atomicity assumed the old one-run-per-room / one-route-per-run model.
 
-## 2. Lifecycle states
+## 2. Canonical mutable roots
 
-Canonical lifecycle state for project-owned ELV3 records:
+Project-owned mutable roots relevant to ELV3:
+
+```text
+Cable
+CableAllocation
+CableRun
+Route / route infrastructure
+PhysicalCarrier
+PathwayContext
+```
+
+ELV2 reference definitions are immutable/versioned reference data and are not mutable ELV3 project roots.
+
+## 3. Design revision semantics
+
+A Cable may have historical routing realizations, but at most one active CableRun in one design revision.
+
+Conceptually:
+
+```text
+Cable C-001
+  revision/design context R1 -> CableRun CR-001 ACTIVE
+  revision/design context R2 -> CableRun CR-002 ACTIVE
+  prior run -> SUPERSEDED/HISTORICAL
+```
+
+Minimum invariant:
+
+```text
+UNIQUE(cableId, designRevisionId) for active CableRun realization
+```
+
+The exact project revision mechanism may reuse existing project revision infrastructure, but ELV3 must not flatten all historical run states into one mutable row if reproducibility requires history.
+
+## 4. Lifecycle states
+
+Canonical project lifecycle states:
 
 ```text
 ACTIVE
 ARCHIVED
 ```
 
-Hard deletion is permitted only for records that are both unreferenced and not required for historical/audit reconstruction.
+Routing realization may additionally expose:
 
-No generic `deleted=true` field is required by this contract; implementation may use archival timestamps/state if it preserves these semantics.
+```text
+ACTIVE
+SUPERSEDED
+ARCHIVED
+```
 
-## 3. Deletion policy matrix
+Allocation reservation may use implementation states such as DRAFT/RESERVED/ACTIVE/RELEASED only if their capacity-consumption semantics are explicit and deterministic.
 
-| Entity | Delete/archive rule |
+## 5. Deletion/restriction matrix
+
+| Entity | Rule |
 |---|---|
-| `EngineeringConnection` | deletion blocked while active `CableAllocation` references it |
-| `CableAllocation` | may be deleted/archived independently if no downstream immutable audit requires retention |
-| `Cable` | deletion blocked while active allocations or runs exist |
-| `CableRun` | may be removed only together with its owned `CableRoute` in one transaction |
-| `CableRoute` | cannot be deleted independently while owned by a run |
-| `RouteNode`/`RouteSegment` | route-owned; replaced/deleted only through route mutation transaction |
-| `PhysicalChannel` | deletion blocked while active route segments reference it |
-| `CableDefinition` edition | immutable and not deletable while any cable references it |
-| channel factual profile/source | immutable or versioned while referenced by persisted engineering evidence |
+| EngineeringConnection | delete blocked while active CableAllocation exists |
+| CableAllocation | release/archive explicitly; removal must free resources atomically |
+| Cable | delete/archive blocked while active allocations or active CableRun exists |
+| CableRun | replace/supersede through command; historical evidence retained where required |
+| CableTraversal | owned by CableRun realization; mutated only through reroute command |
+| Route/RouteSegment | deletion blocked while active traversals reference it |
+| PhysicalCarrier | deletion blocked while active traversals reference it |
+| PathwayContext | deletion blocked while carriers/routes depend on it |
+| CableDefinition/Profile edition | governed by ELV2; immutable and retained while referenced |
 
-## 4. Referential invariants
+No cross-aggregate cascade may silently erase topology or engineering evidence.
 
-The persistence layer MUST enforce or transactionally guarantee:
+## 6. Audit metadata
 
-```text
-CableAllocation.connectionId -> existing active EngineeringConnection
-CableAllocation.cableId      -> existing active Cable
-CableRun.cableId              -> existing active Cable
-CableRun.routeId              -> exactly one owned CableRoute
-RouteSegment.channelId        -> null or existing active PhysicalChannel
-Cable.definitionRef           -> exact immutable CableDefinition edition
-```
-
-No cascade may erase project evidence beyond the aggregate boundary explicitly defined above.
-
-## 5. Atomic operations
-
-The following are mandatory transactional boundaries:
-
-### Create routed cable section
+Mutable ELV3 roots SHOULD expose shared audit metadata:
 
 ```text
-create CableRun
-create CableRoute
-create nodes
-create segments
-validate geometry
-commit all-or-nothing
-```
-
-### Delete routed cable section
-
-```text
-verify no handoff/junction dependency requiring explicit detach
-remove dependent handoff/junction endpoint references
-remove segments/nodes/route
-remove run
-commit all-or-nothing
-```
-
-### Create cable allocation
-
-```text
-load exact CableDefinition resource namespace
-load all active allocations for cable
-validate selector
-validate overlap / WHOLE_CABLE exclusivity
-insert allocation
-commit all-or-nothing
-```
-
-This boundary is required to prevent concurrent double allocation.
-
-## 6. Audit fields
-
-Every ELV3 project-owned mutable record SHOULD have, directly or through shared metadata:
-
-```text
+revision/version token
 createdAt
 createdBy
 updatedAt
 updatedBy
 archivedAt?
 archivedBy?
-revision/version token
+originDeviceId?   // where existing offline architecture requires it
 ```
 
-For offline/mobile concurrency the repository must support optimistic conflict detection or an equivalent deterministic retry contract.
+Use existing project conventions where available rather than creating a parallel audit framework.
 
 ## 7. Provenance
 
-### 7.1 Cable provenance
+### Cable
 
-`Cable` must persist exact definition identity, not only a human-readable name:
+Persist exact ELV2 project/reference binding sufficient to reconstruct the exact `CableDefinition/Profile` edition used by the Cable.
 
-```text
-catalog/profile id
-edition/version id
-immutable content identity/hash if available
-```
+Do not duplicate catalog governance fields when the canonical reference binding already provides them.
 
-A later catalog update MUST NOT silently change an installed cable.
+### PhysicalCarrier / PathwayContext
 
-### 7.2 PhysicalChannel provenance
-
-Dimensions/environment facts may originate from:
+Factual dimensions/geometry may retain:
 
 ```text
-MANUAL
-MEASURED
-IMPORTED
-CATALOG_DERIVED
-MODEL_DERIVED
+sourceType
+sourceReference?
+sourceRevision?
+capturedAt?
+capturedBy?
 ```
 
-Where available, persist source reference and source revision.
+### Derived results
 
-### 7.3 Derived results
+Length, occupied area, fill basis and compatibility results are derived evidence. If persisted/cached, they require input fingerprint/revisions and are never independently editable truth.
 
-Derived values such as route length and fill are not authoritative editable facts. If cached/persisted later, they must retain input revision/hash and rule/profile identity sufficient to detect staleness.
+## 8. Mandatory application commands
 
-## 8. Restart contract
+ELV3 must not be implemented as arbitrary UI sequences of repository writes.
 
-After database close/reopen the application must reconstruct exactly:
-
-- Cable identity and exact definition binding;
-- every active allocation selector and sequence;
-- Cable -> CableRun order/continuity;
-- CableRun -> CableRoute identity;
-- route nodes/segments and channel references;
-- channel dimensions/compartments/environment facts;
-- audit/provenance fields;
-- handoff/junction endpoint fingerprints independent of electrical circuit ownership.
-
-Restart MUST NOT depend on in-memory generated defaults.
-
-## 9. Mutation/staleness rules
-
-Changes to any of the following invalidate downstream physical compatibility results:
+Required command families:
 
 ```text
-CableDefinition edition/facts
-CableAllocation selector
-CableRun reserve/allowance
-CableRoute geometry
-RouteSegment laying method/channel
-PhysicalChannel dimensions/compartments/environment facts
+CreateCable
+ArchiveCable
+ChangeCableDefinitionBinding
+AllocateCableResources
+ReleaseCableResources
+BindCableTermination
+CreateCableRun
+RerouteCableRun
+SupersedeCableRun
+AttachTraversalToRoute
+AttachTraversalToCarrier
+DetachTraversalFromCarrier
+CreateOrUpdatePhysicalCarrier
+CreateOrUpdatePathwayContext
+AdoptLegacyElectricalRoute
 ```
 
-Changing an upstream logical connection endpoint invalidates or blocks affected allocations; it MUST NOT silently retarget them.
+Each command must define:
 
-## 10. Project isolation
+- transaction boundary;
+- structural validation;
+- expected revision / optimistic concurrency guard;
+- project-isolation checks;
+- affected dependency keys;
+- idempotency identity where retry is possible;
+- undo/redo semantics where editor UX exposes the operation.
 
-All project-owned records must be derivably scoped to exactly one project. Cross-project references are forbidden even if UUIDs happen to exist.
+## 9. Atomicity examples
 
-Repository APIs must validate project ownership at transaction boundaries.
-
-## 11. Failure behaviour
-
-On validation or storage failure:
+### AllocateCableResources
 
 ```text
-no partial CableAllocation
-no orphan CableRun
-no orphan CableRoute
-no partial route node/segment chain
-no dangling PhysicalChannel reference
+BEGIN
+  load Cable + exact ELV2 definition binding
+  resolve resource selection
+  load active resource claims
+  validate overlap / WHOLE_CABLE exclusivity
+  validate explicit transition if multi-cable realization
+  persist allocation + resource atoms + termination mappings
+  increment revisions
+COMMIT
 ```
 
-The caller receives a structured failure; retries must not duplicate records when the same command/idempotency identity is replayed.
+### RerouteCableRun
 
-## 12. P0.5 acceptance gate
+```text
+BEGIN
+  load active CableRun + expected revision
+  validate target route/traversal chain
+  validate route/carrier references
+  replace/supersede traversal set atomically
+  invalidate affected physical calculations only
+  increment revision
+COMMIT
+```
 
-- [x] delete/archive behaviour is explicit for all canonical ELV3 entities;
-- [x] CableRun/CableRoute mutation is atomic;
-- [x] allocation overlap check is transactional;
-- [x] exact cable-definition provenance survives restart;
-- [x] channel factual provenance is separated from normative rules;
-- [x] project isolation is mandatory;
-- [x] downstream results have explicit staleness triggers;
-- [x] failure cannot leave partial routing state.
+### AdoptLegacyElectricalRoute
+
+```text
+BEGIN
+  load legacy electrical routing evidence
+  require explicit adoption decision
+  require sufficient physical-cable facts
+  create Cable only when evidence exists
+  create canonical CableRun/traversals
+  persist adoption mapping/provenance
+COMMIT
+```
+
+No partial canonical Cable is created from ambiguous electrical data.
+
+## 10. Dependency invalidation
+
+Expected direction:
+
+```text
+ELV2 CableDefinition/Profile binding
+  -> Cable
+  -> CableAllocation / termination
+  -> CableRun / traversal
+  -> Route occupancy + length
+  -> ELV3 technical compatibility
+  -> ELV4/ELV5 calculations using physical path facts
+  -> ELV7 normative evaluation
+  -> ELV8 schedules/BOM/deliverables
+```
+
+Commands invalidate only affected IDs/subgraphs. Whole-project recalculation is not the default.
+
+## 11. Restart contract
+
+After close/reopen, reconstruct exactly:
+
+- Cable identity;
+- exact ELV2 reference binding;
+- allocation resource selection and resource atoms;
+- termination mappings;
+- active/historical CableRun revision identity;
+- ordered CableTraversal chain;
+- referenced route geometry;
+- carrier/pathway references;
+- audit/provenance metadata;
+- explicit legacy adoption mapping when present.
+
+Restart must not regenerate identity from display labels or latest catalog values.
+
+## 12. Failure behavior
+
+Failure leaves:
+
+```text
+no partial allocation
+no duplicate resource claim
+no orphan CableRun traversal
+no half-rerouted route state
+no invented Cable from ambiguous legacy circuit
+no dangling carrier/pathway reference
+```
+
+Retry with the same idempotency identity must not duplicate successfully committed domain objects.
+
+## 13. Undo/redo
+
+Editor-facing compound operations must be represented as single logical commands where the engineer perceives one action.
+
+Examples:
+
+```text
+create cable + allocation
+reroute cable
+release allocation
+adopt legacy route
+```
+
+Undo must restore a valid prior aggregate state, not replay low-level row deletes independently.
+
+## 14. P0-R9 lifecycle/command acceptance
+
+- [x] design-revision identity is explicit.
+- [x] at most one active CableRun per Cable/revision.
+- [x] route infrastructure deletion is restrictive while used.
+- [x] ELV2 reference governance is reused.
+- [x] command boundaries are explicit.
+- [x] transaction/revision/idempotency/undo requirements are explicit.
+- [x] dependency invalidation direction is defined through ELV4–ELV8.
+- [x] restart and failure semantics are deterministic.
+
+This remediation point is CLOSED subject to P0-R10.
