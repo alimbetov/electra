@@ -37,14 +37,26 @@ The [ELV delivery plan](elv-delivery-plan.md) is the active product roadmap. His
 | ELV0 | Systems, sixteen family editions, shared device participation | Baseline closed |
 | ELV1 | Ports, connections, topology, passive mappings and assemblies | CLOSED / ACCEPTED |
 | ELV2 | Canonical discipline profiles, versioned catalogs, placement and explicit adoption | CLOSED / ACCEPTED |
-| ELV3 | Cable resources, allocation/termination, cable-run traversal, reusable routing/carriers/pathways and physical compatibility | P0 CLOSED / P1–P9 IMPLEMENTATION SPEC READY |
+| ELV3 | Cable resources, allocation/termination, cable-run traversal, reusable routing/carriers/pathways and physical compatibility | FINAL SPEC HARDENED / READY FOR EXECUTION — P1 NEXT |
 | ELV4 | Power, PoE, PSU, UPS, converters and backup graph | Planned |
 | ELV5 | Versioned CCTV/LAN/ACS/fire calculations | Planned |
 | ELV6 | Racks, cabinets, patching and physical capacity | Planned |
 | ELV7 | Jurisdiction profiles, normative rule packs and findings | Planned |
 | ELV8 | Manufacturer selection, snapshots, BOM and deliverables | Planned |
 
-ELV3-P0 was reopened after a project-wide system-architecture audit found conflicts in the first closure. P0-R1 through P0-R10 remediated those conflicts; the final system-architecture audit is PASS. `docs/product/elv3-implementation-specification.md` now defines implementation-ready P1–P9 execution contracts, and `docs/audit/elv3-implementation-spec-readiness-audit.md` confirms readiness to start P1.
+ELV3-P0 was reopened after a project-wide system-architecture audit found conflicts in the first closure. P0-R1 through P0-R10 remediated those conflicts. A later adversarial implementation review found seven remaining specification ambiguities; PRE-P1 hardening closed them and a final audit now authorizes P1.
+
+The single execution entry point is `docs/product/elv3-authoritative-spec-index.md`.
+
+Authoritative implementation documents:
+
+- `docs/product/elv3-implementation-specification-v2.md`;
+- `docs/product/elv3-pre-p1-final-hardening.md`;
+- `docs/adr/ADR-029-elv3-reusable-route-traversal.md`;
+- `docs/adr/ADR-030-project-design-revision-identity.md`;
+- `docs/audit/elv3-implementation-spec-readiness-audit.md`.
+
+The first `docs/product/elv3-implementation-specification.md` is SUPERSEDED and must not be implemented.
 
 The accepted ELV3 physical direction is:
 
@@ -54,24 +66,54 @@ EngineeringConnection
       -> CableResourceSelection
       -> CableTerminationMapping[]
   -> Cable
-  -> one active CableRun per design revision
-  -> ordered CableTraversal[]
-  -> reusable Route/geometry infrastructure
-  -> optional PhysicalCarrier
-  -> PathwayContext
+      -> exact CableDefinitionRef
+  -> one active CableRun per ProjectDesignRevision
+  -> ordered CableRunTraversal[]
+  -> existing/evolved reusable CableRouteSegment geometry
+  -> optional PhysicalCarrier/compartment
+  -> sealed PathwayContext host
 ```
 
-`CableDefinition` consumes accepted ELV2 reference-snapshot/project-binding governance rather than creating a parallel catalog system. Legacy electrical routing remains valid through coexistence/adoption semantics; physical Cable identity is never invented from `ElectricalCircuit` alone. ELV3 owns technical physical compatibility, while ELV7 owns jurisdictional/normative compliance.
+Frozen clarifications before execution:
+
+```text
+CableDefinition provenance
+  = catalogId + catalogVersion + definitionCode + contentHash
+  using existing ELV2 EngineeringReferenceCatalog governance
+
+CableAllocation lifecycle
+  = strict DRAFT -> RESERVED -> ACTIVE -> RELEASED -> ARCHIVED
+
+one continuous EngineeringConnection
+  = at most one RESERVED/ACTIVE physical Cable in ELV3 P1-P9
+
+routing
+  = one existing/evolved CableRoute graph; no second ELV route graph
+
+design revision identity
+  = ProjectDesignRevision.id, never Projects.revision
+
+PathwayContext
+  = sealed Room/Floor/SurfaceVoid/Vertical/Project host model
+
+P5 profiles
+  = exact ELV2 PhysicalCompatibilityProfile editions
+
+P6 segregation
+  = factual evidence; ELV7 owns jurisdictional thresholds/compliance
+```
+
+Legacy electrical routing remains valid through coexistence/adoption semantics; physical Cable identity is never invented from `ElectricalCircuit` alone.
 
 ELV3 implementation sequence is fixed as:
 
 ```text
-P1 Cable identity / exact ELV2 binding
-P2 Allocation / resources / terminations
-P3 CableRun / traversal / legacy coexistence
-P4 PathwayContext / PhysicalCarrier
+P1 Cable identity / exact ELV2 CableDefinitionRef
+P2 Allocation / resources / A-B terminations
+P3 ProjectDesignRevision / CableRun / traversal / legacy coexistence
+P4 sealed PathwayContext / PhysicalCarrier
 P5 Technical physical compatibility
-P6 Common physical calculations
+P6 Common physical evidence/calculations
 P7 Engineer workflow
 P8 Restart / rollback / idempotency verticals
 P9 Hard audit / exact-SHA closure
