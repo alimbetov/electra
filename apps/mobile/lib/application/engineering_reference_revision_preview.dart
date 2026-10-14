@@ -18,6 +18,7 @@ class BoundProfileRevisionImpact {
     required Iterable<String> portIds,
     required Iterable<String> connectionIds,
     required Iterable<String> topologyGroupIds,
+    required this.graphFingerprint,
     this.placementResult,
     this.placementBlockerReason,
     Iterable<String> candidateProfileValidationErrors = const [],
@@ -39,6 +40,7 @@ class BoundProfileRevisionImpact {
   final List<String> portIds;
   final List<String> connectionIds;
   final List<String> topologyGroupIds;
+  final String graphFingerprint;
   final PlacementCompatibilityResult? placementResult;
   final String? placementBlockerReason;
   final List<String> candidateProfileValidationErrors;
@@ -140,6 +142,7 @@ CatalogRevisionPreview previewCatalogRevision({
           portIds: binding.portIds,
           connectionIds: graph.connections,
           topologyGroupIds: graph.groups,
+          graphFingerprint: graph.fingerprint,
           placementBlockerReason:
               'The bound profile is absent from the candidate catalog edition.',
         ),
@@ -188,6 +191,7 @@ CatalogRevisionPreview previewCatalogRevision({
         portIds: binding.portIds,
         connectionIds: graph.connections,
         topologyGroupIds: graph.groups,
+        graphFingerprint: graph.fingerprint,
         placementResult: placementResult,
         placementBlockerReason: placementBlockerReason,
         candidateProfileValidationErrors: profileErrors,
@@ -214,32 +218,46 @@ CatalogRevisionPreview previewCatalogRevision({
   );
 }
 
-({List<String> connections, List<String> groups}) _graphImpact(
+({List<String> connections, List<String> groups, String fingerprint})
+_graphImpact(
   Iterable<String> portIds,
   ProjectEngineeringTopologySnapshot topology,
 ) {
   final ports = portIds.toSet();
-  final connections =
+  final relevantConnections =
       topology.connections
           .where(
             (connection) =>
                 ports.contains(connection.fromPortId) ||
                 ports.contains(connection.toPortId),
           )
-          .map((connection) => connection.id)
-          .toSet()
           .toList()
-        ..sort();
-  final groups =
+        ..sort((a, b) => a.id.compareTo(b.id));
+  final relevantGroups =
       topology.groups
           .where(
             (group) =>
                 ports.contains(group.startPortId) ||
                 (group.endPortId != null && ports.contains(group.endPortId)),
           )
-          .map((group) => group.id)
-          .toSet()
           .toList()
-        ..sort();
-  return (connections: connections, groups: groups);
+        ..sort((a, b) => a.id.compareTo(b.id));
+  final relevantInternal =
+      topology.internalLinks
+          .where(
+            (mapping) =>
+                ports.contains(mapping.fromPortId) ||
+                ports.contains(mapping.toPortId),
+          )
+          .toList()
+        ..sort((a, b) => a.id.compareTo(b.id));
+  return (
+    connections: relevantConnections.map((item) => item.id).toList(),
+    groups: relevantGroups.map((item) => item.id).toList(),
+    fingerprint: canonicalEngineeringJson({
+      'connections': relevantConnections.map((item) => item.toMap()).toList(),
+      'groups': relevantGroups.map((item) => item.toMap()).toList(),
+      'internalLinks': relevantInternal.map((item) => item.toMap()).toList(),
+    }),
+  );
 }
