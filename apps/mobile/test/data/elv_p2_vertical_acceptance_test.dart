@@ -20,15 +20,11 @@ const _profileId = 'profile-wired';
 const _catalogId = 'catalog-p2';
 
 TerminationPolicy _bothEnds() => TerminationPolicy(
-      mode: TerminationPolicyMode.bothEnds,
-      terminalRequired: false,
-    );
+  mode: TerminationPolicyMode.bothEnds,
+  terminalRequired: false,
+);
 
-CableDefinition _multiCore(
-  String code,
-  int count,
-  CableResourceKind kind,
-) {
+CableDefinition _multiCore(String code, int count, CableResourceKind kind) {
   final atoms = [
     for (var i = 1; i <= count; i++)
       CableResourceDefinition(
@@ -61,22 +57,24 @@ CableDefinition _multiCore(
 }
 
 EngineeringReferenceCatalog _catalog() => EngineeringReferenceCatalog(
-      id: _catalogId,
-      code: 'ELV-P2',
-      version: '2026.1',
-      source: 'test',
-      cableDefinitions: [
-        _multiCore('CAT6', 8, CableResourceKind.conductor),
-        _multiCore('ACS8', 8, CableResourceKind.conductor),
-        _multiCore('FIRE2', 2, CableResourceKind.conductor),
-        _multiCore('FIBER12', 12, CableResourceKind.fiber),
-        _multiCore('ACS8-ALT', 8, CableResourceKind.conductor),
-      ],
-    );
+  id: _catalogId,
+  code: 'ELV-P2',
+  version: '2026.1',
+  source: 'test',
+  cableDefinitions: [
+    _multiCore('CAT6', 8, CableResourceKind.conductor),
+    _multiCore('ACS8', 8, CableResourceKind.conductor),
+    _multiCore('FIRE2', 2, CableResourceKind.conductor),
+    _multiCore('FIBER12', 12, CableResourceKind.fiber),
+    _multiCore('ACS8-ALT', 8, CableResourceKind.conductor),
+  ],
+);
 
 Future<void> _seedBase(AppDatabase db) async {
   final now = DateTime.utc(2026, 10, 14, 8);
-  await db.into(db.projects).insert(
+  await db
+      .into(db.projects)
+      .insert(
         ProjectsCompanion.insert(
           id: _projectId,
           name: 'ELV3 P2',
@@ -88,7 +86,9 @@ Future<void> _seedBase(AppDatabase db) async {
           originDeviceId: 'test',
         ),
       );
-  await db.into(db.floors).insert(
+  await db
+      .into(db.floors)
+      .insert(
         FloorsCompanion.insert(
           id: 'floor-p2',
           projectId: _projectId,
@@ -98,7 +98,9 @@ Future<void> _seedBase(AppDatabase db) async {
           originDeviceId: 'test',
         ),
       );
-  await db.into(db.rooms).insert(
+  await db
+      .into(db.rooms)
+      .insert(
         RoomsCompanion.insert(
           id: 'room-p2',
           floorId: 'floor-p2',
@@ -112,7 +114,9 @@ Future<void> _seedBase(AppDatabase db) async {
           originDeviceId: 'test',
         ),
       );
-  await db.into(db.surfacePatches).insert(
+  await db
+      .into(db.surfacePatches)
+      .insert(
         SurfacePatchesCompanion.insert(
           id: 'patch-p2',
           roomId: 'room-p2',
@@ -133,7 +137,9 @@ Future<void> _seedBase(AppDatabase db) async {
           originDeviceId: 'test',
         ),
       );
-  await db.into(db.engineeringFamilyDefinitions).insert(
+  await db
+      .into(db.engineeringFamilyDefinitions)
+      .insert(
         EngineeringFamilyDefinitionsCompanion.insert(
           id: 'family-p2',
           code: 'P2',
@@ -145,7 +151,9 @@ Future<void> _seedBase(AppDatabase db) async {
         ),
         mode: InsertMode.insertOrIgnore,
       );
-  await db.into(db.projectEngineeringSystems).insert(
+  await db
+      .into(db.projectEngineeringSystems)
+      .insert(
         ProjectEngineeringSystemsCompanion.insert(
           id: _systemId,
           projectId: _projectId,
@@ -157,7 +165,9 @@ Future<void> _seedBase(AppDatabase db) async {
           originDeviceId: 'test',
         ),
       );
-  await db.into(db.engineeringCompatibilityProfiles).insert(
+  await db
+      .into(db.engineeringCompatibilityProfiles)
+      .insert(
         EngineeringCompatibilityProfilesCompanion.insert(
           id: _profileId,
           projectId: _projectId,
@@ -171,7 +181,9 @@ Future<void> _seedBase(AppDatabase db) async {
       );
 
   final catalog = _catalog();
-  await db.into(db.engineeringReferenceCatalogs).insert(
+  await db
+      .into(db.engineeringReferenceCatalogs)
+      .insert(
         EngineeringReferenceCatalogsCompanion.insert(
           id: catalog.id,
           projectId: _projectId,
@@ -190,7 +202,9 @@ Future<void> _seedConnection(AppDatabase db, String id) async {
   for (final end in ['a', 'b']) {
     final componentId = 'component-$id-$end';
     final portId = 'port-$id-$end';
-    await db.into(db.componentInstances).insert(
+    await db
+        .into(db.componentInstances)
+        .insert(
           ComponentInstancesCompanion.insert(
             id: componentId,
             definitionId: 'fixture',
@@ -204,7 +218,9 @@ Future<void> _seedConnection(AppDatabase db, String id) async {
             originDeviceId: 'test',
           ),
         );
-    await db.into(db.engineeringPortInstances).insert(
+    await db
+        .into(db.engineeringPortInstances)
+        .insert(
           EngineeringPortInstancesCompanion.insert(
             id: portId,
             projectId: _projectId,
@@ -225,7 +241,9 @@ Future<void> _seedConnection(AppDatabase db, String id) async {
     profileId: _profileId,
     medium: ConnectionMedium.wired,
   );
-  await db.into(db.engineeringPortConnections).insert(
+  await db
+      .into(db.engineeringPortConnections)
+      .insert(
         EngineeringPortConnectionsCompanion.insert(
           id: id,
           projectId: _projectId,
@@ -241,10 +259,16 @@ Future<void> _seedConnection(AppDatabase db, String id) async {
       );
 }
 
-Future<void> _seedCable(AppDatabase db, String id, String definitionCode) async {
+Future<void> _seedCable(
+  AppDatabase db,
+  String id,
+  String definitionCode,
+) async {
   final now = DateTime.utc(2026, 10, 14, 8);
   final ref = _catalog().cableDefinitionRef(definitionCode);
-  await db.into(db.elvCables).insert(
+  await db
+      .into(db.elvCables)
+      .insert(
         ElvCablesCompanion.insert(
           id: id,
           projectId: _projectId,
@@ -450,8 +474,14 @@ void main() {
     );
 
     final repo = DriftElvCableAllocationRepository(db);
-    expect(await repo.loadCableAllocations(_projectId, 'cable-acs'), hasLength(4));
-    expect(await repo.loadCableAllocations(_projectId, 'cable-fiber'), hasLength(2));
+    expect(
+      await repo.loadCableAllocations(_projectId, 'cable-acs'),
+      hasLength(4),
+    );
+    expect(
+      await repo.loadCableAllocations(_projectId, 'cable-fiber'),
+      hasLength(2),
+    );
     final claims = await db.select(db.cableResourceClaims).get();
     expect(claims.where((row) => row.cableId == 'cable-acs'), hasLength(8));
     expect(claims.where((row) => row.cableId == 'cable-fiber'), hasLength(4));
@@ -512,9 +542,9 @@ void main() {
       'ELV_ALLOC_RESOURCE_OVERLAP',
     );
     expect(
-      await (db.select(db.cableAllocationResourceSelections)
-            ..where((row) => row.allocationId.equals('alloc-atom')))
-          .getSingleOrNull(),
+      await (db.select(db.cableAllocationResourceSelections)..where(
+        (row) => row.allocationId.equals('alloc-atom'),
+      )).getSingleOrNull(),
       isNull,
     );
   });
@@ -565,47 +595,57 @@ void main() {
     );
   });
 
-  test('P2 allocation, evidence, claims, terminations and replay survive restart', () async {
-    final dir = await Directory.systemTemp.createTemp('electra-elv3-p2-restart-');
-    addTearDown(() => dir.delete(recursive: true));
-    final file = File('${dir.path}/p2.sqlite');
+  test(
+    'P2 allocation, evidence, claims, terminations and replay survive restart',
+    () async {
+      final dir = await Directory.systemTemp.createTemp(
+        'electra-elv3-p2-restart-',
+      );
+      addTearDown(() => dir.delete(recursive: true));
+      final file = File('${dir.path}/p2.sqlite');
 
-    var db = AppDatabase(NativeDatabase(file));
-    await _seedBase(db);
-    await _seedConnection(db, 'restart');
-    await _seedCable(db, 'cable-restart', 'ACS8');
-    await _activateFixture(
-      db,
-      allocationId: 'alloc-restart',
-      connectionId: 'restart',
-      cableId: 'cable-restart',
-      selection: ResourceSetSelection(const ['COND-1', 'COND-2']),
-    );
-    await db.close();
-
-    db = AppDatabase(NativeDatabase(file));
-    final repo = DriftElvCableAllocationRepository(db);
-    final restored = await repo.findAllocation(_projectId, 'alloc-restart');
-    expect(restored, isNotNull);
-    expect(restored!.state, CableAllocationState.active);
-    expect(restored.revision, 4);
-    expect((await repo.loadSelectionEvidence(_projectId, 'alloc-restart'))!.resolvedAtoms,
-        ['COND-1', 'COND-2']);
-    expect(
-      await repo.loadTerminationMappings(_projectId, 'alloc-restart'),
-      hasLength(4),
-    );
-
-    final replay = await _service(db).activate(
-      const ActivateCableAllocationCommand(
-        commandId: 'activate-alloc-restart',
-        projectId: _projectId,
+      var db = AppDatabase(NativeDatabase(file));
+      await _seedBase(db);
+      await _seedConnection(db, 'restart');
+      await _seedCable(db, 'cable-restart', 'ACS8');
+      await _activateFixture(
+        db,
         allocationId: 'alloc-restart',
-        expectedRevision: 3,
-      ),
-    );
-    expect(replay, isA<ElvCommandSuccess<CableAllocation>>());
-    expect((replay as ElvCommandSuccess<CableAllocation>).value.revision, 4);
-    await db.close();
-  });
+        connectionId: 'restart',
+        cableId: 'cable-restart',
+        selection: ResourceSetSelection(const ['COND-1', 'COND-2']),
+      );
+      await db.close();
+
+      db = AppDatabase(NativeDatabase(file));
+      final repo = DriftElvCableAllocationRepository(db);
+      final restored = await repo.findAllocation(_projectId, 'alloc-restart');
+      expect(restored, isNotNull);
+      expect(restored!.state, CableAllocationState.active);
+      expect(restored.revision, 4);
+      expect(
+        (await repo.loadSelectionEvidence(
+          _projectId,
+          'alloc-restart',
+        ))!.resolvedAtoms,
+        ['COND-1', 'COND-2'],
+      );
+      expect(
+        await repo.loadTerminationMappings(_projectId, 'alloc-restart'),
+        hasLength(4),
+      );
+
+      final replay = await _service(db).activate(
+        const ActivateCableAllocationCommand(
+          commandId: 'activate-alloc-restart',
+          projectId: _projectId,
+          allocationId: 'alloc-restart',
+          expectedRevision: 3,
+        ),
+      );
+      expect(replay, isA<ElvCommandSuccess<CableAllocation>>());
+      expect((replay as ElvCommandSuccess<CableAllocation>).value.revision, 4);
+      await db.close();
+    },
+  );
 }

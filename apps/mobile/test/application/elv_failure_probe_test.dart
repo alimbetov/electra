@@ -5,7 +5,9 @@ import '../support/elv_failure_injector.dart';
 
 void main() {
   test('probe throws only on the configured stable failure point', () async {
-    final probe = ArmedElvFailureProbe(ElvFailurePoints.p2ReserveAfterFirstClaim);
+    final probe = ArmedElvFailureProbe(
+      ElvFailurePoints.p2ReserveAfterFirstClaim,
+    );
     await probe.hit(ElvFailurePoints.p1CreateCableAfterInsert);
     expect(probe.hits, 0);
 

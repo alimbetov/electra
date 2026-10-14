@@ -15,11 +15,11 @@ final class CableDefinitionRef {
   final String definitionContentHash;
 
   CableDefinitionRef normalized() => CableDefinitionRef(
-    catalogId: catalogId.trim(),
-    catalogVersion: catalogVersion.trim(),
-    definitionCode: definitionCode.trim().toUpperCase(),
-    definitionContentHash: definitionContentHash.trim().toLowerCase(),
-  );
+        catalogId: catalogId.trim(),
+        catalogVersion: catalogVersion.trim(),
+        definitionCode: definitionCode.trim().toUpperCase(),
+        definitionContentHash: definitionContentHash.trim().toLowerCase(),
+      );
 
   List<String> validate() {
     final n = normalized();
@@ -80,16 +80,16 @@ final class CableDefinition {
     this.occupiedAreaMm2,
     this.minimumBendRadiusMm,
     this.maximumPullingForceN,
-  }) : code = code.trim().toUpperCase(),
-       mediaCode = mediaCode.trim().toUpperCase(),
-       categoryCode = _normalizeNullable(categoryCode),
-       conductorMaterialCode = _normalizeNullable(conductorMaterialCode),
-       shieldingCode = _normalizeNullable(shieldingCode),
-       firePerformanceCode = _normalizeNullable(firePerformanceCode),
-       environmentClassCodes = _normalizedCodes(environmentClassCodes),
-       installationClassCodes = _normalizedCodes(installationClassCodes),
-       technicalClassCodes = _normalizedCodes(technicalClassCodes),
-       resourceDefinitions = List.unmodifiable(resourceDefinitions);
+  })  : code = code.trim().toUpperCase(),
+        mediaCode = mediaCode.trim().toUpperCase(),
+        categoryCode = _normalizeNullable(categoryCode),
+        conductorMaterialCode = _normalizeNullable(conductorMaterialCode),
+        shieldingCode = _normalizeNullable(shieldingCode),
+        firePerformanceCode = _normalizeNullable(firePerformanceCode),
+        environmentClassCodes = _normalizedCodes(environmentClassCodes),
+        installationClassCodes = _normalizedCodes(installationClassCodes),
+        technicalClassCodes = _normalizedCodes(technicalClassCodes),
+        resourceDefinitions = List.unmodifiable(resourceDefinitions);
 
   final String code;
   final String label;
@@ -123,7 +123,8 @@ final class CableDefinition {
       errors.add('Cable definition code, label and mediaCode are required.');
     }
     for (final count in [conductorCount, pairCount, fiberCount]) {
-      if (count != null && count < 0) errors.add('Cable counts cannot be negative.');
+      if (count != null && count < 0)
+        errors.add('Cable counts cannot be negative.');
     }
     for (final value in [
       conductorCrossSectionMm2,
@@ -149,7 +150,9 @@ final class CableDefinition {
     for (final resource in resourceDefinitions) {
       errors.addAll(resource.validateLocal());
     }
-    final byId = {for (final resource in resourceDefinitions) resource.identity: resource};
+    final byId = {
+      for (final resource in resourceDefinitions) resource.identity: resource
+    };
     if (byId.length != resourceDefinitions.length) {
       errors.add('Cable resource identities must be unique.');
       return errors;
@@ -158,14 +161,16 @@ final class CableDefinition {
       (resource) => resource.kind == CableResourceKind.wholeCable,
     );
     if (whole.length != 1 || whole.single.identity != '__WHOLE_CABLE__') {
-      errors.add('Cable definition must contain exactly one __WHOLE_CABLE__ resource.');
+      errors.add(
+          'Cable definition must contain exactly one __WHOLE_CABLE__ resource.');
     }
     for (final resource in resourceDefinitions) {
       final parentId = resource.parentResourceId;
       if (parentId != null) {
         final parent = byId[parentId];
         if (parent == null) {
-          errors.add('Cable resource ${resource.identity} references unknown parent $parentId.');
+          errors.add(
+              'Cable resource ${resource.identity} references unknown parent $parentId.');
         } else if (!parent.childResourceIds.contains(resource.identity)) {
           errors.add('Cable resource parent/child links must be reciprocal.');
         }
@@ -173,85 +178,95 @@ final class CableDefinition {
       for (final childId in resource.childResourceIds) {
         final child = byId[childId];
         if (child == null) {
-          errors.add('Cable resource ${resource.identity} references unknown child $childId.');
+          errors.add(
+              'Cable resource ${resource.identity} references unknown child $childId.');
         } else if (child.parentResourceId != resource.identity) {
           errors.add('Cable resource parent/child links must be reciprocal.');
         }
       }
     }
     if (_hasCycle(byId)) errors.add('Cable resource graph must be acyclic.');
-    for (final resource in resourceDefinitions.where((r) => r.allocatable && !r.atomic)) {
+    for (final resource
+        in resourceDefinitions.where((r) => r.allocatable && !r.atomic)) {
       if (_atomicDescendants(resource.identity, byId).isEmpty) {
-        errors.add('Allocatable composite ${resource.identity} must resolve to atomic descendants.');
+        errors.add(
+            'Allocatable composite ${resource.identity} must resolve to atomic descendants.');
       }
     }
     return errors;
   }
 
   Map<String, Object?> toMap() => {
-    'code': code,
-    'label': label,
-    'deprecated': deprecated,
-    'mediaCode': mediaCode,
-    'categoryCode': categoryCode,
-    'conductorMaterialCode': conductorMaterialCode,
-    'shieldingCode': shieldingCode,
-    'firePerformanceCode': firePerformanceCode,
-    'environmentClassCodes': environmentClassCodes,
-    'installationClassCodes': installationClassCodes,
-    'technicalClassCodes': technicalClassCodes,
-    'conductorCount': conductorCount,
-    'pairCount': pairCount,
-    'fiberCount': fiberCount,
-    'conductorCrossSectionMm2': conductorCrossSectionMm2,
-    'characteristicImpedanceOhm': characteristicImpedanceOhm,
-    'dcResistanceOhmPerKm': dcResistanceOhmPerKm,
-    'capacitanceNfPerKm': capacitanceNfPerKm,
-    'inductanceMhPerKm': inductanceMhPerKm,
-    'voltageRatingV': voltageRatingV,
-    'outerDiameterMm': outerDiameterMm,
-    'occupiedAreaMm2': occupiedAreaMm2,
-    'minimumBendRadiusMm': minimumBendRadiusMm,
-    'maximumPullingForceN': maximumPullingForceN,
-    'resourceDefinitions': resourceDefinitions.map((item) => item.toMap()).toList(),
-  };
+        'code': code,
+        'label': label,
+        'deprecated': deprecated,
+        'mediaCode': mediaCode,
+        'categoryCode': categoryCode,
+        'conductorMaterialCode': conductorMaterialCode,
+        'shieldingCode': shieldingCode,
+        'firePerformanceCode': firePerformanceCode,
+        'environmentClassCodes': environmentClassCodes,
+        'installationClassCodes': installationClassCodes,
+        'technicalClassCodes': technicalClassCodes,
+        'conductorCount': conductorCount,
+        'pairCount': pairCount,
+        'fiberCount': fiberCount,
+        'conductorCrossSectionMm2': conductorCrossSectionMm2,
+        'characteristicImpedanceOhm': characteristicImpedanceOhm,
+        'dcResistanceOhmPerKm': dcResistanceOhmPerKm,
+        'capacitanceNfPerKm': capacitanceNfPerKm,
+        'inductanceMhPerKm': inductanceMhPerKm,
+        'voltageRatingV': voltageRatingV,
+        'outerDiameterMm': outerDiameterMm,
+        'occupiedAreaMm2': occupiedAreaMm2,
+        'minimumBendRadiusMm': minimumBendRadiusMm,
+        'maximumPullingForceN': maximumPullingForceN,
+        'resourceDefinitions':
+            resourceDefinitions.map((item) => item.toMap()).toList(),
+      };
 
   factory CableDefinition.fromMap(Map<String, dynamic> map) => CableDefinition(
-    code: map['code'] as String,
-    label: map['label'] as String,
-    deprecated: map['deprecated'] as bool? ?? false,
-    mediaCode: map['mediaCode'] as String,
-    categoryCode: map['categoryCode'] as String?,
-    conductorMaterialCode: map['conductorMaterialCode'] as String?,
-    shieldingCode: map['shieldingCode'] as String?,
-    firePerformanceCode: map['firePerformanceCode'] as String?,
-    environmentClassCodes: (map['environmentClassCodes'] as List? ?? const []).cast<String>(),
-    installationClassCodes: (map['installationClassCodes'] as List? ?? const []).cast<String>(),
-    technicalClassCodes: (map['technicalClassCodes'] as List? ?? const []).cast<String>(),
-    conductorCount: map['conductorCount'] as int?,
-    pairCount: map['pairCount'] as int?,
-    fiberCount: map['fiberCount'] as int?,
-    conductorCrossSectionMm2: (map['conductorCrossSectionMm2'] as num?)?.toDouble(),
-    characteristicImpedanceOhm: (map['characteristicImpedanceOhm'] as num?)?.toDouble(),
-    dcResistanceOhmPerKm: (map['dcResistanceOhmPerKm'] as num?)?.toDouble(),
-    capacitanceNfPerKm: (map['capacitanceNfPerKm'] as num?)?.toDouble(),
-    inductanceMhPerKm: (map['inductanceMhPerKm'] as num?)?.toDouble(),
-    voltageRatingV: (map['voltageRatingV'] as num?)?.toDouble(),
-    outerDiameterMm: (map['outerDiameterMm'] as num?)?.toDouble(),
-    occupiedAreaMm2: (map['occupiedAreaMm2'] as num?)?.toDouble(),
-    minimumBendRadiusMm: (map['minimumBendRadiusMm'] as num?)?.toDouble(),
-    maximumPullingForceN: (map['maximumPullingForceN'] as num?)?.toDouble(),
-    resourceDefinitions: (map['resourceDefinitions'] as List)
-        .map((value) => CableResourceDefinition.fromMap(value as Map<String, dynamic>)),
-  );
+        code: map['code'] as String,
+        label: map['label'] as String,
+        deprecated: map['deprecated'] as bool? ?? false,
+        mediaCode: map['mediaCode'] as String,
+        categoryCode: map['categoryCode'] as String?,
+        conductorMaterialCode: map['conductorMaterialCode'] as String?,
+        shieldingCode: map['shieldingCode'] as String?,
+        firePerformanceCode: map['firePerformanceCode'] as String?,
+        environmentClassCodes:
+            (map['environmentClassCodes'] as List? ?? const []).cast<String>(),
+        installationClassCodes:
+            (map['installationClassCodes'] as List? ?? const []).cast<String>(),
+        technicalClassCodes:
+            (map['technicalClassCodes'] as List? ?? const []).cast<String>(),
+        conductorCount: map['conductorCount'] as int?,
+        pairCount: map['pairCount'] as int?,
+        fiberCount: map['fiberCount'] as int?,
+        conductorCrossSectionMm2:
+            (map['conductorCrossSectionMm2'] as num?)?.toDouble(),
+        characteristicImpedanceOhm:
+            (map['characteristicImpedanceOhm'] as num?)?.toDouble(),
+        dcResistanceOhmPerKm: (map['dcResistanceOhmPerKm'] as num?)?.toDouble(),
+        capacitanceNfPerKm: (map['capacitanceNfPerKm'] as num?)?.toDouble(),
+        inductanceMhPerKm: (map['inductanceMhPerKm'] as num?)?.toDouble(),
+        voltageRatingV: (map['voltageRatingV'] as num?)?.toDouble(),
+        outerDiameterMm: (map['outerDiameterMm'] as num?)?.toDouble(),
+        occupiedAreaMm2: (map['occupiedAreaMm2'] as num?)?.toDouble(),
+        minimumBendRadiusMm: (map['minimumBendRadiusMm'] as num?)?.toDouble(),
+        maximumPullingForceN: (map['maximumPullingForceN'] as num?)?.toDouble(),
+        resourceDefinitions: (map['resourceDefinitions'] as List).map((value) =>
+            CableResourceDefinition.fromMap(value as Map<String, dynamic>)),
+      );
 }
 
-String cableDefinitionContentHashV1(CableDefinition definition) => sha256HexUtf8(
-  canonicalEngineeringJsonV1({
-    'schema': 'electra.cable-definition.v1',
-    'definition': definition.toMap(),
-  }),
-);
+String cableDefinitionContentHashV1(CableDefinition definition) =>
+    sha256HexUtf8(
+      canonicalEngineeringJsonV1({
+        'schema': 'electra.cable-definition.v1',
+        'definition': definition.toMap(),
+      }),
+    );
 
 String? _normalizeNullable(String? value) {
   final normalized = value?.trim().toUpperCase();
@@ -259,8 +274,10 @@ String? _normalizeNullable(String? value) {
 }
 
 List<String> _normalizedCodes(Iterable<String> values) => List.unmodifiable(
-  values.map((value) => value.trim().toUpperCase()).where((value) => value.isNotEmpty),
-);
+      values
+          .map((value) => value.trim().toUpperCase())
+          .where((value) => value.isNotEmpty),
+    );
 
 bool _hasCycle(Map<String, CableResourceDefinition> byId) {
   final visiting = <String>{};
@@ -275,6 +292,7 @@ bool _hasCycle(Map<String, CableResourceDefinition> byId) {
     visiting.remove(id);
     return false;
   }
+
   return byId.keys.any(visit);
 }
 

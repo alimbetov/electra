@@ -1,6 +1,7 @@
 import 'elv_physical_compatibility_profile.dart';
 
-const String physicalCompatibilityEngineVersion = 'elv.physical-compatibility.v1';
+const String physicalCompatibilityEngineVersion =
+    'elv.physical-compatibility.v1';
 
 enum PhysicalCompatibilityStatus { ok, warning, forbidden, unresolved }
 
@@ -73,44 +74,72 @@ abstract final class PhysicalCompatibilityEngine {
       switch (rule) {
         case AllowedCarrierKindRule(:final allowedKinds):
           if (!allowedKinds.contains(input.carrierKind.toUpperCase())) {
-            findings.add(_finding(input, PhysicalCompatibilityStatus.forbidden,
-                'ELV_PHYS_CARRIER_KIND_FORBIDDEN', 'Carrier kind is not allowed by the active technical profile.'));
+            findings.add(_finding(
+                input,
+                PhysicalCompatibilityStatus.forbidden,
+                'ELV_PHYS_CARRIER_KIND_FORBIDDEN',
+                'Carrier kind is not allowed by the active technical profile.'));
           }
         case AllowedInstallationClassRule(:final allowedCodes):
           final actual = input.installationClassCode?.toUpperCase();
           if (actual == null) {
-            findings.add(_finding(input, PhysicalCompatibilityStatus.unresolved,
-                'ELV_PHYS_INSTALLATION_CLASS_MISSING', 'Installation class evidence is missing.'));
+            findings.add(_finding(
+                input,
+                PhysicalCompatibilityStatus.unresolved,
+                'ELV_PHYS_INSTALLATION_CLASS_MISSING',
+                'Installation class evidence is missing.'));
           } else if (!allowedCodes.contains(actual)) {
-            findings.add(_finding(input, PhysicalCompatibilityStatus.forbidden,
-                'ELV_PHYS_INSTALLATION_CLASS_FORBIDDEN', 'Installation class is not allowed by the active technical profile.'));
+            findings.add(_finding(
+                input,
+                PhysicalCompatibilityStatus.forbidden,
+                'ELV_PHYS_INSTALLATION_CLASS_FORBIDDEN',
+                'Installation class is not allowed by the active technical profile.'));
           }
         case AllowedEnvironmentClassRule(:final dimension, :final allowedCodes):
-          final actual = input.environmentCodes[dimension.toUpperCase()]?.toUpperCase();
+          final actual =
+              input.environmentCodes[dimension.toUpperCase()]?.toUpperCase();
           if (actual == null) {
-            findings.add(_finding(input, PhysicalCompatibilityStatus.unresolved,
-                'ELV_PHYS_ENVIRONMENT_FACT_MISSING', 'Required environment evidence is missing.'));
+            findings.add(_finding(
+                input,
+                PhysicalCompatibilityStatus.unresolved,
+                'ELV_PHYS_ENVIRONMENT_FACT_MISSING',
+                'Required environment evidence is missing.'));
           } else if (!allowedCodes.contains(actual)) {
-            findings.add(_finding(input, PhysicalCompatibilityStatus.forbidden,
-                'ELV_PHYS_ENVIRONMENT_FORBIDDEN', 'Environment class is not allowed by the active technical profile.'));
+            findings.add(_finding(
+                input,
+                PhysicalCompatibilityStatus.forbidden,
+                'ELV_PHYS_ENVIRONMENT_FORBIDDEN',
+                'Environment class is not allowed by the active technical profile.'));
           }
         case MaximumCableDiameterRule(:final maximumDiameterMm):
           final actual = input.cableOuterDiameterMm;
           if (actual == null) {
-            findings.add(_finding(input, PhysicalCompatibilityStatus.unresolved,
-                'ELV_PHYS_CABLE_DIAMETER_MISSING', 'Cable outer diameter evidence is missing.'));
+            findings.add(_finding(
+                input,
+                PhysicalCompatibilityStatus.unresolved,
+                'ELV_PHYS_CABLE_DIAMETER_MISSING',
+                'Cable outer diameter evidence is missing.'));
           } else if (actual > maximumDiameterMm) {
-            findings.add(_finding(input, PhysicalCompatibilityStatus.forbidden,
-                'ELV_PHYS_CABLE_DIAMETER_EXCEEDED', 'Cable outer diameter exceeds the technical profile limit.'));
+            findings.add(_finding(
+                input,
+                PhysicalCompatibilityStatus.forbidden,
+                'ELV_PHYS_CABLE_DIAMETER_EXCEEDED',
+                'Cable outer diameter exceeds the technical profile limit.'));
           }
         case MinimumCarrierUsableAreaRule(:final minimumAreaMm2):
           final actual = input.carrierUsableAreaMm2;
           if (actual == null) {
-            findings.add(_finding(input, PhysicalCompatibilityStatus.unresolved,
-                'ELV_PHYS_CARRIER_AREA_MISSING', 'Carrier usable-area evidence is missing.'));
+            findings.add(_finding(
+                input,
+                PhysicalCompatibilityStatus.unresolved,
+                'ELV_PHYS_CARRIER_AREA_MISSING',
+                'Carrier usable-area evidence is missing.'));
           } else if (actual < minimumAreaMm2) {
-            findings.add(_finding(input, PhysicalCompatibilityStatus.forbidden,
-                'ELV_PHYS_CARRIER_AREA_INSUFFICIENT', 'Carrier usable area is below the technical profile requirement.'));
+            findings.add(_finding(
+                input,
+                PhysicalCompatibilityStatus.forbidden,
+                'ELV_PHYS_CARRIER_AREA_INSUFFICIENT',
+                'Carrier usable area is below the technical profile requirement.'));
           }
         case DirectIntrinsicProhibitionRule(:final code):
           findings.add(_finding(input, PhysicalCompatibilityStatus.forbidden,

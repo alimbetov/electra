@@ -9,9 +9,11 @@ enum PhysicalCarrierKind {
 }
 
 enum PhysicalCarrierLifecycleState { active, archived }
+
 enum CarrierCompartmentLifecycleState { active, archived }
 
 enum CarrierEnclosureExposure { indoor, outdoor, mixed }
+
 enum MaintenanceAccessibility { accessible, restricted, inaccessible }
 
 final class CarrierTemperatureRange {
@@ -88,8 +90,7 @@ final class CircularCarrierCrossSection extends CarrierCrossSection {
   bool get valid => diameterMm.isFinite && diameterMm > 0;
 
   @override
-  double get usableAreaMm2 =>
-      3.141592653589793 * diameterMm * diameterMm / 4;
+  double get usableAreaMm2 => 3.141592653589793 * diameterMm * diameterMm / 4;
 }
 
 final class CustomCarrierCrossSection extends CarrierCrossSection {
@@ -208,7 +209,8 @@ List<String> validateCarrierCompartments({
   if (active.map((item) => item.sequence).toSet().length != active.length) {
     errors.add('Active carrier compartment sequences must be unique.');
   }
-  if (active.every((item) => item.crossSection.valid) && carrier.crossSection.valid) {
+  if (active.every((item) => item.crossSection.valid) &&
+      carrier.crossSection.valid) {
     final sum = active.fold<double>(
       0,
       (value, item) => value + item.crossSection.usableAreaMm2,

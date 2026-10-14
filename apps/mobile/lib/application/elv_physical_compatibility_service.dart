@@ -19,12 +19,16 @@ final class ElvPhysicalCompatibilityService {
           code: 'ELV_PHYS_PROFILE_SET_MISSING',
           affectedEntityIds: List.unmodifiable(input.subjectIds),
           inputFingerprint: input.inputFingerprint,
-          explanation: 'No active physical compatibility profile set is configured.',
+          explanation:
+              'No active physical compatibility profile set is configured.',
           sourceProfileRefs: const [],
         ),
       ];
     }
-    final profiles = await repository.resolveProfiles(projectId, activeSet.refs);
+    final profiles = await repository.resolveProfiles(
+      projectId,
+      activeSet.refs,
+    );
     final rules = <PhysicalCompatibilityRule>[
       for (final profile in profiles) ...profile.rules,
     ];

@@ -155,7 +155,8 @@ class ComponentInstances extends Table with GeometryAuditColumns {
   IntColumn get localYmm => integer()();
   RealColumn get rotationRadians => real().withDefault(const Constant(0))();
   TextColumn get displayNameOverride => text().nullable()();
-  TextColumn get metadataOverridesJson => text().withDefault(const Constant('{}'))();
+  TextColumn get metadataOverridesJson =>
+      text().withDefault(const Constant('{}'))();
   @override
   Set<Column<Object>> get primaryKey => {id};
 }
@@ -179,8 +180,10 @@ class ConsumptionGroups extends Table with GeometryAuditColumns {
 
 @DataClassName('EquipmentElectricalLoadRow')
 class EquipmentElectricalLoads extends Table with GeometryAuditColumns {
-  TextColumn get componentInstanceId => text().references(ComponentInstances, #componentInstanceId)();
-  TextColumn get consumptionGroupId => text().nullable().references(ConsumptionGroups, #id)();
+  TextColumn get componentInstanceId =>
+      text().references(ComponentInstances, #componentInstanceId)();
+  TextColumn get consumptionGroupId =>
+      text().nullable().references(ConsumptionGroups, #id)();
   RealColumn get nominalVoltageV => real()();
   IntColumn get phases => integer()();
   TextColumn get supplySystem => text()();
@@ -193,9 +196,12 @@ class EquipmentElectricalLoads extends Table with GeometryAuditColumns {
   TextColumn get startingMethod => text()();
   RealColumn get startingCurrentFactor => real().nullable()();
   TextColumn get loadType => text().nullable()();
-  BoolColumn get dedicatedCircuitRecommended => boolean().withDefault(const Constant(false))();
-  BoolColumn get requiresNeutral => boolean().withDefault(const Constant(false))();
-  BoolColumn get requiresProtectiveEarth => boolean().withDefault(const Constant(true))();
+  BoolColumn get dedicatedCircuitRecommended =>
+      boolean().withDefault(const Constant(false))();
+  BoolColumn get requiresNeutral =>
+      boolean().withDefault(const Constant(false))();
+  BoolColumn get requiresProtectiveEarth =>
+      boolean().withDefault(const Constant(true))();
   TextColumn get powerBasis => text().nullable()();
   @override
   Set<Column<Object>> get primaryKey => {componentInstanceId};
@@ -210,7 +216,8 @@ class ElectricalCircuits extends Table with GeometryAuditColumns {
   IntColumn get phases => integer()();
   TextColumn get supplySystem => text()();
   RealColumn get demandFactor => real().withDefault(const Constant(1))();
-  TextColumn get sourceGroupId => text().nullable().references(ConsumptionGroups, #id)();
+  TextColumn get sourceGroupId =>
+      text().nullable().references(ConsumptionGroups, #id)();
   TextColumn get reviewedInputSignature => text().nullable()();
   @override
   Set<Column<Object>> get primaryKey => {id};
@@ -218,7 +225,8 @@ class ElectricalCircuits extends Table with GeometryAuditColumns {
 
 @DataClassName('CircuitLoadAssignmentRow')
 class CircuitLoadAssignments extends Table {
-  TextColumn get componentInstanceId => text().references(EquipmentElectricalLoads, #componentInstanceId)();
+  TextColumn get componentInstanceId =>
+      text().references(EquipmentElectricalLoads, #componentInstanceId)();
   TextColumn get circuitId => text().references(ElectricalCircuits, #id)();
   @override
   Set<Column<Object>> get primaryKey => {componentInstanceId};
@@ -257,10 +265,12 @@ class CableRouteNodes extends Table with GeometryAuditColumns {
   IntColumn get worldYmm => integer()();
   IntColumn get worldZmm => integer()();
   @ReferenceName('secondaryRouteNodes')
-  TextColumn get otherPatchId => text().nullable().references(SurfacePatches, #id)();
+  TextColumn get otherPatchId =>
+      text().nullable().references(SurfacePatches, #id)();
   IntColumn get otherLocalXmm => integer().nullable()();
   IntColumn get otherLocalYmm => integer().nullable()();
-  TextColumn get adjacencyId => text().nullable().references(SurfaceAdjacencies, #id)();
+  TextColumn get adjacencyId =>
+      text().nullable().references(SurfaceAdjacencies, #id)();
   @override
   Set<Column<Object>> get primaryKey => {id};
 }
@@ -276,7 +286,8 @@ class CableRouteSegments extends Table with GeometryAuditColumns {
   TextColumn get toNodeId => text().references(CableRouteNodes, #id)();
   TextColumn get surfacePatchId => text().references(SurfacePatches, #id)();
   TextColumn get layingMethod => text()();
-  TextColumn get physicalChannelId => text().nullable().references(PhysicalChannels, #id)();
+  TextColumn get physicalChannelId =>
+      text().nullable().references(PhysicalChannels, #id)();
   @override
   Set<Column<Object>> get primaryKey => {id};
 }
@@ -289,7 +300,8 @@ class CableRuns extends Table with GeometryAuditColumns {
   TextColumn get circuitId => text().references(ElectricalCircuits, #id)();
   TextColumn get routeId => text().references(CableRoutes, #id)();
   RealColumn get reservePercent => real().withDefault(const Constant(0))();
-  IntColumn get terminationAllowanceMm => integer().withDefault(const Constant(0))();
+  IntColumn get terminationAllowanceMm =>
+      integer().withDefault(const Constant(0))();
   @override
   Set<Column<Object>> get primaryKey => {id};
 }
@@ -318,7 +330,8 @@ class JunctionConnections extends Table {
   TextColumn get nodeId => text().references(CableRouteNodes, #id)();
   TextColumn get direction => text()();
   TextColumn get circuitId => text().references(ElectricalCircuits, #id)();
-  TextColumn get channelId => text().nullable().references(PhysicalChannels, #id)();
+  TextColumn get channelId =>
+      text().nullable().references(PhysicalChannels, #id)();
   @override
   Set<Column<Object>> get primaryKey => {junctionId, runId};
 }
@@ -385,27 +398,33 @@ class NormativeDocuments extends Table with GeometryAuditColumns {
   @override
   Set<Column<Object>> get primaryKey => {id};
   @override
-  List<Set<Column<Object>>> get uniqueKeys => [{standardCode, version, jurisdiction}];
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {standardCode, version, jurisdiction},
+  ];
 }
 
 @DataClassName('ProtectionRulesetRow')
 class ProtectionRulesets extends Table with GeometryAuditColumns {
   TextColumn get id => text()();
   TextColumn get projectId => text().references(Projects, #id)();
-  TextColumn get normativeDocumentId => text().references(NormativeDocuments, #id)();
+  TextColumn get normativeDocumentId =>
+      text().references(NormativeDocuments, #id)();
   TextColumn get ruleId => text()();
   TextColumn get version => text()();
   TextColumn get payloadJson => text()();
   @override
   Set<Column<Object>> get primaryKey => {id};
   @override
-  List<Set<Column<Object>>> get uniqueKeys => [{projectId, ruleId, version}];
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {projectId, ruleId, version},
+  ];
 }
 
 @DataClassName('CircuitProtectionSettingRow')
 class CircuitProtectionSettings extends Table with GeometryAuditColumns {
   TextColumn get circuitId => text().references(ElectricalCircuits, #id)();
-  TextColumn get rulesetId => text().nullable().references(ProtectionRulesets, #id)();
+  TextColumn get rulesetId =>
+      text().nullable().references(ProtectionRulesets, #id)();
   TextColumn get inputsJson => text()();
   TextColumn get reviewedFingerprint => text().nullable()();
   @override
@@ -433,7 +452,9 @@ class ManufacturerProducts extends Table with GeometryAuditColumns {
   @override
   Set<Column<Object>> get primaryKey => {id};
   @override
-  List<Set<Column<Object>>> get uniqueKeys => [{catalogId, sku}];
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {catalogId, sku},
+  ];
 }
 
 @DataClassName('ManufacturerPolicyRow')
@@ -465,7 +486,9 @@ class PanelGenerationConfigs extends Table with GeometryAuditColumns {
   @override
   Set<Column<Object>> get primaryKey => {id};
   @override
-  List<Set<Column<Object>>> get uniqueKeys => [{floorId}];
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {floorId},
+  ];
 }
 
 @DataClassName('EngineeringFamilyDefinitionRow')
@@ -477,7 +500,9 @@ class EngineeringFamilyDefinitions extends Table with GeometryAuditColumns {
   @override
   Set<Column<Object>> get primaryKey => {id};
   @override
-  List<Set<Column<Object>>> get uniqueKeys => [{code, familyVersion}];
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {code, familyVersion},
+  ];
 }
 
 @DataClassName('ProjectEngineeringSystemRow')
@@ -485,17 +510,21 @@ class ProjectEngineeringSystems extends Table with GeometryAuditColumns {
   TextColumn get id => text()();
   TextColumn get projectId => text().references(Projects, #id)();
   TextColumn get code => text()();
-  TextColumn get familyId => text().references(EngineeringFamilyDefinitions, #id)();
+  TextColumn get familyId =>
+      text().references(EngineeringFamilyDefinitions, #id)();
   TextColumn get payloadJson => text()();
   @override
   Set<Column<Object>> get primaryKey => {id};
   @override
-  List<Set<Column<Object>>> get uniqueKeys => [{projectId, code}];
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {projectId, code},
+  ];
 }
 
 @DataClassName('ComponentEngineeringMembershipRow')
 class ComponentEngineeringMemberships extends Table with GeometryAuditColumns {
-  TextColumn get systemId => text().references(ProjectEngineeringSystems, #id)();
+  TextColumn get systemId =>
+      text().references(ProjectEngineeringSystems, #id)();
   TextColumn get componentId => text().references(ComponentInstances, #id)();
   TextColumn get role => text()();
   @override
@@ -512,14 +541,17 @@ class EngineeringReferenceCatalogs extends Table with GeometryAuditColumns {
   @override
   Set<Column<Object>> get primaryKey => {id};
   @override
-  List<Set<Column<Object>>> get uniqueKeys => [{projectId, code, catalogVersion}];
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {projectId, code, catalogVersion},
+  ];
 }
 
 @DataClassName('ComponentReferenceBindingRow')
 class ComponentReferenceBindings extends Table with GeometryAuditColumns {
   TextColumn get componentId => text().references(ComponentInstances, #id)();
   TextColumn get projectId => text().references(Projects, #id)();
-  TextColumn get catalogId => text().references(EngineeringReferenceCatalogs, #id)();
+  TextColumn get catalogId =>
+      text().references(EngineeringReferenceCatalogs, #id)();
   TextColumn get profileCode => text()();
   TextColumn get payloadJson => text()();
   @override
@@ -536,7 +568,9 @@ class EngineeringPortInstances extends Table with GeometryAuditColumns {
   @override
   Set<Column<Object>> get primaryKey => {id};
   @override
-  List<Set<Column<Object>>> get uniqueKeys => [{componentId, code}];
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {componentId, code},
+  ];
 }
 
 @DataClassName('EngineeringCompatibilityProfileRow')
@@ -549,7 +583,9 @@ class EngineeringCompatibilityProfiles extends Table with GeometryAuditColumns {
   @override
   Set<Column<Object>> get primaryKey => {id};
   @override
-  List<Set<Column<Object>>> get uniqueKeys => [{projectId, code, profileVersion}];
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {projectId, code, profileVersion},
+  ];
 }
 
 @DataClassName('EngineeringTopologyProfileRow')
@@ -562,7 +598,9 @@ class EngineeringTopologyProfiles extends Table with GeometryAuditColumns {
   @override
   Set<Column<Object>> get primaryKey => {id};
   @override
-  List<Set<Column<Object>>> get uniqueKeys => [{projectId, code, profileVersion}];
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {projectId, code, profileVersion},
+  ];
 }
 
 @DataClassName('EngineeringAssemblyProfileRow')
@@ -575,38 +613,50 @@ class EngineeringAssemblyProfiles extends Table with GeometryAuditColumns {
   @override
   Set<Column<Object>> get primaryKey => {id};
   @override
-  List<Set<Column<Object>>> get uniqueKeys => [{projectId, code, profileVersion}];
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {projectId, code, profileVersion},
+  ];
 }
 
 @DataClassName('EngineeringTopologyGroupRow')
 class EngineeringTopologyGroups extends Table with GeometryAuditColumns {
   TextColumn get id => text()();
   TextColumn get projectId => text().references(Projects, #id)();
-  TextColumn get systemId => text().references(ProjectEngineeringSystems, #id)();
+  TextColumn get systemId =>
+      text().references(ProjectEngineeringSystems, #id)();
   TextColumn get code => text()();
-  TextColumn get profileId => text().references(EngineeringTopologyProfiles, #id)();
+  TextColumn get profileId =>
+      text().references(EngineeringTopologyProfiles, #id)();
   @ReferenceName('topologyGroupsStartingAtPort')
-  TextColumn get startPortId => text().references(EngineeringPortInstances, #id)();
+  TextColumn get startPortId =>
+      text().references(EngineeringPortInstances, #id)();
   @ReferenceName('topologyGroupsEndingAtPort')
-  TextColumn get endPortId => text().nullable().references(EngineeringPortInstances, #id)();
+  TextColumn get endPortId =>
+      text().nullable().references(EngineeringPortInstances, #id)();
   TextColumn get payloadJson => text()();
   @override
   Set<Column<Object>> get primaryKey => {id};
   @override
-  List<Set<Column<Object>>> get uniqueKeys => [{systemId, code}];
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {systemId, code},
+  ];
 }
 
 @DataClassName('EngineeringPortConnectionRow')
 class EngineeringPortConnections extends Table with GeometryAuditColumns {
   TextColumn get id => text()();
   TextColumn get projectId => text().references(Projects, #id)();
-  TextColumn get systemId => text().references(ProjectEngineeringSystems, #id)();
+  TextColumn get systemId =>
+      text().references(ProjectEngineeringSystems, #id)();
   @ReferenceName('outgoingEngineeringPortConnections')
-  TextColumn get fromPortId => text().references(EngineeringPortInstances, #id)();
+  TextColumn get fromPortId =>
+      text().references(EngineeringPortInstances, #id)();
   @ReferenceName('incomingEngineeringPortConnections')
   TextColumn get toPortId => text().references(EngineeringPortInstances, #id)();
-  TextColumn get profileId => text().references(EngineeringCompatibilityProfiles, #id)();
-  TextColumn get groupId => text().nullable().references(EngineeringTopologyGroups, #id)();
+  TextColumn get profileId =>
+      text().references(EngineeringCompatibilityProfiles, #id)();
+  TextColumn get groupId =>
+      text().nullable().references(EngineeringTopologyGroups, #id)();
   TextColumn get payloadJson => text()();
   @override
   Set<Column<Object>> get primaryKey => {id};
@@ -618,7 +668,8 @@ class EngineeringInternalMappings extends Table with GeometryAuditColumns {
   TextColumn get projectId => text().references(Projects, #id)();
   TextColumn get componentId => text().references(ComponentInstances, #id)();
   @ReferenceName('outgoingEngineeringInternalMappings')
-  TextColumn get fromPortId => text().references(EngineeringPortInstances, #id)();
+  TextColumn get fromPortId =>
+      text().references(EngineeringPortInstances, #id)();
   @ReferenceName('incomingEngineeringInternalMappings')
   TextColumn get toPortId => text().references(EngineeringPortInstances, #id)();
   TextColumn get payloadJson => text()();
@@ -631,12 +682,15 @@ class EngineeringComponentAssemblies extends Table with GeometryAuditColumns {
   TextColumn get id => text()();
   TextColumn get projectId => text().references(Projects, #id)();
   TextColumn get code => text()();
-  TextColumn get profileId => text().references(EngineeringAssemblyProfiles, #id)();
+  TextColumn get profileId =>
+      text().references(EngineeringAssemblyProfiles, #id)();
   TextColumn get payloadJson => text()();
   @override
   Set<Column<Object>> get primaryKey => {id};
   @override
-  List<Set<Column<Object>>> get uniqueKeys => [{projectId, code}];
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {projectId, code},
+  ];
 }
 
 @DataClassName('EngineeringPlacementOperationRow')
@@ -662,7 +716,8 @@ class ElvCables extends Table with GeometryAuditColumns {
   TextColumn get label => text()();
   TextColumn get normalizedLabel => text()();
   TextColumn get name => text()();
-  TextColumn get definitionCatalogId => text().references(EngineeringReferenceCatalogs, #id)();
+  TextColumn get definitionCatalogId =>
+      text().references(EngineeringReferenceCatalogs, #id)();
   TextColumn get definitionCatalogVersion => text()();
   TextColumn get definitionCode => text()();
   TextColumn get definitionContentHash => text()();
@@ -675,7 +730,8 @@ class ElvCables extends Table with GeometryAuditColumns {
 class CableAllocations extends Table with GeometryAuditColumns {
   TextColumn get id => text()();
   TextColumn get projectId => text().references(Projects, #id)();
-  TextColumn get engineeringConnectionId => text().references(EngineeringPortConnections, #id)();
+  TextColumn get engineeringConnectionId =>
+      text().references(EngineeringPortConnections, #id)();
   TextColumn get cableId => text().references(ElvCables, #id)();
   TextColumn get lifecycleState => text()();
   TextColumn get transitionRef => text().nullable()();
@@ -713,13 +769,16 @@ class CableTerminationMappings extends Table with GeometryAuditColumns {
   TextColumn get allocationId => text().references(CableAllocations, #id)();
   TextColumn get resourceIdentity => text()();
   TextColumn get endRole => text()();
-  TextColumn get endpointPortId => text().references(EngineeringPortInstances, #id)();
+  TextColumn get endpointPortId =>
+      text().references(EngineeringPortInstances, #id)();
   TextColumn get endpointTerminalRef => text().nullable()();
   TextColumn get terminationRole => text().nullable()();
   @override
   Set<Column<Object>> get primaryKey => {id};
   @override
-  List<Set<Column<Object>>> get uniqueKeys => [{allocationId, resourceIdentity, endRole}];
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {allocationId, resourceIdentity, endRole},
+  ];
 }
 
 @DataClassName('CommandExecutionRecordRow')
@@ -740,28 +799,64 @@ class CommandExecutionRecords extends Table {
 
 @DriftDatabase(
   tables: [
-    Projects, Floors, Rooms, SurfacePatches, SurfaceEdges, SurfaceAdjacencies,
-    Openings, SpatialFeatures, ComponentInstances, ComponentCatalogPreferences,
-    ConsumptionGroups, EquipmentElectricalLoads, ElectricalCircuits,
-    CircuitLoadAssignments, PhysicalChannels, CableRoutes, CableRouteNodes,
-    CableRouteSegments, CableRuns, RoutingJunctions, JunctionConnections,
-    FloorRoutingPanels, FloorPanelFeeds, FloorRoutingHandoffs,
-    ProjectDerivedResults, NormativeDocuments, ProtectionRulesets,
-    CircuitProtectionSettings, ManufacturerCatalogs, ManufacturerProducts,
-    ManufacturerPolicies, CircuitProductSelections, PanelGenerationConfigs,
-    EngineeringFamilyDefinitions, ProjectEngineeringSystems,
-    ComponentEngineeringMemberships, EngineeringReferenceCatalogs,
-    ComponentReferenceBindings, EngineeringPortInstances,
-    EngineeringCompatibilityProfiles, EngineeringTopologyProfiles,
-    EngineeringAssemblyProfiles, EngineeringTopologyGroups,
-    EngineeringPortConnections, EngineeringInternalMappings,
-    EngineeringComponentAssemblies, EngineeringPlacementOperations,
-    ElvCables, CableAllocations, CableAllocationResourceSelections,
-    CableResourceClaims, CableTerminationMappings, CommandExecutionRecords,
+    Projects,
+    Floors,
+    Rooms,
+    SurfacePatches,
+    SurfaceEdges,
+    SurfaceAdjacencies,
+    Openings,
+    SpatialFeatures,
+    ComponentInstances,
+    ComponentCatalogPreferences,
+    ConsumptionGroups,
+    EquipmentElectricalLoads,
+    ElectricalCircuits,
+    CircuitLoadAssignments,
+    PhysicalChannels,
+    CableRoutes,
+    CableRouteNodes,
+    CableRouteSegments,
+    CableRuns,
+    RoutingJunctions,
+    JunctionConnections,
+    FloorRoutingPanels,
+    FloorPanelFeeds,
+    FloorRoutingHandoffs,
+    ProjectDerivedResults,
+    NormativeDocuments,
+    ProtectionRulesets,
+    CircuitProtectionSettings,
+    ManufacturerCatalogs,
+    ManufacturerProducts,
+    ManufacturerPolicies,
+    CircuitProductSelections,
+    PanelGenerationConfigs,
+    EngineeringFamilyDefinitions,
+    ProjectEngineeringSystems,
+    ComponentEngineeringMemberships,
+    EngineeringReferenceCatalogs,
+    ComponentReferenceBindings,
+    EngineeringPortInstances,
+    EngineeringCompatibilityProfiles,
+    EngineeringTopologyProfiles,
+    EngineeringAssemblyProfiles,
+    EngineeringTopologyGroups,
+    EngineeringPortConnections,
+    EngineeringInternalMappings,
+    EngineeringComponentAssemblies,
+    EngineeringPlacementOperations,
+    ElvCables,
+    CableAllocations,
+    CableAllocationResourceSelections,
+    CableResourceClaims,
+    CableTerminationMappings,
+    CommandExecutionRecords,
   ],
 )
 final class AppDatabase extends _$AppDatabase {
-  AppDatabase([QueryExecutor? executor]) : super(executor ?? driftDatabase(name: 'electra'));
+  AppDatabase([QueryExecutor? executor])
+    : super(executor ?? driftDatabase(name: 'electra'));
 
   @override
   int get schemaVersion => 19;
@@ -790,7 +885,11 @@ final class AppDatabase extends _$AppDatabase {
           await migrator.createTable(equipmentElectricalLoads);
         }
         if (from < 6) {
-          if (from >= 5) await migrator.addColumn(equipmentElectricalLoads, equipmentElectricalLoads.powerBasis);
+          if (from >= 5)
+            await migrator.addColumn(
+              equipmentElectricalLoads,
+              equipmentElectricalLoads.powerBasis,
+            );
           await migrator.createTable(electricalCircuits);
           await migrator.createTable(circuitLoadAssignments);
         }
@@ -842,7 +941,8 @@ final class AppDatabase extends _$AppDatabase {
           await migrator.createTable(engineeringInternalMappings);
           await migrator.createTable(engineeringComponentAssemblies);
         }
-        if (from < 17) await migrator.createTable(engineeringPlacementOperations);
+        if (from < 17)
+          await migrator.createTable(engineeringPlacementOperations);
         if (from < 18) {
           await migrator.createTable(elvCables);
           await migrator.createTable(commandExecutionRecords);
@@ -892,36 +992,98 @@ final class AppDatabase extends _$AppDatabase {
   );
 
   Future<void> _createIndexes() async {
-    await customStatement('CREATE INDEX IF NOT EXISTS idx_floor_routing_panel ON floor_routing_panels(floor_id)');
-    await customStatement('CREATE INDEX IF NOT EXISTS idx_floor_routing_handoff ON floor_routing_handoffs(floor_id)');
-    await customStatement('CREATE INDEX IF NOT EXISTS idx_cable_route_room ON cable_routes(room_id)');
-    await customStatement('CREATE INDEX IF NOT EXISTS idx_route_node_order ON cable_route_nodes(route_id, sequence)');
-    await customStatement('CREATE INDEX IF NOT EXISTS idx_route_segment_order ON cable_route_segments(route_id, sequence)');
-    await customStatement('CREATE INDEX IF NOT EXISTS idx_cable_run_circuit ON cable_runs(circuit_id)');
-    await customStatement('CREATE INDEX IF NOT EXISTS idx_channel_room ON physical_channels(room_id)');
-    await customStatement('CREATE INDEX IF NOT EXISTS idx_electrical_circuit_room ON electrical_circuits(room_id)');
-    await customStatement('CREATE INDEX IF NOT EXISTS idx_circuit_load_assignment_circuit ON circuit_load_assignments(circuit_id)');
-    await customStatement('CREATE INDEX IF NOT EXISTS idx_consumption_group_room ON consumption_groups(room_id)');
-    await customStatement('CREATE INDEX IF NOT EXISTS idx_equipment_load_group ON equipment_electrical_loads(consumption_group_id)');
-    await customStatement('CREATE INDEX IF NOT EXISTS idx_floor_project_order ON floors(project_id, sort_order)');
-    await customStatement('CREATE INDEX IF NOT EXISTS idx_room_floor_name ON rooms(floor_id, name)');
-    await customStatement('CREATE INDEX IF NOT EXISTS idx_project_updated ON projects(updated_at)');
-    await customStatement('CREATE INDEX IF NOT EXISTS idx_surface_patch_room ON surface_patches(room_id)');
-    await customStatement('CREATE INDEX IF NOT EXISTS idx_surface_edge_patch ON surface_edges(patch_id)');
-    await customStatement('CREATE INDEX IF NOT EXISTS idx_opening_patch ON openings(host_surface_patch_id)');
-    await customStatement('CREATE INDEX IF NOT EXISTS idx_spatial_feature_patch ON spatial_features(host_surface_patch_id)');
-    await customStatement('CREATE INDEX IF NOT EXISTS idx_component_instance_room ON component_instances(room_id)');
-    await customStatement('CREATE INDEX IF NOT EXISTS idx_component_instance_patch ON component_instances(host_surface_patch_id)');
-    await customStatement('CREATE INDEX IF NOT EXISTS idx_component_instance_definition ON component_instances(definition_id, definition_version)');
-    await customStatement('CREATE INDEX IF NOT EXISTS idx_engineering_placement_operation_project ON engineering_placement_operations(project_id, status)');
-    await customStatement('CREATE INDEX IF NOT EXISTS idx_elv_cable_project ON elv_cables(project_id)');
-    await customStatement('CREATE INDEX IF NOT EXISTS idx_elv_cable_definition_catalog ON elv_cables(definition_catalog_id)');
-    await customStatement("CREATE UNIQUE INDEX IF NOT EXISTS ux_elv_cable_active_label ON elv_cables(project_id, normalized_label) WHERE lifecycle_state = 'ACTIVE' AND deleted_at IS NULL");
-    await customStatement('CREATE INDEX IF NOT EXISTS idx_elv_allocation_project ON cable_allocations(project_id)');
-    await customStatement('CREATE INDEX IF NOT EXISTS idx_elv_allocation_cable ON cable_allocations(cable_id)');
-    await customStatement('CREATE INDEX IF NOT EXISTS idx_elv_allocation_connection ON cable_allocations(engineering_connection_id)');
-    await customStatement("CREATE UNIQUE INDEX IF NOT EXISTS ux_elv_connection_consuming_allocation ON cable_allocations(project_id, engineering_connection_id) WHERE lifecycle_state IN ('RESERVED','ACTIVE') AND deleted_at IS NULL");
-    await customStatement('CREATE UNIQUE INDEX IF NOT EXISTS ux_elv_resource_claim ON cable_resource_claims(cable_id, resource_atom)');
-    await customStatement('CREATE INDEX IF NOT EXISTS idx_elv_termination_allocation ON cable_termination_mappings(allocation_id)');
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_floor_routing_panel ON floor_routing_panels(floor_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_floor_routing_handoff ON floor_routing_handoffs(floor_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_cable_route_room ON cable_routes(room_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_route_node_order ON cable_route_nodes(route_id, sequence)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_route_segment_order ON cable_route_segments(route_id, sequence)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_cable_run_circuit ON cable_runs(circuit_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_channel_room ON physical_channels(room_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_electrical_circuit_room ON electrical_circuits(room_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_circuit_load_assignment_circuit ON circuit_load_assignments(circuit_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_consumption_group_room ON consumption_groups(room_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_equipment_load_group ON equipment_electrical_loads(consumption_group_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_floor_project_order ON floors(project_id, sort_order)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_room_floor_name ON rooms(floor_id, name)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_project_updated ON projects(updated_at)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_surface_patch_room ON surface_patches(room_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_surface_edge_patch ON surface_edges(patch_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_opening_patch ON openings(host_surface_patch_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_spatial_feature_patch ON spatial_features(host_surface_patch_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_component_instance_room ON component_instances(room_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_component_instance_patch ON component_instances(host_surface_patch_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_component_instance_definition ON component_instances(definition_id, definition_version)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_engineering_placement_operation_project ON engineering_placement_operations(project_id, status)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_elv_cable_project ON elv_cables(project_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_elv_cable_definition_catalog ON elv_cables(definition_catalog_id)',
+    );
+    await customStatement(
+      "CREATE UNIQUE INDEX IF NOT EXISTS ux_elv_cable_active_label ON elv_cables(project_id, normalized_label) WHERE lifecycle_state = 'ACTIVE' AND deleted_at IS NULL",
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_elv_allocation_project ON cable_allocations(project_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_elv_allocation_cable ON cable_allocations(cable_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_elv_allocation_connection ON cable_allocations(engineering_connection_id)',
+    );
+    await customStatement(
+      "CREATE UNIQUE INDEX IF NOT EXISTS ux_elv_connection_consuming_allocation ON cable_allocations(project_id, engineering_connection_id) WHERE lifecycle_state IN ('RESERVED','ACTIVE') AND deleted_at IS NULL",
+    );
+    await customStatement(
+      'CREATE UNIQUE INDEX IF NOT EXISTS ux_elv_resource_claim ON cable_resource_claims(cable_id, resource_atom)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_elv_termination_allocation ON cable_termination_mappings(allocation_id)',
+    );
   }
 }

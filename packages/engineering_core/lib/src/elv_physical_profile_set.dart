@@ -20,10 +20,13 @@ final class ProjectPhysicalCompatibilityProfileSet {
   bool get active => state == PhysicalCompatibilityProfileSetState.active;
 
   List<String> validate() => [
-        if (id.trim().isEmpty) 'Physical compatibility profile set id is required.',
+        if (id.trim().isEmpty)
+          'Physical compatibility profile set id is required.',
         if (projectId.trim().isEmpty)
           'Physical compatibility profile set projectId is required.',
-        if (refs.isEmpty) 'Physical compatibility profile set must not be empty.',
-        if (revision < 1) 'Physical compatibility profile set revision must be >= 1.',
+        if (refs.isEmpty)
+          'Physical compatibility profile set must not be empty.',
+        if (revision < 1)
+          'Physical compatibility profile set revision must be >= 1.',
       ];
 }

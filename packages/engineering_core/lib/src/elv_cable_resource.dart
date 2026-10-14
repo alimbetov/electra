@@ -51,8 +51,10 @@ CableResourceSelection cableResourceSelectionFromMap(Map<String, dynamic> map) {
     'RESOURCE_SET' => ResourceSetSelection(
         (map['resourceIdentities'] as List? ?? const []).cast<String>(),
       ),
-    'DEFINITION_GROUP' => DefinitionGroupSelection(map['groupIdentity'] as String),
-    final kind => throw FormatException('Unknown cable resource selection kind: $kind'),
+    'DEFINITION_GROUP' =>
+      DefinitionGroupSelection(map['groupIdentity'] as String),
+    final kind =>
+      throw FormatException('Unknown cable resource selection kind: $kind'),
   };
 }
 
@@ -195,7 +197,8 @@ abstract final class CableResourceResolver {
 
   static CableResourceSelection _normalizeSelection(
     CableResourceSelection selection,
-  ) => switch (selection) {
+  ) =>
+      switch (selection) {
         WholeCableSelection() => const WholeCableSelection(),
         ResourceSetSelection(:final resourceIdentities) =>
           ResourceSetSelection((resourceIdentities.toSet().toList()..sort())),

@@ -17,10 +17,9 @@ final class ElvTestConnectionFixture {
 ElvTestConnectionFixture buildElvTestConnection(
   FixedSequenceIdGenerator ids, {
   required String role,
-}) =>
-    ElvTestConnectionFixture(
-      connectionId: ids.next(ElvFixturePrefixes.connection),
-      fromPortId: ids.next(ElvFixturePrefixes.port),
-      toPortId: ids.next(ElvFixturePrefixes.port),
-      role: role,
-    );
+}) => ElvTestConnectionFixture(
+  connectionId: ids.next(ElvFixturePrefixes.connection),
+  fromPortId: ids.next(ElvFixturePrefixes.port),
+  toPortId: ids.next(ElvFixturePrefixes.port),
+  role: role,
+);

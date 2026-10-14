@@ -116,14 +116,10 @@ final class DefaultElvPhysicalRoutingWorkspaceService
   Future<PhysicalTraceResult> traceConnection(
     String projectId,
     String connectionId,
-  ) =>
-      traceService.traceConnection(projectId, connectionId);
+  ) => traceService.traceConnection(projectId, connectionId);
 
   @override
-  Future<PhysicalTraceResult> traceCable(
-    String projectId,
-    String cableId,
-  ) =>
+  Future<PhysicalTraceResult> traceCable(String projectId, String cableId) =>
       traceService.traceCable(projectId, cableId);
 
   PhysicalRoutingWorkspaceState _state(
@@ -155,7 +151,8 @@ final class DefaultElvPhysicalRoutingWorkspaceService
       selectedAllocationId: selection.allocationId,
       selectedCableRunId: selection.cableRunId,
       activeStage: stage,
-      canEdit: context.editingAllowed &&
+      canEdit:
+          context.editingAllowed &&
           context.workingDesignRevisionId != null &&
           selection.commandMutationsAllowed,
       blockingIssues: selection.blockingIssues,

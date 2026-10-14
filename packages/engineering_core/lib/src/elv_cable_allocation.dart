@@ -81,8 +81,8 @@ final class CableAllocationResourceSelectionEvidence {
     required Iterable<String> resolvedAtoms,
     required this.selectionSha256,
   }) : resolvedAtoms = List.unmodifiable(
-         resolvedAtoms.map((value) => value.trim().toUpperCase()),
-       );
+          resolvedAtoms.map((value) => value.trim().toUpperCase()),
+        );
 
   final String allocationId;
   final CableDefinitionRef cableDefinitionRef;
@@ -112,7 +112,8 @@ final class CableAllocationResourceSelectionEvidence {
 
   factory CableAllocationResourceSelectionEvidence.fromMap(
     Map<String, dynamic> map,
-  ) => CableAllocationResourceSelectionEvidence(
+  ) =>
+      CableAllocationResourceSelectionEvidence(
         allocationId: map['allocationId'] as String,
         cableDefinitionRef: CableDefinitionRef.fromMap(
           map['cableDefinitionRef'] as Map<String, dynamic>,
@@ -129,7 +130,8 @@ abstract final class CableAllocationStateMachine {
   static bool canTransition(
     CableAllocationState from,
     CableAllocationState to,
-  ) => switch ((from, to)) {
+  ) =>
+      switch ((from, to)) {
         (CableAllocationState.draft, CableAllocationState.reserved) => true,
         (CableAllocationState.reserved, CableAllocationState.active) => true,
         (CableAllocationState.reserved, CableAllocationState.released) => true,

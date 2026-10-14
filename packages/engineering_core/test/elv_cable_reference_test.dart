@@ -4,56 +4,57 @@ import 'package:engineering_core/engineering_core.dart';
 import 'package:test/test.dart';
 
 TerminationPolicy _bothEnds() => TerminationPolicy(
-  mode: TerminationPolicyMode.bothEnds,
-  terminalRequired: true,
-);
+      mode: TerminationPolicyMode.bothEnds,
+      terminalRequired: true,
+    );
 
-CableDefinition cat6Definition({String label = 'Cat6 U/UTP'}) => CableDefinition(
-  code: 'CAT6-UUTP',
-  label: label,
-  mediaCode: 'COPPER_BALANCED',
-  categoryCode: 'CAT6',
-  technicalClassCodes: const ['DATA'],
-  pairCount: 1,
-  conductorCount: 2,
-  outerDiameterMm: 6.2,
-  minimumBendRadiusMm: 25,
-  resourceDefinitions: [
-    CableResourceDefinition(
-      identity: '__WHOLE_CABLE__',
-      kind: CableResourceKind.wholeCable,
-      allocatable: true,
-      atomic: false,
-      childResourceIds: const ['PAIR-1'],
-      terminationPolicy: _bothEnds(),
-    ),
-    CableResourceDefinition(
-      identity: 'PAIR-1',
-      kind: CableResourceKind.pair,
-      allocatable: true,
-      atomic: false,
-      parentResourceId: '__WHOLE_CABLE__',
-      childResourceIds: const ['COND-1', 'COND-2'],
-      terminationPolicy: _bothEnds(),
-    ),
-    CableResourceDefinition(
-      identity: 'COND-1',
-      kind: CableResourceKind.conductor,
-      allocatable: true,
-      atomic: true,
-      parentResourceId: 'PAIR-1',
-      terminationPolicy: _bothEnds(),
-    ),
-    CableResourceDefinition(
-      identity: 'COND-2',
-      kind: CableResourceKind.conductor,
-      allocatable: true,
-      atomic: true,
-      parentResourceId: 'PAIR-1',
-      terminationPolicy: _bothEnds(),
-    ),
-  ],
-);
+CableDefinition cat6Definition({String label = 'Cat6 U/UTP'}) =>
+    CableDefinition(
+      code: 'CAT6-UUTP',
+      label: label,
+      mediaCode: 'COPPER_BALANCED',
+      categoryCode: 'CAT6',
+      technicalClassCodes: const ['DATA'],
+      pairCount: 1,
+      conductorCount: 2,
+      outerDiameterMm: 6.2,
+      minimumBendRadiusMm: 25,
+      resourceDefinitions: [
+        CableResourceDefinition(
+          identity: '__WHOLE_CABLE__',
+          kind: CableResourceKind.wholeCable,
+          allocatable: true,
+          atomic: false,
+          childResourceIds: const ['PAIR-1'],
+          terminationPolicy: _bothEnds(),
+        ),
+        CableResourceDefinition(
+          identity: 'PAIR-1',
+          kind: CableResourceKind.pair,
+          allocatable: true,
+          atomic: false,
+          parentResourceId: '__WHOLE_CABLE__',
+          childResourceIds: const ['COND-1', 'COND-2'],
+          terminationPolicy: _bothEnds(),
+        ),
+        CableResourceDefinition(
+          identity: 'COND-1',
+          kind: CableResourceKind.conductor,
+          allocatable: true,
+          atomic: true,
+          parentResourceId: 'PAIR-1',
+          terminationPolicy: _bothEnds(),
+        ),
+        CableResourceDefinition(
+          identity: 'COND-2',
+          kind: CableResourceKind.conductor,
+          allocatable: true,
+          atomic: true,
+          parentResourceId: 'PAIR-1',
+          terminationPolicy: _bothEnds(),
+        ),
+      ],
+    );
 
 void main() {
   test('shared SHA-256 helper matches the standard abc vector', () {
@@ -128,7 +129,8 @@ void main() {
     expect(broken.validate(), isNotEmpty);
   });
 
-  test('component-only ELV2 catalog remains readable without cableDefinitions', () {
+  test('component-only ELV2 catalog remains readable without cableDefinitions',
+      () {
     final old = EngineeringReferenceCatalog.fromMap({
       'id': 'legacy',
       'code': 'LEGACY',

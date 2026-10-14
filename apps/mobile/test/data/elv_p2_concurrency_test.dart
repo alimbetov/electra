@@ -13,55 +13,57 @@ import 'package:flutter_test/flutter_test.dart';
 const _projectId = 'race-project';
 
 CableDefinition _definition() => CableDefinition(
-      code: 'RACE-CABLE',
-      label: 'Race cable',
-      mediaCode: 'COPPER',
-      resourceDefinitions: [
-        CableResourceDefinition(
-          identity: '__WHOLE_CABLE__',
-          kind: CableResourceKind.wholeCable,
-          allocatable: true,
-          atomic: false,
-          childResourceIds: const ['COND-1', 'COND-2'],
-          terminationPolicy: TerminationPolicy(
-            mode: TerminationPolicyMode.bothEnds,
-            terminalRequired: false,
-          ),
+  code: 'RACE-CABLE',
+  label: 'Race cable',
+  mediaCode: 'COPPER',
+  resourceDefinitions: [
+    CableResourceDefinition(
+      identity: '__WHOLE_CABLE__',
+      kind: CableResourceKind.wholeCable,
+      allocatable: true,
+      atomic: false,
+      childResourceIds: const ['COND-1', 'COND-2'],
+      terminationPolicy: TerminationPolicy(
+        mode: TerminationPolicyMode.bothEnds,
+        terminalRequired: false,
+      ),
+    ),
+    for (final id in ['COND-1', 'COND-2'])
+      CableResourceDefinition(
+        identity: id,
+        kind: CableResourceKind.conductor,
+        allocatable: true,
+        atomic: true,
+        parentResourceId: '__WHOLE_CABLE__',
+        terminationPolicy: TerminationPolicy(
+          mode: TerminationPolicyMode.bothEnds,
+          terminalRequired: false,
         ),
-        for (final id in ['COND-1', 'COND-2'])
-          CableResourceDefinition(
-            identity: id,
-            kind: CableResourceKind.conductor,
-            allocatable: true,
-            atomic: true,
-            parentResourceId: '__WHOLE_CABLE__',
-            terminationPolicy: TerminationPolicy(
-              mode: TerminationPolicyMode.bothEnds,
-              terminalRequired: false,
-            ),
-          ),
-      ],
-    );
+      ),
+  ],
+);
 
 EngineeringReferenceCatalog _catalog() => EngineeringReferenceCatalog(
-      id: 'race-catalog',
-      code: 'RACE',
-      version: '1',
-      source: 'test',
-      cableDefinitions: [_definition()],
-    );
+  id: 'race-catalog',
+  code: 'RACE',
+  version: '1',
+  source: 'test',
+  cableDefinitions: [_definition()],
+);
 
 NativeDatabase _native(File file) => NativeDatabase(
-      file,
-      setup: (raw) {
-        raw.execute('PRAGMA journal_mode=WAL');
-        raw.execute('PRAGMA busy_timeout=5000');
-      },
-    );
+  file,
+  setup: (raw) {
+    raw.execute('PRAGMA journal_mode=WAL');
+    raw.execute('PRAGMA busy_timeout=5000');
+  },
+);
 
 Future<void> _seed(AppDatabase db) async {
   final now = DateTime.utc(2026, 10, 14, 9);
-  await db.into(db.projects).insert(
+  await db
+      .into(db.projects)
+      .insert(
         ProjectsCompanion.insert(
           id: _projectId,
           name: 'Race project',
@@ -73,7 +75,9 @@ Future<void> _seed(AppDatabase db) async {
           originDeviceId: 'test',
         ),
       );
-  await db.into(db.floors).insert(
+  await db
+      .into(db.floors)
+      .insert(
         FloorsCompanion.insert(
           id: 'floor',
           projectId: _projectId,
@@ -83,7 +87,9 @@ Future<void> _seed(AppDatabase db) async {
           originDeviceId: 'test',
         ),
       );
-  await db.into(db.rooms).insert(
+  await db
+      .into(db.rooms)
+      .insert(
         RoomsCompanion.insert(
           id: 'room',
           floorId: 'floor',
@@ -97,7 +103,9 @@ Future<void> _seed(AppDatabase db) async {
           originDeviceId: 'test',
         ),
       );
-  await db.into(db.surfacePatches).insert(
+  await db
+      .into(db.surfacePatches)
+      .insert(
         SurfacePatchesCompanion.insert(
           id: 'patch',
           roomId: 'room',
@@ -118,7 +126,9 @@ Future<void> _seed(AppDatabase db) async {
           originDeviceId: 'test',
         ),
       );
-  await db.into(db.engineeringFamilyDefinitions).insert(
+  await db
+      .into(db.engineeringFamilyDefinitions)
+      .insert(
         EngineeringFamilyDefinitionsCompanion.insert(
           id: 'family',
           code: 'RACE',
@@ -130,7 +140,9 @@ Future<void> _seed(AppDatabase db) async {
         ),
         mode: InsertMode.insertOrIgnore,
       );
-  await db.into(db.projectEngineeringSystems).insert(
+  await db
+      .into(db.projectEngineeringSystems)
+      .insert(
         ProjectEngineeringSystemsCompanion.insert(
           id: 'system',
           projectId: _projectId,
@@ -142,7 +154,9 @@ Future<void> _seed(AppDatabase db) async {
           originDeviceId: 'test',
         ),
       );
-  await db.into(db.engineeringCompatibilityProfiles).insert(
+  await db
+      .into(db.engineeringCompatibilityProfiles)
+      .insert(
         EngineeringCompatibilityProfilesCompanion.insert(
           id: 'profile',
           projectId: _projectId,
@@ -158,7 +172,9 @@ Future<void> _seed(AppDatabase db) async {
     for (final end in ['a', 'b']) {
       final componentId = '$connectionId-component-$end';
       final portId = '$connectionId-port-$end';
-      await db.into(db.componentInstances).insert(
+      await db
+          .into(db.componentInstances)
+          .insert(
             ComponentInstancesCompanion.insert(
               id: componentId,
               definitionId: 'fixture',
@@ -172,7 +188,9 @@ Future<void> _seed(AppDatabase db) async {
               originDeviceId: 'test',
             ),
           );
-      await db.into(db.engineeringPortInstances).insert(
+      await db
+          .into(db.engineeringPortInstances)
+          .insert(
             EngineeringPortInstancesCompanion.insert(
               id: portId,
               projectId: _projectId,
@@ -193,7 +211,9 @@ Future<void> _seed(AppDatabase db) async {
       profileId: 'profile',
       medium: ConnectionMedium.wired,
     );
-    await db.into(db.engineeringPortConnections).insert(
+    await db
+        .into(db.engineeringPortConnections)
+        .insert(
           EngineeringPortConnectionsCompanion.insert(
             id: connectionId,
             projectId: _projectId,
@@ -209,7 +229,9 @@ Future<void> _seed(AppDatabase db) async {
         );
   }
   final catalog = _catalog();
-  await db.into(db.engineeringReferenceCatalogs).insert(
+  await db
+      .into(db.engineeringReferenceCatalogs)
+      .insert(
         EngineeringReferenceCatalogsCompanion.insert(
           id: catalog.id,
           projectId: _projectId,
@@ -222,7 +244,9 @@ Future<void> _seed(AppDatabase db) async {
         ),
       );
   final ref = catalog.cableDefinitionRef('RACE-CABLE');
-  await db.into(db.elvCables).insert(
+  await db
+      .into(db.elvCables)
+      .insert(
         ElvCablesCompanion.insert(
           id: 'cable',
           projectId: _projectId,
@@ -307,15 +331,19 @@ void main() {
       ),
     ]);
 
-    expect(results.whereType<ElvCommandSuccess<CableAllocation>>(), hasLength(1));
-    final failures = results.whereType<ElvCommandFailureResult<CableAllocation>>();
+    expect(
+      results.whereType<ElvCommandSuccess<CableAllocation>>(),
+      hasLength(1),
+    );
+    final failures =
+        results.whereType<ElvCommandFailureResult<CableAllocation>>();
     expect(failures, hasLength(1));
     expect(failures.single.failure.code, 'ELV_ALLOC_RESOURCE_OVERLAP');
 
     final verifier = AppDatabase(_native(file));
-    final claims = await (verifier.select(verifier.cableResourceClaims)
-          ..where((row) => row.resourceAtom.equals('COND-1')))
-        .get();
+    final claims =
+        await (verifier.select(verifier.cableResourceClaims)
+          ..where((row) => row.resourceAtom.equals('COND-1'))).get();
     expect(claims, hasLength(1));
     await verifier.close();
   });

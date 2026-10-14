@@ -22,15 +22,14 @@ ElvTestRoutingFixture buildElvTestRouting(
   FixedSequenceIdGenerator ids, {
   int traversalCount = 3,
   int installedLengthMm = 12000,
-}) =>
-    ElvTestRoutingFixture(
-      runId: ids.next(ElvFixturePrefixes.run),
-      routeId: ids.next(ElvFixturePrefixes.route),
-      traversalIds: [
-        for (var index = 0; index < traversalCount; index++)
-          ids.next(ElvFixturePrefixes.traversal),
-      ],
-      contextId: ids.next(ElvFixturePrefixes.context),
-      carrierId: ids.next(ElvFixturePrefixes.carrier),
-      installedLengthMm: installedLengthMm,
-    );
+}) => ElvTestRoutingFixture(
+  runId: ids.next(ElvFixturePrefixes.run),
+  routeId: ids.next(ElvFixturePrefixes.route),
+  traversalIds: [
+    for (var index = 0; index < traversalCount; index++)
+      ids.next(ElvFixturePrefixes.traversal),
+  ],
+  contextId: ids.next(ElvFixturePrefixes.context),
+  carrierId: ids.next(ElvFixturePrefixes.carrier),
+  installedLengthMm: installedLengthMm,
+);

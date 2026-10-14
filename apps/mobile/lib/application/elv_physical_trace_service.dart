@@ -38,8 +38,5 @@ abstract interface class ElvPhysicalTraceService {
     String connectionId,
   );
 
-  Future<PhysicalTraceResult> traceCable(
-    String projectId,
-    String cableId,
-  );
+  Future<PhysicalTraceResult> traceCable(String projectId, String cableId);
 }

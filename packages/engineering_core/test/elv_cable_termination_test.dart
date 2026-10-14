@@ -60,6 +60,7 @@ void main() {
     expect(allocation(CableAllocationState.draft).consumesResources, isFalse);
     expect(allocation(CableAllocationState.reserved).consumesResources, isTrue);
     expect(allocation(CableAllocationState.active).consumesResources, isTrue);
-    expect(allocation(CableAllocationState.released).consumesResources, isFalse);
+    expect(
+        allocation(CableAllocationState.released).consumesResources, isFalse);
   });
 }

@@ -2,7 +2,8 @@ import 'package:engineering_core/engineering_core.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('P3 design revision state machine preserves frozen history direction', () {
+  test('P3 design revision state machine preserves frozen history direction',
+      () {
     expect(
       ProjectDesignRevisionStateMachine.canTransition(
         ProjectDesignRevisionState.working,
@@ -75,7 +76,8 @@ void main() {
       code: 'TRAY-1',
       name: 'Tray',
       kind: PhysicalCarrierKind.tray,
-      crossSection: const RectangularCarrierCrossSection(widthMm: 100, heightMm: 10),
+      crossSection:
+          const RectangularCarrierCrossSection(widthMm: 100, heightMm: 10),
       environmentFacts: const CarrierEnvironmentFacts(),
       installationFacts: const CarrierInstallationFacts(),
       lifecycleState: PhysicalCarrierLifecycleState.active,
@@ -89,7 +91,8 @@ void main() {
           carrierId: 'c',
           code: 'A',
           sequence: 1,
-          crossSection: RectangularCarrierCrossSection(widthMm: 80, heightMm: 10),
+          crossSection:
+              RectangularCarrierCrossSection(widthMm: 80, heightMm: 10),
           lifecycleState: CarrierCompartmentLifecycleState.active,
           revision: 1,
         ),
@@ -98,7 +101,8 @@ void main() {
           carrierId: 'c',
           code: 'B',
           sequence: 2,
-          crossSection: RectangularCarrierCrossSection(widthMm: 80, heightMm: 10),
+          crossSection:
+              RectangularCarrierCrossSection(widthMm: 80, heightMm: 10),
           lifecycleState: CarrierCompartmentLifecycleState.active,
           revision: 1,
         ),
@@ -107,8 +111,10 @@ void main() {
     expect(errors, contains(contains('exceeds')));
   });
 
-  test('P5 engine returns forbidden for cable diameter above profile limit', () {
-    final selector = PhysicalCompatibilitySelector(mediaCodes: const ['COPPER']);
+  test('P5 engine returns forbidden for cable diameter above profile limit',
+      () {
+    final selector =
+        PhysicalCompatibilitySelector(mediaCodes: const ['COPPER']);
     final findings = PhysicalCompatibilityEngine.evaluate(
       PhysicalCompatibilityInput(
         subjectIds: const ['cable-1', 'carrier-1'],

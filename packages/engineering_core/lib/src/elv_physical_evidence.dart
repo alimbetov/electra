@@ -82,14 +82,18 @@ final class RouteSeparationEvidence {
 
   List<String> validate() => [
         if (id.trim().isEmpty) 'Separation evidence id is required.',
-        if (projectId.trim().isEmpty) 'Separation evidence projectId is required.',
-        if (designRevisionId.trim().isEmpty) 'Separation evidence designRevisionId is required.',
+        if (projectId.trim().isEmpty)
+          'Separation evidence projectId is required.',
+        if (designRevisionId.trim().isEmpty)
+          'Separation evidence designRevisionId is required.',
         if (subjectAId.trim().isEmpty || subjectBId.trim().isEmpty)
           'Separation evidence requires both subjects.',
-        if (subjectAId == subjectBId) 'Separation evidence subjects must differ.',
+        if (subjectAId == subjectBId)
+          'Separation evidence subjects must differ.',
         if (!distanceMm.isFinite || distanceMm < 0)
           'Separation evidence distance must be finite and non-negative.',
-        if (provenance.trim().isEmpty) 'Separation evidence provenance is required.',
+        if (provenance.trim().isEmpty)
+          'Separation evidence provenance is required.',
         if (revision < 1) 'Separation evidence revision must be >= 1.',
       ];
 }

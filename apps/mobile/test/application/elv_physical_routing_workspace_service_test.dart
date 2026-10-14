@@ -91,17 +91,20 @@ void main() {
       }
     });
 
-    test('derives canEdit from design context and command permission', () async {
-      dataSource.selection = const PhysicalRoutingSelectionSnapshot(
-        connectionId: 'CONN-001',
-        commandMutationsAllowed: false,
-      );
+    test(
+      'derives canEdit from design context and command permission',
+      () async {
+        dataSource.selection = const PhysicalRoutingSelectionSnapshot(
+          connectionId: 'CONN-001',
+          commandMutationsAllowed: false,
+        );
 
-      final state = await service.load(projectId: 'PRJ-001');
+        final state = await service.load(projectId: 'PRJ-001');
 
-      expect(state.canEdit, isFalse);
-      expect(state.isReadOnly, isTrue);
-    });
+        expect(state.canEdit, isFalse);
+        expect(state.isReadOnly, isTrue);
+      },
+    );
 
     test('rejects command when project has no WORKING revision', () async {
       dataSource.context = const PhysicalDesignContext(
@@ -160,8 +163,7 @@ final class _FakeDataSource implements ElvPhysicalRoutingWorkspaceDataSource {
   Future<PhysicalRoutingSelectionSnapshot> loadSelection({
     required String projectId,
     String? connectionId,
-  }) async =>
-      selection;
+  }) async => selection;
 
   @override
   Stream<void> watchChanges(String projectId) => changes.stream;
@@ -193,8 +195,7 @@ final class _FakeTraceService implements ElvPhysicalTraceService {
   Future<PhysicalTraceResult> traceConnection(
     String projectId,
     String connectionId,
-  ) =>
-      Future<PhysicalTraceResult>.error(UnimplementedError());
+  ) => Future<PhysicalTraceResult>.error(UnimplementedError());
 }
 
 final class _TestCommand implements ElvWorkspaceCommand {

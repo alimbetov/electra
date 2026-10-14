@@ -1,8 +1,14 @@
 import 'package:engineering_core/engineering_core.dart';
 
 abstract interface class ElvCableAllocationRepository {
-  Future<CableAllocation?> findAllocation(String projectId, String allocationId);
-  Future<List<CableAllocation>> loadCableAllocations(String projectId, String cableId);
+  Future<CableAllocation?> findAllocation(
+    String projectId,
+    String allocationId,
+  );
+  Future<List<CableAllocation>> loadCableAllocations(
+    String projectId,
+    String cableId,
+  );
   Future<CableAllocationResourceSelectionEvidence?> loadSelectionEvidence(
     String projectId,
     String allocationId,

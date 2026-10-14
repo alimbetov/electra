@@ -35,67 +35,70 @@ CableDefinition _definition(String code) => CableDefinition(
 );
 
 void main() {
-  test('change definition uses optimistic revision and archive is forward-only', () async {
-    final first = _definition('CABLE-A');
-    final second = _definition('CABLE-B');
-    final store = _FakeCableStore({'CABLE-A': first, 'CABLE-B': second});
-    final session = _FakeSession(store);
-    final service = DefaultElvCableCommandService(
-      unitOfWork: _FakeUow(session),
-      originDeviceId: 'test',
-      now: () => DateTime.utc(2026, 10, 14),
-    );
+  test(
+    'change definition uses optimistic revision and archive is forward-only',
+    () async {
+      final first = _definition('CABLE-A');
+      final second = _definition('CABLE-B');
+      final store = _FakeCableStore({'CABLE-A': first, 'CABLE-B': second});
+      final session = _FakeSession(store);
+      final service = DefaultElvCableCommandService(
+        unitOfWork: _FakeUow(session),
+        originDeviceId: 'test',
+        now: () => DateTime.utc(2026, 10, 14),
+      );
 
-    final created = await service.create(
-      CreateCableCommand(
-        commandId: 'create',
-        projectId: 'project',
-        cableId: 'cable',
-        label: 'C-01',
-        name: 'Cable',
-        definitionRef: store.refFor('CABLE-A'),
-      ),
-    );
-    expect(created, isA<ElvCommandSuccess<Cable>>());
+      final created = await service.create(
+        CreateCableCommand(
+          commandId: 'create',
+          projectId: 'project',
+          cableId: 'cable',
+          label: 'C-01',
+          name: 'Cable',
+          definitionRef: store.refFor('CABLE-A'),
+        ),
+      );
+      expect(created, isA<ElvCommandSuccess<Cable>>());
 
-    final changed = await service.changeDefinition(
-      ChangeCableDefinitionRefCommand(
-        commandId: 'change',
-        projectId: 'project',
-        cableId: 'cable',
-        expectedRevision: 1,
-        definitionRef: store.refFor('CABLE-B'),
-      ),
-    );
-    expect((changed as ElvCommandSuccess<Cable>).value.revision, 2);
-    expect(changed.value.definitionRef.definitionCode, 'CABLE-B');
+      final changed = await service.changeDefinition(
+        ChangeCableDefinitionRefCommand(
+          commandId: 'change',
+          projectId: 'project',
+          cableId: 'cable',
+          expectedRevision: 1,
+          definitionRef: store.refFor('CABLE-B'),
+        ),
+      );
+      expect((changed as ElvCommandSuccess<Cable>).value.revision, 2);
+      expect(changed.value.definitionRef.definitionCode, 'CABLE-B');
 
-    final stale = await service.archive(
-      const ArchiveCableCommand(
-        commandId: 'archive-stale',
-        projectId: 'project',
-        cableId: 'cable',
-        expectedRevision: 1,
-      ),
-    );
-    expect(
-      (stale as ElvCommandFailureResult<Cable>).failure.code,
-      'ELV_REVISION_CONFLICT',
-    );
+      final stale = await service.archive(
+        const ArchiveCableCommand(
+          commandId: 'archive-stale',
+          projectId: 'project',
+          cableId: 'cable',
+          expectedRevision: 1,
+        ),
+      );
+      expect(
+        (stale as ElvCommandFailureResult<Cable>).failure.code,
+        'ELV_REVISION_CONFLICT',
+      );
 
-    final archived = await service.archive(
-      const ArchiveCableCommand(
-        commandId: 'archive',
-        projectId: 'project',
-        cableId: 'cable',
-        expectedRevision: 2,
-      ),
-    );
-    expect(
-      (archived as ElvCommandSuccess<Cable>).value.lifecycleState,
-      CableLifecycleState.archived,
-    );
-  });
+      final archived = await service.archive(
+        const ArchiveCableCommand(
+          commandId: 'archive',
+          projectId: 'project',
+          cableId: 'cable',
+          expectedRevision: 2,
+        ),
+      );
+      expect(
+        (archived as ElvCommandSuccess<Cable>).value.lifecycleState,
+        CableLifecycleState.archived,
+      );
+    },
+  );
 }
 
 final class _FakeUow implements ElvWriteUnitOfWork<ElvCableWriteSession> {
@@ -108,7 +111,8 @@ final class _FakeUow implements ElvWriteUnitOfWork<ElvCableWriteSession> {
 }
 
 final class _FakeSession implements ElvCableWriteSession {
-  _FakeSession(this.cables) : references = _FakeReferenceStore(cables.definitions);
+  _FakeSession(this.cables)
+    : references = _FakeReferenceStore(cables.definitions);
 
   @override
   final _FakeCableStore cables;
@@ -127,8 +131,10 @@ final class _FakeLedger implements ElvCommandLedgerStore {
   final Map<String, ElvCommandLedgerEntry> entries = {};
 
   @override
-  Future<ElvCommandLedgerEntry?> find(String projectId, String commandId) async =>
-      entries['$projectId/$commandId'];
+  Future<ElvCommandLedgerEntry?> find(
+    String projectId,
+    String commandId,
+  ) async => entries['$projectId/$commandId'];
 
   @override
   Future<void> save(ElvCommandLedgerEntry entry) async {
@@ -138,17 +144,24 @@ final class _FakeLedger implements ElvCommandLedgerStore {
 
 final class _NoDependencies implements ElvCableDependencyStore {
   @override
-  Future<List<String>> blockingDependencyIds(String projectId, String cableId) async =>
-      const [];
+  Future<List<String>> blockingDependencyIds(
+    String projectId,
+    String cableId,
+  ) async => const [];
 
   @override
-  Future<bool> hasCanonicalRunHistory(String projectId, String cableId) async => false;
+  Future<bool> hasCanonicalRunHistory(String projectId, String cableId) async =>
+      false;
 
   @override
-  Future<bool> hasConsumingAllocation(String projectId, String cableId) async => false;
+  Future<bool> hasConsumingAllocation(String projectId, String cableId) async =>
+      false;
 
   @override
-  Future<bool> hasResourceSelectionHistory(String projectId, String cableId) async => false;
+  Future<bool> hasResourceSelectionHistory(
+    String projectId,
+    String cableId,
+  ) async => false;
 }
 
 final class _FakeReferenceStore implements ElvReferenceReadStore {
@@ -189,16 +202,19 @@ final class _FakeCableStore implements ElvCableWriteStore {
   Future<bool> projectExists(String projectId) async => projectId == 'project';
 
   @override
-  Future<Cable?> findCable(String projectId, String cableId) async => values[cableId];
+  Future<Cable?> findCable(String projectId, String cableId) async =>
+      values[cableId];
 
   @override
-  Future<bool> activeLabelExists(String projectId, String normalizedLabel) async =>
-      values.values.any(
-        (cable) =>
-            cable.projectId == projectId &&
-            cable.lifecycleState == CableLifecycleState.active &&
-            cable.normalizedLabel == normalizedLabel,
-      );
+  Future<bool> activeLabelExists(
+    String projectId,
+    String normalizedLabel,
+  ) async => values.values.any(
+    (cable) =>
+        cable.projectId == projectId &&
+        cable.lifecycleState == CableLifecycleState.active &&
+        cable.normalizedLabel == normalizedLabel,
+  );
 
   @override
   Future<bool> insertCable(Cable cable) async {
