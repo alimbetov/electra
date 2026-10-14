@@ -1,34 +1,30 @@
 # Electra — ELV3 Code Implementation Index
 
-Status: CODE IMPLEMENTATION AUTHORITY / P1 AUTHORIZED / P2-P5 HARDENED  
+Status: CODE IMPLEMENTATION AUTHORITY / P1-P6 DOMAIN-APPLICATION FOUNDATION / P7-P9 FOUNDATION DESIGNED  
 Branch: `feat/flutter-elv3-physical-routing-design`
 
 ## 1. Purpose
 
-This is the implementation entry point for ELV3. Architecture/process meaning remains governed by the ELV3 architecture authority chain. This index governs code structure, public types, command ownership, Drift schema, transaction/concurrency contracts and test placement.
+This is the implementation entry point for ELV3. Architecture/process meaning remains governed by the ELV3 authority chain. This index governs code structure, public types, command ownership, Drift schema, transaction/concurrency contracts and test placement.
 
-General code remediation CR-01..CR-16 is closed. P2-P5 have now received a dedicated second implementation review and hardening pass.
-
-Latest readiness evidence:
-
-- `docs/audit/elv3-code-implementation-technical-rereview.md` — general code re-review PASS;
-- `docs/audit/elv3-p2-p5-code-technical-review.md` — dedicated P2-P5 PASS.
+The branch has progressed beyond the historical `P1 authorized / P2-P5 hardened` label. Domain/application contracts now reach P7-P9, while the actual Drift baseline remains P2/schema 19. That distinction is mandatory: design or application contracts are not persistence/runtime closure.
 
 ## 2. Code-level authority order
 
-1. `docs/product/elv3-code-p2-p5-hardening.md` — exact P2-P5 claims/termination/routing/pathway/profile semantics.
-2. `docs/product/elv3-code-remediation-final-clarifications.md` — phase-specific UoW, ledger replay, exact P6 evidence, P1 graph validation, legacy-route validation reuse.
-3. `docs/product/elv3-code-implementation-remediation-cr01-cr16.md` — closed CR-01..CR-16 remediation.
-4. `docs/product/elv3-code-contract-p1-p3.md`.
-5. `docs/product/elv3-code-contract-p4-p6.md`.
-6. `docs/product/elv3-code-contract-p7-p9.md`.
-7. `docs/product/elv3-dual-review-process-hardening.md`.
-8. `docs/product/elv3-r2-execution-clarifications.md`.
-9. `docs/product/elv3-r2-final-readiness-remediation.md`.
-10. `docs/product/elv3-implementation-specification-v2.md`.
-11. accepted ADR/P0 authority chain.
+1. `docs/product/elv3-p7-p9-foundation-design.md` — implementation-ready P7-P9 foundation and runtime promotion gates.
+2. `docs/product/elv3-code-p2-p5-hardening.md` — exact P2-P5 claims/termination/routing/pathway/profile semantics.
+3. `docs/product/elv3-code-remediation-final-clarifications.md` — phase-specific UoW, ledger replay, exact P6 evidence, P1 graph validation, legacy-route validation reuse.
+4. `docs/product/elv3-code-implementation-remediation-cr01-cr16.md` — closed CR-01..CR-16 remediation.
+5. `docs/product/elv3-code-contract-p1-p3.md`.
+6. `docs/product/elv3-code-contract-p4-p6.md`.
+7. `docs/product/elv3-code-contract-p7-p9.md`.
+8. `docs/product/elv3-dual-review-process-hardening.md`.
+9. `docs/product/elv3-r2-execution-clarifications.md`.
+10. `docs/product/elv3-r2-final-readiness-remediation.md`.
+11. `docs/product/elv3-implementation-specification-v2.md`.
+12. accepted ADR/P0 authority chain.
 
-Earlier wording contradicted by items 1-3 is superseded.
+The foundation design refines implementation sequencing but does not override domain semantics in the authoritative phase contracts.
 
 ## 3. Layer map
 
@@ -37,7 +33,7 @@ engineering_core
   pure domain/value objects/validators/calculations/codecs
 
 application
-  commands/command services/query ports/workspace state/impact coordination
+  commands/services/repository ports/workspace state/impact coordination
 
 data/repositories
   Drift adapters/phase-specific UoW/transaction-bound stores/error translation
@@ -59,46 +55,9 @@ calculation engines MUST NOT query repositories
 command services are the sole use-case orchestration owner
 ```
 
-## 4. Phase resource ownership
+## 4. P1-P2 physical allocation foundation
 
-```text
-P1
-  CableResourceKind
-  TerminationPolicyMode
-  TerminationPolicy
-  CableResourceDefinition
-
-P2
-  CableResourceSelection
-  WholeCableSelection
-  ResourceSetSelection
-  DefinitionGroupSelection
-  ResolvedCableResourceSelection
-  CableResourceResolver
-  CableTerminationObligation
-  CableTerminationObligationResolver
-```
-
-Every published CableDefinition contains exactly one `__WHOLE_CABLE__` resource. Runtime exclusivity is always resolved to atomic resources.
-
-## 5. P2 frozen physical allocation semantics
-
-Canonical claim uniqueness:
-
-```text
-UNIQUE(cable_id, resource_atom)
-```
-
-There is no architectural `claim_key` string identity.
-
-Claim resolution and termination resolution are separate:
-
-```text
-selection -> atomic claim set
-selection -> termination obligation set
-```
-
-Termination may target selected composite/group identity while resource exclusion remains atomic.
+Canonical claim uniqueness is `UNIQUE(cable_id, resource_atom)`. Selection evidence is immutable history; claims are temporary exclusivity ownership. Claim resolution and termination resolution are separate.
 
 Lifecycle:
 
@@ -108,127 +67,51 @@ DRAFT -> ARCHIVED
 RESERVED -> RELEASED
 ```
 
-Complete-set termination replacement is allowed only in RESERVED/ACTIVE and increments allocation revision.
+Reserve/termination/activate always reload current connection endpoints. Physical history protects destructive ELV1 topology mutation.
 
-Releasing the final consuming allocation is blocked while current WORKING revision has an ACTIVE CanonicalCableRun for the Cable.
+## 5. P3-P6 domain/application foundation
 
-## 6. P2 topology integration
+P3 defines ProjectDesignRevision, immutable frozen physical snapshots, canonical CableRun/traversal, route handoff/bend evidence and legacy adoption contracts.
 
-Reserve/termination/activate always reload the current `EngineeringPortConnection` endpoints.
+P4 defines PathwayContext, PhysicalCarrier and compartments with project isolation, dependency-aware archive and factual capacity invariants.
 
-`ElvConnectionPhysicalDependencyInspector` protects physical evidence from destructive/re-endpoint ELV1 topology mutation after P2 selection history exists.
+P5 defines exact physical compatibility profile sets, selector-aware deterministic combination and intrinsic-only findings.
 
-## 7. P3 reusable routing hardening
+P6 defines revision-scoped calculation/evidence contracts and process codes `ELV-ROUTE-01` through `ELV-ROUTE-06`.
 
-Route/node/segment project identity is derived only through:
+These contracts exist in source, but their canonical P3-P6 Drift persistence is still pending.
 
-```text
-CableRoute.roomId -> Room.floorId -> Floor.projectId
-```
+## 6. P7 shared engineer workspace
 
-`RouteHandoff` v1 continuity accepts only:
+P7 has one workspace; there are no per-discipline route editors.
 
-```text
-exact integer world-coordinate equality
-OR
-exact typed SurfaceAdjacency/interface evidence
-```
-
-No arbitrary geometry tolerance.
-
-Shared route edit uses exact:
+Canonical progression:
 
 ```text
-CableRouteGeometryCandidate(route,nodes,segments)
+Connection -> Cable -> Allocation -> Termination -> Route -> Carrier -> Findings
 ```
 
-and validates canonical ELV + legacy electrical dependents through the existing routing validators.
+`canEdit` is derived from `PhysicalDesignContext` plus command permission evidence. Actual execution re-authorizes through `ElvWorkspaceCommandAuthorizer`.
 
-## 8. P4 frozen pathway/carrier semantics
+ELV3 undo/redo is persisted command evidence, not `EditorCommandHistory`. Reversible history requires inverse payload + precondition fingerprint. Freeze/revision-history/release/adoption history stays irreversible.
 
-Canonical lifecycle:
+## 7. P8 deterministic acceptance foundation
 
-```text
-PathwayContext ACTIVE -> ARCHIVED
-PhysicalCarrier ACTIVE -> ARCHIVED
-CarrierCompartment ACTIVE -> ARCHIVED
-```
+Deterministic fixture builders are frozen for catalog/project/topology/routing plus canonical ID prefixes. Five fixture plans are frozen for CCTV, LAN, ACS, Fire and Fiber.
 
-P4 command session materializes Project/Floor/Room/SpatialFeature/parent ownership transactionally and enforces same-project hosts.
+Fixture-contract tests are foundation evidence only. They become runtime vertical evidence only after they execute against the real P3-P6 Drift persistence and the mandatory reopen/failure/idempotency protocols.
 
-Archive is dependency-blocked by active children/carriers/current WORKING traversal usage.
+## 8. P9 executable architecture guard
 
-Factual compartment capacity invariant:
+`scripts/ci/check-elv3-p7-p9-foundation.sh` fails fast when P7-P9 structural contracts drift. The Flutter workflow executes it before Flutter setup.
 
-```text
-sum(active compartment usableAreaMm2)
-  <= carrier usableAreaMm2
-```
+P9 final closure still requires the complete implementation inventory, command matrix, runtime forbidden-shortcut assertions and exact-SHA evidence.
 
-No compartment packing geometry is inferred beyond this factual area check.
+## 9. Common ELV command result
 
-## 9. P5 exact profile and rule semantics
+All P1-P9 commands use `ElvCommandResult<T>` / `ElvFailure`. Raw Drift/SQLite exceptions never cross the application boundary.
 
-Profile:
-
-```text
-PhysicalCompatibilityProfile
-  code
-  label
-  deprecated
-  rules[]
-```
-
-Every rule contains an explicit typed selector. Selector dimensions are wildcard when empty, OR within one dimension, AND across dimensions.
-
-P5 v1 rules are frozen for:
-
-```text
-allowed cable technical class
-allowed carrier kind
-allowed installation class
-allowed environment dimension/value
-maximum cable diameter
-minimum carrier usable area
-direct intrinsic prohibition
-```
-
-Profile combination is selector-aware and order-independent.
-
-Engine version:
-
-```text
-elv.physical-compatibility.v1
-```
-
-Stable status order:
-
-```text
-FORBIDDEN
-UNRESOLVED
-WARNING
-OK
-```
-
-Profile-set mutation requires one current WORKING ProjectDesignRevision once P3 exists.
-
-## 10. Common ELV command result
-
-All P1-P9 commands use:
-
-```text
-ElvCommandResult<T>
-  ElvCommandSuccess<T>
-  ElvCommandFailureResult<T>
-
-ElvFailure
-```
-
-Raw Drift/SQLite exceptions never cross the application boundary.
-
-## 11. Transaction and concurrency model
-
-Use phase-specific write sessions over the common command ledger scope.
+## 10. Transaction and concurrency model
 
 Correctness relies on:
 
@@ -237,95 +120,69 @@ FKs
 partial unique indexes
 expectedRevision conditional updates
 atomic Drift transaction
-real two-connection SQLite race tests
+persisted command ledger
+real two-connection SQLite race tests where applicable
 ```
 
-not assumed application serialization.
+P7 command history state changes must commit in the same transaction as the underlying inverse/forward command.
 
-## 12. Canonical tables by phase
+## 11. Actual Drift baseline
+
+Current implemented schema baseline is **P2 / schema version 19**.
+
+Implemented ELV tables:
 
 ```text
-P1 / schema 18
-  ElvCables
-  CommandExecutionRecords
-
-P2 / schema 19
-  CableAllocations
-  CableAllocationResourceSelections
-  CableResourceClaims
-  CableTerminationMappings
-
-P3 / schema 20
-  ProjectDesignRevisions
-  DesignRevisionPhysicalSnapshots
-  CanonicalCableRuns
-  CableRunTraversals
-  RouteHandoffs
-  RouteBendEvidence
-  LegacyRouteAdoptions
-
-P4 / schema 21
-  PathwayContexts
-  PhysicalCarriers
-  PhysicalCarrierCompartments
-
-P5 / schema 22
-  ProjectPhysicalCompatibilityProfileSets
-  ProjectPhysicalCompatibilityProfileRefs
-
-P6 / schema 23
-  RouteSeparationEvidenceRecords
+ElvCables
+CableAllocations
+CableAllocationResourceSelections
+CableResourceClaims
+CableTerminationMappings
+CommandExecutionRecords
 ```
 
-If branch schema advances before a phase starts, only monotonic number rebasing is allowed; ownership/order remains fixed.
-
-## 13. Required phase gates
-
-Every implementation phase includes format/analyze, core/mobile tests, Drift generation, migration/restart/failure tests, real race tests where applicable, command-contract matrix update and exact-SHA evidence.
-
-Dedicated additions:
+Planned persistence waves:
 
 ```text
-P2
-  whole/composite/group overlap
-  termination obligation semantics
-  allocation/run release dependency
-
-P3
-  route project isolation
-  exact handoff proof
-  canonical + legacy shared route regression
-
-P4
-  host project isolation
-  archive dependency guards
-  compartment aggregate capacity
-
-P5
-  selector/combiner order-independence
-  exact ref/hash/deprecated validation
-  WORKING revision guard
-  engine-version/fingerprint restart equivalence
+P3 / schema 20  ProjectDesignRevisions, snapshots, canonical runs/traversals, handoffs/bend evidence, legacy adoption
+P4 / schema 21  PathwayContexts, PhysicalCarriers, PhysicalCarrierCompartments
+P5 / schema 22  ProjectPhysicalCompatibilityProfileSets + exact refs
+P6 / schema 23  RouteSeparationEvidenceRecords + revision-scoped derived results
+P7 follow-up       persisted command-history records/cursor evidence
 ```
 
-## 14. Current authorization
+Only monotonic schema-number rebasing is allowed if the branch advances first.
+
+## 12. Required phase gates
+
+Every persistence phase includes format/analyze, core/mobile tests, Drift generation, migration/restart/failure tests, race tests where applicable, command-matrix update and exact-SHA evidence.
+
+P7 adds shared-workspace stage/permission/history/trace acceptance. P8 adds five real DB verticals plus rollback/reopen/idempotency/frozen reconstruction. P9 adds architecture inventory/assertions and final exact-SHA evidence.
+
+## 13. Current authorization
 
 ```text
-P1 implementation                  AUTHORIZED
-P2 code specification              HARDENED / PASS
-P3 code specification              HARDENED / PASS
-P4 code specification              HARDENED / PASS
-P5 code specification              HARDENED / PASS
-
-open BLOCKER P2-P5 findings        0
-open HIGH P2-P5 findings           0
+P1-P2 runtime persistence foundation          IMPLEMENTED / TESTED IN BRANCH
+P3-P6 domain/application contracts            PRESENT
+P3-P6 canonical Drift persistence             OPEN
+P7 workspace orchestration foundation         IMPLEMENTED
+P7 persisted history + concrete trace         OPEN
+P8 deterministic fixture foundation           IMPLEMENTED
+P8 real DB vertical/restart proof              OPEN
+P9 structural CI guard                        IMPLEMENTED
+P9 final runtime exact-SHA closure             OPEN
 ```
 
-Implementation authorization remains sequential:
+No `ELV3 COMPLETE` label is permitted while any OPEN row above remains.
+
+## 14. Next implementation sequence
 
 ```text
-P2 only after P1 exact-SHA gate
-P3 only after P2 gate
-P4 only after P3 gate
-P5 only after P4 gate
+P3 persistence
+ -> P4 persistence
+ -> P5 persistence
+ -> P6 persistence
+ -> P7 concrete query/trace/history adapters
+ -> P8 five DB verticals + failure/reopen/idempotency/frozen proof
+ -> P9 runtime audit + exact-SHA closure
 ```

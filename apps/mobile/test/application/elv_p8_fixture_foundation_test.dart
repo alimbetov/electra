@@ -5,6 +5,7 @@ import '../support/elv_test_ids.dart';
 import '../support/elv_test_project.dart';
 import '../support/elv_test_routing.dart';
 import '../support/elv_test_topology.dart';
+import '../support/elv_vertical_fixture_plan.dart';
 
 void main() {
   group('ELV3 P8 deterministic fixture foundation', () {
@@ -20,6 +21,22 @@ void main() {
       expect(first.connectionId, startsWith(ElvFixturePrefixes.connection));
       expect(first.runId, startsWith(ElvFixturePrefixes.run));
       expect(first.traversalIds, hasLength(3));
+    });
+
+    test('freezes all five discipline fixture contracts', () {
+      expect(ElvVerticalFixturePlans.all, hasLength(5));
+      expect(
+        ElvVerticalFixturePlans.all.map((plan) => plan.discipline).toSet(),
+        ElvVerticalDiscipline.values.toSet(),
+      );
+      expect(
+        ElvVerticalFixturePlans.all
+            .where((plan) => plan.normativeComplianceExpected),
+        isEmpty,
+      );
+      expect(ElvVerticalFixturePlans.acs.connectionCount, 4);
+      expect(ElvVerticalFixturePlans.acs.cableCount, 1);
+      expect(ElvVerticalFixturePlans.fire.cableCount, 2);
     });
 
     test('ACS fixture partitions one 8-core cable without overlap', () {

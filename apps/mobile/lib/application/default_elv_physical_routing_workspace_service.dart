@@ -4,6 +4,7 @@ import 'elv_command_result.dart';
 import 'elv_physical_routing_workspace_service.dart';
 import 'elv_physical_routing_workspace_state.dart';
 import 'elv_physical_trace_service.dart';
+import 'elv_workspace_error_codes.dart';
 
 final class PhysicalRoutingSelectionSnapshot {
   const PhysicalRoutingSelectionSnapshot({
@@ -95,7 +96,7 @@ final class DefaultElvPhysicalRoutingWorkspaceService
     if (!context.editingAllowed || context.workingDesignRevisionId == null) {
       return const ElvCommandFailureResult<Object?>(
         ElvFailure(
-          code: 'ELV_WORKSPACE_READ_ONLY',
+          code: ElvWorkspaceErrorCodes.readOnly,
           category: ElvFailureCategory.lifecycle,
         ),
       );
@@ -103,7 +104,7 @@ final class DefaultElvPhysicalRoutingWorkspaceService
     if (!await authorizer.canExecute(command)) {
       return const ElvCommandFailureResult<Object?>(
         ElvFailure(
-          code: 'ELV_WORKSPACE_COMMAND_FORBIDDEN',
+          code: ElvWorkspaceErrorCodes.commandForbidden,
           category: ElvFailureCategory.validation,
         ),
       );
