@@ -1,6 +1,6 @@
 # Electra — ELV3 Authoritative Specification Index
 
-Status: EXECUTION AUTHORITY / R2 HARDENED / THIRD AUDIT REQUIRED  
+Status: EXECUTION AUTHORITY / R2 HARDENED / READY FOR EXECUTION  
 Branch: `feat/flutter-elv3-physical-routing-design`
 
 ## 1. Purpose
@@ -11,7 +11,7 @@ Implementation teams MUST use the documents below in this order. Historical file
 
 ## 2. Authority order
 
-1. `docs/product/elv3-r2-execution-clarifications.md` — final execution clarifications for frozen write guards, handoffs, selection history and P5 profile-set semantics.
+1. `docs/product/elv3-r2-execution-clarifications.md` — final execution clarifications for frozen write guards, handoffs, selection history, exact hashes, CableDefinition semantics and P5 profile-set semantics.
 2. `docs/product/elv3-r2-final-readiness-remediation.md` — authoritative closure of the second technical audit.
 3. `docs/product/elv3-implementation-specification-v2.md` — executable P1-P9 contract where not superseded by R2.
 4. `docs/product/elv3-pre-p1-final-hardening.md` — F1-F7 closure where consistent with R2.
@@ -54,6 +54,9 @@ ELV2 P1 wire extension
   + optional `cableDefinitions`
   P5 later adds `physicalCompatibilityProfiles`
 
+CableDefinition semantics
+  = exact C7 field contract aligned with ELV2 cable/reference catalogs
+
 CableAllocation lifecycle
   = DRAFT -> RESERVED -> ACTIVE -> RELEASED -> ARCHIVED
   plus DRAFT->ARCHIVED and RESERVED->RELEASED only
@@ -94,6 +97,13 @@ P6
 
 ## 5. Frozen canonical persistence names
 
+P2:
+
+```text
+CableAllocationResourceSelections
+CableResourceClaims
+```
+
 P3:
 
 ```text
@@ -113,13 +123,6 @@ ProjectPhysicalCompatibilityProfileSets
 ProjectPhysicalCompatibilityProfileRefs
 ```
 
-P2 additionally separates:
-
-```text
-CableAllocationResourceSelections
-CableResourceClaims
-```
-
 Existing legacy routing tables remain coexistence inputs.
 
 ## 6. Remaining implementation freedom
@@ -129,7 +132,7 @@ May vary without changing architecture:
 - Dart source-file boundaries;
 - private helper names;
 - Drift schema-version integer assigned by migration order;
-- equivalent SQL shape that proves the required atomic result;
+- equivalent SQL shape that proves required atomic behavior;
 - widget composition inside the specified workflow;
 - test-helper organization;
 - non-semantic indexes/materialized projections.
@@ -138,4 +141,17 @@ No other domain, identity, cardinality, lifecycle, ownership, historical-evidenc
 
 ## 7. Execution authorization
 
-P1 is authorized only if `docs/audit/elv3-p1-p9-third-adversarial-audit.md` reports zero open BLOCKER/HIGH specification findings and the roadmap records that authorization.
+Authoritative readiness evidence:
+
+`docs/audit/elv3-p1-p9-third-adversarial-audit.md`
+
+Result:
+
+```text
+open BLOCKER specification findings = 0
+open HIGH specification findings    = 0
+P1 implementation                   = AUTHORIZED
+ELV3 master specification           = READY FOR EXECUTION
+```
+
+This authorizes P1 implementation only. P2 may start only after P1 earns its own exact-SHA implementation gate, and the same rule applies sequentially through P9.
