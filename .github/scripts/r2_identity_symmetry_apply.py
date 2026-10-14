@@ -37,40 +37,48 @@ replacement = """        if (portTemplates
         ))
           'Interface binding references an unknown port template.',"""
 assert needle in text
+text = text.replace(needle, replacement, 1)
+needle = """        if ([id, code, version, source].any((value) => value.trim().isEmpty))
+          'Catalog identity, code, version and provenance are required.',
+        if (profiles.isEmpty) 'Provide at least one engineering profile.',"""
+replacement = """        if ([id, code, version, source].any((value) => value.trim().isEmpty))
+          'Catalog identity, code, version and provenance are required.',
+        if (code != normalizeEngineeringReferenceCode(code))
+          'Catalog code must use canonical engineering identity.',
+        if (profiles.isEmpty) 'Provide at least one engineering profile.',"""
+assert needle in text
 core.write_text(text.replace(needle, replacement, 1))
 
 p5 = Path('apps/mobile/lib/application/engineering_reference_revision_preview.dart')
 text = p5.read_text()
-needle = """    final nextProfile =
-        candidate.profiles
-            .where((item) => item.code == binding.profileCode)
-            .firstOrNull;
-    if (nextProfile == null) {"""
-replacement = """    ComponentEngineeringProfile? nextProfile;
-    try {
-      nextProfile = candidate.profile(binding.profileCode);
-    } catch (_) {
-      nextProfile = null;
-    }
-    if (nextProfile == null) {"""
+needle = """  final candidateProfiles = {
+    for (final profile in candidate.profiles) profile.code: profile,
+  };"""
+replacement = """  final candidateProfiles = {
+    for (final profile in candidate.profiles)
+      normalizeEngineeringReferenceCode(profile.code): profile,
+  };"""
 assert needle in text
-p5.write_text(text.replace(needle, replacement, 1))
+text = text.replace(needle, replacement, 1)
+text = text.replace(
+"final candidateProfile = candidateProfiles[binding.profileCode];",
+"final candidateProfile = candidateProfiles[normalizeEngineeringReferenceCode(binding.profileCode)];",
+1,
+)
+p5.write_text(text)
 
 p6 = Path('apps/mobile/lib/application/engineering_reference_adoption_repository.dart')
 text = p6.read_text()
-text = text.replace(
-"""    required this.candidateCatalogVersion,
+needle = """    required this.candidateCatalogVersion,
     required this.profileCode,
-    required this.reviewedBindingFingerprint,""",
-"""    required this.candidateCatalogVersion,
+    required this.reviewedBindingFingerprint,"""
+replacement = """    required this.candidateCatalogVersion,
     required String profileCode,
-    required this.reviewedBindingFingerprint,""",
-1,
-)
-text = text.replace(
-"""  }) : reviewedConnectionIds = List.unmodifiable(""",
-"""  }) : profileCode = normalizeEngineeringReferenceCode(profileCode),
-       reviewedConnectionIds = List.unmodifiable(""",
-1,
-)
-p6.write_text(text)
+    required this.reviewedBindingFingerprint,"""
+assert needle in text
+text = text.replace(needle, replacement, 1)
+needle = """  }) : reviewedConnectionIds = List.unmodifiable("""
+replacement = """  }) : profileCode = normalizeEngineeringReferenceCode(profileCode),
+       reviewedConnectionIds = List.unmodifiable("""
+assert needle in text
+p6.write_text(text.replace(needle, replacement, 1))
