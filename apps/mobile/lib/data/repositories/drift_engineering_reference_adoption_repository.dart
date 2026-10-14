@@ -47,11 +47,6 @@ final class DriftEngineeringReferenceAdoptionRepository
       );
     }
 
-    final topologyBeforeCommit = await DriftEngineeringTopologyRepository(
-      database,
-      originDeviceId: originDeviceId,
-    ).load(command.projectId);
-
     return database.transaction(() async {
       final ledgerKey = command.ledgerOperationId;
       final existingOperation =
@@ -275,6 +270,11 @@ WHERE ci.id = ? AND ci.deleted_at IS NULL
         );
       }
 
+      final topologyAtCommit = await DriftEngineeringTopologyRepository(
+        database,
+        originDeviceId: originDeviceId,
+      ).load(command.projectId);
+
       final dependentPortIds = <String>{};
       for (final row in connections) {
         dependentPortIds.add(row.fromPortId);
@@ -336,7 +336,7 @@ WHERE ci.id = ? AND ci.deleted_at IS NULL
       }
 
       _validateCandidateGraph(
-        topologyBeforeCommit,
+        topologyAtCommit,
         currentBindingPortIds: boundIds,
         candidatePorts: candidatePorts,
         relevantConnectionIds: currentConnectionIds.toSet(),
