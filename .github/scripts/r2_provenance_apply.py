@@ -3,17 +3,38 @@ from pathlib import Path
 path = Path('apps/mobile/lib/data/repositories/drift_engineering_reference_adoption_repository.dart')
 text = path.read_text()
 
-needle = """      if (currentCatalogRow == null) {
+needle = """      if (currentCatalogRow == null || candidateRow == null) {
         throw const EngineeringReferenceAdoptionFailure(
-          EngineeringReferenceAdoptionFailureCode.currentBindingUnavailable,
-          'The currently bound catalog edition is unavailable.',
+          EngineeringReferenceAdoptionFailureCode.candidateUnavailable,
+          'The exact current and candidate catalog editions must both exist.',
         );
       }
-      final candidateRow ="""
+      if (currentCatalogRow.code != candidateRow.code) {
+        throw const EngineeringReferenceAdoptionFailure(
+          EngineeringReferenceAdoptionFailureCode.candidateUnavailable,
+          'Catalog adoption cannot switch to an unrelated catalog code.',
+        );
+      }
+      final candidateCatalog = EngineeringReferenceCatalog.fromMap(
+        jsonDecode(candidateRow.payloadJson) as Map<String, dynamic>,
+      );
+      if (candidateCatalog.id != command.candidateCatalogId ||
+          candidateCatalog.version != command.candidateCatalogVersion) {
+        throw const EngineeringReferenceAdoptionFailure(
+          EngineeringReferenceAdoptionFailureCode.candidateUnavailable,
+          'Candidate catalog payload provenance does not match its durable edition.',
+        );
+      }"""
 replacement = """      if (currentCatalogRow == null) {
         throw const EngineeringReferenceAdoptionFailure(
           EngineeringReferenceAdoptionFailureCode.currentBindingUnavailable,
-          'The currently bound catalog edition is unavailable.',
+          'The exact current catalog edition is unavailable.',
+        );
+      }
+      if (candidateRow == null) {
+        throw const EngineeringReferenceAdoptionFailure(
+          EngineeringReferenceAdoptionFailureCode.candidateUnavailable,
+          'The exact candidate catalog edition is unavailable.',
         );
       }
       final currentCatalog = EngineeringReferenceCatalog.fromMap(
@@ -44,18 +65,16 @@ replacement = """      if (currentCatalogRow == null) {
           'Frozen binding profile disagrees with the exact immutable catalog payload.',
         );
       }
-      final candidateRow ="""
-assert needle in text
-text = text.replace(needle, replacement, 1)
-
-needle = """      if (candidateCatalog.id != command.candidateCatalogId ||
-          candidateCatalog.version != command.candidateCatalogVersion) {
+      if (currentCatalogRow.code != candidateRow.code) {
         throw const EngineeringReferenceAdoptionFailure(
           EngineeringReferenceAdoptionFailureCode.candidateUnavailable,
-          'Candidate catalog payload provenance does not match the exact row.',
+          'Catalog adoption cannot switch to an unrelated catalog code.',
         );
-      }"""
-replacement = """      if (candidateCatalog.id != command.candidateCatalogId ||
+      }
+      final candidateCatalog = EngineeringReferenceCatalog.fromMap(
+        jsonDecode(candidateRow.payloadJson) as Map<String, dynamic>,
+      );
+      if (candidateCatalog.id != command.candidateCatalogId ||
           candidateCatalog.version != command.candidateCatalogVersion ||
           candidateCatalog.code != candidateRow.code) {
         throw const EngineeringReferenceAdoptionFailure(
@@ -111,11 +130,11 @@ helper = """  void _assertExactSameEditionAggregate({
     required EngineeringReferenceAdoptionCommand command,
     required ComponentReferenceBindingRow bindingRow,
     required ComponentReferenceBinding binding,
-    required List<EngineeringPortInstanceRow> currentPorts,
+    required List<EngineeringPort> currentPorts,
     required EngineeringReferenceCatalog candidateCatalog,
     required ComponentEngineeringProfile candidateProfile,
   }) {
-    final currentPortIds = currentPorts.map((row) => row.id).toSet();
+    final currentPortIds = currentPorts.map((port) => port.id).toSet();
     final bindingPortIds = binding.portIds.toSet();
     if (bindingRow.catalogId != candidateCatalog.id ||
         bindingRow.profileCode != binding.profileCode ||
@@ -131,13 +150,10 @@ helper = """  void _assertExactSameEditionAggregate({
       );
     }
 
-    final currentByCode = <String, EngineeringPortInstanceRow>{};
-    for (final row in currentPorts) {
-      final port = EngineeringPort.fromMap(
-        jsonDecode(row.payloadJson) as Map<String, dynamic>,
-      );
-      currentByCode[normalizeEngineeringReferenceCode(port.code)] = row;
-    }
+    final currentByCode = {
+      for (final port in currentPorts)
+        normalizeEngineeringReferenceCode(port.code): port,
+    };
     var generated = 0;
     final expectedPorts = candidateProfile.instantiate(
       componentId: command.componentId,
@@ -146,14 +162,14 @@ helper = """  void _assertExactSameEditionAggregate({
       vocabulary: candidateCatalog.vocabulary,
       nextId: () => 'unexpected-same-edition-${generated++}',
       idForTemplate: (code) {
-        final row = currentByCode[normalizeEngineeringReferenceCode(code)];
-        if (row == null) {
+        final port = currentByCode[normalizeEngineeringReferenceCode(code)];
+        if (port == null) {
           throw const EngineeringReferenceAdoptionFailure(
             EngineeringReferenceAdoptionFailureCode.currentBindingUnavailable,
             'Same-edition aggregate is missing a canonical profile port.',
           );
         }
-        return row.id;
+        return port.id;
       },
     );
     if (expectedPorts.length != currentPorts.length) {
@@ -163,14 +179,10 @@ helper = """  void _assertExactSameEditionAggregate({
       );
     }
     final expectedById = {for (final port in expectedPorts) port.id: port};
-    for (final row in currentPorts) {
-      final expected = expectedById[row.id];
+    for (final current in currentPorts) {
+      final expected = expectedById[current.id];
       if (expected == null ||
-          canonicalEngineeringJson(
-                EngineeringPort.fromMap(
-                  jsonDecode(row.payloadJson) as Map<String, dynamic>,
-                ).toMap(),
-              ) !=
+          canonicalEngineeringJson(current.toMap()) !=
               canonicalEngineeringJson(expected.toMap())) {
         throw const EngineeringReferenceAdoptionFailure(
           EngineeringReferenceAdoptionFailureCode.currentBindingUnavailable,
