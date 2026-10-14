@@ -37,14 +37,14 @@ The [ELV delivery plan](elv-delivery-plan.md) is the active product roadmap. His
 | ELV0 | Systems, sixteen family editions, shared device participation | Baseline closed |
 | ELV1 | Ports, connections, topology, passive mappings and assemblies | CLOSED / ACCEPTED |
 | ELV2 | Canonical discipline profiles, versioned catalogs, placement and explicit adoption | CLOSED / ACCEPTED |
-| ELV3 | Cable resources, allocations, CableRun ownership, shared routes/pathways and physical compatibility | P0 design/discovery in progress |
+| ELV3 | Cable resources, allocations, CableRun ownership, shared routes/pathways and physical compatibility | P0 DESIGN CLOSED / P1 NEXT |
 | ELV4 | Power, PoE, PSU, UPS, converters and backup graph | Planned |
 | ELV5 | Versioned CCTV/LAN/ACS/fire calculations | Planned |
 | ELV6 | Racks, cabinets, patching and physical capacity | Planned |
 | ELV7 | Jurisdiction profiles, normative rule packs and findings | Planned |
 | ELV8 | Manufacturer selection, snapshots, BOM and deliverables | Planned |
 
-ELV3 starts with `ELV3-P0` ownership/cardinality and migration design. No persistence refactor begins until the relation between `EngineeringConnection`, `CableAllocation`, `Cable`, `CableRun`, `CableRoute` and `PhysicalChannel` is frozen.
+ELV3-P0 is closed with explicit ownership/cardinality, cable-resource allocation, PhysicalChannel facts, lifecycle/provenance, staged electrical CableRun migration, four-discipline walkthrough, persistence proposal and hard design audit. The canonical physical chain is `EngineeringConnection -> CableAllocation -> Cable -> CableRun -> CableRoute -> RouteSegment -> PhysicalChannel`. The next implementation stage is `ELV3-P1` for exact/versioned `CableDefinition` and project-owned physical `Cable` identity.
 
 All four discipline fixtures remain required throughout the track. National rule packs require verified sources and provenance. FL16 and ELV6 share enclosure infrastructure; ELV8 reuses electrical BOM/reporting foundations.
 
