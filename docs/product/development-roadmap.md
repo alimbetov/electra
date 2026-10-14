@@ -29,7 +29,7 @@ Delivery is incremental: each baseline has an exact-commit Flutter/core CI gate.
 | ELV0 | Systems, sixteen family editions, shared device participation | Baseline closed |
 | ELV1 | Ports, connections, topology, passive mappings and assemblies | CLOSED / ACCEPTED |
 | ELV2 | Canonical discipline profiles, versioned catalogs, placement and explicit adoption | CLOSED / ACCEPTED |
-| ELV3 | Cable resources, allocation/termination, revision-scoped cable runs, reusable routing/carriers/pathways, physical compatibility and runtime evidence | RUNTIME CLOSURE P3-P9 IN PROGRESS |
+| ELV3 | Cable resources, allocation/termination, revision-scoped cable runs, reusable routing/carriers/pathways, physical compatibility and runtime evidence | RUNTIME CLOSURE P3-P9 IN PROGRESS / RCR-0 APPROVED |
 | ELV4 | Power, PoE, PSU, UPS, converters and backup graph | BLOCKED until ELV3 closure |
 | ELV5 | Versioned CCTV/LAN/ACS/fire calculations | Planned |
 | ELV6 | Racks, cabinets, patching and physical capacity | Planned |
@@ -42,8 +42,28 @@ The merged ELV3 baseline contains real P1/P2 persistence plus P3-P8 domain/appli
 
 ### ELV3 runtime-closure authority
 
-- `docs/product/elv3-runtime-closure-specification.md` — authoritative execution specification for P3-P9 runtime closure;
-- `docs/product/elv3-runtime-closure-delivery-plan.md` — ordered RC0-RC9 execution and exact-SHA gates;
+Authority order for execution:
+
+```text
+ELV3 architecture/process authority
+  ↓
+ELV3 code-level contracts P1-P9
+  ↓
+docs/product/elv3-runtime-closure-rcr0-remediation.md
+  ↓
+docs/product/elv3-runtime-closure-specification.md
+  ↓
+docs/product/elv3-runtime-closure-delivery-plan.md
+  ↓
+implementation
+```
+
+Runtime-closure documents:
+
+- `docs/product/elv3-runtime-closure-rcr0-remediation.md` — authoritative RCR-0 amendment closing RC-A01…RC-A07 and overriding conflicting Runtime Closure wording;
+- `docs/audit/elv3-runtime-closure-rcr0-rereview.md` — post-remediation re-review: APPROVED / READY FOR RC0;
+- `docs/product/elv3-runtime-closure-specification.md` — execution specification for P3-P9 runtime closure subject to RCR-0 precedence;
+- `docs/product/elv3-runtime-closure-delivery-plan.md` — ordered RC0-RC9 execution and exact-SHA gates subject to RCR-0 precedence;
 - `docs/audit/elv3-implementation-inventory.md` — source-reality inventory used as the starting closure baseline;
 - `docs/product/elv3-code-contract-p7-p9.md` — accepted workspace/restart/final-audit contract reused by closure.
 
@@ -64,11 +84,12 @@ Current code implementation authority:
 - `docs/product/elv3-code-contract-p4-p6.md`;
 - `docs/product/elv3-code-contract-p7-p9.md`.
 
-Latest design/code readiness evidence:
+Latest design/code/runtime-closure readiness evidence:
 
 - `docs/audit/elv3-code-implementation-technical-rereview.md` — general design/code readiness PASS;
 - `docs/audit/elv3-p2-p5-code-technical-review.md` — dedicated P2-P5 PASS;
-- `docs/audit/elv3-implementation-inventory.md` — runtime source reality and open closure gaps.
+- `docs/audit/elv3-implementation-inventory.md` — runtime source reality and open closure gaps;
+- `docs/audit/elv3-runtime-closure-rcr0-rereview.md` — Runtime Closure consistency PASS and RC0 authorization.
 
 Historical finding evidence remains in the earlier code technical review/audits and does not override the current hardened authority set.
 
@@ -90,19 +111,28 @@ P3
   run/allocation reverse dependency preserved
 
 P4
+  PathwayContext / PhysicalCarrier / compartment canonical roots are project-owned physical facts
   exact ACTIVE->ARCHIVED lifecycle for context/carrier/compartment
+  typed host foreign keys; no generic hostKind+hostId authority
+  traversal carrier relation has one source of truth; no duplicate assignment aggregate
   transaction-bound host/project ownership validation
   archive dependency guards
   factual compartment-area aggregate capacity
 
 P5
   exact PhysicalCompatibilityProfile shape
+  exact canonical tables ProjectPhysicalCompatibilityProfileSets / ProjectPhysicalCompatibilityProfileRefs
+  findings persisted as revision-scoped ProjectDerivedResults, not a second canonical finding table
   typed selector applicability
   exact v1 rule semantics
   deterministic order-independent combiner
   engine version elv.physical-compatibility.v1
   stable status order FORBIDDEN->UNRESOLVED->WARNING->OK
   profile-set mutations require WORKING design revision
+
+P6
+  ELV-ROUTE-01..06 persisted through revision-scoped ProjectDerivedResults by default
+  new process-specific result tables require a prior audited exception
 ```
 
 Canonical ELV3 implementation/runtime-closure sequence is now:
@@ -112,17 +142,19 @@ P1 Cable identity / exact ELV2 reference / resource definitions                 
   ↓
 P2 allocation / resource selection / atomic claims / terminations                MERGED
   ↓
+RCR-0 project-consistency remediation                                             CLOSED / APPROVED
+  ↓
 RC0 baseline inventory + executable audit
   ↓
 RC1 P3 canonical schema/repositories
-  ↓ exact-SHA
+  ↓ exact-SHA A (must be recorded before RC2 begins)
 RC2 P3 design-revision/freeze/reroute runtime verticals
+  ↓ exact-SHA B
+RC3 P4 project-owned pathway/carrier/compartment runtime
   ↓ exact-SHA
-RC3 P4 pathway/carrier/compartment runtime
+RC4 P5 exact profile-set persistence + ProjectDerivedResults findings
   ↓ exact-SHA
-RC4 P5 profile-set/finding persistence
-  ↓ exact-SHA
-RC5 P6 revision-scoped calculations/evidence
+RC5 P6 revision-scoped calculations/evidence via ProjectDerivedResults
   ↓ exact-SHA
 RC6 P7 concrete workspace/trace/history
   ↓ exact-SHA
@@ -141,6 +173,8 @@ Current runtime authorization:
 
 ```text
 P1/P2 persisted runtime baseline           MERGED
+RCR-0 consistency remediation              CLOSED / PASS
+RC0 implementation                         AUTHORIZED
 P3-P6 domain/application contracts         PRESENT
 P7 workspace/history foundation            PRESENT
 P8 fixture/failure foundation              PRESENT
