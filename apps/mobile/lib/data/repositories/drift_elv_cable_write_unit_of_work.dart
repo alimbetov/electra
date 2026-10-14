@@ -37,7 +37,7 @@ final class _DriftElvCableWriteSession implements ElvCableWriteSession {
           originDeviceId: originDeviceId,
         ),
         references = _DriftElvReferenceReadStore(database),
-        cableDependencies = const _P1CableDependencyStore();
+        cableDependencies = _P2AwareCableDependencyStore(database);
 
   @override
   final ElvCommandLedgerStore commandLedger;
@@ -295,19 +295,56 @@ final class _DriftElvCableWriteStore implements ElvCableWriteStore {
   );
 }
 
-final class _P1CableDependencyStore implements ElvCableDependencyStore {
-  const _P1CableDependencyStore();
+final class _P2AwareCableDependencyStore implements ElvCableDependencyStore {
+  const _P2AwareCableDependencyStore(this.database);
+
+  final AppDatabase database;
 
   @override
-  Future<List<String>> blockingDependencyIds(String projectId, String cableId) async =>
-      const [];
+  Future<List<String>> blockingDependencyIds(
+    String projectId,
+    String cableId,
+  ) async {
+    final rows = await (database.select(database.cableAllocations)
+          ..where(
+            (row) =>
+                row.projectId.equals(projectId) &
+                row.cableId.equals(cableId) &
+                row.lifecycleState.isIn(const ['RESERVED', 'ACTIVE']) &
+                row.deletedAt.isNull(),
+          ))
+        .get();
+    return rows.map((row) => row.id).toList(growable: false);
+  }
 
   @override
-  Future<bool> hasCanonicalRunHistory(String projectId, String cableId) async => false;
+  Future<bool> hasCanonicalRunHistory(String projectId, String cableId) async {
+    // P3 replaces this branch with canonical run persistence.
+    return false;
+  }
 
   @override
-  Future<bool> hasConsumingAllocation(String projectId, String cableId) async => false;
+  Future<bool> hasConsumingAllocation(String projectId, String cableId) async =>
+      (await blockingDependencyIds(projectId, cableId)).isNotEmpty;
 
   @override
-  Future<bool> hasResourceSelectionHistory(String projectId, String cableId) async => false;
+  Future<bool> hasResourceSelectionHistory(String projectId, String cableId) async {
+    final allocationIds = database.cableAllocations.id;
+    final query = database.selectOnly(database.cableAllocations)
+      ..addColumns([allocationIds])
+      ..where(
+        database.cableAllocations.projectId.equals(projectId) &
+            database.cableAllocations.cableId.equals(cableId) &
+            database.cableAllocations.deletedAt.isNull(),
+      );
+    final ids = (await query.get())
+        .map((row) => row.read(allocationIds))
+        .whereType<String>()
+        .toList(growable: false);
+    if (ids.isEmpty) return false;
+    return await (database.select(database.cableAllocationResourceSelections)
+          ..where((row) => row.allocationId.isIn(ids)))
+        .getSingleOrNull() !=
+        null;
+  }
 }
