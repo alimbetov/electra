@@ -43,4 +43,47 @@ void main() {
     expect(catalog.profile(' camera ').code, 'CAMERA');
     expect(catalog.profile('Camera').code, 'CAMERA');
   });
+
+  test('publication rejects noncanonical port template codes', () {
+    final source = _fixture();
+    final camera = source.profile('CAMERA');
+    final template = camera.portTemplates.single;
+    final noncanonical = ComponentEngineeringProfile.fromMap({
+      ...camera.toMap(),
+      'portTemplates': [
+        {
+          ...template.toMap(),
+          'code': ' eth ',
+        },
+      ],
+      'portInterfaceCodes': const {' eth ': 'ETHERNET_POE'},
+    });
+    final catalog = EngineeringReferenceCatalog(
+      id: 'round2-port-code',
+      code: 'ELV2',
+      version: '2',
+      source: 'round2-test',
+      profiles: [noncanonical],
+      vocabulary: source.vocabulary,
+    );
+
+    expect(
+      catalog.validateForPublication(),
+      contains('Port template codes must use canonical engineering identity.'),
+    );
+  });
+
+  test('interface binding keys must use canonical port identity', () {
+    final source = _fixture();
+    final camera = source.profile('CAMERA');
+    final noncanonical = ComponentEngineeringProfile.fromMap({
+      ...camera.toMap(),
+      'portInterfaceCodes': const {' eth ': 'ETHERNET_POE'},
+    });
+
+    expect(
+      noncanonical.validate(),
+      contains('Interface binding keys must use canonical port identity.'),
+    );
+  });
 }
