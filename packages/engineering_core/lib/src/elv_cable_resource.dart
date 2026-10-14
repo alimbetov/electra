@@ -45,6 +45,17 @@ final class DefinitionGroupSelection extends CableResourceSelection {
       };
 }
 
+CableResourceSelection cableResourceSelectionFromMap(Map<String, dynamic> map) {
+  return switch (map['kind'] as String) {
+    'WHOLE_CABLE' => const WholeCableSelection(),
+    'RESOURCE_SET' => ResourceSetSelection(
+        (map['resourceIdentities'] as List? ?? const []).cast<String>(),
+      ),
+    'DEFINITION_GROUP' => DefinitionGroupSelection(map['groupIdentity'] as String),
+    final kind => throw FormatException('Unknown cable resource selection kind: $kind'),
+  };
+}
+
 final class ResolvedCableResourceSelection {
   const ResolvedCableResourceSelection({
     required this.selection,
@@ -88,7 +99,7 @@ abstract final class CableResourceResolver {
     late final Set<String> atoms;
     switch (selection) {
       case WholeCableSelection():
-        atoms = {'__WHOLE_CABLE__'};
+        atoms = _wholeCableClaims(definition);
       case ResourceSetSelection(:final resourceIdentities):
         if (resourceIdentities.isEmpty) {
           throw const CableResourceResolutionException(
@@ -110,7 +121,11 @@ abstract final class CableResourceResolver {
               {'resourceIdentity': id},
             );
           }
-          atoms.addAll(_resolveAtomicDescendants(resource, byId));
+          if (resource.kind == CableResourceKind.wholeCable) {
+            atoms.addAll(_wholeCableClaims(definition));
+          } else {
+            atoms.addAll(_resolveAtomicDescendants(resource, byId));
+          }
         }
       case DefinitionGroupSelection(:final groupIdentity):
         if (groupIdentity.isEmpty) {
@@ -122,6 +137,7 @@ abstract final class CableResourceResolver {
             .where(
               (resource) =>
                   resource.allocatable &&
+                  resource.kind != CableResourceKind.wholeCable &&
                   resource.groupMembership.contains(groupIdentity),
             )
             .toList(growable: false);
@@ -159,13 +175,17 @@ abstract final class CableResourceResolver {
     );
   }
 
+  static Set<String> _wholeCableClaims(CableDefinition definition) => {
+        '__WHOLE_CABLE__',
+        for (final resource in definition.resourceDefinitions)
+          if (resource.atomic && resource.kind != CableResourceKind.wholeCable)
+            resource.identity,
+      };
+
   static Set<String> _resolveAtomicDescendants(
     CableResourceDefinition resource,
     Map<String, CableResourceDefinition> byId,
   ) {
-    if (resource.kind == CableResourceKind.wholeCable) {
-      return {'__WHOLE_CABLE__'};
-    }
     if (resource.atomic) return {resource.identity};
     return {
       for (final childId in resource.childResourceIds)
