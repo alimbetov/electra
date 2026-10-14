@@ -61,4 +61,5 @@ jobs:
                   apps/mobile/test/data/elv_p4_runtime_closure_test.dart
           git diff --cached --quiet && { echo 'No changes produced'; exit 1; }
           git commit -m 'feat(elv3): implement RC3 P4 carrier persistence'
+          git pull --rebase origin feat/elv3-runtime-closure
           git push origin HEAD:feat/elv3-runtime-closure
