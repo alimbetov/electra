@@ -31,34 +31,57 @@ jobs:
         run: flutter pub get --enforce-lockfile
 
       - name: Apply immutable RC1-RC2 patch
+        id: patch
         shell: bash
         run: |
           mkdir -p scripts/ci
           curl -fsSL \
             https://raw.githubusercontent.com/alimbetov/electra/e8db15e64c8e53cc23e5e6567ecb37ffff414c87/scripts/ci/apply-elv3-runtime-rc1-rc2.py \
             -o scripts/ci/apply-elv3-runtime-rc1-rc2.py
-          python3 scripts/ci/apply-elv3-runtime-rc1-rc2.py
+          set +e
+          python3 scripts/ci/apply-elv3-runtime-rc1-rc2.py > patch-diagnostics.txt 2>&1
+          status=$?
+          set -e
+          cat patch-diagnostics.txt
+          echo "status=$status" >> "$GITHUB_OUTPUT"
           rm scripts/ci/apply-elv3-runtime-rc1-rc2.py
 
+      - name: Upload patch diagnostics
+        if: steps.patch.outputs.status != '0'
+        uses: actions/upload-artifact@v4
+        with:
+          name: rc1-rc2-patch-diagnostics
+          path: patch-diagnostics.txt
+
+      - name: Fail when patch did not apply
+        if: steps.patch.outputs.status != '0'
+        run: exit 1
+
       - name: Generate Drift code
+        if: steps.patch.outputs.status == '0'
         working-directory: apps/mobile
         run: dart run build_runner build --delete-conflicting-outputs
 
       - name: Format mobile source
+        if: steps.patch.outputs.status == '0'
         working-directory: apps/mobile
         run: dart format lib test
 
       - name: Analyze mobile app
+        if: steps.patch.outputs.status == '0'
         working-directory: apps/mobile
         run: flutter analyze
 
       - name: Test RC1-RC2
+        if: steps.patch.outputs.status == '0'
         working-directory: apps/mobile
         run: flutter test test/data/elv_p3_runtime_closure_test.dart
 
       - name: Commit resulting source
+        if: steps.patch.outputs.status == '0'
         shell: bash
         run: |
+          rm -f patch-diagnostics.txt
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add apps/mobile/lib/data/database/app_database.dart \
