@@ -7,6 +7,9 @@ on:
     paths:
       - '.github/workflows/tmp-elv3-test-diagnostics.yml'
 
+permissions:
+  contents: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -28,20 +31,31 @@ jobs:
 
       - name: Generate Drift code
         working-directory: apps/mobile
-        run: dart run build_runner build
+        run: dart run build_runner build --delete-conflicting-outputs
 
       - name: Capture test output
         working-directory: apps/mobile
         shell: bash
         run: |
           set +e
-          flutter test > test.log 2>&1
+          flutter test --reporter expanded > test.log 2>&1
           status=$?
-          cat test.log
+          {
+            echo '# Temporary ELV3 test diagnostics'
+            echo
+            echo "Exit status: $status"
+            echo
+            echo '```text'
+            tail -n 500 test.log
+            echo '```'
+          } > ../../docs/audit/elv3-runtime-test-diagnostics.tmp.md
           exit 0
 
-      - name: Upload test log
-        uses: actions/upload-artifact@v4
-        with:
-          name: elv3-test-log
-          path: apps/mobile/test.log
+      - name: Commit diagnostic output
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/audit/elv3-runtime-test-diagnostics.tmp.md
+          git commit -m 'chore(ci): capture ELV3 runtime test diagnostics' || exit 0
+          git push origin HEAD:feat/elv3-runtime-closure
