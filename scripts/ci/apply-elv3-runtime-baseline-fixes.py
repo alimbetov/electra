@@ -23,6 +23,63 @@ replace_once(
     "    beforeOpen: (details) async {\n      await customStatement('PRAGMA foreign_keys = ON');\n      await customStatement('PRAGMA busy_timeout = 5000');\n",
 )
 
+# BEGIN IMMEDIATE contention happens before the body is entered, so SQLite busy timeout
+# is not sufficient across independent Drift connections. Retry only SQLITE_BUSY with
+# a small bounded backoff; all other database failures propagate unchanged.
+for rel, session_type, session_ctor in [
+    (
+        'apps/mobile/lib/data/repositories/drift_elv_cable_write_unit_of_work.dart',
+        'ElvCableWriteSession',
+        '_DriftElvCableWriteSession',
+    ),
+    (
+        'apps/mobile/lib/data/repositories/drift_elv_cable_allocation_write_unit_of_work.dart',
+        'ElvAllocationWriteSession',
+        '_DriftElvAllocationWriteSession',
+    ),
+]:
+    path = ROOT / rel
+    text = path.read_text()
+    if "package:sqlite3/sqlite3.dart" not in text:
+        text = text.replace(
+            "import 'package:engineering_core/engineering_core.dart';\n",
+            "import 'package:engineering_core/engineering_core.dart';\nimport 'package:sqlite3/sqlite3.dart' show SqliteException;\n",
+            1,
+        )
+    old = (
+        f"  @override\n  Future<T> run<T>(Future<T> Function({session_type} session) action) =>\n"
+        "      database.transaction(() async {\n"
+        f"        final session = {session_ctor}(\n"
+        "          database,\n"
+        "          originDeviceId: originDeviceId,\n"
+        "        );\n"
+        "        return action(session);\n"
+        "      });\n"
+    )
+    new = (
+        f"  @override\n  Future<T> run<T>(Future<T> Function({session_type} session) action) async {{\n"
+        "    const maxAttempts = 8;\n"
+        "    for (var attempt = 1; attempt <= maxAttempts; attempt++) {\n"
+        "      try {\n"
+        "        return await database.transaction(() async {\n"
+        f"          final session = {session_ctor}(\n"
+        "            database,\n"
+        "            originDeviceId: originDeviceId,\n"
+        "          );\n"
+        "          return action(session);\n"
+        "        });\n"
+        "      } on SqliteException catch (error) {\n"
+        "        if (error.resultCode != 5 || attempt == maxAttempts) rethrow;\n"
+        "        await Future<void>.delayed(Duration(milliseconds: 25 * attempt));\n"
+        "      }\n"
+        "    }\n"
+        "    throw StateError('unreachable sqlite busy retry state');\n"
+        "  }\n"
+    )
+    if old not in text:
+        raise SystemExit(f'{rel}: transaction run anchor missing')
+    path.write_text(text.replace(old, new, 1))
+
 # Make claim acquisition deterministic after the writer lock is acquired. The unique
 # index remains the final database invariant; the pre-check maps the common conflict
 # to the domain outcome instead of relying on insertOrIgnore row-id semantics.
