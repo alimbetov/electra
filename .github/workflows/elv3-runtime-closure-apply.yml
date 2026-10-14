@@ -8,6 +8,7 @@ on:
       - 'scripts/ci/apply-elv3-runtime-rc1-rc2.py'
       - 'scripts/ci/apply-elv3-runtime-rc1-rc2-fix.py'
       - 'scripts/ci/apply-elv3-runtime-core-fixes.py'
+      - 'scripts/ci/apply-elv3-runtime-baseline-fixes.py'
       - '.github/workflows/elv3-runtime-closure-apply.yml'
   workflow_dispatch:
 
@@ -30,6 +31,7 @@ jobs:
           python3 scripts/ci/apply-elv3-runtime-rc1-rc2.py
           python3 scripts/ci/apply-elv3-runtime-rc1-rc2-fix.py
           python3 scripts/ci/apply-elv3-runtime-core-fixes.py
+          python3 scripts/ci/apply-elv3-runtime-baseline-fixes.py
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -84,18 +86,7 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add apps/mobile/lib/data/database/app_database.dart \
-                  apps/mobile/lib/data/repositories/drift_elv_runtime_support.dart \
-                  apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart \
-                  apps/mobile/lib/data/repositories/drift_elv_cable_run_repository.dart \
-                  apps/mobile/lib/data/repositories/drift_elv_cable_write_unit_of_work.dart \
-                  apps/mobile/test/data/elv_p1_cable_persistence_test.dart \
-                  apps/mobile/test/data/elv_p3_runtime_closure_test.dart \
-                  packages/engineering_core/lib/src/elv_cable_resource_definition.dart \
-                  packages/engineering_core/lib/src/elv_cable_reference.dart \
-                  packages/engineering_core/lib/src/elv_cable_termination.dart \
-                  packages/engineering_core/lib/src/elv_pathway_context.dart \
-                  packages/engineering_core/lib/src/elv_physical_compatibility_profile.dart
+          git add apps/mobile/lib apps/mobile/test packages/engineering_core/lib packages/engineering_core/test
           git diff --cached --quiet && exit 0
           git commit -m 'feat(elv3): close P3 runtime persistence baseline'
           git pull --rebase origin feat/elv3-runtime-closure
