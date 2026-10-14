@@ -13,13 +13,13 @@ def replace_exact(path: str, old: str, new: str) -> None:
 replace_exact(
     "docs/product/elv-delivery-plan.md",
     "Status: ELV1 baseline merged; ELV2 reference vocabulary and compatibility slice in progress\nSpecification branch: `docs/elv-engineering-systems-spec` (revision `091e6d8`)  \nImplementation branch: `feat/flutter-elv2-reference-catalogs`\nScope: implementation roadmap after ELV1 connectivity foundation",
-    "Status: ELV1 CLOSED; ELV2 CLOSED; ELV3 READY FOR DESIGN / ANALYSIS\nAccepted baseline: `main@f05b1e558a93b40928429ca86d91f4daa0cf4ef0`  \nPre-ELV3 hardening: `feat/flutter-elv12-pre-elv3-hardening`\nScope: implementation roadmap after accepted ELV1/ELV2 baseline",
+    "Status: ELV1 CLOSED; ELV2 CLOSED; ELV3 READY FOR DESIGN / ANALYSIS\nAccepted baseline: `main@f05b1e558a93b40928429ca86d91f4daa0cf4ef0`\nPre-ELV3 hardening: `feat/flutter-elv12-pre-elv3-hardening`\nScope: implementation roadmap after accepted ELV1/ELV2 baseline",
 )
 
 replace_exact(
     "docs/product/elv-canonical-discipline-model.md",
     "Status: Draft 0.1  \nBranch: `docs/elv-engineering-systems-spec`",
-    "Status: ACCEPTED ARCHITECTURE — ELV1/ELV2 baseline  \nAccepted baseline: `main@f05b1e558a93b40928429ca86d91f4daa0cf4ef0`  \nNext stage: `ELV3-P0` physical-routing design/audit",
+    "Status: ACCEPTED ARCHITECTURE — ELV1/ELV2 baseline\nAccepted baseline: `main@f05b1e558a93b40928429ca86d91f4daa0cf4ef0`\nNext stage: `ELV3-P0` physical-routing design/audit",
 )
 
 db = Path("apps/mobile/lib/data/database/app_database.dart")
@@ -48,8 +48,8 @@ db.write_text(text)
 Path("docs/audit/elv12-pre-elv3-governance-checklist.md").write_text(
     """# ELV1/ELV2 Pre-ELV3 Governance Checklist
 
-Status: OWNER ACTION REQUIRED  
-Observed baseline: `main@f05b1e558a93b40928429ca86d91f4daa0cf4ef0`  
+Status: OWNER ACTION REQUIRED
+Observed baseline: `main@f05b1e558a93b40928429ca86d91f4daa0cf4ef0`
 Hardening branch: `feat/flutter-elv12-pre-elv3-hardening`
 
 ## Observed state
@@ -88,6 +88,5 @@ H2 is complete only after the repository owner confirms that the settings above 
 """
 )
 
-# Remove temporary apply machinery from the final tree.
 Path(".github/workflows/elv12-hardening-apply.yml").unlink(missing_ok=True)
 Path(".github/scripts/elv12_hardening_apply.py").unlink(missing_ok=True)
