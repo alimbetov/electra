@@ -923,6 +923,68 @@ class LegacyRouteAdoptions extends Table {
   Set<Column<Object>> get primaryKey => {legacySourceIdentity};
 }
 
+@DataClassName('PathwayContextRow')
+class PathwayContexts extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get projectId => text().references(Projects, #id)();
+  TextColumn get kind => text()();
+  TextColumn get hostType => text()();
+  TextColumn get hostJson => text()();
+  @ReferenceName('parentPathwayContext')
+  TextColumn get parentContextId =>
+      text().nullable().references(PathwayContexts, #id)();
+  TextColumn get provenance => text().nullable()();
+  TextColumn get lifecycleState => text()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('PhysicalCarrierRow')
+class PhysicalCarriers extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get projectId => text().references(Projects, #id)();
+  TextColumn get pathwayContextId => text().references(PathwayContexts, #id)();
+  TextColumn get code => text()();
+  TextColumn get normalizedCode => text()();
+  TextColumn get name => text()();
+  TextColumn get kind => text()();
+  TextColumn get payloadJson => text()();
+  TextColumn get lifecycleState => text()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('PhysicalCarrierCompartmentRow')
+class PhysicalCarrierCompartments extends Table with GeometryAuditColumns {
+  TextColumn get id => text()();
+  TextColumn get carrierId => text().references(PhysicalCarriers, #id)();
+  TextColumn get code => text()();
+  TextColumn get normalizedCode => text()();
+  IntColumn get sequence => integer()();
+  TextColumn get payloadJson => text()();
+  TextColumn get lifecycleState => text()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName('TraversalCarrierAssignmentRow')
+class TraversalCarrierAssignments extends Table with GeometryAuditColumns {
+  TextColumn get traversalId => text().references(CableRunTraversals, #id)();
+  TextColumn get cableRunId => text().references(CanonicalCableRuns, #id)();
+  TextColumn get projectId => text().references(Projects, #id)();
+  TextColumn get designRevisionId =>
+      text().references(ProjectDesignRevisions, #id)();
+  TextColumn get carrierId => text().references(PhysicalCarriers, #id)();
+  TextColumn get compartmentId =>
+      text().nullable().references(PhysicalCarrierCompartments, #id)();
+
+  @override
+  Set<Column<Object>> get primaryKey => {traversalId};
+}
+
 @DriftDatabase(
   tables: [
     Projects,
@@ -985,6 +1047,10 @@ class LegacyRouteAdoptions extends Table {
     RouteHandoffs,
     RouteBendEvidence,
     LegacyRouteAdoptions,
+    PathwayContexts,
+    PhysicalCarriers,
+    PhysicalCarrierCompartments,
+    TraversalCarrierAssignments,
   ],
 )
 final class AppDatabase extends _$AppDatabase {
@@ -992,7 +1058,7 @@ final class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'electra'));
 
   @override
-  int get schemaVersion => 20;
+  int get schemaVersion => 21;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -1094,6 +1160,12 @@ final class AppDatabase extends _$AppDatabase {
           await migrator.createTable(routeHandoffs);
           await migrator.createTable(routeBendEvidence);
           await migrator.createTable(legacyRouteAdoptions);
+        }
+        if (from < 21) {
+          await migrator.createTable(pathwayContexts);
+          await migrator.createTable(physicalCarriers);
+          await migrator.createTable(physicalCarrierCompartments);
+          await migrator.createTable(traversalCarrierAssignments);
         }
       }
       await _createIndexes();
@@ -1250,6 +1322,24 @@ final class AppDatabase extends _$AppDatabase {
     );
     await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_elv_bend_project ON route_bend_evidence(project_id, route_node_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_elv_pathway_project ON pathway_contexts(project_id, lifecycle_state)',
+    );
+    await customStatement(
+      "CREATE UNIQUE INDEX IF NOT EXISTS ux_elv_pathway_active_identity ON pathway_contexts(project_id, id) WHERE lifecycle_state = 'ACTIVE' AND deleted_at IS NULL",
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_elv_carrier_project ON physical_carriers(project_id, pathway_context_id)',
+    );
+    await customStatement(
+      "CREATE UNIQUE INDEX IF NOT EXISTS ux_elv_carrier_active_code ON physical_carriers(project_id, normalized_code) WHERE lifecycle_state = 'ACTIVE' AND deleted_at IS NULL",
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_elv_compartment_carrier ON physical_carrier_compartments(carrier_id, sequence)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_elv_traversal_carrier_assignment_run ON traversal_carrier_assignments(cable_run_id)',
     );
   }
 }
