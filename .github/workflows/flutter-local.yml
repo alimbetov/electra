@@ -46,7 +46,9 @@ jobs:
         run: dart run build_runner build
 
       - name: Verify mobile formatting
-        run: dart format --output=none --set-exit-if-changed lib test
+        run: |
+          dart format lib test
+          git diff --exit-code -- lib test
 
       - name: Analyze mobile app
         run: flutter analyze
@@ -60,7 +62,9 @@ jobs:
 
       - name: Verify engineering core formatting
         working-directory: packages/engineering_core
-        run: dart format --output=none --set-exit-if-changed lib test
+        run: |
+          dart format lib test
+          git diff --exit-code -- lib test
 
       - name: Analyze engineering core
         working-directory: packages/engineering_core
