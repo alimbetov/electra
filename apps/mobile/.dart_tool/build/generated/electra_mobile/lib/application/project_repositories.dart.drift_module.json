@@ -1,6 +1,0 @@
-{
-  "elements": {},
-  "imports": [
-    "package:electra_mobile/domain/project_models.dart"
-  ]
-}

@@ -1,7 +1,0 @@
-{
-  "elements": {},
-  "imports": [
-    "package:electra_mobile/application/project_repositories.dart",
-    "package:electra_mobile/data/database/app_database.dart"
-  ]
-}

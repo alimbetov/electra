@@ -1,9 +1,0 @@
-{
-  "elements": {},
-  "imports": [
-    "package:electra_mobile/application/engineering_profile_palette.dart",
-    "package:engineering_core/engineering_core.dart",
-    "package:flutter_test/flutter_test.dart",
-    "asset:electra_mobile/test/support/engineering_palette_fixture.dart"
-  ]
-}

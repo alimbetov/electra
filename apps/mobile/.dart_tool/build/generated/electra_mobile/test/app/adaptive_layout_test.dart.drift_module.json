@@ -1,8 +1,0 @@
-{
-  "elements": {},
-  "imports": [
-    "package:electra_mobile/app/adaptive_layout.dart",
-    "package:flutter/material.dart",
-    "package:flutter_test/flutter_test.dart"
-  ]
-}

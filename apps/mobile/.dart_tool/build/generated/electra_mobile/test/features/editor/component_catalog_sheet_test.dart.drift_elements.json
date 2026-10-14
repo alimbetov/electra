@@ -1,1 +1,0 @@
-{"valid_import":true,"imports":[{"uri":"package:electra_mobile/domain/system_component_catalog.dart","transitive":false},{"uri":"package:electra_mobile/features/editor/component_catalog_sheet.dart","transitive":false},{"uri":"package:flutter/material.dart","transitive":false},{"uri":"package:flutter_test/flutter_test.dart","transitive":false}],"elements":[]}

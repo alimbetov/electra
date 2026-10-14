@@ -1,7 +1,0 @@
-{
-  "elements": {},
-  "imports": [
-    "package:electra_mobile/features/editor/editor_command_history.dart",
-    "package:flutter_test/flutter_test.dart"
-  ]
-}

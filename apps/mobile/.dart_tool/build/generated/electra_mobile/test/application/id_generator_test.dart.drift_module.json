@@ -1,7 +1,0 @@
-{
-  "elements": {},
-  "imports": [
-    "package:electra_mobile/application/id_generator.dart",
-    "package:flutter_test/flutter_test.dart"
-  ]
-}

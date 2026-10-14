@@ -1,6 +1,0 @@
-{
-  "elements": {},
-  "imports": [
-    "package:electra_mobile/application/engineering_placement_command.dart"
-  ]
-}

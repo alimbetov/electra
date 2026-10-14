@@ -1,8 +1,0 @@
-{
-  "elements": {},
-  "imports": [
-    "package:drift/drift.dart",
-    "package:electra_mobile/application/catalog_preferences_repository.dart",
-    "package:electra_mobile/data/database/app_database.dart"
-  ]
-}

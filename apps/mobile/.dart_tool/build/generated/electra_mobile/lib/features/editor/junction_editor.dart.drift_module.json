@@ -1,8 +1,0 @@
-{
-  "elements": {},
-  "imports": [
-    "package:engineering_core/engineering_core.dart",
-    "package:flutter/material.dart",
-    "package:electra_mobile/application/cable_routing_repository.dart"
-  ]
-}

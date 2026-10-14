@@ -1,9 +1,0 @@
-{
-  "elements": {},
-  "imports": [
-    "package:electra_mobile/domain/system_component_catalog.dart",
-    "package:electra_mobile/features/editor/component_catalog_sheet.dart",
-    "package:flutter/material.dart",
-    "package:flutter_test/flutter_test.dart"
-  ]
-}

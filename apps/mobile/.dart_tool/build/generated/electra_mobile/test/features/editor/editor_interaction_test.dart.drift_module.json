@@ -1,9 +1,0 @@
-{
-  "elements": {},
-  "imports": [
-    "package:electra_mobile/application/geometry_repository.dart",
-    "package:electra_mobile/features/editor/editor_interaction.dart",
-    "package:engineering_core/engineering_core.dart",
-    "package:flutter_test/flutter_test.dart"
-  ]
-}
