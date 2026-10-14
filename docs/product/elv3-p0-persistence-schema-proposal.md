@@ -1,225 +1,188 @@
 # Electra — ELV3 P0.8 Persistence / Schema Proposal
 
-Status: DESIGN PROPOSAL / P0.8  
+Status: REMEDIATED DESIGN PROPOSAL / P0-R9  
 Branch: `feat/flutter-elv3-physical-routing-design`  
-Depends on: P0.1–P0.7  
-Implementation status: NOT STARTED
+Authoritative parent: `docs/product/elv3-p0-system-architecture-remediation.md`  
+Implementation status: NOT AUTHORIZED UNTIL P0-R10
 
 ## 1. Purpose
 
-P0.8 translates the frozen ELV3 domain contracts into a persistence proposal. This is not yet a migration implementation. It defines tables, keys, indexes, ownership and transaction boundaries that P1–P4 must follow.
+Translate the remediated ELV3 domain model into a persistence direction without creating a second reference-data architecture or forcing legacy electrical routing into invented Cable identities.
 
-## 2. New canonical tables
+This document supersedes the first P0.8 proposal where it introduced an independent `CableDefinitions` table family and modeled `Cable 1 -> N CableRun` with room-local route ownership.
 
-### 2.1 CableDefinitions
+## 2. Persistence principles
+
+1. Reuse ELV2 reference snapshot/binding/version governance.
+2. Persist project-owned physical Cable identity separately from reference definitions.
+3. One Cable has at most one active CableRun per design revision.
+4. CableRun persists ordered traversal usage of reusable route infrastructure.
+5. PhysicalCarrier and PathwayContext are distinct persisted concepts.
+6. Resource selections are normalized enough to enforce overlap atomically.
+7. Cable terminations are persisted explicitly when required.
+8. Legacy electrical routing remains valid without mandatory synthetic cable backfill.
+9. Derived compatibility/calculation results are rebuildable evidence, not editable source truth.
+
+## 3. ELV2 reference integration
+
+ELV3 MUST NOT create a parallel catalog/versioning subsystem such as an autonomous `CableDefinitions` lifecycle.
+
+A project Cable references the exact cable definition/profile edition through the accepted ELV2 reference architecture.
+
+Conceptual field:
 
 ```text
-id
-project_or_catalog_scope
-code
-name
-medium
-construction
-pair_count
-conductor_count
-fiber_count
-outer_diameter_mm
-minimum_bend_radius_mm
-fire_performance_class
-environment_class
-catalog_id
-edition_id
-content_hash
-created_at
+cable_definition_binding_id
 ```
 
-Rules:
+The exact FK target must use the already accepted ELV2 schema/project-binding concept available at implementation time.
 
-- immutable exact-edition identity;
-- referenced editions cannot be mutated in place;
-- project Cable references exact row/revision.
+Required semantics:
 
-### 2.2 CableDefinitionCoreGroups
+- exact immutable definition edition;
+- project/reference snapshot provenance;
+- no silent latest-edition adoption;
+- explicit migration/adoption only.
 
-```text
-id
-cable_definition_id
-code
-resource_kind
-member_indexes_serialized_or_child_rows
-```
+## 4. Project-owned Cables
 
-Prefer normalized child rows if selector membership must be queried frequently.
-
-### 2.3 Cables
+Conceptual table:
 
 ```text
-id
-project_id
-label
-name
-cable_definition_id
-state
-created_at
-created_by
-updated_at
-updated_by
-archived_at?
-revision
+Cables
+- id
+- project_id
+- label
+- name
+- cable_definition_binding_id
+- lifecycle_state
+- revision
+- created_at / created_by
+- updated_at / updated_by
+- archived_at / archived_by?
 ```
 
 Constraints:
 
 ```text
-UNIQUE(project_id, label) WHERE active
-FK cable_definition_id -> CableDefinitions
+unique active label inside project where applicable
+project-safe definition binding
 ```
 
-### 2.4 CableAllocations
+No room/floor ownership belongs on Cable.
+
+## 5. CableAllocations
 
 ```text
-id
-project_id
-engineering_connection_id
-cable_id
-resource_kind
-sequence_no
-role
-state
-created_at
-created_by
-updated_at
-updated_by
-revision
+CableAllocations
+- id
+- project_id
+- engineering_connection_id
+- cable_id
+- lifecycle_state
+- transition_ref?      // only for explicit multi-cable continuity
+- revision
+- audit columns
 ```
 
-Selectors are persisted separately; no free-form selector string is canonical.
+Do not use free-form selector text as canonical state.
 
-### 2.5 CableAllocationResources
+## 6. Cable allocation resource atoms
 
-Canonical normalized representation:
+Normalized child table/projection:
 
 ```text
-allocation_id
-resource_kind
-resource_index
+CableAllocationResources
+- allocation_id
+- cable_id              // denormalized/indexed if needed for uniqueness
+- resource_code
+- resource_kind
+- resource_index?
+- definition_resource_identity
 ```
 
-Examples:
+Database/repository must guarantee that two resource-consuming allocations cannot claim the same atom on the same Cable.
+
+Preferred enforceable key where applicable:
 
 ```text
-PAIR 1
-CONDUCTOR 3
-FIBER 12
+UNIQUE(cable_id, definition_resource_identity)
 ```
 
-For `WHOLE_CABLE`, store the allocation kind and zero child resources.
+`WHOLE_CABLE` exclusivity may require a dedicated reservation atom or transaction guard.
 
-For `CORE_GROUP`, persist both group identity/provenance and resolved atomic members sufficient to enforce overlap deterministically.
-
-Recommended columns:
+## 7. Cable termination mappings
 
 ```text
-allocation_id
-group_code?
-resolved_resource_kind
-resource_index
+CableTerminationMappings
+- id
+- allocation_id
+- cable_resource_identity
+- end_role                 // A | B | INTERMEDIATE
+- endpoint_port_id
+- endpoint_terminal_ref?
+- termination_role?
+- revision/audit metadata
 ```
 
-Unique/index strategy must allow overlap detection inside one Cable transaction.
+Termination rows must reference persisted project endpoint identities and cannot substitute display labels for identity.
 
-### 2.6 CableRuns
+## 8. CableRuns
 
-Target canonical shape:
+Canonical table:
 
 ```text
-id
-project_id
-room_id_or_spatial_context
-name
-cable_id
-route_id
-sequence_no
-reserve_percent
-termination_allowance_mm
-state
-created_at
-created_by
-updated_at
-updated_by
-revision
+CableRuns
+- id
+- project_id
+- cable_id
+- design_revision_id
+- lifecycle_state          // ACTIVE / SUPERSEDED / ARCHIVED as required
+- reserve/slack policy facts where run-scoped
+- revision
+- audit columns
 ```
 
-Legacy `circuit_id` remains transitional only during P3 migration and is not part of final canonical identity.
+Constraint:
+
+```text
+at most one ACTIVE CableRun per (cable_id, design_revision_id)
+```
+
+No canonical `circuit_id` ownership field belongs on new ELV3 CableRun records.
+
+No room ownership is required on CableRun itself.
+
+## 9. CableRunTraversals
+
+```text
+CableRunTraversals
+- id
+- cable_run_id
+- sequence_no
+- route_segment_id / route_reference
+- direction
+- physical_carrier_id?
+- carrier_compartment_id?
+- start_attachment_ref?
+- end_attachment_ref?
+- revision/audit metadata as needed
+```
 
 Constraints:
 
 ```text
-FK cable_id -> Cables
-UNIQUE(route_id)
-INDEX(cable_id, sequence_no)
+UNIQUE(cable_run_id, sequence_no)
+ordered traversals form a continuous path
+referenced route geometry belongs to same project
+carrier/compartment references match traversal geometry/context
 ```
 
-### 2.7 PhysicalChannels
+This replaces the old final-domain assumption `CableRun.route_id -> exactly one owned CableRoute`.
 
-Current table is extended or migrated toward:
+## 10. Reusable route geometry
 
-```text
-id
-project_id
-name
-kind
-spatial_context_type
-room_id?
-floor_id?
-riser_or_shaft_id?
-width_mm?
-height_mm?
-diameter_mm?
-usable_area_mm2?
-environment_class?
-installation_class?
-source_type?
-source_ref?
-source_revision?
-state
-revision
-```
-
-At least one valid spatial context must be present according to kind/context rules. `room_id` is not universally mandatory.
-
-### 2.8 PhysicalChannelCompartments
-
-```text
-id
-physical_channel_id
-code
-width_mm?
-height_mm?
-usable_area_mm2?
-sequence_no
-```
-
-RouteSegment may eventually bind to a specific compartment rather than only parent channel.
-
-### 2.9 Route segment channel binding
-
-Preferred target:
-
-```text
-CableRouteSegments.physical_channel_id nullable
-CableRouteSegments.physical_channel_compartment_id nullable
-```
-
-Invariant:
-
-- compartment, if present, belongs to referenced channel;
-- segment may have neither for surface/chase/free routing;
-- no segment references two channels.
-
-## 3. Existing tables retained
-
-The mature geometry foundation remains:
+The existing geometry tables remain valuable:
 
 ```text
 CableRoutes
@@ -230,171 +193,233 @@ SurfaceEdges
 SurfaceAdjacencies
 Openings
 SpatialFeatures
-RoutingJunctions
+```
+
+However, implementation must evolve them toward reusable route infrastructure rather than duplicating one independent canonical route per CableRun.
+
+P0 does not require an immediate destructive rewrite. An adapter/evolution layer is acceptable if canonical traversal semantics are preserved.
+
+## 11. PathwayContexts
+
+Conceptual table:
+
+```text
+PathwayContexts
+- id
+- project_id
+- kind
+- room_id?
+- floor_id?
+- spatial_feature_id?
+- parent_context_id?
+- vertical_span_or_geometry_ref?
+- provenance
+- lifecycle_state
+- revision
+```
+
+Typed validation makes invalid host combinations impossible.
+
+Examples:
+
+```text
+ROOM_LOCAL
+FLOOR_COMMON
+CEILING_VOID
+UNDERFLOOR
+RISER
+SHAFT
+PROJECT_SHARED
+```
+
+## 12. PhysicalCarriers
+
+```text
+PhysicalCarriers
+- id
+- project_id
+- pathway_context_id
+- code
+- name
+- kind
+- cross_section_shape
+- width_mm?
+- height_mm?
+- diameter_mm?
+- usable_area_mm2?
+- environment/install facts
+- provenance
+- lifecycle_state
+- revision
+```
+
+Kinds include tray/conduit/trunking/duct and other physical carrier constructions, not shaft/riser spatial contexts.
+
+## 13. Carrier compartments
+
+```text
+PhysicalCarrierCompartments
+- id
+- physical_carrier_id
+- code
+- sequence_no
+- width_mm?
+- height_mm?
+- usable_area_mm2?
+```
+
+A traversal may bind to one carrier or one compartment target.
+
+## 14. Legacy electrical routing coexistence
+
+Existing tables/columns such as:
+
+```text
+CableRuns.circuit_id
+JunctionConnections.circuit_id
 FloorRoutingHandoffs
 ```
 
-P0.8 does not authorize a route-geometry rewrite.
+remain valid legacy electrical persistence until explicit adoption.
 
-## 4. Transitional migration columns/tables
+ELV3 implementation MUST NOT require a global migration that fills `cable_id` for every existing row.
 
-During P3:
+Possible implementation strategies:
 
-```text
-CableRuns.cable_id       nullable initially
-CableRuns.circuit_id     retained temporarily
-JunctionConnections.circuit_id retained as provenance
-```
+- separate canonical ELV3 CableRun/traversal tables;
+- staged schema with explicit legacy/canonical discriminator and strong constraints;
+- compatibility views/adapters.
 
-Recommended migration mapping table:
+Selection must preserve referential integrity and existing electrical tests.
 
-```text
-Elv3MigrationMappings {
-  source_type
-  source_id
-  target_type
-  target_id
-  status = RESOLVED | REVIEW_REQUIRED
-  reason?
-  created_at
-}
-```
+## 15. LegacyRouteAdoptions
 
-Unique source identity prevents duplicate rerun creation.
-
-## 5. Foreign-key and deletion rules
-
-Use restrictive semantics by default:
+When explicit adoption occurs, persist mapping/provenance:
 
 ```text
-CableDefinition <- Cable          RESTRICT
-Cable <- CableAllocation          RESTRICT
-Cable <- CableRun                 RESTRICT
-CableRun <-> CableRoute           aggregate-controlled
-PhysicalChannel <- RouteSegment   RESTRICT
-EngineeringConnection <- Allocation RESTRICT
+LegacyRouteAdoptions
+- legacy_run_id
+- legacy_circuit_id
+- cable_id
+- canonical_cable_run_id
+- design_revision_id
+- source_evidence_ref?
+- status
+- adopted_at
+- adopted_by
 ```
 
-Cascade is acceptable only inside strict route-owned child tables:
+Unique legacy source identity makes adoption idempotent.
+
+## 16. Foreign-key/deletion rules
+
+Restrictive by default:
 
 ```text
-CableRoute -> RouteNodes
-CableRoute -> RouteSegments
-CableAllocation -> selector child rows
-PhysicalChannel -> compartment rows only when channel deletion itself is allowed
+EngineeringConnection <- CableAllocation        RESTRICT
+Cable <- CableAllocation                        RESTRICT
+Cable <- active CableRun                        RESTRICT
+CableRun <- CableRunTraversal                   aggregate controlled
+Route/RouteSegment <- CableRunTraversal         RESTRICT
+PhysicalCarrier <- CableRunTraversal            RESTRICT
+PathwayContext <- PhysicalCarrier               RESTRICT
+ELV2 CableDefinition binding <- Cable            governed by ELV2/restrictive
 ```
 
-## 6. Allocation overlap enforcement
+Cascade is acceptable only for strict owned child records such as allocation resource atoms or termination rows when the parent operation itself is authorized.
 
-SQLite/Drift cannot express all selector-overlap semantics as simple foreign keys.
+## 17. Command transaction boundaries
 
-Required repository transaction:
+Persistence APIs must support atomic commands rather than arbitrary row operations:
 
 ```text
-BEGIN
-  load cable + exact definition
-  load active allocations/selectors for cable
-  resolve requested selector -> atomic resource set
-  reject WHOLE_CABLE conflict
-  reject set intersection
-  insert allocation + selector rows
-COMMIT
+CreateCable
+AllocateCableResources
+ReleaseCableResources
+BindCableTermination
+CreateCableRun
+RerouteCableRun
+SupersedeCableRun
+AttachTraversalToCarrier
+CreateOrUpdatePhysicalCarrier
+CreateOrUpdatePathwayContext
+AdoptLegacyElectricalRoute
+ArchiveCable
 ```
 
-If concurrent writers are possible, repository serialization/optimistic revision retry must guarantee that two successful transactions cannot claim the same atomic resource.
+Each command validates project scope and expected revisions before commit.
 
-A database uniqueness strategy on normalized atomic resources should be added where feasible:
+## 18. Concurrency
+
+Minimum protections:
+
+- optimistic revision guard for mutable roots;
+- atomic resource overlap protection;
+- unique active CableRun realization per Cable/revision;
+- idempotent legacy adoption;
+- no duplicate command result after retry.
+
+## 19. Restart requirements
+
+After database reopen reconstruct exactly:
+
+- Cable + exact ELV2 definition binding;
+- allocations/resource atoms;
+- termination mappings;
+- active/superseded CableRun identity;
+- ordered traversals;
+- route geometry references;
+- carrier/pathway context;
+- provenance/audit metadata;
+- legacy adoption mapping.
+
+## 20. Derived evidence
+
+If later persisted, these are cache/evidence only:
 
 ```text
-UNIQUE(cable_id, resolved_resource_kind, resource_index)
+installed cable length
+occupied carrier area
+fill basis
+technical compatibility findings
 ```
 
-This requires materializing cable_id on allocation-resource rows or equivalent indexed projection.
+They require an input fingerprint over exact revisions/identities and must be rebuildable.
 
-## 7. Required indexes
+## 21. Schema delivery sequence
 
-At minimum:
+Recommended capability order:
 
 ```text
-Cables(project_id, state)
-Cables(project_id, label)
-CableAllocations(cable_id, state)
-CableAllocations(engineering_connection_id, state)
-CableAllocationResources(allocation_id)
-CableAllocationResources(cable_id, resolved_resource_kind, resource_index)
-CableRuns(cable_id, sequence_no)
-CableRuns(project_id, room/spatial-context)
-CableRouteSegments(physical_channel_id)
-PhysicalChannels(project_id, spatial context)
+P1
+  Cable project identity + ELV2 exact definition binding
+
+P2
+  CableAllocation + resource atoms + termination mappings
+
+P3
+  CableRun + CableRunTraversal canonical path
+  coexistence/adoption adapter for legacy electrical routing
+
+P4
+  PathwayContext + PhysicalCarrier + compartments
+
+P5+
+  compatibility evidence/calculation projections
 ```
 
-## 8. Revision/staleness
+Exact Drift schema-version numbers are implementation decisions, not P0 architecture.
 
-Canonical mutable roots carry `revision`.
+## 22. P0.8 remediation acceptance
 
-Compatibility input fingerprint should be derived from exact revisions/identities of:
+- [x] no parallel ELV3 CableDefinition catalog system.
+- [x] Cable references exact ELV2 reference binding.
+- [x] one active CableRun per Cable/design revision.
+- [x] traversal storage replaces room-local multiple-run target model.
+- [x] route infrastructure can be reused.
+- [x] PhysicalCarrier and PathwayContext are separate.
+- [x] termination mappings are persisted.
+- [x] legacy electrical rows need no synthetic Cable backfill.
+- [x] command/revision/concurrency constraints are represented.
 
-```text
-Cable.definition edition
-CableAllocation selector
-CableRun
-CableRoute geometry
-PhysicalChannel / compartment
-selected engineering profile
-```
-
-Persisted compatibility results, if introduced, are cache/evidence records and never source-of-truth facts.
-
-## 9. Repository transaction boundaries
-
-Mandatory application operations:
-
-```text
-createCable
-archiveCable
-allocateCableResources
-releaseCableAllocation
-createRunWithRoute
-replaceRunRoute
-removeRunWithRoute
-create/update PhysicalChannel facts
-attach/detach RouteSegment channel
-migrateLegacyRun
-```
-
-Each command validates project isolation and relevant revisions before commit.
-
-## 10. Schema-version execution order
-
-Recommended delivery, not final version numbers:
-
-```text
-P1 schema A
-  CableDefinition + Cable
-
-P2 schema B
-  CableAllocation + resources + overlap guards
-
-P3 schema C
-  CableRun.cable_id + migration mapping + dual-read transition
-
-P4 schema D
-  PhysicalChannel facts + compartments
-
-P8 cleanup schema
-  remove legacy circuit ownership after migration closure
-```
-
-This prevents a monolithic schema change and preserves bisectability.
-
-## 11. P0.8 acceptance gate
-
-- [x] tables reflect P0.1/P0.2 cardinalities;
-- [x] selectors are normalized and not free-form strings;
-- [x] CableRun canonical FK targets Cable;
-- [x] PhysicalChannel supports non-room spatial context;
-- [x] restrictive FK policy prevents silent evidence loss;
-- [x] route geometry tables are retained;
-- [x] migration can run incrementally;
-- [x] indexes exist for allocation, run and channel hot paths;
-- [x] exact edition/revision provenance can survive restart.
+P0.8 is synchronized and ready for P0-R10 final audit.
