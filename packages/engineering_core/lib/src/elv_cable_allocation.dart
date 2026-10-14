@@ -51,6 +51,26 @@ final class CableAllocation {
         revision: revision ?? this.revision,
         transitionRef: transitionRef ?? this.transitionRef,
       );
+
+  Map<String, Object?> toMap() => {
+        'id': id,
+        'projectId': projectId,
+        'engineeringConnectionId': engineeringConnectionId,
+        'cableId': cableId,
+        'state': state.name,
+        'revision': revision,
+        'transitionRef': transitionRef,
+      };
+
+  factory CableAllocation.fromMap(Map<String, dynamic> map) => CableAllocation(
+        id: map['id'] as String,
+        projectId: map['projectId'] as String,
+        engineeringConnectionId: map['engineeringConnectionId'] as String,
+        cableId: map['cableId'] as String,
+        state: CableAllocationState.values.byName(map['state'] as String),
+        revision: map['revision'] as int,
+        transitionRef: map['transitionRef'] as String?,
+      );
 }
 
 final class CableAllocationResourceSelectionEvidence {
@@ -78,9 +98,31 @@ final class CableAllocationResourceSelectionEvidence {
           'Resolved resource atom identities must not be empty.',
         if (resolvedAtoms.toSet().length != resolvedAtoms.length)
           'Resolved resource atom identities must be unique.',
-        if (selectionSha256.trim().length != 64)
-          'Selection SHA-256 must be 64 characters.',
+        if (!RegExp(r'^[0-9a-f]{64}$').hasMatch(selectionSha256.trim()))
+          'Selection SHA-256 must be lowercase 64-character hex.',
       ];
+
+  Map<String, Object?> toMap() => {
+        'allocationId': allocationId,
+        'cableDefinitionRef': cableDefinitionRef.normalized().toMap(),
+        'selection': selection.toMap(),
+        'resolvedAtoms': resolvedAtoms,
+        'selectionSha256': selectionSha256,
+      };
+
+  factory CableAllocationResourceSelectionEvidence.fromMap(
+    Map<String, dynamic> map,
+  ) => CableAllocationResourceSelectionEvidence(
+        allocationId: map['allocationId'] as String,
+        cableDefinitionRef: CableDefinitionRef.fromMap(
+          map['cableDefinitionRef'] as Map<String, dynamic>,
+        ),
+        selection: cableResourceSelectionFromMap(
+          map['selection'] as Map<String, dynamic>,
+        ),
+        resolvedAtoms: (map['resolvedAtoms'] as List).cast<String>(),
+        selectionSha256: map['selectionSha256'] as String,
+      );
 }
 
 abstract final class CableAllocationStateMachine {
