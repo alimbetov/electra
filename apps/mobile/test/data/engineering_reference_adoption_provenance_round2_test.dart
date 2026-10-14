@@ -1,8 +1,6 @@
 import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:drift/native.dart';
 import 'package:electra_mobile/application/engineering_reference_adoption_repository.dart';
-import 'package:electra_mobile/application/engineering_reference_repository.dart';
-import 'package:electra_mobile/application/engineering_reference_revision_preview.dart';
 import 'package:electra_mobile/application/id_generator.dart';
 import 'package:electra_mobile/data/database/app_database.dart';
 import 'package:electra_mobile/data/repositories/drift_engineering_placement_repository.dart';
