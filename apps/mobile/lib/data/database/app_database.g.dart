@@ -8041,9 +8041,6 @@ class $EquipmentElectricalLoadsTable extends EquipmentElectricalLoads
         false,
         type: DriftSqlType.string,
         requiredDuringInsert: true,
-        defaultConstraints: GeneratedColumn.constraintIsAlways(
-          'REFERENCES component_instances (id)',
-        ),
       );
   static const VerificationMeta _consumptionGroupIdMeta =
       const VerificationMeta('consumptionGroupId');
@@ -32617,6 +32614,4050 @@ class EngineeringPlacementOperationsCompanion
   }
 }
 
+class $ElvCablesTable extends ElvCables
+    with TableInfo<$ElvCablesTable, ElvCableRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ElvCablesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _revisionMeta = const VerificationMeta(
+    'revision',
+  );
+  @override
+  late final GeneratedColumn<int> revision = GeneratedColumn<int>(
+    'revision',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _originDeviceIdMeta = const VerificationMeta(
+    'originDeviceId',
+  );
+  @override
+  late final GeneratedColumn<String> originDeviceId = GeneratedColumn<String>(
+    'origin_device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _projectIdMeta = const VerificationMeta(
+    'projectId',
+  );
+  @override
+  late final GeneratedColumn<String> projectId = GeneratedColumn<String>(
+    'project_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES projects (id)',
+    ),
+  );
+  static const VerificationMeta _labelMeta = const VerificationMeta('label');
+  @override
+  late final GeneratedColumn<String> label = GeneratedColumn<String>(
+    'label',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _normalizedLabelMeta = const VerificationMeta(
+    'normalizedLabel',
+  );
+  @override
+  late final GeneratedColumn<String> normalizedLabel = GeneratedColumn<String>(
+    'normalized_label',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _definitionCatalogIdMeta =
+      const VerificationMeta('definitionCatalogId');
+  @override
+  late final GeneratedColumn<String> definitionCatalogId =
+      GeneratedColumn<String>(
+        'definition_catalog_id',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES engineering_reference_catalogs (id)',
+        ),
+      );
+  static const VerificationMeta _definitionCatalogVersionMeta =
+      const VerificationMeta('definitionCatalogVersion');
+  @override
+  late final GeneratedColumn<String> definitionCatalogVersion =
+      GeneratedColumn<String>(
+        'definition_catalog_version',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _definitionCodeMeta = const VerificationMeta(
+    'definitionCode',
+  );
+  @override
+  late final GeneratedColumn<String> definitionCode = GeneratedColumn<String>(
+    'definition_code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _definitionContentHashMeta =
+      const VerificationMeta('definitionContentHash');
+  @override
+  late final GeneratedColumn<String> definitionContentHash =
+      GeneratedColumn<String>(
+        'definition_content_hash',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _lifecycleStateMeta = const VerificationMeta(
+    'lifecycleState',
+  );
+  @override
+  late final GeneratedColumn<String> lifecycleState = GeneratedColumn<String>(
+    'lifecycle_state',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    revision,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    originDeviceId,
+    id,
+    projectId,
+    label,
+    normalizedLabel,
+    name,
+    definitionCatalogId,
+    definitionCatalogVersion,
+    definitionCode,
+    definitionContentHash,
+    lifecycleState,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'elv_cables';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ElvCableRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('revision')) {
+      context.handle(
+        _revisionMeta,
+        revision.isAcceptableOrUnknown(data['revision']!, _revisionMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('origin_device_id')) {
+      context.handle(
+        _originDeviceIdMeta,
+        originDeviceId.isAcceptableOrUnknown(
+          data['origin_device_id']!,
+          _originDeviceIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_originDeviceIdMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('project_id')) {
+      context.handle(
+        _projectIdMeta,
+        projectId.isAcceptableOrUnknown(data['project_id']!, _projectIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_projectIdMeta);
+    }
+    if (data.containsKey('label')) {
+      context.handle(
+        _labelMeta,
+        label.isAcceptableOrUnknown(data['label']!, _labelMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_labelMeta);
+    }
+    if (data.containsKey('normalized_label')) {
+      context.handle(
+        _normalizedLabelMeta,
+        normalizedLabel.isAcceptableOrUnknown(
+          data['normalized_label']!,
+          _normalizedLabelMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_normalizedLabelMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('definition_catalog_id')) {
+      context.handle(
+        _definitionCatalogIdMeta,
+        definitionCatalogId.isAcceptableOrUnknown(
+          data['definition_catalog_id']!,
+          _definitionCatalogIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_definitionCatalogIdMeta);
+    }
+    if (data.containsKey('definition_catalog_version')) {
+      context.handle(
+        _definitionCatalogVersionMeta,
+        definitionCatalogVersion.isAcceptableOrUnknown(
+          data['definition_catalog_version']!,
+          _definitionCatalogVersionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_definitionCatalogVersionMeta);
+    }
+    if (data.containsKey('definition_code')) {
+      context.handle(
+        _definitionCodeMeta,
+        definitionCode.isAcceptableOrUnknown(
+          data['definition_code']!,
+          _definitionCodeMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_definitionCodeMeta);
+    }
+    if (data.containsKey('definition_content_hash')) {
+      context.handle(
+        _definitionContentHashMeta,
+        definitionContentHash.isAcceptableOrUnknown(
+          data['definition_content_hash']!,
+          _definitionContentHashMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_definitionContentHashMeta);
+    }
+    if (data.containsKey('lifecycle_state')) {
+      context.handle(
+        _lifecycleStateMeta,
+        lifecycleState.isAcceptableOrUnknown(
+          data['lifecycle_state']!,
+          _lifecycleStateMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_lifecycleStateMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ElvCableRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ElvCableRow(
+      revision:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}revision'],
+          )!,
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      updatedAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}updated_at'],
+          )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      originDeviceId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}origin_device_id'],
+          )!,
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}id'],
+          )!,
+      projectId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}project_id'],
+          )!,
+      label:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}label'],
+          )!,
+      normalizedLabel:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}normalized_label'],
+          )!,
+      name:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}name'],
+          )!,
+      definitionCatalogId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}definition_catalog_id'],
+          )!,
+      definitionCatalogVersion:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}definition_catalog_version'],
+          )!,
+      definitionCode:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}definition_code'],
+          )!,
+      definitionContentHash:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}definition_content_hash'],
+          )!,
+      lifecycleState:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}lifecycle_state'],
+          )!,
+    );
+  }
+
+  @override
+  $ElvCablesTable createAlias(String alias) {
+    return $ElvCablesTable(attachedDatabase, alias);
+  }
+}
+
+class ElvCableRow extends DataClass implements Insertable<ElvCableRow> {
+  final int revision;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  final String originDeviceId;
+  final String id;
+  final String projectId;
+  final String label;
+  final String normalizedLabel;
+  final String name;
+  final String definitionCatalogId;
+  final String definitionCatalogVersion;
+  final String definitionCode;
+  final String definitionContentHash;
+  final String lifecycleState;
+  const ElvCableRow({
+    required this.revision,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.originDeviceId,
+    required this.id,
+    required this.projectId,
+    required this.label,
+    required this.normalizedLabel,
+    required this.name,
+    required this.definitionCatalogId,
+    required this.definitionCatalogVersion,
+    required this.definitionCode,
+    required this.definitionContentHash,
+    required this.lifecycleState,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['revision'] = Variable<int>(revision);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['origin_device_id'] = Variable<String>(originDeviceId);
+    map['id'] = Variable<String>(id);
+    map['project_id'] = Variable<String>(projectId);
+    map['label'] = Variable<String>(label);
+    map['normalized_label'] = Variable<String>(normalizedLabel);
+    map['name'] = Variable<String>(name);
+    map['definition_catalog_id'] = Variable<String>(definitionCatalogId);
+    map['definition_catalog_version'] = Variable<String>(
+      definitionCatalogVersion,
+    );
+    map['definition_code'] = Variable<String>(definitionCode);
+    map['definition_content_hash'] = Variable<String>(definitionContentHash);
+    map['lifecycle_state'] = Variable<String>(lifecycleState);
+    return map;
+  }
+
+  ElvCablesCompanion toCompanion(bool nullToAbsent) {
+    return ElvCablesCompanion(
+      revision: Value(revision),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt:
+          deletedAt == null && nullToAbsent
+              ? const Value.absent()
+              : Value(deletedAt),
+      originDeviceId: Value(originDeviceId),
+      id: Value(id),
+      projectId: Value(projectId),
+      label: Value(label),
+      normalizedLabel: Value(normalizedLabel),
+      name: Value(name),
+      definitionCatalogId: Value(definitionCatalogId),
+      definitionCatalogVersion: Value(definitionCatalogVersion),
+      definitionCode: Value(definitionCode),
+      definitionContentHash: Value(definitionContentHash),
+      lifecycleState: Value(lifecycleState),
+    );
+  }
+
+  factory ElvCableRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ElvCableRow(
+      revision: serializer.fromJson<int>(json['revision']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      originDeviceId: serializer.fromJson<String>(json['originDeviceId']),
+      id: serializer.fromJson<String>(json['id']),
+      projectId: serializer.fromJson<String>(json['projectId']),
+      label: serializer.fromJson<String>(json['label']),
+      normalizedLabel: serializer.fromJson<String>(json['normalizedLabel']),
+      name: serializer.fromJson<String>(json['name']),
+      definitionCatalogId: serializer.fromJson<String>(
+        json['definitionCatalogId'],
+      ),
+      definitionCatalogVersion: serializer.fromJson<String>(
+        json['definitionCatalogVersion'],
+      ),
+      definitionCode: serializer.fromJson<String>(json['definitionCode']),
+      definitionContentHash: serializer.fromJson<String>(
+        json['definitionContentHash'],
+      ),
+      lifecycleState: serializer.fromJson<String>(json['lifecycleState']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'revision': serializer.toJson<int>(revision),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'originDeviceId': serializer.toJson<String>(originDeviceId),
+      'id': serializer.toJson<String>(id),
+      'projectId': serializer.toJson<String>(projectId),
+      'label': serializer.toJson<String>(label),
+      'normalizedLabel': serializer.toJson<String>(normalizedLabel),
+      'name': serializer.toJson<String>(name),
+      'definitionCatalogId': serializer.toJson<String>(definitionCatalogId),
+      'definitionCatalogVersion': serializer.toJson<String>(
+        definitionCatalogVersion,
+      ),
+      'definitionCode': serializer.toJson<String>(definitionCode),
+      'definitionContentHash': serializer.toJson<String>(definitionContentHash),
+      'lifecycleState': serializer.toJson<String>(lifecycleState),
+    };
+  }
+
+  ElvCableRow copyWith({
+    int? revision,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+    String? originDeviceId,
+    String? id,
+    String? projectId,
+    String? label,
+    String? normalizedLabel,
+    String? name,
+    String? definitionCatalogId,
+    String? definitionCatalogVersion,
+    String? definitionCode,
+    String? definitionContentHash,
+    String? lifecycleState,
+  }) => ElvCableRow(
+    revision: revision ?? this.revision,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    originDeviceId: originDeviceId ?? this.originDeviceId,
+    id: id ?? this.id,
+    projectId: projectId ?? this.projectId,
+    label: label ?? this.label,
+    normalizedLabel: normalizedLabel ?? this.normalizedLabel,
+    name: name ?? this.name,
+    definitionCatalogId: definitionCatalogId ?? this.definitionCatalogId,
+    definitionCatalogVersion:
+        definitionCatalogVersion ?? this.definitionCatalogVersion,
+    definitionCode: definitionCode ?? this.definitionCode,
+    definitionContentHash: definitionContentHash ?? this.definitionContentHash,
+    lifecycleState: lifecycleState ?? this.lifecycleState,
+  );
+  ElvCableRow copyWithCompanion(ElvCablesCompanion data) {
+    return ElvCableRow(
+      revision: data.revision.present ? data.revision.value : this.revision,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      originDeviceId:
+          data.originDeviceId.present
+              ? data.originDeviceId.value
+              : this.originDeviceId,
+      id: data.id.present ? data.id.value : this.id,
+      projectId: data.projectId.present ? data.projectId.value : this.projectId,
+      label: data.label.present ? data.label.value : this.label,
+      normalizedLabel:
+          data.normalizedLabel.present
+              ? data.normalizedLabel.value
+              : this.normalizedLabel,
+      name: data.name.present ? data.name.value : this.name,
+      definitionCatalogId:
+          data.definitionCatalogId.present
+              ? data.definitionCatalogId.value
+              : this.definitionCatalogId,
+      definitionCatalogVersion:
+          data.definitionCatalogVersion.present
+              ? data.definitionCatalogVersion.value
+              : this.definitionCatalogVersion,
+      definitionCode:
+          data.definitionCode.present
+              ? data.definitionCode.value
+              : this.definitionCode,
+      definitionContentHash:
+          data.definitionContentHash.present
+              ? data.definitionContentHash.value
+              : this.definitionContentHash,
+      lifecycleState:
+          data.lifecycleState.present
+              ? data.lifecycleState.value
+              : this.lifecycleState,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ElvCableRow(')
+          ..write('revision: $revision, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('originDeviceId: $originDeviceId, ')
+          ..write('id: $id, ')
+          ..write('projectId: $projectId, ')
+          ..write('label: $label, ')
+          ..write('normalizedLabel: $normalizedLabel, ')
+          ..write('name: $name, ')
+          ..write('definitionCatalogId: $definitionCatalogId, ')
+          ..write('definitionCatalogVersion: $definitionCatalogVersion, ')
+          ..write('definitionCode: $definitionCode, ')
+          ..write('definitionContentHash: $definitionContentHash, ')
+          ..write('lifecycleState: $lifecycleState')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    revision,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    originDeviceId,
+    id,
+    projectId,
+    label,
+    normalizedLabel,
+    name,
+    definitionCatalogId,
+    definitionCatalogVersion,
+    definitionCode,
+    definitionContentHash,
+    lifecycleState,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ElvCableRow &&
+          other.revision == this.revision &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.originDeviceId == this.originDeviceId &&
+          other.id == this.id &&
+          other.projectId == this.projectId &&
+          other.label == this.label &&
+          other.normalizedLabel == this.normalizedLabel &&
+          other.name == this.name &&
+          other.definitionCatalogId == this.definitionCatalogId &&
+          other.definitionCatalogVersion == this.definitionCatalogVersion &&
+          other.definitionCode == this.definitionCode &&
+          other.definitionContentHash == this.definitionContentHash &&
+          other.lifecycleState == this.lifecycleState);
+}
+
+class ElvCablesCompanion extends UpdateCompanion<ElvCableRow> {
+  final Value<int> revision;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<String> originDeviceId;
+  final Value<String> id;
+  final Value<String> projectId;
+  final Value<String> label;
+  final Value<String> normalizedLabel;
+  final Value<String> name;
+  final Value<String> definitionCatalogId;
+  final Value<String> definitionCatalogVersion;
+  final Value<String> definitionCode;
+  final Value<String> definitionContentHash;
+  final Value<String> lifecycleState;
+  final Value<int> rowid;
+  const ElvCablesCompanion({
+    this.revision = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.originDeviceId = const Value.absent(),
+    this.id = const Value.absent(),
+    this.projectId = const Value.absent(),
+    this.label = const Value.absent(),
+    this.normalizedLabel = const Value.absent(),
+    this.name = const Value.absent(),
+    this.definitionCatalogId = const Value.absent(),
+    this.definitionCatalogVersion = const Value.absent(),
+    this.definitionCode = const Value.absent(),
+    this.definitionContentHash = const Value.absent(),
+    this.lifecycleState = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ElvCablesCompanion.insert({
+    this.revision = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.deletedAt = const Value.absent(),
+    required String originDeviceId,
+    required String id,
+    required String projectId,
+    required String label,
+    required String normalizedLabel,
+    required String name,
+    required String definitionCatalogId,
+    required String definitionCatalogVersion,
+    required String definitionCode,
+    required String definitionContentHash,
+    required String lifecycleState,
+    this.rowid = const Value.absent(),
+  }) : createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       originDeviceId = Value(originDeviceId),
+       id = Value(id),
+       projectId = Value(projectId),
+       label = Value(label),
+       normalizedLabel = Value(normalizedLabel),
+       name = Value(name),
+       definitionCatalogId = Value(definitionCatalogId),
+       definitionCatalogVersion = Value(definitionCatalogVersion),
+       definitionCode = Value(definitionCode),
+       definitionContentHash = Value(definitionContentHash),
+       lifecycleState = Value(lifecycleState);
+  static Insertable<ElvCableRow> custom({
+    Expression<int>? revision,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<String>? originDeviceId,
+    Expression<String>? id,
+    Expression<String>? projectId,
+    Expression<String>? label,
+    Expression<String>? normalizedLabel,
+    Expression<String>? name,
+    Expression<String>? definitionCatalogId,
+    Expression<String>? definitionCatalogVersion,
+    Expression<String>? definitionCode,
+    Expression<String>? definitionContentHash,
+    Expression<String>? lifecycleState,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (revision != null) 'revision': revision,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (originDeviceId != null) 'origin_device_id': originDeviceId,
+      if (id != null) 'id': id,
+      if (projectId != null) 'project_id': projectId,
+      if (label != null) 'label': label,
+      if (normalizedLabel != null) 'normalized_label': normalizedLabel,
+      if (name != null) 'name': name,
+      if (definitionCatalogId != null)
+        'definition_catalog_id': definitionCatalogId,
+      if (definitionCatalogVersion != null)
+        'definition_catalog_version': definitionCatalogVersion,
+      if (definitionCode != null) 'definition_code': definitionCode,
+      if (definitionContentHash != null)
+        'definition_content_hash': definitionContentHash,
+      if (lifecycleState != null) 'lifecycle_state': lifecycleState,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ElvCablesCompanion copyWith({
+    Value<int>? revision,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<String>? originDeviceId,
+    Value<String>? id,
+    Value<String>? projectId,
+    Value<String>? label,
+    Value<String>? normalizedLabel,
+    Value<String>? name,
+    Value<String>? definitionCatalogId,
+    Value<String>? definitionCatalogVersion,
+    Value<String>? definitionCode,
+    Value<String>? definitionContentHash,
+    Value<String>? lifecycleState,
+    Value<int>? rowid,
+  }) {
+    return ElvCablesCompanion(
+      revision: revision ?? this.revision,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      originDeviceId: originDeviceId ?? this.originDeviceId,
+      id: id ?? this.id,
+      projectId: projectId ?? this.projectId,
+      label: label ?? this.label,
+      normalizedLabel: normalizedLabel ?? this.normalizedLabel,
+      name: name ?? this.name,
+      definitionCatalogId: definitionCatalogId ?? this.definitionCatalogId,
+      definitionCatalogVersion:
+          definitionCatalogVersion ?? this.definitionCatalogVersion,
+      definitionCode: definitionCode ?? this.definitionCode,
+      definitionContentHash:
+          definitionContentHash ?? this.definitionContentHash,
+      lifecycleState: lifecycleState ?? this.lifecycleState,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (revision.present) {
+      map['revision'] = Variable<int>(revision.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (originDeviceId.present) {
+      map['origin_device_id'] = Variable<String>(originDeviceId.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (projectId.present) {
+      map['project_id'] = Variable<String>(projectId.value);
+    }
+    if (label.present) {
+      map['label'] = Variable<String>(label.value);
+    }
+    if (normalizedLabel.present) {
+      map['normalized_label'] = Variable<String>(normalizedLabel.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (definitionCatalogId.present) {
+      map['definition_catalog_id'] = Variable<String>(
+        definitionCatalogId.value,
+      );
+    }
+    if (definitionCatalogVersion.present) {
+      map['definition_catalog_version'] = Variable<String>(
+        definitionCatalogVersion.value,
+      );
+    }
+    if (definitionCode.present) {
+      map['definition_code'] = Variable<String>(definitionCode.value);
+    }
+    if (definitionContentHash.present) {
+      map['definition_content_hash'] = Variable<String>(
+        definitionContentHash.value,
+      );
+    }
+    if (lifecycleState.present) {
+      map['lifecycle_state'] = Variable<String>(lifecycleState.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ElvCablesCompanion(')
+          ..write('revision: $revision, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('originDeviceId: $originDeviceId, ')
+          ..write('id: $id, ')
+          ..write('projectId: $projectId, ')
+          ..write('label: $label, ')
+          ..write('normalizedLabel: $normalizedLabel, ')
+          ..write('name: $name, ')
+          ..write('definitionCatalogId: $definitionCatalogId, ')
+          ..write('definitionCatalogVersion: $definitionCatalogVersion, ')
+          ..write('definitionCode: $definitionCode, ')
+          ..write('definitionContentHash: $definitionContentHash, ')
+          ..write('lifecycleState: $lifecycleState, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CableAllocationsTable extends CableAllocations
+    with TableInfo<$CableAllocationsTable, CableAllocationRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CableAllocationsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _revisionMeta = const VerificationMeta(
+    'revision',
+  );
+  @override
+  late final GeneratedColumn<int> revision = GeneratedColumn<int>(
+    'revision',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _originDeviceIdMeta = const VerificationMeta(
+    'originDeviceId',
+  );
+  @override
+  late final GeneratedColumn<String> originDeviceId = GeneratedColumn<String>(
+    'origin_device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _projectIdMeta = const VerificationMeta(
+    'projectId',
+  );
+  @override
+  late final GeneratedColumn<String> projectId = GeneratedColumn<String>(
+    'project_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES projects (id)',
+    ),
+  );
+  static const VerificationMeta _engineeringConnectionIdMeta =
+      const VerificationMeta('engineeringConnectionId');
+  @override
+  late final GeneratedColumn<String> engineeringConnectionId =
+      GeneratedColumn<String>(
+        'engineering_connection_id',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES engineering_port_connections (id)',
+        ),
+      );
+  static const VerificationMeta _cableIdMeta = const VerificationMeta(
+    'cableId',
+  );
+  @override
+  late final GeneratedColumn<String> cableId = GeneratedColumn<String>(
+    'cable_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES elv_cables (id)',
+    ),
+  );
+  static const VerificationMeta _lifecycleStateMeta = const VerificationMeta(
+    'lifecycleState',
+  );
+  @override
+  late final GeneratedColumn<String> lifecycleState = GeneratedColumn<String>(
+    'lifecycle_state',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _transitionRefMeta = const VerificationMeta(
+    'transitionRef',
+  );
+  @override
+  late final GeneratedColumn<String> transitionRef = GeneratedColumn<String>(
+    'transition_ref',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    revision,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    originDeviceId,
+    id,
+    projectId,
+    engineeringConnectionId,
+    cableId,
+    lifecycleState,
+    transitionRef,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cable_allocations';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CableAllocationRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('revision')) {
+      context.handle(
+        _revisionMeta,
+        revision.isAcceptableOrUnknown(data['revision']!, _revisionMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('origin_device_id')) {
+      context.handle(
+        _originDeviceIdMeta,
+        originDeviceId.isAcceptableOrUnknown(
+          data['origin_device_id']!,
+          _originDeviceIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_originDeviceIdMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('project_id')) {
+      context.handle(
+        _projectIdMeta,
+        projectId.isAcceptableOrUnknown(data['project_id']!, _projectIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_projectIdMeta);
+    }
+    if (data.containsKey('engineering_connection_id')) {
+      context.handle(
+        _engineeringConnectionIdMeta,
+        engineeringConnectionId.isAcceptableOrUnknown(
+          data['engineering_connection_id']!,
+          _engineeringConnectionIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_engineeringConnectionIdMeta);
+    }
+    if (data.containsKey('cable_id')) {
+      context.handle(
+        _cableIdMeta,
+        cableId.isAcceptableOrUnknown(data['cable_id']!, _cableIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_cableIdMeta);
+    }
+    if (data.containsKey('lifecycle_state')) {
+      context.handle(
+        _lifecycleStateMeta,
+        lifecycleState.isAcceptableOrUnknown(
+          data['lifecycle_state']!,
+          _lifecycleStateMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_lifecycleStateMeta);
+    }
+    if (data.containsKey('transition_ref')) {
+      context.handle(
+        _transitionRefMeta,
+        transitionRef.isAcceptableOrUnknown(
+          data['transition_ref']!,
+          _transitionRefMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CableAllocationRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CableAllocationRow(
+      revision:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}revision'],
+          )!,
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      updatedAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}updated_at'],
+          )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      originDeviceId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}origin_device_id'],
+          )!,
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}id'],
+          )!,
+      projectId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}project_id'],
+          )!,
+      engineeringConnectionId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}engineering_connection_id'],
+          )!,
+      cableId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}cable_id'],
+          )!,
+      lifecycleState:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}lifecycle_state'],
+          )!,
+      transitionRef: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}transition_ref'],
+      ),
+    );
+  }
+
+  @override
+  $CableAllocationsTable createAlias(String alias) {
+    return $CableAllocationsTable(attachedDatabase, alias);
+  }
+}
+
+class CableAllocationRow extends DataClass
+    implements Insertable<CableAllocationRow> {
+  final int revision;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  final String originDeviceId;
+  final String id;
+  final String projectId;
+  final String engineeringConnectionId;
+  final String cableId;
+  final String lifecycleState;
+  final String? transitionRef;
+  const CableAllocationRow({
+    required this.revision,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.originDeviceId,
+    required this.id,
+    required this.projectId,
+    required this.engineeringConnectionId,
+    required this.cableId,
+    required this.lifecycleState,
+    this.transitionRef,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['revision'] = Variable<int>(revision);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['origin_device_id'] = Variable<String>(originDeviceId);
+    map['id'] = Variable<String>(id);
+    map['project_id'] = Variable<String>(projectId);
+    map['engineering_connection_id'] = Variable<String>(
+      engineeringConnectionId,
+    );
+    map['cable_id'] = Variable<String>(cableId);
+    map['lifecycle_state'] = Variable<String>(lifecycleState);
+    if (!nullToAbsent || transitionRef != null) {
+      map['transition_ref'] = Variable<String>(transitionRef);
+    }
+    return map;
+  }
+
+  CableAllocationsCompanion toCompanion(bool nullToAbsent) {
+    return CableAllocationsCompanion(
+      revision: Value(revision),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt:
+          deletedAt == null && nullToAbsent
+              ? const Value.absent()
+              : Value(deletedAt),
+      originDeviceId: Value(originDeviceId),
+      id: Value(id),
+      projectId: Value(projectId),
+      engineeringConnectionId: Value(engineeringConnectionId),
+      cableId: Value(cableId),
+      lifecycleState: Value(lifecycleState),
+      transitionRef:
+          transitionRef == null && nullToAbsent
+              ? const Value.absent()
+              : Value(transitionRef),
+    );
+  }
+
+  factory CableAllocationRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CableAllocationRow(
+      revision: serializer.fromJson<int>(json['revision']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      originDeviceId: serializer.fromJson<String>(json['originDeviceId']),
+      id: serializer.fromJson<String>(json['id']),
+      projectId: serializer.fromJson<String>(json['projectId']),
+      engineeringConnectionId: serializer.fromJson<String>(
+        json['engineeringConnectionId'],
+      ),
+      cableId: serializer.fromJson<String>(json['cableId']),
+      lifecycleState: serializer.fromJson<String>(json['lifecycleState']),
+      transitionRef: serializer.fromJson<String?>(json['transitionRef']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'revision': serializer.toJson<int>(revision),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'originDeviceId': serializer.toJson<String>(originDeviceId),
+      'id': serializer.toJson<String>(id),
+      'projectId': serializer.toJson<String>(projectId),
+      'engineeringConnectionId': serializer.toJson<String>(
+        engineeringConnectionId,
+      ),
+      'cableId': serializer.toJson<String>(cableId),
+      'lifecycleState': serializer.toJson<String>(lifecycleState),
+      'transitionRef': serializer.toJson<String?>(transitionRef),
+    };
+  }
+
+  CableAllocationRow copyWith({
+    int? revision,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+    String? originDeviceId,
+    String? id,
+    String? projectId,
+    String? engineeringConnectionId,
+    String? cableId,
+    String? lifecycleState,
+    Value<String?> transitionRef = const Value.absent(),
+  }) => CableAllocationRow(
+    revision: revision ?? this.revision,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    originDeviceId: originDeviceId ?? this.originDeviceId,
+    id: id ?? this.id,
+    projectId: projectId ?? this.projectId,
+    engineeringConnectionId:
+        engineeringConnectionId ?? this.engineeringConnectionId,
+    cableId: cableId ?? this.cableId,
+    lifecycleState: lifecycleState ?? this.lifecycleState,
+    transitionRef:
+        transitionRef.present ? transitionRef.value : this.transitionRef,
+  );
+  CableAllocationRow copyWithCompanion(CableAllocationsCompanion data) {
+    return CableAllocationRow(
+      revision: data.revision.present ? data.revision.value : this.revision,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      originDeviceId:
+          data.originDeviceId.present
+              ? data.originDeviceId.value
+              : this.originDeviceId,
+      id: data.id.present ? data.id.value : this.id,
+      projectId: data.projectId.present ? data.projectId.value : this.projectId,
+      engineeringConnectionId:
+          data.engineeringConnectionId.present
+              ? data.engineeringConnectionId.value
+              : this.engineeringConnectionId,
+      cableId: data.cableId.present ? data.cableId.value : this.cableId,
+      lifecycleState:
+          data.lifecycleState.present
+              ? data.lifecycleState.value
+              : this.lifecycleState,
+      transitionRef:
+          data.transitionRef.present
+              ? data.transitionRef.value
+              : this.transitionRef,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CableAllocationRow(')
+          ..write('revision: $revision, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('originDeviceId: $originDeviceId, ')
+          ..write('id: $id, ')
+          ..write('projectId: $projectId, ')
+          ..write('engineeringConnectionId: $engineeringConnectionId, ')
+          ..write('cableId: $cableId, ')
+          ..write('lifecycleState: $lifecycleState, ')
+          ..write('transitionRef: $transitionRef')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    revision,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    originDeviceId,
+    id,
+    projectId,
+    engineeringConnectionId,
+    cableId,
+    lifecycleState,
+    transitionRef,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CableAllocationRow &&
+          other.revision == this.revision &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.originDeviceId == this.originDeviceId &&
+          other.id == this.id &&
+          other.projectId == this.projectId &&
+          other.engineeringConnectionId == this.engineeringConnectionId &&
+          other.cableId == this.cableId &&
+          other.lifecycleState == this.lifecycleState &&
+          other.transitionRef == this.transitionRef);
+}
+
+class CableAllocationsCompanion extends UpdateCompanion<CableAllocationRow> {
+  final Value<int> revision;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<String> originDeviceId;
+  final Value<String> id;
+  final Value<String> projectId;
+  final Value<String> engineeringConnectionId;
+  final Value<String> cableId;
+  final Value<String> lifecycleState;
+  final Value<String?> transitionRef;
+  final Value<int> rowid;
+  const CableAllocationsCompanion({
+    this.revision = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.originDeviceId = const Value.absent(),
+    this.id = const Value.absent(),
+    this.projectId = const Value.absent(),
+    this.engineeringConnectionId = const Value.absent(),
+    this.cableId = const Value.absent(),
+    this.lifecycleState = const Value.absent(),
+    this.transitionRef = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CableAllocationsCompanion.insert({
+    this.revision = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.deletedAt = const Value.absent(),
+    required String originDeviceId,
+    required String id,
+    required String projectId,
+    required String engineeringConnectionId,
+    required String cableId,
+    required String lifecycleState,
+    this.transitionRef = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       originDeviceId = Value(originDeviceId),
+       id = Value(id),
+       projectId = Value(projectId),
+       engineeringConnectionId = Value(engineeringConnectionId),
+       cableId = Value(cableId),
+       lifecycleState = Value(lifecycleState);
+  static Insertable<CableAllocationRow> custom({
+    Expression<int>? revision,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<String>? originDeviceId,
+    Expression<String>? id,
+    Expression<String>? projectId,
+    Expression<String>? engineeringConnectionId,
+    Expression<String>? cableId,
+    Expression<String>? lifecycleState,
+    Expression<String>? transitionRef,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (revision != null) 'revision': revision,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (originDeviceId != null) 'origin_device_id': originDeviceId,
+      if (id != null) 'id': id,
+      if (projectId != null) 'project_id': projectId,
+      if (engineeringConnectionId != null)
+        'engineering_connection_id': engineeringConnectionId,
+      if (cableId != null) 'cable_id': cableId,
+      if (lifecycleState != null) 'lifecycle_state': lifecycleState,
+      if (transitionRef != null) 'transition_ref': transitionRef,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CableAllocationsCompanion copyWith({
+    Value<int>? revision,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<String>? originDeviceId,
+    Value<String>? id,
+    Value<String>? projectId,
+    Value<String>? engineeringConnectionId,
+    Value<String>? cableId,
+    Value<String>? lifecycleState,
+    Value<String?>? transitionRef,
+    Value<int>? rowid,
+  }) {
+    return CableAllocationsCompanion(
+      revision: revision ?? this.revision,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      originDeviceId: originDeviceId ?? this.originDeviceId,
+      id: id ?? this.id,
+      projectId: projectId ?? this.projectId,
+      engineeringConnectionId:
+          engineeringConnectionId ?? this.engineeringConnectionId,
+      cableId: cableId ?? this.cableId,
+      lifecycleState: lifecycleState ?? this.lifecycleState,
+      transitionRef: transitionRef ?? this.transitionRef,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (revision.present) {
+      map['revision'] = Variable<int>(revision.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (originDeviceId.present) {
+      map['origin_device_id'] = Variable<String>(originDeviceId.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (projectId.present) {
+      map['project_id'] = Variable<String>(projectId.value);
+    }
+    if (engineeringConnectionId.present) {
+      map['engineering_connection_id'] = Variable<String>(
+        engineeringConnectionId.value,
+      );
+    }
+    if (cableId.present) {
+      map['cable_id'] = Variable<String>(cableId.value);
+    }
+    if (lifecycleState.present) {
+      map['lifecycle_state'] = Variable<String>(lifecycleState.value);
+    }
+    if (transitionRef.present) {
+      map['transition_ref'] = Variable<String>(transitionRef.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CableAllocationsCompanion(')
+          ..write('revision: $revision, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('originDeviceId: $originDeviceId, ')
+          ..write('id: $id, ')
+          ..write('projectId: $projectId, ')
+          ..write('engineeringConnectionId: $engineeringConnectionId, ')
+          ..write('cableId: $cableId, ')
+          ..write('lifecycleState: $lifecycleState, ')
+          ..write('transitionRef: $transitionRef, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CableAllocationResourceSelectionsTable
+    extends CableAllocationResourceSelections
+    with
+        TableInfo<
+          $CableAllocationResourceSelectionsTable,
+          CableAllocationResourceSelectionRow
+        > {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CableAllocationResourceSelectionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _allocationIdMeta = const VerificationMeta(
+    'allocationId',
+  );
+  @override
+  late final GeneratedColumn<String> allocationId = GeneratedColumn<String>(
+    'allocation_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES cable_allocations (id)',
+    ),
+  );
+  static const VerificationMeta _cableDefinitionRefJsonMeta =
+      const VerificationMeta('cableDefinitionRefJson');
+  @override
+  late final GeneratedColumn<String> cableDefinitionRefJson =
+      GeneratedColumn<String>(
+        'cable_definition_ref_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _selectionJsonMeta = const VerificationMeta(
+    'selectionJson',
+  );
+  @override
+  late final GeneratedColumn<String> selectionJson = GeneratedColumn<String>(
+    'selection_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _resolvedAtomsJsonMeta = const VerificationMeta(
+    'resolvedAtomsJson',
+  );
+  @override
+  late final GeneratedColumn<String> resolvedAtomsJson =
+      GeneratedColumn<String>(
+        'resolved_atoms_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _selectionSha256Meta = const VerificationMeta(
+    'selectionSha256',
+  );
+  @override
+  late final GeneratedColumn<String> selectionSha256 = GeneratedColumn<String>(
+    'selection_sha256',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _originDeviceIdMeta = const VerificationMeta(
+    'originDeviceId',
+  );
+  @override
+  late final GeneratedColumn<String> originDeviceId = GeneratedColumn<String>(
+    'origin_device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    allocationId,
+    cableDefinitionRefJson,
+    selectionJson,
+    resolvedAtomsJson,
+    selectionSha256,
+    createdAt,
+    originDeviceId,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cable_allocation_resource_selections';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CableAllocationResourceSelectionRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('allocation_id')) {
+      context.handle(
+        _allocationIdMeta,
+        allocationId.isAcceptableOrUnknown(
+          data['allocation_id']!,
+          _allocationIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_allocationIdMeta);
+    }
+    if (data.containsKey('cable_definition_ref_json')) {
+      context.handle(
+        _cableDefinitionRefJsonMeta,
+        cableDefinitionRefJson.isAcceptableOrUnknown(
+          data['cable_definition_ref_json']!,
+          _cableDefinitionRefJsonMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_cableDefinitionRefJsonMeta);
+    }
+    if (data.containsKey('selection_json')) {
+      context.handle(
+        _selectionJsonMeta,
+        selectionJson.isAcceptableOrUnknown(
+          data['selection_json']!,
+          _selectionJsonMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_selectionJsonMeta);
+    }
+    if (data.containsKey('resolved_atoms_json')) {
+      context.handle(
+        _resolvedAtomsJsonMeta,
+        resolvedAtomsJson.isAcceptableOrUnknown(
+          data['resolved_atoms_json']!,
+          _resolvedAtomsJsonMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_resolvedAtomsJsonMeta);
+    }
+    if (data.containsKey('selection_sha256')) {
+      context.handle(
+        _selectionSha256Meta,
+        selectionSha256.isAcceptableOrUnknown(
+          data['selection_sha256']!,
+          _selectionSha256Meta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_selectionSha256Meta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('origin_device_id')) {
+      context.handle(
+        _originDeviceIdMeta,
+        originDeviceId.isAcceptableOrUnknown(
+          data['origin_device_id']!,
+          _originDeviceIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_originDeviceIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {allocationId};
+  @override
+  CableAllocationResourceSelectionRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CableAllocationResourceSelectionRow(
+      allocationId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}allocation_id'],
+          )!,
+      cableDefinitionRefJson:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}cable_definition_ref_json'],
+          )!,
+      selectionJson:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}selection_json'],
+          )!,
+      resolvedAtomsJson:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}resolved_atoms_json'],
+          )!,
+      selectionSha256:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}selection_sha256'],
+          )!,
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      originDeviceId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}origin_device_id'],
+          )!,
+    );
+  }
+
+  @override
+  $CableAllocationResourceSelectionsTable createAlias(String alias) {
+    return $CableAllocationResourceSelectionsTable(attachedDatabase, alias);
+  }
+}
+
+class CableAllocationResourceSelectionRow extends DataClass
+    implements Insertable<CableAllocationResourceSelectionRow> {
+  final String allocationId;
+  final String cableDefinitionRefJson;
+  final String selectionJson;
+  final String resolvedAtomsJson;
+  final String selectionSha256;
+  final DateTime createdAt;
+  final String originDeviceId;
+  const CableAllocationResourceSelectionRow({
+    required this.allocationId,
+    required this.cableDefinitionRefJson,
+    required this.selectionJson,
+    required this.resolvedAtomsJson,
+    required this.selectionSha256,
+    required this.createdAt,
+    required this.originDeviceId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['allocation_id'] = Variable<String>(allocationId);
+    map['cable_definition_ref_json'] = Variable<String>(cableDefinitionRefJson);
+    map['selection_json'] = Variable<String>(selectionJson);
+    map['resolved_atoms_json'] = Variable<String>(resolvedAtomsJson);
+    map['selection_sha256'] = Variable<String>(selectionSha256);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['origin_device_id'] = Variable<String>(originDeviceId);
+    return map;
+  }
+
+  CableAllocationResourceSelectionsCompanion toCompanion(bool nullToAbsent) {
+    return CableAllocationResourceSelectionsCompanion(
+      allocationId: Value(allocationId),
+      cableDefinitionRefJson: Value(cableDefinitionRefJson),
+      selectionJson: Value(selectionJson),
+      resolvedAtomsJson: Value(resolvedAtomsJson),
+      selectionSha256: Value(selectionSha256),
+      createdAt: Value(createdAt),
+      originDeviceId: Value(originDeviceId),
+    );
+  }
+
+  factory CableAllocationResourceSelectionRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CableAllocationResourceSelectionRow(
+      allocationId: serializer.fromJson<String>(json['allocationId']),
+      cableDefinitionRefJson: serializer.fromJson<String>(
+        json['cableDefinitionRefJson'],
+      ),
+      selectionJson: serializer.fromJson<String>(json['selectionJson']),
+      resolvedAtomsJson: serializer.fromJson<String>(json['resolvedAtomsJson']),
+      selectionSha256: serializer.fromJson<String>(json['selectionSha256']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      originDeviceId: serializer.fromJson<String>(json['originDeviceId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'allocationId': serializer.toJson<String>(allocationId),
+      'cableDefinitionRefJson': serializer.toJson<String>(
+        cableDefinitionRefJson,
+      ),
+      'selectionJson': serializer.toJson<String>(selectionJson),
+      'resolvedAtomsJson': serializer.toJson<String>(resolvedAtomsJson),
+      'selectionSha256': serializer.toJson<String>(selectionSha256),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'originDeviceId': serializer.toJson<String>(originDeviceId),
+    };
+  }
+
+  CableAllocationResourceSelectionRow copyWith({
+    String? allocationId,
+    String? cableDefinitionRefJson,
+    String? selectionJson,
+    String? resolvedAtomsJson,
+    String? selectionSha256,
+    DateTime? createdAt,
+    String? originDeviceId,
+  }) => CableAllocationResourceSelectionRow(
+    allocationId: allocationId ?? this.allocationId,
+    cableDefinitionRefJson:
+        cableDefinitionRefJson ?? this.cableDefinitionRefJson,
+    selectionJson: selectionJson ?? this.selectionJson,
+    resolvedAtomsJson: resolvedAtomsJson ?? this.resolvedAtomsJson,
+    selectionSha256: selectionSha256 ?? this.selectionSha256,
+    createdAt: createdAt ?? this.createdAt,
+    originDeviceId: originDeviceId ?? this.originDeviceId,
+  );
+  CableAllocationResourceSelectionRow copyWithCompanion(
+    CableAllocationResourceSelectionsCompanion data,
+  ) {
+    return CableAllocationResourceSelectionRow(
+      allocationId:
+          data.allocationId.present
+              ? data.allocationId.value
+              : this.allocationId,
+      cableDefinitionRefJson:
+          data.cableDefinitionRefJson.present
+              ? data.cableDefinitionRefJson.value
+              : this.cableDefinitionRefJson,
+      selectionJson:
+          data.selectionJson.present
+              ? data.selectionJson.value
+              : this.selectionJson,
+      resolvedAtomsJson:
+          data.resolvedAtomsJson.present
+              ? data.resolvedAtomsJson.value
+              : this.resolvedAtomsJson,
+      selectionSha256:
+          data.selectionSha256.present
+              ? data.selectionSha256.value
+              : this.selectionSha256,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      originDeviceId:
+          data.originDeviceId.present
+              ? data.originDeviceId.value
+              : this.originDeviceId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CableAllocationResourceSelectionRow(')
+          ..write('allocationId: $allocationId, ')
+          ..write('cableDefinitionRefJson: $cableDefinitionRefJson, ')
+          ..write('selectionJson: $selectionJson, ')
+          ..write('resolvedAtomsJson: $resolvedAtomsJson, ')
+          ..write('selectionSha256: $selectionSha256, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('originDeviceId: $originDeviceId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    allocationId,
+    cableDefinitionRefJson,
+    selectionJson,
+    resolvedAtomsJson,
+    selectionSha256,
+    createdAt,
+    originDeviceId,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CableAllocationResourceSelectionRow &&
+          other.allocationId == this.allocationId &&
+          other.cableDefinitionRefJson == this.cableDefinitionRefJson &&
+          other.selectionJson == this.selectionJson &&
+          other.resolvedAtomsJson == this.resolvedAtomsJson &&
+          other.selectionSha256 == this.selectionSha256 &&
+          other.createdAt == this.createdAt &&
+          other.originDeviceId == this.originDeviceId);
+}
+
+class CableAllocationResourceSelectionsCompanion
+    extends UpdateCompanion<CableAllocationResourceSelectionRow> {
+  final Value<String> allocationId;
+  final Value<String> cableDefinitionRefJson;
+  final Value<String> selectionJson;
+  final Value<String> resolvedAtomsJson;
+  final Value<String> selectionSha256;
+  final Value<DateTime> createdAt;
+  final Value<String> originDeviceId;
+  final Value<int> rowid;
+  const CableAllocationResourceSelectionsCompanion({
+    this.allocationId = const Value.absent(),
+    this.cableDefinitionRefJson = const Value.absent(),
+    this.selectionJson = const Value.absent(),
+    this.resolvedAtomsJson = const Value.absent(),
+    this.selectionSha256 = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.originDeviceId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CableAllocationResourceSelectionsCompanion.insert({
+    required String allocationId,
+    required String cableDefinitionRefJson,
+    required String selectionJson,
+    required String resolvedAtomsJson,
+    required String selectionSha256,
+    required DateTime createdAt,
+    required String originDeviceId,
+    this.rowid = const Value.absent(),
+  }) : allocationId = Value(allocationId),
+       cableDefinitionRefJson = Value(cableDefinitionRefJson),
+       selectionJson = Value(selectionJson),
+       resolvedAtomsJson = Value(resolvedAtomsJson),
+       selectionSha256 = Value(selectionSha256),
+       createdAt = Value(createdAt),
+       originDeviceId = Value(originDeviceId);
+  static Insertable<CableAllocationResourceSelectionRow> custom({
+    Expression<String>? allocationId,
+    Expression<String>? cableDefinitionRefJson,
+    Expression<String>? selectionJson,
+    Expression<String>? resolvedAtomsJson,
+    Expression<String>? selectionSha256,
+    Expression<DateTime>? createdAt,
+    Expression<String>? originDeviceId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (allocationId != null) 'allocation_id': allocationId,
+      if (cableDefinitionRefJson != null)
+        'cable_definition_ref_json': cableDefinitionRefJson,
+      if (selectionJson != null) 'selection_json': selectionJson,
+      if (resolvedAtomsJson != null) 'resolved_atoms_json': resolvedAtomsJson,
+      if (selectionSha256 != null) 'selection_sha256': selectionSha256,
+      if (createdAt != null) 'created_at': createdAt,
+      if (originDeviceId != null) 'origin_device_id': originDeviceId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CableAllocationResourceSelectionsCompanion copyWith({
+    Value<String>? allocationId,
+    Value<String>? cableDefinitionRefJson,
+    Value<String>? selectionJson,
+    Value<String>? resolvedAtomsJson,
+    Value<String>? selectionSha256,
+    Value<DateTime>? createdAt,
+    Value<String>? originDeviceId,
+    Value<int>? rowid,
+  }) {
+    return CableAllocationResourceSelectionsCompanion(
+      allocationId: allocationId ?? this.allocationId,
+      cableDefinitionRefJson:
+          cableDefinitionRefJson ?? this.cableDefinitionRefJson,
+      selectionJson: selectionJson ?? this.selectionJson,
+      resolvedAtomsJson: resolvedAtomsJson ?? this.resolvedAtomsJson,
+      selectionSha256: selectionSha256 ?? this.selectionSha256,
+      createdAt: createdAt ?? this.createdAt,
+      originDeviceId: originDeviceId ?? this.originDeviceId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (allocationId.present) {
+      map['allocation_id'] = Variable<String>(allocationId.value);
+    }
+    if (cableDefinitionRefJson.present) {
+      map['cable_definition_ref_json'] = Variable<String>(
+        cableDefinitionRefJson.value,
+      );
+    }
+    if (selectionJson.present) {
+      map['selection_json'] = Variable<String>(selectionJson.value);
+    }
+    if (resolvedAtomsJson.present) {
+      map['resolved_atoms_json'] = Variable<String>(resolvedAtomsJson.value);
+    }
+    if (selectionSha256.present) {
+      map['selection_sha256'] = Variable<String>(selectionSha256.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (originDeviceId.present) {
+      map['origin_device_id'] = Variable<String>(originDeviceId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CableAllocationResourceSelectionsCompanion(')
+          ..write('allocationId: $allocationId, ')
+          ..write('cableDefinitionRefJson: $cableDefinitionRefJson, ')
+          ..write('selectionJson: $selectionJson, ')
+          ..write('resolvedAtomsJson: $resolvedAtomsJson, ')
+          ..write('selectionSha256: $selectionSha256, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('originDeviceId: $originDeviceId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CableResourceClaimsTable extends CableResourceClaims
+    with TableInfo<$CableResourceClaimsTable, CableResourceClaimRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CableResourceClaimsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _allocationIdMeta = const VerificationMeta(
+    'allocationId',
+  );
+  @override
+  late final GeneratedColumn<String> allocationId = GeneratedColumn<String>(
+    'allocation_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES cable_allocations (id)',
+    ),
+  );
+  static const VerificationMeta _cableIdMeta = const VerificationMeta(
+    'cableId',
+  );
+  @override
+  late final GeneratedColumn<String> cableId = GeneratedColumn<String>(
+    'cable_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES elv_cables (id)',
+    ),
+  );
+  static const VerificationMeta _resourceAtomMeta = const VerificationMeta(
+    'resourceAtom',
+  );
+  @override
+  late final GeneratedColumn<String> resourceAtom = GeneratedColumn<String>(
+    'resource_atom',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _originDeviceIdMeta = const VerificationMeta(
+    'originDeviceId',
+  );
+  @override
+  late final GeneratedColumn<String> originDeviceId = GeneratedColumn<String>(
+    'origin_device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    allocationId,
+    cableId,
+    resourceAtom,
+    createdAt,
+    originDeviceId,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cable_resource_claims';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CableResourceClaimRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('allocation_id')) {
+      context.handle(
+        _allocationIdMeta,
+        allocationId.isAcceptableOrUnknown(
+          data['allocation_id']!,
+          _allocationIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_allocationIdMeta);
+    }
+    if (data.containsKey('cable_id')) {
+      context.handle(
+        _cableIdMeta,
+        cableId.isAcceptableOrUnknown(data['cable_id']!, _cableIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_cableIdMeta);
+    }
+    if (data.containsKey('resource_atom')) {
+      context.handle(
+        _resourceAtomMeta,
+        resourceAtom.isAcceptableOrUnknown(
+          data['resource_atom']!,
+          _resourceAtomMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_resourceAtomMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('origin_device_id')) {
+      context.handle(
+        _originDeviceIdMeta,
+        originDeviceId.isAcceptableOrUnknown(
+          data['origin_device_id']!,
+          _originDeviceIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_originDeviceIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {allocationId, resourceAtom};
+  @override
+  CableResourceClaimRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CableResourceClaimRow(
+      allocationId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}allocation_id'],
+          )!,
+      cableId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}cable_id'],
+          )!,
+      resourceAtom:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}resource_atom'],
+          )!,
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      originDeviceId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}origin_device_id'],
+          )!,
+    );
+  }
+
+  @override
+  $CableResourceClaimsTable createAlias(String alias) {
+    return $CableResourceClaimsTable(attachedDatabase, alias);
+  }
+}
+
+class CableResourceClaimRow extends DataClass
+    implements Insertable<CableResourceClaimRow> {
+  final String allocationId;
+  final String cableId;
+  final String resourceAtom;
+  final DateTime createdAt;
+  final String originDeviceId;
+  const CableResourceClaimRow({
+    required this.allocationId,
+    required this.cableId,
+    required this.resourceAtom,
+    required this.createdAt,
+    required this.originDeviceId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['allocation_id'] = Variable<String>(allocationId);
+    map['cable_id'] = Variable<String>(cableId);
+    map['resource_atom'] = Variable<String>(resourceAtom);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['origin_device_id'] = Variable<String>(originDeviceId);
+    return map;
+  }
+
+  CableResourceClaimsCompanion toCompanion(bool nullToAbsent) {
+    return CableResourceClaimsCompanion(
+      allocationId: Value(allocationId),
+      cableId: Value(cableId),
+      resourceAtom: Value(resourceAtom),
+      createdAt: Value(createdAt),
+      originDeviceId: Value(originDeviceId),
+    );
+  }
+
+  factory CableResourceClaimRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CableResourceClaimRow(
+      allocationId: serializer.fromJson<String>(json['allocationId']),
+      cableId: serializer.fromJson<String>(json['cableId']),
+      resourceAtom: serializer.fromJson<String>(json['resourceAtom']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      originDeviceId: serializer.fromJson<String>(json['originDeviceId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'allocationId': serializer.toJson<String>(allocationId),
+      'cableId': serializer.toJson<String>(cableId),
+      'resourceAtom': serializer.toJson<String>(resourceAtom),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'originDeviceId': serializer.toJson<String>(originDeviceId),
+    };
+  }
+
+  CableResourceClaimRow copyWith({
+    String? allocationId,
+    String? cableId,
+    String? resourceAtom,
+    DateTime? createdAt,
+    String? originDeviceId,
+  }) => CableResourceClaimRow(
+    allocationId: allocationId ?? this.allocationId,
+    cableId: cableId ?? this.cableId,
+    resourceAtom: resourceAtom ?? this.resourceAtom,
+    createdAt: createdAt ?? this.createdAt,
+    originDeviceId: originDeviceId ?? this.originDeviceId,
+  );
+  CableResourceClaimRow copyWithCompanion(CableResourceClaimsCompanion data) {
+    return CableResourceClaimRow(
+      allocationId:
+          data.allocationId.present
+              ? data.allocationId.value
+              : this.allocationId,
+      cableId: data.cableId.present ? data.cableId.value : this.cableId,
+      resourceAtom:
+          data.resourceAtom.present
+              ? data.resourceAtom.value
+              : this.resourceAtom,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      originDeviceId:
+          data.originDeviceId.present
+              ? data.originDeviceId.value
+              : this.originDeviceId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CableResourceClaimRow(')
+          ..write('allocationId: $allocationId, ')
+          ..write('cableId: $cableId, ')
+          ..write('resourceAtom: $resourceAtom, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('originDeviceId: $originDeviceId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    allocationId,
+    cableId,
+    resourceAtom,
+    createdAt,
+    originDeviceId,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CableResourceClaimRow &&
+          other.allocationId == this.allocationId &&
+          other.cableId == this.cableId &&
+          other.resourceAtom == this.resourceAtom &&
+          other.createdAt == this.createdAt &&
+          other.originDeviceId == this.originDeviceId);
+}
+
+class CableResourceClaimsCompanion
+    extends UpdateCompanion<CableResourceClaimRow> {
+  final Value<String> allocationId;
+  final Value<String> cableId;
+  final Value<String> resourceAtom;
+  final Value<DateTime> createdAt;
+  final Value<String> originDeviceId;
+  final Value<int> rowid;
+  const CableResourceClaimsCompanion({
+    this.allocationId = const Value.absent(),
+    this.cableId = const Value.absent(),
+    this.resourceAtom = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.originDeviceId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CableResourceClaimsCompanion.insert({
+    required String allocationId,
+    required String cableId,
+    required String resourceAtom,
+    required DateTime createdAt,
+    required String originDeviceId,
+    this.rowid = const Value.absent(),
+  }) : allocationId = Value(allocationId),
+       cableId = Value(cableId),
+       resourceAtom = Value(resourceAtom),
+       createdAt = Value(createdAt),
+       originDeviceId = Value(originDeviceId);
+  static Insertable<CableResourceClaimRow> custom({
+    Expression<String>? allocationId,
+    Expression<String>? cableId,
+    Expression<String>? resourceAtom,
+    Expression<DateTime>? createdAt,
+    Expression<String>? originDeviceId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (allocationId != null) 'allocation_id': allocationId,
+      if (cableId != null) 'cable_id': cableId,
+      if (resourceAtom != null) 'resource_atom': resourceAtom,
+      if (createdAt != null) 'created_at': createdAt,
+      if (originDeviceId != null) 'origin_device_id': originDeviceId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CableResourceClaimsCompanion copyWith({
+    Value<String>? allocationId,
+    Value<String>? cableId,
+    Value<String>? resourceAtom,
+    Value<DateTime>? createdAt,
+    Value<String>? originDeviceId,
+    Value<int>? rowid,
+  }) {
+    return CableResourceClaimsCompanion(
+      allocationId: allocationId ?? this.allocationId,
+      cableId: cableId ?? this.cableId,
+      resourceAtom: resourceAtom ?? this.resourceAtom,
+      createdAt: createdAt ?? this.createdAt,
+      originDeviceId: originDeviceId ?? this.originDeviceId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (allocationId.present) {
+      map['allocation_id'] = Variable<String>(allocationId.value);
+    }
+    if (cableId.present) {
+      map['cable_id'] = Variable<String>(cableId.value);
+    }
+    if (resourceAtom.present) {
+      map['resource_atom'] = Variable<String>(resourceAtom.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (originDeviceId.present) {
+      map['origin_device_id'] = Variable<String>(originDeviceId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CableResourceClaimsCompanion(')
+          ..write('allocationId: $allocationId, ')
+          ..write('cableId: $cableId, ')
+          ..write('resourceAtom: $resourceAtom, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('originDeviceId: $originDeviceId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CableTerminationMappingsTable extends CableTerminationMappings
+    with TableInfo<$CableTerminationMappingsTable, CableTerminationMappingRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CableTerminationMappingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _revisionMeta = const VerificationMeta(
+    'revision',
+  );
+  @override
+  late final GeneratedColumn<int> revision = GeneratedColumn<int>(
+    'revision',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _originDeviceIdMeta = const VerificationMeta(
+    'originDeviceId',
+  );
+  @override
+  late final GeneratedColumn<String> originDeviceId = GeneratedColumn<String>(
+    'origin_device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _allocationIdMeta = const VerificationMeta(
+    'allocationId',
+  );
+  @override
+  late final GeneratedColumn<String> allocationId = GeneratedColumn<String>(
+    'allocation_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES cable_allocations (id)',
+    ),
+  );
+  static const VerificationMeta _resourceIdentityMeta = const VerificationMeta(
+    'resourceIdentity',
+  );
+  @override
+  late final GeneratedColumn<String> resourceIdentity = GeneratedColumn<String>(
+    'resource_identity',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _endRoleMeta = const VerificationMeta(
+    'endRole',
+  );
+  @override
+  late final GeneratedColumn<String> endRole = GeneratedColumn<String>(
+    'end_role',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _endpointPortIdMeta = const VerificationMeta(
+    'endpointPortId',
+  );
+  @override
+  late final GeneratedColumn<String> endpointPortId = GeneratedColumn<String>(
+    'endpoint_port_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES engineering_port_instances (id)',
+    ),
+  );
+  static const VerificationMeta _endpointTerminalRefMeta =
+      const VerificationMeta('endpointTerminalRef');
+  @override
+  late final GeneratedColumn<String> endpointTerminalRef =
+      GeneratedColumn<String>(
+        'endpoint_terminal_ref',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _terminationRoleMeta = const VerificationMeta(
+    'terminationRole',
+  );
+  @override
+  late final GeneratedColumn<String> terminationRole = GeneratedColumn<String>(
+    'termination_role',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    revision,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    originDeviceId,
+    id,
+    allocationId,
+    resourceIdentity,
+    endRole,
+    endpointPortId,
+    endpointTerminalRef,
+    terminationRole,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cable_termination_mappings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CableTerminationMappingRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('revision')) {
+      context.handle(
+        _revisionMeta,
+        revision.isAcceptableOrUnknown(data['revision']!, _revisionMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('origin_device_id')) {
+      context.handle(
+        _originDeviceIdMeta,
+        originDeviceId.isAcceptableOrUnknown(
+          data['origin_device_id']!,
+          _originDeviceIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_originDeviceIdMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('allocation_id')) {
+      context.handle(
+        _allocationIdMeta,
+        allocationId.isAcceptableOrUnknown(
+          data['allocation_id']!,
+          _allocationIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_allocationIdMeta);
+    }
+    if (data.containsKey('resource_identity')) {
+      context.handle(
+        _resourceIdentityMeta,
+        resourceIdentity.isAcceptableOrUnknown(
+          data['resource_identity']!,
+          _resourceIdentityMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_resourceIdentityMeta);
+    }
+    if (data.containsKey('end_role')) {
+      context.handle(
+        _endRoleMeta,
+        endRole.isAcceptableOrUnknown(data['end_role']!, _endRoleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_endRoleMeta);
+    }
+    if (data.containsKey('endpoint_port_id')) {
+      context.handle(
+        _endpointPortIdMeta,
+        endpointPortId.isAcceptableOrUnknown(
+          data['endpoint_port_id']!,
+          _endpointPortIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_endpointPortIdMeta);
+    }
+    if (data.containsKey('endpoint_terminal_ref')) {
+      context.handle(
+        _endpointTerminalRefMeta,
+        endpointTerminalRef.isAcceptableOrUnknown(
+          data['endpoint_terminal_ref']!,
+          _endpointTerminalRefMeta,
+        ),
+      );
+    }
+    if (data.containsKey('termination_role')) {
+      context.handle(
+        _terminationRoleMeta,
+        terminationRole.isAcceptableOrUnknown(
+          data['termination_role']!,
+          _terminationRoleMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {allocationId, resourceIdentity, endRole},
+  ];
+  @override
+  CableTerminationMappingRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CableTerminationMappingRow(
+      revision:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}revision'],
+          )!,
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      updatedAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}updated_at'],
+          )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      originDeviceId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}origin_device_id'],
+          )!,
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}id'],
+          )!,
+      allocationId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}allocation_id'],
+          )!,
+      resourceIdentity:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}resource_identity'],
+          )!,
+      endRole:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}end_role'],
+          )!,
+      endpointPortId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}endpoint_port_id'],
+          )!,
+      endpointTerminalRef: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}endpoint_terminal_ref'],
+      ),
+      terminationRole: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}termination_role'],
+      ),
+    );
+  }
+
+  @override
+  $CableTerminationMappingsTable createAlias(String alias) {
+    return $CableTerminationMappingsTable(attachedDatabase, alias);
+  }
+}
+
+class CableTerminationMappingRow extends DataClass
+    implements Insertable<CableTerminationMappingRow> {
+  final int revision;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  final String originDeviceId;
+  final String id;
+  final String allocationId;
+  final String resourceIdentity;
+  final String endRole;
+  final String endpointPortId;
+  final String? endpointTerminalRef;
+  final String? terminationRole;
+  const CableTerminationMappingRow({
+    required this.revision,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.originDeviceId,
+    required this.id,
+    required this.allocationId,
+    required this.resourceIdentity,
+    required this.endRole,
+    required this.endpointPortId,
+    this.endpointTerminalRef,
+    this.terminationRole,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['revision'] = Variable<int>(revision);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['origin_device_id'] = Variable<String>(originDeviceId);
+    map['id'] = Variable<String>(id);
+    map['allocation_id'] = Variable<String>(allocationId);
+    map['resource_identity'] = Variable<String>(resourceIdentity);
+    map['end_role'] = Variable<String>(endRole);
+    map['endpoint_port_id'] = Variable<String>(endpointPortId);
+    if (!nullToAbsent || endpointTerminalRef != null) {
+      map['endpoint_terminal_ref'] = Variable<String>(endpointTerminalRef);
+    }
+    if (!nullToAbsent || terminationRole != null) {
+      map['termination_role'] = Variable<String>(terminationRole);
+    }
+    return map;
+  }
+
+  CableTerminationMappingsCompanion toCompanion(bool nullToAbsent) {
+    return CableTerminationMappingsCompanion(
+      revision: Value(revision),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt:
+          deletedAt == null && nullToAbsent
+              ? const Value.absent()
+              : Value(deletedAt),
+      originDeviceId: Value(originDeviceId),
+      id: Value(id),
+      allocationId: Value(allocationId),
+      resourceIdentity: Value(resourceIdentity),
+      endRole: Value(endRole),
+      endpointPortId: Value(endpointPortId),
+      endpointTerminalRef:
+          endpointTerminalRef == null && nullToAbsent
+              ? const Value.absent()
+              : Value(endpointTerminalRef),
+      terminationRole:
+          terminationRole == null && nullToAbsent
+              ? const Value.absent()
+              : Value(terminationRole),
+    );
+  }
+
+  factory CableTerminationMappingRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CableTerminationMappingRow(
+      revision: serializer.fromJson<int>(json['revision']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      originDeviceId: serializer.fromJson<String>(json['originDeviceId']),
+      id: serializer.fromJson<String>(json['id']),
+      allocationId: serializer.fromJson<String>(json['allocationId']),
+      resourceIdentity: serializer.fromJson<String>(json['resourceIdentity']),
+      endRole: serializer.fromJson<String>(json['endRole']),
+      endpointPortId: serializer.fromJson<String>(json['endpointPortId']),
+      endpointTerminalRef: serializer.fromJson<String?>(
+        json['endpointTerminalRef'],
+      ),
+      terminationRole: serializer.fromJson<String?>(json['terminationRole']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'revision': serializer.toJson<int>(revision),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'originDeviceId': serializer.toJson<String>(originDeviceId),
+      'id': serializer.toJson<String>(id),
+      'allocationId': serializer.toJson<String>(allocationId),
+      'resourceIdentity': serializer.toJson<String>(resourceIdentity),
+      'endRole': serializer.toJson<String>(endRole),
+      'endpointPortId': serializer.toJson<String>(endpointPortId),
+      'endpointTerminalRef': serializer.toJson<String?>(endpointTerminalRef),
+      'terminationRole': serializer.toJson<String?>(terminationRole),
+    };
+  }
+
+  CableTerminationMappingRow copyWith({
+    int? revision,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+    String? originDeviceId,
+    String? id,
+    String? allocationId,
+    String? resourceIdentity,
+    String? endRole,
+    String? endpointPortId,
+    Value<String?> endpointTerminalRef = const Value.absent(),
+    Value<String?> terminationRole = const Value.absent(),
+  }) => CableTerminationMappingRow(
+    revision: revision ?? this.revision,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    originDeviceId: originDeviceId ?? this.originDeviceId,
+    id: id ?? this.id,
+    allocationId: allocationId ?? this.allocationId,
+    resourceIdentity: resourceIdentity ?? this.resourceIdentity,
+    endRole: endRole ?? this.endRole,
+    endpointPortId: endpointPortId ?? this.endpointPortId,
+    endpointTerminalRef:
+        endpointTerminalRef.present
+            ? endpointTerminalRef.value
+            : this.endpointTerminalRef,
+    terminationRole:
+        terminationRole.present ? terminationRole.value : this.terminationRole,
+  );
+  CableTerminationMappingRow copyWithCompanion(
+    CableTerminationMappingsCompanion data,
+  ) {
+    return CableTerminationMappingRow(
+      revision: data.revision.present ? data.revision.value : this.revision,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      originDeviceId:
+          data.originDeviceId.present
+              ? data.originDeviceId.value
+              : this.originDeviceId,
+      id: data.id.present ? data.id.value : this.id,
+      allocationId:
+          data.allocationId.present
+              ? data.allocationId.value
+              : this.allocationId,
+      resourceIdentity:
+          data.resourceIdentity.present
+              ? data.resourceIdentity.value
+              : this.resourceIdentity,
+      endRole: data.endRole.present ? data.endRole.value : this.endRole,
+      endpointPortId:
+          data.endpointPortId.present
+              ? data.endpointPortId.value
+              : this.endpointPortId,
+      endpointTerminalRef:
+          data.endpointTerminalRef.present
+              ? data.endpointTerminalRef.value
+              : this.endpointTerminalRef,
+      terminationRole:
+          data.terminationRole.present
+              ? data.terminationRole.value
+              : this.terminationRole,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CableTerminationMappingRow(')
+          ..write('revision: $revision, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('originDeviceId: $originDeviceId, ')
+          ..write('id: $id, ')
+          ..write('allocationId: $allocationId, ')
+          ..write('resourceIdentity: $resourceIdentity, ')
+          ..write('endRole: $endRole, ')
+          ..write('endpointPortId: $endpointPortId, ')
+          ..write('endpointTerminalRef: $endpointTerminalRef, ')
+          ..write('terminationRole: $terminationRole')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    revision,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    originDeviceId,
+    id,
+    allocationId,
+    resourceIdentity,
+    endRole,
+    endpointPortId,
+    endpointTerminalRef,
+    terminationRole,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CableTerminationMappingRow &&
+          other.revision == this.revision &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.originDeviceId == this.originDeviceId &&
+          other.id == this.id &&
+          other.allocationId == this.allocationId &&
+          other.resourceIdentity == this.resourceIdentity &&
+          other.endRole == this.endRole &&
+          other.endpointPortId == this.endpointPortId &&
+          other.endpointTerminalRef == this.endpointTerminalRef &&
+          other.terminationRole == this.terminationRole);
+}
+
+class CableTerminationMappingsCompanion
+    extends UpdateCompanion<CableTerminationMappingRow> {
+  final Value<int> revision;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<String> originDeviceId;
+  final Value<String> id;
+  final Value<String> allocationId;
+  final Value<String> resourceIdentity;
+  final Value<String> endRole;
+  final Value<String> endpointPortId;
+  final Value<String?> endpointTerminalRef;
+  final Value<String?> terminationRole;
+  final Value<int> rowid;
+  const CableTerminationMappingsCompanion({
+    this.revision = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.originDeviceId = const Value.absent(),
+    this.id = const Value.absent(),
+    this.allocationId = const Value.absent(),
+    this.resourceIdentity = const Value.absent(),
+    this.endRole = const Value.absent(),
+    this.endpointPortId = const Value.absent(),
+    this.endpointTerminalRef = const Value.absent(),
+    this.terminationRole = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CableTerminationMappingsCompanion.insert({
+    this.revision = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.deletedAt = const Value.absent(),
+    required String originDeviceId,
+    required String id,
+    required String allocationId,
+    required String resourceIdentity,
+    required String endRole,
+    required String endpointPortId,
+    this.endpointTerminalRef = const Value.absent(),
+    this.terminationRole = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       originDeviceId = Value(originDeviceId),
+       id = Value(id),
+       allocationId = Value(allocationId),
+       resourceIdentity = Value(resourceIdentity),
+       endRole = Value(endRole),
+       endpointPortId = Value(endpointPortId);
+  static Insertable<CableTerminationMappingRow> custom({
+    Expression<int>? revision,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<String>? originDeviceId,
+    Expression<String>? id,
+    Expression<String>? allocationId,
+    Expression<String>? resourceIdentity,
+    Expression<String>? endRole,
+    Expression<String>? endpointPortId,
+    Expression<String>? endpointTerminalRef,
+    Expression<String>? terminationRole,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (revision != null) 'revision': revision,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (originDeviceId != null) 'origin_device_id': originDeviceId,
+      if (id != null) 'id': id,
+      if (allocationId != null) 'allocation_id': allocationId,
+      if (resourceIdentity != null) 'resource_identity': resourceIdentity,
+      if (endRole != null) 'end_role': endRole,
+      if (endpointPortId != null) 'endpoint_port_id': endpointPortId,
+      if (endpointTerminalRef != null)
+        'endpoint_terminal_ref': endpointTerminalRef,
+      if (terminationRole != null) 'termination_role': terminationRole,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CableTerminationMappingsCompanion copyWith({
+    Value<int>? revision,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<String>? originDeviceId,
+    Value<String>? id,
+    Value<String>? allocationId,
+    Value<String>? resourceIdentity,
+    Value<String>? endRole,
+    Value<String>? endpointPortId,
+    Value<String?>? endpointTerminalRef,
+    Value<String?>? terminationRole,
+    Value<int>? rowid,
+  }) {
+    return CableTerminationMappingsCompanion(
+      revision: revision ?? this.revision,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      originDeviceId: originDeviceId ?? this.originDeviceId,
+      id: id ?? this.id,
+      allocationId: allocationId ?? this.allocationId,
+      resourceIdentity: resourceIdentity ?? this.resourceIdentity,
+      endRole: endRole ?? this.endRole,
+      endpointPortId: endpointPortId ?? this.endpointPortId,
+      endpointTerminalRef: endpointTerminalRef ?? this.endpointTerminalRef,
+      terminationRole: terminationRole ?? this.terminationRole,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (revision.present) {
+      map['revision'] = Variable<int>(revision.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (originDeviceId.present) {
+      map['origin_device_id'] = Variable<String>(originDeviceId.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (allocationId.present) {
+      map['allocation_id'] = Variable<String>(allocationId.value);
+    }
+    if (resourceIdentity.present) {
+      map['resource_identity'] = Variable<String>(resourceIdentity.value);
+    }
+    if (endRole.present) {
+      map['end_role'] = Variable<String>(endRole.value);
+    }
+    if (endpointPortId.present) {
+      map['endpoint_port_id'] = Variable<String>(endpointPortId.value);
+    }
+    if (endpointTerminalRef.present) {
+      map['endpoint_terminal_ref'] = Variable<String>(
+        endpointTerminalRef.value,
+      );
+    }
+    if (terminationRole.present) {
+      map['termination_role'] = Variable<String>(terminationRole.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CableTerminationMappingsCompanion(')
+          ..write('revision: $revision, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('originDeviceId: $originDeviceId, ')
+          ..write('id: $id, ')
+          ..write('allocationId: $allocationId, ')
+          ..write('resourceIdentity: $resourceIdentity, ')
+          ..write('endRole: $endRole, ')
+          ..write('endpointPortId: $endpointPortId, ')
+          ..write('endpointTerminalRef: $endpointTerminalRef, ')
+          ..write('terminationRole: $terminationRole, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CommandExecutionRecordsTable extends CommandExecutionRecords
+    with TableInfo<$CommandExecutionRecordsTable, CommandExecutionRecordRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CommandExecutionRecordsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _projectIdMeta = const VerificationMeta(
+    'projectId',
+  );
+  @override
+  late final GeneratedColumn<String> projectId = GeneratedColumn<String>(
+    'project_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES projects (id)',
+    ),
+  );
+  static const VerificationMeta _commandIdMeta = const VerificationMeta(
+    'commandId',
+  );
+  @override
+  late final GeneratedColumn<String> commandId = GeneratedColumn<String>(
+    'command_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _commandTypeMeta = const VerificationMeta(
+    'commandType',
+  );
+  @override
+  late final GeneratedColumn<String> commandType = GeneratedColumn<String>(
+    'command_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _payloadSchemaVersionMeta =
+      const VerificationMeta('payloadSchemaVersion');
+  @override
+  late final GeneratedColumn<int> payloadSchemaVersion = GeneratedColumn<int>(
+    'payload_schema_version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _normalizedPayloadSha256Meta =
+      const VerificationMeta('normalizedPayloadSha256');
+  @override
+  late final GeneratedColumn<String> normalizedPayloadSha256 =
+      GeneratedColumn<String>(
+        'normalized_payload_sha256',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _outcomeKindMeta = const VerificationMeta(
+    'outcomeKind',
+  );
+  @override
+  late final GeneratedColumn<String> outcomeKind = GeneratedColumn<String>(
+    'outcome_kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _logicalResultJsonMeta = const VerificationMeta(
+    'logicalResultJson',
+  );
+  @override
+  late final GeneratedColumn<String> logicalResultJson =
+      GeneratedColumn<String>(
+        'logical_result_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _committedAtMeta = const VerificationMeta(
+    'committedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> committedAt = GeneratedColumn<DateTime>(
+    'committed_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _originDeviceIdMeta = const VerificationMeta(
+    'originDeviceId',
+  );
+  @override
+  late final GeneratedColumn<String> originDeviceId = GeneratedColumn<String>(
+    'origin_device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    projectId,
+    commandId,
+    commandType,
+    payloadSchemaVersion,
+    normalizedPayloadSha256,
+    outcomeKind,
+    logicalResultJson,
+    createdAt,
+    committedAt,
+    originDeviceId,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'command_execution_records';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CommandExecutionRecordRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('project_id')) {
+      context.handle(
+        _projectIdMeta,
+        projectId.isAcceptableOrUnknown(data['project_id']!, _projectIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_projectIdMeta);
+    }
+    if (data.containsKey('command_id')) {
+      context.handle(
+        _commandIdMeta,
+        commandId.isAcceptableOrUnknown(data['command_id']!, _commandIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_commandIdMeta);
+    }
+    if (data.containsKey('command_type')) {
+      context.handle(
+        _commandTypeMeta,
+        commandType.isAcceptableOrUnknown(
+          data['command_type']!,
+          _commandTypeMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_commandTypeMeta);
+    }
+    if (data.containsKey('payload_schema_version')) {
+      context.handle(
+        _payloadSchemaVersionMeta,
+        payloadSchemaVersion.isAcceptableOrUnknown(
+          data['payload_schema_version']!,
+          _payloadSchemaVersionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_payloadSchemaVersionMeta);
+    }
+    if (data.containsKey('normalized_payload_sha256')) {
+      context.handle(
+        _normalizedPayloadSha256Meta,
+        normalizedPayloadSha256.isAcceptableOrUnknown(
+          data['normalized_payload_sha256']!,
+          _normalizedPayloadSha256Meta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_normalizedPayloadSha256Meta);
+    }
+    if (data.containsKey('outcome_kind')) {
+      context.handle(
+        _outcomeKindMeta,
+        outcomeKind.isAcceptableOrUnknown(
+          data['outcome_kind']!,
+          _outcomeKindMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_outcomeKindMeta);
+    }
+    if (data.containsKey('logical_result_json')) {
+      context.handle(
+        _logicalResultJsonMeta,
+        logicalResultJson.isAcceptableOrUnknown(
+          data['logical_result_json']!,
+          _logicalResultJsonMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_logicalResultJsonMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('committed_at')) {
+      context.handle(
+        _committedAtMeta,
+        committedAt.isAcceptableOrUnknown(
+          data['committed_at']!,
+          _committedAtMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_committedAtMeta);
+    }
+    if (data.containsKey('origin_device_id')) {
+      context.handle(
+        _originDeviceIdMeta,
+        originDeviceId.isAcceptableOrUnknown(
+          data['origin_device_id']!,
+          _originDeviceIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_originDeviceIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {projectId, commandId};
+  @override
+  CommandExecutionRecordRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CommandExecutionRecordRow(
+      projectId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}project_id'],
+          )!,
+      commandId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}command_id'],
+          )!,
+      commandType:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}command_type'],
+          )!,
+      payloadSchemaVersion:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}payload_schema_version'],
+          )!,
+      normalizedPayloadSha256:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}normalized_payload_sha256'],
+          )!,
+      outcomeKind:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}outcome_kind'],
+          )!,
+      logicalResultJson:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}logical_result_json'],
+          )!,
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      committedAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}committed_at'],
+          )!,
+      originDeviceId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}origin_device_id'],
+          )!,
+    );
+  }
+
+  @override
+  $CommandExecutionRecordsTable createAlias(String alias) {
+    return $CommandExecutionRecordsTable(attachedDatabase, alias);
+  }
+}
+
+class CommandExecutionRecordRow extends DataClass
+    implements Insertable<CommandExecutionRecordRow> {
+  final String projectId;
+  final String commandId;
+  final String commandType;
+  final int payloadSchemaVersion;
+  final String normalizedPayloadSha256;
+  final String outcomeKind;
+  final String logicalResultJson;
+  final DateTime createdAt;
+  final DateTime committedAt;
+  final String originDeviceId;
+  const CommandExecutionRecordRow({
+    required this.projectId,
+    required this.commandId,
+    required this.commandType,
+    required this.payloadSchemaVersion,
+    required this.normalizedPayloadSha256,
+    required this.outcomeKind,
+    required this.logicalResultJson,
+    required this.createdAt,
+    required this.committedAt,
+    required this.originDeviceId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['project_id'] = Variable<String>(projectId);
+    map['command_id'] = Variable<String>(commandId);
+    map['command_type'] = Variable<String>(commandType);
+    map['payload_schema_version'] = Variable<int>(payloadSchemaVersion);
+    map['normalized_payload_sha256'] = Variable<String>(
+      normalizedPayloadSha256,
+    );
+    map['outcome_kind'] = Variable<String>(outcomeKind);
+    map['logical_result_json'] = Variable<String>(logicalResultJson);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['committed_at'] = Variable<DateTime>(committedAt);
+    map['origin_device_id'] = Variable<String>(originDeviceId);
+    return map;
+  }
+
+  CommandExecutionRecordsCompanion toCompanion(bool nullToAbsent) {
+    return CommandExecutionRecordsCompanion(
+      projectId: Value(projectId),
+      commandId: Value(commandId),
+      commandType: Value(commandType),
+      payloadSchemaVersion: Value(payloadSchemaVersion),
+      normalizedPayloadSha256: Value(normalizedPayloadSha256),
+      outcomeKind: Value(outcomeKind),
+      logicalResultJson: Value(logicalResultJson),
+      createdAt: Value(createdAt),
+      committedAt: Value(committedAt),
+      originDeviceId: Value(originDeviceId),
+    );
+  }
+
+  factory CommandExecutionRecordRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CommandExecutionRecordRow(
+      projectId: serializer.fromJson<String>(json['projectId']),
+      commandId: serializer.fromJson<String>(json['commandId']),
+      commandType: serializer.fromJson<String>(json['commandType']),
+      payloadSchemaVersion: serializer.fromJson<int>(
+        json['payloadSchemaVersion'],
+      ),
+      normalizedPayloadSha256: serializer.fromJson<String>(
+        json['normalizedPayloadSha256'],
+      ),
+      outcomeKind: serializer.fromJson<String>(json['outcomeKind']),
+      logicalResultJson: serializer.fromJson<String>(json['logicalResultJson']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      committedAt: serializer.fromJson<DateTime>(json['committedAt']),
+      originDeviceId: serializer.fromJson<String>(json['originDeviceId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'projectId': serializer.toJson<String>(projectId),
+      'commandId': serializer.toJson<String>(commandId),
+      'commandType': serializer.toJson<String>(commandType),
+      'payloadSchemaVersion': serializer.toJson<int>(payloadSchemaVersion),
+      'normalizedPayloadSha256': serializer.toJson<String>(
+        normalizedPayloadSha256,
+      ),
+      'outcomeKind': serializer.toJson<String>(outcomeKind),
+      'logicalResultJson': serializer.toJson<String>(logicalResultJson),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'committedAt': serializer.toJson<DateTime>(committedAt),
+      'originDeviceId': serializer.toJson<String>(originDeviceId),
+    };
+  }
+
+  CommandExecutionRecordRow copyWith({
+    String? projectId,
+    String? commandId,
+    String? commandType,
+    int? payloadSchemaVersion,
+    String? normalizedPayloadSha256,
+    String? outcomeKind,
+    String? logicalResultJson,
+    DateTime? createdAt,
+    DateTime? committedAt,
+    String? originDeviceId,
+  }) => CommandExecutionRecordRow(
+    projectId: projectId ?? this.projectId,
+    commandId: commandId ?? this.commandId,
+    commandType: commandType ?? this.commandType,
+    payloadSchemaVersion: payloadSchemaVersion ?? this.payloadSchemaVersion,
+    normalizedPayloadSha256:
+        normalizedPayloadSha256 ?? this.normalizedPayloadSha256,
+    outcomeKind: outcomeKind ?? this.outcomeKind,
+    logicalResultJson: logicalResultJson ?? this.logicalResultJson,
+    createdAt: createdAt ?? this.createdAt,
+    committedAt: committedAt ?? this.committedAt,
+    originDeviceId: originDeviceId ?? this.originDeviceId,
+  );
+  CommandExecutionRecordRow copyWithCompanion(
+    CommandExecutionRecordsCompanion data,
+  ) {
+    return CommandExecutionRecordRow(
+      projectId: data.projectId.present ? data.projectId.value : this.projectId,
+      commandId: data.commandId.present ? data.commandId.value : this.commandId,
+      commandType:
+          data.commandType.present ? data.commandType.value : this.commandType,
+      payloadSchemaVersion:
+          data.payloadSchemaVersion.present
+              ? data.payloadSchemaVersion.value
+              : this.payloadSchemaVersion,
+      normalizedPayloadSha256:
+          data.normalizedPayloadSha256.present
+              ? data.normalizedPayloadSha256.value
+              : this.normalizedPayloadSha256,
+      outcomeKind:
+          data.outcomeKind.present ? data.outcomeKind.value : this.outcomeKind,
+      logicalResultJson:
+          data.logicalResultJson.present
+              ? data.logicalResultJson.value
+              : this.logicalResultJson,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      committedAt:
+          data.committedAt.present ? data.committedAt.value : this.committedAt,
+      originDeviceId:
+          data.originDeviceId.present
+              ? data.originDeviceId.value
+              : this.originDeviceId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CommandExecutionRecordRow(')
+          ..write('projectId: $projectId, ')
+          ..write('commandId: $commandId, ')
+          ..write('commandType: $commandType, ')
+          ..write('payloadSchemaVersion: $payloadSchemaVersion, ')
+          ..write('normalizedPayloadSha256: $normalizedPayloadSha256, ')
+          ..write('outcomeKind: $outcomeKind, ')
+          ..write('logicalResultJson: $logicalResultJson, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('committedAt: $committedAt, ')
+          ..write('originDeviceId: $originDeviceId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    projectId,
+    commandId,
+    commandType,
+    payloadSchemaVersion,
+    normalizedPayloadSha256,
+    outcomeKind,
+    logicalResultJson,
+    createdAt,
+    committedAt,
+    originDeviceId,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CommandExecutionRecordRow &&
+          other.projectId == this.projectId &&
+          other.commandId == this.commandId &&
+          other.commandType == this.commandType &&
+          other.payloadSchemaVersion == this.payloadSchemaVersion &&
+          other.normalizedPayloadSha256 == this.normalizedPayloadSha256 &&
+          other.outcomeKind == this.outcomeKind &&
+          other.logicalResultJson == this.logicalResultJson &&
+          other.createdAt == this.createdAt &&
+          other.committedAt == this.committedAt &&
+          other.originDeviceId == this.originDeviceId);
+}
+
+class CommandExecutionRecordsCompanion
+    extends UpdateCompanion<CommandExecutionRecordRow> {
+  final Value<String> projectId;
+  final Value<String> commandId;
+  final Value<String> commandType;
+  final Value<int> payloadSchemaVersion;
+  final Value<String> normalizedPayloadSha256;
+  final Value<String> outcomeKind;
+  final Value<String> logicalResultJson;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> committedAt;
+  final Value<String> originDeviceId;
+  final Value<int> rowid;
+  const CommandExecutionRecordsCompanion({
+    this.projectId = const Value.absent(),
+    this.commandId = const Value.absent(),
+    this.commandType = const Value.absent(),
+    this.payloadSchemaVersion = const Value.absent(),
+    this.normalizedPayloadSha256 = const Value.absent(),
+    this.outcomeKind = const Value.absent(),
+    this.logicalResultJson = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.committedAt = const Value.absent(),
+    this.originDeviceId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CommandExecutionRecordsCompanion.insert({
+    required String projectId,
+    required String commandId,
+    required String commandType,
+    required int payloadSchemaVersion,
+    required String normalizedPayloadSha256,
+    required String outcomeKind,
+    required String logicalResultJson,
+    required DateTime createdAt,
+    required DateTime committedAt,
+    required String originDeviceId,
+    this.rowid = const Value.absent(),
+  }) : projectId = Value(projectId),
+       commandId = Value(commandId),
+       commandType = Value(commandType),
+       payloadSchemaVersion = Value(payloadSchemaVersion),
+       normalizedPayloadSha256 = Value(normalizedPayloadSha256),
+       outcomeKind = Value(outcomeKind),
+       logicalResultJson = Value(logicalResultJson),
+       createdAt = Value(createdAt),
+       committedAt = Value(committedAt),
+       originDeviceId = Value(originDeviceId);
+  static Insertable<CommandExecutionRecordRow> custom({
+    Expression<String>? projectId,
+    Expression<String>? commandId,
+    Expression<String>? commandType,
+    Expression<int>? payloadSchemaVersion,
+    Expression<String>? normalizedPayloadSha256,
+    Expression<String>? outcomeKind,
+    Expression<String>? logicalResultJson,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? committedAt,
+    Expression<String>? originDeviceId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (projectId != null) 'project_id': projectId,
+      if (commandId != null) 'command_id': commandId,
+      if (commandType != null) 'command_type': commandType,
+      if (payloadSchemaVersion != null)
+        'payload_schema_version': payloadSchemaVersion,
+      if (normalizedPayloadSha256 != null)
+        'normalized_payload_sha256': normalizedPayloadSha256,
+      if (outcomeKind != null) 'outcome_kind': outcomeKind,
+      if (logicalResultJson != null) 'logical_result_json': logicalResultJson,
+      if (createdAt != null) 'created_at': createdAt,
+      if (committedAt != null) 'committed_at': committedAt,
+      if (originDeviceId != null) 'origin_device_id': originDeviceId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CommandExecutionRecordsCompanion copyWith({
+    Value<String>? projectId,
+    Value<String>? commandId,
+    Value<String>? commandType,
+    Value<int>? payloadSchemaVersion,
+    Value<String>? normalizedPayloadSha256,
+    Value<String>? outcomeKind,
+    Value<String>? logicalResultJson,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? committedAt,
+    Value<String>? originDeviceId,
+    Value<int>? rowid,
+  }) {
+    return CommandExecutionRecordsCompanion(
+      projectId: projectId ?? this.projectId,
+      commandId: commandId ?? this.commandId,
+      commandType: commandType ?? this.commandType,
+      payloadSchemaVersion: payloadSchemaVersion ?? this.payloadSchemaVersion,
+      normalizedPayloadSha256:
+          normalizedPayloadSha256 ?? this.normalizedPayloadSha256,
+      outcomeKind: outcomeKind ?? this.outcomeKind,
+      logicalResultJson: logicalResultJson ?? this.logicalResultJson,
+      createdAt: createdAt ?? this.createdAt,
+      committedAt: committedAt ?? this.committedAt,
+      originDeviceId: originDeviceId ?? this.originDeviceId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (projectId.present) {
+      map['project_id'] = Variable<String>(projectId.value);
+    }
+    if (commandId.present) {
+      map['command_id'] = Variable<String>(commandId.value);
+    }
+    if (commandType.present) {
+      map['command_type'] = Variable<String>(commandType.value);
+    }
+    if (payloadSchemaVersion.present) {
+      map['payload_schema_version'] = Variable<int>(payloadSchemaVersion.value);
+    }
+    if (normalizedPayloadSha256.present) {
+      map['normalized_payload_sha256'] = Variable<String>(
+        normalizedPayloadSha256.value,
+      );
+    }
+    if (outcomeKind.present) {
+      map['outcome_kind'] = Variable<String>(outcomeKind.value);
+    }
+    if (logicalResultJson.present) {
+      map['logical_result_json'] = Variable<String>(logicalResultJson.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (committedAt.present) {
+      map['committed_at'] = Variable<DateTime>(committedAt.value);
+    }
+    if (originDeviceId.present) {
+      map['origin_device_id'] = Variable<String>(originDeviceId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CommandExecutionRecordsCompanion(')
+          ..write('projectId: $projectId, ')
+          ..write('commandId: $commandId, ')
+          ..write('commandType: $commandType, ')
+          ..write('payloadSchemaVersion: $payloadSchemaVersion, ')
+          ..write('normalizedPayloadSha256: $normalizedPayloadSha256, ')
+          ..write('outcomeKind: $outcomeKind, ')
+          ..write('logicalResultJson: $logicalResultJson, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('committedAt: $committedAt, ')
+          ..write('originDeviceId: $originDeviceId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -32713,6 +36754,20 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   engineeringComponentAssemblies = $EngineeringComponentAssembliesTable(this);
   late final $EngineeringPlacementOperationsTable
   engineeringPlacementOperations = $EngineeringPlacementOperationsTable(this);
+  late final $ElvCablesTable elvCables = $ElvCablesTable(this);
+  late final $CableAllocationsTable cableAllocations = $CableAllocationsTable(
+    this,
+  );
+  late final $CableAllocationResourceSelectionsTable
+  cableAllocationResourceSelections = $CableAllocationResourceSelectionsTable(
+    this,
+  );
+  late final $CableResourceClaimsTable cableResourceClaims =
+      $CableResourceClaimsTable(this);
+  late final $CableTerminationMappingsTable cableTerminationMappings =
+      $CableTerminationMappingsTable(this);
+  late final $CommandExecutionRecordsTable commandExecutionRecords =
+      $CommandExecutionRecordsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -32765,6 +36820,12 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     engineeringInternalMappings,
     engineeringComponentAssemblies,
     engineeringPlacementOperations,
+    elvCables,
+    cableAllocations,
+    cableAllocationResourceSelections,
+    cableResourceClaims,
+    cableTerminationMappings,
+    commandExecutionRecords,
   ];
 }
 
@@ -33216,6 +37277,69 @@ final class $$ProjectsTableReferences
 
     final cache = $_typedResult.readTableOrNull(
       _engineeringPlacementOperationsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$ElvCablesTable, List<ElvCableRow>>
+  _elvCablesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.elvCables,
+    aliasName: 'projects__id__elv_cables__project_id',
+  );
+
+  $$ElvCablesTableProcessedTableManager get elvCablesRefs {
+    final manager = $$ElvCablesTableTableManager(
+      $_db,
+      $_db.elvCables,
+    ).filter((f) => f.projectId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_elvCablesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$CableAllocationsTable, List<CableAllocationRow>>
+  _cableAllocationsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.cableAllocations,
+    aliasName: 'projects__id__cable_allocations__project_id',
+  );
+
+  $$CableAllocationsTableProcessedTableManager get cableAllocationsRefs {
+    final manager = $$CableAllocationsTableTableManager(
+      $_db,
+      $_db.cableAllocations,
+    ).filter((f) => f.projectId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _cableAllocationsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $CommandExecutionRecordsTable,
+    List<CommandExecutionRecordRow>
+  >
+  _commandExecutionRecordsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.commandExecutionRecords,
+        aliasName: 'projects__id__command_execution_records__project_id',
+      );
+
+  $$CommandExecutionRecordsTableProcessedTableManager
+  get commandExecutionRecordsRefs {
+    final manager = $$CommandExecutionRecordsTableTableManager(
+      $_db,
+      $_db.commandExecutionRecords,
+    ).filter((f) => f.projectId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _commandExecutionRecordsRefsTable($_db),
     );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
@@ -33743,6 +37867,82 @@ class $$ProjectsTableFilterComposer
               }) => $$EngineeringPlacementOperationsTableFilterComposer(
                 $db: $db,
                 $table: $db.engineeringPlacementOperations,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> elvCablesRefs(
+    Expression<bool> Function($$ElvCablesTableFilterComposer f) f,
+  ) {
+    final $$ElvCablesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.elvCables,
+      getReferencedColumn: (t) => t.projectId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ElvCablesTableFilterComposer(
+            $db: $db,
+            $table: $db.elvCables,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> cableAllocationsRefs(
+    Expression<bool> Function($$CableAllocationsTableFilterComposer f) f,
+  ) {
+    final $$CableAllocationsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.cableAllocations,
+      getReferencedColumn: (t) => t.projectId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableAllocationsTableFilterComposer(
+            $db: $db,
+            $table: $db.cableAllocations,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> commandExecutionRecordsRefs(
+    Expression<bool> Function($$CommandExecutionRecordsTableFilterComposer f) f,
+  ) {
+    final $$CommandExecutionRecordsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.commandExecutionRecords,
+          getReferencedColumn: (t) => t.projectId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CommandExecutionRecordsTableFilterComposer(
+                $db: $db,
+                $table: $db.commandExecutionRecords,
                 $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
                 joinBuilder: joinBuilder,
                 $removeJoinBuilderFromRootComposer:
@@ -34338,6 +38538,83 @@ class $$ProjectsTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> elvCablesRefs<T extends Object>(
+    Expression<T> Function($$ElvCablesTableAnnotationComposer a) f,
+  ) {
+    final $$ElvCablesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.elvCables,
+      getReferencedColumn: (t) => t.projectId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ElvCablesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.elvCables,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> cableAllocationsRefs<T extends Object>(
+    Expression<T> Function($$CableAllocationsTableAnnotationComposer a) f,
+  ) {
+    final $$CableAllocationsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.cableAllocations,
+      getReferencedColumn: (t) => t.projectId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableAllocationsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.cableAllocations,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> commandExecutionRecordsRefs<T extends Object>(
+    Expression<T> Function($$CommandExecutionRecordsTableAnnotationComposer a)
+    f,
+  ) {
+    final $$CommandExecutionRecordsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.commandExecutionRecords,
+          getReferencedColumn: (t) => t.projectId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CommandExecutionRecordsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.commandExecutionRecords,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$ProjectsTableTableManager
@@ -34371,6 +38648,9 @@ class $$ProjectsTableTableManager
             bool engineeringInternalMappingsRefs,
             bool engineeringComponentAssembliesRefs,
             bool engineeringPlacementOperationsRefs,
+            bool elvCablesRefs,
+            bool cableAllocationsRefs,
+            bool commandExecutionRecordsRefs,
           })
         > {
   $$ProjectsTableTableManager(_$AppDatabase db, $ProjectsTable table)
@@ -34469,6 +38749,9 @@ class $$ProjectsTableTableManager
             engineeringInternalMappingsRefs = false,
             engineeringComponentAssembliesRefs = false,
             engineeringPlacementOperationsRefs = false,
+            elvCablesRefs = false,
+            cableAllocationsRefs = false,
+            commandExecutionRecordsRefs = false,
           }) {
             return PrefetchHooks(
               db: db,
@@ -34499,6 +38782,9 @@ class $$ProjectsTableTableManager
                   db.engineeringComponentAssemblies,
                 if (engineeringPlacementOperationsRefs)
                   db.engineeringPlacementOperations,
+                if (elvCablesRefs) db.elvCables,
+                if (cableAllocationsRefs) db.cableAllocations,
+                if (commandExecutionRecordsRefs) db.commandExecutionRecords,
               ],
               addJoins: null,
               getPrefetchedDataCallback: (items) async {
@@ -34873,6 +39159,72 @@ class $$ProjectsTableTableManager
                           ),
                       typedResults: items,
                     ),
+                  if (elvCablesRefs)
+                    await $_getPrefetchedData<
+                      Project,
+                      $ProjectsTable,
+                      ElvCableRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$ProjectsTableReferences
+                          ._elvCablesRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$ProjectsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).elvCablesRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.projectId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                  if (cableAllocationsRefs)
+                    await $_getPrefetchedData<
+                      Project,
+                      $ProjectsTable,
+                      CableAllocationRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$ProjectsTableReferences
+                          ._cableAllocationsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$ProjectsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).cableAllocationsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.projectId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                  if (commandExecutionRecordsRefs)
+                    await $_getPrefetchedData<
+                      Project,
+                      $ProjectsTable,
+                      CommandExecutionRecordRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$ProjectsTableReferences
+                          ._commandExecutionRecordsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$ProjectsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).commandExecutionRecordsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.projectId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
                 ];
               },
             );
@@ -34911,6 +39263,9 @@ typedef $$ProjectsTableProcessedTableManager =
         bool engineeringInternalMappingsRefs,
         bool engineeringComponentAssembliesRefs,
         bool engineeringPlacementOperationsRefs,
+        bool elvCablesRefs,
+        bool cableAllocationsRefs,
+        bool commandExecutionRecordsRefs,
       })
     >;
 typedef $$FloorsTableCreateCompanionBuilder =
@@ -41132,35 +45487,6 @@ final class $$ComponentInstancesTableReferences
   }
 
   static MultiTypedResultKey<
-    $EquipmentElectricalLoadsTable,
-    List<EquipmentElectricalLoadRow>
-  >
-  _equipmentElectricalLoadsRefsTable(
-    _$AppDatabase db,
-  ) => MultiTypedResultKey.fromTable(
-    db.equipmentElectricalLoads,
-    aliasName:
-        'component_instances__id__equipment_electrical_loads__component_instance_id',
-  );
-
-  $$EquipmentElectricalLoadsTableProcessedTableManager
-  get equipmentElectricalLoadsRefs {
-    final manager = $$EquipmentElectricalLoadsTableTableManager(
-      $_db,
-      $_db.equipmentElectricalLoads,
-    ).filter(
-      (f) => f.componentInstanceId.id.sqlEquals($_itemColumn<String>('id')!),
-    );
-
-    final cache = $_typedResult.readTableOrNull(
-      _equipmentElectricalLoadsRefsTable($_db),
-    );
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
-  static MultiTypedResultKey<
     $ComponentEngineeringMembershipsTable,
     List<ComponentEngineeringMembershipRow>
   >
@@ -41413,33 +45739,6 @@ class $$ComponentInstancesTableFilterComposer
           ),
     );
     return composer;
-  }
-
-  Expression<bool> equipmentElectricalLoadsRefs(
-    Expression<bool> Function($$EquipmentElectricalLoadsTableFilterComposer f)
-    f,
-  ) {
-    final $$EquipmentElectricalLoadsTableFilterComposer composer =
-        $composerBuilder(
-          composer: this,
-          getCurrentColumn: (t) => t.id,
-          referencedTable: $db.equipmentElectricalLoads,
-          getReferencedColumn: (t) => t.componentInstanceId,
-          builder:
-              (
-                joinBuilder, {
-                $addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer,
-              }) => $$EquipmentElectricalLoadsTableFilterComposer(
-                $db: $db,
-                $table: $db.equipmentElectricalLoads,
-                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-                joinBuilder: joinBuilder,
-                $removeJoinBuilderFromRootComposer:
-                    $removeJoinBuilderFromRootComposer,
-              ),
-        );
-    return f(composer);
   }
 
   Expression<bool> componentEngineeringMembershipsRefs(
@@ -41811,33 +46110,6 @@ class $$ComponentInstancesTableAnnotationComposer
     return composer;
   }
 
-  Expression<T> equipmentElectricalLoadsRefs<T extends Object>(
-    Expression<T> Function($$EquipmentElectricalLoadsTableAnnotationComposer a)
-    f,
-  ) {
-    final $$EquipmentElectricalLoadsTableAnnotationComposer composer =
-        $composerBuilder(
-          composer: this,
-          getCurrentColumn: (t) => t.id,
-          referencedTable: $db.equipmentElectricalLoads,
-          getReferencedColumn: (t) => t.componentInstanceId,
-          builder:
-              (
-                joinBuilder, {
-                $addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer,
-              }) => $$EquipmentElectricalLoadsTableAnnotationComposer(
-                $db: $db,
-                $table: $db.equipmentElectricalLoads,
-                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-                joinBuilder: joinBuilder,
-                $removeJoinBuilderFromRootComposer:
-                    $removeJoinBuilderFromRootComposer,
-              ),
-        );
-    return f(composer);
-  }
-
   Expression<T> componentEngineeringMembershipsRefs<T extends Object>(
     Expression<T> Function(
       $$ComponentEngineeringMembershipsTableAnnotationComposer a,
@@ -41998,7 +46270,6 @@ class $$ComponentInstancesTableTableManager
           PrefetchHooks Function({
             bool roomId,
             bool hostSurfacePatchId,
-            bool equipmentElectricalLoadsRefs,
             bool componentEngineeringMembershipsRefs,
             bool componentReferenceBindingsRefs,
             bool engineeringPortInstancesRefs,
@@ -42116,7 +46387,6 @@ class $$ComponentInstancesTableTableManager
           prefetchHooksCallback: ({
             roomId = false,
             hostSurfacePatchId = false,
-            equipmentElectricalLoadsRefs = false,
             componentEngineeringMembershipsRefs = false,
             componentReferenceBindingsRefs = false,
             engineeringPortInstancesRefs = false,
@@ -42126,7 +46396,6 @@ class $$ComponentInstancesTableTableManager
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [
-                if (equipmentElectricalLoadsRefs) db.equipmentElectricalLoads,
                 if (componentEngineeringMembershipsRefs)
                   db.componentEngineeringMemberships,
                 if (componentReferenceBindingsRefs)
@@ -42185,28 +46454,6 @@ class $$ComponentInstancesTableTableManager
               },
               getPrefetchedDataCallback: (items) async {
                 return [
-                  if (equipmentElectricalLoadsRefs)
-                    await $_getPrefetchedData<
-                      ComponentInstanceRow,
-                      $ComponentInstancesTable,
-                      EquipmentElectricalLoadRow
-                    >(
-                      currentTable: table,
-                      referencedTable: $$ComponentInstancesTableReferences
-                          ._equipmentElectricalLoadsRefsTable(db),
-                      managerFromTypedResult:
-                          (p0) =>
-                              $$ComponentInstancesTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).equipmentElectricalLoadsRefs,
-                      referencedItemsForCurrentItem:
-                          (item, referencedItems) => referencedItems.where(
-                            (e) => e.componentInstanceId == item.id,
-                          ),
-                      typedResults: items,
-                    ),
                   if (componentEngineeringMembershipsRefs)
                     await $_getPrefetchedData<
                       ComponentInstanceRow,
@@ -42340,7 +46587,6 @@ typedef $$ComponentInstancesTableProcessedTableManager =
       PrefetchHooks Function({
         bool roomId,
         bool hostSurfacePatchId,
-        bool equipmentElectricalLoadsRefs,
         bool componentEngineeringMembershipsRefs,
         bool componentReferenceBindingsRefs,
         bool engineeringPortInstancesRefs,
@@ -43233,26 +47479,6 @@ final class $$EquipmentElectricalLoadsTableReferences
     super.$_typedResult,
   );
 
-  static $ComponentInstancesTable _componentInstanceIdTable(
-    _$AppDatabase db,
-  ) => db.componentInstances.createAlias(
-    'equipment_electrical_loads__component_instance_id__component_instances__id',
-  );
-
-  $$ComponentInstancesTableProcessedTableManager get componentInstanceId {
-    final $_column = $_itemColumn<String>('component_instance_id')!;
-
-    final manager = $$ComponentInstancesTableTableManager(
-      $_db,
-      $_db.componentInstances,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_componentInstanceIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-
   static $ConsumptionGroupsTable _consumptionGroupIdTable(
     _$AppDatabase db,
   ) => db.consumptionGroups.createAlias(
@@ -43270,6 +47496,37 @@ final class $$EquipmentElectricalLoadsTableReferences
     if (item == null) return manager;
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $CircuitLoadAssignmentsTable,
+    List<CircuitLoadAssignmentRow>
+  >
+  _circuitLoadAssignmentsRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.circuitLoadAssignments,
+    aliasName:
+        'equipment_electrical_loads__component_instance_id__circuit_load_assignments__component_instance_id',
+  );
+
+  $$CircuitLoadAssignmentsTableProcessedTableManager
+  get circuitLoadAssignmentsRefs {
+    final manager = $$CircuitLoadAssignmentsTableTableManager(
+      $_db,
+      $_db.circuitLoadAssignments,
+    ).filter(
+      (f) => f.componentInstanceId.componentInstanceId.sqlEquals(
+        $_itemColumn<String>('component_instance_id')!,
+      ),
+    );
+
+    final cache = $_typedResult.readTableOrNull(
+      _circuitLoadAssignmentsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
     );
   }
 }
@@ -43305,6 +47562,11 @@ class $$EquipmentElectricalLoadsTableFilterComposer
 
   ColumnFilters<String> get originDeviceId => $composableBuilder(
     column: $table.originDeviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get componentInstanceId => $composableBuilder(
+    column: $table.componentInstanceId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -43388,29 +47650,6 @@ class $$EquipmentElectricalLoadsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  $$ComponentInstancesTableFilterComposer get componentInstanceId {
-    final $$ComponentInstancesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.componentInstanceId,
-      referencedTable: $db.componentInstances,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ComponentInstancesTableFilterComposer(
-            $db: $db,
-            $table: $db.componentInstances,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
   $$ConsumptionGroupsTableFilterComposer get consumptionGroupId {
     final $$ConsumptionGroupsTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -43432,6 +47671,32 @@ class $$EquipmentElectricalLoadsTableFilterComposer
           ),
     );
     return composer;
+  }
+
+  Expression<bool> circuitLoadAssignmentsRefs(
+    Expression<bool> Function($$CircuitLoadAssignmentsTableFilterComposer f) f,
+  ) {
+    final $$CircuitLoadAssignmentsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.componentInstanceId,
+          referencedTable: $db.circuitLoadAssignments,
+          getReferencedColumn: (t) => t.componentInstanceId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CircuitLoadAssignmentsTableFilterComposer(
+                $db: $db,
+                $table: $db.circuitLoadAssignments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
   }
 }
 
@@ -43466,6 +47731,11 @@ class $$EquipmentElectricalLoadsTableOrderingComposer
 
   ColumnOrderings<String> get originDeviceId => $composableBuilder(
     column: $table.originDeviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get componentInstanceId => $composableBuilder(
+    column: $table.componentInstanceId,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -43549,29 +47819,6 @@ class $$EquipmentElectricalLoadsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  $$ComponentInstancesTableOrderingComposer get componentInstanceId {
-    final $$ComponentInstancesTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.componentInstanceId,
-      referencedTable: $db.componentInstances,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ComponentInstancesTableOrderingComposer(
-            $db: $db,
-            $table: $db.componentInstances,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
   $$ConsumptionGroupsTableOrderingComposer get consumptionGroupId {
     final $$ConsumptionGroupsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -43619,6 +47866,11 @@ class $$EquipmentElectricalLoadsTableAnnotationComposer
 
   GeneratedColumn<String> get originDeviceId => $composableBuilder(
     column: $table.originDeviceId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get componentInstanceId => $composableBuilder(
+    column: $table.componentInstanceId,
     builder: (column) => column,
   );
 
@@ -43698,30 +47950,6 @@ class $$EquipmentElectricalLoadsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  $$ComponentInstancesTableAnnotationComposer get componentInstanceId {
-    final $$ComponentInstancesTableAnnotationComposer composer =
-        $composerBuilder(
-          composer: this,
-          getCurrentColumn: (t) => t.componentInstanceId,
-          referencedTable: $db.componentInstances,
-          getReferencedColumn: (t) => t.id,
-          builder:
-              (
-                joinBuilder, {
-                $addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer,
-              }) => $$ComponentInstancesTableAnnotationComposer(
-                $db: $db,
-                $table: $db.componentInstances,
-                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-                joinBuilder: joinBuilder,
-                $removeJoinBuilderFromRootComposer:
-                    $removeJoinBuilderFromRootComposer,
-              ),
-        );
-    return composer;
-  }
-
   $$ConsumptionGroupsTableAnnotationComposer get consumptionGroupId {
     final $$ConsumptionGroupsTableAnnotationComposer composer =
         $composerBuilder(
@@ -43745,6 +47973,32 @@ class $$EquipmentElectricalLoadsTableAnnotationComposer
         );
     return composer;
   }
+
+  Expression<T> circuitLoadAssignmentsRefs<T extends Object>(
+    Expression<T> Function($$CircuitLoadAssignmentsTableAnnotationComposer a) f,
+  ) {
+    final $$CircuitLoadAssignmentsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.componentInstanceId,
+          referencedTable: $db.circuitLoadAssignments,
+          getReferencedColumn: (t) => t.componentInstanceId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CircuitLoadAssignmentsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.circuitLoadAssignments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$EquipmentElectricalLoadsTableTableManager
@@ -43764,8 +48018,8 @@ class $$EquipmentElectricalLoadsTableTableManager
           ),
           EquipmentElectricalLoadRow,
           PrefetchHooks Function({
-            bool componentInstanceId,
             bool consumptionGroupId,
+            bool circuitLoadAssignmentsRefs,
           })
         > {
   $$EquipmentElectricalLoadsTableTableManager(
@@ -43912,12 +48166,14 @@ class $$EquipmentElectricalLoadsTableTableManager
                       )
                       .toList(),
           prefetchHooksCallback: ({
-            componentInstanceId = false,
             consumptionGroupId = false,
+            circuitLoadAssignmentsRefs = false,
           }) {
             return PrefetchHooks(
               db: db,
-              explicitlyWatchedTables: [],
+              explicitlyWatchedTables: [
+                if (circuitLoadAssignmentsRefs) db.circuitLoadAssignments,
+              ],
               addJoins: <
                 T extends TableManagerState<
                   dynamic,
@@ -43933,21 +48189,6 @@ class $$EquipmentElectricalLoadsTableTableManager
                   dynamic
                 >
               >(state) {
-                if (componentInstanceId) {
-                  state =
-                      state.withJoin(
-                            currentTable: table,
-                            currentColumn: table.componentInstanceId,
-                            referencedTable:
-                                $$EquipmentElectricalLoadsTableReferences
-                                    ._componentInstanceIdTable(db),
-                            referencedColumn:
-                                $$EquipmentElectricalLoadsTableReferences
-                                    ._componentInstanceIdTable(db)
-                                    .id,
-                          )
-                          as T;
-                }
                 if (consumptionGroupId) {
                   state =
                       state.withJoin(
@@ -43967,7 +48208,32 @@ class $$EquipmentElectricalLoadsTableTableManager
                 return state;
               },
               getPrefetchedDataCallback: (items) async {
-                return [];
+                return [
+                  if (circuitLoadAssignmentsRefs)
+                    await $_getPrefetchedData<
+                      EquipmentElectricalLoadRow,
+                      $EquipmentElectricalLoadsTable,
+                      CircuitLoadAssignmentRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$EquipmentElectricalLoadsTableReferences
+                          ._circuitLoadAssignmentsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$EquipmentElectricalLoadsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).circuitLoadAssignmentsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) =>
+                                e.componentInstanceId ==
+                                item.componentInstanceId,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
               },
             );
           },
@@ -43988,8 +48254,8 @@ typedef $$EquipmentElectricalLoadsTableProcessedTableManager =
       (EquipmentElectricalLoadRow, $$EquipmentElectricalLoadsTableReferences),
       EquipmentElectricalLoadRow,
       PrefetchHooks Function({
-        bool componentInstanceId,
         bool consumptionGroupId,
+        bool circuitLoadAssignmentsRefs,
       })
     >;
 typedef $$ElectricalCircuitsTableCreateCompanionBuilder =
@@ -45153,6 +49419,26 @@ final class $$CircuitLoadAssignmentsTableReferences
     super.$_typedResult,
   );
 
+  static $EquipmentElectricalLoadsTable _componentInstanceIdTable(
+    _$AppDatabase db,
+  ) => db.equipmentElectricalLoads.createAlias(
+    'circuit_load_assignments__component_instance_id__equipment_electrical_loads__component_instance_id',
+  );
+
+  $$EquipmentElectricalLoadsTableProcessedTableManager get componentInstanceId {
+    final $_column = $_itemColumn<String>('component_instance_id')!;
+
+    final manager = $$EquipmentElectricalLoadsTableTableManager(
+      $_db,
+      $_db.equipmentElectricalLoads,
+    ).filter((f) => f.componentInstanceId.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_componentInstanceIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
   static $ElectricalCircuitsTable _circuitIdTable(_$AppDatabase db) =>
       db.electricalCircuits.createAlias(
         'circuit_load_assignments__circuit_id__electrical_circuits__id',
@@ -45182,6 +49468,30 @@ class $$CircuitLoadAssignmentsTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+  $$EquipmentElectricalLoadsTableFilterComposer get componentInstanceId {
+    final $$EquipmentElectricalLoadsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.componentInstanceId,
+          referencedTable: $db.equipmentElectricalLoads,
+          getReferencedColumn: (t) => t.componentInstanceId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EquipmentElectricalLoadsTableFilterComposer(
+                $db: $db,
+                $table: $db.equipmentElectricalLoads,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
   $$ElectricalCircuitsTableFilterComposer get circuitId {
     final $$ElectricalCircuitsTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -45215,6 +49525,30 @@ class $$CircuitLoadAssignmentsTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+  $$EquipmentElectricalLoadsTableOrderingComposer get componentInstanceId {
+    final $$EquipmentElectricalLoadsTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.componentInstanceId,
+          referencedTable: $db.equipmentElectricalLoads,
+          getReferencedColumn: (t) => t.componentInstanceId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EquipmentElectricalLoadsTableOrderingComposer(
+                $db: $db,
+                $table: $db.equipmentElectricalLoads,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
   $$ElectricalCircuitsTableOrderingComposer get circuitId {
     final $$ElectricalCircuitsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -45248,6 +49582,30 @@ class $$CircuitLoadAssignmentsTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+  $$EquipmentElectricalLoadsTableAnnotationComposer get componentInstanceId {
+    final $$EquipmentElectricalLoadsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.componentInstanceId,
+          referencedTable: $db.equipmentElectricalLoads,
+          getReferencedColumn: (t) => t.componentInstanceId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EquipmentElectricalLoadsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.equipmentElectricalLoads,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
   $$ElectricalCircuitsTableAnnotationComposer get circuitId {
     final $$ElectricalCircuitsTableAnnotationComposer composer =
         $composerBuilder(
@@ -45286,7 +49644,7 @@ class $$CircuitLoadAssignmentsTableTableManager
           $$CircuitLoadAssignmentsTableUpdateCompanionBuilder,
           (CircuitLoadAssignmentRow, $$CircuitLoadAssignmentsTableReferences),
           CircuitLoadAssignmentRow,
-          PrefetchHooks Function({bool circuitId})
+          PrefetchHooks Function({bool componentInstanceId, bool circuitId})
         > {
   $$CircuitLoadAssignmentsTableTableManager(
     _$AppDatabase db,
@@ -45343,7 +49701,10 @@ class $$CircuitLoadAssignmentsTableTableManager
                         ),
                       )
                       .toList(),
-          prefetchHooksCallback: ({circuitId = false}) {
+          prefetchHooksCallback: ({
+            componentInstanceId = false,
+            circuitId = false,
+          }) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [],
@@ -45362,6 +49723,21 @@ class $$CircuitLoadAssignmentsTableTableManager
                   dynamic
                 >
               >(state) {
+                if (componentInstanceId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.componentInstanceId,
+                            referencedTable:
+                                $$CircuitLoadAssignmentsTableReferences
+                                    ._componentInstanceIdTable(db),
+                            referencedColumn:
+                                $$CircuitLoadAssignmentsTableReferences
+                                    ._componentInstanceIdTable(db)
+                                    .componentInstanceId,
+                          )
+                          as T;
+                }
                 if (circuitId) {
                   state =
                       state.withJoin(
@@ -45401,7 +49777,7 @@ typedef $$CircuitLoadAssignmentsTableProcessedTableManager =
       $$CircuitLoadAssignmentsTableUpdateCompanionBuilder,
       (CircuitLoadAssignmentRow, $$CircuitLoadAssignmentsTableReferences),
       CircuitLoadAssignmentRow,
-      PrefetchHooks Function({bool circuitId})
+      PrefetchHooks Function({bool componentInstanceId, bool circuitId})
     >;
 typedef $$PhysicalChannelsTableCreateCompanionBuilder =
     PhysicalChannelsCompanion Function({
@@ -59495,6 +63871,24 @@ final class $$EngineeringReferenceCatalogsTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$ElvCablesTable, List<ElvCableRow>>
+  _elvCablesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.elvCables,
+    aliasName:
+        'engineering_reference_catalogs__id__elv_cables__definition_catalog_id',
+  );
+
+  $$ElvCablesTableProcessedTableManager get elvCablesRefs {
+    final manager = $$ElvCablesTableTableManager($_db, $_db.elvCables).filter(
+      (f) => f.definitionCatalogId.id.sqlEquals($_itemColumn<String>('id')!),
+    );
+
+    final cache = $_typedResult.readTableOrNull(_elvCablesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$EngineeringReferenceCatalogsTableFilterComposer
@@ -59598,6 +63992,31 @@ class $$EngineeringReferenceCatalogsTableFilterComposer
                     $removeJoinBuilderFromRootComposer,
               ),
         );
+    return f(composer);
+  }
+
+  Expression<bool> elvCablesRefs(
+    Expression<bool> Function($$ElvCablesTableFilterComposer f) f,
+  ) {
+    final $$ElvCablesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.elvCables,
+      getReferencedColumn: (t) => t.definitionCatalogId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ElvCablesTableFilterComposer(
+            $db: $db,
+            $table: $db.elvCables,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
     return f(composer);
   }
 }
@@ -59773,6 +64192,31 @@ class $$EngineeringReferenceCatalogsTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> elvCablesRefs<T extends Object>(
+    Expression<T> Function($$ElvCablesTableAnnotationComposer a) f,
+  ) {
+    final $$ElvCablesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.elvCables,
+      getReferencedColumn: (t) => t.definitionCatalogId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ElvCablesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.elvCables,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$EngineeringReferenceCatalogsTableTableManager
@@ -59794,6 +64238,7 @@ class $$EngineeringReferenceCatalogsTableTableManager
           PrefetchHooks Function({
             bool projectId,
             bool componentReferenceBindingsRefs,
+            bool elvCablesRefs,
           })
         > {
   $$EngineeringReferenceCatalogsTableTableManager(
@@ -59890,12 +64335,14 @@ class $$EngineeringReferenceCatalogsTableTableManager
           prefetchHooksCallback: ({
             projectId = false,
             componentReferenceBindingsRefs = false,
+            elvCablesRefs = false,
           }) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [
                 if (componentReferenceBindingsRefs)
                   db.componentReferenceBindings,
+                if (elvCablesRefs) db.elvCables,
               ],
               addJoins: <
                 T extends TableManagerState<
@@ -59955,6 +64402,29 @@ class $$EngineeringReferenceCatalogsTableTableManager
                           ),
                       typedResults: items,
                     ),
+                  if (elvCablesRefs)
+                    await $_getPrefetchedData<
+                      EngineeringReferenceCatalogRow,
+                      $EngineeringReferenceCatalogsTable,
+                      ElvCableRow
+                    >(
+                      currentTable: table,
+                      referencedTable:
+                          $$EngineeringReferenceCatalogsTableReferences
+                              ._elvCablesRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$EngineeringReferenceCatalogsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).elvCablesRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.definitionCatalogId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
                 ];
               },
             );
@@ -59981,6 +64451,7 @@ typedef $$EngineeringReferenceCatalogsTableProcessedTableManager =
       PrefetchHooks Function({
         bool projectId,
         bool componentReferenceBindingsRefs,
+        bool elvCablesRefs,
       })
     >;
 typedef $$ComponentReferenceBindingsTableCreateCompanionBuilder =
@@ -60707,6 +65178,195 @@ final class $$EngineeringPortInstancesTableReferences
       manager.$state.copyWith(prefetchedData: [item]),
     );
   }
+
+  static MultiTypedResultKey<
+    $EngineeringTopologyGroupsTable,
+    List<EngineeringTopologyGroupRow>
+  >
+  _topologyGroupsStartingAtPortTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.engineeringTopologyGroups,
+    aliasName:
+        'engineering_port_instances__id__engineering_topology_groups__start_port_id',
+  );
+
+  $$EngineeringTopologyGroupsTableProcessedTableManager
+  get topologyGroupsStartingAtPort {
+    final manager = $$EngineeringTopologyGroupsTableTableManager(
+      $_db,
+      $_db.engineeringTopologyGroups,
+    ).filter((f) => f.startPortId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _topologyGroupsStartingAtPortTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $EngineeringTopologyGroupsTable,
+    List<EngineeringTopologyGroupRow>
+  >
+  _topologyGroupsEndingAtPortTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.engineeringTopologyGroups,
+    aliasName:
+        'engineering_port_instances__id__engineering_topology_groups__end_port_id',
+  );
+
+  $$EngineeringTopologyGroupsTableProcessedTableManager
+  get topologyGroupsEndingAtPort {
+    final manager = $$EngineeringTopologyGroupsTableTableManager(
+      $_db,
+      $_db.engineeringTopologyGroups,
+    ).filter((f) => f.endPortId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _topologyGroupsEndingAtPortTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $EngineeringPortConnectionsTable,
+    List<EngineeringPortConnectionRow>
+  >
+  _outgoingEngineeringPortConnectionsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.engineeringPortConnections,
+    aliasName:
+        'engineering_port_instances__id__engineering_port_connections__from_port_id',
+  );
+
+  $$EngineeringPortConnectionsTableProcessedTableManager
+  get outgoingEngineeringPortConnections {
+    final manager = $$EngineeringPortConnectionsTableTableManager(
+      $_db,
+      $_db.engineeringPortConnections,
+    ).filter((f) => f.fromPortId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _outgoingEngineeringPortConnectionsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $EngineeringPortConnectionsTable,
+    List<EngineeringPortConnectionRow>
+  >
+  _incomingEngineeringPortConnectionsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.engineeringPortConnections,
+    aliasName:
+        'engineering_port_instances__id__engineering_port_connections__to_port_id',
+  );
+
+  $$EngineeringPortConnectionsTableProcessedTableManager
+  get incomingEngineeringPortConnections {
+    final manager = $$EngineeringPortConnectionsTableTableManager(
+      $_db,
+      $_db.engineeringPortConnections,
+    ).filter((f) => f.toPortId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _incomingEngineeringPortConnectionsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $EngineeringInternalMappingsTable,
+    List<EngineeringInternalMappingRow>
+  >
+  _outgoingEngineeringInternalMappingsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.engineeringInternalMappings,
+    aliasName:
+        'engineering_port_instances__id__engineering_internal_mappings__from_port_id',
+  );
+
+  $$EngineeringInternalMappingsTableProcessedTableManager
+  get outgoingEngineeringInternalMappings {
+    final manager = $$EngineeringInternalMappingsTableTableManager(
+      $_db,
+      $_db.engineeringInternalMappings,
+    ).filter((f) => f.fromPortId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _outgoingEngineeringInternalMappingsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $EngineeringInternalMappingsTable,
+    List<EngineeringInternalMappingRow>
+  >
+  _incomingEngineeringInternalMappingsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.engineeringInternalMappings,
+    aliasName:
+        'engineering_port_instances__id__engineering_internal_mappings__to_port_id',
+  );
+
+  $$EngineeringInternalMappingsTableProcessedTableManager
+  get incomingEngineeringInternalMappings {
+    final manager = $$EngineeringInternalMappingsTableTableManager(
+      $_db,
+      $_db.engineeringInternalMappings,
+    ).filter((f) => f.toPortId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _incomingEngineeringInternalMappingsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $CableTerminationMappingsTable,
+    List<CableTerminationMappingRow>
+  >
+  _cableTerminationMappingsRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.cableTerminationMappings,
+    aliasName:
+        'engineering_port_instances__id__cable_termination_mappings__endpoint_port_id',
+  );
+
+  $$CableTerminationMappingsTableProcessedTableManager
+  get cableTerminationMappingsRefs {
+    final manager = $$CableTerminationMappingsTableTableManager(
+      $_db,
+      $_db.cableTerminationMappings,
+    ).filter((f) => f.endpointPortId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _cableTerminationMappingsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$EngineeringPortInstancesTableFilterComposer
@@ -60802,6 +65462,199 @@ class $$EngineeringPortInstancesTableFilterComposer
           ),
     );
     return composer;
+  }
+
+  Expression<bool> topologyGroupsStartingAtPort(
+    Expression<bool> Function($$EngineeringTopologyGroupsTableFilterComposer f)
+    f,
+  ) {
+    final $$EngineeringTopologyGroupsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.engineeringTopologyGroups,
+          getReferencedColumn: (t) => t.startPortId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EngineeringTopologyGroupsTableFilterComposer(
+                $db: $db,
+                $table: $db.engineeringTopologyGroups,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> topologyGroupsEndingAtPort(
+    Expression<bool> Function($$EngineeringTopologyGroupsTableFilterComposer f)
+    f,
+  ) {
+    final $$EngineeringTopologyGroupsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.engineeringTopologyGroups,
+          getReferencedColumn: (t) => t.endPortId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EngineeringTopologyGroupsTableFilterComposer(
+                $db: $db,
+                $table: $db.engineeringTopologyGroups,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> outgoingEngineeringPortConnections(
+    Expression<bool> Function($$EngineeringPortConnectionsTableFilterComposer f)
+    f,
+  ) {
+    final $$EngineeringPortConnectionsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.engineeringPortConnections,
+          getReferencedColumn: (t) => t.fromPortId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EngineeringPortConnectionsTableFilterComposer(
+                $db: $db,
+                $table: $db.engineeringPortConnections,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> incomingEngineeringPortConnections(
+    Expression<bool> Function($$EngineeringPortConnectionsTableFilterComposer f)
+    f,
+  ) {
+    final $$EngineeringPortConnectionsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.engineeringPortConnections,
+          getReferencedColumn: (t) => t.toPortId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EngineeringPortConnectionsTableFilterComposer(
+                $db: $db,
+                $table: $db.engineeringPortConnections,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> outgoingEngineeringInternalMappings(
+    Expression<bool> Function(
+      $$EngineeringInternalMappingsTableFilterComposer f,
+    )
+    f,
+  ) {
+    final $$EngineeringInternalMappingsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.engineeringInternalMappings,
+          getReferencedColumn: (t) => t.fromPortId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EngineeringInternalMappingsTableFilterComposer(
+                $db: $db,
+                $table: $db.engineeringInternalMappings,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> incomingEngineeringInternalMappings(
+    Expression<bool> Function(
+      $$EngineeringInternalMappingsTableFilterComposer f,
+    )
+    f,
+  ) {
+    final $$EngineeringInternalMappingsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.engineeringInternalMappings,
+          getReferencedColumn: (t) => t.toPortId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EngineeringInternalMappingsTableFilterComposer(
+                $db: $db,
+                $table: $db.engineeringInternalMappings,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> cableTerminationMappingsRefs(
+    Expression<bool> Function($$CableTerminationMappingsTableFilterComposer f)
+    f,
+  ) {
+    final $$CableTerminationMappingsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.cableTerminationMappings,
+          getReferencedColumn: (t) => t.endpointPortId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CableTerminationMappingsTableFilterComposer(
+                $db: $db,
+                $table: $db.cableTerminationMappings,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
   }
 }
 
@@ -60984,6 +65837,203 @@ class $$EngineeringPortInstancesTableAnnotationComposer
         );
     return composer;
   }
+
+  Expression<T> topologyGroupsStartingAtPort<T extends Object>(
+    Expression<T> Function($$EngineeringTopologyGroupsTableAnnotationComposer a)
+    f,
+  ) {
+    final $$EngineeringTopologyGroupsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.engineeringTopologyGroups,
+          getReferencedColumn: (t) => t.startPortId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EngineeringTopologyGroupsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.engineeringTopologyGroups,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> topologyGroupsEndingAtPort<T extends Object>(
+    Expression<T> Function($$EngineeringTopologyGroupsTableAnnotationComposer a)
+    f,
+  ) {
+    final $$EngineeringTopologyGroupsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.engineeringTopologyGroups,
+          getReferencedColumn: (t) => t.endPortId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EngineeringTopologyGroupsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.engineeringTopologyGroups,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> outgoingEngineeringPortConnections<T extends Object>(
+    Expression<T> Function(
+      $$EngineeringPortConnectionsTableAnnotationComposer a,
+    )
+    f,
+  ) {
+    final $$EngineeringPortConnectionsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.engineeringPortConnections,
+          getReferencedColumn: (t) => t.fromPortId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EngineeringPortConnectionsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.engineeringPortConnections,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> incomingEngineeringPortConnections<T extends Object>(
+    Expression<T> Function(
+      $$EngineeringPortConnectionsTableAnnotationComposer a,
+    )
+    f,
+  ) {
+    final $$EngineeringPortConnectionsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.engineeringPortConnections,
+          getReferencedColumn: (t) => t.toPortId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EngineeringPortConnectionsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.engineeringPortConnections,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> outgoingEngineeringInternalMappings<T extends Object>(
+    Expression<T> Function(
+      $$EngineeringInternalMappingsTableAnnotationComposer a,
+    )
+    f,
+  ) {
+    final $$EngineeringInternalMappingsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.engineeringInternalMappings,
+          getReferencedColumn: (t) => t.fromPortId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EngineeringInternalMappingsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.engineeringInternalMappings,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> incomingEngineeringInternalMappings<T extends Object>(
+    Expression<T> Function(
+      $$EngineeringInternalMappingsTableAnnotationComposer a,
+    )
+    f,
+  ) {
+    final $$EngineeringInternalMappingsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.engineeringInternalMappings,
+          getReferencedColumn: (t) => t.toPortId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EngineeringInternalMappingsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.engineeringInternalMappings,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> cableTerminationMappingsRefs<T extends Object>(
+    Expression<T> Function($$CableTerminationMappingsTableAnnotationComposer a)
+    f,
+  ) {
+    final $$CableTerminationMappingsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.cableTerminationMappings,
+          getReferencedColumn: (t) => t.endpointPortId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CableTerminationMappingsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.cableTerminationMappings,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$EngineeringPortInstancesTableTableManager
@@ -61002,7 +66052,17 @@ class $$EngineeringPortInstancesTableTableManager
             $$EngineeringPortInstancesTableReferences,
           ),
           EngineeringPortInstanceRow,
-          PrefetchHooks Function({bool projectId, bool componentId})
+          PrefetchHooks Function({
+            bool projectId,
+            bool componentId,
+            bool topologyGroupsStartingAtPort,
+            bool topologyGroupsEndingAtPort,
+            bool outgoingEngineeringPortConnections,
+            bool incomingEngineeringPortConnections,
+            bool outgoingEngineeringInternalMappings,
+            bool incomingEngineeringInternalMappings,
+            bool cableTerminationMappingsRefs,
+          })
         > {
   $$EngineeringPortInstancesTableTableManager(
     _$AppDatabase db,
@@ -61095,10 +66155,32 @@ class $$EngineeringPortInstancesTableTableManager
                         ),
                       )
                       .toList(),
-          prefetchHooksCallback: ({projectId = false, componentId = false}) {
+          prefetchHooksCallback: ({
+            projectId = false,
+            componentId = false,
+            topologyGroupsStartingAtPort = false,
+            topologyGroupsEndingAtPort = false,
+            outgoingEngineeringPortConnections = false,
+            incomingEngineeringPortConnections = false,
+            outgoingEngineeringInternalMappings = false,
+            incomingEngineeringInternalMappings = false,
+            cableTerminationMappingsRefs = false,
+          }) {
             return PrefetchHooks(
               db: db,
-              explicitlyWatchedTables: [],
+              explicitlyWatchedTables: [
+                if (topologyGroupsStartingAtPort) db.engineeringTopologyGroups,
+                if (topologyGroupsEndingAtPort) db.engineeringTopologyGroups,
+                if (outgoingEngineeringPortConnections)
+                  db.engineeringPortConnections,
+                if (incomingEngineeringPortConnections)
+                  db.engineeringPortConnections,
+                if (outgoingEngineeringInternalMappings)
+                  db.engineeringInternalMappings,
+                if (incomingEngineeringInternalMappings)
+                  db.engineeringInternalMappings,
+                if (cableTerminationMappingsRefs) db.cableTerminationMappings,
+              ],
               addJoins: <
                 T extends TableManagerState<
                   dynamic,
@@ -61148,7 +66230,162 @@ class $$EngineeringPortInstancesTableTableManager
                 return state;
               },
               getPrefetchedDataCallback: (items) async {
-                return [];
+                return [
+                  if (topologyGroupsStartingAtPort)
+                    await $_getPrefetchedData<
+                      EngineeringPortInstanceRow,
+                      $EngineeringPortInstancesTable,
+                      EngineeringTopologyGroupRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$EngineeringPortInstancesTableReferences
+                          ._topologyGroupsStartingAtPortTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$EngineeringPortInstancesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).topologyGroupsStartingAtPort,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.startPortId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                  if (topologyGroupsEndingAtPort)
+                    await $_getPrefetchedData<
+                      EngineeringPortInstanceRow,
+                      $EngineeringPortInstancesTable,
+                      EngineeringTopologyGroupRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$EngineeringPortInstancesTableReferences
+                          ._topologyGroupsEndingAtPortTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$EngineeringPortInstancesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).topologyGroupsEndingAtPort,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.endPortId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                  if (outgoingEngineeringPortConnections)
+                    await $_getPrefetchedData<
+                      EngineeringPortInstanceRow,
+                      $EngineeringPortInstancesTable,
+                      EngineeringPortConnectionRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$EngineeringPortInstancesTableReferences
+                          ._outgoingEngineeringPortConnectionsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$EngineeringPortInstancesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).outgoingEngineeringPortConnections,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.fromPortId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                  if (incomingEngineeringPortConnections)
+                    await $_getPrefetchedData<
+                      EngineeringPortInstanceRow,
+                      $EngineeringPortInstancesTable,
+                      EngineeringPortConnectionRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$EngineeringPortInstancesTableReferences
+                          ._incomingEngineeringPortConnectionsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$EngineeringPortInstancesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).incomingEngineeringPortConnections,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.toPortId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                  if (outgoingEngineeringInternalMappings)
+                    await $_getPrefetchedData<
+                      EngineeringPortInstanceRow,
+                      $EngineeringPortInstancesTable,
+                      EngineeringInternalMappingRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$EngineeringPortInstancesTableReferences
+                          ._outgoingEngineeringInternalMappingsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$EngineeringPortInstancesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).outgoingEngineeringInternalMappings,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.fromPortId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                  if (incomingEngineeringInternalMappings)
+                    await $_getPrefetchedData<
+                      EngineeringPortInstanceRow,
+                      $EngineeringPortInstancesTable,
+                      EngineeringInternalMappingRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$EngineeringPortInstancesTableReferences
+                          ._incomingEngineeringInternalMappingsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$EngineeringPortInstancesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).incomingEngineeringInternalMappings,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.toPortId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                  if (cableTerminationMappingsRefs)
+                    await $_getPrefetchedData<
+                      EngineeringPortInstanceRow,
+                      $EngineeringPortInstancesTable,
+                      CableTerminationMappingRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$EngineeringPortInstancesTableReferences
+                          ._cableTerminationMappingsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$EngineeringPortInstancesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).cableTerminationMappingsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.endpointPortId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
               },
             );
           },
@@ -61168,7 +66405,17 @@ typedef $$EngineeringPortInstancesTableProcessedTableManager =
       $$EngineeringPortInstancesTableUpdateCompanionBuilder,
       (EngineeringPortInstanceRow, $$EngineeringPortInstancesTableReferences),
       EngineeringPortInstanceRow,
-      PrefetchHooks Function({bool projectId, bool componentId})
+      PrefetchHooks Function({
+        bool projectId,
+        bool componentId,
+        bool topologyGroupsStartingAtPort,
+        bool topologyGroupsEndingAtPort,
+        bool outgoingEngineeringPortConnections,
+        bool incomingEngineeringPortConnections,
+        bool outgoingEngineeringInternalMappings,
+        bool incomingEngineeringInternalMappings,
+        bool cableTerminationMappingsRefs,
+      })
     >;
 typedef $$EngineeringCompatibilityProfilesTableCreateCompanionBuilder =
     EngineeringCompatibilityProfilesCompanion Function({
@@ -64067,6 +69314,30 @@ final class $$EngineeringPortConnectionsTableReferences
       manager.$state.copyWith(prefetchedData: [item]),
     );
   }
+
+  static MultiTypedResultKey<$CableAllocationsTable, List<CableAllocationRow>>
+  _cableAllocationsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.cableAllocations,
+    aliasName:
+        'engineering_port_connections__id__cable_allocations__engineering_connection_id',
+  );
+
+  $$CableAllocationsTableProcessedTableManager get cableAllocationsRefs {
+    final manager = $$CableAllocationsTableTableManager(
+      $_db,
+      $_db.cableAllocations,
+    ).filter(
+      (f) =>
+          f.engineeringConnectionId.id.sqlEquals($_itemColumn<String>('id')!),
+    );
+
+    final cache = $_typedResult.readTableOrNull(
+      _cableAllocationsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$EngineeringPortConnectionsTableFilterComposer
@@ -64254,6 +69525,31 @@ class $$EngineeringPortConnectionsTableFilterComposer
               ),
         );
     return composer;
+  }
+
+  Expression<bool> cableAllocationsRefs(
+    Expression<bool> Function($$CableAllocationsTableFilterComposer f) f,
+  ) {
+    final $$CableAllocationsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.cableAllocations,
+      getReferencedColumn: (t) => t.engineeringConnectionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableAllocationsTableFilterComposer(
+            $db: $db,
+            $table: $db.cableAllocations,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
   }
 }
 
@@ -64621,6 +69917,31 @@ class $$EngineeringPortConnectionsTableAnnotationComposer
         );
     return composer;
   }
+
+  Expression<T> cableAllocationsRefs<T extends Object>(
+    Expression<T> Function($$CableAllocationsTableAnnotationComposer a) f,
+  ) {
+    final $$CableAllocationsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.cableAllocations,
+      getReferencedColumn: (t) => t.engineeringConnectionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableAllocationsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.cableAllocations,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$EngineeringPortConnectionsTableTableManager
@@ -64646,6 +69967,7 @@ class $$EngineeringPortConnectionsTableTableManager
             bool toPortId,
             bool profileId,
             bool groupId,
+            bool cableAllocationsRefs,
           })
         > {
   $$EngineeringPortConnectionsTableTableManager(
@@ -64758,10 +70080,13 @@ class $$EngineeringPortConnectionsTableTableManager
             toPortId = false,
             profileId = false,
             groupId = false,
+            cableAllocationsRefs = false,
           }) {
             return PrefetchHooks(
               db: db,
-              explicitlyWatchedTables: [],
+              explicitlyWatchedTables: [
+                if (cableAllocationsRefs) db.cableAllocations,
+              ],
               addJoins: <
                 T extends TableManagerState<
                   dynamic,
@@ -64871,7 +70196,31 @@ class $$EngineeringPortConnectionsTableTableManager
                 return state;
               },
               getPrefetchedDataCallback: (items) async {
-                return [];
+                return [
+                  if (cableAllocationsRefs)
+                    await $_getPrefetchedData<
+                      EngineeringPortConnectionRow,
+                      $EngineeringPortConnectionsTable,
+                      CableAllocationRow
+                    >(
+                      currentTable: table,
+                      referencedTable:
+                          $$EngineeringPortConnectionsTableReferences
+                              ._cableAllocationsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$EngineeringPortConnectionsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).cableAllocationsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.engineeringConnectionId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
               },
             );
           },
@@ -64901,6 +70250,7 @@ typedef $$EngineeringPortConnectionsTableProcessedTableManager =
         bool toPortId,
         bool profileId,
         bool groupId,
+        bool cableAllocationsRefs,
       })
     >;
 typedef $$EngineeringInternalMappingsTableCreateCompanionBuilder =
@@ -66768,6 +72118,3696 @@ typedef $$EngineeringPlacementOperationsTableProcessedTableManager =
       EngineeringPlacementOperationRow,
       PrefetchHooks Function({bool projectId, bool componentId})
     >;
+typedef $$ElvCablesTableCreateCompanionBuilder =
+    ElvCablesCompanion Function({
+      Value<int> revision,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<DateTime?> deletedAt,
+      required String originDeviceId,
+      required String id,
+      required String projectId,
+      required String label,
+      required String normalizedLabel,
+      required String name,
+      required String definitionCatalogId,
+      required String definitionCatalogVersion,
+      required String definitionCode,
+      required String definitionContentHash,
+      required String lifecycleState,
+      Value<int> rowid,
+    });
+typedef $$ElvCablesTableUpdateCompanionBuilder =
+    ElvCablesCompanion Function({
+      Value<int> revision,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<String> originDeviceId,
+      Value<String> id,
+      Value<String> projectId,
+      Value<String> label,
+      Value<String> normalizedLabel,
+      Value<String> name,
+      Value<String> definitionCatalogId,
+      Value<String> definitionCatalogVersion,
+      Value<String> definitionCode,
+      Value<String> definitionContentHash,
+      Value<String> lifecycleState,
+      Value<int> rowid,
+    });
+
+final class $$ElvCablesTableReferences
+    extends BaseReferences<_$AppDatabase, $ElvCablesTable, ElvCableRow> {
+  $$ElvCablesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $ProjectsTable _projectIdTable(_$AppDatabase db) =>
+      db.projects.createAlias('elv_cables__project_id__projects__id');
+
+  $$ProjectsTableProcessedTableManager get projectId {
+    final $_column = $_itemColumn<String>('project_id')!;
+
+    final manager = $$ProjectsTableTableManager(
+      $_db,
+      $_db.projects,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_projectIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $EngineeringReferenceCatalogsTable _definitionCatalogIdTable(
+    _$AppDatabase db,
+  ) => db.engineeringReferenceCatalogs.createAlias(
+    'elv_cables__definition_catalog_id__engineering_reference_catalogs__id',
+  );
+
+  $$EngineeringReferenceCatalogsTableProcessedTableManager
+  get definitionCatalogId {
+    final $_column = $_itemColumn<String>('definition_catalog_id')!;
+
+    final manager = $$EngineeringReferenceCatalogsTableTableManager(
+      $_db,
+      $_db.engineeringReferenceCatalogs,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_definitionCatalogIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$CableAllocationsTable, List<CableAllocationRow>>
+  _cableAllocationsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.cableAllocations,
+    aliasName: 'elv_cables__id__cable_allocations__cable_id',
+  );
+
+  $$CableAllocationsTableProcessedTableManager get cableAllocationsRefs {
+    final manager = $$CableAllocationsTableTableManager(
+      $_db,
+      $_db.cableAllocations,
+    ).filter((f) => f.cableId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _cableAllocationsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $CableResourceClaimsTable,
+    List<CableResourceClaimRow>
+  >
+  _cableResourceClaimsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.cableResourceClaims,
+        aliasName: 'elv_cables__id__cable_resource_claims__cable_id',
+      );
+
+  $$CableResourceClaimsTableProcessedTableManager get cableResourceClaimsRefs {
+    final manager = $$CableResourceClaimsTableTableManager(
+      $_db,
+      $_db.cableResourceClaims,
+    ).filter((f) => f.cableId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _cableResourceClaimsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$ElvCablesTableFilterComposer
+    extends Composer<_$AppDatabase, $ElvCablesTable> {
+  $$ElvCablesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get revision => $composableBuilder(
+    column: $table.revision,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get label => $composableBuilder(
+    column: $table.label,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get normalizedLabel => $composableBuilder(
+    column: $table.normalizedLabel,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get definitionCatalogVersion => $composableBuilder(
+    column: $table.definitionCatalogVersion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get definitionCode => $composableBuilder(
+    column: $table.definitionCode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get definitionContentHash => $composableBuilder(
+    column: $table.definitionContentHash,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lifecycleState => $composableBuilder(
+    column: $table.lifecycleState,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProjectsTableFilterComposer get projectId {
+    final $$ProjectsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableFilterComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$EngineeringReferenceCatalogsTableFilterComposer get definitionCatalogId {
+    final $$EngineeringReferenceCatalogsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.definitionCatalogId,
+          referencedTable: $db.engineeringReferenceCatalogs,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EngineeringReferenceCatalogsTableFilterComposer(
+                $db: $db,
+                $table: $db.engineeringReferenceCatalogs,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  Expression<bool> cableAllocationsRefs(
+    Expression<bool> Function($$CableAllocationsTableFilterComposer f) f,
+  ) {
+    final $$CableAllocationsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.cableAllocations,
+      getReferencedColumn: (t) => t.cableId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableAllocationsTableFilterComposer(
+            $db: $db,
+            $table: $db.cableAllocations,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> cableResourceClaimsRefs(
+    Expression<bool> Function($$CableResourceClaimsTableFilterComposer f) f,
+  ) {
+    final $$CableResourceClaimsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.cableResourceClaims,
+      getReferencedColumn: (t) => t.cableId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableResourceClaimsTableFilterComposer(
+            $db: $db,
+            $table: $db.cableResourceClaims,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$ElvCablesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ElvCablesTable> {
+  $$ElvCablesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get revision => $composableBuilder(
+    column: $table.revision,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get label => $composableBuilder(
+    column: $table.label,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get normalizedLabel => $composableBuilder(
+    column: $table.normalizedLabel,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get definitionCatalogVersion => $composableBuilder(
+    column: $table.definitionCatalogVersion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get definitionCode => $composableBuilder(
+    column: $table.definitionCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get definitionContentHash => $composableBuilder(
+    column: $table.definitionContentHash,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get lifecycleState => $composableBuilder(
+    column: $table.lifecycleState,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProjectsTableOrderingComposer get projectId {
+    final $$ProjectsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableOrderingComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$EngineeringReferenceCatalogsTableOrderingComposer get definitionCatalogId {
+    final $$EngineeringReferenceCatalogsTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.definitionCatalogId,
+          referencedTable: $db.engineeringReferenceCatalogs,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EngineeringReferenceCatalogsTableOrderingComposer(
+                $db: $db,
+                $table: $db.engineeringReferenceCatalogs,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$ElvCablesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ElvCablesTable> {
+  $$ElvCablesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get revision =>
+      $composableBuilder(column: $table.revision, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get label =>
+      $composableBuilder(column: $table.label, builder: (column) => column);
+
+  GeneratedColumn<String> get normalizedLabel => $composableBuilder(
+    column: $table.normalizedLabel,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get definitionCatalogVersion => $composableBuilder(
+    column: $table.definitionCatalogVersion,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get definitionCode => $composableBuilder(
+    column: $table.definitionCode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get definitionContentHash => $composableBuilder(
+    column: $table.definitionContentHash,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get lifecycleState => $composableBuilder(
+    column: $table.lifecycleState,
+    builder: (column) => column,
+  );
+
+  $$ProjectsTableAnnotationComposer get projectId {
+    final $$ProjectsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$EngineeringReferenceCatalogsTableAnnotationComposer
+  get definitionCatalogId {
+    final $$EngineeringReferenceCatalogsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.definitionCatalogId,
+          referencedTable: $db.engineeringReferenceCatalogs,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EngineeringReferenceCatalogsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.engineeringReferenceCatalogs,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  Expression<T> cableAllocationsRefs<T extends Object>(
+    Expression<T> Function($$CableAllocationsTableAnnotationComposer a) f,
+  ) {
+    final $$CableAllocationsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.cableAllocations,
+      getReferencedColumn: (t) => t.cableId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableAllocationsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.cableAllocations,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> cableResourceClaimsRefs<T extends Object>(
+    Expression<T> Function($$CableResourceClaimsTableAnnotationComposer a) f,
+  ) {
+    final $$CableResourceClaimsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.cableResourceClaims,
+          getReferencedColumn: (t) => t.cableId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CableResourceClaimsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.cableResourceClaims,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$ElvCablesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ElvCablesTable,
+          ElvCableRow,
+          $$ElvCablesTableFilterComposer,
+          $$ElvCablesTableOrderingComposer,
+          $$ElvCablesTableAnnotationComposer,
+          $$ElvCablesTableCreateCompanionBuilder,
+          $$ElvCablesTableUpdateCompanionBuilder,
+          (ElvCableRow, $$ElvCablesTableReferences),
+          ElvCableRow,
+          PrefetchHooks Function({
+            bool projectId,
+            bool definitionCatalogId,
+            bool cableAllocationsRefs,
+            bool cableResourceClaimsRefs,
+          })
+        > {
+  $$ElvCablesTableTableManager(_$AppDatabase db, $ElvCablesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$ElvCablesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer:
+              () => $$ElvCablesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer:
+              () => $$ElvCablesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> revision = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<String> originDeviceId = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> projectId = const Value.absent(),
+                Value<String> label = const Value.absent(),
+                Value<String> normalizedLabel = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> definitionCatalogId = const Value.absent(),
+                Value<String> definitionCatalogVersion = const Value.absent(),
+                Value<String> definitionCode = const Value.absent(),
+                Value<String> definitionContentHash = const Value.absent(),
+                Value<String> lifecycleState = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ElvCablesCompanion(
+                revision: revision,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                originDeviceId: originDeviceId,
+                id: id,
+                projectId: projectId,
+                label: label,
+                normalizedLabel: normalizedLabel,
+                name: name,
+                definitionCatalogId: definitionCatalogId,
+                definitionCatalogVersion: definitionCatalogVersion,
+                definitionCode: definitionCode,
+                definitionContentHash: definitionContentHash,
+                lifecycleState: lifecycleState,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> revision = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<DateTime?> deletedAt = const Value.absent(),
+                required String originDeviceId,
+                required String id,
+                required String projectId,
+                required String label,
+                required String normalizedLabel,
+                required String name,
+                required String definitionCatalogId,
+                required String definitionCatalogVersion,
+                required String definitionCode,
+                required String definitionContentHash,
+                required String lifecycleState,
+                Value<int> rowid = const Value.absent(),
+              }) => ElvCablesCompanion.insert(
+                revision: revision,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                originDeviceId: originDeviceId,
+                id: id,
+                projectId: projectId,
+                label: label,
+                normalizedLabel: normalizedLabel,
+                name: name,
+                definitionCatalogId: definitionCatalogId,
+                definitionCatalogVersion: definitionCatalogVersion,
+                definitionCode: definitionCode,
+                definitionContentHash: definitionContentHash,
+                lifecycleState: lifecycleState,
+                rowid: rowid,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable<$ElvCablesTable, ElvCableRow>(table),
+                          $$ElvCablesTableReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: ({
+            projectId = false,
+            definitionCatalogId = false,
+            cableAllocationsRefs = false,
+            cableResourceClaimsRefs = false,
+          }) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (cableAllocationsRefs) db.cableAllocations,
+                if (cableResourceClaimsRefs) db.cableResourceClaims,
+              ],
+              addJoins: <
+                T extends TableManagerState<
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic
+                >
+              >(state) {
+                if (projectId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.projectId,
+                            referencedTable: $$ElvCablesTableReferences
+                                ._projectIdTable(db),
+                            referencedColumn:
+                                $$ElvCablesTableReferences
+                                    ._projectIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+                if (definitionCatalogId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.definitionCatalogId,
+                            referencedTable: $$ElvCablesTableReferences
+                                ._definitionCatalogIdTable(db),
+                            referencedColumn:
+                                $$ElvCablesTableReferences
+                                    ._definitionCatalogIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (cableAllocationsRefs)
+                    await $_getPrefetchedData<
+                      ElvCableRow,
+                      $ElvCablesTable,
+                      CableAllocationRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$ElvCablesTableReferences
+                          ._cableAllocationsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$ElvCablesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).cableAllocationsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.cableId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                  if (cableResourceClaimsRefs)
+                    await $_getPrefetchedData<
+                      ElvCableRow,
+                      $ElvCablesTable,
+                      CableResourceClaimRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$ElvCablesTableReferences
+                          ._cableResourceClaimsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$ElvCablesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).cableResourceClaimsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.cableId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ElvCablesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ElvCablesTable,
+      ElvCableRow,
+      $$ElvCablesTableFilterComposer,
+      $$ElvCablesTableOrderingComposer,
+      $$ElvCablesTableAnnotationComposer,
+      $$ElvCablesTableCreateCompanionBuilder,
+      $$ElvCablesTableUpdateCompanionBuilder,
+      (ElvCableRow, $$ElvCablesTableReferences),
+      ElvCableRow,
+      PrefetchHooks Function({
+        bool projectId,
+        bool definitionCatalogId,
+        bool cableAllocationsRefs,
+        bool cableResourceClaimsRefs,
+      })
+    >;
+typedef $$CableAllocationsTableCreateCompanionBuilder =
+    CableAllocationsCompanion Function({
+      Value<int> revision,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<DateTime?> deletedAt,
+      required String originDeviceId,
+      required String id,
+      required String projectId,
+      required String engineeringConnectionId,
+      required String cableId,
+      required String lifecycleState,
+      Value<String?> transitionRef,
+      Value<int> rowid,
+    });
+typedef $$CableAllocationsTableUpdateCompanionBuilder =
+    CableAllocationsCompanion Function({
+      Value<int> revision,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<String> originDeviceId,
+      Value<String> id,
+      Value<String> projectId,
+      Value<String> engineeringConnectionId,
+      Value<String> cableId,
+      Value<String> lifecycleState,
+      Value<String?> transitionRef,
+      Value<int> rowid,
+    });
+
+final class $$CableAllocationsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $CableAllocationsTable,
+          CableAllocationRow
+        > {
+  $$CableAllocationsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProjectsTable _projectIdTable(_$AppDatabase db) =>
+      db.projects.createAlias('cable_allocations__project_id__projects__id');
+
+  $$ProjectsTableProcessedTableManager get projectId {
+    final $_column = $_itemColumn<String>('project_id')!;
+
+    final manager = $$ProjectsTableTableManager(
+      $_db,
+      $_db.projects,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_projectIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $EngineeringPortConnectionsTable _engineeringConnectionIdTable(
+    _$AppDatabase db,
+  ) => db.engineeringPortConnections.createAlias(
+    'cable_allocations__engineering_connection_id__engineering_port_connections__id',
+  );
+
+  $$EngineeringPortConnectionsTableProcessedTableManager
+  get engineeringConnectionId {
+    final $_column = $_itemColumn<String>('engineering_connection_id')!;
+
+    final manager = $$EngineeringPortConnectionsTableTableManager(
+      $_db,
+      $_db.engineeringPortConnections,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(
+      _engineeringConnectionIdTable($_db),
+    );
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $ElvCablesTable _cableIdTable(_$AppDatabase db) =>
+      db.elvCables.createAlias('cable_allocations__cable_id__elv_cables__id');
+
+  $$ElvCablesTableProcessedTableManager get cableId {
+    final $_column = $_itemColumn<String>('cable_id')!;
+
+    final manager = $$ElvCablesTableTableManager(
+      $_db,
+      $_db.elvCables,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_cableIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $CableAllocationResourceSelectionsTable,
+    List<CableAllocationResourceSelectionRow>
+  >
+  _cableAllocationResourceSelectionsRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.cableAllocationResourceSelections,
+    aliasName:
+        'cable_allocations__id__cable_allocation_resource_selections__allocation_id',
+  );
+
+  $$CableAllocationResourceSelectionsTableProcessedTableManager
+  get cableAllocationResourceSelectionsRefs {
+    final manager = $$CableAllocationResourceSelectionsTableTableManager(
+      $_db,
+      $_db.cableAllocationResourceSelections,
+    ).filter((f) => f.allocationId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _cableAllocationResourceSelectionsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $CableResourceClaimsTable,
+    List<CableResourceClaimRow>
+  >
+  _cableResourceClaimsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.cableResourceClaims,
+        aliasName:
+            'cable_allocations__id__cable_resource_claims__allocation_id',
+      );
+
+  $$CableResourceClaimsTableProcessedTableManager get cableResourceClaimsRefs {
+    final manager = $$CableResourceClaimsTableTableManager(
+      $_db,
+      $_db.cableResourceClaims,
+    ).filter((f) => f.allocationId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _cableResourceClaimsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $CableTerminationMappingsTable,
+    List<CableTerminationMappingRow>
+  >
+  _cableTerminationMappingsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.cableTerminationMappings,
+        aliasName:
+            'cable_allocations__id__cable_termination_mappings__allocation_id',
+      );
+
+  $$CableTerminationMappingsTableProcessedTableManager
+  get cableTerminationMappingsRefs {
+    final manager = $$CableTerminationMappingsTableTableManager(
+      $_db,
+      $_db.cableTerminationMappings,
+    ).filter((f) => f.allocationId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _cableTerminationMappingsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$CableAllocationsTableFilterComposer
+    extends Composer<_$AppDatabase, $CableAllocationsTable> {
+  $$CableAllocationsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get revision => $composableBuilder(
+    column: $table.revision,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lifecycleState => $composableBuilder(
+    column: $table.lifecycleState,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get transitionRef => $composableBuilder(
+    column: $table.transitionRef,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProjectsTableFilterComposer get projectId {
+    final $$ProjectsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableFilterComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$EngineeringPortConnectionsTableFilterComposer get engineeringConnectionId {
+    final $$EngineeringPortConnectionsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.engineeringConnectionId,
+          referencedTable: $db.engineeringPortConnections,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EngineeringPortConnectionsTableFilterComposer(
+                $db: $db,
+                $table: $db.engineeringPortConnections,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$ElvCablesTableFilterComposer get cableId {
+    final $$ElvCablesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.cableId,
+      referencedTable: $db.elvCables,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ElvCablesTableFilterComposer(
+            $db: $db,
+            $table: $db.elvCables,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> cableAllocationResourceSelectionsRefs(
+    Expression<bool> Function(
+      $$CableAllocationResourceSelectionsTableFilterComposer f,
+    )
+    f,
+  ) {
+    final $$CableAllocationResourceSelectionsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.cableAllocationResourceSelections,
+          getReferencedColumn: (t) => t.allocationId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CableAllocationResourceSelectionsTableFilterComposer(
+                $db: $db,
+                $table: $db.cableAllocationResourceSelections,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> cableResourceClaimsRefs(
+    Expression<bool> Function($$CableResourceClaimsTableFilterComposer f) f,
+  ) {
+    final $$CableResourceClaimsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.cableResourceClaims,
+      getReferencedColumn: (t) => t.allocationId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableResourceClaimsTableFilterComposer(
+            $db: $db,
+            $table: $db.cableResourceClaims,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> cableTerminationMappingsRefs(
+    Expression<bool> Function($$CableTerminationMappingsTableFilterComposer f)
+    f,
+  ) {
+    final $$CableTerminationMappingsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.cableTerminationMappings,
+          getReferencedColumn: (t) => t.allocationId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CableTerminationMappingsTableFilterComposer(
+                $db: $db,
+                $table: $db.cableTerminationMappings,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$CableAllocationsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CableAllocationsTable> {
+  $$CableAllocationsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get revision => $composableBuilder(
+    column: $table.revision,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get lifecycleState => $composableBuilder(
+    column: $table.lifecycleState,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get transitionRef => $composableBuilder(
+    column: $table.transitionRef,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProjectsTableOrderingComposer get projectId {
+    final $$ProjectsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableOrderingComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$EngineeringPortConnectionsTableOrderingComposer
+  get engineeringConnectionId {
+    final $$EngineeringPortConnectionsTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.engineeringConnectionId,
+          referencedTable: $db.engineeringPortConnections,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EngineeringPortConnectionsTableOrderingComposer(
+                $db: $db,
+                $table: $db.engineeringPortConnections,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$ElvCablesTableOrderingComposer get cableId {
+    final $$ElvCablesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.cableId,
+      referencedTable: $db.elvCables,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ElvCablesTableOrderingComposer(
+            $db: $db,
+            $table: $db.elvCables,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CableAllocationsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CableAllocationsTable> {
+  $$CableAllocationsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get revision =>
+      $composableBuilder(column: $table.revision, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get lifecycleState => $composableBuilder(
+    column: $table.lifecycleState,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get transitionRef => $composableBuilder(
+    column: $table.transitionRef,
+    builder: (column) => column,
+  );
+
+  $$ProjectsTableAnnotationComposer get projectId {
+    final $$ProjectsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$EngineeringPortConnectionsTableAnnotationComposer
+  get engineeringConnectionId {
+    final $$EngineeringPortConnectionsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.engineeringConnectionId,
+          referencedTable: $db.engineeringPortConnections,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EngineeringPortConnectionsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.engineeringPortConnections,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$ElvCablesTableAnnotationComposer get cableId {
+    final $$ElvCablesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.cableId,
+      referencedTable: $db.elvCables,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ElvCablesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.elvCables,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> cableAllocationResourceSelectionsRefs<T extends Object>(
+    Expression<T> Function(
+      $$CableAllocationResourceSelectionsTableAnnotationComposer a,
+    )
+    f,
+  ) {
+    final $$CableAllocationResourceSelectionsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.cableAllocationResourceSelections,
+          getReferencedColumn: (t) => t.allocationId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CableAllocationResourceSelectionsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.cableAllocationResourceSelections,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> cableResourceClaimsRefs<T extends Object>(
+    Expression<T> Function($$CableResourceClaimsTableAnnotationComposer a) f,
+  ) {
+    final $$CableResourceClaimsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.cableResourceClaims,
+          getReferencedColumn: (t) => t.allocationId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CableResourceClaimsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.cableResourceClaims,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> cableTerminationMappingsRefs<T extends Object>(
+    Expression<T> Function($$CableTerminationMappingsTableAnnotationComposer a)
+    f,
+  ) {
+    final $$CableTerminationMappingsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.cableTerminationMappings,
+          getReferencedColumn: (t) => t.allocationId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CableTerminationMappingsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.cableTerminationMappings,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$CableAllocationsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CableAllocationsTable,
+          CableAllocationRow,
+          $$CableAllocationsTableFilterComposer,
+          $$CableAllocationsTableOrderingComposer,
+          $$CableAllocationsTableAnnotationComposer,
+          $$CableAllocationsTableCreateCompanionBuilder,
+          $$CableAllocationsTableUpdateCompanionBuilder,
+          (CableAllocationRow, $$CableAllocationsTableReferences),
+          CableAllocationRow,
+          PrefetchHooks Function({
+            bool projectId,
+            bool engineeringConnectionId,
+            bool cableId,
+            bool cableAllocationResourceSelectionsRefs,
+            bool cableResourceClaimsRefs,
+            bool cableTerminationMappingsRefs,
+          })
+        > {
+  $$CableAllocationsTableTableManager(
+    _$AppDatabase db,
+    $CableAllocationsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () =>
+                  $$CableAllocationsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer:
+              () => $$CableAllocationsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer:
+              () => $$CableAllocationsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> revision = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<String> originDeviceId = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> projectId = const Value.absent(),
+                Value<String> engineeringConnectionId = const Value.absent(),
+                Value<String> cableId = const Value.absent(),
+                Value<String> lifecycleState = const Value.absent(),
+                Value<String?> transitionRef = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CableAllocationsCompanion(
+                revision: revision,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                originDeviceId: originDeviceId,
+                id: id,
+                projectId: projectId,
+                engineeringConnectionId: engineeringConnectionId,
+                cableId: cableId,
+                lifecycleState: lifecycleState,
+                transitionRef: transitionRef,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> revision = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<DateTime?> deletedAt = const Value.absent(),
+                required String originDeviceId,
+                required String id,
+                required String projectId,
+                required String engineeringConnectionId,
+                required String cableId,
+                required String lifecycleState,
+                Value<String?> transitionRef = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CableAllocationsCompanion.insert(
+                revision: revision,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                originDeviceId: originDeviceId,
+                id: id,
+                projectId: projectId,
+                engineeringConnectionId: engineeringConnectionId,
+                cableId: cableId,
+                lifecycleState: lifecycleState,
+                transitionRef: transitionRef,
+                rowid: rowid,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable<
+                            $CableAllocationsTable,
+                            CableAllocationRow
+                          >(table),
+                          $$CableAllocationsTableReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: ({
+            projectId = false,
+            engineeringConnectionId = false,
+            cableId = false,
+            cableAllocationResourceSelectionsRefs = false,
+            cableResourceClaimsRefs = false,
+            cableTerminationMappingsRefs = false,
+          }) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (cableAllocationResourceSelectionsRefs)
+                  db.cableAllocationResourceSelections,
+                if (cableResourceClaimsRefs) db.cableResourceClaims,
+                if (cableTerminationMappingsRefs) db.cableTerminationMappings,
+              ],
+              addJoins: <
+                T extends TableManagerState<
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic
+                >
+              >(state) {
+                if (projectId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.projectId,
+                            referencedTable: $$CableAllocationsTableReferences
+                                ._projectIdTable(db),
+                            referencedColumn:
+                                $$CableAllocationsTableReferences
+                                    ._projectIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+                if (engineeringConnectionId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.engineeringConnectionId,
+                            referencedTable: $$CableAllocationsTableReferences
+                                ._engineeringConnectionIdTable(db),
+                            referencedColumn:
+                                $$CableAllocationsTableReferences
+                                    ._engineeringConnectionIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+                if (cableId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.cableId,
+                            referencedTable: $$CableAllocationsTableReferences
+                                ._cableIdTable(db),
+                            referencedColumn:
+                                $$CableAllocationsTableReferences
+                                    ._cableIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (cableAllocationResourceSelectionsRefs)
+                    await $_getPrefetchedData<
+                      CableAllocationRow,
+                      $CableAllocationsTable,
+                      CableAllocationResourceSelectionRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$CableAllocationsTableReferences
+                          ._cableAllocationResourceSelectionsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$CableAllocationsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).cableAllocationResourceSelectionsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.allocationId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                  if (cableResourceClaimsRefs)
+                    await $_getPrefetchedData<
+                      CableAllocationRow,
+                      $CableAllocationsTable,
+                      CableResourceClaimRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$CableAllocationsTableReferences
+                          ._cableResourceClaimsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$CableAllocationsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).cableResourceClaimsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.allocationId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                  if (cableTerminationMappingsRefs)
+                    await $_getPrefetchedData<
+                      CableAllocationRow,
+                      $CableAllocationsTable,
+                      CableTerminationMappingRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$CableAllocationsTableReferences
+                          ._cableTerminationMappingsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$CableAllocationsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).cableTerminationMappingsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.allocationId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$CableAllocationsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CableAllocationsTable,
+      CableAllocationRow,
+      $$CableAllocationsTableFilterComposer,
+      $$CableAllocationsTableOrderingComposer,
+      $$CableAllocationsTableAnnotationComposer,
+      $$CableAllocationsTableCreateCompanionBuilder,
+      $$CableAllocationsTableUpdateCompanionBuilder,
+      (CableAllocationRow, $$CableAllocationsTableReferences),
+      CableAllocationRow,
+      PrefetchHooks Function({
+        bool projectId,
+        bool engineeringConnectionId,
+        bool cableId,
+        bool cableAllocationResourceSelectionsRefs,
+        bool cableResourceClaimsRefs,
+        bool cableTerminationMappingsRefs,
+      })
+    >;
+typedef $$CableAllocationResourceSelectionsTableCreateCompanionBuilder =
+    CableAllocationResourceSelectionsCompanion Function({
+      required String allocationId,
+      required String cableDefinitionRefJson,
+      required String selectionJson,
+      required String resolvedAtomsJson,
+      required String selectionSha256,
+      required DateTime createdAt,
+      required String originDeviceId,
+      Value<int> rowid,
+    });
+typedef $$CableAllocationResourceSelectionsTableUpdateCompanionBuilder =
+    CableAllocationResourceSelectionsCompanion Function({
+      Value<String> allocationId,
+      Value<String> cableDefinitionRefJson,
+      Value<String> selectionJson,
+      Value<String> resolvedAtomsJson,
+      Value<String> selectionSha256,
+      Value<DateTime> createdAt,
+      Value<String> originDeviceId,
+      Value<int> rowid,
+    });
+
+final class $$CableAllocationResourceSelectionsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $CableAllocationResourceSelectionsTable,
+          CableAllocationResourceSelectionRow
+        > {
+  $$CableAllocationResourceSelectionsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $CableAllocationsTable _allocationIdTable(
+    _$AppDatabase db,
+  ) => db.cableAllocations.createAlias(
+    'cable_allocation_resource_selections__allocation_id__cable_allocations__id',
+  );
+
+  $$CableAllocationsTableProcessedTableManager get allocationId {
+    final $_column = $_itemColumn<String>('allocation_id')!;
+
+    final manager = $$CableAllocationsTableTableManager(
+      $_db,
+      $_db.cableAllocations,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_allocationIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$CableAllocationResourceSelectionsTableFilterComposer
+    extends Composer<_$AppDatabase, $CableAllocationResourceSelectionsTable> {
+  $$CableAllocationResourceSelectionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get cableDefinitionRefJson => $composableBuilder(
+    column: $table.cableDefinitionRefJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get selectionJson => $composableBuilder(
+    column: $table.selectionJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get resolvedAtomsJson => $composableBuilder(
+    column: $table.resolvedAtomsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get selectionSha256 => $composableBuilder(
+    column: $table.selectionSha256,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$CableAllocationsTableFilterComposer get allocationId {
+    final $$CableAllocationsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.allocationId,
+      referencedTable: $db.cableAllocations,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableAllocationsTableFilterComposer(
+            $db: $db,
+            $table: $db.cableAllocations,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CableAllocationResourceSelectionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CableAllocationResourceSelectionsTable> {
+  $$CableAllocationResourceSelectionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get cableDefinitionRefJson => $composableBuilder(
+    column: $table.cableDefinitionRefJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get selectionJson => $composableBuilder(
+    column: $table.selectionJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get resolvedAtomsJson => $composableBuilder(
+    column: $table.resolvedAtomsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get selectionSha256 => $composableBuilder(
+    column: $table.selectionSha256,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$CableAllocationsTableOrderingComposer get allocationId {
+    final $$CableAllocationsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.allocationId,
+      referencedTable: $db.cableAllocations,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableAllocationsTableOrderingComposer(
+            $db: $db,
+            $table: $db.cableAllocations,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CableAllocationResourceSelectionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CableAllocationResourceSelectionsTable> {
+  $$CableAllocationResourceSelectionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get cableDefinitionRefJson => $composableBuilder(
+    column: $table.cableDefinitionRefJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get selectionJson => $composableBuilder(
+    column: $table.selectionJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get resolvedAtomsJson => $composableBuilder(
+    column: $table.resolvedAtomsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get selectionSha256 => $composableBuilder(
+    column: $table.selectionSha256,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => column,
+  );
+
+  $$CableAllocationsTableAnnotationComposer get allocationId {
+    final $$CableAllocationsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.allocationId,
+      referencedTable: $db.cableAllocations,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableAllocationsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.cableAllocations,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CableAllocationResourceSelectionsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CableAllocationResourceSelectionsTable,
+          CableAllocationResourceSelectionRow,
+          $$CableAllocationResourceSelectionsTableFilterComposer,
+          $$CableAllocationResourceSelectionsTableOrderingComposer,
+          $$CableAllocationResourceSelectionsTableAnnotationComposer,
+          $$CableAllocationResourceSelectionsTableCreateCompanionBuilder,
+          $$CableAllocationResourceSelectionsTableUpdateCompanionBuilder,
+          (
+            CableAllocationResourceSelectionRow,
+            $$CableAllocationResourceSelectionsTableReferences,
+          ),
+          CableAllocationResourceSelectionRow,
+          PrefetchHooks Function({bool allocationId})
+        > {
+  $$CableAllocationResourceSelectionsTableTableManager(
+    _$AppDatabase db,
+    $CableAllocationResourceSelectionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$CableAllocationResourceSelectionsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer:
+              () => $$CableAllocationResourceSelectionsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer:
+              () => $$CableAllocationResourceSelectionsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> allocationId = const Value.absent(),
+                Value<String> cableDefinitionRefJson = const Value.absent(),
+                Value<String> selectionJson = const Value.absent(),
+                Value<String> resolvedAtomsJson = const Value.absent(),
+                Value<String> selectionSha256 = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<String> originDeviceId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CableAllocationResourceSelectionsCompanion(
+                allocationId: allocationId,
+                cableDefinitionRefJson: cableDefinitionRefJson,
+                selectionJson: selectionJson,
+                resolvedAtomsJson: resolvedAtomsJson,
+                selectionSha256: selectionSha256,
+                createdAt: createdAt,
+                originDeviceId: originDeviceId,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String allocationId,
+                required String cableDefinitionRefJson,
+                required String selectionJson,
+                required String resolvedAtomsJson,
+                required String selectionSha256,
+                required DateTime createdAt,
+                required String originDeviceId,
+                Value<int> rowid = const Value.absent(),
+              }) => CableAllocationResourceSelectionsCompanion.insert(
+                allocationId: allocationId,
+                cableDefinitionRefJson: cableDefinitionRefJson,
+                selectionJson: selectionJson,
+                resolvedAtomsJson: resolvedAtomsJson,
+                selectionSha256: selectionSha256,
+                createdAt: createdAt,
+                originDeviceId: originDeviceId,
+                rowid: rowid,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable<
+                            $CableAllocationResourceSelectionsTable,
+                            CableAllocationResourceSelectionRow
+                          >(table),
+                          $$CableAllocationResourceSelectionsTableReferences(
+                            db,
+                            table,
+                            e,
+                          ),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: ({allocationId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                T extends TableManagerState<
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic
+                >
+              >(state) {
+                if (allocationId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.allocationId,
+                            referencedTable:
+                                $$CableAllocationResourceSelectionsTableReferences
+                                    ._allocationIdTable(db),
+                            referencedColumn:
+                                $$CableAllocationResourceSelectionsTableReferences
+                                    ._allocationIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$CableAllocationResourceSelectionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CableAllocationResourceSelectionsTable,
+      CableAllocationResourceSelectionRow,
+      $$CableAllocationResourceSelectionsTableFilterComposer,
+      $$CableAllocationResourceSelectionsTableOrderingComposer,
+      $$CableAllocationResourceSelectionsTableAnnotationComposer,
+      $$CableAllocationResourceSelectionsTableCreateCompanionBuilder,
+      $$CableAllocationResourceSelectionsTableUpdateCompanionBuilder,
+      (
+        CableAllocationResourceSelectionRow,
+        $$CableAllocationResourceSelectionsTableReferences,
+      ),
+      CableAllocationResourceSelectionRow,
+      PrefetchHooks Function({bool allocationId})
+    >;
+typedef $$CableResourceClaimsTableCreateCompanionBuilder =
+    CableResourceClaimsCompanion Function({
+      required String allocationId,
+      required String cableId,
+      required String resourceAtom,
+      required DateTime createdAt,
+      required String originDeviceId,
+      Value<int> rowid,
+    });
+typedef $$CableResourceClaimsTableUpdateCompanionBuilder =
+    CableResourceClaimsCompanion Function({
+      Value<String> allocationId,
+      Value<String> cableId,
+      Value<String> resourceAtom,
+      Value<DateTime> createdAt,
+      Value<String> originDeviceId,
+      Value<int> rowid,
+    });
+
+final class $$CableResourceClaimsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $CableResourceClaimsTable,
+          CableResourceClaimRow
+        > {
+  $$CableResourceClaimsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $CableAllocationsTable _allocationIdTable(_$AppDatabase db) =>
+      db.cableAllocations.createAlias(
+        'cable_resource_claims__allocation_id__cable_allocations__id',
+      );
+
+  $$CableAllocationsTableProcessedTableManager get allocationId {
+    final $_column = $_itemColumn<String>('allocation_id')!;
+
+    final manager = $$CableAllocationsTableTableManager(
+      $_db,
+      $_db.cableAllocations,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_allocationIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $ElvCablesTable _cableIdTable(_$AppDatabase db) => db.elvCables
+      .createAlias('cable_resource_claims__cable_id__elv_cables__id');
+
+  $$ElvCablesTableProcessedTableManager get cableId {
+    final $_column = $_itemColumn<String>('cable_id')!;
+
+    final manager = $$ElvCablesTableTableManager(
+      $_db,
+      $_db.elvCables,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_cableIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$CableResourceClaimsTableFilterComposer
+    extends Composer<_$AppDatabase, $CableResourceClaimsTable> {
+  $$CableResourceClaimsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get resourceAtom => $composableBuilder(
+    column: $table.resourceAtom,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$CableAllocationsTableFilterComposer get allocationId {
+    final $$CableAllocationsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.allocationId,
+      referencedTable: $db.cableAllocations,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableAllocationsTableFilterComposer(
+            $db: $db,
+            $table: $db.cableAllocations,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ElvCablesTableFilterComposer get cableId {
+    final $$ElvCablesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.cableId,
+      referencedTable: $db.elvCables,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ElvCablesTableFilterComposer(
+            $db: $db,
+            $table: $db.elvCables,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CableResourceClaimsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CableResourceClaimsTable> {
+  $$CableResourceClaimsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get resourceAtom => $composableBuilder(
+    column: $table.resourceAtom,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$CableAllocationsTableOrderingComposer get allocationId {
+    final $$CableAllocationsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.allocationId,
+      referencedTable: $db.cableAllocations,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableAllocationsTableOrderingComposer(
+            $db: $db,
+            $table: $db.cableAllocations,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ElvCablesTableOrderingComposer get cableId {
+    final $$ElvCablesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.cableId,
+      referencedTable: $db.elvCables,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ElvCablesTableOrderingComposer(
+            $db: $db,
+            $table: $db.elvCables,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CableResourceClaimsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CableResourceClaimsTable> {
+  $$CableResourceClaimsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get resourceAtom => $composableBuilder(
+    column: $table.resourceAtom,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => column,
+  );
+
+  $$CableAllocationsTableAnnotationComposer get allocationId {
+    final $$CableAllocationsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.allocationId,
+      referencedTable: $db.cableAllocations,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableAllocationsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.cableAllocations,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ElvCablesTableAnnotationComposer get cableId {
+    final $$ElvCablesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.cableId,
+      referencedTable: $db.elvCables,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ElvCablesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.elvCables,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CableResourceClaimsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CableResourceClaimsTable,
+          CableResourceClaimRow,
+          $$CableResourceClaimsTableFilterComposer,
+          $$CableResourceClaimsTableOrderingComposer,
+          $$CableResourceClaimsTableAnnotationComposer,
+          $$CableResourceClaimsTableCreateCompanionBuilder,
+          $$CableResourceClaimsTableUpdateCompanionBuilder,
+          (CableResourceClaimRow, $$CableResourceClaimsTableReferences),
+          CableResourceClaimRow,
+          PrefetchHooks Function({bool allocationId, bool cableId})
+        > {
+  $$CableResourceClaimsTableTableManager(
+    _$AppDatabase db,
+    $CableResourceClaimsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$CableResourceClaimsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer:
+              () => $$CableResourceClaimsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer:
+              () => $$CableResourceClaimsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> allocationId = const Value.absent(),
+                Value<String> cableId = const Value.absent(),
+                Value<String> resourceAtom = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<String> originDeviceId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CableResourceClaimsCompanion(
+                allocationId: allocationId,
+                cableId: cableId,
+                resourceAtom: resourceAtom,
+                createdAt: createdAt,
+                originDeviceId: originDeviceId,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String allocationId,
+                required String cableId,
+                required String resourceAtom,
+                required DateTime createdAt,
+                required String originDeviceId,
+                Value<int> rowid = const Value.absent(),
+              }) => CableResourceClaimsCompanion.insert(
+                allocationId: allocationId,
+                cableId: cableId,
+                resourceAtom: resourceAtom,
+                createdAt: createdAt,
+                originDeviceId: originDeviceId,
+                rowid: rowid,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable<
+                            $CableResourceClaimsTable,
+                            CableResourceClaimRow
+                          >(table),
+                          $$CableResourceClaimsTableReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: ({allocationId = false, cableId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                T extends TableManagerState<
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic
+                >
+              >(state) {
+                if (allocationId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.allocationId,
+                            referencedTable:
+                                $$CableResourceClaimsTableReferences
+                                    ._allocationIdTable(db),
+                            referencedColumn:
+                                $$CableResourceClaimsTableReferences
+                                    ._allocationIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+                if (cableId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.cableId,
+                            referencedTable:
+                                $$CableResourceClaimsTableReferences
+                                    ._cableIdTable(db),
+                            referencedColumn:
+                                $$CableResourceClaimsTableReferences
+                                    ._cableIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$CableResourceClaimsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CableResourceClaimsTable,
+      CableResourceClaimRow,
+      $$CableResourceClaimsTableFilterComposer,
+      $$CableResourceClaimsTableOrderingComposer,
+      $$CableResourceClaimsTableAnnotationComposer,
+      $$CableResourceClaimsTableCreateCompanionBuilder,
+      $$CableResourceClaimsTableUpdateCompanionBuilder,
+      (CableResourceClaimRow, $$CableResourceClaimsTableReferences),
+      CableResourceClaimRow,
+      PrefetchHooks Function({bool allocationId, bool cableId})
+    >;
+typedef $$CableTerminationMappingsTableCreateCompanionBuilder =
+    CableTerminationMappingsCompanion Function({
+      Value<int> revision,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<DateTime?> deletedAt,
+      required String originDeviceId,
+      required String id,
+      required String allocationId,
+      required String resourceIdentity,
+      required String endRole,
+      required String endpointPortId,
+      Value<String?> endpointTerminalRef,
+      Value<String?> terminationRole,
+      Value<int> rowid,
+    });
+typedef $$CableTerminationMappingsTableUpdateCompanionBuilder =
+    CableTerminationMappingsCompanion Function({
+      Value<int> revision,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<String> originDeviceId,
+      Value<String> id,
+      Value<String> allocationId,
+      Value<String> resourceIdentity,
+      Value<String> endRole,
+      Value<String> endpointPortId,
+      Value<String?> endpointTerminalRef,
+      Value<String?> terminationRole,
+      Value<int> rowid,
+    });
+
+final class $$CableTerminationMappingsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $CableTerminationMappingsTable,
+          CableTerminationMappingRow
+        > {
+  $$CableTerminationMappingsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $CableAllocationsTable _allocationIdTable(_$AppDatabase db) =>
+      db.cableAllocations.createAlias(
+        'cable_termination_mappings__allocation_id__cable_allocations__id',
+      );
+
+  $$CableAllocationsTableProcessedTableManager get allocationId {
+    final $_column = $_itemColumn<String>('allocation_id')!;
+
+    final manager = $$CableAllocationsTableTableManager(
+      $_db,
+      $_db.cableAllocations,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_allocationIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $EngineeringPortInstancesTable _endpointPortIdTable(
+    _$AppDatabase db,
+  ) => db.engineeringPortInstances.createAlias(
+    'cable_termination_mappings__endpoint_port_id__engineering_port_instances__id',
+  );
+
+  $$EngineeringPortInstancesTableProcessedTableManager get endpointPortId {
+    final $_column = $_itemColumn<String>('endpoint_port_id')!;
+
+    final manager = $$EngineeringPortInstancesTableTableManager(
+      $_db,
+      $_db.engineeringPortInstances,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_endpointPortIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$CableTerminationMappingsTableFilterComposer
+    extends Composer<_$AppDatabase, $CableTerminationMappingsTable> {
+  $$CableTerminationMappingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get revision => $composableBuilder(
+    column: $table.revision,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get resourceIdentity => $composableBuilder(
+    column: $table.resourceIdentity,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get endRole => $composableBuilder(
+    column: $table.endRole,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get endpointTerminalRef => $composableBuilder(
+    column: $table.endpointTerminalRef,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get terminationRole => $composableBuilder(
+    column: $table.terminationRole,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$CableAllocationsTableFilterComposer get allocationId {
+    final $$CableAllocationsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.allocationId,
+      referencedTable: $db.cableAllocations,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableAllocationsTableFilterComposer(
+            $db: $db,
+            $table: $db.cableAllocations,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$EngineeringPortInstancesTableFilterComposer get endpointPortId {
+    final $$EngineeringPortInstancesTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.endpointPortId,
+          referencedTable: $db.engineeringPortInstances,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EngineeringPortInstancesTableFilterComposer(
+                $db: $db,
+                $table: $db.engineeringPortInstances,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$CableTerminationMappingsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CableTerminationMappingsTable> {
+  $$CableTerminationMappingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get revision => $composableBuilder(
+    column: $table.revision,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get resourceIdentity => $composableBuilder(
+    column: $table.resourceIdentity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get endRole => $composableBuilder(
+    column: $table.endRole,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get endpointTerminalRef => $composableBuilder(
+    column: $table.endpointTerminalRef,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get terminationRole => $composableBuilder(
+    column: $table.terminationRole,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$CableAllocationsTableOrderingComposer get allocationId {
+    final $$CableAllocationsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.allocationId,
+      referencedTable: $db.cableAllocations,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableAllocationsTableOrderingComposer(
+            $db: $db,
+            $table: $db.cableAllocations,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$EngineeringPortInstancesTableOrderingComposer get endpointPortId {
+    final $$EngineeringPortInstancesTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.endpointPortId,
+          referencedTable: $db.engineeringPortInstances,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EngineeringPortInstancesTableOrderingComposer(
+                $db: $db,
+                $table: $db.engineeringPortInstances,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$CableTerminationMappingsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CableTerminationMappingsTable> {
+  $$CableTerminationMappingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get revision =>
+      $composableBuilder(column: $table.revision, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get resourceIdentity => $composableBuilder(
+    column: $table.resourceIdentity,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get endRole =>
+      $composableBuilder(column: $table.endRole, builder: (column) => column);
+
+  GeneratedColumn<String> get endpointTerminalRef => $composableBuilder(
+    column: $table.endpointTerminalRef,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get terminationRole => $composableBuilder(
+    column: $table.terminationRole,
+    builder: (column) => column,
+  );
+
+  $$CableAllocationsTableAnnotationComposer get allocationId {
+    final $$CableAllocationsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.allocationId,
+      referencedTable: $db.cableAllocations,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableAllocationsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.cableAllocations,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$EngineeringPortInstancesTableAnnotationComposer get endpointPortId {
+    final $$EngineeringPortInstancesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.endpointPortId,
+          referencedTable: $db.engineeringPortInstances,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EngineeringPortInstancesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.engineeringPortInstances,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$CableTerminationMappingsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CableTerminationMappingsTable,
+          CableTerminationMappingRow,
+          $$CableTerminationMappingsTableFilterComposer,
+          $$CableTerminationMappingsTableOrderingComposer,
+          $$CableTerminationMappingsTableAnnotationComposer,
+          $$CableTerminationMappingsTableCreateCompanionBuilder,
+          $$CableTerminationMappingsTableUpdateCompanionBuilder,
+          (
+            CableTerminationMappingRow,
+            $$CableTerminationMappingsTableReferences,
+          ),
+          CableTerminationMappingRow,
+          PrefetchHooks Function({bool allocationId, bool endpointPortId})
+        > {
+  $$CableTerminationMappingsTableTableManager(
+    _$AppDatabase db,
+    $CableTerminationMappingsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$CableTerminationMappingsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer:
+              () => $$CableTerminationMappingsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer:
+              () => $$CableTerminationMappingsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> revision = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<String> originDeviceId = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> allocationId = const Value.absent(),
+                Value<String> resourceIdentity = const Value.absent(),
+                Value<String> endRole = const Value.absent(),
+                Value<String> endpointPortId = const Value.absent(),
+                Value<String?> endpointTerminalRef = const Value.absent(),
+                Value<String?> terminationRole = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CableTerminationMappingsCompanion(
+                revision: revision,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                originDeviceId: originDeviceId,
+                id: id,
+                allocationId: allocationId,
+                resourceIdentity: resourceIdentity,
+                endRole: endRole,
+                endpointPortId: endpointPortId,
+                endpointTerminalRef: endpointTerminalRef,
+                terminationRole: terminationRole,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> revision = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<DateTime?> deletedAt = const Value.absent(),
+                required String originDeviceId,
+                required String id,
+                required String allocationId,
+                required String resourceIdentity,
+                required String endRole,
+                required String endpointPortId,
+                Value<String?> endpointTerminalRef = const Value.absent(),
+                Value<String?> terminationRole = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CableTerminationMappingsCompanion.insert(
+                revision: revision,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                originDeviceId: originDeviceId,
+                id: id,
+                allocationId: allocationId,
+                resourceIdentity: resourceIdentity,
+                endRole: endRole,
+                endpointPortId: endpointPortId,
+                endpointTerminalRef: endpointTerminalRef,
+                terminationRole: terminationRole,
+                rowid: rowid,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable<
+                            $CableTerminationMappingsTable,
+                            CableTerminationMappingRow
+                          >(table),
+                          $$CableTerminationMappingsTableReferences(
+                            db,
+                            table,
+                            e,
+                          ),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: ({
+            allocationId = false,
+            endpointPortId = false,
+          }) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                T extends TableManagerState<
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic
+                >
+              >(state) {
+                if (allocationId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.allocationId,
+                            referencedTable:
+                                $$CableTerminationMappingsTableReferences
+                                    ._allocationIdTable(db),
+                            referencedColumn:
+                                $$CableTerminationMappingsTableReferences
+                                    ._allocationIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+                if (endpointPortId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.endpointPortId,
+                            referencedTable:
+                                $$CableTerminationMappingsTableReferences
+                                    ._endpointPortIdTable(db),
+                            referencedColumn:
+                                $$CableTerminationMappingsTableReferences
+                                    ._endpointPortIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$CableTerminationMappingsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CableTerminationMappingsTable,
+      CableTerminationMappingRow,
+      $$CableTerminationMappingsTableFilterComposer,
+      $$CableTerminationMappingsTableOrderingComposer,
+      $$CableTerminationMappingsTableAnnotationComposer,
+      $$CableTerminationMappingsTableCreateCompanionBuilder,
+      $$CableTerminationMappingsTableUpdateCompanionBuilder,
+      (CableTerminationMappingRow, $$CableTerminationMappingsTableReferences),
+      CableTerminationMappingRow,
+      PrefetchHooks Function({bool allocationId, bool endpointPortId})
+    >;
+typedef $$CommandExecutionRecordsTableCreateCompanionBuilder =
+    CommandExecutionRecordsCompanion Function({
+      required String projectId,
+      required String commandId,
+      required String commandType,
+      required int payloadSchemaVersion,
+      required String normalizedPayloadSha256,
+      required String outcomeKind,
+      required String logicalResultJson,
+      required DateTime createdAt,
+      required DateTime committedAt,
+      required String originDeviceId,
+      Value<int> rowid,
+    });
+typedef $$CommandExecutionRecordsTableUpdateCompanionBuilder =
+    CommandExecutionRecordsCompanion Function({
+      Value<String> projectId,
+      Value<String> commandId,
+      Value<String> commandType,
+      Value<int> payloadSchemaVersion,
+      Value<String> normalizedPayloadSha256,
+      Value<String> outcomeKind,
+      Value<String> logicalResultJson,
+      Value<DateTime> createdAt,
+      Value<DateTime> committedAt,
+      Value<String> originDeviceId,
+      Value<int> rowid,
+    });
+
+final class $$CommandExecutionRecordsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $CommandExecutionRecordsTable,
+          CommandExecutionRecordRow
+        > {
+  $$CommandExecutionRecordsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProjectsTable _projectIdTable(_$AppDatabase db) => db.projects
+      .createAlias('command_execution_records__project_id__projects__id');
+
+  $$ProjectsTableProcessedTableManager get projectId {
+    final $_column = $_itemColumn<String>('project_id')!;
+
+    final manager = $$ProjectsTableTableManager(
+      $_db,
+      $_db.projects,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_projectIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$CommandExecutionRecordsTableFilterComposer
+    extends Composer<_$AppDatabase, $CommandExecutionRecordsTable> {
+  $$CommandExecutionRecordsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get commandId => $composableBuilder(
+    column: $table.commandId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get commandType => $composableBuilder(
+    column: $table.commandType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get payloadSchemaVersion => $composableBuilder(
+    column: $table.payloadSchemaVersion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get normalizedPayloadSha256 => $composableBuilder(
+    column: $table.normalizedPayloadSha256,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get outcomeKind => $composableBuilder(
+    column: $table.outcomeKind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get logicalResultJson => $composableBuilder(
+    column: $table.logicalResultJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get committedAt => $composableBuilder(
+    column: $table.committedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProjectsTableFilterComposer get projectId {
+    final $$ProjectsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableFilterComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CommandExecutionRecordsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CommandExecutionRecordsTable> {
+  $$CommandExecutionRecordsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get commandId => $composableBuilder(
+    column: $table.commandId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get commandType => $composableBuilder(
+    column: $table.commandType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get payloadSchemaVersion => $composableBuilder(
+    column: $table.payloadSchemaVersion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get normalizedPayloadSha256 => $composableBuilder(
+    column: $table.normalizedPayloadSha256,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get outcomeKind => $composableBuilder(
+    column: $table.outcomeKind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get logicalResultJson => $composableBuilder(
+    column: $table.logicalResultJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get committedAt => $composableBuilder(
+    column: $table.committedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProjectsTableOrderingComposer get projectId {
+    final $$ProjectsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableOrderingComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CommandExecutionRecordsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CommandExecutionRecordsTable> {
+  $$CommandExecutionRecordsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get commandId =>
+      $composableBuilder(column: $table.commandId, builder: (column) => column);
+
+  GeneratedColumn<String> get commandType => $composableBuilder(
+    column: $table.commandType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get payloadSchemaVersion => $composableBuilder(
+    column: $table.payloadSchemaVersion,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get normalizedPayloadSha256 => $composableBuilder(
+    column: $table.normalizedPayloadSha256,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get outcomeKind => $composableBuilder(
+    column: $table.outcomeKind,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get logicalResultJson => $composableBuilder(
+    column: $table.logicalResultJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get committedAt => $composableBuilder(
+    column: $table.committedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => column,
+  );
+
+  $$ProjectsTableAnnotationComposer get projectId {
+    final $$ProjectsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CommandExecutionRecordsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CommandExecutionRecordsTable,
+          CommandExecutionRecordRow,
+          $$CommandExecutionRecordsTableFilterComposer,
+          $$CommandExecutionRecordsTableOrderingComposer,
+          $$CommandExecutionRecordsTableAnnotationComposer,
+          $$CommandExecutionRecordsTableCreateCompanionBuilder,
+          $$CommandExecutionRecordsTableUpdateCompanionBuilder,
+          (CommandExecutionRecordRow, $$CommandExecutionRecordsTableReferences),
+          CommandExecutionRecordRow,
+          PrefetchHooks Function({bool projectId})
+        > {
+  $$CommandExecutionRecordsTableTableManager(
+    _$AppDatabase db,
+    $CommandExecutionRecordsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$CommandExecutionRecordsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer:
+              () => $$CommandExecutionRecordsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer:
+              () => $$CommandExecutionRecordsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> projectId = const Value.absent(),
+                Value<String> commandId = const Value.absent(),
+                Value<String> commandType = const Value.absent(),
+                Value<int> payloadSchemaVersion = const Value.absent(),
+                Value<String> normalizedPayloadSha256 = const Value.absent(),
+                Value<String> outcomeKind = const Value.absent(),
+                Value<String> logicalResultJson = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> committedAt = const Value.absent(),
+                Value<String> originDeviceId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CommandExecutionRecordsCompanion(
+                projectId: projectId,
+                commandId: commandId,
+                commandType: commandType,
+                payloadSchemaVersion: payloadSchemaVersion,
+                normalizedPayloadSha256: normalizedPayloadSha256,
+                outcomeKind: outcomeKind,
+                logicalResultJson: logicalResultJson,
+                createdAt: createdAt,
+                committedAt: committedAt,
+                originDeviceId: originDeviceId,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String projectId,
+                required String commandId,
+                required String commandType,
+                required int payloadSchemaVersion,
+                required String normalizedPayloadSha256,
+                required String outcomeKind,
+                required String logicalResultJson,
+                required DateTime createdAt,
+                required DateTime committedAt,
+                required String originDeviceId,
+                Value<int> rowid = const Value.absent(),
+              }) => CommandExecutionRecordsCompanion.insert(
+                projectId: projectId,
+                commandId: commandId,
+                commandType: commandType,
+                payloadSchemaVersion: payloadSchemaVersion,
+                normalizedPayloadSha256: normalizedPayloadSha256,
+                outcomeKind: outcomeKind,
+                logicalResultJson: logicalResultJson,
+                createdAt: createdAt,
+                committedAt: committedAt,
+                originDeviceId: originDeviceId,
+                rowid: rowid,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable<
+                            $CommandExecutionRecordsTable,
+                            CommandExecutionRecordRow
+                          >(table),
+                          $$CommandExecutionRecordsTableReferences(
+                            db,
+                            table,
+                            e,
+                          ),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: ({projectId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                T extends TableManagerState<
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic
+                >
+              >(state) {
+                if (projectId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.projectId,
+                            referencedTable:
+                                $$CommandExecutionRecordsTableReferences
+                                    ._projectIdTable(db),
+                            referencedColumn:
+                                $$CommandExecutionRecordsTableReferences
+                                    ._projectIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$CommandExecutionRecordsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CommandExecutionRecordsTable,
+      CommandExecutionRecordRow,
+      $$CommandExecutionRecordsTableFilterComposer,
+      $$CommandExecutionRecordsTableOrderingComposer,
+      $$CommandExecutionRecordsTableAnnotationComposer,
+      $$CommandExecutionRecordsTableCreateCompanionBuilder,
+      $$CommandExecutionRecordsTableUpdateCompanionBuilder,
+      (CommandExecutionRecordRow, $$CommandExecutionRecordsTableReferences),
+      CommandExecutionRecordRow,
+      PrefetchHooks Function({bool projectId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -66937,5 +75977,27 @@ class $AppDatabaseManager {
       $$EngineeringPlacementOperationsTableTableManager(
         _db,
         _db.engineeringPlacementOperations,
+      );
+  $$ElvCablesTableTableManager get elvCables =>
+      $$ElvCablesTableTableManager(_db, _db.elvCables);
+  $$CableAllocationsTableTableManager get cableAllocations =>
+      $$CableAllocationsTableTableManager(_db, _db.cableAllocations);
+  $$CableAllocationResourceSelectionsTableTableManager
+  get cableAllocationResourceSelections =>
+      $$CableAllocationResourceSelectionsTableTableManager(
+        _db,
+        _db.cableAllocationResourceSelections,
+      );
+  $$CableResourceClaimsTableTableManager get cableResourceClaims =>
+      $$CableResourceClaimsTableTableManager(_db, _db.cableResourceClaims);
+  $$CableTerminationMappingsTableTableManager get cableTerminationMappings =>
+      $$CableTerminationMappingsTableTableManager(
+        _db,
+        _db.cableTerminationMappings,
+      );
+  $$CommandExecutionRecordsTableTableManager get commandExecutionRecords =>
+      $$CommandExecutionRecordsTableTableManager(
+        _db,
+        _db.commandExecutionRecords,
       );
 }
