@@ -64,36 +64,57 @@ final class _DriftElvCommandLedgerStore implements ElvCommandLedgerStore {
           ))
         .getSingleOrNull();
     if (row == null) return null;
-    return ElvCommandLedgerEntry(
-      projectId: row.projectId,
-      commandId: row.commandId,
-      commandType: row.commandType,
-      payloadSchemaVersion: row.payloadSchemaVersion,
-      normalizedPayloadSha256: row.normalizedPayloadSha256,
-      outcomeKind: row.outcomeKind,
-      logicalResultJson: row.logicalResultJson,
-      createdAt: row.createdAt,
-      committedAt: row.committedAt,
-      originDeviceId: row.originDeviceId,
-    );
+    return _entry(row);
   }
 
   @override
-  Future<void> save(ElvCommandLedgerEntry entry) =>
-      database.into(database.commandExecutionRecords).insert(
-            CommandExecutionRecordsCompanion.insert(
-              projectId: entry.projectId,
-              commandId: entry.commandId,
-              commandType: entry.commandType,
-              payloadSchemaVersion: entry.payloadSchemaVersion,
-              normalizedPayloadSha256: entry.normalizedPayloadSha256,
-              outcomeKind: entry.outcomeKind,
-              logicalResultJson: entry.logicalResultJson,
-              createdAt: entry.createdAt,
-              committedAt: entry.committedAt,
-              originDeviceId: entry.originDeviceId,
-            ),
-          );
+  Future<void> save(ElvCommandLedgerEntry entry) async {
+    await database.into(database.commandExecutionRecords).insert(
+          CommandExecutionRecordsCompanion.insert(
+            projectId: entry.projectId,
+            commandId: entry.commandId,
+            commandType: entry.commandType,
+            payloadSchemaVersion: entry.payloadSchemaVersion,
+            normalizedPayloadSha256: entry.normalizedPayloadSha256,
+            outcomeKind: entry.outcomeKind,
+            logicalResultJson: entry.logicalResultJson,
+            createdAt: entry.createdAt,
+            committedAt: entry.committedAt,
+            originDeviceId: entry.originDeviceId,
+          ),
+          mode: InsertMode.insertOrIgnore,
+        );
+    final persisted = await find(entry.projectId, entry.commandId);
+    if (persisted == null || !_sameLedgerEntry(persisted, entry)) {
+      throw StateError('ELV command ledger conflict.');
+    }
+  }
+
+  ElvCommandLedgerEntry _entry(CommandExecutionRecordRow row) =>
+      ElvCommandLedgerEntry(
+        projectId: row.projectId,
+        commandId: row.commandId,
+        commandType: row.commandType,
+        payloadSchemaVersion: row.payloadSchemaVersion,
+        normalizedPayloadSha256: row.normalizedPayloadSha256,
+        outcomeKind: row.outcomeKind,
+        logicalResultJson: row.logicalResultJson,
+        createdAt: row.createdAt,
+        committedAt: row.committedAt,
+        originDeviceId: row.originDeviceId,
+      );
+
+  bool _sameLedgerEntry(
+    ElvCommandLedgerEntry left,
+    ElvCommandLedgerEntry right,
+  ) =>
+      left.projectId == right.projectId &&
+      left.commandId == right.commandId &&
+      left.commandType == right.commandType &&
+      left.payloadSchemaVersion == right.payloadSchemaVersion &&
+      left.normalizedPayloadSha256 == right.normalizedPayloadSha256 &&
+      left.outcomeKind == right.outcomeKind &&
+      left.logicalResultJson == right.logicalResultJson;
 }
 
 final class _DriftElvCableWriteStore implements ElvCableWriteStore {
@@ -171,35 +192,26 @@ final class _DriftElvCableWriteStore implements ElvCableWriteStore {
   @override
   Future<bool> insertCable(Cable cable) async {
     final now = DateTime.now().toUtc();
-    await database.customStatement(
-      '''
-      INSERT OR IGNORE INTO elv_cables(
-        id, project_id, label, normalized_label, name,
-        definition_catalog_id, definition_catalog_version, definition_code,
-        definition_content_hash, lifecycle_state, revision,
-        created_at, updated_at, deleted_at, origin_device_id
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'ACTIVE', ?, ?, ?, NULL, ?)
-      ''',
-      [
-        cable.id,
-        cable.projectId,
-        cable.label,
-        cable.normalizedLabel,
-        cable.name,
-        cable.definitionRef.catalogId,
-        cable.definitionRef.catalogVersion,
-        cable.definitionRef.definitionCode,
-        cable.definitionRef.definitionContentHash,
-        cable.revision,
-        now,
-        now,
-        originDeviceId,
-      ],
-    );
-    final changed = await database
-        .customSelect('SELECT changes() AS changed')
-        .getSingle();
-    return changed.read<int>('changed') == 1;
+    final inserted = await database.into(database.elvCables).insert(
+          ElvCablesCompanion.insert(
+            id: cable.id,
+            projectId: cable.projectId,
+            label: cable.label,
+            normalizedLabel: cable.normalizedLabel,
+            name: cable.name,
+            definitionCatalogId: cable.definitionRef.catalogId,
+            definitionCatalogVersion: cable.definitionRef.catalogVersion,
+            definitionCode: cable.definitionRef.definitionCode,
+            definitionContentHash: cable.definitionRef.definitionContentHash,
+            lifecycleState: 'ACTIVE',
+            revision: Value(cable.revision),
+            createdAt: now,
+            updatedAt: now,
+            originDeviceId: originDeviceId,
+          ),
+          mode: InsertMode.insertOrIgnore,
+        );
+    return inserted > 0;
   }
 
   @override
