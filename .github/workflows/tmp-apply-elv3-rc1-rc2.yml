@@ -74,7 +74,7 @@ jobs:
             -o scripts/ci/apply-elv3-runtime-rc1-rc2.py
           python3 scripts/ci/apply-elv3-runtime-rc1-rc2.py
           rm scripts/ci/apply-elv3-runtime-rc1-rc2.py
-          sed -i "/import 'package:drift\/drift.dart';/d" apps/mobile/test/data/elv_p3_runtime_closure_test.dart
+          sed -i "/import 'package:drift\/drift.dart'/d" apps/mobile/test/data/elv_p3_runtime_closure_test.dart
 
       - name: Generate Drift code
         working-directory: apps/mobile
