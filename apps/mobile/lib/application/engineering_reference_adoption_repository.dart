@@ -36,13 +36,14 @@ final class EngineeringReferenceAdoptionCommand {
     required this.expectedCatalogVersion,
     required this.candidateCatalogId,
     required this.candidateCatalogVersion,
-    required this.profileCode,
+    required String profileCode,
     required this.reviewedBindingFingerprint,
     required this.reviewedGraphFingerprint,
     Iterable<String> reviewedConnectionIds = const [],
     Iterable<String> reviewedTopologyGroupIds = const [],
     Map<String, String> explicitPortMappings = const {},
-  }) : reviewedConnectionIds = List.unmodifiable(
+  }) : profileCode = normalizeEngineeringReferenceCode(profileCode),
+       reviewedConnectionIds = List.unmodifiable(
          reviewedConnectionIds.toSet().toList()..sort(),
        ),
        reviewedTopologyGroupIds = List.unmodifiable(

@@ -246,14 +246,26 @@ class ComponentEngineeringProfile {
         if (capabilities.toSet().length != capabilities.length)
           'Duplicate capability.',
         if (portTemplates
-                .map((port) => port.code.trim().toUpperCase())
+                .map((port) => normalizeEngineeringReferenceCode(port.code))
                 .toSet()
                 .length !=
             portTemplates.length)
           'Duplicate port template code.',
+        if (portTemplates.any(
+          (port) => port.code != normalizeEngineeringReferenceCode(port.code),
+        ))
+          'Port template codes must use canonical engineering identity.',
         for (final port in portTemplates) ...port.validate(),
         if (portInterfaceCodes.keys.any(
-          (code) => !portTemplates.any((port) => port.code == code),
+          (code) => code != normalizeEngineeringReferenceCode(code),
+        ))
+          'Interface binding keys must use canonical port identity.',
+        if (portInterfaceCodes.keys.any(
+          (code) => !portTemplates.any(
+            (port) =>
+                normalizeEngineeringReferenceCode(port.code) ==
+                normalizeEngineeringReferenceCode(code),
+          ),
         ))
           'Interface binding references an unknown port template.',
         if (!switch (discipline) {
@@ -414,6 +426,8 @@ class EngineeringReferenceCatalog {
   List<String> validate() => [
         if ([id, code, version, source].any((value) => value.trim().isEmpty))
           'Catalog identity, code, version and provenance are required.',
+        if (code != normalizeEngineeringReferenceCode(code))
+          'Catalog code must use canonical engineering identity.',
         if (profiles.isEmpty) 'Provide at least one engineering profile.',
         if (profiles.any(
               (profile) =>

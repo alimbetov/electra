@@ -122,7 +122,8 @@ CatalogRevisionPreview previewCatalogRevision({
           .toList();
   final byId = {for (final catalog in sameCode) catalog.id: catalog};
   final candidateProfiles = {
-    for (final profile in candidate.profiles) profile.code: profile,
+    for (final profile in candidate.profiles)
+      normalizeEngineeringReferenceCode(profile.code): profile,
   };
   final impacts = <BoundProfileRevisionImpact>[];
   final removed = <String>{};
@@ -134,7 +135,10 @@ CatalogRevisionPreview previewCatalogRevision({
       continue;
     }
 
-    final candidateProfile = candidateProfiles[binding.profileCode];
+    final candidateProfile =
+        candidateProfiles[normalizeEngineeringReferenceCode(
+          binding.profileCode,
+        )];
     if (candidateProfile == null) {
       removed.add(binding.profileCode);
       final graph = _graphImpact(binding.portIds, topology);
