@@ -1,3 +1,4 @@
+import 'elv_cable_reference.dart';
 import 'engineering_reference_constraints.dart';
 import 'engineering_reference_vocabulary.dart';
 import 'engineering_system.dart';
@@ -409,10 +410,12 @@ class EngineeringReferenceCatalog {
     required this.code,
     required this.version,
     required this.source,
-    required Iterable<ComponentEngineeringProfile> profiles,
+    Iterable<ComponentEngineeringProfile> profiles = const [],
+    Iterable<CableDefinition> cableDefinitions = const [],
     this.jurisdiction,
     EngineeringReferenceVocabulary? vocabulary,
   })  : profiles = List.unmodifiable(profiles),
+        cableDefinitions = List.unmodifiable(cableDefinitions),
         vocabulary = vocabulary ?? EngineeringReferenceVocabulary();
 
   final String id;
@@ -421,6 +424,7 @@ class EngineeringReferenceCatalog {
   final String source;
   final String? jurisdiction;
   final List<ComponentEngineeringProfile> profiles;
+  final List<CableDefinition> cableDefinitions;
   final EngineeringReferenceVocabulary vocabulary;
 
   List<String> validate() => [
@@ -428,7 +432,8 @@ class EngineeringReferenceCatalog {
           'Catalog identity, code, version and provenance are required.',
         if (code != normalizeEngineeringReferenceCode(code))
           'Catalog code must use canonical engineering identity.',
-        if (profiles.isEmpty) 'Provide at least one engineering profile.',
+        if (profiles.isEmpty && cableDefinitions.isEmpty)
+          'Provide at least one engineering profile or cable definition.',
         if (profiles.any(
               (profile) =>
                   profile.code !=
@@ -443,8 +448,15 @@ class EngineeringReferenceCatalog {
                     .length !=
                 profiles.length)
           'Profile codes must be canonical and unique after normalization.',
+        if (cableDefinitions
+                .map((definition) => definition.code)
+                .toSet()
+                .length !=
+            cableDefinitions.length)
+          'Cable definition codes must be canonical and unique.',
         ...vocabulary.validate(),
         for (final profile in profiles) ...profile.validate(),
+        for (final definition in cableDefinitions) ...definition.validate(),
         ..._referenceErrors(),
       ];
 
@@ -493,6 +505,23 @@ class EngineeringReferenceCatalog {
     );
   }
 
+  CableDefinition cableDefinition(String rawCode) {
+    final normalized = normalizeEngineeringReferenceCode(rawCode);
+    return cableDefinitions.singleWhere(
+      (definition) => definition.code == normalized,
+    );
+  }
+
+  CableDefinitionRef cableDefinitionRef(String rawCode) {
+    final definition = cableDefinition(rawCode);
+    return CableDefinitionRef(
+      catalogId: id,
+      catalogVersion: version,
+      definitionCode: definition.code,
+      definitionContentHash: cableDefinitionContentHashV1(definition),
+    );
+  }
+
   Map<String, Object?> toMap() => {
         'id': id,
         'code': code,
@@ -501,6 +530,9 @@ class EngineeringReferenceCatalog {
         'jurisdiction': jurisdiction,
         if (!vocabulary.isEmpty) 'vocabulary': vocabulary.toMap(),
         'profiles': profiles.map((profile) => profile.toMap()).toList(),
+        if (cableDefinitions.isNotEmpty)
+          'cableDefinitions':
+              cableDefinitions.map((definition) => definition.toMap()).toList(),
       };
 
   factory EngineeringReferenceCatalog.fromMap(Map<String, dynamic> map) =>
@@ -515,10 +547,13 @@ class EngineeringReferenceCatalog {
             : EngineeringReferenceVocabulary.fromMap(
                 map['vocabulary'] as Map<String, dynamic>,
               ),
-        profiles: (map['profiles'] as List).map(
+        profiles: (map['profiles'] as List? ?? const []).map(
           (value) => ComponentEngineeringProfile.fromMap(
             value as Map<String, dynamic>,
           ),
+        ),
+        cableDefinitions: (map['cableDefinitions'] as List? ?? const []).map(
+          (value) => CableDefinition.fromMap(value as Map<String, dynamic>),
         ),
       );
 }
