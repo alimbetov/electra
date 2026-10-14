@@ -1,5 +1,6 @@
 from pathlib import Path
 
+# Round-2 remediation patcher. The workflow deletes this file after success.
 path = Path('apps/mobile/lib/data/repositories/drift_engineering_reference_adoption_repository.dart')
 text = path.read_text()
 
