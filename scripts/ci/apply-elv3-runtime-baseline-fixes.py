@@ -51,12 +51,12 @@ for path in (ROOT / 'apps/mobile/test').rglob('*.dart'):
         path.write_text(text)
         changed_schema_assertions += 1
 
-# Record equality does not imply deep List equality. Keep this test about deterministic
-# identities rather than List object identity.
+# Dart records still compare List fields by identity. Assert deterministic fixture
+# identities structurally instead of record equality.
 replace_once(
     'apps/mobile/test/application/elv_p8_fixture_foundation_test.dart',
-    "      expect(\n        (\n          projectId: project.project.id,\n          connectionId: topology.connection.id,\n          runId: routing.run.id,\n          traversalIds: routing.traversals.map((item) => item.id).toList(),\n        ),\n        (\n          projectId: 'PRJ-001',\n          connectionId: 'CONN-003',\n          runId: 'RUN-006',\n          traversalIds: ['TRV-008', 'TRV-009', 'TRV-010'],\n        ),\n      );\n",
-    "      expect(project.project.id, 'PRJ-001');\n      expect(topology.connection.id, 'CONN-003');\n      expect(routing.run.id, 'RUN-006');\n      expect(\n        routing.traversals.map((item) => item.id),\n        orderedEquals(['TRV-008', 'TRV-009', 'TRV-010']),\n      );\n",
+    "      expect(first, second);\n",
+    "      expect(first.projectId, second.projectId);\n      expect(first.connectionId, second.connectionId);\n      expect(first.runId, second.runId);\n      expect(first.traversalIds, orderedEquals(second.traversalIds));\n",
 )
 
 print(f'ELV3 baseline fixes applied; schema assertion files updated: {changed_schema_assertions}')
