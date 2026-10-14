@@ -12,7 +12,8 @@ EngineeringReferenceCatalog _fixture() => EngineeringReferenceCatalog.fromMap(
     );
 
 void main() {
-  test('publication rejects profile codes that collide after normalization', () {
+  test('publication rejects profile codes that collide after normalization',
+      () {
     final source = _fixture();
     final camera = source.profile('CAMERA');
     final alias = ComponentEngineeringProfile.fromMap({

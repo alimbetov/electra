@@ -3,6 +3,9 @@ import 'engineering_reference_vocabulary.dart';
 import 'engineering_system.dart';
 import 'engineering_topology.dart';
 
+String normalizeEngineeringReferenceCode(String value) =>
+    value.trim().toUpperCase();
+
 enum ReferenceDiscipline { cctv, lan, acs, fire }
 
 enum CanonicalComponentClass {
@@ -412,9 +415,20 @@ class EngineeringReferenceCatalog {
         if ([id, code, version, source].any((value) => value.trim().isEmpty))
           'Catalog identity, code, version and provenance are required.',
         if (profiles.isEmpty) 'Provide at least one engineering profile.',
-        if (profiles.map((profile) => profile.code).toSet().length !=
-            profiles.length)
-          'Profile codes must be unique.',
+        if (profiles.any(
+              (profile) =>
+                  profile.code !=
+                  normalizeEngineeringReferenceCode(profile.code),
+            ) ||
+            profiles
+                    .map(
+                      (profile) =>
+                          normalizeEngineeringReferenceCode(profile.code),
+                    )
+                    .toSet()
+                    .length !=
+                profiles.length)
+          'Profile codes must be canonical and unique after normalization.',
         ...vocabulary.validate(),
         for (final profile in profiles) ...profile.validate(),
         ..._referenceErrors(),
@@ -457,8 +471,13 @@ class EngineeringReferenceCatalog {
         source: source,
       );
 
-  ComponentEngineeringProfile profile(String code) =>
-      profiles.singleWhere((profile) => profile.code == code);
+  ComponentEngineeringProfile profile(String code) {
+    final normalized = normalizeEngineeringReferenceCode(code);
+    return profiles.singleWhere(
+      (profile) =>
+          normalizeEngineeringReferenceCode(profile.code) == normalized,
+    );
+  }
 
   Map<String, Object?> toMap() => {
         'id': id,
