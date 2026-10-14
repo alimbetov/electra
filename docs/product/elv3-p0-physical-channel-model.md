@@ -1,365 +1,280 @@
-# Electra — ELV3 P0.4 PhysicalChannel Factual Model
+# Electra — ELV3 P0.4 Physical Carrier and Pathway Factual Model
 
-Status: DESIGN CONTRACT / P0.4  
+Status: REMEDIATED DESIGN CONTRACT / P0-R5 + P0-R7  
 Branch: `feat/flutter-elv3-physical-routing-design`  
-Depends on: P0.1/P0.2 ownership/cardinality and P0.3 cable resource model  
-Implementation status: NOT STARTED
+Authoritative parent: `docs/product/elv3-p0-system-architecture-remediation.md`  
+Implementation status: HOLD UNTIL P0-R10
 
 ## 1. Purpose
 
-P0.4 freezes the factual model for pathways/containment used by ELV3 routing and compatibility.
+This document replaces the first P0.4 model where `PhysicalChannel` mixed physical carrier kinds with spatial pathway contexts.
 
-The goal is to separate:
+ELV3 now separates:
 
 ```text
-persisted physical facts
-from
-versioned engineering/normative rules
+PhysicalCarrier
+  = what physically carries the cable
+
+PathwayContext
+  = where that carrier/path exists spatially
 ```
 
-`PhysicalChannel` describes what exists in the project. It MUST NOT embed anonymous mutable thresholds such as maximum fill percentage, mandatory segregation distance, permitted fire class or jurisdictional compliance decisions.
+It also sharpens the boundary between ELV3 technical compatibility and ELV7 normative compliance.
 
-## 2. Scope
-
-P0.4 covers factual modelling of:
-
-- tray;
-- conduit;
-- trunking;
-- channel compartments/dividers;
-- usable geometry/capacity basis;
-- spatial ownership/context;
-- environment/install facts;
-- route-segment attachment;
-- vertical/riser continuity requirements;
-- provenance of factual dimensions when imported or measured.
-
-P0.4 does not define:
-
-- regulatory fill percentages;
-- separation distances;
-- fire-code acceptance;
-- electrical derating;
-- PoE/power calculations;
-- manufacturer product selection;
-- legal compliance claims.
-
-## 3. Canonical responsibility
-
-`PhysicalChannel` is a spatial installation asset that may carry zero or many route segments.
-
-Frozen cardinality from P0.1/P0.2:
+## 2. Corrected physical model
 
 ```text
-RouteSegment -> 0..1 PhysicalChannel
-PhysicalChannel -> 0..N RouteSegment
+CableRun
+  -> CableTraversal[]
+  -> reusable Route / geometry
+  -> optional PhysicalCarrier
+  -> PathwayContext
 ```
 
-A channel does not own cables or logical connections. Occupancy is derived from route segments and their owning CableRuns/Cables.
+A free/surface route may have no carrier while still belonging to a spatial context.
 
-## 4. Channel kinds
+## 3. PhysicalCarrier
 
-Current kinds:
+`PhysicalCarrier` is a factual project asset such as:
 
 ```text
-CONDUIT
 TRAY
-TRUNKING
-```
-
-P0.4 preserves these and reserves extension for factual kinds such as:
-
-```text
-DUCT
 BASKET_TRAY
 LADDER_TRAY
-UNDERFLOOR
-RISER
-SHAFT
-CUSTOM
+CONDUIT
+TRUNKING
+DUCT
+CABLE_LADDER
+CUSTOM_CARRIER
 ```
 
-No discipline-specific kinds (`CCTV_TRAY`, `FIRE_TRAY`, etc.) are permitted.
+Carrier kinds are physical construction/containment classifications. Discipline-specific kinds such as `CCTV_TRAY` or `FIRE_CONDUIT` are prohibited.
 
-The exact enum/value set may expand in P4 implementation, but every kind must remain a physical/pathway classification rather than a rule outcome.
-
-## 5. PhysicalChannel conceptual contract
+Conceptual contract:
 
 ```text
-PhysicalChannel {
+PhysicalCarrier {
   id
   projectId
   code
   name
   kind
-  spatialContext
+  pathwayContextId
   crossSection
-  usableCapacityFacts
   compartments[]
   environmentFacts
   installationFacts
   provenance
   lifecycleStatus
+  revision
 }
 ```
 
-The current `roomId`-only model is insufficient for ELV3 because vertical and shared pathways may cross room/floor boundaries.
+## 4. PathwayContext
 
-## 6. Spatial ownership/context
+`PathwayContext` models spatial routing context independent from carrier construction.
 
-P0.4 rejects hard-coding every channel as room-owned.
-
-Canonical concept:
+Initial typed contexts:
 
 ```text
-ChannelSpatialContext
-  room-local
-  floor-common
-  riser/shaft
-  project/shared infrastructure
+ROOM_LOCAL
+FLOOR_COMMON
+CORRIDOR
+CEILING_VOID
+UNDERFLOOR
+RISER
+SHAFT
+PROJECT_SHARED
+CUSTOM_CONTEXT
 ```
-
-A channel must have one authoritative spatial host/context.
-
-Candidate typed fields:
-
-```text
-contextType
-roomId?
-floorId?
-spatialFeatureId?
-shaftOrRiserId?
-```
-
-The exact persistence shape is deferred to P0.8, but invalid combinations must be impossible in the domain model.
-
-Examples:
-
-```text
-wall conduit        -> room-local
-corridor tray       -> floor/common or corridor room context
-vertical riser      -> shaft/riser context
-main service duct   -> shared/project infrastructure
-```
-
-## 7. Cross-section model
-
-A channel must expose factual geometry sufficient to derive usable cross-sectional area or support a documented direct capacity fact.
-
-Canonical shapes:
-
-```text
-RECTANGULAR
-CIRCULAR
-CUSTOM
-```
-
-### 7.1 Rectangular
-
-```text
-widthMm  > 0
-heightMm > 0
-```
-
-Gross area is derived:
-
-```text
-widthMm * heightMm
-```
-
-### 7.2 Circular
-
-```text
-diameterMm > 0
-```
-
-Gross area is derived geometrically.
-
-### 7.3 Custom
-
-For a channel whose usable geometry cannot be represented by the primitive shapes, P0.4 permits a factual explicit area with provenance:
-
-```text
-usableAreaMm2
-source/evidence
-```
-
-A custom area without provenance is `UNRESOLVED` for calculations that require trusted capacity.
-
-## 8. Gross vs usable area
-
-P0.4 explicitly separates:
-
-```text
-gross physical area
-usable factual area
-normative permitted fill
-```
-
-`PhysicalChannel` may persist/derive:
-
-```text
-grossCrossSectionAreaMm2
-usableCrossSectionAreaMm2
-```
-
-but MUST NOT persist an anonymous rule like:
-
-```text
-maxFillPercent = 40
-```
-
-unless that value is a versioned rule/profile reference, not a factual property of the channel.
-
-The compatibility engine later evaluates:
-
-```text
-occupiedArea / usableArea
-against
-selected rule profile
-```
-
-## 9. Compartments and dividers
-
-P0.4 requires first-class compartment modelling where the physical channel is divided.
 
 Conceptual contract:
 
 ```text
-ChannelCompartment {
+PathwayContext {
   id
-  channelId
-  code
-  order
-  crossSection
-  usableAreaMm2?
+  projectId
+  kind
+  roomId?
+  floorId?
+  spatialFeatureId?
+  verticalSpan?
+  parentContextId?
+  geometry/evidence references
 }
 ```
 
-A divider is represented through compartment structure rather than as free text.
-
-Canonical rule:
+Examples:
 
 ```text
-RouteSegment may reference either
-  PhysicalChannel as a whole
-or
-  one explicit ChannelCompartment
+shaft S-01
+  -> tray T-01
+  -> conduit C-02
+
+ceiling void CV-01
+  -> basket tray BT-04
 ```
 
-The implementation may eventually replace `physicalChannelId` with a typed channel target reference, but P0.4 does not approve schema yet.
+A shaft/riser is therefore not treated as if it were itself a tray or conduit.
 
-## 10. Compartment occupancy semantics
+## 5. Cross-section facts
 
-If a segment is assigned to a compartment, occupancy belongs to that compartment, not to the undivided whole-channel pool.
-
-Compatibility must therefore calculate fill/segregation against the selected compartment facts.
-
-A segment cannot simultaneously occupy two compartments.
-
-## 11. Environment facts
-
-Persist only observed/declared facts, not conclusions.
-
-Candidate factual dimensions:
+Carrier cross-section may be:
 
 ```text
-installationEnvironment:
-  INDOOR
-  OUTDOOR
-  UNDERGROUND
-  WET
-  DAMP
-  CORROSIVE
-  PLENUM_OR_VOID
-  HIGH_TEMPERATURE
-  CUSTOM
-
-exposure facts
-fireZoneId?
-penetrationIds?
-mechanicalProtectionClass?
+RECTANGULAR(widthMm, heightMm)
+CIRCULAR(diameterMm)
+CUSTOM(usableAreaMm2 + provenance)
 ```
 
-P0.4 does not prescribe a final exhaustive enum because project/source catalogs may require extension, but the model must use structured values rather than discipline-specific booleans such as `allowedForFireCable`.
-
-## 12. Installation facts
-
-Candidate facts:
+Separate:
 
 ```text
-openOrClosed
-embeddedOrExposed
-accessibleForMaintenance
-supportMethod
-installationClass
+gross physical area
+usable factual area
+normative allowed fill
 ```
 
-These facts may later participate in compatibility rules.
+`maxFillPercent` is not a mutable carrier fact.
 
-They MUST NOT directly encode rule outcomes such as `compatible=true`.
+## 6. Compartments/dividers
 
-## 13. Route-segment binding
-
-The existing route kernel already attaches optional `physicalChannelId` to a `RouteSegment`.
-
-P0.4 retains this architecture conceptually:
+Where a carrier is physically divided, compartments are first-class facts:
 
 ```text
-RouteSegment
-  -> channel target optional
+CarrierCompartment {
+  id
+  carrierId
+  code
+  order
+  crossSection / usableArea
+}
 ```
 
-Free/surface/wall-chase routing can remain without a channel reference.
+A traversal may occupy the whole carrier or one specific compartment, but never multiple compartments simultaneously for the same traversal segment unless a future explicit split model is introduced.
 
-Contained routing requires a channel target compatible with the segment's laying method.
+## 7. Occupancy
 
-Current validation rule matching laying method and channel kind is retained as a structural baseline, but future compatibility may allow richer mapping than exact enum-name equality.
+Occupancy is derived, not stored as a mutable cable list:
 
-## 14. Channel continuity
+```text
+PhysicalCarrier
+  <- CableTraversal
+  <- CableRun
+  -> Cable
+```
 
-Channel continuity is a physical-pathway concept and MUST NOT imply cable continuity or logical topology.
+One physical Cable counts once for the occupied path segment regardless of how many `CableAllocation` records use resources inside that cable.
+
+This is mandatory for ACS/multicore correctness.
+
+## 8. Carrier continuity versus cable continuity
+
+Connected carrier geometry does not imply cable continuity and never creates logical topology.
 
 Examples:
 
 ```text
 tray branch
 conduit branch
-riser continuation
 shaft transition
+carrier transition
 ```
 
-may connect pathway geometry without creating:
+are pathway facts only.
 
-- an EngineeringConnection;
-- a Cable splice;
-- an electrical circuit edge.
+Cable continuity is established by the ordered CableRun traversal chain and explicit terminations/transitions where required.
 
-This preserves the existing rule that crossing/connected geometry does not infer logical connectivity.
+## 9. Environment and installation facts
 
-## 15. Vertical/riser modelling
-
-A vertical riser is not correctly represented by pretending it belongs to one room.
-
-P0.4 requires a spatial context capable of representing multi-floor infrastructure.
-
-A cable may have:
+Persist factual inputs such as:
 
 ```text
-Run floor 1
-Run riser section
-Run floor 2
+INDOOR / OUTDOOR
+WET / DAMP
+UNDERGROUND
+CORROSIVE
+PLENUM_OR_VOID
+HIGH_TEMPERATURE
+open/closed
+embedded/exposed
+support method
+maintenance accessibility
+fire-zone reference
+penetration reference
 ```
 
-and the riser run may reference a riser/shaft channel whose spatial context spans floors.
+Do not persist verdict fields such as:
 
-The precise handoff model is completed in P0.6/P0.7, but no `roomId` fiction may be introduced merely to satisfy current schema constraints.
+```text
+allowedForFireCable=true
+compliant=true
+```
 
-## 16. Capacity evidence/provenance
+as source-of-truth facts.
 
-For every non-derived factual capacity/dimension, the system must be able to preserve where the fact came from.
+## 10. ELV3 technical compatibility boundary
 
-Candidate provenance:
+ELV3 may evaluate deterministic physical/technical facts such as:
+
+- resource overlap;
+- geometric continuity;
+- carrier dimensional availability;
+- cable minimum bend-radius versus actual geometry;
+- definition-declared permitted installation method;
+- technical environment compatibility;
+- factual occupied-area/fill basis;
+- physical compartment assignment;
+- carrier/pathway availability.
+
+ELV3 findings may use statuses such as:
+
+```text
+COMPATIBLE
+WARNING
+FORBIDDEN
+UNRESOLVED
+```
+
+but the finding must identify itself as technical physical compatibility, not jurisdictional compliance.
+
+## 11. ELV7 normative boundary
+
+ELV7 owns evaluation that depends on a jurisdiction/normative rule pack, including:
+
+- permitted maximum fill percentage;
+- required segregation distance;
+- statutory fire-cable routing requirements;
+- mandatory firestop/penetration treatment;
+- code-specific exceptions and waivers;
+- formal standards/jurisdiction compliance claims.
+
+Canonical composition:
+
+```text
+ELV3 physical facts/evidence
+  + ELV7 versioned rule pack
+  -> NormativeComplianceFinding
+```
+
+ELV3 must never claim `COMPLIES WITH <standard/jurisdiction>` without ELV7 rule provenance.
+
+## 12. Vertical routing
+
+A cable crossing several floors remains one Cable and one active CableRun per revision:
+
+```text
+CableRun
+  -> traversal floor 1
+  -> traversal carrier in shaft S-01
+  -> traversal floor 2
+```
+
+No fake room ownership and no CableRun split are introduced merely because a pathway spans floors.
+
+## 13. Provenance
+
+Carrier and pathway factual data may originate from:
 
 ```text
 MANUAL_ENTRY
@@ -368,235 +283,38 @@ IMPORTED_DRAWING
 CATALOG
 BIM_IMPORT
 MIGRATED_LEGACY
+MODEL_DERIVED
 ```
 
-with optional:
+Persist source reference/revision when available. Derived area/occupancy remains reproducible from canonical facts.
 
-```text
-sourceReference
-sourceVersion
-capturedAt
-capturedBy
-```
+## 14. Four-discipline validation
 
-Detailed audit lifecycle is finalized in P0.5.
+### CCTV
 
-## 17. Occupancy derivation
+Camera wall route -> corridor tray -> telecom-room conduit, all within one CableRun traversal chain.
 
-`PhysicalChannel` MUST NOT maintain an independently editable list of cable IDs as source of truth.
+### LAN
 
-Occupancy is derived from:
+Many permanent-link CableRuns traverse one shared tray. Occupancy counts distinct physical cables.
 
-```text
-PhysicalChannel
- <- RouteSegment
- <- CableRoute
- <- CableRun
- -> Cable
-```
+### ACS
 
-This avoids dual ownership and restart drift.
+Several logical connections may allocate one multicore Cable, but tray occupancy still counts one cable.
 
-Cached/materialized occupancy may exist later for performance but must be rebuildable from canonical references.
+### Fire
 
-## 18. Fill basis
+Carrier/pathway facts are persisted in ELV3. A legal fire-routing decision is deferred to ELV7; ELV3 may still detect malformed geometry or definition-declared technical incompatibility.
 
-ELV3-P6 will calculate a fill basis using cable physical facts and channel facts.
+## 15. P0-R5/P0-R7 acceptance
 
-P0.4 only freezes required source semantics:
+- [x] PhysicalCarrier and PathwayContext are separate concepts.
+- [x] shaft/riser are spatial contexts, not carrier types.
+- [x] carrier facts remain discipline-neutral.
+- [x] compartments are factual first-class structures.
+- [x] occupancy derives from physical CableRun traversals.
+- [x] multicore cable counts once.
+- [x] vertical routing does not split CableRun identity.
+- [x] ELV3 technical compatibility and ELV7 normative compliance are explicitly separated.
 
-```text
-CableDefinition.outerDiameter / equivalent occupied area basis
-PhysicalChannel usable area / compartment usable area
-RouteSegment -> selected channel target
-```
-
-No normative acceptance threshold is hard-coded in P0.4.
-
-## 19. Segregation basis
-
-P0.4 supports factual segregation by making compartment identity and pathway spatial facts explicit.
-
-It does NOT decide whether two cable classes are legally allowed together.
-
-Later compatibility evaluates:
-
-```text
-cable facts + other occupancy + channel/compartment facts + rule profile
-```
-
-## 20. Fire/penetration facts
-
-Where a route crosses a fire boundary/penetration, P0.4 permits factual references such as:
-
-```text
-fireZoneId
-penetrationId
-penetrationType
-seal/system reference
-```
-
-but compliance evaluation is deferred to ELV7 rules.
-
-A factual penetration record must not contain an unproven `compliant=true` source-of-truth flag.
-
-## 21. Structural validation
-
-Minimum structural validation codes:
-
-```text
-CHANNEL_MISSING_IDENTITY
-CHANNEL_PROJECT_MISMATCH
-CHANNEL_INVALID_SPATIAL_CONTEXT
-CHANNEL_INVALID_DIMENSIONS
-CHANNEL_AREA_UNRESOLVED
-CHANNEL_COMPARTMENT_DUPLICATE
-CHANNEL_COMPARTMENT_INVALID
-CHANNEL_TARGET_MISMATCH
-CHANNEL_KIND_UNSUPPORTED
-CHANNEL_PROVENANCE_MISSING
-```
-
-Structural invalidity blocks persistence/commit where required facts are malformed.
-
-Engineering incompatibility remains a separate compatibility result.
-
-## 22. Four-discipline walkthrough
-
-### CCTV — PASS
-
-```text
-camera room wall segment
-  -> no channel / surface route
-corridor segment
-  -> tray T-01
-telecom room segment
-  -> conduit C-12
-```
-
-Same physical cable can move through several pathway types without creating multiple logical connections.
-
-### LAN — PASS
-
-Permanent-link cables share a corridor tray. Occupancy is derived from each cable's route segments referencing the tray.
-
-No tray-owned cable list is needed.
-
-### ACS — PASS
-
-Several logical ACS connections may share one multicore cable. The tray sees one physical cable occupancy through the cable's route/run geometry, not four independent logical connections.
-
-This is a critical invariant for fill calculations.
-
-### Fire — PASS
-
-A fire cable may be routed through a compartment/channel. The channel persists facts only; compatibility rules later decide whether that containment is permitted.
-
-An invalid scenario can therefore produce:
-
-```text
-FORBIDDEN: fire/segregation/containment
-```
-
-without mutating channel facts.
-
-## 23. Important occupancy invariant for multicore cables
-
-When several `CableAllocation` records share one `Cable`, pathway fill MUST count the physical `Cable` once, not once per allocation.
-
-Canonical derivation:
-
-```text
-Channel occupancy
-  -> distinct physical Cable identities on referencing runs/segments
-```
-
-NOT:
-
-```text
-number of EngineeringConnections
-or
-number of CableAllocations
-```
-
-This prevents severe over-counting in ACS and other multicore scenarios.
-
-## 24. Invalid models rejected
-
-P0.4 rejects:
-
-```text
-PhysicalChannel.allowedForFire = true
-PhysicalChannel.maxFillPercent = anonymous mutable number
-PhysicalChannel.cableIds[] as canonical ownership
-PhysicalChannel.networkId
-roomId required for every pathway including risers
-CCTV/LAN/ACS/FIRE-specific channel entities
-free-text compartment assignment
-fill counted per CableAllocation rather than physical Cable
-pathway continuity implying electrical/logical continuity
-```
-
-## 25. Required pure-domain direction
-
-Equivalent pure-domain capabilities are required later:
-
-```text
-ChannelGeometryResolver
-  -> gross/usable geometry facts
-
-ChannelOccupancyResolver
-  -> distinct cables occupying channel/compartment
-
-PhysicalRoutingCompatibilityEngine
-  -> evaluates facts against versioned rules
-```
-
-Facts/resolution must be deterministic and repository-independent.
-
-## 26. Persistence direction, not schema approval
-
-P0.4 implies future storage for:
-
-```text
-PhysicalChannels
-ChannelCompartments
-spatial context references
-factual dimensions/capacity
-provenance
-```
-
-but P0.8 will decide exact schema after lifecycle and migration analysis.
-
-The current `PhysicalChannels(id, roomId, name, kind)` records must be migratable without data loss.
-
-## 27. P0.4 acceptance gate
-
-P0.4 is CLOSED when all statements below are accepted:
-
-- [x] channel facts are separated from normative/rule thresholds;
-- [x] room-only ownership is rejected for shared/riser infrastructure;
-- [x] rectangular/circular/custom cross-section facts are representable;
-- [x] gross area, usable area and allowed fill are distinct concepts;
-- [x] compartments/dividers are first-class factual structures;
-- [x] route segment targets at most one channel/compartment;
-- [x] occupancy is derived from route/run/cable references;
-- [x] multicore cable occupancy is counted once per physical Cable;
-- [x] channel continuity does not imply cable/logical continuity;
-- [x] environment/install/fire-zone facts are factual, not verdicts;
-- [x] vertical/riser pathways do not require fake room ownership;
-- [x] CCTV/LAN/ACS/Fire all fit the same model;
-- [x] existing route geometry kernel remains reusable;
-- [x] exact schema remains deferred to P0.8.
-
-## 28. Remaining P0 work
-
-```text
-P0.5  Lifecycle / deletion / audit / provenance
-P0.6  Migration from electrical CableRun
-P0.7  Full four-discipline walkthrough
-P0.8  Persistence proposal
-P0.9  Hard design review
-```
-
-No implementation migration begins before P0.9 closes the design contract.
+These remediation points are CLOSED subject to P0-R10.
