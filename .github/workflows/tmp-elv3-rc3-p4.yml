@@ -23,7 +23,19 @@ jobs:
           channel: stable
           cache: true
       - name: Apply RC3 patch
-        run: python3 scripts/ci/apply-elv3-runtime-rc3.py
+        run: |
+          python3 scripts/ci/apply-elv3-runtime-rc3.py
+          sed -i "s#import 'package:drift/native.dart';#import 'package:drift/drift.dart';\nimport 'package:drift/native.dart';#" apps/mobile/test/data/elv_p4_runtime_closure_test.dart
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('apps/mobile/lib/data/repositories/drift_elv_physical_carrier_repository.dart')
+          s = p.read_text()
+          old = "revision: Value((await (database.select(database.traversalCarrierAssignments)..where((row) => row.traversalId.equals(command.traversalId))).getSingleOrNull())?.revision ?? 0 + 1),"
+          new = "revision: Value(((await (database.select(database.traversalCarrierAssignments)..where((row) => row.traversalId.equals(command.traversalId))).getSingleOrNull())?.revision ?? 0) + 1),"
+          if old not in s:
+              raise SystemExit('assignment revision anchor not found')
+          p.write_text(s.replace(old, new, 1))
+          PY
       - name: Install dependencies
         working-directory: apps/mobile
         run: flutter pub get --enforce-lockfile
