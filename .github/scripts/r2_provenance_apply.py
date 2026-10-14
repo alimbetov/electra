@@ -1,6 +1,6 @@
 from pathlib import Path
 
-# Round-2 remediation patcher replayed after canonical identity hardening.
+# Round-2 remediation patcher replayed on the clean canonical-identity head.
 path = Path('apps/mobile/lib/data/repositories/drift_engineering_reference_adoption_repository.dart')
 text = path.read_text()
 
