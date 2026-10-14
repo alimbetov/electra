@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - 'feat/flutter-*'
+      - 'feat/elv3-*'
       - 'audit/elv2-*'
   pull_request:
     paths:
