@@ -36,6 +36,7 @@ final class DriftElvPhysicalCalculationResultStore
       'trace': result.trace,
       'blockingCodes': result.blockingCodes,
     };
+
     await database.into(database.projectDerivedResults).insertOnConflictUpdate(
           ProjectDerivedResultsCompanion.insert(
             projectId: projectId,
@@ -47,7 +48,7 @@ final class DriftElvPhysicalCalculationResultStore
               'algorithmVersion': result.algorithmVersion,
               'subjectId': result.subjectId,
             }),
-            dependenciesJson: const '[]',
+            dependenciesJson: '[]',
             resultJson: jsonEncode(payload),
             state: result.state.name.toUpperCase(),
             revision: const Value(1),
@@ -72,7 +73,12 @@ final class DriftElvPhysicalCalculationResultStore
           ))
         .getSingleOrNull();
     if (row == null) return null;
+
     final map = jsonDecode(row.resultJson) as Map<String, dynamic>;
+    final persistedState = ElvCalculationState.values.byName(
+      row.state.toLowerCase(),
+    );
+
     return ElvPhysicalCalculationResult<Object?>(
       processCode: map['processCode'] as String,
       algorithmVersion: map['algorithmVersion'] as String,
@@ -81,7 +87,7 @@ final class DriftElvPhysicalCalculationResultStore
       subjectId: map['subjectId'] as String,
       value: map['value'],
       unit: map['unit'] as String,
-      state: ElvCalculationState.values.byName(map['state'] as String),
+      state: persistedState,
       inputFingerprint: map['inputFingerprint'] as String,
       trace: (map['trace'] as Map).cast<String, Object?>(),
       blockingCodes: (map['blockingCodes'] as List).cast<String>(),
@@ -92,6 +98,7 @@ final class DriftElvPhysicalCalculationResultStore
   Future<void> invalidate(String projectId, Iterable<String> nodeKeys) async {
     final keys = nodeKeys.toSet();
     if (keys.isEmpty) return;
+
     await (database.update(database.projectDerivedResults)
           ..where(
             (row) =>
