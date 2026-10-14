@@ -56,6 +56,13 @@ CableDefinition cat6Definition({String label = 'Cat6 U/UTP'}) => CableDefinition
 );
 
 void main() {
+  test('shared SHA-256 helper matches the standard abc vector', () {
+    expect(
+      sha256HexUtf8('abc'),
+      'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad',
+    );
+  });
+
   test('valid cable definition produces stable exact reference hash', () {
     final definition = cat6Definition();
     expect(definition.validate(), isEmpty);
