@@ -1,24 +1,31 @@
 # Electra — ELV3 Code Implementation Index
 
-Status: CODE IMPLEMENTATION AUTHORITY / READY FOR P1  
+Status: CODE IMPLEMENTATION AUTHORITY / READINESS REOPENED / P1 HOLD  
 Branch: `feat/flutter-elv3-physical-routing-design`
 
 ## 1. Purpose
 
 This is the implementation entry point once a developer starts coding ELV3. Architectural meaning remains governed by the higher-level ELV3 authority chain, but code structure, type names, repository boundaries, persistence ownership and test placement are defined here.
 
+A stricter implementation review found code-design gaps that must be remediated before P1 starts. The current blocking review is:
+
+`docs/audit/elv3-code-implementation-technical-review.md`
+
+Until CR-01 through CR-16 are closed, the earlier code-level READY status is suspended.
+
 ## 2. Code-level authority order
 
-1. `docs/product/elv3-code-contract-p1-p3.md`
-2. `docs/product/elv3-code-contract-p4-p6.md`
-3. `docs/product/elv3-code-contract-p7-p9.md`
-4. `docs/product/elv3-dual-review-process-hardening.md`
-5. `docs/product/elv3-r2-execution-clarifications.md`
-6. `docs/product/elv3-r2-final-readiness-remediation.md`
-7. `docs/product/elv3-implementation-specification-v2.md`
-8. accepted ADR/P0 authority chain
+1. `docs/audit/elv3-code-implementation-technical-review.md` — temporary readiness blocker and required CR-01..CR-16 remediation contract.
+2. `docs/product/elv3-code-contract-p1-p3.md`
+3. `docs/product/elv3-code-contract-p4-p6.md`
+4. `docs/product/elv3-code-contract-p7-p9.md`
+5. `docs/product/elv3-dual-review-process-hardening.md`
+6. `docs/product/elv3-r2-execution-clarifications.md`
+7. `docs/product/elv3-r2-final-readiness-remediation.md`
+8. `docs/product/elv3-implementation-specification-v2.md`
+9. accepted ADR/P0 authority chain
 
-Code-level contracts refine but may not contradict domain architecture. If a lower-level code document conflicts with a higher-ranked code document, earlier item wins. If code-level wording would violate domain architecture, domain architecture wins and P9 must record the correction.
+The technical review currently wins wherever it identifies a code-design ambiguity. After remediation, this index must be updated to reference the closed remediation and rerun audit.
 
 ## 3. Layer map
 
@@ -33,13 +40,13 @@ packages/engineering_core/lib/src
 apps/mobile/lib/application
   commands
   services/use-cases
-  repository interfaces
+  repository/query interfaces
   workspace state
   dependency/impact coordination
 
 apps/mobile/lib/data/repositories
-  Drift repository implementations
-  database transactions
+  Drift persistence adapters
+  transaction-bound query/write primitives
   row/domain mapping
   SQLite error translation
   restart/idempotency persistence
@@ -58,12 +65,15 @@ apps/mobile/lib/...presentation...
 
 ## 4. Frozen source-file groups
 
-### P1–P3 core
+The source-file groups remain the intended target but CR-01 requires P1/P2 resource-definition ownership to be corrected before coding starts.
+
+### P1–P3 core target
 
 ```text
 elv_cable_reference.dart
 elv_cable.dart
-elv_cable_resource.dart
+elv_cable_resource_definition.dart   # P1 reference-data type after CR-01
+elv_cable_resource_selection.dart    # P2 runtime selection/resolver after CR-01
 elv_cable_allocation.dart
 elv_cable_termination.dart
 elv_design_revision.dart
@@ -131,7 +141,7 @@ ProjectPhysicalCompatibilityProfileSets
 ProjectPhysicalCompatibilityProfileRefs
 ```
 
-P6 uses existing derived-result persistence with design-revision-scoped keys unless P9-approved evidence proves this is technically impossible.
+P6 uses existing derived-result persistence with design-revision-scoped keys unless a later audited implementation finding proves this is technically impossible.
 
 ## 6. No-cross-layer rules
 
@@ -139,11 +149,15 @@ P6 uses existing derived-result persistence with design-revision-scoped keys unl
 engineering_core MUST NOT import Drift/Flutter
 application MUST NOT depend on Drift row types
 widgets MUST NOT use database tables directly for domain mutations
-repositories MUST NOT invent domain validation semantics
+persistence repositories MUST NOT invent domain validation semantics
 calculation engines MUST NOT query repositories
 ```
 
+CR-02 further requires exactly one application command-orchestration owner; persistence repositories become query/write ports rather than alternate command services.
+
 ## 7. Public command naming
+
+Existing command names remain reserved, subject to CR-14 common result/failure envelope and CR-02 orchestration hardening.
 
 P1:
 
@@ -198,13 +212,13 @@ expectedRevision
 expectedImpactFingerprint (when shared fan-out applies)
 ```
 
-No repository may substitute implicit latest revision for a required expected revision.
+No repository/service may substitute implicit latest revision for a required expected revision.
 
 ## 9. Error contract
 
 Errors cross application boundary as typed deterministic failures, never raw Drift/SQLite exceptions.
 
-Primary evaluation order:
+Primary evaluation order remains:
 
 ```text
 1 command envelope / idempotency
@@ -218,42 +232,67 @@ Primary evaluation order:
 9 storage translation
 ```
 
-Multiple findings in one category sort by `(code, entityId, field)`.
+CR-14 requires one shared ELV3 `ElvCommandResult<T>` / `ElvFailure` envelope across P1-P9.
 
 ## 10. Migration discipline
 
-Each phase owns only its new schema. P1 cannot pre-create P2/P3 tables. Before coding a phase, implementer reads current `schemaVersion` and assigns the next incremental version(s) needed by that phase.
-
-Migration tests must cover:
+Current branch database schema is version 17. CR-15 requires the initial phase mapping to be treated as:
 
 ```text
-fresh database
-upgrade from previous exact phase schema
-reopen after migration
-foreign_keys ON
-index/uniqueness behavior
-legacy electrical data preservation
+P1 -> 18
+P2 -> 19
+P3 -> 20
+P4 -> 21
+P5 -> 22
 ```
 
-## 11. Code-review checklist per PR
+unless the branch schema changes before the relevant phase starts; any rebase must remain monotonic and be documented in the phase gate.
+
+Migration tests must cover fresh DB, exact previous-version upgrade, reopen, foreign keys, partial unique indexes and preservation of legacy electrical data.
+
+## 11. Current mandatory remediation before P1
+
+```text
+CR-01 P1/P2 cable-resource type ownership
+CR-02 one command orchestration owner
+CR-03 exact durable command ledger schema/codec
+CR-04 DB-level critical partial unique indexes
+CR-05 concrete Drift write-unit-of-work transaction contract
+CR-06 two-connection SQLite concurrency tests
+CR-07 route edit impact includes legacy electrical CableRuns
+CR-08 snapshot assembler vs transaction coordinator split
+CR-09 typed carrier environment/installation facts
+CR-10 exact P5 sealed rule hierarchy
+CR-11 executable P6 separation evidence/algorithm
+CR-12 DRAFT termination persistence contradiction
+CR-13 CreateCableRun allocation prerequisite
+CR-14 one ELV command result/failure envelope
+CR-15 migration-version baseline
+CR-16 exact Cable dependency inspector port
+```
+
+## 12. Code-review checklist per PR
 
 Every phase PR reviewer checks:
 
 ```text
 [ ] files follow layer ownership
-[ ] public types match code contract
+[ ] public types match remediated code contract
 [ ] no future-phase persistence leaked
-[ ] transactions match command contract matrix
+[ ] DB-level invariants/indexes exist
+[ ] transactions match command matrix/UoW
 [ ] errors translated deterministically
 [ ] idempotency evidence persists atomically
+[ ] two-connection race tests exist where required
 [ ] restart test exists
 [ ] failure/rollback test exists where compound
 [ ] dependency keys emitted where required
+[ ] shared route edits validate canonical + legacy dependents
 [ ] no widget direct multi-table writes
 [ ] no legacy electrical regression
 [ ] exact-SHA workflow green
 ```
 
-## 12. Implementation start rule
+## 13. Implementation start rule
 
-P1 may start from this index. After P1 exact-SHA gate closes, update this index only if code-level audit discovers a necessary non-semantic mapping change. Any semantic change reopens architecture review rather than being hidden in implementation.
+P1 MUST NOT start from the previous READY state. First close CR-01 through CR-16 in the code-level contracts and rerun `elv3-code-implementation-technical-review.md`. Only a new PASS may restore `P1 AUTHORIZED`.
