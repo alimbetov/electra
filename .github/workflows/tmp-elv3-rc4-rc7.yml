@@ -43,6 +43,16 @@ jobs:
       - name: Apply RC4-RC7 patches
         shell: bash
         run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('apps/mobile/lib/data/database/app_database.dart')
+          s = p.read_text()
+          formatted = """    await customStatement(\n      'CREATE INDEX IF NOT EXISTS idx_elv_traversal_carrier_assignment_run ON traversal_carrier_assignments(cable_run_id)',\n    );\n"""
+          compact = "    await customStatement('CREATE INDEX IF NOT EXISTS idx_elv_traversal_carrier_assignment_run ON traversal_carrier_assignments(cable_run_id)');\n"
+          if formatted not in s:
+              raise SystemExit('formatted P4 traversal assignment index anchor not found')
+          p.write_text(s.replace(formatted, compact, 1))
+          PY
           python3 scripts/ci/apply-elv3-runtime-rc4.py
           sed -i "s#import 'package:drift/native.dart';#import 'package:drift/drift.dart' show Value;\nimport 'package:drift/native.dart';#" apps/mobile/test/data/elv_p5_runtime_closure_test.dart
           python3 scripts/ci/apply-elv3-runtime-rc5.py
