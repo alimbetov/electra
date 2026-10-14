@@ -91,8 +91,10 @@ void main() {
         expectedRevision: 2,
       ),
     );
-    expect((archived as ElvCommandSuccess<Cable>).value.lifecycleState,
-        CableLifecycleState.archived);
+    expect(
+      (archived as ElvCommandSuccess<Cable>).value.lifecycleState,
+      CableLifecycleState.archived,
+    );
   });
 }
 
@@ -106,10 +108,13 @@ final class _FakeUow implements ElvWriteUnitOfWork<ElvCableWriteSession> {
 }
 
 final class _FakeSession implements ElvCableWriteSession {
-  _FakeSession(this.cables);
+  _FakeSession(this.cables) : references = _FakeReferenceStore(cables.definitions);
 
   @override
   final _FakeCableStore cables;
+
+  @override
+  final ElvReferenceReadStore references;
 
   @override
   final _FakeLedger commandLedger = _FakeLedger();
@@ -146,6 +151,24 @@ final class _NoDependencies implements ElvCableDependencyStore {
   Future<bool> hasResourceSelectionHistory(String projectId, String cableId) async => false;
 }
 
+final class _FakeReferenceStore implements ElvReferenceReadStore {
+  const _FakeReferenceStore(this.definitions);
+  final Map<String, CableDefinition> definitions;
+
+  @override
+  Future<CableDefinition> resolveCableDefinition(
+    String projectId,
+    CableDefinitionRef ref,
+  ) async {
+    final definition = definitions[ref.definitionCode];
+    if (definition == null ||
+        cableDefinitionContentHashV1(definition) != ref.definitionContentHash) {
+      throw StateError('not found');
+    }
+    return definition;
+  }
+}
+
 final class _FakeCableStore implements ElvCableWriteStore {
   _FakeCableStore(this.definitions);
 
@@ -167,19 +190,6 @@ final class _FakeCableStore implements ElvCableWriteStore {
 
   @override
   Future<Cable?> findCable(String projectId, String cableId) async => values[cableId];
-
-  @override
-  Future<CableDefinition> resolveDefinition(
-    String projectId,
-    CableDefinitionRef ref,
-  ) async {
-    final definition = definitions[ref.definitionCode];
-    if (definition == null ||
-        cableDefinitionContentHashV1(definition) != ref.definitionContentHash) {
-      throw StateError('not found');
-    }
-    return definition;
-  }
 
   @override
   Future<bool> activeLabelExists(String projectId, String normalizedLabel) async =>
