@@ -21,85 +21,84 @@ Delivery is incremental: each baseline has an exact-commit Flutter/core CI gate.
 | FL19 | Offline PDF reports: drawings, schedules, BOM/estimate and engineering evidence | Planned |
 | FL20 | Offline installation, deviations/as-built, tests and commissioning evidence | Planned |
 
-## Next vertical acceptance: FL16
-
-The editor reports module/mm overflow and represents the exact physical row arrangement of a generated panel.
-Recommended enclosure width, height and depth must account for device dimensions, DIN rails, terminals, cable ducts, clearances and reserved space.
-FL15 already supplies preliminary occupied/spare/total module capacity. This is not a physical enclosure dimension.
-Normative requirements, manufacturer selection and physical placement remain separate concerns.
-
 ## ELV extension track
-
-The [ELV delivery plan](elv-delivery-plan.md) is the active product roadmap.
 
 | Stage | Outcome | Status |
 |---|---|---|
 | ELV0 | Systems, sixteen family editions, shared device participation | Baseline closed |
 | ELV1 | Ports, connections, topology, passive mappings and assemblies | CLOSED / ACCEPTED |
 | ELV2 | Canonical discipline profiles, versioned catalogs, placement and explicit adoption | CLOSED / ACCEPTED |
-| ELV3 | Cable resources, allocation/termination, cable-run traversal, reusable routing/carriers/pathways and physical compatibility | ARCHITECTURE READY / CODE READINESS REOPENED / CR-01..CR-16 REMEDIATION / P1 HOLD |
+| ELV3 | Cable resources, allocation/termination, cable-run traversal, reusable routing/carriers/pathways and physical compatibility | CODE REMEDIATION CLOSED / TECHNICAL RE-REVIEW PASS / P1 CODE AUTHORIZED |
 | ELV4 | Power, PoE, PSU, UPS, converters and backup graph | Planned |
 | ELV5 | Versioned CCTV/LAN/ACS/fire calculations | Planned |
 | ELV6 | Racks, cabinets, patching and physical capacity | Planned |
 | ELV7 | Jurisdiction profiles, normative rule packs and findings | Planned |
 | ELV8 | Manufacturer selection, snapshots, BOM and deliverables | Planned |
 
-ELV3 architecture/process specification remains accepted after P0, R2 and dual-review hardening. A later code-implementation technical review against the actual Dart/Drift code reopened only code-level readiness: one BLOCKER and eleven HIGH findings remain in implementation contracts. The canonical ELV3 domain architecture itself is not reopened.
+ELV3 architecture/process specification remains accepted after P0, R2 and dual-review hardening. The code-implementation technical review later reopened readiness with CR-01..CR-16. Those findings are now closed by the authoritative code-remediation contracts, and a fresh implementation-level re-review reports zero open BLOCKER/HIGH code-design findings.
 
-Architecture/process execution authority remains:
+Architecture/process authority remains:
 
 - `docs/product/elv3-authoritative-spec-index.md`;
 - `docs/product/elv3-dual-review-process-hardening.md`;
 - `docs/product/elv3-r2-execution-clarifications.md`;
 - `docs/product/elv3-r2-final-readiness-remediation.md`.
 
-Current code implementation authority/readiness:
+Current code implementation authority:
 
-- `docs/product/elv3-code-implementation-index.md` — READINESS REOPENED;
-- `docs/audit/elv3-code-implementation-technical-review.md` — current blocker/remediation review;
+- `docs/product/elv3-code-implementation-index.md`;
+- `docs/product/elv3-code-remediation-final-clarifications.md`;
+- `docs/product/elv3-code-implementation-remediation-cr01-cr16.md`;
 - `docs/product/elv3-code-contract-p1-p3.md`;
 - `docs/product/elv3-code-contract-p4-p6.md`;
 - `docs/product/elv3-code-contract-p7-p9.md`.
 
-The prior `docs/audit/elv3-code-level-readiness-audit.md` is historical/superseded and is not implementation authorization.
+Latest code readiness evidence:
 
-Current code remediation set before P1:
+- `docs/audit/elv3-code-implementation-technical-rereview.md` — PASS.
+
+Historical finding evidence:
+
+- `docs/audit/elv3-code-implementation-technical-review.md` — CR-01..CR-16 source review, superseded as authorization;
+- `docs/audit/elv3-code-level-readiness-audit.md` — earlier historical PASS.
+
+Closed code remediation set:
 
 ```text
 CR-01 P1/P2 resource-definition ownership/compile order
 CR-02 single command orchestration owner
 CR-03 exact durable CommandExecutionRecords schema/codec
 CR-04 DB-enforced partial unique invariants
-CR-05 concrete Drift write-unit-of-work transaction strategy
+CR-05 concrete phase-specific Drift write-unit-of-work strategy
 CR-06 two-connection SQLite race tests
 CR-07 shared route edit validates canonical + legacy electrical dependents
 CR-08 pure snapshot assembler + transaction-bound coordinator
 CR-09 typed carrier environment/installation facts
 CR-10 exact P5 sealed compatibility-rule hierarchy
-CR-11 executable P6 separation evidence/algorithm
-CR-12 DRAFT termination persistence contradiction
+CR-11 persisted explicit P6 separation evidence
+CR-12 DRAFT termination memory-only candidate
 CR-13 CreateCableRun allocation prerequisite
 CR-14 common ELV command result/failure envelope
-CR-15 migration version baseline from schemaVersion 17
+CR-15 migration baseline schema 18→23
 CR-16 exact Cable downstream dependency inspector port
 ```
 
-Implementation sequence remains conceptually fixed:
+Additional remediation self-review clarifications closed phase-specific UoW compile isolation, ledger replay semantics, exact P6 separation persistence, resource graph publication validation and reuse of legacy route validators.
+
+Canonical implementation sequence is now:
 
 ```text
-CR-01..CR-16 remediation
-  ↓ code technical review PASS
-P1 Cable identity / exact ELV2 CableDefinitionRef
+P1 Cable identity / CableDefinitionRef / P1 resource-definition types
   ↓ exact-SHA
-P2 Allocation / resource selections + atomic claims / A-B terminations
+P2 Allocation / runtime resource selection + claims / A-B terminations
   ↓ exact-SHA
-P3 ProjectDesignRevision / frozen snapshot / deterministic revision fork / CanonicalCableRun / traversal / handoff / legacy coexistence
+P3 ProjectDesignRevision / frozen snapshot / revision fork / CanonicalCableRun / traversal / route coexistence
   ↓ exact-SHA
-P4 sealed PathwayContext / PhysicalCarrier / compartments
+P4 sealed PathwayContext / typed PhysicalCarrier facts / compartments
   ↓ exact-SHA
-P5 exact technical physical compatibility profile set / findings
+P5 sealed physical-compatibility profile rules / exact project profile set
   ↓ exact-SHA
-P6 revision-scoped reproducible physical evidence/calculations
+P6 revision-scoped calculations + persisted RouteSeparationEvidence
   ↓ exact-SHA
 P7 Engineer Physical Routing workspace
   ↓ exact-SHA
@@ -108,9 +107,9 @@ P8 Restart / rollback / failure injection / persisted idempotency verticals
 P9 Architecture-vs-code hard audit / command-matrix audit / final exact-SHA closure
 ```
 
-P1 code implementation is currently on HOLD. Only a new PASS of `elv3-code-implementation-technical-review.md` after CR remediation restores authorization.
+P1 code implementation is AUTHORIZED. P2 may begin only after P1 closes on its own exact branch SHA with required green CI and acceptance evidence; the same sequential rule applies through P9.
 
-All four discipline fixtures plus a fiber fixture remain required throughout the track. National rule packs require verified sources and provenance. FL16 and ELV6 share enclosure infrastructure; ELV8 reuses electrical BOM/reporting foundations.
+All four discipline fixtures plus a fiber fixture remain mandatory throughout the track. Legacy electrical routing regression is mandatory from P3 onward. National rule packs remain ELV7 concerns with verified provenance.
 
 ## Validation at FL15
 
