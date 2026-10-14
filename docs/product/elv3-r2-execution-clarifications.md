@@ -85,11 +85,53 @@ ProjectPhysicalCompatibilityProfileSets
 ProjectPhysicalCompatibilityProfileRefs
 ```
 
+## C5 — DesignRevisionPhysicalSnapshot wire/hash contract
+
+Snapshot integrity uses one versioned deterministic representation:
+
+```text
+schema marker = "electra.design-revision-physical-snapshot.v1"
+canonical value = {
+  "schema": marker,
+  "designRevisionId": <stable id>,
+  "physicalState": <complete embedded snapshot payload>
+}
+canonical bytes = UTF-8(canonicalEngineeringJson(canonical value))
+payloadSha256 = SHA-256(canonical bytes)
+stored form = lowercase 64-character hexadecimal
+```
+
+Rules:
+
+- unordered collections inside the snapshot are sorted by stable canonical identity before serialization;
+- ordered engineering sequences such as traversal order remain ordered and are never sorted away;
+- frozen snapshot verification after reopen recomputes the hash and blocks on mismatch;
+- schema marker change requires an explicit new reader/version, never silent reinterpretation.
+
+## C6 — resource-selection evidence hash
+
+`CableAllocationResourceSelections` persist both the original typed selection evidence and the exact resolved atomic set used at reservation time.
+
+```text
+schema marker = "electra.cable-resource-selection.v1"
+canonical value = {
+  "schema": marker,
+  "cableDefinitionRef": <exact ref>,
+  "selection": <typed selection>,
+  "resolvedAtoms": <sorted atomic identities>
+}
+selectionSha256 = SHA-256(UTF-8(canonicalEngineeringJson(canonical value)))
+```
+
+The stored atomic set and hash are immutable after RESERVE. Restart must resolve the current immutable CableDefinition edition again and prove the resolved atom set/hash is identical; mismatch is `ELV_RESTART_RECONSTRUCTION_FAILED`/integrity failure, not a silent remap.
+
 ## Closure
 
 ```text
-C1 frozen revision write guard       CLOSED
-C2 zero-length interface handoff      CLOSED
-C3 immutable selection evidence       CLOSED
-C4 deterministic P5 profile set       CLOSED
+C1 frozen revision write guard        CLOSED
+C2 zero-length interface handoff       CLOSED
+C3 immutable selection evidence        CLOSED
+C4 deterministic P5 profile set        CLOSED
+C5 snapshot wire/hash contract         CLOSED
+C6 selection evidence hash             CLOSED
 ```
