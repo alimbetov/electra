@@ -1,7 +1,8 @@
 # Electra — Canonical ELV Discipline Model
 
-Status: Draft 0.1  
-Branch: `docs/elv-engineering-systems-spec`
+Status: ACCEPTED ARCHITECTURE — ELV1/ELV2 baseline
+Accepted baseline: `main@f05b1e558a93b40928429ca86d91f4daa0cf4ef0`
+Next stage: `ELV3-P0` physical-routing design/audit
 
 ## 1. Decision
 
