@@ -1,0 +1,90 @@
+name: ELV3 Runtime Closure Apply
+
+on:
+  push:
+    branches:
+      - feat/elv3-runtime-closure
+    paths:
+      - 'scripts/ci/apply-elv3-runtime-rc1-rc2.py'
+      - '.github/workflows/elv3-runtime-closure-apply.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply-rc1-rc2:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout runtime closure branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/elv3-runtime-closure
+          fetch-depth: 0
+
+      - name: Apply deterministic RC1-RC2 patch
+        run: python3 scripts/ci/apply-elv3-runtime-rc1-rc2.py
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install mobile dependencies
+        working-directory: apps/mobile
+        run: flutter pub get --enforce-lockfile
+
+      - name: Format mobile source and tests
+        working-directory: apps/mobile
+        run: dart format lib test
+
+      - name: Generate Drift code
+        working-directory: apps/mobile
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Analyze mobile app
+        working-directory: apps/mobile
+        run: flutter analyze
+
+      - name: Run P3 runtime closure tests
+        working-directory: apps/mobile
+        run: flutter test test/data/elv_p3_runtime_closure_test.dart
+
+      - name: Run full mobile tests
+        working-directory: apps/mobile
+        run: flutter test
+
+      - name: Install engineering core dependencies
+        working-directory: packages/engineering_core
+        run: dart pub get
+
+      - name: Verify engineering core formatting
+        working-directory: packages/engineering_core
+        run: dart format --output=none --set-exit-if-changed lib test
+
+      - name: Analyze engineering core
+        working-directory: packages/engineering_core
+        run: dart analyze
+
+      - name: Test engineering core
+        working-directory: packages/engineering_core
+        run: dart test
+
+      - name: Verify generated artifacts are not tracked
+        run: bash scripts/ci/check-no-generated-artifacts.sh
+
+      - name: Commit RC1-RC2 implementation
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add apps/mobile/lib/data/database/app_database.dart \
+                  apps/mobile/lib/data/repositories/drift_elv_runtime_support.dart \
+                  apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart \
+                  apps/mobile/lib/data/repositories/drift_elv_cable_run_repository.dart \
+                  apps/mobile/lib/data/repositories/drift_elv_cable_write_unit_of_work.dart \
+                  apps/mobile/test/data/elv_p3_runtime_closure_test.dart
+          git diff --cached --quiet && exit 0
+          git commit -m 'feat(elv3): close P3 runtime persistence baseline'
+          git push origin HEAD:feat/elv3-runtime-closure
