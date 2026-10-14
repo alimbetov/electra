@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/providers.dart';
 import '../../application/component_placement_history.dart';
+import '../../application/engineering_placement_repository.dart';
 import 'room_editor_screen.dart';
 
 /// Persistent route boundary for the Room Editor.
@@ -65,6 +66,12 @@ class _PersistedRoomEditorScreenState
     final roomAsync = ref.watch(roomProvider(roomId));
     final geometryAsync = ref.watch(roomGeometryProvider(roomId));
     final componentsAsync = ref.watch(roomComponentsProvider(roomId));
+    final referencesAsync = ref.watch(
+      projectEngineeringReferencesProvider(projectId),
+    );
+    final topologyAsync = ref.watch(
+      projectEngineeringTopologyProvider(projectId),
+    );
 
     return projectAsync.when(
       loading: () => const _LoadingScaffold(),
@@ -104,6 +111,18 @@ class _PersistedRoomEditorScreenState
                               room: room,
                               geometry: geometry,
                               components: components,
+                              engineeringReferences:
+                                  referencesAsync.asData?.value,
+                              engineeringReferenceMessage:
+                                  referencesAsync.hasError
+                                      ? 'Unable to load reference catalogs: ${referencesAsync.error}'
+                                      : 'Loading engineering reference catalogs…',
+                              engineeringTopologyProfiles:
+                                  topologyAsync
+                                      .asData
+                                      ?.value
+                                      .topologyProfiles ??
+                                  const [],
                               catalogPreferences: ref.watch(
                                 catalogPreferencesRepositoryProvider,
                               ),
@@ -111,6 +130,22 @@ class _PersistedRoomEditorScreenState
                               canRedoPlacement: history.canRedo,
                               onUndoPlacement: () => changeHistory(true),
                               onRedoPlacement: () => changeHistory(false),
+                              onPlaceEngineeringProfile: (command) async {
+                                final placementHistory = history;
+                                final repository = ref.read(
+                                  engineeringPlacementRepositoryProvider,
+                                );
+                                final result = await repository.place(command);
+                                placementHistory.recordEngineering(
+                                  EngineeringPlacementHistoryEntry(
+                                    command: command,
+                                    result: result,
+                                  ),
+                                  repository,
+                                );
+                                if (mounted) setState(() {});
+                                return result;
+                              },
                               onPlaceComponent: (
                                 definition,
                                 hostSurfacePatchId,

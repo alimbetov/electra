@@ -14,10 +14,7 @@
         "bitrateMbps": 4,
         "powerDemandW": 8
       },
-      "capabilities": [
-        "videoSource",
-        "poeConsumer"
-      ],
+      "capabilities": ["videoSource", "poeConsumer"],
       "portTemplates": [
         {
           "id": "template-ETH",
@@ -27,12 +24,34 @@
           "direction": "bidirectional",
           "capacity": 1,
           "connector": "TEST-CONNECTOR",
-          "protocol": {
-            "id": "TEST-CCTV",
-            "version": "1"
-          }
+          "protocol": {"id": "TEST-CCTV", "version": "1"}
         }
-      ]
+      ],
+      "constraintsState": "defined",
+      "constraints": {
+        "mounting": {
+          "options": [
+            {"surface": "wall", "method": "bracket"},
+            {"surface": "ceiling", "method": "surface"}
+          ],
+          "enclosureRequired": false,
+          "minimumClearanceMm": 50
+        },
+        "environment": {
+          "allowedExposure": ["indoor", "protectedOutdoor"],
+          "allowedClimate": ["conditioned", "unconditioned"],
+          "minimumIpRating": "IP44",
+          "minimumTemperatureC": -10,
+          "maximumTemperatureC": 50
+        },
+        "topology": {
+          "allowedShapes": ["star"],
+          "allowedRoles": ["endpoint"],
+          "branchingAllowed": false,
+          "closedLoopRequired": false,
+          "nodeOrderMatters": false
+        }
+      }
     },
     {
       "code": "OUTLET",
@@ -43,9 +62,7 @@
         "category": "cat6",
         "speedMbps": 1000
       },
-      "capabilities": [
-        "ethernet"
-      ],
+      "capabilities": ["ethernet"],
       "portTemplates": [
         {
           "id": "template-ETH",
@@ -55,12 +72,31 @@
           "direction": "bidirectional",
           "capacity": 1,
           "connector": "TEST-CONNECTOR",
-          "protocol": {
-            "id": "TEST-LAN",
-            "version": "1"
-          }
+          "protocol": {"id": "TEST-LAN", "version": "1"}
         }
-      ]
+      ],
+      "constraintsState": "defined",
+      "constraints": {
+        "mounting": {
+          "options": [
+            {"surface": "wall", "method": "flush"},
+            {"surface": "wall", "method": "surface"}
+          ],
+          "enclosureRequired": false
+        },
+        "environment": {
+          "allowedExposure": ["indoor"],
+          "allowedClimate": ["conditioned", "unconditioned"],
+          "minimumIpRating": "IP20"
+        },
+        "topology": {
+          "allowedShapes": ["star"],
+          "allowedRoles": ["endpoint"],
+          "branchingAllowed": false,
+          "closedLoopRequired": false,
+          "nodeOrderMatters": false
+        }
+      }
     },
     {
       "code": "READER",
@@ -70,9 +106,7 @@
         "discipline": "acs",
         "operatingCurrentA": 0.1
       },
-      "capabilities": [
-        "accessReader"
-      ],
+      "capabilities": ["accessReader"],
       "portTemplates": [
         {
           "id": "template-BUS",
@@ -82,12 +116,30 @@
           "direction": "bidirectional",
           "capacity": 1,
           "connector": "TEST-CONNECTOR",
-          "protocol": {
-            "id": "TEST-ACS",
-            "version": "1"
-          }
+          "protocol": {"id": "TEST-ACS", "version": "1"}
         }
-      ]
+      ],
+      "constraintsState": "defined",
+      "constraints": {
+        "mounting": {
+          "options": [
+            {"surface": "wall", "method": "surface"}
+          ],
+          "enclosureRequired": false
+        },
+        "environment": {
+          "allowedExposure": ["indoor", "protectedOutdoor"],
+          "allowedClimate": ["conditioned", "unconditioned"],
+          "minimumIpRating": "IP44"
+        },
+        "topology": {
+          "allowedShapes": ["star"],
+          "allowedRoles": ["endpoint"],
+          "branchingAllowed": false,
+          "closedLoopRequired": false,
+          "nodeOrderMatters": false
+        }
+      }
     },
     {
       "code": "LOCK",
@@ -98,9 +150,7 @@
         "lockBehavior": "failSafe",
         "operatingCurrentA": 0.5
       },
-      "capabilities": [
-        "accessActuator"
-      ],
+      "capabilities": ["accessActuator"],
       "portTemplates": [
         {
           "id": "template-PWR",
@@ -110,12 +160,31 @@
           "direction": "input",
           "capacity": 1,
           "connector": "TEST-CONNECTOR",
-          "protocol": {
-            "id": "TEST-ACS",
-            "version": "1"
-          }
+          "protocol": {"id": "TEST-ACS", "version": "1"}
         }
-      ]
+      ],
+      "constraintsState": "defined",
+      "constraints": {
+        "mounting": {
+          "options": [
+            {"surface": "wall", "method": "surface"},
+            {"surface": "enclosure", "method": "insideEnclosure"}
+          ],
+          "enclosureRequired": false
+        },
+        "environment": {
+          "allowedExposure": ["indoor"],
+          "allowedClimate": ["conditioned", "unconditioned"],
+          "minimumIpRating": "IP20"
+        },
+        "topology": {
+          "allowedShapes": ["star"],
+          "allowedRoles": ["sink", "endpoint"],
+          "branchingAllowed": false,
+          "closedLoopRequired": false,
+          "nodeOrderMatters": false
+        }
+      }
     },
     {
       "code": "DETECTOR",
@@ -127,9 +196,7 @@
         "standbyCurrentA": 0.001,
         "alarmCurrentA": 0.005
       },
-      "capabilities": [
-        "addressable"
-      ],
+      "capabilities": ["addressable"],
       "portTemplates": [
         {
           "id": "template-IN",
@@ -139,10 +206,7 @@
           "direction": "input",
           "capacity": 1,
           "connector": "TEST-CONNECTOR",
-          "protocol": {
-            "id": "TEST-FIRE",
-            "version": "1"
-          }
+          "protocol": {"id": "TEST-FIRE", "version": "1"}
         },
         {
           "id": "template-OUT",
@@ -152,12 +216,31 @@
           "direction": "output",
           "capacity": 1,
           "connector": "TEST-CONNECTOR",
-          "protocol": {
-            "id": "TEST-FIRE",
-            "version": "1"
-          }
+          "protocol": {"id": "TEST-FIRE", "version": "1"}
         }
-      ]
+      ],
+      "constraintsState": "defined",
+      "constraints": {
+        "mounting": {
+          "options": [
+            {"surface": "ceiling", "method": "surface"}
+          ],
+          "enclosureRequired": false
+        },
+        "environment": {
+          "allowedExposure": ["indoor"],
+          "allowedClimate": ["conditioned", "unconditioned"],
+          "minimumIpRating": "IP20"
+        },
+        "topology": {
+          "allowedShapes": ["loop", "tree"],
+          "allowedRoles": ["endpoint"],
+          "branchingAllowed": true,
+          "closedLoopRequired": false,
+          "nodeOrderMatters": true,
+          "maximumDegree": 2
+        }
+      }
     }
   ]
 }

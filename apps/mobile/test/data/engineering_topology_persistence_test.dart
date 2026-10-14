@@ -1030,7 +1030,7 @@ void main() {
         originDeviceId: 'elv1-migration',
       );
       data = await topology.load(project.id);
-      expect(database.schemaVersion, 16);
+      expect(database.schemaVersion, 17);
       expect(data.ports, isEmpty);
       expect(data.connections, isEmpty);
       expect(data.systems.systems.length, 5);

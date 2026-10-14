@@ -1,5 +1,6 @@
 import 'package:engineering_core/engineering_core.dart';
 import 'engineering_system_repository.dart';
+import 'engineering_placement_command.dart';
 
 class ComponentReferenceBinding {
   const ComponentReferenceBinding({
@@ -9,10 +10,14 @@ class ComponentReferenceBinding {
     required this.catalogVersion,
     required this.profile,
     required this.portIds,
+    this.placementCommand,
   });
   final String componentId, catalogId, profileCode, catalogVersion;
   final ComponentEngineeringProfile profile;
   final List<String> portIds;
+
+  /// Exact reviewed placement evidence; absent in historical/manual bindings.
+  final PlaceEngineeringProfileCommand? placementCommand;
   Map<String, Object?> toMap() => {
     'componentId': componentId,
     'catalogId': catalogId,
@@ -20,6 +25,7 @@ class ComponentReferenceBinding {
     'catalogVersion': catalogVersion,
     'profile': profile.toMap(),
     'portIds': portIds,
+    if (placementCommand != null) 'placementCommand': placementCommand!.toMap(),
   };
   factory ComponentReferenceBinding.fromMap(Map<String, dynamic> m) =>
       ComponentReferenceBinding(
@@ -31,6 +37,12 @@ class ComponentReferenceBinding {
           m['profile'] as Map<String, dynamic>,
         ),
         portIds: (m['portIds'] as List).cast<String>(),
+        placementCommand:
+            m['placementCommand'] == null
+                ? null
+                : PlaceEngineeringProfileCommand.fromMap(
+                  m['placementCommand'] as Map<String, dynamic>,
+                ),
       );
 }
 
