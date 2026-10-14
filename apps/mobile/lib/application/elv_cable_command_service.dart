@@ -28,20 +28,19 @@ final class DefaultElvCableCommandService implements ElvCableCommandService {
   @override
   Future<ElvCommandResult<Cable>> create(CreateCableCommand command) =>
       unitOfWork.run((session) async {
-        final envelope = _validateEnvelope(command.commandId, command.projectId);
-        if (envelope != null) return envelope;
-        final replay = await _replay<Cable>(
+        final common = _validateEnvelope(command.commandId, command.projectId);
+        if (common != null) return common;
+        final replay = await _replayCable(
           session.commandLedger,
-          projectId: command.projectId,
           commandId: command.commandId,
+          projectId: command.projectId,
           commandType: 'CREATE_CABLE',
           schema: 'electra.command.create-cable.v1',
           payload: command.normalizedPayload(),
-          decodeSuccess: (map) => Cable.fromMap(map),
         );
         if (replay != null) return replay;
         if (!await session.cables.projectExists(command.projectId)) {
-          return _rejectAndRecord(
+          return _reject(
             session.commandLedger,
             commandId: command.commandId,
             projectId: command.projectId,
@@ -55,6 +54,21 @@ final class DefaultElvCableCommandService implements ElvCableCommandService {
             ),
           );
         }
+        if (await session.cables.findCable(command.projectId, command.cableId) != null) {
+          return _reject(
+            session.commandLedger,
+            commandId: command.commandId,
+            projectId: command.projectId,
+            commandType: 'CREATE_CABLE',
+            schema: 'electra.command.create-cable.v1',
+            payload: command.normalizedPayload(),
+            failure: const ElvFailure(
+              code: 'ELV_CABLE_ID_CONFLICT',
+              category: ElvFailureCategory.validation,
+              entityType: 'Cable',
+            ),
+          );
+        }
         CableDefinition definition;
         try {
           definition = await session.cables.resolveDefinition(
@@ -62,7 +76,7 @@ final class DefaultElvCableCommandService implements ElvCableCommandService {
             command.definitionRef,
           );
         } catch (_) {
-          return _rejectAndRecord(
+          return _reject(
             session.commandLedger,
             commandId: command.commandId,
             projectId: command.projectId,
@@ -77,7 +91,7 @@ final class DefaultElvCableCommandService implements ElvCableCommandService {
           );
         }
         if (definition.deprecated) {
-          return _rejectAndRecord(
+          return _reject(
             session.commandLedger,
             commandId: command.commandId,
             projectId: command.projectId,
@@ -101,7 +115,7 @@ final class DefaultElvCableCommandService implements ElvCableCommandService {
         );
         final validation = cable.validate();
         if (validation.isNotEmpty) {
-          return _rejectAndRecord(
+          return _reject(
             session.commandLedger,
             commandId: command.commandId,
             projectId: command.projectId,
@@ -119,24 +133,22 @@ final class DefaultElvCableCommandService implements ElvCableCommandService {
           command.projectId,
           cable.normalizedLabel,
         )) {
-          return _rejectAndRecord(
+          return _labelConflict(
             session.commandLedger,
-            commandId: command.commandId,
-            projectId: command.projectId,
-            commandType: 'CREATE_CABLE',
-            schema: 'electra.command.create-cable.v1',
-            payload: command.normalizedPayload(),
-            failure: const ElvFailure(
-              code: 'ELV_CABLE_LABEL_CONFLICT',
-              category: ElvFailureCategory.validation,
-            ),
+            command,
           );
         }
-        await session.cables.insertCable(cable);
+        final inserted = await session.cables.insertCable(cable);
+        if (!inserted) {
+          return _labelConflict(
+            session.commandLedger,
+            command,
+          );
+        }
         await _recordSuccess(
           session.commandLedger,
-          projectId: command.projectId,
           commandId: command.commandId,
+          projectId: command.projectId,
           commandType: 'CREATE_CABLE',
           schema: 'electra.command.create-cable.v1',
           payload: command.normalizedPayload(),
@@ -149,21 +161,20 @@ final class DefaultElvCableCommandService implements ElvCableCommandService {
   Future<ElvCommandResult<Cable>> changeDefinition(
     ChangeCableDefinitionRefCommand command,
   ) => unitOfWork.run((session) async {
-    final envelope = _validateEnvelope(command.commandId, command.projectId);
-    if (envelope != null) return envelope;
-    final replay = await _replay<Cable>(
+    final common = _validateEnvelope(command.commandId, command.projectId);
+    if (common != null) return common;
+    final replay = await _replayCable(
       session.commandLedger,
-      projectId: command.projectId,
       commandId: command.commandId,
+      projectId: command.projectId,
       commandType: 'CHANGE_CABLE_DEFINITION',
       schema: 'electra.command.change-cable-definition.v1',
       payload: command.normalizedPayload(),
-      decodeSuccess: Cable.fromMap,
     );
     if (replay != null) return replay;
     final cable = await session.cables.findCable(command.projectId, command.cableId);
     if (cable == null) {
-      return _rejectAndRecord(
+      return _reject(
         session.commandLedger,
         commandId: command.commandId,
         projectId: command.projectId,
@@ -178,7 +189,7 @@ final class DefaultElvCableCommandService implements ElvCableCommandService {
       );
     }
     if (cable.lifecycleState != CableLifecycleState.active) {
-      return _rejectAndRecord(
+      return _reject(
         session.commandLedger,
         commandId: command.commandId,
         projectId: command.projectId,
@@ -199,7 +210,7 @@ final class DefaultElvCableCommandService implements ElvCableCommandService {
           command.projectId,
           command.cableId,
         )) {
-      return _rejectAndRecord(
+      return _reject(
         session.commandLedger,
         commandId: command.commandId,
         projectId: command.projectId,
@@ -213,9 +224,26 @@ final class DefaultElvCableCommandService implements ElvCableCommandService {
       );
     }
     try {
-      await session.cables.resolveDefinition(command.projectId, command.definitionRef);
+      final definition = await session.cables.resolveDefinition(
+        command.projectId,
+        command.definitionRef,
+      );
+      if (definition.deprecated) {
+        return _reject(
+          session.commandLedger,
+          commandId: command.commandId,
+          projectId: command.projectId,
+          commandType: 'CHANGE_CABLE_DEFINITION',
+          schema: 'electra.command.change-cable-definition.v1',
+          payload: command.normalizedPayload(),
+          failure: const ElvFailure(
+            code: 'ELV_CABLE_DEFINITION_DEPRECATED',
+            category: ElvFailureCategory.referenceIntegrity,
+          ),
+        );
+      }
     } catch (_) {
-      return _rejectAndRecord(
+      return _reject(
         session.commandLedger,
         commandId: command.commandId,
         projectId: command.projectId,
@@ -235,19 +263,15 @@ final class DefaultElvCableCommandService implements ElvCableCommandService {
       definitionRef: command.definitionRef.normalized(),
     );
     if (!updated) {
-      return _rejectAndRecord(
+      return _revisionConflict(
         session.commandLedger,
         commandId: command.commandId,
         projectId: command.projectId,
         commandType: 'CHANGE_CABLE_DEFINITION',
         schema: 'electra.command.change-cable-definition.v1',
         payload: command.normalizedPayload(),
-        failure: ElvFailure(
-          code: 'ELV_REVISION_CONFLICT',
-          category: ElvFailureCategory.revisionConflict,
-          expectedRevision: command.expectedRevision,
-          actualRevision: cable.revision,
-        ),
+        expectedRevision: command.expectedRevision,
+        actualRevision: cable.revision,
       );
     }
     final result = Cable(
@@ -261,8 +285,8 @@ final class DefaultElvCableCommandService implements ElvCableCommandService {
     );
     await _recordSuccess(
       session.commandLedger,
-      projectId: command.projectId,
       commandId: command.commandId,
+      projectId: command.projectId,
       commandType: 'CHANGE_CABLE_DEFINITION',
       schema: 'electra.command.change-cable-definition.v1',
       payload: command.normalizedPayload(),
@@ -274,21 +298,20 @@ final class DefaultElvCableCommandService implements ElvCableCommandService {
   @override
   Future<ElvCommandResult<Cable>> archive(ArchiveCableCommand command) =>
       unitOfWork.run((session) async {
-        final envelope = _validateEnvelope(command.commandId, command.projectId);
-        if (envelope != null) return envelope;
-        final replay = await _replay<Cable>(
+        final common = _validateEnvelope(command.commandId, command.projectId);
+        if (common != null) return common;
+        final replay = await _replayCable(
           session.commandLedger,
-          projectId: command.projectId,
           commandId: command.commandId,
+          projectId: command.projectId,
           commandType: 'ARCHIVE_CABLE',
           schema: 'electra.command.archive-cable.v1',
           payload: command.normalizedPayload(),
-          decodeSuccess: Cable.fromMap,
         );
         if (replay != null) return replay;
         final cable = await session.cables.findCable(command.projectId, command.cableId);
         if (cable == null) {
-          return _rejectAndRecord(
+          return _reject(
             session.commandLedger,
             commandId: command.commandId,
             projectId: command.projectId,
@@ -306,7 +329,7 @@ final class DefaultElvCableCommandService implements ElvCableCommandService {
           command.cableId,
         );
         if (blockers.isNotEmpty) {
-          return _rejectAndRecord(
+          return _reject(
             session.commandLedger,
             commandId: command.commandId,
             projectId: command.projectId,
@@ -326,19 +349,15 @@ final class DefaultElvCableCommandService implements ElvCableCommandService {
           expectedRevision: command.expectedRevision,
         );
         if (!updated) {
-          return _rejectAndRecord(
+          return _revisionConflict(
             session.commandLedger,
             commandId: command.commandId,
             projectId: command.projectId,
             commandType: 'ARCHIVE_CABLE',
             schema: 'electra.command.archive-cable.v1',
             payload: command.normalizedPayload(),
-            failure: ElvFailure(
-              code: 'ELV_REVISION_CONFLICT',
-              category: ElvFailureCategory.revisionConflict,
-              expectedRevision: command.expectedRevision,
-              actualRevision: cable.revision,
-            ),
+            expectedRevision: command.expectedRevision,
+            actualRevision: cable.revision,
           );
         }
         final result = Cable(
@@ -352,8 +371,8 @@ final class DefaultElvCableCommandService implements ElvCableCommandService {
         );
         await _recordSuccess(
           session.commandLedger,
-          projectId: command.projectId,
           commandId: command.commandId,
+          projectId: command.projectId,
           commandType: 'ARCHIVE_CABLE',
           schema: 'electra.command.archive-cable.v1',
           payload: command.normalizedPayload(),
@@ -365,31 +384,27 @@ final class DefaultElvCableCommandService implements ElvCableCommandService {
   ElvCommandFailureResult<Cable>? _validateEnvelope(
     String commandId,
     String projectId,
-  ) {
-    if (commandId.trim().isEmpty || projectId.trim().isEmpty) {
-      return const ElvCommandFailureResult(
-        ElvFailure(
-          code: 'ELV_COMMAND_INVALID',
-          category: ElvFailureCategory.commandEnvelope,
-        ),
-      );
-    }
-    return null;
-  }
+  ) => commandId.trim().isEmpty || projectId.trim().isEmpty
+      ? const ElvCommandFailureResult(
+          ElvFailure(
+            code: 'ELV_COMMAND_INVALID',
+            category: ElvFailureCategory.commandEnvelope,
+          ),
+        )
+      : null;
 
-  Future<ElvCommandResult<T>?> _replay<T>(
+  Future<ElvCommandResult<Cable>?> _replayCable(
     ElvCommandLedgerStore ledger, {
     required String projectId,
     required String commandId,
     required String commandType,
     required String schema,
     required Map<String, Object?> payload,
-    required T Function(Map<String, dynamic>) decodeSuccess,
   }) async {
     final existing = await ledger.find(projectId, commandId);
     if (existing == null) return null;
-    final hash = _payloadHash(schema, commandType, payload);
-    if (existing.normalizedPayloadSha256 != hash) {
+    if (existing.normalizedPayloadSha256 !=
+        _payloadHash(schema, commandType, payload)) {
       return const ElvCommandFailureResult(
         ElvFailure(
           code: 'ELV_IDEMPOTENCY_CONFLICT',
@@ -399,12 +414,56 @@ final class DefaultElvCableCommandService implements ElvCableCommandService {
     }
     final map = jsonDecode(existing.logicalResultJson) as Map<String, dynamic>;
     if (existing.outcomeKind == 'SUCCESS') {
-      return ElvCommandSuccess(decodeSuccess(map['value'] as Map<String, dynamic>));
+      return ElvCommandSuccess(
+        Cable.fromMap(map['value'] as Map<String, dynamic>),
+      );
     }
-    return ElvCommandFailureResult(_failureFromMap(map['failure'] as Map<String, dynamic>));
+    return ElvCommandFailureResult(
+      _failureFromMap(map['failure'] as Map<String, dynamic>),
+    );
   }
 
-  Future<ElvCommandFailureResult<Cable>> _rejectAndRecord(
+  Future<ElvCommandFailureResult<Cable>> _labelConflict(
+    ElvCommandLedgerStore ledger,
+    CreateCableCommand command,
+  ) => _reject(
+    ledger,
+    commandId: command.commandId,
+    projectId: command.projectId,
+    commandType: 'CREATE_CABLE',
+    schema: 'electra.command.create-cable.v1',
+    payload: command.normalizedPayload(),
+    failure: const ElvFailure(
+      code: 'ELV_CABLE_LABEL_CONFLICT',
+      category: ElvFailureCategory.validation,
+    ),
+  );
+
+  Future<ElvCommandFailureResult<Cable>> _revisionConflict(
+    ElvCommandLedgerStore ledger, {
+    required String projectId,
+    required String commandId,
+    required String commandType,
+    required String schema,
+    required Map<String, Object?> payload,
+    required int expectedRevision,
+    required int actualRevision,
+  }) => _reject(
+    ledger,
+    projectId: projectId,
+    commandId: commandId,
+    commandType: commandType,
+    schema: schema,
+    payload: payload,
+    failure: ElvFailure(
+      code: 'ELV_REVISION_CONFLICT',
+      category: ElvFailureCategory.revisionConflict,
+      expectedRevision: expectedRevision,
+      actualRevision: actualRevision,
+    ),
+  );
+
+  Future<ElvCommandFailureResult<Cable>> _reject(
     ElvCommandLedgerStore ledger, {
     required String projectId,
     required String commandId,
