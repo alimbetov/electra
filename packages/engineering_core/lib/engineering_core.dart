@@ -39,5 +39,24 @@ export 'src/engineering_placement_compatibility.dart';
 export 'src/engineering_reference_catalog.dart';
 export 'src/engineering_reference_constraints.dart';
 export 'src/engineering_reference_revision.dart';
-
 export 'src/engineering_reference_vocabulary.dart';
+
+export 'src/engineering_hash.dart';
+export 'src/elv_cable_resource_definition.dart';
+export 'src/elv_cable_reference.dart';
+export 'src/elv_cable.dart';
+export 'src/elv_cable_resource.dart';
+export 'src/elv_cable_allocation.dart';
+export 'src/elv_cable_termination.dart';
+export 'src/elv_design_revision.dart';
+export 'src/elv_cable_run.dart';
+export 'src/elv_route_handoff.dart';
+export 'src/elv_route_bend_evidence.dart';
+export 'src/elv_physical_snapshot.dart';
+export 'src/elv_pathway_context.dart';
+export 'src/elv_physical_carrier.dart';
+export 'src/elv_physical_compatibility_profile.dart';
+export 'src/elv_physical_profile_set.dart';
+export 'src/elv_physical_compatibility.dart';
+export 'src/elv_physical_calculations.dart';
+export 'src/elv_physical_evidence.dart';

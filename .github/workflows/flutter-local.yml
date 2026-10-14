@@ -30,6 +30,10 @@ jobs:
         working-directory: .
         run: bash scripts/ci/check-no-generated-artifacts.sh
 
+      - name: Verify ELV3 P7-P9 foundation contract
+        working-directory: .
+        run: bash scripts/ci/check-elv3-p7-p9-foundation.sh
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -46,7 +50,9 @@ jobs:
         run: dart run build_runner build
 
       - name: Verify mobile formatting
-        run: dart format --output=none --set-exit-if-changed lib test
+        run: |
+          dart format lib test
+          git diff --exit-code -- lib test
 
       - name: Analyze mobile app
         run: flutter analyze
@@ -60,7 +66,9 @@ jobs:
 
       - name: Verify engineering core formatting
         working-directory: packages/engineering_core
-        run: dart format --output=none --set-exit-if-changed lib test
+        run: |
+          dart format lib test
+          git diff --exit-code -- lib test
 
       - name: Analyze engineering core
         working-directory: packages/engineering_core
