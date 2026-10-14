@@ -1,0 +1,47 @@
+name: Temporary ELV3 Test Diagnostics
+
+on:
+  push:
+    branches:
+      - feat/elv3-runtime-closure
+    paths:
+      - '.github/workflows/tmp-elv3-test-diagnostics.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: feat/elv3-runtime-closure
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        working-directory: apps/mobile
+        run: flutter pub get --enforce-lockfile
+
+      - name: Generate Drift code
+        working-directory: apps/mobile
+        run: dart run build_runner build
+
+      - name: Capture test output
+        working-directory: apps/mobile
+        shell: bash
+        run: |
+          set +e
+          flutter test > test.log 2>&1
+          status=$?
+          cat test.log
+          exit 0
+
+      - name: Upload test log
+        uses: actions/upload-artifact@v4
+        with:
+          name: elv3-test-log
+          path: apps/mobile/test.log
