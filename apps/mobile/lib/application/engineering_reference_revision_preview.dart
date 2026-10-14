@@ -18,6 +18,7 @@ class BoundProfileRevisionImpact {
     required Iterable<String> portIds,
     required Iterable<String> connectionIds,
     required Iterable<String> topologyGroupIds,
+    required Iterable<String> internalMappingIds,
     required this.graphFingerprint,
     this.placementResult,
     this.placementBlockerReason,
@@ -25,6 +26,7 @@ class BoundProfileRevisionImpact {
   }) : portIds = List.unmodifiable(portIds),
        connectionIds = List.unmodifiable(connectionIds),
        topologyGroupIds = List.unmodifiable(topologyGroupIds),
+       internalMappingIds = List.unmodifiable(internalMappingIds),
        candidateProfileValidationErrors = List.unmodifiable(
          candidateProfileValidationErrors,
        );
@@ -40,13 +42,16 @@ class BoundProfileRevisionImpact {
   final List<String> portIds;
   final List<String> connectionIds;
   final List<String> topologyGroupIds;
+  final List<String> internalMappingIds;
   final String graphFingerprint;
   final PlacementCompatibilityResult? placementResult;
   final String? placementBlockerReason;
   final List<String> candidateProfileValidationErrors;
 
   bool get affectsProjectGraph =>
-      connectionIds.isNotEmpty || topologyGroupIds.isNotEmpty;
+      connectionIds.isNotEmpty ||
+      topologyGroupIds.isNotEmpty ||
+      internalMappingIds.isNotEmpty;
 
   bool get adoptionBlocked {
     if (disposition == BoundProfileRevisionDisposition.removed ||
@@ -86,6 +91,10 @@ class CatalogRevisionPreview {
 
   Set<String> get affectedTopologyGroupIds => {
     for (final impact in bindingImpacts) ...impact.topologyGroupIds,
+  };
+
+  Set<String> get affectedInternalMappingIds => {
+    for (final impact in bindingImpacts) ...impact.internalMappingIds,
   };
 
   bool get affectsPlacement =>
@@ -142,6 +151,7 @@ CatalogRevisionPreview previewCatalogRevision({
           portIds: binding.portIds,
           connectionIds: graph.connections,
           topologyGroupIds: graph.groups,
+          internalMappingIds: graph.internalMappings,
           graphFingerprint: graph.fingerprint,
           placementBlockerReason:
               'The bound profile is absent from the candidate catalog edition.',
@@ -191,6 +201,7 @@ CatalogRevisionPreview previewCatalogRevision({
         portIds: binding.portIds,
         connectionIds: graph.connections,
         topologyGroupIds: graph.groups,
+        internalMappingIds: graph.internalMappings,
         graphFingerprint: graph.fingerprint,
         placementResult: placementResult,
         placementBlockerReason: placementBlockerReason,
@@ -218,7 +229,12 @@ CatalogRevisionPreview previewCatalogRevision({
   );
 }
 
-({List<String> connections, List<String> groups, String fingerprint})
+({
+  List<String> connections,
+  List<String> groups,
+  List<String> internalMappings,
+  String fingerprint,
+})
 _graphImpact(
   Iterable<String> portIds,
   ProjectEngineeringTopologySnapshot topology,
@@ -254,6 +270,7 @@ _graphImpact(
   return (
     connections: relevantConnections.map((item) => item.id).toList(),
     groups: relevantGroups.map((item) => item.id).toList(),
+    internalMappings: relevantInternal.map((item) => item.id).toList(),
     fingerprint: canonicalEngineeringJson({
       'connections': relevantConnections.map((item) => item.toMap()).toList(),
       'groups': relevantGroups.map((item) => item.toMap()).toList(),
