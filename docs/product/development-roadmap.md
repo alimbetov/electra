@@ -2,8 +2,9 @@
 
 The detailed scope and evidence live in [Flutter delivery plan](flutter-delivery-plan.md).
 Electrical delivery branch: `feat/flutter-routing-cablerun`.
-Current ELV design branch: `feat/flutter-elv3-physical-routing-design`.
+Current ELV runtime-closure branch: `feat/elv3-runtime-closure`.
 Accepted ELV1/ELV2 baseline: `main@786a28ac6e4b532b1e7ac2083502799935ca51ed`.
+ELV3 merged baseline: `main@5a139ed64585c0df8d52e4da270417453f93e2af`.
 Delivery is incremental: each baseline has an exact-commit Flutter/core CI gate.
 
 | Milestone | Outcome | Status |
@@ -28,14 +29,23 @@ Delivery is incremental: each baseline has an exact-commit Flutter/core CI gate.
 | ELV0 | Systems, sixteen family editions, shared device participation | Baseline closed |
 | ELV1 | Ports, connections, topology, passive mappings and assemblies | CLOSED / ACCEPTED |
 | ELV2 | Canonical discipline profiles, versioned catalogs, placement and explicit adoption | CLOSED / ACCEPTED |
-| ELV3 | Cable resources, allocation/termination, cable-run traversal, reusable routing/carriers/pathways and physical compatibility | CODE REMEDIATION CLOSED / P2-P5 HARDENED / P1 CODE AUTHORIZED |
-| ELV4 | Power, PoE, PSU, UPS, converters and backup graph | Planned |
+| ELV3 | Cable resources, allocation/termination, revision-scoped cable runs, reusable routing/carriers/pathways, physical compatibility and runtime evidence | RUNTIME CLOSURE P3-P9 IN PROGRESS |
+| ELV4 | Power, PoE, PSU, UPS, converters and backup graph | BLOCKED until ELV3 closure |
 | ELV5 | Versioned CCTV/LAN/ACS/fire calculations | Planned |
 | ELV6 | Racks, cabinets, patching and physical capacity | Planned |
 | ELV7 | Jurisdiction profiles, normative rule packs and findings | Planned |
 | ELV8 | Manufacturer selection, snapshots, BOM and deliverables | Planned |
 
 ELV3 architecture/process specification remains accepted after P0, R2 and dual-review hardening. General code readiness was later reopened by CR-01..CR-16, then restored after remediation and re-review. A subsequent dedicated P2-P5 implementation review found and closed additional phase-local ambiguities in allocation claims/terminations, route project/handoff semantics, carrier lifecycle/dependencies and compatibility-profile applicability/combination.
+
+The merged ELV3 baseline contains real P1/P2 persistence plus P3-P8 domain/application foundations, but it is not yet a closed runtime vertical. Runtime closure is now an explicit delivery phase rather than implicit follow-up work.
+
+### ELV3 runtime-closure authority
+
+- `docs/product/elv3-runtime-closure-specification.md` — authoritative execution specification for P3-P9 runtime closure;
+- `docs/product/elv3-runtime-closure-delivery-plan.md` — ordered RC0-RC9 execution and exact-SHA gates;
+- `docs/audit/elv3-implementation-inventory.md` — source-reality inventory used as the starting closure baseline;
+- `docs/product/elv3-code-contract-p7-p9.md` — accepted workspace/restart/final-audit contract reused by closure.
 
 Architecture/process authority remains:
 
@@ -54,14 +64,15 @@ Current code implementation authority:
 - `docs/product/elv3-code-contract-p4-p6.md`;
 - `docs/product/elv3-code-contract-p7-p9.md`.
 
-Latest code readiness evidence:
+Latest design/code readiness evidence:
 
-- `docs/audit/elv3-code-implementation-technical-rereview.md` — general PASS;
-- `docs/audit/elv3-p2-p5-code-technical-review.md` — dedicated P2-P5 PASS.
+- `docs/audit/elv3-code-implementation-technical-rereview.md` — general design/code readiness PASS;
+- `docs/audit/elv3-p2-p5-code-technical-review.md` — dedicated P2-P5 PASS;
+- `docs/audit/elv3-implementation-inventory.md` — runtime source reality and open closure gaps.
 
 Historical finding evidence remains in the earlier code technical review/audits and does not override the current hardened authority set.
 
-Dedicated P2-P5 hardening now freezes:
+Dedicated P2-P5 hardening freezes:
 
 ```text
 P2
@@ -94,41 +105,53 @@ P5
   profile-set mutations require WORKING design revision
 ```
 
-Canonical implementation sequence remains:
+Canonical ELV3 implementation/runtime-closure sequence is now:
 
 ```text
-P1 Cable identity / CableDefinitionRef / P1 resource-definition types
+P1 Cable identity / exact ELV2 reference / resource definitions                 MERGED
+  ↓
+P2 allocation / resource selection / atomic claims / terminations                MERGED
+  ↓
+RC0 baseline inventory + executable audit
+  ↓
+RC1 P3 canonical schema/repositories
   ↓ exact-SHA
-P2 Allocation / runtime resource selection + atomic claims / terminations
+RC2 P3 design-revision/freeze/reroute runtime verticals
   ↓ exact-SHA
-P3 ProjectDesignRevision / frozen snapshot / revision fork / CanonicalCableRun / traversal / route coexistence
+RC3 P4 pathway/carrier/compartment runtime
   ↓ exact-SHA
-P4 sealed PathwayContext / typed PhysicalCarrier facts / compartments
+RC4 P5 profile-set/finding persistence
   ↓ exact-SHA
-P5 sealed physical-compatibility profile rules / exact project profile set
+RC5 P6 revision-scoped calculations/evidence
   ↓ exact-SHA
-P6 revision-scoped calculations + persisted RouteSeparationEvidence
+RC6 P7 concrete workspace/trace/history
   ↓ exact-SHA
-P7 Engineer Physical Routing workspace
+RC7 five real SQLite discipline verticals
+  ↓
+RC8 rollback/idempotency/frozen-history matrix
   ↓ exact-SHA
-P8 Restart / rollback / failure injection / persisted idempotency verticals
-  ↓ exact-SHA
-P9 Architecture-vs-code hard audit / command-matrix audit / final exact-SHA closure
+RC9 architecture-vs-runtime final audit
+  ↓
+ELV3 CLOSED / ACCEPTED
+  ↓
+ELV4 implementation AUTHORIZED
 ```
 
-Current authorization:
+Current runtime authorization:
 
 ```text
-P1 implementation      AUTHORIZED
-P2 code specification  HARDENED / PASS
-P3 code specification  HARDENED / PASS
-P4 code specification  HARDENED / PASS
-P5 code specification  HARDENED / PASS
+P1/P2 persisted runtime baseline           MERGED
+P3-P6 domain/application contracts         PRESENT
+P7 workspace/history foundation            PRESENT
+P8 fixture/failure foundation              PRESENT
+P3-P6 canonical DB verticals               OPEN
+P7 concrete persisted adapters             OPEN
+P8 five real DB restart verticals          OPEN
+P9 final closure                           OPEN
+ELV4 implementation                        BLOCKED
 ```
 
-Implementation authorization remains sequential: P2 starts only after P1 exact-SHA gate, P3 only after P2 gate, P4 only after P3 gate, and P5 only after P4 gate.
-
-All four discipline fixtures plus a fiber fixture remain mandatory throughout the track. Legacy electrical routing regression is mandatory from P3 onward. National rule packs remain ELV7 concerns with verified provenance.
+All four discipline fixtures plus a fiber fixture remain mandatory throughout runtime closure. Legacy electrical routing regression is mandatory from RC1 onward. National rule packs remain ELV7 concerns with verified provenance.
 
 ## Validation at FL15
 
