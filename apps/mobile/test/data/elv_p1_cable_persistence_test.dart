@@ -126,7 +126,7 @@ void main() {
     final replay = await service.create(_create());
     expect(replay, isA<ElvCommandSuccess<Cable>>());
 
-    final cables = await const DriftElvCableRepository(db).loadProjectCables('project-1');
+    final cables = await DriftElvCableRepository(db).loadProjectCables('project-1');
     expect(cables, hasLength(1));
     expect(cables.single.definitionRef.definitionCode, 'CAT6-UUTP');
     expect(cables.single.definitionRef.definitionContentHash, hasLength(64));
@@ -199,7 +199,7 @@ void main() {
     final restored = await repo.findCable('project-1', 'cable-1');
     expect(restored, isNotNull);
     expect(restored!.revision, 1);
-    expect(restored.definitionRef, isNotNull);
+    expect(restored.definitionRef.definitionCode, 'CAT6-UUTP');
 
     final replay = await _service(db).create(_create());
     expect(replay, isA<ElvCommandSuccess<Cable>>());
