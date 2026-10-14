@@ -44,28 +44,15 @@ jobs:
               CableTerminationMappings,
               CommandExecutionRecords,
           '''
-          # The source is normally two-space indented exactly as below; normalize
-          # only this registry fragment so the audited immutable patch can anchor.
-          current = '''    ElvCables,
-              CableAllocations,
-              CableAllocationResourceSelections,
-              CableResourceClaims,
-              CableTerminationMappings,
-              CommandExecutionRecords,
-          '''.replace('      ', '')
-          expected = '''    ElvCables,
-              CableAllocations,
-              CableAllocationResourceSelections,
-              CableResourceClaims,
-              CableTerminationMappings,
-              CommandExecutionRecords,
-          '''.replace('      ', '')
+          # YAML block indentation is stripped before shell execution, but the
+          # Dart fragment itself uses four spaces on every registry line.
+          current = current.replace('\n      ', '\n')
           compact = '''    ElvCables, CableAllocations, CableAllocationResourceSelections,
               CableResourceClaims, CableTerminationMappings, CommandExecutionRecords,
-          '''.replace('      ', '')
-          if text.count(expected) != 1:
-              raise SystemExit(f'expected current ELV registry once, got {text.count(expected)}')
-          path.write_text(text.replace(expected, compact, 1))
+          '''.replace('\n      ', '\n')
+          if text.count(current) != 1:
+              raise SystemExit(f'expected current ELV registry once, got {text.count(current)}')
+          path.write_text(text.replace(current, compact, 1))
           PY
 
       - name: Apply immutable RC1-RC2 patch
