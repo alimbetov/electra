@@ -169,26 +169,37 @@ final class _DriftElvCableWriteStore implements ElvCableWriteStore {
       null;
 
   @override
-  Future<void> insertCable(Cable cable) {
+  Future<bool> insertCable(Cable cable) async {
     final now = DateTime.now().toUtc();
-    return database.into(database.elvCables).insert(
-          ElvCablesCompanion.insert(
-            id: cable.id,
-            projectId: cable.projectId,
-            label: cable.label,
-            normalizedLabel: cable.normalizedLabel,
-            name: cable.name,
-            definitionCatalogId: cable.definitionRef.catalogId,
-            definitionCatalogVersion: cable.definitionRef.catalogVersion,
-            definitionCode: cable.definitionRef.definitionCode,
-            definitionContentHash: cable.definitionRef.definitionContentHash,
-            lifecycleState: 'ACTIVE',
-            revision: Value(cable.revision),
-            createdAt: now,
-            updatedAt: now,
-            originDeviceId: originDeviceId,
-          ),
-        );
+    await database.customStatement(
+      '''
+      INSERT OR IGNORE INTO elv_cables(
+        id, project_id, label, normalized_label, name,
+        definition_catalog_id, definition_catalog_version, definition_code,
+        definition_content_hash, lifecycle_state, revision,
+        created_at, updated_at, deleted_at, origin_device_id
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'ACTIVE', ?, ?, ?, NULL, ?)
+      ''',
+      [
+        cable.id,
+        cable.projectId,
+        cable.label,
+        cable.normalizedLabel,
+        cable.name,
+        cable.definitionRef.catalogId,
+        cable.definitionRef.catalogVersion,
+        cable.definitionRef.definitionCode,
+        cable.definitionRef.definitionContentHash,
+        cable.revision,
+        now,
+        now,
+        originDeviceId,
+      ],
+    );
+    final changed = await database
+        .customSelect('SELECT changes() AS changed')
+        .getSingle();
+    return changed.read<int>('changed') == 1;
   }
 
   @override
