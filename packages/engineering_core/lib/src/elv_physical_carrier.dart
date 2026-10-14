@@ -15,7 +15,11 @@ enum CarrierEnclosureExposure { indoor, outdoor, mixed }
 enum MaintenanceAccessibility { accessible, restricted, inaccessible }
 
 final class CarrierTemperatureRange {
-  const CarrierTemperatureRange({required this.minimumC, required this.maximumC});
+  const CarrierTemperatureRange({
+    required this.minimumC,
+    required this.maximumC,
+  });
+
   final double minimumC;
   final double maximumC;
 
@@ -53,13 +57,23 @@ final class CarrierInstallationFacts {
 
 sealed class CarrierCrossSection {
   const CarrierCrossSection();
+
+  bool get valid;
   double get usableAreaMm2;
 }
 
 final class RectangularCarrierCrossSection extends CarrierCrossSection {
-  const RectangularCarrierCrossSection({required this.widthMm, required this.heightMm});
+  const RectangularCarrierCrossSection({
+    required this.widthMm,
+    required this.heightMm,
+  });
+
   final double widthMm;
   final double heightMm;
+
+  @override
+  bool get valid =>
+      widthMm.isFinite && heightMm.isFinite && widthMm > 0 && heightMm > 0;
 
   @override
   double get usableAreaMm2 => widthMm * heightMm;
@@ -67,16 +81,29 @@ final class RectangularCarrierCrossSection extends CarrierCrossSection {
 
 final class CircularCarrierCrossSection extends CarrierCrossSection {
   const CircularCarrierCrossSection(this.diameterMm);
+
   final double diameterMm;
 
   @override
-  double get usableAreaMm2 => 3.141592653589793 * diameterMm * diameterMm / 4;
+  bool get valid => diameterMm.isFinite && diameterMm > 0;
+
+  @override
+  double get usableAreaMm2 =>
+      3.141592653589793 * diameterMm * diameterMm / 4;
 }
 
 final class CustomCarrierCrossSection extends CarrierCrossSection {
-  const CustomCarrierCrossSection({required this.areaMm2, required this.provenance});
+  const CustomCarrierCrossSection({
+    required this.areaMm2,
+    required this.provenance,
+  });
+
   final double areaMm2;
   final String provenance;
+
+  @override
+  bool get valid =>
+      areaMm2.isFinite && areaMm2 > 0 && provenance.trim().isNotEmpty;
 
   @override
   double get usableAreaMm2 => areaMm2;
@@ -117,8 +144,8 @@ final class PhysicalCarrier {
         if (pathwayContextId.trim().isEmpty)
           'Carrier pathwayContextId is required.',
         if (normalizedCode.isEmpty) 'Carrier code is required.',
-        if (!crossSection.usableAreaMm2.isFinite || crossSection.usableAreaMm2 <= 0)
-          'Carrier usable area must be positive and finite.',
+        if (!crossSection.valid)
+          'Carrier cross-section dimensions must be positive and finite.',
         if (environmentFacts.temperatureRange?.valid == false)
           'Carrier temperature range is invalid.',
         if (revision < 1) 'Carrier revision must be >= 1.',
@@ -145,6 +172,16 @@ final class PhysicalCarrierCompartment {
   final int revision;
 
   String get normalizedCode => code.trim().toUpperCase();
+
+  List<String> validate() => [
+        if (id.trim().isEmpty || carrierId.trim().isEmpty)
+          'Carrier compartment identity and carrier are required.',
+        if (normalizedCode.isEmpty) 'Carrier compartment code is required.',
+        if (sequence < 1) 'Carrier compartment sequence must be >= 1.',
+        if (!crossSection.valid)
+          'Carrier compartment cross-section must be positive and finite.',
+        if (revision < 1) 'Carrier compartment revision must be >= 1.',
+      ];
 }
 
 List<String> validateCarrierCompartments({
@@ -152,21 +189,34 @@ List<String> validateCarrierCompartments({
   required Iterable<PhysicalCarrierCompartment> compartments,
 }) {
   final active = compartments
-      .where((item) => item.lifecycleState == CarrierCompartmentLifecycleState.active)
+      .where(
+        (item) =>
+            item.lifecycleState == CarrierCompartmentLifecycleState.active,
+      )
       .toList(growable: false);
-  final errors = <String>[];
+  final errors = <String>[
+    for (final compartment in active) ...compartment.validate(),
+  ];
+
   if (active.any((item) => item.carrierId != carrier.id)) {
     errors.add('Carrier compartments must belong to the same carrier.');
   }
-  if (active.map((e) => e.normalizedCode).toSet().length != active.length) {
+  if (active.map((item) => item.normalizedCode).toSet().length !=
+      active.length) {
     errors.add('Active carrier compartment codes must be unique.');
   }
-  if (active.map((e) => e.sequence).toSet().length != active.length) {
+  if (active.map((item) => item.sequence).toSet().length != active.length) {
     errors.add('Active carrier compartment sequences must be unique.');
   }
-  final sum = active.fold<double>(0, (value, item) => value + item.crossSection.usableAreaMm2);
-  if (sum > carrier.crossSection.usableAreaMm2) {
-    errors.add('Active compartment usable area exceeds carrier usable area.');
+  if (active.every((item) => item.crossSection.valid) && carrier.crossSection.valid) {
+    final sum = active.fold<double>(
+      0,
+      (value, item) => value + item.crossSection.usableAreaMm2,
+    );
+    if (sum > carrier.crossSection.usableAreaMm2) {
+      errors.add('Active compartment usable area exceeds carrier usable area.');
+    }
   }
+
   return errors;
 }
