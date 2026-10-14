@@ -53,3 +53,7 @@ export 'src/elv_cable_run.dart';
 export 'src/elv_route_handoff.dart';
 export 'src/elv_route_bend_evidence.dart';
 export 'src/elv_physical_snapshot.dart';
+export 'src/elv_pathway_context.dart';
+export 'src/elv_physical_carrier.dart';
+export 'src/elv_physical_compatibility_profile.dart';
+export 'src/elv_physical_compatibility.dart';
