@@ -1,216 +1,198 @@
-# Electra — ELV3 P0.6 Electrical CableRun Migration Contract
+# Electra — ELV3 P0.6 Electrical Routing Coexistence and Adoption Contract
 
-Status: DESIGN CONTRACT / P0.6  
+Status: REMEDIATED DESIGN CONTRACT / P0-R8  
 Branch: `feat/flutter-elv3-physical-routing-design`  
-Depends on: P0.1–P0.5  
-Implementation status: NOT STARTED
+Authoritative parent: `docs/product/elv3-p0-system-architecture-remediation.md`  
+Implementation status: HOLD UNTIL P0-R10
 
 ## 1. Purpose
 
-P0.6 defines how the current electrical-only routing model migrates to canonical ELV3 physical cable identity without breaking existing electrical projects, route geometry, floor handoffs or junction persistence.
+This document replaces the first P0.6 migration model that assumed legacy electrical `CableRun.circuitId` could be deterministically migrated to a canonical physical `Cable`.
 
-The legacy coupling is:
+That assumption is unsafe because a legacy electrical circuit-routing record does not prove the existence, count, construction or termination identity of one physical cable.
+
+## 2. Core decision
+
+Legacy electrical routing remains valid through a compatibility layer until explicit physical-cable adoption is performed.
+
+Canonical rule:
 
 ```text
-CableRun.circuitId
-CableRuns.circuit_id -> ElectricalCircuits.id
-JunctionConnections.circuit_id -> ElectricalCircuits.id
-FloorRoutingRun.endpointSignature includes run.circuitId
-RoomRoutingSnapshot.activeCircuitIds
+legacy ElectricalCircuit routing
+  != proven physical Cable identity
 ```
 
-The target model is:
+ELV3 MUST NOT invent Cable records merely because a legacy `CableRun` references `ElectricalCircuit`.
+
+## 3. Coexistence model
+
+During ELV3 rollout:
 
 ```text
-Electrical logical topology
+COMMON ROUTING/GEOMETRY FOUNDATION
         |
-        v
-CableAllocation
+        +-- legacy electrical routing adapter
+        |      `CableRun.circuitId` semantics preserved
         |
-        v
-Cable
-        |
-        v
-CableRun(cableId)
+        +-- canonical ELV3 physical realization
+               Cable -> CableRun -> CableTraversal[]
 ```
 
-## 2. Migration principles
+The common geometry kernel may be reused by both paths while their ownership semantics remain distinct until adoption/migration is proven safe.
 
-1. Existing route geometry is retained.
-2. No fake electrical circuit is created for ELV disciplines.
-3. `networkId` or generic `ownerType/ownerId` MUST NOT replace `circuitId`.
-4. Existing electrical circuit semantics remain available through explicit logical-to-physical mapping.
-5. Migration must be restart-safe, deterministic and idempotent.
-6. No legacy run may be silently dropped because mapping is incomplete.
+## 4. Why automatic backfill is prohibited
 
-## 3. Target CableRun contract
+A legacy `ElectricalCircuit` may represent cases such as:
+
+- a single multicore cable;
+- separate L/N/PE conductors;
+- parallel cables;
+- cable plus protective conductor;
+- route-only design without exact cable specification;
+- preliminary circuit geometry with no installation identity.
+
+Therefore this transformation is forbidden without evidence:
 
 ```text
-CableRun {
-  id
-  roomId
-  name
-  cableId        REQUIRED
-  routeId
-  reservePercent
-  terminationAllowanceMm
+ElectricalCircuit -> create Cable -> replace circuitId with cableId
+```
+
+## 5. Explicit adoption
+
+Canonical command:
+
+```text
+AdoptLegacyElectricalRoute
+```
+
+Adoption requires:
+
+1. explicit engineer/system migration action;
+2. resolved physical cable definition/binding;
+3. sufficient evidence for physical cable count and identity;
+4. deterministic route/traversal mapping;
+5. project and design-revision context;
+6. audit/provenance of source legacy records.
+
+If any required physical fact is unknown:
+
+```text
+ADOPTION_REVIEW_REQUIRED
+```
+
+No guessed Cable is created.
+
+## 6. Adoption outcomes
+
+### Resolved single physical cable
+
+```text
+legacy circuit route evidence
+  -> Cable C-001
+  -> CableRun CR-001
+  -> traversal chain referencing reused geometry
+```
+
+### Multiple physical cables proven
+
+Create separate canonical Cable identities and runs only when source evidence proves multiplicity and their assignments.
+
+### Ambiguous evidence
+
+Retain legacy route unchanged and surface migration/adoption review state.
+
+## 7. Legacy adapter responsibilities
+
+The compatibility adapter may expose legacy routing to shared UI/trace infrastructure but MUST preserve its provenance as legacy electrical semantics.
+
+It must not pretend that:
+
+- `circuitId` is `cableId`;
+- same circuit means same physical cable;
+- floor handoff proves cable continuity;
+- electrical route length automatically equals one installed cable length.
+
+## 8. Junction and floor graph migration
+
+Current junction/floor code uses `run.circuitId` as a continuity/fingerprint input.
+
+During coexistence:
+
+```text
+legacy electrical path
+  -> legacy circuit-aware fingerprint/validation adapter
+
+canonical CableRun
+  -> cable/run/traversal-aware physical fingerprint
+```
+
+Do not globally replace `circuitId` with `cableId` until the canonical path owns those records.
+
+## 9. Persistence direction
+
+Do not require every existing `CableRuns` row to gain a synthetic `cable_id`.
+
+Implementation options may include:
+
+- separate canonical ELV3 CableRun storage;
+- discriminated legacy/canonical routing records with strong typed constraints;
+- staged schema where `cable_id` is nullable and canonical records are distinguishable from legacy records.
+
+The final implementation must avoid weak generic `ownerType/ownerId` semantics if referential integrity can be modeled explicitly.
+
+## 10. Migration/adoption mapping
+
+When adoption occurs, persist explicit mapping/evidence:
+
+```text
+LegacyRouteAdoption {
+  legacyRunId
+  legacyCircuitId
+  cableId
+  canonicalCableRunId
+  designRevisionId
+  sourceEvidenceRef?
+  adoptedAt
+  adoptedBy
+  status
 }
 ```
 
-Canonical `circuitId` is removed from the domain model after migration compatibility expires.
+This mapping supports restart, audit and idempotent rerun.
 
-## 4. Deterministic backfill strategy
+## 11. Idempotency
 
-For every legacy `CableRun`:
+Replaying adoption for the same accepted mapping must return/reuse the already-created canonical identities rather than create duplicates.
 
-### Case A — one electrical circuit run maps to one installed cable
+Ambiguous/rejected adoption must remain unresolved without partial canonical rows.
 
-Create or resolve a deterministic migrated `Cable` using stable legacy identity, for example:
+## 12. Electrical future direction
 
-```text
-migration source = electrical circuit + physical run grouping evidence
-```
+The long-term architecture may converge electrical and ELV onto the same canonical Cable/CableRun model, but that is a separate vertical migration decision.
 
-Then:
+ELV3 does not require full electrical-domain conversion before ELV cable functionality can ship.
 
-```text
-legacy CableRun.circuitId
-  -> migrated CableAllocation(s) referencing logical electrical connection/circuit-derived topology
-  -> migrated Cable
-  -> CableRun.cableId
-```
+This limits blast radius and preserves the accepted electrical baseline.
 
-The exact electrical connection source must be resolved from the accepted electrical domain model during P3 implementation; P0 does not invent a synthetic `EngineeringConnection` if none exists.
+## 13. Regression requirements
 
-### Case B — insufficient evidence to identify canonical cable identity
+Before any adoption implementation closes:
 
-The row is migrated into an explicit review state, never guessed.
+- all existing electrical routing tests stay green;
+- legacy circuit routes render/trace as before;
+- no fake Cable is created for untouched legacy records;
+- adoption of a proven cable is deterministic after restart;
+- ambiguous adoption produces review state;
+- rollback leaves legacy routing unchanged;
+- canonical ELV fixtures never require fake circuit IDs.
 
-```text
-MIGRATION_REVIEW_REQUIRED
-```
+## 14. P0-R8 acceptance
 
-The original `circuitId`, run identity and route geometry remain preserved as migration provenance until resolved.
+- [x] automatic `circuitId -> cableId` backfill is rejected.
+- [x] legacy electrical routing remains supported through coexistence/adapter semantics.
+- [x] explicit adoption requires physical evidence.
+- [x] ambiguous cases remain review-required.
+- [x] migration is idempotent and auditable.
+- [x] ELV3 no longer requires simultaneous full electrical routing reform.
 
-## 5. Transitional schema strategy
-
-Recommended migration sequence:
-
-```text
-schema N
-  add CableDefinition/Cable/CableAllocation structures
-  add nullable CableRuns.cable_id
-  retain circuit_id temporarily
-
-backfill
-  map legacy runs deterministically
-  populate cable_id
-  record unresolved rows
-
-validation gate
-  all active migrated rows either RESOLVED or REVIEW_REQUIRED
-  no silently null ownership
-
-schema N+1
-  application reads canonical cable_id
-  legacy circuit_id read only for migration diagnostics
-
-schema N+2
-  remove circuit FK/column when exact migration closure is proven
-```
-
-A single destructive migration that drops `circuit_id` immediately is rejected.
-
-## 6. Junction migration
-
-Current junction persistence carries electrical `circuitId`, while the domain already has a broader `circuitOrNetworkId` concept.
-
-Target semantics:
-
-- routing continuity references run endpoints and `cableId` where cable continuity is asserted;
-- pathway-only tray/conduit branch junctions assert channel geometry, not cable/electrical continuity;
-- logical splice/termination requires an explicit object/contract, not same-circuit inference;
-- legacy `JunctionConnections.circuit_id` becomes migration provenance and is later removed from canonical validation.
-
-## 7. Floor endpoint signature migration
-
-Current signature includes `run.circuitId`.
-
-Target fingerprint:
-
-```text
-run.id
-run.cableId
-run.roomId
-route.id
-endpoint node id
-surface anchor
-world position
-laying method
-physical channel id
-```
-
-Migration must regenerate signatures and mark stale handoffs for explicit review when the reconstructed physical identity differs.
-
-No handoff is automatically reconnected solely because two runs used the same legacy electrical circuit.
-
-## 8. RoomRoutingSnapshot migration
-
-Current snapshot dependency:
-
-```text
-activeCircuitIds
-```
-
-Target physical snapshot must instead expose the physical resources needed for route readiness, for example:
-
-```text
-activeCableIds
-CableRun -> Cable existence
-route validity
-channel availability
-```
-
-Electrical circuit information may still be joined in electrical-specific application views, but it is not a prerequisite for generic physical route validity.
-
-## 9. Compatibility adapter
-
-During migration a narrow adapter MAY expose legacy electrical behavior:
-
-```text
-legacy circuit -> migrated allocation/cable -> cable runs
-```
-
-The adapter must be one-way compatibility infrastructure. New ELV3 writes MUST NOT populate physical ownership through legacy `circuitId`.
-
-## 10. Rollback and failure safety
-
-Migration must be resumable and idempotent:
-
-- deterministic migrated IDs or mapping table prevent duplicate Cable creation;
-- every migrated row retains source legacy identity;
-- failure midway leaves old schema/read path intact until a gate switches canonical reads;
-- unresolved mappings are explicit and queryable;
-- rollback must not destroy pre-migration electrical routing evidence.
-
-## 11. Required migration tests
-
-1. single electrical run -> cable -> restart;
-2. multiple room runs for same confirmed physical cable -> one Cable / N CableRuns;
-3. junction continuity survives migration;
-4. floor handoff signatures regenerate deterministically;
-5. unresolved ambiguity becomes REVIEW_REQUIRED;
-6. rerunning migration creates no duplicates;
-7. ELV cable run requires no electrical circuit;
-8. legacy electrical screens remain functionally equivalent through adapter during transition.
-
-## 12. P0.6 acceptance gate
-
-- [x] target ownership is `CableRun.cableId`;
-- [x] destructive one-step migration rejected;
-- [x] unresolved mappings are explicit, never guessed;
-- [x] junction continuity is decoupled from circuit identity;
-- [x] floor signatures become cable/geometry-based;
-- [x] generic routing no longer depends on `activeCircuitIds`;
-- [x] migration is restart-safe and idempotent;
-- [x] existing electrical behavior has a compatibility path.
+P0-R8 is CLOSED subject to P0-R10.
