@@ -8,6 +8,8 @@ on:
       - .github/workflows/tmp-elv4-p4-p5-boundary-gate.yml
       - packages/engineering_core/lib/engineering_core.dart
       - packages/engineering_core/lib/src/power_bottom_up_evaluation.dart
+      - packages/engineering_core/lib/src/power_load_evaluation.dart
+      - packages/engineering_core/lib/src/power_dc_backup.dart
       - packages/engineering_core/test/power_bottom_up_evaluation_test.dart
 
 permissions:
@@ -32,6 +34,8 @@ jobs:
           dart format \
             packages/engineering_core/lib/engineering_core.dart \
             packages/engineering_core/lib/src/power_bottom_up_evaluation.dart \
+            packages/engineering_core/lib/src/power_load_evaluation.dart \
+            packages/engineering_core/lib/src/power_dc_backup.dart \
             packages/engineering_core/test/power_bottom_up_evaluation_test.dart
       - name: Analyze engineering core
         working-directory: packages/engineering_core
@@ -49,6 +53,8 @@ jobs:
           git add \
             packages/engineering_core/lib/engineering_core.dart \
             packages/engineering_core/lib/src/power_bottom_up_evaluation.dart \
+            packages/engineering_core/lib/src/power_load_evaluation.dart \
+            packages/engineering_core/lib/src/power_dc_backup.dart \
             packages/engineering_core/test/power_bottom_up_evaluation_test.dart
           git commit -m "style(elv4): format P4 P5 boundary slice"
           git push origin HEAD:${{ github.ref_name }}
