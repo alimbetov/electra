@@ -79,7 +79,7 @@ void main() {
       final undoRuntime = DriftElvReviewedRoutingRuntime(
         db,
         originDeviceId: 'test-reopen-undo',
-        idGenerator: FixedSequenceIdGenerator(const ['undo-execution-1']),
+        idGenerator: FixedSequenceIdGenerator(const []),
         now: _clock,
       );
       expect(
@@ -92,8 +92,31 @@ void main() {
       final undone = await undoRuntime.undo(
         projectId: 'project',
         designRevisionId: 'rev-1',
+        executionCommandId: 'undo-execution-1',
       );
       expect(undone, isA<ElvCommandSuccess<Object?>>());
+      await _expectRoute(db, 'seg-old', revision: 3);
+      await _expectHistory(
+        db,
+        state: 'UNDONE',
+        headSequence: 0,
+        generation: 2,
+        executionKinds: const {'ORIGINAL', 'UNDO'},
+      );
+
+      db = await harness.reopen(db);
+      final undoReplayRuntime = DriftElvReviewedRoutingRuntime(
+        db,
+        originDeviceId: 'test-reopen-undo-replay',
+        idGenerator: FixedSequenceIdGenerator(const []),
+        now: _clock,
+      );
+      final undoReplay = await undoReplayRuntime.undo(
+        projectId: 'project',
+        designRevisionId: 'rev-1',
+        executionCommandId: 'undo-execution-1',
+      );
+      expect(undoReplay, isA<ElvCommandSuccess<Object?>>());
       await _expectRoute(db, 'seg-old', revision: 3);
       await _expectHistory(
         db,
@@ -107,7 +130,7 @@ void main() {
       final redoRuntime = DriftElvReviewedRoutingRuntime(
         db,
         originDeviceId: 'test-reopen-redo',
-        idGenerator: FixedSequenceIdGenerator(const ['redo-execution-1']),
+        idGenerator: FixedSequenceIdGenerator(const []),
         now: _clock,
       );
       expect(
@@ -120,8 +143,31 @@ void main() {
       final redone = await redoRuntime.redo(
         projectId: 'project',
         designRevisionId: 'rev-1',
+        executionCommandId: 'redo-execution-1',
       );
       expect(redone, isA<ElvCommandSuccess<Object?>>());
+      await _expectRoute(db, 'seg-new', revision: 4);
+      await _expectHistory(
+        db,
+        state: 'APPLIED',
+        headSequence: 1,
+        generation: 3,
+        executionKinds: const {'ORIGINAL', 'UNDO', 'REDO'},
+      );
+
+      db = await harness.reopen(db);
+      final redoReplayRuntime = DriftElvReviewedRoutingRuntime(
+        db,
+        originDeviceId: 'test-reopen-redo-replay',
+        idGenerator: FixedSequenceIdGenerator(const []),
+        now: _clock,
+      );
+      final redoReplay = await redoReplayRuntime.redo(
+        projectId: 'project',
+        designRevisionId: 'rev-1',
+        executionCommandId: 'redo-execution-1',
+      );
+      expect(redoReplay, isA<ElvCommandSuccess<Object?>>());
       await _expectRoute(db, 'seg-new', revision: 4);
       await _expectHistory(
         db,

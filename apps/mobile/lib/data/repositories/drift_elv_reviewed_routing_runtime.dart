@@ -152,7 +152,15 @@ final class DriftElvReviewedRoutingRuntime
   Future<ElvCommandResult<Object?>> undo({
     required String projectId,
     required String designRevisionId,
+    required String executionCommandId,
   }) => database.transaction(() async {
+    final replay = await _replayHistoryExecution(
+      projectId: projectId,
+      designRevisionId: designRevisionId,
+      executionCommandId: executionCommandId,
+      expectedKind: 'UNDO',
+    );
+    if (replay != null) return replay;
     final lifecycleFailure = await _workingRevisionFailure(
       projectId,
       designRevisionId,
@@ -187,15 +195,16 @@ final class DriftElvReviewedRoutingRuntime
       return _historyFailure('ELV4_HISTORY_AGGREGATE_CHANGED');
     }
 
-    final executionCommandId = idGenerator.next();
+    final effectivePayload = _storedReroutePayload(
+      commandId: executionCommandId,
+      projectId: projectId,
+      designRevisionId: designRevisionId,
+      cableRunId: cableRunId,
+      expectedRevision: current.run.revision,
+      traversals: _decodeTraversals(inversePayload, cableRunId),
+    );
     final mutation = await _runs.reroute(
-      RerouteCableRunCommand(
-        commandId: executionCommandId,
-        projectId: projectId,
-        cableRunId: cableRunId,
-        expectedRevision: current.run.revision,
-        traversals: _decodeTraversals(inversePayload, cableRunId),
-      ),
+      _rerouteFromStoredPayload(effectivePayload.json),
     );
     if (mutation is ElvCommandFailureResult<CanonicalCableRun>) {
       return ElvCommandFailureResult<Object?>(mutation.failure);
@@ -250,6 +259,7 @@ final class DriftElvReviewedRoutingRuntime
       historySequence: operation.sequence,
       commandId: executionCommandId,
       kind: 'UNDO',
+      payload: effectivePayload,
     );
     return ElvCommandSuccess<Object?>((mutation as ElvCommandSuccess).value);
   });
@@ -258,7 +268,15 @@ final class DriftElvReviewedRoutingRuntime
   Future<ElvCommandResult<Object?>> redo({
     required String projectId,
     required String designRevisionId,
+    required String executionCommandId,
   }) => database.transaction(() async {
+    final replay = await _replayHistoryExecution(
+      projectId: projectId,
+      designRevisionId: designRevisionId,
+      executionCommandId: executionCommandId,
+      expectedKind: 'REDO',
+    );
+    if (replay != null) return replay;
     final lifecycleFailure = await _workingRevisionFailure(
       projectId,
       designRevisionId,
@@ -292,15 +310,16 @@ final class DriftElvReviewedRoutingRuntime
       return _historyFailure('ELV4_HISTORY_AGGREGATE_CHANGED');
     }
 
-    final executionCommandId = idGenerator.next();
+    final effectivePayload = _storedReroutePayload(
+      commandId: executionCommandId,
+      projectId: projectId,
+      designRevisionId: designRevisionId,
+      cableRunId: cableRunId,
+      expectedRevision: current.run.revision,
+      traversals: _decodeTraversals(forwardPayload, cableRunId),
+    );
     final mutation = await _runs.reroute(
-      RerouteCableRunCommand(
-        commandId: executionCommandId,
-        projectId: projectId,
-        cableRunId: cableRunId,
-        expectedRevision: current.run.revision,
-        traversals: _decodeTraversals(forwardPayload, cableRunId),
-      ),
+      _rerouteFromStoredPayload(effectivePayload.json),
     );
     if (mutation is ElvCommandFailureResult<CanonicalCableRun>) {
       return ElvCommandFailureResult<Object?>(mutation.failure);
@@ -349,6 +368,7 @@ final class DriftElvReviewedRoutingRuntime
       historySequence: operation.sequence,
       commandId: executionCommandId,
       kind: 'REDO',
+      payload: effectivePayload,
     );
     return ElvCommandSuccess<Object?>((mutation as ElvCommandSuccess).value);
   });
@@ -444,6 +464,7 @@ final class DriftElvReviewedRoutingRuntime
       historySequence: sequence,
       commandId: command.commandId,
       kind: 'ORIGINAL',
+      payload: forward,
     );
 
     if (cursor == null) {
@@ -524,6 +545,7 @@ final class DriftElvReviewedRoutingRuntime
     required int historySequence,
     required String commandId,
     required String kind,
+    required _StoredPayload payload,
   }) async {
     await database
         .into(database.elvRevisionCommandHistoryExecutions)
@@ -534,11 +556,52 @@ final class DriftElvReviewedRoutingRuntime
             historySequence: historySequence,
             executionCommandId: commandId,
             executionKind: kind,
+            commandType: 'REROUTE_CABLE_RUN',
+            commandSchema:
+                ReviewedRerouteCableRunWorkspaceCommand.payloadSchema,
+            canonicalPayloadJson: payload.json,
+            payloadSha256: payload.sha256,
             createdAt: _now(),
             originDeviceId: originDeviceId,
           ),
         );
   }
+
+  Future<ElvCommandResult<Object?>?> _replayHistoryExecution({
+    required String projectId,
+    required String designRevisionId,
+    required String executionCommandId,
+    required String expectedKind,
+  }) async {
+    final execution = await _executionByCommandId(
+      projectId,
+      executionCommandId,
+    );
+    if (execution == null) return null;
+    if (execution.designRevisionId != designRevisionId ||
+        execution.executionKind != expectedKind ||
+        execution.commandType != 'REROUTE_CABLE_RUN' ||
+        execution.commandSchema !=
+            ReviewedRerouteCableRunWorkspaceCommand.payloadSchema ||
+        sha256HexUtf8(execution.canonicalPayloadJson) !=
+            execution.payloadSha256) {
+      return _historyFailure('ELV4_HISTORY_EXECUTION_ID_CONFLICT');
+    }
+    final result = await _runs.reroute(
+      _rerouteFromStoredPayload(execution.canonicalPayloadJson),
+    );
+    return _objectResult(result);
+  }
+
+  Future<ElvRevisionCommandHistoryExecutionRow?> _executionByCommandId(
+    String projectId,
+    String executionCommandId,
+  ) =>
+      (database.select(database.elvRevisionCommandHistoryExecutions)..where(
+        (row) =>
+            row.projectId.equals(projectId) &
+            row.executionCommandId.equals(executionCommandId),
+      )).getSingleOrNull();
 
   Future<void> _moveCursor(
     ElvRevisionCommandHistoryCursorRow cursor, {
@@ -743,6 +806,18 @@ Map<String, Object?> _traversalMap(CableRunTraversal value) =>
 
 Map<String, Object?> _decodePayload(String canonicalJson) =>
     (jsonDecode(canonicalJson) as Map).cast<String, Object?>();
+
+RerouteCableRunCommand _rerouteFromStoredPayload(String canonicalJson) {
+  final payload = _decodePayload(canonicalJson);
+  final cableRunId = _requiredString(payload, 'cableRunId');
+  return RerouteCableRunCommand(
+    commandId: _requiredString(payload, 'commandId'),
+    projectId: _requiredString(payload, 'projectId'),
+    cableRunId: cableRunId,
+    expectedRevision: payload['expectedRevision'] as int,
+    traversals: _decodeTraversals(payload, cableRunId),
+  );
+}
 
 String _requiredString(Map<String, Object?> payload, String key) {
   final value = payload[key];

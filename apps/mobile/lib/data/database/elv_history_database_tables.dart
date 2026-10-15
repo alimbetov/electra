@@ -75,6 +75,10 @@ class ElvRevisionCommandHistoryExecutions extends Table {
   IntColumn get historySequence => integer()();
   TextColumn get executionCommandId => text()();
   TextColumn get executionKind => text()();
+  TextColumn get commandType => text()();
+  TextColumn get commandSchema => text()();
+  TextColumn get canonicalPayloadJson => text()();
+  TextColumn get payloadSha256 => text()();
   DateTimeColumn get createdAt => dateTime()();
   TextColumn get originDeviceId => text()();
 

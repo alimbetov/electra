@@ -6,6 +6,7 @@ import 'package:electra_mobile/application/elv_physical_routing_workspace_state.
 import 'package:electra_mobile/application/elv_physical_trace_service.dart';
 import 'package:electra_mobile/application/elv_reviewed_workspace_command.dart';
 import 'package:electra_mobile/application/elv_revision_command_history_service.dart';
+import 'package:electra_mobile/application/id_generator.dart';
 import 'package:electra_mobile/application/power_workspace_controller.dart';
 import 'package:electra_mobile/application/power_workspace_projection.dart';
 import 'package:electra_mobile/application/power_workspace_state.dart';
@@ -187,6 +188,10 @@ void main() {
     final controller = PowerWorkspaceController(
       repository: _Repository(),
       historyService: history,
+      historyCommandIds: FixedSequenceIdGenerator(const [
+        'undo-command-1',
+        'redo-command-1',
+      ]),
     );
     await controller.open('project');
 
@@ -197,6 +202,7 @@ void main() {
     expect(history.undoCalls, 1);
     expect(history.redoCalls, 1);
     expect(history.scopes, everyElement(('project', 'rev-1')));
+    expect(history.executionCommandIds, ['undo-command-1', 'redo-command-1']);
   });
 
   test('P7 frozen workspace does not expose history mutations', () async {
@@ -364,6 +370,7 @@ final class _HistoryService implements ElvRevisionCommandHistoryService {
   int undoCalls = 0;
   int redoCalls = 0;
   final scopes = <(String, String)>[];
+  final executionCommandIds = <String>[];
 
   @override
   Future<bool> canRedo({
@@ -387,8 +394,10 @@ final class _HistoryService implements ElvRevisionCommandHistoryService {
   Future<ElvCommandResult<Object?>> redo({
     required String projectId,
     required String designRevisionId,
+    required String executionCommandId,
   }) async {
     scopes.add((projectId, designRevisionId));
+    executionCommandIds.add(executionCommandId);
     redoCalls += 1;
     return const ElvCommandSuccess<Object?>('redo');
   }
@@ -397,8 +406,10 @@ final class _HistoryService implements ElvRevisionCommandHistoryService {
   Future<ElvCommandResult<Object?>> undo({
     required String projectId,
     required String designRevisionId,
+    required String executionCommandId,
   }) async {
     scopes.add((projectId, designRevisionId));
+    executionCommandIds.add(executionCommandId);
     undoCalls += 1;
     return const ElvCommandSuccess<Object?>('undo');
   }
