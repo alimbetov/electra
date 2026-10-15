@@ -51,7 +51,14 @@ final class PowerWorkspaceController {
       _projection = null;
       return null;
     }
-    _state = result.state;
+    _state = result.state.applyTechnicalState(
+      contextGeneration: result.state.context.generation,
+      findings: [
+        for (final card in result.projection.cards.values)
+          for (final finding in card.findings) finding.finding,
+      ],
+      pointerStates: result.projection.pointerStates,
+    );
     _projection = result.projection;
     return snapshot;
   }
@@ -212,7 +219,7 @@ final class PowerWorkspaceController {
           for (final card in loaded.cards.values)
             for (final finding in card.findings) finding.finding,
         ],
-        pointerStates: current.pointerStates,
+        pointerStates: loaded.pointerStates,
       );
     }
     return snapshot;
