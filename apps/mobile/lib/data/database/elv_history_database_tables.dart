@@ -33,9 +33,11 @@ class ElvRevisionCommandHistoryOperations extends Table {
   TextColumn get inverseCommandSchema => text()();
   TextColumn get inverseCanonicalPayloadJson => text()();
   TextColumn get inversePayloadSha256 => text()();
+  @ReferenceName('historyOperationsByBeforeEvidence')
   TextColumn get beforeAggregateEvidenceRef =>
       text().references(ElvRevisionAggregateEvidenceRecords, #evidenceRef)();
   TextColumn get beforeAggregateHash => text()();
+  @ReferenceName('historyOperationsByAfterEvidence')
   TextColumn get afterAggregateEvidenceRef =>
       text().references(ElvRevisionAggregateEvidenceRecords, #evidenceRef)();
   TextColumn get afterAggregateHash => text()();
