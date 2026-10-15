@@ -1,42 +1,74 @@
 import 'package:flutter/foundation.dart';
 
+import '../../application/power_workspace_controller.dart';
 import '../../application/power_workspace_projection.dart';
 import '../../application/power_workspace_state.dart';
 
-/// Presentation-only bridge between the persisted editor shell and the P7
-/// power workspace. It carries immutable state plus intents; no repository or
-/// engineering evaluator is reachable from the widget tree through this type.
+/// Presentation adapter between the persisted editor shell and the P7 power
+/// application controller. Widgets can issue intents through this boundary but
+/// cannot reach persistence repositories or engineering evaluators directly.
 final class PowerWorkspaceEditorBinding {
-  const PowerWorkspaceEditorBinding({
-    required this.state,
-    required this.projection,
-    required this.onSelectComponent,
-    required this.onScenarioChanged,
-    required this.onOverlayChanged,
-    required this.onPreviousCard,
-    required this.onNextCard,
+  PowerWorkspaceEditorBinding({
+    required this.controller,
+    required this.onSessionChanged,
     required this.onFindingSelected,
-    this.canUndo = false,
-    this.canRedo = false,
-    this.onUndo,
-    this.onRedo,
     this.onApplyReviewedRoute,
     this.onDiscardDraft,
   });
 
-  final PowerWorkspaceState state;
-  final PowerWorkspaceProjection projection;
-  final Future<void> Function(String? componentId) onSelectComponent;
-  final Future<void> Function(PowerWorkspaceScenarioOption value)
-  onScenarioChanged;
-  final ValueChanged<PowerWorkspaceOverlayMode> onOverlayChanged;
-  final VoidCallback onPreviousCard;
-  final VoidCallback onNextCard;
+  final PowerWorkspaceController controller;
+  final Future<void> Function(PowerWorkspaceSessionSnapshot snapshot)
+  onSessionChanged;
   final ValueChanged<PowerWorkspaceFindingProjection> onFindingSelected;
-  final bool canUndo;
-  final bool canRedo;
-  final Future<void> Function()? onUndo;
-  final Future<void> Function()? onRedo;
   final Future<void> Function()? onApplyReviewedRoute;
   final VoidCallback? onDiscardDraft;
+
+  PowerWorkspaceState get state => controller.state;
+  PowerWorkspaceProjection get projection => controller.projection;
+
+  Future<void> selectComponent(String? componentId) async {
+    final snapshot = await controller.select(componentId: componentId);
+    await onSessionChanged(snapshot);
+  }
+
+  Future<void> switchScenario(PowerWorkspaceScenarioOption value) async {
+    final snapshot = await controller.switchScenario(
+      scenarioId: value.scenarioId,
+      segmentId: value.segmentId,
+    );
+    await onSessionChanged(snapshot);
+  }
+
+  Future<void> setOverlay(PowerWorkspaceOverlayMode mode) async {
+    final snapshot = controller.setOverlay(mode);
+    await onSessionChanged(snapshot);
+  }
+
+  Future<void> previousCard() async {
+    final snapshot = controller.previousCard();
+    await onSessionChanged(snapshot);
+  }
+
+  Future<void> nextCard() async {
+    final snapshot = controller.nextCard();
+    await onSessionChanged(snapshot);
+  }
+
+  Future<void> showCard(PowerWorkspaceCardCode card) async {
+    final snapshot = controller.showCard(card);
+    await onSessionChanged(snapshot);
+  }
+
+  Future<bool> canUndo() => controller.canUndo();
+  Future<bool> canRedo() => controller.canRedo();
+
+  Future<void> undo() async {
+    await controller.undo();
+    await onSessionChanged(controller.snapshot);
+  }
+
+  Future<void> redo() async {
+    await controller.redo();
+    await onSessionChanged(controller.snapshot);
+  }
 }
