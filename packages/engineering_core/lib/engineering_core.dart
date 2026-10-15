@@ -68,3 +68,4 @@ export 'src/power_scenarios.dart';
 export 'src/power_assets.dart';
 export 'src/power_legacy_adoption.dart';
 export 'src/power_catalog.dart';
+export 'src/power_evaluation.dart';
