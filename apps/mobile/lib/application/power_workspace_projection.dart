@@ -139,11 +139,12 @@ final class PowerWorkspaceProjection {
     required Iterable<PowerWorkspaceCardProjection> cards,
     required this.overlay,
     Iterable<PowerWorkspaceBudgetProjection> budgets = const [],
+    Map<String, PowerPointerState> pointerStates = const {},
     this.reasonCode,
   }) : lifecycleState = _text(lifecycleState, 'lifecycleState').toUpperCase(),
        scenarios = List.unmodifiable(scenarios),
-       cards = Map.unmodifiable({for (final card in cards) card.code: card}),
-       budgets = List.unmodifiable(budgets) {
+       budgets = List.unmodifiable(budgets),
+       pointerStates = Map.unmodifiable(pointerStates) {
     if (contextGeneration < 1) {
       throw ArgumentError.value(
         contextGeneration,
@@ -151,9 +152,12 @@ final class PowerWorkspaceProjection {
         'Must be positive.',
       );
     }
-    if (this.cards.length != List<PowerWorkspaceCardProjection>.from(cards).length) {
+    final cardList = List<PowerWorkspaceCardProjection>.unmodifiable(cards);
+    final byCode = {for (final card in cardList) card.code: card};
+    if (byCode.length != cardList.length) {
       throw ArgumentError('Workspace cards must be unique by code.');
     }
+    this.cards = Map.unmodifiable(byCode);
     if (readKind == PowerWorkspaceReadKind.notCaptured &&
         (reasonCode == null || reasonCode!.trim().isEmpty)) {
       throw ArgumentError('NOT_CAPTURED projection requires a reason code.');
@@ -165,9 +169,10 @@ final class PowerWorkspaceProjection {
   final String lifecycleState;
   final PowerWorkspaceCurrentness currentness;
   final List<PowerWorkspaceScenarioOption> scenarios;
-  final Map<PowerWorkspaceCardCode, PowerWorkspaceCardProjection> cards;
+  late final Map<PowerWorkspaceCardCode, PowerWorkspaceCardProjection> cards;
   final PowerWorkspaceOverlayProjection overlay;
   final List<PowerWorkspaceBudgetProjection> budgets;
+  final Map<String, PowerPointerState> pointerStates;
   final String? reasonCode;
 
   bool get mutationAllowed => lifecycleState == 'WORKING';
