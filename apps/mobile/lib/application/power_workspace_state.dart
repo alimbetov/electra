@@ -9,6 +9,26 @@ enum PowerWorkspaceOverlayMode {
   findings,
 }
 
+enum PowerWorkspaceScopeKind { building, floor }
+
+enum PowerWorkspaceLoadMode { all, selectedComponent }
+
+final class PowerWorkspaceScope {
+  PowerWorkspaceScope.building()
+    : kind = PowerWorkspaceScopeKind.building,
+      floorId = null;
+
+  PowerWorkspaceScope.floor(String floorId)
+    : kind = PowerWorkspaceScopeKind.floor,
+      floorId = _text(floorId, 'floorId');
+
+  final PowerWorkspaceScopeKind kind;
+  final String? floorId;
+
+  bool sameAs(PowerWorkspaceScope other) =>
+      kind == other.kind && floorId == other.floorId;
+}
+
 enum PowerWorkspaceOperationState { idle, running, cancelled, failed }
 
 enum PowerWorkspaceCardCode {
@@ -85,6 +105,8 @@ final class PowerWorkspaceState {
   PowerWorkspaceState({
     required this.context,
     required Iterable<PowerWorkspaceCardCode> cards,
+    PowerWorkspaceScope? scope,
+    this.loadMode = PowerWorkspaceLoadMode.all,
     this.cardIndex = 0,
     this.selectedComponentId,
     this.selectedPortId,
@@ -97,7 +119,8 @@ final class PowerWorkspaceState {
     Iterable<PowerEvaluationFinding> findings = const [],
     Map<String, PowerPointerState> pointerStates = const {},
     this.unsavedDraftWarning = false,
-  }) : cards = List.unmodifiable(cards),
+  }) : scope = scope ?? PowerWorkspaceScope.building(),
+       cards = List.unmodifiable(cards),
        draft = Map.unmodifiable(draft ?? const <String, Object?>{}),
        findings = List.unmodifiable(findings),
        pointerStates = Map.unmodifiable(pointerStates) {
@@ -116,6 +139,8 @@ final class PowerWorkspaceState {
   }
 
   final PowerWorkspaceReadContext context;
+  final PowerWorkspaceScope scope;
+  final PowerWorkspaceLoadMode loadMode;
   final List<PowerWorkspaceCardCode> cards;
   final int cardIndex;
   final String? selectedComponentId;
@@ -133,6 +158,11 @@ final class PowerWorkspaceState {
   PowerWorkspaceCardCode get currentCard => cards[cardIndex];
   bool get mutationAllowed => context.mutationAllowed;
   bool get hasDraft => draft.isNotEmpty;
+  PowerWorkspaceLoadMode get effectiveLoadMode =>
+      loadMode == PowerWorkspaceLoadMode.selectedComponent &&
+              selectedComponentId == null
+          ? PowerWorkspaceLoadMode.all
+          : loadMode;
 
   PowerWorkspaceState select({String? componentId, String? portId}) {
     final normalizedComponent = _nullableText(componentId, 'componentId');
@@ -146,6 +176,25 @@ final class PowerWorkspaceState {
       selectedPortId: normalizedPort,
       clearSelection: normalizedComponent == null,
       clearPortSelection: normalizedComponent != null && normalizedPort == null,
+      clearQuerySnapshot: true,
+    );
+  }
+
+  PowerWorkspaceState switchScope(PowerWorkspaceScope nextScope) {
+    if (scope.sameAs(nextScope)) return this;
+    return _copy(
+      context: context.nextGeneration(),
+      scope: nextScope,
+      clearQuerySnapshot: true,
+      unsavedDraftWarning: hasDraft,
+    );
+  }
+
+  PowerWorkspaceState setLoadMode(PowerWorkspaceLoadMode mode) {
+    if (loadMode == mode) return this;
+    return _copy(
+      context: context.nextGeneration(),
+      loadMode: mode,
       clearQuerySnapshot: true,
     );
   }
@@ -175,6 +224,8 @@ final class PowerWorkspaceState {
       segmentId: _text(segmentId, 'segmentId'),
     ),
     cards: cards,
+    scope: scope,
+    loadMode: loadMode,
     cardIndex: cardIndex,
     selectedComponentId: selectedComponentId,
     selectedPortId: selectedPortId,
@@ -270,6 +321,8 @@ final class PowerWorkspaceState {
 
   PowerWorkspaceState _copy({
     PowerWorkspaceReadContext? context,
+    PowerWorkspaceScope? scope,
+    PowerWorkspaceLoadMode? loadMode,
     int? cardIndex,
     String? selectedComponentId,
     String? selectedPortId,
@@ -290,6 +343,8 @@ final class PowerWorkspaceState {
   }) => PowerWorkspaceState(
     context: context ?? this.context,
     cards: cards,
+    scope: scope ?? this.scope,
+    loadMode: loadMode ?? this.loadMode,
     cardIndex: cardIndex ?? this.cardIndex,
     selectedComponentId:
         clearSelection ? null : selectedComponentId ?? this.selectedComponentId,

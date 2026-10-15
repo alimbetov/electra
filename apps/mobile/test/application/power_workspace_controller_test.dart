@@ -223,6 +223,50 @@ void main() {
     expect(history.undoCalls, 0);
   });
 
+  test('P7 T08 scope change reloads the requested dataset', () async {
+    final repository = _Repository();
+    final controller = PowerWorkspaceController(repository: repository);
+    await controller.open('project');
+
+    await controller.switchScope(PowerWorkspaceScope.floor('floor-7'));
+    expect(repository.loadedScopes.single.kind, PowerWorkspaceScopeKind.floor);
+    expect(repository.loadedScopes.single.floorId, 'floor-7');
+
+    await controller.switchScope(PowerWorkspaceScope.building());
+    expect(repository.loadedScopes.last.kind, PowerWorkspaceScopeKind.building);
+    expect(repository.loadedScopes.last.floorId, isNull);
+  });
+
+  test(
+    'P7 T08 controller preserves preferred load mode across selection',
+    () async {
+      final repository = _Repository();
+      final controller = PowerWorkspaceController(repository: repository);
+      await controller.open('project');
+
+      await controller.setLoadMode(PowerWorkspaceLoadMode.selectedComponent);
+      expect(
+        controller.state.loadMode,
+        PowerWorkspaceLoadMode.selectedComponent,
+      );
+      expect(controller.state.effectiveLoadMode, PowerWorkspaceLoadMode.all);
+
+      await controller.select(componentId: 'camera-9');
+      expect(
+        controller.state.loadMode,
+        PowerWorkspaceLoadMode.selectedComponent,
+      );
+      expect(
+        controller.state.effectiveLoadMode,
+        PowerWorkspaceLoadMode.selectedComponent,
+      );
+      expect(
+        repository.loadedModes.last,
+        PowerWorkspaceLoadMode.selectedComponent,
+      );
+    },
+  );
+
   test(
     'P7 controller discards projection returned for obsolete generation',
     () async {
@@ -288,6 +332,8 @@ final class _Repository implements PowerWorkspaceRepository {
 
   final String lifecycleState;
   int loads = 0;
+  final loadedScopes = <PowerWorkspaceScope>[];
+  final loadedModes = <PowerWorkspaceLoadMode>[];
 
   @override
   Future<PowerWorkspaceOpenResult?> open(String projectId) async {
@@ -301,6 +347,8 @@ final class _Repository implements PowerWorkspaceRepository {
   @override
   Future<PowerWorkspaceProjection> load(PowerWorkspaceState state) async {
     loads += 1;
+    loadedScopes.add(state.scope);
+    loadedModes.add(state.effectiveLoadMode);
     return _projection(
       generation: state.context.generation,
       lifecycleState: state.context.lifecycleState,

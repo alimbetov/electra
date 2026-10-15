@@ -38,6 +38,33 @@ void main() {
     },
   );
 
+  test('P7 T08 building scope never retains a floor filter', () {
+    final floor = _state().switchScope(PowerWorkspaceScope.floor('floor-2'));
+    expect(floor.scope.kind, PowerWorkspaceScopeKind.floor);
+    expect(floor.scope.floorId, 'floor-2');
+
+    final building = floor.switchScope(PowerWorkspaceScope.building());
+
+    expect(building.scope.kind, PowerWorkspaceScopeKind.building);
+    expect(building.scope.floorId, isNull);
+    expect(building.context.generation, floor.context.generation + 1);
+  });
+
+  test('P7 T08 preferred load mode survives temporary ineffectiveness', () {
+    var state = _state().setLoadMode(PowerWorkspaceLoadMode.selectedComponent);
+
+    expect(state.loadMode, PowerWorkspaceLoadMode.selectedComponent);
+    expect(state.effectiveLoadMode, PowerWorkspaceLoadMode.all);
+
+    state = state.select(componentId: 'camera-1');
+    expect(state.loadMode, PowerWorkspaceLoadMode.selectedComponent);
+    expect(state.effectiveLoadMode, PowerWorkspaceLoadMode.selectedComponent);
+
+    state = state.select();
+    expect(state.loadMode, PowerWorkspaceLoadMode.selectedComponent);
+    expect(state.effectiveLoadMode, PowerWorkspaceLoadMode.all);
+  });
+
   test('P7 workspace discards stale async query and technical responses', () {
     final initial = _state();
     final staleGeneration = initial.context.generation;

@@ -79,6 +79,14 @@ final class PowerWorkspaceController {
     String? portId,
   }) => _reload(state.select(componentId: componentId, portId: portId));
 
+  Future<PowerWorkspaceSessionSnapshot> switchScope(
+    PowerWorkspaceScope scope,
+  ) => _reload(state.switchScope(scope));
+
+  Future<PowerWorkspaceSessionSnapshot> setLoadMode(
+    PowerWorkspaceLoadMode mode,
+  ) => _reload(state.setLoadMode(mode));
+
   Future<PowerWorkspaceSessionSnapshot> switchScenario({
     required String scenarioId,
     required String segmentId,

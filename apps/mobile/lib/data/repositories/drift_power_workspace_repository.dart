@@ -95,7 +95,7 @@ final class DriftPowerWorkspaceRepository implements PowerWorkspaceRepository {
       PowerRevisionReadKind.notCaptured => const <_WorkspaceEvidence>[],
     };
 
-    final scoped = records
+    final scenarioRecords = records
         .where(
           (row) =>
               row.nodeKey.scenarioId == context.scenarioId &&
@@ -103,19 +103,30 @@ final class DriftPowerWorkspaceRepository implements PowerWorkspaceRepository {
                   row.nodeKey.scopeId == context.segmentId),
         )
         .toList(growable: false);
+    final scopeRecords = await _scopeRecords(
+      context: context,
+      scope: state.scope,
+      values: scenarioRecords,
+    );
     final pointerStates = <String, PowerPointerState>{
-      for (final row in scoped) row.nodeKey.encode(): row.pointerState,
+      for (final row in scopeRecords) row.nodeKey.encode(): row.pointerState,
     };
-    final relevant = _relevant(scoped, state.selectedComponentId);
+    final selectedEvidence = _relevant(scopeRecords, state.selectedComponentId);
+    final loadedEvidence =
+        state.effectiveLoadMode == PowerWorkspaceLoadMode.selectedComponent
+            ? selectedEvidence
+            : scopeRecords;
+    final overlayEvidence =
+        state.selectedComponentId == null ? loadedEvidence : selectedEvidence;
     final overlay = await _overlay(
       context: context,
       selectedComponentId: state.selectedComponentId,
-      evidence: relevant,
+      evidence: overlayEvidence,
     );
     final budgets = await _budgets(
       context: context,
-      evidence: scoped,
-      relevant: relevant,
+      evidence: scopeRecords,
+      relevant: selectedEvidence,
       selectedGroupIds: overlay.capacityGroupIds.toSet(),
     );
 
@@ -126,14 +137,18 @@ final class DriftPowerWorkspaceRepository implements PowerWorkspaceRepository {
         PowerWorkspaceReadKind.capturedEmpty,
       PowerRevisionReadKind.notCaptured => PowerWorkspaceReadKind.notCaptured,
     };
-    final cardRows = relevant.isEmpty ? scoped : relevant;
+    final cardRows = loadedEvidence;
     return PowerWorkspaceProjection(
       contextGeneration: context.generation,
       readKind: readKind,
       lifecycleState: revision.lifecycleState,
-      currentness: _currentness(scoped),
+      currentness: _currentness(scopeRecords),
       scenarios: scenarios,
-      cards: _cards(context: context, evidence: cardRows, allEvidence: scoped),
+      cards: _cards(
+        context: context,
+        evidence: cardRows,
+        allEvidence: scopeRecords,
+      ),
       overlay: overlay,
       budgets: budgets,
       pointerStates: pointerStates,
@@ -290,6 +305,40 @@ final class DriftPowerWorkspaceRepository implements PowerWorkspaceRepository {
     }
     result.sort((a, b) => a.nodeKey.compareTo(b.nodeKey));
     return List.unmodifiable(result);
+  }
+
+  Future<List<_WorkspaceEvidence>> _scopeRecords({
+    required PowerWorkspaceReadContext context,
+    required PowerWorkspaceScope scope,
+    required List<_WorkspaceEvidence> values,
+  }) async {
+    if (scope.kind == PowerWorkspaceScopeKind.building) {
+      return values;
+    }
+    final floorId = scope.floorId;
+    if (floorId == null) {
+      throw StateError('Floor scope requires floorId.');
+    }
+    final rows =
+        await database
+            .customSelect(
+              'SELECT ci.id FROM component_instances ci '
+              'JOIN rooms r ON r.id = ci.room_id '
+              'JOIN floors f ON f.id = r.floor_id '
+              'WHERE f.project_id = ? AND f.id = ? '
+              'AND f.deleted_at IS NULL AND r.deleted_at IS NULL '
+              'AND ci.deleted_at IS NULL ORDER BY ci.id',
+              variables: [
+                Variable.withString(context.projectId),
+                Variable.withString(floorId),
+              ],
+            )
+            .get();
+    final componentIds = {for (final row in rows) row.read<String>('id')};
+    if (componentIds.isEmpty) return const <_WorkspaceEvidence>[];
+    return values
+        .where((row) => componentIds.any(row.referencesEntity))
+        .toList(growable: false);
   }
 
   List<_WorkspaceEvidence> _relevant(
