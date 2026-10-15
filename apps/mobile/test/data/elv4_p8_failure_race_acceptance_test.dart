@@ -80,26 +80,22 @@ Future<void> _bootstrap(AppDatabase db) async {
 Future<void> _expectNoFreezeArtifacts(AppDatabase db) async {
   expect(
     await (db.select(db.designRevisionPhysicalSnapshots)
-          ..where((row) => row.designRevisionId.equals(_revisionId)))
-        .get(),
+      ..where((row) => row.designRevisionId.equals(_revisionId))).get(),
     isEmpty,
   );
   expect(
     await (db.select(db.designRevisionPowerSnapshots)
-          ..where((row) => row.designRevisionId.equals(_revisionId)))
-        .get(),
+      ..where((row) => row.designRevisionId.equals(_revisionId))).get(),
     isEmpty,
   );
   expect(
     await (db.select(db.designRevisionSnapshotManifests)
-          ..where((row) => row.designRevisionId.equals(_revisionId)))
-        .get(),
+      ..where((row) => row.designRevisionId.equals(_revisionId))).get(),
     isEmpty,
   );
   final revision =
       await (db.select(db.projectDesignRevisions)
-            ..where((row) => row.id.equals(_revisionId)))
-          .getSingle();
+        ..where((row) => row.id.equals(_revisionId))).getSingle();
   expect(revision.state, 'WORKING');
   expect(revision.revision, 1);
 }
@@ -108,7 +104,9 @@ void main() {
   test(
     'P8 stale freeze precondition leaves no physical/power/manifest artifacts',
     () async {
-      final dir = await Directory.systemTemp.createTemp('electra-elv4-p8-stale-');
+      final dir = await Directory.systemTemp.createTemp(
+        'electra-elv4-p8-stale-',
+      );
       addTearDown(() => dir.delete(recursive: true));
       final file = File('${dir.path}/electra.sqlite');
 
@@ -144,7 +142,9 @@ void main() {
   test(
     'P8 injected freeze failure atomically rolls back physical, power and manifest',
     () async {
-      final dir = await Directory.systemTemp.createTemp('electra-elv4-p8-fault-');
+      final dir = await Directory.systemTemp.createTemp(
+        'electra-elv4-p8-fault-',
+      );
       addTearDown(() => dir.delete(recursive: true));
       final file = File('${dir.path}/electra.sqlite');
 
@@ -181,7 +181,9 @@ void main() {
   test(
     'P8 concurrent freeze/create-next has only serializable revision outcomes',
     () async {
-      final dir = await Directory.systemTemp.createTemp('electra-elv4-p8-race-');
+      final dir = await Directory.systemTemp.createTemp(
+        'electra-elv4-p8-race-',
+      );
       addTearDown(() => dir.delete(recursive: true));
       final file = File('${dir.path}/electra.sqlite');
 
@@ -221,26 +223,22 @@ void main() {
 
       final revisionR1 =
           await (dbA.select(dbA.projectDesignRevisions)
-                ..where((row) => row.id.equals(_revisionId)))
-              .getSingle();
+            ..where((row) => row.id.equals(_revisionId))).getSingle();
       expect(revisionR1.state, 'FROZEN');
       expect(revisionR1.revision, 2);
       expect(
         await (dbA.select(dbA.designRevisionPhysicalSnapshots)
-              ..where((row) => row.designRevisionId.equals(_revisionId)))
-            .get(),
+          ..where((row) => row.designRevisionId.equals(_revisionId))).get(),
         hasLength(1),
       );
       expect(
         await (dbA.select(dbA.designRevisionPowerSnapshots)
-              ..where((row) => row.designRevisionId.equals(_revisionId)))
-            .get(),
+          ..where((row) => row.designRevisionId.equals(_revisionId))).get(),
         hasLength(1),
       );
       expect(
         await (dbA.select(dbA.designRevisionSnapshotManifests)
-              ..where((row) => row.designRevisionId.equals(_revisionId)))
-            .get(),
+          ..where((row) => row.designRevisionId.equals(_revisionId))).get(),
         hasLength(1),
       );
 
@@ -275,8 +273,7 @@ void main() {
       expect(context.workingDesignRevisionId, 'REV-2');
       final r2Rows =
           await (reopened.select(reopened.projectDesignRevisions)
-                ..where((row) => row.id.equals('REV-2')))
-              .get();
+            ..where((row) => row.id.equals('REV-2'))).get();
       expect(r2Rows, hasLength(1));
     },
   );
