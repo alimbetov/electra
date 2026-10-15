@@ -88,7 +88,11 @@ void main() {
       expect(published.generation, 3);
       expect(published.evaluationId, 'eval-2');
 
-      expect(pointer.markStale().markStale, throwsStateError);
+      expect(() => stale.markStale(), throwsStateError);
+      expect(
+        () => pointer.publish(next),
+        throwsStateError,
+      );
     });
   });
 }
