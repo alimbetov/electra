@@ -73,5 +73,6 @@ export 'src/power_graph.dart';
 export 'src/power_trace_evidence.dart';
 export 'src/power_graph_readiness.dart';
 export 'src/power_load_evaluation.dart';
+export 'src/power_load_evidence.dart';
 export 'src/poe_evaluation.dart';
 export 'src/power_dc_backup.dart';
