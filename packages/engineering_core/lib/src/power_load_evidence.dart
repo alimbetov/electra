@@ -74,6 +74,7 @@ PowerEvaluationEvidence buildPowerCapabilityEvidence({
   required String subjectId,
   required PowerCapabilityDimension input,
   required PowerCapabilityAssessment assessment,
+  Iterable<PowerNodeKeyV2> dependencies = const [],
 }) {
   if (input.dimension != assessment.dimension ||
       input.demand != assessment.physicalDemand) {
@@ -124,6 +125,7 @@ PowerEvaluationEvidence buildPowerCapabilityEvidence({
     applicability: PowerEvaluationApplicability.applicable,
     inputs: inputs,
     output: output,
+    dependencies: dependencies,
     findings: [
       if (assessment.zeroCapacity)
         PowerEvaluationFinding(
