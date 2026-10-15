@@ -305,11 +305,9 @@ Future<void> _prepareDrafts(File file) async {
 void _expectSingleOverlapFailure(
   List<ElvCommandResult<CableAllocation>> results,
 ) {
-  expect(
-    results.whereType<ElvCommandSuccess<CableAllocation>>(),
-    hasLength(1),
-  );
-  final failures = results.whereType<ElvCommandFailureResult<CableAllocation>>();
+  expect(results.whereType<ElvCommandSuccess<CableAllocation>>(), hasLength(1));
+  final failures =
+      results.whereType<ElvCommandFailureResult<CableAllocation>>();
   expect(failures, hasLength(1));
   expect(failures.single.failure.code, 'ELV_ALLOC_RESOURCE_OVERLAP');
 }
@@ -354,14 +352,15 @@ void main() {
     final verifier = AppDatabase(_native(file));
     final claims =
         await (verifier.select(verifier.cableResourceClaims)
-              ..where((row) => row.resourceAtom.equals('COND-1')))
-            .get();
+          ..where((row) => row.resourceAtom.equals('COND-1'))).get();
     expect(claims, hasLength(1));
     await verifier.close();
   });
 
   test('atomic claim blocks a later whole-cable claim', () async {
-    final dir = await Directory.systemTemp.createTemp('electra-elv3-p2-atom-first-');
+    final dir = await Directory.systemTemp.createTemp(
+      'electra-elv3-p2-atom-first-',
+    );
     addTearDown(() => dir.delete(recursive: true));
     final file = File('${dir.path}/atom-first.sqlite');
     await _prepareDrafts(file);
@@ -397,57 +396,61 @@ void main() {
     );
   });
 
-  test('two sqlite connections serialize whole-cable versus atomic claims',
-      () async {
-    final dir = await Directory.systemTemp.createTemp('electra-elv3-p2-whole-race-');
-    addTearDown(() => dir.delete(recursive: true));
-    final file = File('${dir.path}/whole-race.sqlite');
-    await _prepareDrafts(file);
+  test(
+    'two sqlite connections serialize whole-cable versus atomic claims',
+    () async {
+      final dir = await Directory.systemTemp.createTemp(
+        'electra-elv3-p2-whole-race-',
+      );
+      addTearDown(() => dir.delete(recursive: true));
+      final file = File('${dir.path}/whole-race.sqlite');
+      await _prepareDrafts(file);
 
-    final dbA = AppDatabase(_native(file));
-    final dbB = AppDatabase(_native(file));
-    addTearDown(dbA.close);
-    addTearDown(dbB.close);
-    final serviceA = _service(dbA, 'device-whole');
-    final serviceB = _service(dbB, 'device-atom');
+      final dbA = AppDatabase(_native(file));
+      final dbB = AppDatabase(_native(file));
+      addTearDown(dbA.close);
+      addTearDown(dbB.close);
+      final serviceA = _service(dbA, 'device-whole');
+      final serviceB = _service(dbB, 'device-atom');
 
-    final results = await Future.wait([
-      serviceA.reserve(
-        const ReserveCableResourcesCommand(
-          commandId: 'reserve-whole-race',
-          projectId: _projectId,
-          allocationId: 'alloc-a',
-          expectedRevision: 1,
-          selection: WholeCableSelection(),
+      final results = await Future.wait([
+        serviceA.reserve(
+          const ReserveCableResourcesCommand(
+            commandId: 'reserve-whole-race',
+            projectId: _projectId,
+            allocationId: 'alloc-a',
+            expectedRevision: 1,
+            selection: WholeCableSelection(),
+          ),
         ),
-      ),
-      serviceB.reserve(
-        ReserveCableResourcesCommand(
-          commandId: 'reserve-atom-race',
-          projectId: _projectId,
-          allocationId: 'alloc-b',
-          expectedRevision: 1,
-          selection: ResourceSetSelection(const ['COND-1']),
+        serviceB.reserve(
+          ReserveCableResourcesCommand(
+            commandId: 'reserve-atom-race',
+            projectId: _projectId,
+            allocationId: 'alloc-b',
+            expectedRevision: 1,
+            selection: ResourceSetSelection(const ['COND-1']),
+          ),
         ),
-      ),
-    ]);
+      ]);
 
-    _expectSingleOverlapFailure(results);
+      _expectSingleOverlapFailure(results);
 
-    final verifier = AppDatabase(_native(file));
-    final claims = await verifier.select(verifier.cableResourceClaims).get();
-    expect(
-      claims.where((claim) => claim.resourceAtom == '__WHOLE_CABLE__'),
-      isEmpty,
-    );
-    expect(
-      claims.where((claim) => claim.resourceAtom == 'COND-1'),
-      hasLength(1),
-    );
-    expect(
-      claims.map((claim) => claim.resourceAtom).toSet(),
-      anyOf({'COND-1'}, {'COND-1', 'COND-2'}),
-    );
-    await verifier.close();
-  });
+      final verifier = AppDatabase(_native(file));
+      final claims = await verifier.select(verifier.cableResourceClaims).get();
+      expect(
+        claims.where((claim) => claim.resourceAtom == '__WHOLE_CABLE__'),
+        isEmpty,
+      );
+      expect(
+        claims.where((claim) => claim.resourceAtom == 'COND-1'),
+        hasLength(1),
+      );
+      expect(
+        claims.map((claim) => claim.resourceAtom).toSet(),
+        anyOf({'COND-1'}, {'COND-1', 'COND-2'}),
+      );
+      await verifier.close();
+    },
+  );
 }
