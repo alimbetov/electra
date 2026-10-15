@@ -49,6 +49,7 @@ jobs:
         run: |
           flutter test \
             test/data/elv4_p8_rejection_concurrency_acceptance_test.dart \
+            test/data/elv4_p8_public_vertical_acceptance_test.dart \
             test/data/elv4_p8_command_outcome_durability_test.dart \
             test/data/elv4_p8_idempotency_race_acceptance_test.dart \
             test/data/elv4_p8_failure_race_acceptance_test.dart
