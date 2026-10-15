@@ -46,13 +46,15 @@ jobs:
 
           test = Path('apps/mobile/test/data/elv4_p8_public_vertical_acceptance_test.dart')
           text = test.read_text()
-          import_line = "import 'package:electra_mobile/data/repositories/drift_power_command_service.dart';\n"
-          if "drift_power_publication_runtime.dart" not in text:
-              text = text.replace(
-                  import_line,
-                  import_line + "import 'package:electra_mobile/data/repositories/drift_power_publication_runtime.dart';\n",
-              )
-          text = text.replace(import_line, '')
+          command_import = "import 'package:electra_mobile/data/repositories/drift_power_command_service.dart';\n"
+          publication_import = "import 'package:electra_mobile/data/repositories/drift_power_publication_runtime.dart';\n"
+          if 'drift_power_publication_runtime.dart' not in text:
+              text = text.replace(command_import, command_import + publication_import)
+          text = text.replace(command_import, '')
+          text = text.replace(
+              "import 'package:electra_mobile/data/repositories/drift_elv_design_revision_repository.dart';\n",
+              '',
+          )
           text = text.replace(
               "      final powerView = await reopened.readPowerRevision(\n        builder.projectId,\n        builder.revisionId,\n      );",
               "      final powerView = await DriftPowerPublicationRuntime(\n        db,\n        originDeviceId: 'qualification',\n      ).readRevision(\n        projectId: builder.projectId,\n        designRevisionId: builder.revisionId,\n      );",
