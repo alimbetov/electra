@@ -8,11 +8,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 EngineeringReferenceCatalog fixture() => EngineeringReferenceCatalog.fromMap(
   jsonDecode(
-        File(
-          '../../docs/examples/elv2-reference-catalog.json',
-        ).readAsStringSync(),
-      )
-      as Map<String, dynamic>,
+    File('../../docs/examples/elv2-reference-catalog.json').readAsStringSync(),
+  ) as Map<String, dynamic>,
 );
 
 ComponentReferenceBinding bindingFor(
@@ -63,8 +60,11 @@ void main() {
   test('template reorder preserves exact existing port identity by code', () {
     final previous = fixture();
     final ports = currentPorts(previous);
-    final templates =
-        previous.profile('CAMERA').portTemplates.reversed.toList();
+    final templates = previous
+        .profile('CAMERA')
+        .portTemplates
+        .reversed
+        .toList();
     final plan = planEngineeringReferenceAdoption(
       binding: bindingFor(previous, ports),
       currentPorts: ports,
@@ -133,16 +133,15 @@ void main() {
     final previous = fixture();
     final ports = currentPorts(previous);
     final removed = ports.first;
-    final keepCodes =
-        ports.skip(1).map((port) => port.code.toUpperCase()).toSet();
-    final templates =
-        previous
-            .profile('CAMERA')
-            .portTemplates
-            .where(
-              (template) => keepCodes.contains(template.code.toUpperCase()),
-            )
-            .toList();
+    final keepCodes = ports
+        .skip(1)
+        .map((port) => port.code.toUpperCase())
+        .toSet();
+    final templates = previous
+        .profile('CAMERA')
+        .portTemplates
+        .where((template) => keepCodes.contains(template.code.toUpperCase()))
+        .toList();
 
     final plan = planEngineeringReferenceAdoption(
       binding: bindingFor(previous, ports),
@@ -236,11 +235,10 @@ void main() {
       ...previous.toMap(),
       'id': '${previous.id}-v2',
       'version': '2',
-      'profiles':
-          previous.profiles
-              .where((profile) => profile.code != 'CAMERA')
-              .map((profile) => profile.toMap())
-              .toList(),
+      'profiles': previous.profiles
+          .where((profile) => profile.code != 'CAMERA')
+          .map((profile) => profile.toMap())
+          .toList(),
     });
 
     final plan = planEngineeringReferenceAdoption(

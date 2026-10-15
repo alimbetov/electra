@@ -1,9 +1,11 @@
 import 'dart:convert';
+
 import 'package:electra_mobile/application/manufacturer_repository.dart';
 import 'package:electra_mobile/features/calculations/manufacturer_screen.dart';
 import 'package:engineering_core/engineering_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
 import 'protection_screen_test.dart' show protectionFixture;
 
 ProjectManufacturerSnapshot manufacturerFixture() {
@@ -74,13 +76,12 @@ void main() {
       await tester.scrollUntilVisible(
         buttons.last,
         100,
-        scrollable:
-            find
-                .descendant(
-                  of: find.byKey(const ValueKey('manufacturer-selection')),
-                  matching: find.byType(Scrollable),
-                )
-                .first,
+        scrollable: find
+            .descendant(
+              of: find.byKey(const ValueKey('manufacturer-selection')),
+              matching: find.byType(Scrollable),
+            )
+            .first,
       );
       await Scrollable.ensureVisible(
         tester.element(buttons.last),

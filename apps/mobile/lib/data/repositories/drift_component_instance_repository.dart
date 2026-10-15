@@ -1,4 +1,5 @@
 import '../elv_deletion_guards.dart';
+
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
@@ -22,10 +23,9 @@ final class DriftComponentInstanceRepository
 
   @override
   Stream<List<ComponentInstance>> watchRoomComponents(String roomId) {
-    final query =
-        database.select(database.componentInstances)
-          ..where((row) => row.roomId.equals(roomId) & row.deletedAt.isNull())
-          ..orderBy([(row) => OrderingTerm.asc(row.id)]);
+    final query = database.select(database.componentInstances)
+      ..where((row) => row.roomId.equals(roomId) & row.deletedAt.isNull())
+      ..orderBy([(row) => OrderingTerm.asc(row.id)]);
     return query.watch().map(
       (rows) => rows.map(_instanceFromRow).toList(growable: false),
     );
@@ -33,10 +33,9 @@ final class DriftComponentInstanceRepository
 
   @override
   Future<List<ComponentInstance>> loadRoomComponents(String roomId) async {
-    final query =
-        database.select(database.componentInstances)
-          ..where((row) => row.roomId.equals(roomId) & row.deletedAt.isNull())
-          ..orderBy([(row) => OrderingTerm.asc(row.id)]);
+    final query = database.select(database.componentInstances)
+      ..where((row) => row.roomId.equals(roomId) & row.deletedAt.isNull())
+      ..orderBy([(row) => OrderingTerm.asc(row.id)]);
     final rows = await query.get();
     return rows.map(_instanceFromRow).toList(growable: false);
   }
@@ -46,13 +45,15 @@ final class DriftComponentInstanceRepository
     await database.transaction(() async {
       final row =
           await (database.select(database.componentInstances)..where(
-            (row) => row.id.equals(instanceId) & row.deletedAt.isNull(),
-          )).getSingleOrNull();
+                (row) => row.id.equals(instanceId) & row.deletedAt.isNull(),
+              ))
+              .getSingleOrNull();
       if (row == null) throw StateError('Component $instanceId is not active.');
       await guardComponentElvPorts(database, [instanceId]);
       final now = _clock();
-      await (database.update(database.componentInstances)
-        ..where((item) => item.id.equals(instanceId))).write(
+      await (database.update(
+        database.componentInstances,
+      )..where((item) => item.id.equals(instanceId))).write(
         ComponentInstancesCompanion(
           revision: Value(row.revision + 1),
           updatedAt: Value(now),
@@ -68,18 +69,21 @@ final class DriftComponentInstanceRepository
     await database.transaction(() async {
       final room =
           await (database.select(database.rooms)..where(
-            (row) => row.id.equals(instance.roomId) & row.deletedAt.isNull(),
-          )).getSingleOrNull();
+                (row) =>
+                    row.id.equals(instance.roomId) & row.deletedAt.isNull(),
+              ))
+              .getSingleOrNull();
       if (room == null) {
         throw StateError('Room ${instance.roomId} does not exist.');
       }
 
       final patchRow =
           await (database.select(database.surfacePatches)..where(
-            (row) =>
-                row.id.equals(instance.hostSurfacePatchId) &
-                row.deletedAt.isNull(),
-          )).getSingleOrNull();
+                (row) =>
+                    row.id.equals(instance.hostSurfacePatchId) &
+                    row.deletedAt.isNull(),
+              ))
+              .getSingleOrNull();
       final violations = ComponentPlacementValidator.validate(
         instance: instance,
         patches: patchRow == null ? const [] : [_patchFromRow(patchRow)],
@@ -91,9 +95,9 @@ final class DriftComponentInstanceRepository
         );
       }
 
-      final existing =
-          await (database.select(database.componentInstances)
-            ..where((row) => row.id.equals(instance.id))).getSingleOrNull();
+      final existing = await (database.select(
+        database.componentInstances,
+      )..where((row) => row.id.equals(instance.id))).getSingleOrNull();
       final now = _clock();
       await database
           .into(database.componentInstances)
@@ -126,17 +130,19 @@ final class DriftComponentInstanceRepository
 
     await database.transaction(() async {
       final room =
-          await (database.select(database.rooms)..where(
-            (row) => row.id.equals(roomId) & row.deletedAt.isNull(),
-          )).getSingleOrNull();
+          await (database.select(
+                database.rooms,
+              )..where((row) => row.id.equals(roomId) & row.deletedAt.isNull()))
+              .getSingleOrNull();
       if (room == null) {
         throw StateError('Room $roomId does not exist.');
       }
 
       final patchRows =
           await (database.select(database.surfacePatches)..where(
-            (row) => row.roomId.equals(roomId) & row.deletedAt.isNull(),
-          )).get();
+                (row) => row.roomId.equals(roomId) & row.deletedAt.isNull(),
+              ))
+              .get();
       final patches = patchRows.map(_patchFromRow).toList(growable: false);
 
       for (final instance in next) {
@@ -152,9 +158,9 @@ final class DriftComponentInstanceRepository
         }
       }
 
-      final existingRows =
-          await (database.select(database.componentInstances)
-            ..where((row) => row.roomId.equals(roomId))).get();
+      final existingRows = await (database.select(
+        database.componentInstances,
+      )..where((row) => row.roomId.equals(roomId))).get();
       final existingById = {for (final row in existingRows) row.id: row};
       final nextIds = next.map((instance) => instance.id).toSet();
       await guardComponentElvPorts(
@@ -167,8 +173,9 @@ final class DriftComponentInstanceRepository
 
       for (final row in existingRows) {
         if (!nextIds.contains(row.id) && row.deletedAt == null) {
-          await (database.update(database.componentInstances)
-            ..where((item) => item.id.equals(row.id))).write(
+          await (database.update(
+            database.componentInstances,
+          )..where((item) => item.id.equals(row.id))).write(
             ComponentInstancesCompanion(
               revision: Value(row.revision + 1),
               updatedAt: Value(now),

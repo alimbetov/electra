@@ -4,6 +4,7 @@ import 'package:electra_mobile/features/calculations/protection_screen.dart';
 import 'package:engineering_core/engineering_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
 import 'recalculation_workspace_test.dart' show fixture;
 
 ProjectProtectionSnapshot protectionFixture() {
@@ -47,8 +48,8 @@ ProjectProtectionSnapshot protectionFixture() {
           settings: settings,
           ruleset: rule,
           normativeDocument: doc,
-          designCurrentA:
-              (deps['circuit:a']!.values['designCurrentA'] as num).toDouble(),
+          designCurrentA: (deps['circuit:a']!.values['designCurrentA'] as num)
+              .toDouble(),
           nominalVoltageV: 230,
           phases: 1,
           supplySystem: SupplySystem.singlePhaseAc,
@@ -115,13 +116,12 @@ void main() {
       await tester.scrollUntilVisible(
         find.text('Confirm functional requirement'),
         250,
-        scrollable:
-            find
-                .descendant(
-                  of: find.byKey(const ValueKey('protection-list')),
-                  matching: find.byType(Scrollable),
-                )
-                .first,
+        scrollable: find
+            .descendant(
+              of: find.byKey(const ValueKey('protection-list')),
+              matching: find.byType(Scrollable),
+            )
+            .first,
       );
       await Scrollable.ensureVisible(
         tester.element(find.text('Confirm functional requirement')),
@@ -138,13 +138,12 @@ void main() {
       await tester.scrollUntilVisible(
         find.text(label),
         200,
-        scrollable:
-            find
-                .descendant(
-                  of: find.byKey(const ValueKey('normative-list')),
-                  matching: find.byType(Scrollable),
-                )
-                .first,
+        scrollable: find
+            .descendant(
+              of: find.byKey(const ValueKey('normative-list')),
+              matching: find.byType(Scrollable),
+            )
+            .first,
       );
       await Scrollable.ensureVisible(
         tester.element(find.text(label)),

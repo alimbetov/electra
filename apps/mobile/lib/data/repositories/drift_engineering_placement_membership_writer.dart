@@ -28,15 +28,15 @@ final class DriftEngineeringPlacementMembershipWriter {
 
     final existing =
         await (database.select(database.componentEngineeringMemberships)..where(
-          (row) =>
-              row.systemId.equals(command.systemId) &
-              row.componentId.equals(componentId),
-        )).getSingleOrNull();
+              (row) =>
+                  row.systemId.equals(command.systemId) &
+                  row.componentId.equals(componentId),
+            ))
+            .getSingleOrNull();
     if (existing != null) {
       throw EngineeringPlacementFailure(
         code: EngineeringPlacementFailureCode.membershipConflict,
-        message:
-            'Canonical placement cannot reuse, restore or overwrite an existing membership identity.',
+        message: 'Canonical placement cannot reuse, restore or overwrite an existing membership identity.',
         details: {
           'systemId': command.systemId,
           'componentId': componentId,
@@ -86,8 +86,9 @@ final class DriftEngineeringPlacementMembershipWriter {
 
     final systemRow =
         await (database.select(database.projectEngineeringSystems)..where(
-          (row) => row.id.equals(command.systemId) & row.deletedAt.isNull(),
-        )).getSingleOrNull();
+              (row) => row.id.equals(command.systemId) & row.deletedAt.isNull(),
+            ))
+            .getSingleOrNull();
     if (systemRow == null) {
       throw EngineeringPlacementFailure(
         code: EngineeringPlacementFailureCode.systemNotFound,
@@ -110,11 +111,12 @@ final class DriftEngineeringPlacementMembershipWriter {
     final system = _decodeSystem(systemRow);
     final familyRow =
         await (database.select(database.engineeringFamilyDefinitions)..where(
-          (row) =>
-              row.id.equals(system.familyId) &
-              row.familyVersion.equals(system.familyVersion) &
-              row.deletedAt.isNull(),
-        )).getSingleOrNull();
+              (row) =>
+                  row.id.equals(system.familyId) &
+                  row.familyVersion.equals(system.familyVersion) &
+                  row.deletedAt.isNull(),
+            ))
+            .getSingleOrNull();
     if (familyRow == null) {
       throw EngineeringPlacementFailure(
         code: EngineeringPlacementFailureCode.systemNotFound,
@@ -138,8 +140,7 @@ final class DriftEngineeringPlacementMembershipWriter {
     if (family.code.trim().toUpperCase() != expectedFamilyCode) {
       throw EngineeringPlacementFailure(
         code: EngineeringPlacementFailureCode.systemDisciplineMismatch,
-        message:
-            'Engineering-system family discipline does not match the exact profile discipline.',
+        message: 'Engineering-system family discipline does not match the exact profile discipline.',
         details: {
           'systemId': system.id,
           'familyId': family.id,
@@ -199,10 +200,11 @@ final class DriftEngineeringPlacementMembershipWriter {
   resolveProfile(PlaceEngineeringProfileCommand command) async {
     final row =
         await (database.select(database.engineeringReferenceCatalogs)..where(
-          (candidate) =>
-              candidate.id.equals(command.catalogId) &
-              candidate.projectId.equals(command.projectId),
-        )).getSingleOrNull();
+              (candidate) =>
+                  candidate.id.equals(command.catalogId) &
+                  candidate.projectId.equals(command.projectId),
+            ))
+            .getSingleOrNull();
     if (row == null || row.catalogVersion != command.catalogVersion) {
       throw EngineeringPlacementFailure(
         code: EngineeringPlacementFailureCode.catalogEditionNotFound,
@@ -260,8 +262,9 @@ final class DriftEngineeringPlacementMembershipWriter {
   ) async {
     final component =
         await (database.select(database.componentInstances)..where(
-          (row) => row.id.equals(componentId) & row.deletedAt.isNull(),
-        )).getSingleOrNull();
+              (row) => row.id.equals(componentId) & row.deletedAt.isNull(),
+            ))
+            .getSingleOrNull();
     if (component == null) {
       throw EngineeringPlacementFailure(
         code: EngineeringPlacementFailureCode.membershipConflict,
@@ -272,14 +275,15 @@ final class DriftEngineeringPlacementMembershipWriter {
 
     final room =
         await (database.select(database.rooms)..where(
-          (row) => row.id.equals(component.roomId) & row.deletedAt.isNull(),
-        )).getSingleOrNull();
-    final floor =
-        room == null
-            ? null
-            : await (database.select(database.floors)..where(
-              (row) => row.id.equals(room.floorId) & row.deletedAt.isNull(),
-            )).getSingleOrNull();
+              (row) => row.id.equals(component.roomId) & row.deletedAt.isNull(),
+            ))
+            .getSingleOrNull();
+    final floor = room == null
+        ? null
+        : await (database.select(database.floors)..where(
+                (row) => row.id.equals(room.floorId) & row.deletedAt.isNull(),
+              ))
+              .getSingleOrNull();
     if (room == null ||
         floor == null ||
         floor.projectId != command.projectId ||

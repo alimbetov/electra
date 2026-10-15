@@ -1,5 +1,6 @@
 import 'package:engineering_core/engineering_core.dart';
 import 'package:flutter/material.dart';
+
 import '../../application/cable_routing_repository.dart';
 
 /// Placement is anchored to a selected incoming endpoint, never a freehand crossing.
@@ -48,14 +49,15 @@ class _JunctionEditorState extends State<JunctionEditor> {
   }
 
   RoutingJunction? buildJunction() {
-    final incoming =
-        selected.entries
-            .where((e) => e.value == RoutingConnectionDirection.incoming)
-            .firstOrNull;
-    final run =
-        widget.snapshot.runs.where((r) => r.id == incoming?.key).firstOrNull;
-    final route =
-        widget.snapshot.routes.where((r) => r.id == run?.routeId).firstOrNull;
+    final incoming = selected.entries
+        .where((e) => e.value == RoutingConnectionDirection.incoming)
+        .firstOrNull;
+    final run = widget.snapshot.runs
+        .where((r) => r.id == incoming?.key)
+        .firstOrNull;
+    final route = widget.snapshot.routes
+        .where((r) => r.id == run?.routeId)
+        .firstOrNull;
     if (route == null || route.nodes.isEmpty) return null;
     final node = route.nodes.last;
     return RoutingJunction(
@@ -124,10 +126,9 @@ class _JunctionEditorState extends State<JunctionEditor> {
           initialValue: kind,
           isExpanded: true,
           decoration: const InputDecoration(labelText: 'Junction type'),
-          items:
-              RoutingJunctionType.values
-                  .map((t) => DropdownMenuItem(value: t, child: Text(t.name)))
-                  .toList(),
+          items: RoutingJunctionType.values
+              .map((t) => DropdownMenuItem(value: t, child: Text(t.name)))
+              .toList(),
           onChanged: saving ? null : (value) => setState(() => kind = value!),
         ),
         TextField(
@@ -175,8 +176,9 @@ class _JunctionEditorState extends State<JunctionEditor> {
             title: Text('Missing run: $id'),
             trailing: IconButton(
               tooltip: 'Remove missing connection',
-              onPressed:
-                  saving ? null : () => setState(() => selected.remove(id)),
+              onPressed: saving
+                  ? null
+                  : () => setState(() => selected.remove(id)),
               icon: const Icon(Icons.link_off),
             ),
           ),
@@ -209,18 +211,17 @@ class _JunctionEditorState extends State<JunctionEditor> {
                         child: Text('Outgoing ← junction'),
                       ),
                     ],
-                    onChanged:
-                        saving
-                            ? null
-                            : (value) => setState(() {
-                              if (value == 'none') {
-                                selected.remove(run.id);
-                              } else {
-                                selected[run.id] = RoutingConnectionDirection
-                                    .values
-                                    .byName(value!);
-                              }
-                            }),
+                    onChanged: saving
+                        ? null
+                        : (value) => setState(() {
+                            if (value == 'none') {
+                              selected.remove(run.id);
+                            } else {
+                              selected[run.id] = RoutingConnectionDirection
+                                  .values
+                                  .byName(value!);
+                            }
+                          }),
                   ),
                   TextButton(
                     onPressed: saving ? null : () => widget.onOpenRun(run),

@@ -35,10 +35,9 @@ final class DriftGeometryRepository implements GeometryRepository {
 
   @override
   Future<RoomGeometrySnapshot> loadRoomGeometry(String roomId) async {
-    final patchQuery =
-        database.select(database.surfacePatches)
-          ..where((row) => row.roomId.equals(roomId) & row.deletedAt.isNull())
-          ..orderBy([(row) => OrderingTerm.asc(row.id)]);
+    final patchQuery = database.select(database.surfacePatches)
+      ..where((row) => row.roomId.equals(roomId) & row.deletedAt.isNull())
+      ..orderBy([(row) => OrderingTerm.asc(row.id)]);
     final patchRows = await patchQuery.get();
     final patchIds = patchRows.map((row) => row.id).toList(growable: false);
 
@@ -46,30 +45,22 @@ final class DriftGeometryRepository implements GeometryRepository {
       return RoomGeometrySnapshot(roomId: roomId);
     }
 
-    final edgeQuery =
-        database.select(database.surfaceEdges)
-          ..where((row) => row.patchId.isIn(patchIds) & row.deletedAt.isNull())
-          ..orderBy([(row) => OrderingTerm.asc(row.id)]);
-    final adjacencyQuery =
-        database.select(database.surfaceAdjacencies)
-          ..where(
-            (row) => row.fromPatchId.isIn(patchIds) & row.deletedAt.isNull(),
-          )
-          ..orderBy([(row) => OrderingTerm.asc(row.id)]);
-    final openingQuery =
-        database.select(database.openings)
-          ..where(
-            (row) =>
-                row.hostSurfacePatchId.isIn(patchIds) & row.deletedAt.isNull(),
-          )
-          ..orderBy([(row) => OrderingTerm.asc(row.id)]);
-    final featureQuery =
-        database.select(database.spatialFeatures)
-          ..where(
-            (row) =>
-                row.hostSurfacePatchId.isIn(patchIds) & row.deletedAt.isNull(),
-          )
-          ..orderBy([(row) => OrderingTerm.asc(row.id)]);
+    final edgeQuery = database.select(database.surfaceEdges)
+      ..where((row) => row.patchId.isIn(patchIds) & row.deletedAt.isNull())
+      ..orderBy([(row) => OrderingTerm.asc(row.id)]);
+    final adjacencyQuery = database.select(database.surfaceAdjacencies)
+      ..where((row) => row.fromPatchId.isIn(patchIds) & row.deletedAt.isNull())
+      ..orderBy([(row) => OrderingTerm.asc(row.id)]);
+    final openingQuery = database.select(database.openings)
+      ..where(
+        (row) => row.hostSurfacePatchId.isIn(patchIds) & row.deletedAt.isNull(),
+      )
+      ..orderBy([(row) => OrderingTerm.asc(row.id)]);
+    final featureQuery = database.select(database.spatialFeatures)
+      ..where(
+        (row) => row.hostSurfacePatchId.isIn(patchIds) & row.deletedAt.isNull(),
+      )
+      ..orderBy([(row) => OrderingTerm.asc(row.id)]);
 
     final edgeRows = await edgeQuery.get();
     final adjacencyRows = await adjacencyQuery.get();
@@ -108,44 +99,46 @@ final class DriftGeometryRepository implements GeometryRepository {
     await database.transaction(() async {
       final room =
           await (database.select(database.rooms)..where(
-            (row) => row.id.equals(snapshot.roomId) & row.deletedAt.isNull(),
-          )).getSingleOrNull();
+                (row) =>
+                    row.id.equals(snapshot.roomId) & row.deletedAt.isNull(),
+              ))
+              .getSingleOrNull();
       if (room == null) {
         throw StateError('Room ${snapshot.roomId} does not exist.');
       }
 
-      final existingPatchRows =
-          await (database.select(database.surfacePatches)
-            ..where((row) => row.roomId.equals(snapshot.roomId))).get();
+      final existingPatchRows = await (database.select(
+        database.surfacePatches,
+      )..where((row) => row.roomId.equals(snapshot.roomId))).get();
       final existingPatchIds = existingPatchRows
           .map((row) => row.id)
           .toList(growable: false);
 
-      final existingEdgeRows =
-          existingPatchIds.isEmpty
-              ? <SurfaceEdgeRow>[]
-              : await (database.select(database.surfaceEdges)
-                ..where((row) => row.patchId.isIn(existingPatchIds))).get();
-      final existingAdjacencyRows =
-          existingPatchIds.isEmpty
-              ? <SurfaceAdjacencyRow>[]
-              : await (database.select(database.surfaceAdjacencies)..where(
-                (row) =>
-                    row.fromPatchId.isIn(existingPatchIds) |
-                    row.toPatchId.isIn(existingPatchIds),
-              )).get();
-      final existingOpeningRows =
-          existingPatchIds.isEmpty
-              ? <OpeningRow>[]
-              : await (database.select(database.openings)..where(
-                (row) => row.hostSurfacePatchId.isIn(existingPatchIds),
-              )).get();
-      final existingFeatureRows =
-          existingPatchIds.isEmpty
-              ? <SpatialFeatureRow>[]
-              : await (database.select(database.spatialFeatures)..where(
-                (row) => row.hostSurfacePatchId.isIn(existingPatchIds),
-              )).get();
+      final existingEdgeRows = existingPatchIds.isEmpty
+          ? <SurfaceEdgeRow>[]
+          : await (database.select(
+              database.surfaceEdges,
+            )..where((row) => row.patchId.isIn(existingPatchIds))).get();
+      final existingAdjacencyRows = existingPatchIds.isEmpty
+          ? <SurfaceAdjacencyRow>[]
+          : await (database.select(database.surfaceAdjacencies)..where(
+                  (row) =>
+                      row.fromPatchId.isIn(existingPatchIds) |
+                      row.toPatchId.isIn(existingPatchIds),
+                ))
+                .get();
+      final existingOpeningRows = existingPatchIds.isEmpty
+          ? <OpeningRow>[]
+          : await (database.select(database.openings)..where(
+                  (row) => row.hostSurfacePatchId.isIn(existingPatchIds),
+                ))
+                .get();
+      final existingFeatureRows = existingPatchIds.isEmpty
+          ? <SpatialFeatureRow>[]
+          : await (database.select(database.spatialFeatures)..where(
+                  (row) => row.hostSurfacePatchId.isIn(existingPatchIds),
+                ))
+                .get();
 
       final patchById = {for (final row in existingPatchRows) row.id: row};
       final edgeById = {for (final row in existingEdgeRows) row.id: row};
@@ -157,8 +150,9 @@ final class DriftGeometryRepository implements GeometryRepository {
 
       final nextPatchIds = snapshot.patches.map((item) => item.id).toSet();
       final nextEdgeIds = snapshot.edges.map((item) => item.id).toSet();
-      final nextAdjacencyIds =
-          snapshot.adjacencies.map((item) => item.id).toSet();
+      final nextAdjacencyIds = snapshot.adjacencies
+          .map((item) => item.id)
+          .toSet();
       final nextOpeningIds = snapshot.openings.map((item) => item.id).toSet();
       final nextFeatureIds = snapshot.features.map((item) => item.id).toSet();
       final now = _clock();
@@ -240,8 +234,9 @@ final class DriftGeometryRepository implements GeometryRepository {
   }
 
   Future<void> _tombstonePatch(SurfacePatchRow row, DateTime now) async {
-    await (database.update(database.surfacePatches)
-      ..where((item) => item.id.equals(row.id))).write(
+    await (database.update(
+      database.surfacePatches,
+    )..where((item) => item.id.equals(row.id))).write(
       SurfacePatchesCompanion(
         revision: Value(row.revision + 1),
         updatedAt: Value(now),
@@ -252,8 +247,9 @@ final class DriftGeometryRepository implements GeometryRepository {
   }
 
   Future<void> _tombstoneEdge(SurfaceEdgeRow row, DateTime now) async {
-    await (database.update(database.surfaceEdges)
-      ..where((item) => item.id.equals(row.id))).write(
+    await (database.update(
+      database.surfaceEdges,
+    )..where((item) => item.id.equals(row.id))).write(
       SurfaceEdgesCompanion(
         revision: Value(row.revision + 1),
         updatedAt: Value(now),
@@ -267,8 +263,9 @@ final class DriftGeometryRepository implements GeometryRepository {
     SurfaceAdjacencyRow row,
     DateTime now,
   ) async {
-    await (database.update(database.surfaceAdjacencies)
-      ..where((item) => item.id.equals(row.id))).write(
+    await (database.update(
+      database.surfaceAdjacencies,
+    )..where((item) => item.id.equals(row.id))).write(
       SurfaceAdjacenciesCompanion(
         revision: Value(row.revision + 1),
         updatedAt: Value(now),
@@ -279,8 +276,9 @@ final class DriftGeometryRepository implements GeometryRepository {
   }
 
   Future<void> _tombstoneOpening(OpeningRow row, DateTime now) async {
-    await (database.update(database.openings)
-      ..where((item) => item.id.equals(row.id))).write(
+    await (database.update(
+      database.openings,
+    )..where((item) => item.id.equals(row.id))).write(
       OpeningsCompanion(
         revision: Value(row.revision + 1),
         updatedAt: Value(now),
@@ -291,8 +289,9 @@ final class DriftGeometryRepository implements GeometryRepository {
   }
 
   Future<void> _tombstoneFeature(SpatialFeatureRow row, DateTime now) async {
-    await (database.update(database.spatialFeatures)
-      ..where((item) => item.id.equals(row.id))).write(
+    await (database.update(
+      database.spatialFeatures,
+    )..where((item) => item.id.equals(row.id))).write(
       SpatialFeaturesCompanion(
         revision: Value(row.revision + 1),
         updatedAt: Value(now),

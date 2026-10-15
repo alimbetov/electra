@@ -89,9 +89,9 @@ void main() {
       await repository.replaceRoomGeometry(
         RoomGeometrySnapshot(roomId: room.id, patches: [patch]),
       );
-      final first =
-          await (database.select(database.surfacePatches)
-            ..where((row) => row.id.equals(patch.id))).getSingle();
+      final first = await (database.select(
+        database.surfacePatches,
+      )..where((row) => row.id.equals(patch.id))).getSingle();
 
       expect(first.revision, 1);
       expectSameInstant(first.createdAt, now);
@@ -103,9 +103,9 @@ void main() {
       await repository.replaceRoomGeometry(
         RoomGeometrySnapshot(roomId: room.id, patches: [patch]),
       );
-      final second =
-          await (database.select(database.surfacePatches)
-            ..where((row) => row.id.equals(patch.id))).getSingle();
+      final second = await (database.select(
+        database.surfacePatches,
+      )..where((row) => row.id.equals(patch.id))).getSingle();
 
       expect(second.revision, 2);
       expectSameInstant(second.createdAt, createdAt);
@@ -116,9 +116,9 @@ void main() {
       await repository.replaceRoomGeometry(
         RoomGeometrySnapshot(roomId: room.id),
       );
-      final deleted =
-          await (database.select(database.surfacePatches)
-            ..where((row) => row.id.equals(patch.id))).getSingle();
+      final deleted = await (database.select(
+        database.surfacePatches,
+      )..where((row) => row.id.equals(patch.id))).getSingle();
 
       expect(deleted.revision, 3);
       expectSameInstant(deleted.createdAt, createdAt);
@@ -130,9 +130,9 @@ void main() {
       await repository.replaceRoomGeometry(
         RoomGeometrySnapshot(roomId: room.id, patches: [patch]),
       );
-      final restored =
-          await (database.select(database.surfacePatches)
-            ..where((row) => row.id.equals(patch.id))).getSingle();
+      final restored = await (database.select(
+        database.surfacePatches,
+      )..where((row) => row.id.equals(patch.id))).getSingle();
 
       expect(restored.revision, 4);
       expectSameInstant(restored.createdAt, createdAt);

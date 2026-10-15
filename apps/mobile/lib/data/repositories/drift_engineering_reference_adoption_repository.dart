@@ -49,11 +49,9 @@ final class DriftEngineeringReferenceAdoptionRepository
 
     return database.transaction(() async {
       final ledgerKey = command.ledgerOperationId;
-      final existingOperation =
-          await (database.select(database.engineeringPlacementOperations)
-            ..where(
-              (row) => row.operationId.equals(ledgerKey),
-            )).getSingleOrNull();
+      final existingOperation = await (database.select(
+        database.engineeringPlacementOperations,
+      )..where((row) => row.operationId.equals(ledgerKey))).getSingleOrNull();
       if (existingOperation != null) {
         if (existingOperation.commandFingerprint != command.fingerprint ||
             existingOperation.fingerprintVersion !=
@@ -70,22 +68,21 @@ final class DriftEngineeringReferenceAdoptionRepository
         );
       }
 
-      final componentProject =
-          await database
-              .customSelect(
-                '''SELECT ci.id FROM component_instances ci
+      final componentProject = await database
+          .customSelect(
+            '''SELECT ci.id FROM component_instances ci
 JOIN rooms r ON r.id = ci.room_id
 JOIN floors f ON f.id = r.floor_id
 WHERE ci.id = ? AND ci.deleted_at IS NULL
   AND r.deleted_at IS NULL AND f.deleted_at IS NULL
   AND f.project_id = ?''',
-                variables: [
-                  Variable.withString(command.componentId),
-                  Variable.withString(command.projectId),
-                ],
-                readsFrom: database.allTables.toSet(),
-              )
-              .getSingleOrNull();
+            variables: [
+              Variable.withString(command.componentId),
+              Variable.withString(command.projectId),
+            ],
+            readsFrom: database.allTables.toSet(),
+          )
+          .getSingleOrNull();
       if (componentProject == null) {
         throw const EngineeringReferenceAdoptionFailure(
           EngineeringReferenceAdoptionFailureCode.currentBindingUnavailable,
@@ -95,11 +92,12 @@ WHERE ci.id = ? AND ci.deleted_at IS NULL
 
       final bindingRow =
           await (database.select(database.componentReferenceBindings)..where(
-            (row) =>
-                row.componentId.equals(command.componentId) &
-                row.projectId.equals(command.projectId) &
-                row.deletedAt.isNull(),
-          )).getSingleOrNull();
+                (row) =>
+                    row.componentId.equals(command.componentId) &
+                    row.projectId.equals(command.projectId) &
+                    row.deletedAt.isNull(),
+              ))
+              .getSingleOrNull();
       if (bindingRow == null) {
         throw const EngineeringReferenceAdoptionFailure(
           EngineeringReferenceAdoptionFailureCode.currentBindingUnavailable,
@@ -122,19 +120,21 @@ WHERE ci.id = ? AND ci.deleted_at IS NULL
 
       final currentCatalogRow =
           await (database.select(database.engineeringReferenceCatalogs)..where(
-            (row) =>
-                row.id.equals(binding.catalogId) &
-                row.projectId.equals(command.projectId) &
-                row.deletedAt.isNull(),
-          )).getSingleOrNull();
+                (row) =>
+                    row.id.equals(binding.catalogId) &
+                    row.projectId.equals(command.projectId) &
+                    row.deletedAt.isNull(),
+              ))
+              .getSingleOrNull();
       final candidateRow =
           await (database.select(database.engineeringReferenceCatalogs)..where(
-            (row) =>
-                row.id.equals(command.candidateCatalogId) &
-                row.projectId.equals(command.projectId) &
-                row.catalogVersion.equals(command.candidateCatalogVersion) &
-                row.deletedAt.isNull(),
-          )).getSingleOrNull();
+                (row) =>
+                    row.id.equals(command.candidateCatalogId) &
+                    row.projectId.equals(command.projectId) &
+                    row.catalogVersion.equals(command.candidateCatalogVersion) &
+                    row.deletedAt.isNull(),
+              ))
+              .getSingleOrNull();
       if (currentCatalogRow == null) {
         throw const EngineeringReferenceAdoptionFailure(
           EngineeringReferenceAdoptionFailureCode.currentBindingUnavailable,
@@ -246,11 +246,12 @@ WHERE ci.id = ? AND ci.deleted_at IS NULL
       final boundIds = binding.portIds.toSet();
       final portRows =
           await (database.select(database.engineeringPortInstances)..where(
-            (row) =>
-                row.projectId.equals(command.projectId) &
-                row.id.isIn(boundIds) &
-                row.deletedAt.isNull(),
-          )).get();
+                (row) =>
+                    row.projectId.equals(command.projectId) &
+                    row.id.isIn(boundIds) &
+                    row.deletedAt.isNull(),
+              ))
+              .get();
       if (portRows.length != boundIds.length) {
         throw const EngineeringReferenceAdoptionFailure(
           EngineeringReferenceAdoptionFailureCode.staleReview,
@@ -266,25 +267,31 @@ WHERE ci.id = ? AND ci.deleted_at IS NULL
 
       final connections =
           await (database.select(database.engineeringPortConnections)..where(
-            (row) =>
-                row.deletedAt.isNull() &
-                (row.fromPortId.isIn(boundIds) | row.toPortId.isIn(boundIds)),
-          )).get();
+                (row) =>
+                    row.deletedAt.isNull() &
+                    (row.fromPortId.isIn(boundIds) |
+                        row.toPortId.isIn(boundIds)),
+              ))
+              .get();
       final groups =
           await (database.select(database.engineeringTopologyGroups)..where(
-            (row) =>
-                row.deletedAt.isNull() &
-                (row.startPortId.isIn(boundIds) | row.endPortId.isIn(boundIds)),
-          )).get();
+                (row) =>
+                    row.deletedAt.isNull() &
+                    (row.startPortId.isIn(boundIds) |
+                        row.endPortId.isIn(boundIds)),
+              ))
+              .get();
       final internal =
           await (database.select(database.engineeringInternalMappings)..where(
-            (row) =>
-                row.deletedAt.isNull() &
-                (row.fromPortId.isIn(boundIds) | row.toPortId.isIn(boundIds)),
-          )).get();
+                (row) =>
+                    row.deletedAt.isNull() &
+                    (row.fromPortId.isIn(boundIds) |
+                        row.toPortId.isIn(boundIds)),
+              ))
+              .get();
 
-      final currentConnectionIds =
-          connections.map((row) => row.id).toList()..sort();
+      final currentConnectionIds = connections.map((row) => row.id).toList()
+        ..sort();
       final currentGroupIds = groups.map((row) => row.id).toList()..sort();
       if (!_sameStrings(currentConnectionIds, command.reviewedConnectionIds) ||
           !_sameStrings(currentGroupIds, command.reviewedTopologyGroupIds)) {
@@ -410,8 +417,9 @@ WHERE ci.id = ? AND ci.deleted_at IS NULL
       for (final port in candidatePorts) {
         final old = rowsById[port.id];
         if (old != null) {
-          await (database.update(database.engineeringPortInstances)
-            ..where((row) => row.id.equals(port.id))).write(
+          await (database.update(
+            database.engineeringPortInstances,
+          )..where((row) => row.id.equals(port.id))).write(
             EngineeringPortInstancesCompanion(
               code: Value(port.code.trim().toUpperCase()),
               payloadJson: Value(canonicalEngineeringJson(port.toMap())),
@@ -455,8 +463,9 @@ WHERE ci.id = ? AND ci.deleted_at IS NULL
       var retired = false;
       for (final row in portRows) {
         if (candidateIds.contains(row.id)) continue;
-        await (database.update(database.engineeringPortInstances)
-          ..where((candidate) => candidate.id.equals(row.id))).write(
+        await (database.update(
+          database.engineeringPortInstances,
+        )..where((candidate) => candidate.id.equals(row.id))).write(
           EngineeringPortInstancesCompanion(
             revision: Value(row.revision + 1),
             updatedAt: Value(now),
@@ -481,8 +490,9 @@ WHERE ci.id = ? AND ci.deleted_at IS NULL
         portIds: candidatePorts.map((port) => port.id).toList(),
         placementCommand: placementEvidence,
       );
-      await (database.update(database.componentReferenceBindings)
-        ..where((row) => row.componentId.equals(command.componentId))).write(
+      await (database.update(
+        database.componentReferenceBindings,
+      )..where((row) => row.componentId.equals(command.componentId))).write(
         ComponentReferenceBindingsCompanion(
           catalogId: Value(candidateCatalog.id),
           profileCode: Value(candidateProfile.code),
@@ -542,18 +552,20 @@ WHERE ci.id = ? AND ci.deleted_at IS NULL
   }) async {
     final membership =
         await (database.select(database.componentEngineeringMemberships)..where(
-          (row) =>
-              row.systemId.equals(systemId) &
-              row.componentId.equals(componentId) &
-              row.deletedAt.isNull(),
-        )).getSingleOrNull();
+              (row) =>
+                  row.systemId.equals(systemId) &
+                  row.componentId.equals(componentId) &
+                  row.deletedAt.isNull(),
+            ))
+            .getSingleOrNull();
     final system =
         await (database.select(database.projectEngineeringSystems)..where(
-          (row) =>
-              row.id.equals(systemId) &
-              row.projectId.equals(projectId) &
-              row.deletedAt.isNull(),
-        )).getSingleOrNull();
+              (row) =>
+                  row.id.equals(systemId) &
+                  row.projectId.equals(projectId) &
+                  row.deletedAt.isNull(),
+            ))
+            .getSingleOrNull();
     if (membership == null || system == null) {
       throw const EngineeringReferenceAdoptionFailure(
         EngineeringReferenceAdoptionFailureCode.staleReview,
@@ -562,8 +574,9 @@ WHERE ci.id = ? AND ci.deleted_at IS NULL
     }
     final family =
         await (database.select(database.engineeringFamilyDefinitions)..where(
-          (row) => row.id.equals(system.familyId) & row.deletedAt.isNull(),
-        )).getSingleOrNull();
+              (row) => row.id.equals(system.familyId) & row.deletedAt.isNull(),
+            ))
+            .getSingleOrNull();
     final expectedCode = switch (discipline) {
       ReferenceDiscipline.cctv => 'CCTV',
       ReferenceDiscipline.lan => 'LAN',
@@ -728,19 +741,21 @@ WHERE ci.id = ? AND ci.deleted_at IS NULL
   }) async {
     final bindingRow =
         await (database.select(database.componentReferenceBindings)..where(
-          (row) =>
-              row.componentId.equals(command.componentId) &
-              row.deletedAt.isNull(),
-        )).getSingle();
+              (row) =>
+                  row.componentId.equals(command.componentId) &
+                  row.deletedAt.isNull(),
+            ))
+            .getSingle();
     final durableBinding = ComponentReferenceBinding.fromMap(
       jsonDecode(bindingRow.payloadJson) as Map<String, dynamic>,
     );
     final activePorts =
         await (database.select(database.engineeringPortInstances)..where(
-          (row) =>
-              row.componentId.equals(command.componentId) &
-              row.deletedAt.isNull(),
-        )).get();
+              (row) =>
+                  row.componentId.equals(command.componentId) &
+                  row.deletedAt.isNull(),
+            ))
+            .get();
     final expectedIds = candidatePorts.map((port) => port.id).toSet();
     final durableIds = activePorts.map((row) => row.id).toSet();
     if (durableBinding.catalogId != command.candidateCatalogId ||

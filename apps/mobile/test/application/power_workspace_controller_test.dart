@@ -453,10 +453,9 @@ PowerWorkspaceProjection _projection({
   String segmentId = 'SEG-1',
 }) => PowerWorkspaceProjection(
   contextGeneration: generation,
-  readKind:
-      lifecycleState == 'WORKING'
-          ? PowerWorkspaceReadKind.working
-          : PowerWorkspaceReadKind.capturedEmpty,
+  readKind: lifecycleState == 'WORKING'
+      ? PowerWorkspaceReadKind.working
+      : PowerWorkspaceReadKind.capturedEmpty,
   lifecycleState: lifecycleState,
   currentness: PowerWorkspaceCurrentness.empty,
   scenarios: [

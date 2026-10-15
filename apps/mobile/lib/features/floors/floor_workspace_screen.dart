@@ -37,16 +37,12 @@ class FloorWorkspaceScreen extends ConsumerWidget {
         OutlinedButton.icon(
           icon: const Icon(Icons.route),
           label: const Text('Floor routing'),
-          onPressed:
-              () => Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder:
-                      (_) => FloorRoutingScreen(
-                        projectId: projectId,
-                        floorId: floorId,
-                      ),
-                ),
-              ),
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) =>
+                  FloorRoutingScreen(projectId: projectId, floorId: floorId),
+            ),
+          ),
         ),
       ],
       body: ElectraAdaptiveBuilder(
@@ -57,9 +53,8 @@ class FloorWorkspaceScreen extends ConsumerWidget {
               constraints: BoxConstraints(maxWidth: width),
               child: rooms.when(
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error:
-                    (error, _) =>
-                        Center(child: Text('Unable to load rooms: $error')),
+                error: (error, _) =>
+                    Center(child: Text('Unable to load rooms: $error')),
                 data: (items) {
                   if (items.isEmpty) {
                     return const Center(
@@ -81,11 +76,10 @@ class FloorWorkspaceScreen extends ConsumerWidget {
                             '${room.widthMm} × ${room.depthMm} mm',
                           ),
                           trailing: const Icon(Icons.chevron_right),
-                          onTap:
-                              () => context.go(
-                                '/projects/$projectId/floors/$floorId/'
-                                'rooms/${room.id}',
-                              ),
+                          onTap: () => context.go(
+                            '/projects/$projectId/floors/$floorId/'
+                            'rooms/${room.id}',
+                          ),
                         ),
                       );
                     },
@@ -97,8 +91,8 @@ class FloorWorkspaceScreen extends ConsumerWidget {
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed:
-            () => context.go('/projects/$projectId/floors/$floorId/rooms/new'),
+        onPressed: () =>
+            context.go('/projects/$projectId/floors/$floorId/rooms/new'),
         icon: const Icon(Icons.add),
         label: const Text('New room'),
       ),

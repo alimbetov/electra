@@ -111,42 +111,45 @@ void main() {
     );
   });
 
-  test('component hit testing wins over host surface and uses nearest instance', () {
-    final geometry = snapshot();
-    final surface = geometry.patches.single;
-    final components = [
-      const ComponentInstance(
-        id: 'camera-near',
-        definitionId: 'camera',
-        definitionVersion: 1,
-        roomId: 'room-a',
-        hostSurfacePatchId: 'patch-a',
-        localPosition: Point2Mm(2100, 1200),
-      ),
-      const ComponentInstance(
-        id: 'camera-far',
-        definitionId: 'camera',
-        definitionVersion: 1,
-        roomId: 'room-a',
-        hostSurfacePatchId: 'patch-a',
-        localPosition: Point2Mm(2300, 1200),
-      ),
-    ];
+  test(
+    'component hit testing wins over host surface and uses nearest instance',
+    () {
+      final geometry = snapshot();
+      final surface = geometry.patches.single;
+      final components = [
+        const ComponentInstance(
+          id: 'camera-near',
+          definitionId: 'camera',
+          definitionVersion: 1,
+          roomId: 'room-a',
+          hostSurfacePatchId: 'patch-a',
+          localPosition: Point2Mm(2100, 1200),
+        ),
+        const ComponentInstance(
+          id: 'camera-far',
+          definitionId: 'camera',
+          definitionVersion: 1,
+          roomId: 'room-a',
+          hostSurfacePatchId: 'patch-a',
+          localPosition: Point2Mm(2300, 1200),
+        ),
+      ];
 
-    expect(
-      hitTestSurface(
-        geometry: geometry,
-        patch: surface,
-        localPoint: const Point2Mm(2140, 1200),
-        components: components,
-      ),
-      const EditorSelection(
-        kind: EditorSelectionKind.component,
-        id: 'camera-near',
-        hostPatchId: 'patch-a',
-      ),
-    );
-  });
+      expect(
+        hitTestSurface(
+          geometry: geometry,
+          patch: surface,
+          localPoint: const Point2Mm(2140, 1200),
+          components: components,
+        ),
+        const EditorSelection(
+          kind: EditorSelectionKind.component,
+          id: 'camera-near',
+          hostPatchId: 'patch-a',
+        ),
+      );
+    },
+  );
 
   test('component hit tolerance does not steal distant surface selection', () {
     final geometry = snapshot();

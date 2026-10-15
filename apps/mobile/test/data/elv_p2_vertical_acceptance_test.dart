@@ -542,9 +542,9 @@ void main() {
       'ELV_ALLOC_RESOURCE_OVERLAP',
     );
     expect(
-      await (db.select(db.cableAllocationResourceSelections)..where(
-        (row) => row.allocationId.equals('alloc-atom'),
-      )).getSingleOrNull(),
+      await (db.select(db.cableAllocationResourceSelections)
+            ..where((row) => row.allocationId.equals('alloc-atom')))
+          .getSingleOrNull(),
       isNull,
     );
   });

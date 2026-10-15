@@ -80,28 +80,27 @@ final class PowerWorkspacePanel extends StatelessWidget {
               const _StatusBanner(
                 icon: Icons.edit_note,
                 title: 'Unsaved reviewed draft',
-                detail:
-                    'Scenario/revision context changed; review the draft again before applying.',
+                detail: 'Scenario/revision context changed; review the draft again before applying.',
               ),
             Expanded(
-              child:
-                  card == null
-                      ? const Center(child: Text('No power card data.'))
-                      : _CardBody(
-                        card: card,
-                        budgets:
-                            state.currentCard ==
-                                    PowerWorkspaceCardCode.sourceCapacity
-                                ? projection.budgets
-                                : const [],
-                        onFindingSelected: onFindingSelected,
-                      ),
+              child: card == null
+                  ? const Center(child: Text('No power card data.'))
+                  : _CardBody(
+                      card: card,
+                      budgets:
+                          state.currentCard ==
+                              PowerWorkspaceCardCode.sourceCapacity
+                          ? projection.budgets
+                          : const [],
+                      onFindingSelected: onFindingSelected,
+                    ),
             ),
             if (state.hasDraft)
               _ReviewedDraftBar(
                 state: state,
-                onApply:
-                    projection.mutationAllowed ? onApplyReviewedRoute : null,
+                onApply: projection.mutationAllowed
+                    ? onApplyReviewedRoute
+                    : null,
                 onDiscard: onDiscardDraft,
               ),
             _NavigationBar(
@@ -209,15 +208,17 @@ final class _Header extends StatelessWidget {
               IconButton(
                 key: const ValueKey('power-undo'),
                 tooltip: 'Undo ELV change',
-                onPressed:
-                    projection.mutationAllowed && canUndo ? onUndo : null,
+                onPressed: projection.mutationAllowed && canUndo
+                    ? onUndo
+                    : null,
                 icon: const Icon(Icons.undo),
               ),
               IconButton(
                 key: const ValueKey('power-redo'),
                 tooltip: 'Redo ELV change',
-                onPressed:
-                    projection.mutationAllowed && canRedo ? onRedo : null,
+                onPressed: projection.mutationAllowed && canRedo
+                    ? onRedo
+                    : null,
                 icon: const Icon(Icons.redo),
               ),
             ],
@@ -361,10 +362,9 @@ final class _FindingTile extends StatelessWidget {
     leading: const Icon(Icons.report_outlined),
     title: Text('${value.finding.code} · ${value.finding.severity}'),
     subtitle: Text(value.finding.message),
-    trailing:
-        value.entityRef == null
-            ? null
-            : const Icon(Icons.open_in_new, size: 18),
+    trailing: value.entityRef == null
+        ? null
+        : const Icon(Icons.open_in_new, size: 18),
     onTap: onTap == null ? null : () => onTap!(value),
   );
 }
@@ -513,10 +513,8 @@ Future<void> showPowerWorkspaceSheet({
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
-    builder:
-        (context) => SafeArea(
-          child: FractionallySizedBox(heightFactor: 0.82, child: child),
-        ),
+    builder: (context) =>
+        SafeArea(child: FractionallySizedBox(heightFactor: 0.82, child: child)),
   );
   if (restoreFocusTo.canRequestFocus) restoreFocusTo.requestFocus();
 }

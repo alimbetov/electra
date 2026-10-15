@@ -2,19 +2,9 @@ import 'package:engineering_core/engineering_core.dart';
 
 import 'power_workspace_state.dart';
 
-enum PowerWorkspaceReadKind {
-  working,
-  captured,
-  capturedEmpty,
-  notCaptured,
-}
+enum PowerWorkspaceReadKind { working, captured, capturedEmpty, notCaptured }
 
-enum PowerWorkspaceCurrentness {
-  current,
-  stale,
-  mixed,
-  empty,
-}
+enum PowerWorkspaceCurrentness { current, stale, mixed, empty }
 
 final class PowerWorkspaceScenarioOption {
   PowerWorkspaceScenarioOption({
@@ -185,7 +175,8 @@ final class PowerWorkspaceProjection {
       readKind == PowerWorkspaceReadKind.captured ||
       readKind == PowerWorkspaceReadKind.capturedEmpty;
 
-  PowerWorkspaceCardProjection? card(PowerWorkspaceCardCode code) => cards[code];
+  PowerWorkspaceCardProjection? card(PowerWorkspaceCardCode code) =>
+      cards[code];
 }
 
 final class PowerWorkspaceOpenResult {
@@ -218,7 +209,8 @@ String? _nullableText(String? value, String field) {
 }
 
 List<String> _sortedUnique(Iterable<String> values) {
-  final result = values.map((value) => _text(value, 'overlayRef')).toSet().toList()
-    ..sort();
+  final result =
+      values.map((value) => _text(value, 'overlayRef')).toSet().toList()
+        ..sort();
   return List.unmodifiable(result);
 }

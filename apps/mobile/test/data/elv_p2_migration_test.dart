@@ -41,17 +41,16 @@ void main() {
     await db.close();
 
     db = AppDatabase(NativeDatabase(file));
-    final project =
-        await (db.select(db.projects)
-          ..where((row) => row.id.equals('existing-project'))).getSingle();
+    final project = await (db.select(
+      db.projects,
+    )..where((row) => row.id.equals('existing-project'))).getSingle();
     expect(project.name, 'Existing project');
 
-    final tables =
-        await db
-            .customSelect(
-              "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('cable_allocations','cable_allocation_resource_selections','cable_resource_claims','cable_termination_mappings') ORDER BY name",
-            )
-            .get();
+    final tables = await db
+        .customSelect(
+          "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('cable_allocations','cable_allocation_resource_selections','cable_resource_claims','cable_termination_mappings') ORDER BY name",
+        )
+        .get();
     expect(tables.map((row) => row.read<String>('name')).toList(), [
       'cable_allocation_resource_selections',
       'cable_allocations',

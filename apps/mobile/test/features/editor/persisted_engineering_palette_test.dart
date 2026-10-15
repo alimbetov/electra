@@ -19,9 +19,11 @@ import 'package:engineering_core/engineering_core.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'dart:convert';
+
 import 'package:electra_mobile/data/repositories/drift_engineering_reference_repository.dart';
 import 'package:electra_mobile/data/repositories/drift_engineering_system_repository.dart';
 import 'package:electra_mobile/features/editor/room_editor_screen.dart';
+
 import 'engineering_profile_palette_test.dart'
     show chooseCameraPreview, pickCandidate;
 
@@ -113,20 +115,17 @@ void main() {
         );
         final catalog = EngineeringReferenceCatalog.fromMap(
           jsonDecode(
-                File(
-                  '../../docs/examples/elv2-reference-catalog.json',
-                ).readAsStringSync(),
-              )
-              as Map<String, dynamic>,
+            File('../../docs/examples/elv2-reference-catalog.json')
+                .readAsStringSync(),
+          ) as Map<String, dynamic>,
         );
         await references.importCatalog(project.id, catalog);
         final networks = DriftEngineeringSystemRepository(
           database,
           originDeviceId: 'test',
         );
-        final family = (await networks.load(
-          project.id,
-        )).families.singleWhere((f) => f.code == 'CCTV');
+        final family = (await networks.load(project.id)).families
+            .singleWhere((f) => f.code == 'CCTV');
         await networks.saveSystem(
           EngineeringSystem(
             id: 'CCTV',
@@ -147,10 +146,11 @@ void main() {
       });
       await tester.binding.setSurfaceSize(const Size(1200, 900));
       addTearDown(() => tester.binding.setSurfaceSize(null));
-      Future<int> changes() async => (await database
-              .customSelect('SELECT total_changes() AS count')
-              .getSingle())
-          .read<int>('count');
+      Future<int> changes() async =>
+          (await database
+                  .customSelect('SELECT total_changes() AS count')
+                  .getSingle())
+              .read<int>('count');
       final before = await changes();
       await tester.pumpWidget(
         ProviderScope(

@@ -1,4 +1,5 @@
 import 'package:engineering_core/engineering_core.dart';
+
 import '../domain/project_models.dart';
 import 'cable_routing_repository.dart';
 
@@ -43,10 +44,9 @@ class FloorRoutingSnapshot {
     panels: panels ?? this.panels,
     handoffs: handoffs ?? this.handoffs,
     junctions: routing.values.expand((s) => s.junctions),
-    junctionIssues:
-        (j) =>
-            routing[j.roomId]?.junctionIssues(j) ??
-            ['Junction room is unavailable.'],
+    junctionIssues: (j) =>
+        routing[j.roomId]?.junctionIssues(j) ??
+        ['Junction room is unavailable.'],
   );
 }
 

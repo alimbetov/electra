@@ -1,7 +1,9 @@
 import 'dart:convert';
+
 import 'package:engineering_core/engineering_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../app/providers.dart';
 import '../../application/engineering_reference_repository.dart';
 
@@ -16,22 +18,18 @@ class EngineeringReferenceScreen extends ConsumerWidget {
         .when(
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (e, _) => Center(child: Text('Unable to load references: $e')),
-          data:
-              (s) => EngineeringReferenceWorkspace(
-                snapshot: s,
-                onImport:
-                    (c) => ref
-                        .read(engineeringReferenceRepositoryProvider)
-                        .importCatalog(projectId, c),
-                onBind:
-                    (c, r, p) => ref
-                        .read(engineeringReferenceRepositoryProvider)
-                        .bind(projectId, c, r, p),
-                onUnbind:
-                    (c) => ref
-                        .read(engineeringReferenceRepositoryProvider)
-                        .unbind(projectId, c),
-              ),
+          data: (s) => EngineeringReferenceWorkspace(
+            snapshot: s,
+            onImport: (c) => ref
+                .read(engineeringReferenceRepositoryProvider)
+                .importCatalog(projectId, c),
+            onBind: (c, r, p) => ref
+                .read(engineeringReferenceRepositoryProvider)
+                .bind(projectId, c, r, p),
+            onUnbind: (c) => ref
+                .read(engineeringReferenceRepositoryProvider)
+                .unbind(projectId, c),
+          ),
         ),
   );
 }
@@ -82,16 +80,13 @@ class _EngineeringReferenceWorkspaceState
           'Product-neutral definitions. Choose an exact edition, then instantiate ports on an existing placed device.',
         ),
         FilledButton(
-          onPressed:
-              busy
-                  ? null
-                  : () => showDialog<void>(
-                    context: context,
-                    builder:
-                        (_) => ReferenceCatalogImportDialog(
-                          onImport: widget.onImport,
-                        ),
-                  ),
+          onPressed: busy
+              ? null
+              : () => showDialog<void>(
+                  context: context,
+                  builder: (_) =>
+                      ReferenceCatalogImportDialog(onImport: widget.onImport),
+                ),
           child: const Text('Import catalog JSON'),
         ),
         DropdownButtonFormField<ReferenceDiscipline>(
@@ -138,19 +133,17 @@ class _EngineeringReferenceWorkspaceState
                       subtitle: Text(
                         '${p.discipline.name.toUpperCase()} · ${p.engineeringClass.name}\n${p.portTemplates.length} ports · ${p.capabilities.map((v) => v.name).join(', ')}${p.deprecated ? '\nDeprecated — preserved for existing bindings' : ''}',
                       ),
-                      onTap:
-                          busy || p.deprecated
-                              ? null
-                              : () => showDialog<void>(
-                                context: context,
-                                builder:
-                                    (_) => ReferenceProfileBindDialog(
-                                      snapshot: s,
-                                      catalog: c,
-                                      profile: p,
-                                      onBind: widget.onBind,
-                                    ),
+                      onTap: busy || p.deprecated
+                          ? null
+                          : () => showDialog<void>(
+                              context: context,
+                              builder: (_) => ReferenceProfileBindDialog(
+                                snapshot: s,
+                                catalog: c,
+                                profile: p,
+                                onBind: widget.onBind,
                               ),
+                            ),
                     ),
                 ],
               ),
@@ -174,10 +167,9 @@ class _EngineeringReferenceWorkspaceState
                     'A newer catalog does not replace this binding. Resolve links and retire its ports before adopting another edition.',
                   ),
                   TextButton(
-                    onPressed:
-                        busy
-                            ? null
-                            : () => work(() => widget.onUnbind(b.componentId)),
+                    onPressed: busy
+                        ? null
+                        : () => work(() => widget.onUnbind(b.componentId)),
                     child: const Text('Release binding'),
                   ),
                 ],

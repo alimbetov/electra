@@ -1,6 +1,8 @@
 import 'dart:convert';
+
 import 'package:drift/drift.dart';
 import 'package:engineering_core/engineering_core.dart';
+
 import '../../application/dependency_recalculation_repository.dart';
 import '../database/app_database.dart';
 import 'drift_project_hierarchy_repository.dart';
@@ -58,17 +60,16 @@ class DriftDependencyRecalculationRepository
   Future<ProjectRecalculationSnapshot> load(
     String projectId,
   ) => database.transaction(() async {
-    final project = await DriftProjectHierarchyRepository(
-      database,
-    ).findProject(projectId);
+    final project = await DriftProjectHierarchyRepository(database)
+        .findProject(projectId);
     if (project == null)
       return ProjectRecalculationSnapshot(
         project: null,
         session: RecalculationSession(nodes: const []),
       );
-    final rows =
-        await (database.select(database.projectDerivedResults)
-          ..where((r) => r.projectId.equals(projectId))).get();
+    final rows = await (database.select(
+      database.projectDerivedResults,
+    )..where((r) => r.projectId.equals(projectId))).get();
     final cache = rows.where((r) => r.deletedAt == null).map(decode).toList();
     final nodes = <String, RecalculationNode>{};
     void add(
@@ -89,9 +90,9 @@ class DriftDependencyRecalculationRepository
       );
     }
 
-    final normRows =
-        await (database.select(database.normativeDocuments)
-          ..where((r) => r.deletedAt.isNull())).get();
+    final normRows = await (database.select(
+      database.normativeDocuments,
+    )..where((r) => r.deletedAt.isNull())).get();
     final norms = {
       for (final row in normRows)
         row.id: NormativeDocument.fromMap(
@@ -100,8 +101,9 @@ class DriftDependencyRecalculationRepository
     };
     final ruleRows =
         await (database.select(database.protectionRulesets)..where(
-          (r) => r.projectId.equals(projectId) & r.deletedAt.isNull(),
-        )).get();
+              (r) => r.projectId.equals(projectId) & r.deletedAt.isNull(),
+            ))
+            .get();
     final rules = {
       for (final row in ruleRows)
         row.id: ProtectionRuleset.fromMap(
@@ -138,27 +140,24 @@ class DriftDependencyRecalculationRepository
                   ..where((r) => r.circuitId.isIn(circuitRows.map((r) => r.id)))
                   ..orderBy([(r) => OrderingTerm.asc(r.componentInstanceId)]))
                 .get();
-        final circuits =
-            circuitRows
-                .map(
-                  (row) => ElectricalCircuit(
-                    id: row.id,
-                    roomId: row.roomId,
-                    name: row.name,
-                    inputs: ElectricalCircuitInputs(
-                      nominalVoltageV: row.nominalVoltageV,
-                      phases: row.phases,
-                      supplySystem: SupplySystem.values.byName(
-                        row.supplySystem,
-                      ),
-                      demandFactor: row.demandFactor,
-                    ),
-                    loadIds: assignments
-                        .where((a) => a.circuitId == row.id)
-                        .map((a) => a.componentInstanceId),
-                  ),
-                )
-                .toList();
+        final circuits = circuitRows
+            .map(
+              (row) => ElectricalCircuit(
+                id: row.id,
+                roomId: row.roomId,
+                name: row.name,
+                inputs: ElectricalCircuitInputs(
+                  nominalVoltageV: row.nominalVoltageV,
+                  phases: row.phases,
+                  supplySystem: SupplySystem.values.byName(row.supplySystem),
+                  demandFactor: row.demandFactor,
+                ),
+                loadIds: assignments
+                    .where((a) => a.circuitId == row.id)
+                    .map((a) => a.componentInstanceId),
+              ),
+            )
+            .toList();
         final activeLoads = await DriftElectricalLoadRepository(
           database,
           originDeviceId: originDeviceId,
@@ -175,17 +174,15 @@ class DriftDependencyRecalculationRepository
           ...circuits.expand((c) => c.loadIds),
         };
         for (final id in ids) {
-          final row =
-              await (database.select(database.equipmentElectricalLoads)..where(
-                (r) => r.componentInstanceId.equals(id),
-              )).getSingleOrNull();
+          final row = await (database.select(
+            database.equipmentElectricalLoads,
+          )..where((r) => r.componentInstanceId.equals(id))).getSingleOrNull();
           final available = activeLoads.any((l) => l.componentInstanceId == id);
-          final inputs =
-              row == null || !available
-                  ? <String, Object?>{'available': false}
-                  : (semantic(row.toJson())
-                    ..remove('consumptionGroupId')
-                    ..['available'] = true);
+          final inputs = row == null || !available
+              ? <String, Object?>{'available': false}
+              : (semantic(row.toJson())
+                  ..remove('consumptionGroupId')
+                  ..['available'] = true);
           add(
             'consumer:$id',
             '${room.name} · Load $id',
@@ -200,29 +197,32 @@ class DriftDependencyRecalculationRepository
         }
         final patchIds = routing.geometry.patches.map((p) => p.id).toSet();
         // Sources are patch-scoped, so an unrelated wall does not invalidate other routes.
-        final patches =
-            await (database.select(database.surfacePatches)
-              ..where((r) => r.id.isIn(patchIds))).get();
-        final edges =
-            await (database.select(database.surfaceEdges)..where(
-              (r) => r.patchId.isIn(patchIds) & r.deletedAt.isNull(),
-            )).get();
+        final patches = await (database.select(
+          database.surfacePatches,
+        )..where((r) => r.id.isIn(patchIds))).get();
+        final edges = await (database.select(
+          database.surfaceEdges,
+        )..where((r) => r.patchId.isIn(patchIds) & r.deletedAt.isNull())).get();
         final adjacencies =
             await (database.select(database.surfaceAdjacencies)..where(
-              (r) => r.fromPatchId.isIn(patchIds) & r.deletedAt.isNull(),
-            )).get();
+                  (r) => r.fromPatchId.isIn(patchIds) & r.deletedAt.isNull(),
+                ))
+                .get();
         final openings =
             await (database.select(database.openings)..where(
-              (r) => r.hostSurfacePatchId.isIn(patchIds) & r.deletedAt.isNull(),
-            )).get();
+                  (r) =>
+                      r.hostSurfacePatchId.isIn(patchIds) &
+                      r.deletedAt.isNull(),
+                ))
+                .get();
         for (final patch in patches) {
           List<Map<String, Object?>> sortedRows(
             Iterable<Map<String, dynamic>> rows,
           ) {
-            final items =
-                rows.map(semantic).toList()..sort(
-                  (a, b) => (a['id'] as String).compareTo(b['id'] as String),
-                );
+            final items = rows.map(semantic).toList()
+              ..sort(
+                (a, b) => (a['id'] as String).compareTo(b['id'] as String),
+              );
             return items;
           }
 
@@ -289,14 +289,14 @@ class DriftDependencyRecalculationRepository
           );
           final settingRow =
               await (database.select(database.circuitProtectionSettings)..where(
-                (r) => r.circuitId.equals(c.id) & r.deletedAt.isNull(),
-              )).getSingleOrNull();
-          final settings =
-              settingRow == null
-                  ? CircuitProtectionInputs(circuitId: c.id)
-                  : CircuitProtectionInputs.fromMap(
-                    jsonDecode(settingRow.inputsJson) as Map<String, dynamic>,
-                  );
+                    (r) => r.circuitId.equals(c.id) & r.deletedAt.isNull(),
+                  ))
+                  .getSingleOrNull();
+          final settings = settingRow == null
+              ? CircuitProtectionInputs(circuitId: c.id)
+              : CircuitProtectionInputs.fromMap(
+                  jsonDecode(settingRow.inputsJson) as Map<String, dynamic>,
+                );
           final ruleset = rules[settings.rulesetId],
               norm = norms[ruleset?.normativeDocumentId];
           if (ruleset != null) {
@@ -376,13 +376,12 @@ class DriftDependencyRecalculationRepository
                     n.worldPosition.zMm,
                   ],
                   'otherPatch': n.otherAnchor?.patchId,
-                  'otherLocal':
-                      n.otherAnchor == null
-                          ? null
-                          : [
-                            n.otherAnchor!.localPosition.xMm,
-                            n.otherAnchor!.localPosition.yMm,
-                          ],
+                  'otherLocal': n.otherAnchor == null
+                      ? null
+                      : [
+                          n.otherAnchor!.localPosition.xMm,
+                          n.otherAnchor!.localPosition.yMm,
+                        ],
                   'adjacency': n.adjacencyId,
                 },
             ],
@@ -431,14 +430,12 @@ class DriftDependencyRecalculationRepository
               return DependencyProposal(
                 values: {
                   'cableLengthMm': length,
-                  'designCurrentA':
-                      deps['circuit:${run.circuitId}']!
-                          .values['designCurrentA'],
+                  'designCurrentA': deps['circuit:${run.circuitId}']!
+                      .values['designCurrentA'],
                 },
-                issues:
-                    length == null
-                        ? ['Cable route or allowances are invalid.']
-                        : [],
+                issues: length == null
+                    ? ['Cable route or allowances are invalid.']
+                    : [],
               );
             },
           );
@@ -446,11 +443,12 @@ class DriftDependencyRecalculationRepository
       }
       final generationRows =
           await (database.select(database.panelGenerationConfigs)..where(
-            (r) =>
-                r.floorId.equals(floor.id) &
-                r.projectId.equals(projectId) &
-                r.deletedAt.isNull(),
-          )).get();
+                (r) =>
+                    r.floorId.equals(floor.id) &
+                    r.projectId.equals(projectId) &
+                    r.deletedAt.isNull(),
+              ))
+              .get();
       for (final row in generationRows) {
         final policy = PanelGenerationPolicy.fromMap(
           jsonDecode(row.payloadJson) as Map<String, dynamic>,
@@ -476,12 +474,12 @@ class DriftDependencyRecalculationRepository
             (_) => DependencyProposal(values: ruleset.toMap()),
           );
         }
-        final groups =
-            generationGroups.toList()..sort((a, b) => a.id.compareTo(b.id));
-        final loads =
-            generationLoads.toList()..sort(
-              (a, b) => a.componentInstanceId.compareTo(b.componentInstanceId),
-            );
+        final groups = generationGroups.toList()
+          ..sort((a, b) => a.id.compareTo(b.id));
+        final loads = generationLoads.toList()
+          ..sort(
+            (a, b) => a.componentInstanceId.compareTo(b.componentInstanceId),
+          );
         add(
           'panelProposal:${row.id}',
           policy.name,
@@ -569,8 +567,7 @@ class DriftDependencyRecalculationRepository
             return DependencyProposal(
               values: {
                 'circuitCurrentsA': currents,
-                'capability':
-                    'Per-circuit basis only; panel rating and phase balance are not calculated.',
+                'capability': 'Per-circuit basis only; panel rating and phase balance are not calculated.',
               },
               issues: issues,
               requiresReview: true,
@@ -579,26 +576,24 @@ class DriftDependencyRecalculationRepository
         );
       }
     }
-    final circuitIds =
-        nodes.keys
-            .where((k) => k.startsWith('circuit:'))
-            .map((k) => k.substring(8))
-            .toList();
-    final selections =
-        await (database.select(database.circuitProductSelections)..where(
-          (r) => r.circuitId.isIn(circuitIds) & r.deletedAt.isNull(),
-        )).get();
+    final circuitIds = nodes.keys
+        .where((k) => k.startsWith('circuit:'))
+        .map((k) => k.substring(8))
+        .toList();
+    final selections = await (database.select(
+      database.circuitProductSelections,
+    )..where((r) => r.circuitId.isIn(circuitIds) & r.deletedAt.isNull())).get();
     if (selections.isNotEmpty) {
       final policyRow =
           await (database.select(database.manufacturerPolicies)..where(
-            (r) => r.projectId.equals(projectId) & r.deletedAt.isNull(),
-          )).getSingleOrNull();
-      final policy =
-          policyRow == null
-              ? const ProjectManufacturerPolicy()
-              : ManufacturerCatalogCodec.decodePolicy(
-                jsonDecode(policyRow.payloadJson) as Map<String, dynamic>,
-              );
+                (r) => r.projectId.equals(projectId) & r.deletedAt.isNull(),
+              ))
+              .getSingleOrNull();
+      final policy = policyRow == null
+          ? const ProjectManufacturerPolicy()
+          : ManufacturerCatalogCodec.decodePolicy(
+              jsonDecode(policyRow.payloadJson) as Map<String, dynamic>,
+            );
       final policyMap = ManufacturerCatalogCodec.policy(policy);
       add(
         'manufacturerPolicy:$projectId',
@@ -611,15 +606,14 @@ class DriftDependencyRecalculationRepository
       // Protection fingerprints are computed before commercial selection nodes are appended.
       final normative = RecalculationSession(nodes: nodes.values, cache: cache);
       for (final selected in selections) {
-        final row =
-            await (database.select(
-              database.manufacturerProducts,
-            )..where((r) => r.id.equals(selected.productId))).getSingleOrNull();
-        final catalog =
-            row == null
-                ? null
-                : await (database.select(database.manufacturerCatalogs)
-                  ..where((r) => r.id.equals(row.catalogId))).getSingleOrNull();
+        final row = await (database.select(
+          database.manufacturerProducts,
+        )..where((r) => r.id.equals(selected.productId))).getSingleOrNull();
+        final catalog = row == null
+            ? null
+            : await (database.select(
+                database.manufacturerCatalogs,
+              )..where((r) => r.id.equals(row.catalogId))).getSingleOrNull();
         final available =
             row != null &&
             row.deletedAt == null &&
@@ -641,10 +635,9 @@ class DriftDependencyRecalculationRepository
           [],
           (_) => DependencyProposal(
             values: commercialInputs,
-            issues:
-                available
-                    ? []
-                    : ['Selected catalog product is archived or unavailable.'],
+            issues: available
+                ? []
+                : ['Selected catalog product is archived or unavailable.'],
           ),
         );
         final input = <String, Object?>{
@@ -672,15 +665,14 @@ class DriftDependencyRecalculationRepository
             final product = ManufacturerCatalogCodec.decodeProduct(
               selectedSnapshot['product'] as Map<String, dynamic>,
             );
-            final problems =
-                requirement == null
-                    ? ['Functional requirement is unavailable.']
-                    : ManufacturerProductMatcher.match(
-                      requirement,
-                      product,
-                      policy: policy,
-                      catalogRegion: catalog?.region,
-                    ).issues;
+            final problems = requirement == null
+                ? ['Functional requirement is unavailable.']
+                : ManufacturerProductMatcher.match(
+                    requirement,
+                    product,
+                    policy: policy,
+                    catalogRegion: catalog?.region,
+                  ).issues;
             final needsReview =
                 selected.requirementFingerprint !=
                     normative
@@ -731,8 +723,10 @@ class DriftDependencyRecalculationRepository
     for (final item in updates.values) {
       final old =
           await (database.select(database.projectDerivedResults)..where(
-            (r) => r.projectId.equals(projectId) & r.nodeKey.equals(item.key),
-          )).getSingleOrNull();
+                (r) =>
+                    r.projectId.equals(projectId) & r.nodeKey.equals(item.key),
+              ))
+              .getSingleOrNull();
       await database
           .into(database.projectDerivedResults)
           .insertOnConflictUpdate(
@@ -759,15 +753,16 @@ class DriftDependencyRecalculationRepository
     }
     for (final key in snapshot.session.removedKeys) {
       await (database.update(database.projectDerivedResults)..where(
-        (r) => r.projectId.equals(projectId) & r.nodeKey.equals(key),
-      )).write(
-        ProjectDerivedResultsCompanion(
-          deletedAt: Value(now),
-          updatedAt: Value(now),
-          revision: Value(snapshot.revisions[key]! + 1),
-          originDeviceId: Value(originDeviceId),
-        ),
-      );
+            (r) => r.projectId.equals(projectId) & r.nodeKey.equals(key),
+          ))
+          .write(
+            ProjectDerivedResultsCompanion(
+              deletedAt: Value(now),
+              updatedAt: Value(now),
+              revision: Value(snapshot.revisions[key]! + 1),
+              originDeviceId: Value(originDeviceId),
+            ),
+          );
     }
     return updates.keys.toSet();
   });
@@ -845,23 +840,24 @@ class DriftDependencyRecalculationRepository
   ) async {
     final row =
         await (database.select(database.projectDerivedResults)..where(
-          (r) =>
-              r.projectId.equals(projectId) &
-              r.nodeKey.equals(key) &
-              r.deletedAt.isNull(),
-        )).getSingleOrNull();
+              (r) =>
+                  r.projectId.equals(projectId) &
+                  r.nodeKey.equals(key) &
+                  r.deletedAt.isNull(),
+            ))
+            .getSingleOrNull();
     if (row == null) throw StateError('Recalculate this proposal first.');
-    await (database.update(database.projectDerivedResults)..where(
-      (r) => r.projectId.equals(projectId) & r.nodeKey.equals(key),
-    )).write(
-      ProjectDerivedResultsCompanion(
-        manualValue: value,
-        manualReason: reason,
-        manualReviewedFingerprint: reviewed,
-        revision: Value(row.revision + 1),
-        updatedAt: Value(DateTime.now().toUtc()),
-        originDeviceId: Value(originDeviceId),
-      ),
-    );
+    await (database.update(database.projectDerivedResults)
+          ..where((r) => r.projectId.equals(projectId) & r.nodeKey.equals(key)))
+        .write(
+          ProjectDerivedResultsCompanion(
+            manualValue: value,
+            manualReason: reason,
+            manualReviewedFingerprint: reviewed,
+            revision: Value(row.revision + 1),
+            updatedAt: Value(DateTime.now().toUtc()),
+            originDeviceId: Value(originDeviceId),
+          ),
+        );
   }
 }

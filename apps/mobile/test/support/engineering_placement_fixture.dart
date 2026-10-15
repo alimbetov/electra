@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:drift/drift.dart';
 import 'package:electra_mobile/application/engineering_placement_command.dart';
 import 'package:electra_mobile/data/database/app_database.dart';
@@ -99,13 +100,9 @@ Future<void> seedPlacementSystemAndCatalog(AppDatabase database) async {
     familyCode: 'CCTV',
   );
   final now = DateTime.utc(2026, 10, 13, 19, 2);
-  final source =
-      jsonDecode(
-            File(
-              '../../docs/examples/elv2-interface-catalog.json',
-            ).readAsStringSync(),
-          )
-          as Map<String, dynamic>;
+  final source = jsonDecode(
+    File('../../docs/examples/elv2-interface-catalog.json').readAsStringSync(),
+  ) as Map<String, dynamic>;
   final catalog = EngineeringReferenceCatalog.fromMap({
     ...source,
     'id': 'catalog-1',
@@ -135,8 +132,9 @@ Future<void> seedEngineeringSystem(
 }) async {
   final family =
       await (database.select(database.engineeringFamilyDefinitions)..where(
-        (row) => row.code.equals(familyCode) & row.deletedAt.isNull(),
-      )).getSingle();
+            (row) => row.code.equals(familyCode) & row.deletedAt.isNull(),
+          ))
+          .getSingle();
   final system = EngineeringSystem(
     id: id,
     projectId: 'project-1',

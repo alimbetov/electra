@@ -42,7 +42,8 @@ EditorSelection? hitTestSurface({
   }
 
   ComponentInstance? nearestComponent;
-  var nearestDistanceSquared = componentHitToleranceMm * componentHitToleranceMm + 1;
+  var nearestDistanceSquared =
+      componentHitToleranceMm * componentHitToleranceMm + 1;
   for (final component in components) {
     if (component.hostSurfacePatchId != patch.id) continue;
     final dx = component.localPosition.xMm - localPoint.xMm;
@@ -54,7 +55,8 @@ EditorSelection? hitTestSurface({
     }
   }
   if (nearestComponent != null &&
-      nearestDistanceSquared <= componentHitToleranceMm * componentHitToleranceMm) {
+      nearestDistanceSquared <=
+          componentHitToleranceMm * componentHitToleranceMm) {
     return EditorSelection(
       kind: EditorSelectionKind.component,
       id: nearestComponent.id,

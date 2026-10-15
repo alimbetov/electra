@@ -62,10 +62,11 @@ final class _P2CommandLedgerStore implements ElvCommandLedgerStore {
   ) async {
     final row =
         await (database.select(database.commandExecutionRecords)..where(
-          (candidate) =>
-              candidate.projectId.equals(projectId) &
-              candidate.commandId.equals(commandId),
-        )).getSingleOrNull();
+              (candidate) =>
+                  candidate.projectId.equals(projectId) &
+                  candidate.commandId.equals(commandId),
+            ))
+            .getSingleOrNull();
     if (row == null) return null;
     return ElvCommandLedgerEntry(
       projectId: row.projectId,
@@ -123,12 +124,13 @@ final class _P2ReferenceReadStore implements ElvReferenceReadStore {
     final normalized = ref.normalized();
     final row =
         await (database.select(database.engineeringReferenceCatalogs)..where(
-          (candidate) =>
-              candidate.projectId.equals(projectId) &
-              candidate.id.equals(normalized.catalogId) &
-              candidate.catalogVersion.equals(normalized.catalogVersion) &
-              candidate.deletedAt.isNull(),
-        )).getSingleOrNull();
+              (candidate) =>
+                  candidate.projectId.equals(projectId) &
+                  candidate.id.equals(normalized.catalogId) &
+                  candidate.catalogVersion.equals(normalized.catalogVersion) &
+                  candidate.deletedAt.isNull(),
+            ))
+            .getSingleOrNull();
     if (row == null) throw StateError('Catalog edition not found.');
     final catalog = EngineeringReferenceCatalog.fromMap(
       jsonDecode(row.payloadJson) as Map<String, dynamic>,
@@ -158,11 +160,12 @@ final class _DriftElvAllocationWriteStore implements ElvAllocationWriteStore {
   ) async {
     final row =
         await (database.select(database.cableAllocations)..where(
-          (candidate) =>
-              candidate.projectId.equals(projectId) &
-              candidate.id.equals(allocationId) &
-              candidate.deletedAt.isNull(),
-        )).getSingleOrNull();
+              (candidate) =>
+                  candidate.projectId.equals(projectId) &
+                  candidate.id.equals(allocationId) &
+                  candidate.deletedAt.isNull(),
+            ))
+            .getSingleOrNull();
     return row == null ? null : _allocation(row);
   }
 
@@ -170,14 +173,16 @@ final class _DriftElvAllocationWriteStore implements ElvAllocationWriteStore {
   Future<List<CableAllocation>> loadCableAllocations(
     String projectId,
     String cableId,
-  ) async => (await (database.select(database.cableAllocations)..where(
-        (row) =>
-            row.projectId.equals(projectId) &
-            row.cableId.equals(cableId) &
-            row.deletedAt.isNull(),
-      )).get())
-      .map(_allocation)
-      .toList(growable: false);
+  ) async =>
+      (await (database.select(database.cableAllocations)..where(
+                (row) =>
+                    row.projectId.equals(projectId) &
+                    row.cableId.equals(cableId) &
+                    row.deletedAt.isNull(),
+              ))
+              .get())
+          .map(_allocation)
+          .toList(growable: false);
 
   @override
   Future<CableAllocationResourceSelectionEvidence?> loadSelectionEvidence(
@@ -188,9 +193,10 @@ final class _DriftElvAllocationWriteStore implements ElvAllocationWriteStore {
     if (allocation == null) return null;
     final row =
         await (database.select(database.cableAllocationResourceSelections)
-          ..where(
-            (candidate) => candidate.allocationId.equals(allocationId),
-          )).getSingleOrNull();
+              ..where(
+                (candidate) => candidate.allocationId.equals(allocationId),
+              ))
+            .getSingleOrNull();
     if (row == null) return null;
     return CableAllocationResourceSelectionEvidence(
       allocationId: row.allocationId,
@@ -213,9 +219,11 @@ final class _DriftElvAllocationWriteStore implements ElvAllocationWriteStore {
     if (await findAllocation(projectId, allocationId) == null) return const [];
     final rows =
         await (database.select(database.cableTerminationMappings)..where(
-          (row) =>
-              row.allocationId.equals(allocationId) & row.deletedAt.isNull(),
-        )).get();
+              (row) =>
+                  row.allocationId.equals(allocationId) &
+                  row.deletedAt.isNull(),
+            ))
+            .get();
     return rows
         .map(
           (row) => CableTerminationMapping(
@@ -235,11 +243,12 @@ final class _DriftElvAllocationWriteStore implements ElvAllocationWriteStore {
   Future<Cable?> findCable(String projectId, String cableId) async {
     final row =
         await (database.select(database.elvCables)..where(
-          (candidate) =>
-              candidate.projectId.equals(projectId) &
-              candidate.id.equals(cableId) &
-              candidate.deletedAt.isNull(),
-        )).getSingleOrNull();
+              (candidate) =>
+                  candidate.projectId.equals(projectId) &
+                  candidate.id.equals(cableId) &
+                  candidate.deletedAt.isNull(),
+            ))
+            .getSingleOrNull();
     if (row == null) return null;
     return Cable(
       id: row.id,
@@ -266,11 +275,12 @@ final class _DriftElvAllocationWriteStore implements ElvAllocationWriteStore {
   ) async {
     final row =
         await (database.select(database.engineeringPortConnections)..where(
-          (candidate) =>
-              candidate.projectId.equals(projectId) &
-              candidate.id.equals(connectionId) &
-              candidate.deletedAt.isNull(),
-        )).getSingleOrNull();
+              (candidate) =>
+                  candidate.projectId.equals(projectId) &
+                  candidate.id.equals(connectionId) &
+                  candidate.deletedAt.isNull(),
+            ))
+            .getSingleOrNull();
     if (row == null) return null;
     final connection = EngineeringConnection.fromMap(
       jsonDecode(row.payloadJson) as Map<String, dynamic>,
@@ -290,13 +300,14 @@ final class _DriftElvAllocationWriteStore implements ElvAllocationWriteStore {
     String connectionId, {
     String? excludingAllocationId,
   }) async {
-    final query = database.select(database.cableAllocations)..where(
-      (row) =>
-          row.projectId.equals(projectId) &
-          row.engineeringConnectionId.equals(connectionId) &
-          row.lifecycleState.isIn(const ['RESERVED', 'ACTIVE']) &
-          row.deletedAt.isNull(),
-    );
+    final query = database.select(database.cableAllocations)
+      ..where(
+        (row) =>
+            row.projectId.equals(projectId) &
+            row.engineeringConnectionId.equals(connectionId) &
+            row.lifecycleState.isIn(const ['RESERVED', 'ACTIVE']) &
+            row.deletedAt.isNull(),
+      );
     if (excludingAllocationId != null) {
       query.where((row) => row.id.isNotValue(excludingAllocationId));
     }
@@ -367,34 +378,40 @@ final class _DriftElvAllocationWriteStore implements ElvAllocationWriteStore {
             mode: InsertMode.insertOrIgnore,
           );
       if (inserted == null) {
-        await (database.delete(database.cableResourceClaims)
-          ..where((row) => row.allocationId.equals(allocation.id))).go();
-        await (database.delete(database.cableAllocationResourceSelections)
-          ..where((row) => row.allocationId.equals(allocation.id))).go();
+        await (database.delete(
+          database.cableResourceClaims,
+        )..where((row) => row.allocationId.equals(allocation.id))).go();
+        await (database.delete(
+          database.cableAllocationResourceSelections,
+        )..where((row) => row.allocationId.equals(allocation.id))).go();
         return ElvAllocationMutationOutcome.resourceOverlap;
       }
     }
 
-    final affected = await (database.update(database.cableAllocations)..where(
-      (row) =>
-          row.id.equals(allocation.id) &
-          row.projectId.equals(allocation.projectId) &
-          row.revision.equals(expectedRevision) &
-          row.lifecycleState.equals('DRAFT') &
-          row.deletedAt.isNull(),
-    )).write(
-      CableAllocationsCompanion(
-        lifecycleState: const Value('RESERVED'),
-        revision: Value(allocation.revision),
-        updatedAt: Value(now),
-        originDeviceId: Value(originDeviceId),
-      ),
-    );
+    final affected =
+        await (database.update(database.cableAllocations)..where(
+              (row) =>
+                  row.id.equals(allocation.id) &
+                  row.projectId.equals(allocation.projectId) &
+                  row.revision.equals(expectedRevision) &
+                  row.lifecycleState.equals('DRAFT') &
+                  row.deletedAt.isNull(),
+            ))
+            .write(
+              CableAllocationsCompanion(
+                lifecycleState: const Value('RESERVED'),
+                revision: Value(allocation.revision),
+                updatedAt: Value(now),
+                originDeviceId: Value(originDeviceId),
+              ),
+            );
     if (affected != 1) {
-      await (database.delete(database.cableResourceClaims)
-        ..where((row) => row.allocationId.equals(allocation.id))).go();
-      await (database.delete(database.cableAllocationResourceSelections)
-        ..where((row) => row.allocationId.equals(allocation.id))).go();
+      await (database.delete(
+        database.cableResourceClaims,
+      )..where((row) => row.allocationId.equals(allocation.id))).go();
+      await (database.delete(
+        database.cableAllocationResourceSelections,
+      )..where((row) => row.allocationId.equals(allocation.id))).go();
       return ElvAllocationMutationOutcome.revisionConflict;
     }
     return ElvAllocationMutationOutcome.success;
@@ -411,32 +428,35 @@ final class _DriftElvAllocationWriteStore implements ElvAllocationWriteStore {
       return ElvAllocationMutationOutcome.storageConflict;
     }
     if (ids.isNotEmpty) {
-      final existing =
-          await (database.select(database.cableTerminationMappings)
-            ..where((row) => row.id.isIn(ids))).get();
+      final existing = await (database.select(
+        database.cableTerminationMappings,
+      )..where((row) => row.id.isIn(ids))).get();
       if (existing.any((row) => row.allocationId != allocation.id)) {
         return ElvAllocationMutationOutcome.storageConflict;
       }
     }
 
-    final affected = await (database.update(database.cableAllocations)..where(
-      (row) =>
-          row.id.equals(allocation.id) &
-          row.projectId.equals(allocation.projectId) &
-          row.revision.equals(expectedRevision) &
-          row.lifecycleState.isIn(const ['RESERVED', 'ACTIVE']) &
-          row.deletedAt.isNull(),
-    )).write(
-      CableAllocationsCompanion(
-        revision: Value(allocation.revision),
-        updatedAt: Value(DateTime.now().toUtc()),
-        originDeviceId: Value(originDeviceId),
-      ),
-    );
+    final affected =
+        await (database.update(database.cableAllocations)..where(
+              (row) =>
+                  row.id.equals(allocation.id) &
+                  row.projectId.equals(allocation.projectId) &
+                  row.revision.equals(expectedRevision) &
+                  row.lifecycleState.isIn(const ['RESERVED', 'ACTIVE']) &
+                  row.deletedAt.isNull(),
+            ))
+            .write(
+              CableAllocationsCompanion(
+                revision: Value(allocation.revision),
+                updatedAt: Value(DateTime.now().toUtc()),
+                originDeviceId: Value(originDeviceId),
+              ),
+            );
     if (affected != 1) return ElvAllocationMutationOutcome.revisionConflict;
 
-    await (database.delete(database.cableTerminationMappings)
-      ..where((row) => row.allocationId.equals(allocation.id))).go();
+    await (database.delete(
+      database.cableTerminationMappings,
+    )..where((row) => row.allocationId.equals(allocation.id))).go();
     final now = DateTime.now().toUtc();
     for (final mapping in mappings) {
       await database
@@ -483,8 +503,9 @@ final class _DriftElvAllocationWriteStore implements ElvAllocationWriteStore {
       toState: 'RELEASED',
     );
     if (outcome != ElvAllocationMutationOutcome.success) return outcome;
-    await (database.delete(database.cableResourceClaims)
-      ..where((row) => row.allocationId.equals(allocation.id))).go();
+    await (database.delete(
+      database.cableResourceClaims,
+    )..where((row) => row.allocationId.equals(allocation.id))).go();
     return ElvAllocationMutationOutcome.success;
   }
 
@@ -505,21 +526,23 @@ final class _DriftElvAllocationWriteStore implements ElvAllocationWriteStore {
     required List<String> fromStates,
     required String toState,
   }) async {
-    final affected = await (database.update(database.cableAllocations)..where(
-      (row) =>
-          row.id.equals(allocation.id) &
-          row.projectId.equals(allocation.projectId) &
-          row.revision.equals(expectedRevision) &
-          row.lifecycleState.isIn(fromStates) &
-          row.deletedAt.isNull(),
-    )).write(
-      CableAllocationsCompanion(
-        lifecycleState: Value(toState),
-        revision: Value(allocation.revision),
-        updatedAt: Value(DateTime.now().toUtc()),
-        originDeviceId: Value(originDeviceId),
-      ),
-    );
+    final affected =
+        await (database.update(database.cableAllocations)..where(
+              (row) =>
+                  row.id.equals(allocation.id) &
+                  row.projectId.equals(allocation.projectId) &
+                  row.revision.equals(expectedRevision) &
+                  row.lifecycleState.isIn(fromStates) &
+                  row.deletedAt.isNull(),
+            ))
+            .write(
+              CableAllocationsCompanion(
+                lifecycleState: Value(toState),
+                revision: Value(allocation.revision),
+                updatedAt: Value(DateTime.now().toUtc()),
+                originDeviceId: Value(originDeviceId),
+              ),
+            );
     return affected == 1
         ? ElvAllocationMutationOutcome.success
         : ElvAllocationMutationOutcome.revisionConflict;
@@ -535,18 +558,17 @@ final class _DriftElvAllocationWriteStore implements ElvAllocationWriteStore {
   @override
   Future<int> consumingAllocationCount(String projectId, String cableId) async {
     final count = database.cableAllocations.id.count();
-    final query =
-        database.selectOnly(database.cableAllocations)
-          ..addColumns([count])
-          ..where(
-            database.cableAllocations.projectId.equals(projectId) &
-                database.cableAllocations.cableId.equals(cableId) &
-                database.cableAllocations.lifecycleState.isIn(const [
-                  'RESERVED',
-                  'ACTIVE',
-                ]) &
-                database.cableAllocations.deletedAt.isNull(),
-          );
+    final query = database.selectOnly(database.cableAllocations)
+      ..addColumns([count])
+      ..where(
+        database.cableAllocations.projectId.equals(projectId) &
+            database.cableAllocations.cableId.equals(cableId) &
+            database.cableAllocations.lifecycleState.isIn(const [
+              'RESERVED',
+              'ACTIVE',
+            ]) &
+            database.cableAllocations.deletedAt.isNull(),
+      );
     return (await query.getSingle()).read(count) ?? 0;
   }
 

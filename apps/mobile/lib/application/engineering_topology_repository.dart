@@ -1,4 +1,5 @@
 import 'package:engineering_core/engineering_core.dart';
+
 import 'engineering_system_repository.dart';
 
 enum TopologyObjectKind { port, connection, internalMapping, group, assembly }
@@ -28,10 +29,9 @@ class ProjectEngineeringTopologySnapshot {
     List<T> values,
     T? candidate,
     String Function(T) id,
-  ) =>
-      candidate == null
-          ? values
-          : [...values.where((v) => id(v) != id(candidate)), candidate];
+  ) => candidate == null
+      ? values
+      : [...values.where((v) => id(v) != id(candidate)), candidate];
   EngineeringTopologyGraph graph({
     EngineeringPort? port,
     EngineeringConnection? connection,

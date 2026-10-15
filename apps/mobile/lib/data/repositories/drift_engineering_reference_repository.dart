@@ -38,31 +38,31 @@ class DriftEngineeringReferenceRepository
           database,
           originDeviceId: originDeviceId,
         ).load(projectId);
-        final catalogs =
-            await (database.select(database.engineeringReferenceCatalogs)
-              ..where((row) => row.projectId.equals(projectId))).get();
+        final catalogs = await (database.select(
+          database.engineeringReferenceCatalogs,
+        )..where((row) => row.projectId.equals(projectId))).get();
         final bindings =
             await (database.select(database.componentReferenceBindings)..where(
-              (row) => row.projectId.equals(projectId) & row.deletedAt.isNull(),
-            )).get();
+                  (row) =>
+                      row.projectId.equals(projectId) & row.deletedAt.isNull(),
+                ))
+                .get();
         return ProjectEngineeringReferences(
           systems: systems,
-          catalogs:
-              catalogs
-                  .map(
-                    (row) => EngineeringReferenceCatalog.fromMap(
-                      jsonDecode(row.payloadJson) as Map<String, dynamic>,
-                    ),
-                  )
-                  .toList(),
-          bindings:
-              bindings
-                  .map(
-                    (row) => ComponentReferenceBinding.fromMap(
-                      jsonDecode(row.payloadJson) as Map<String, dynamic>,
-                    ),
-                  )
-                  .toList(),
+          catalogs: catalogs
+              .map(
+                (row) => EngineeringReferenceCatalog.fromMap(
+                  jsonDecode(row.payloadJson) as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
+          bindings: bindings
+              .map(
+                (row) => ComponentReferenceBinding.fromMap(
+                  jsonDecode(row.payloadJson) as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
         );
       });
 
@@ -85,9 +85,9 @@ class DriftEngineeringReferenceRepository
       throw ArgumentError(validation.join(' '));
     }
     final payload = canonicalEngineeringJson(catalog.toMap());
-    final old =
-        await (database.select(database.engineeringReferenceCatalogs)
-          ..where((row) => row.id.equals(catalog.id))).getSingleOrNull();
+    final old = await (database.select(
+      database.engineeringReferenceCatalogs,
+    )..where((row) => row.id.equals(catalog.id))).getSingleOrNull();
     if (old != null) {
       if (old.projectId != projectId || old.payloadJson != payload) {
         throw StateError(
@@ -133,8 +133,9 @@ class DriftEngineeringReferenceRepository
     )) {
       throw StateError('Choose an active placed component in this project.');
     }
-    final catalog =
-        snapshot.catalogs.where((item) => item.id == catalogId).single;
+    final catalog = snapshot.catalogs
+        .where((item) => item.id == catalogId)
+        .single;
     final profile = catalog.profile(profileCode);
     final familyCode = switch (profile.discipline) {
       ReferenceDiscipline.cctv => 'CCTV',
@@ -142,18 +143,17 @@ class DriftEngineeringReferenceRepository
       ReferenceDiscipline.acs => 'ACS',
       ReferenceDiscipline.fire => 'FIRE',
     };
-    final eligibleSystems =
-        snapshot.systems.systems
-            .where(
-              (system) => snapshot.systems.families.any(
-                (family) =>
-                    family.id == system.familyId &&
-                    family.version == system.familyVersion &&
-                    family.code == familyCode,
-              ),
-            )
-            .map((system) => system.id)
-            .toSet();
+    final eligibleSystems = snapshot.systems.systems
+        .where(
+          (system) => snapshot.systems.families.any(
+            (family) =>
+                family.id == system.familyId &&
+                family.version == system.familyVersion &&
+                family.code == familyCode,
+          ),
+        )
+        .map((system) => system.id)
+        .toSet();
     if (!snapshot.systems.memberships.any(
       (membership) =>
           membership.componentId == componentId &&
@@ -163,10 +163,9 @@ class DriftEngineeringReferenceRepository
         'Assign the device to the profile discipline system first.',
       );
     }
-    final old =
-        await (database.select(database.componentReferenceBindings)..where(
-          (row) => row.componentId.equals(componentId),
-        )).getSingleOrNull();
+    final old = await (database.select(
+      database.componentReferenceBindings,
+    )..where((row) => row.componentId.equals(componentId))).getSingleOrNull();
     if (old != null && old.deletedAt == null) {
       if (old.projectId == projectId &&
           old.catalogId == catalogId &&
@@ -182,8 +181,10 @@ class DriftEngineeringReferenceRepository
     }
     final existing =
         await (database.select(database.engineeringPortInstances)..where(
-          (row) => row.componentId.equals(componentId) & row.deletedAt.isNull(),
-        )).get();
+              (row) =>
+                  row.componentId.equals(componentId) & row.deletedAt.isNull(),
+            ))
+            .get();
     if (existing.isNotEmpty) {
       throw StateError(
         'Resolve existing manually authored ports before profile instantiation.',
@@ -191,9 +192,11 @@ class DriftEngineeringReferenceRepository
     }
     final retired =
         await (database.select(database.engineeringPortInstances)..where(
-          (row) =>
-              row.componentId.equals(componentId) & row.deletedAt.isNotNull(),
-        )).get();
+              (row) =>
+                  row.componentId.equals(componentId) &
+                  row.deletedAt.isNotNull(),
+            ))
+            .get();
     final retiredIds = {for (final row in retired) row.code: row.id};
     var templateIndex = 0;
     final ports = profile.instantiate(
@@ -202,8 +205,9 @@ class DriftEngineeringReferenceRepository
       version: catalog.version,
       vocabulary: catalog.vocabulary,
       nextId: () {
-        final code =
-            profile.portTemplates[templateIndex++].code.trim().toUpperCase();
+        final code = profile.portTemplates[templateIndex++].code
+            .trim()
+            .toUpperCase();
         return retiredIds[code] ?? idGenerator.next();
       },
     );
@@ -242,41 +246,41 @@ class DriftEngineeringReferenceRepository
   });
 
   @override
-  Future<void> unbind(
-    String projectId,
-    String componentId,
-  ) => database.transaction(() async {
-    await _active(projectId);
-    final row =
-        await (database.select(database.componentReferenceBindings)..where(
-          (candidate) =>
-              candidate.componentId.equals(componentId) &
-              candidate.projectId.equals(projectId) &
-              candidate.deletedAt.isNull(),
-        )).getSingle();
-    final ports =
-        ComponentReferenceBinding.fromMap(
+  Future<void> unbind(String projectId, String componentId) =>
+      database.transaction(() async {
+        await _active(projectId);
+        final row =
+            await (database.select(database.componentReferenceBindings)..where(
+                  (candidate) =>
+                      candidate.componentId.equals(componentId) &
+                      candidate.projectId.equals(projectId) &
+                      candidate.deletedAt.isNull(),
+                ))
+                .getSingle();
+        final ports = ComponentReferenceBinding.fromMap(
           jsonDecode(row.payloadJson) as Map<String, dynamic>,
         ).portIds;
-    final activePorts =
-        await (database.select(database.engineeringPortInstances)..where(
-          (candidate) =>
-              candidate.id.isIn(ports) & candidate.deletedAt.isNull(),
-        )).get();
-    if (activePorts.isNotEmpty) {
-      throw StateError(
-        'Resolve links and retire instantiated ports before releasing the binding.',
-      );
-    }
-    final now = DateTime.now().toUtc();
-    await (database.update(database.componentReferenceBindings)
-      ..where((candidate) => candidate.componentId.equals(componentId))).write(
-      ComponentReferenceBindingsCompanion(
-        deletedAt: Value(now),
-        updatedAt: Value(now),
-        revision: Value(row.revision + 1),
-        originDeviceId: Value(originDeviceId),
-      ),
-    );
-  });
+        final activePorts =
+            await (database.select(database.engineeringPortInstances)..where(
+                  (candidate) =>
+                      candidate.id.isIn(ports) & candidate.deletedAt.isNull(),
+                ))
+                .get();
+        if (activePorts.isNotEmpty) {
+          throw StateError(
+            'Resolve links and retire instantiated ports before releasing the binding.',
+          );
+        }
+        final now = DateTime.now().toUtc();
+        await (database.update(database.componentReferenceBindings)
+              ..where((candidate) => candidate.componentId.equals(componentId)))
+            .write(
+              ComponentReferenceBindingsCompanion(
+                deletedAt: Value(now),
+                updatedAt: Value(now),
+                revision: Value(row.revision + 1),
+                originDeviceId: Value(originDeviceId),
+              ),
+            );
+      });
 }

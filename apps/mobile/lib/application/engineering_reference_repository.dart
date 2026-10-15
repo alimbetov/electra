@@ -1,4 +1,5 @@
 import 'package:engineering_core/engineering_core.dart';
+
 import 'engineering_system_repository.dart';
 import 'engineering_placement_command.dart';
 
@@ -37,12 +38,11 @@ class ComponentReferenceBinding {
           m['profile'] as Map<String, dynamic>,
         ),
         portIds: (m['portIds'] as List).cast<String>(),
-        placementCommand:
-            m['placementCommand'] == null
-                ? null
-                : PlaceEngineeringProfileCommand.fromMap(
-                  m['placementCommand'] as Map<String, dynamic>,
-                ),
+        placementCommand: m['placementCommand'] == null
+            ? null
+            : PlaceEngineeringProfileCommand.fromMap(
+                m['placementCommand'] as Map<String, dynamic>,
+              ),
       );
 }
 

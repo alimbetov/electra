@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:drift/native.dart';
 import 'package:electra_mobile/application/component_placement_history.dart';
@@ -14,6 +15,7 @@ import 'package:electra_mobile/data/repositories/drift_engineering_placement_rep
 import 'package:electra_mobile/data/repositories/drift_engineering_topology_repository.dart';
 import 'package:engineering_core/engineering_core.dart';
 import 'package:flutter_test/flutter_test.dart';
+
 import '../support/engineering_placement_fixture.dart';
 
 Future<void> seedAtomic(AppDatabase db) async {
@@ -55,10 +57,9 @@ Future<String> aggregateRows(AppDatabase db) async {
     ...DriftEngineeringPlacementAggregate.aggregateTables.keys,
     'engineering_placement_operations',
   ]) {
-    m[table] =
-        (await db.customSelect('SELECT * FROM $table ORDER BY 1').get())
-            .map((r) => r.data)
-            .toList();
+    m[table] = (await db.customSelect('SELECT * FROM $table ORDER BY 1').get())
+        .map((r) => r.data)
+        .toList();
   }
   return canonicalEngineeringJson(m);
 }
@@ -105,77 +106,70 @@ void main() {
     },
   );
 
-  test(
-    'deprecated and historical unspecified profiles cannot pass the commit boundary',
-    () async {
-      final row =
-          await (db.select(db.engineeringReferenceCatalogs)
-            ..where((r) => r.id.equals('catalog-1'))).getSingle();
-      final original = jsonDecode(row.payloadJson) as Map<String, dynamic>;
-      for (final legacy in [false, true]) {
-        final profiles =
-            (original['profiles'] as List)
-                .cast<Map<String, dynamic>>()
-                .map(
-                  (p) =>
-                      p['code'] != 'CAMERA'
-                          ? p
-                          : {
-                            ...p,
-                            if (!legacy) 'deprecated': true,
-                            if (legacy) ...{
-                              'constraintsState': 'legacyUnspecified',
-                              'constraints': null,
-                            },
-                          },
-                )
-                .toList();
-        await (db.update(db.engineeringReferenceCatalogs)
-          ..where((r) => r.id.equals('catalog-1'))).write(
-          EngineeringReferenceCatalogsCompanion(
-            payloadJson: Value(
-              canonicalEngineeringJson({...original, 'profiles': profiles}),
-            ),
+  test('deprecated and historical unspecified profiles cannot pass the commit boundary', () async {
+    final row = await (db.select(
+      db.engineeringReferenceCatalogs,
+    )..where((r) => r.id.equals('catalog-1'))).getSingle();
+    final original = jsonDecode(row.payloadJson) as Map<String, dynamic>;
+    for (final legacy in [false, true]) {
+      final profiles = (original['profiles'] as List)
+          .cast<Map<String, dynamic>>()
+          .map(
+            (p) => p['code'] != 'CAMERA'
+                ? p
+                : {
+                    ...p,
+                    if (!legacy) 'deprecated': true,
+                    if (legacy) ...{
+                      'constraintsState': 'legacyUnspecified',
+                      'constraints': null,
+                    },
+                  },
+          )
+          .toList();
+      await (db.update(
+        db.engineeringReferenceCatalogs,
+      )..where((r) => r.id.equals('catalog-1'))).write(
+        EngineeringReferenceCatalogsCompanion(
+          payloadJson: Value(
+            canonicalEngineeringJson({...original, 'profiles': profiles}),
           ),
-        );
-        final before = await aggregateRows(db);
-        await expectLater(
-          repo.place(atomicCommand('CAMERA')),
-          throwsA(
-            isA<EngineeringPlacementFailure>().having(
-              (e) => e.code,
-              'code',
-              legacy
-                  ? EngineeringPlacementFailureCode.placementUnresolved
-                  : EngineeringPlacementFailureCode.profileDeprecated,
-            ),
-          ),
-        );
-        expect(await aggregateRows(db), before);
-      }
-    },
-  );
-
-  test(
-    'failed history transition rolls back retirement and keeps COMPLETED ledger',
-    () async {
-      final result = await repo.place(atomicCommand('CAMERA'));
-      final before = await aggregateRows(db);
-      final failing = DriftEngineeringPlacementRepository(
-        db,
-        originDeviceId: 'fault',
-        fault: (point, _) {
-          if (point == EngineeringPlacementFailurePoint.beforeCommit)
-            throw StateError('undo fault');
-        },
+        ),
       );
+      final before = await aggregateRows(db);
       await expectLater(
-        failing.undo(result.operationId),
-        throwsA(isA<EngineeringPlacementFailure>()),
+        repo.place(atomicCommand('CAMERA')),
+        throwsA(
+          isA<EngineeringPlacementFailure>().having(
+            (e) => e.code,
+            'code',
+            legacy
+                ? EngineeringPlacementFailureCode.placementUnresolved
+                : EngineeringPlacementFailureCode.profileDeprecated,
+          ),
+        ),
       );
       expect(await aggregateRows(db), before);
-    },
-  );
+    }
+  });
+
+  test('failed history transition rolls back retirement and keeps COMPLETED ledger', () async {
+    final result = await repo.place(atomicCommand('CAMERA'));
+    final before = await aggregateRows(db);
+    final failing = DriftEngineeringPlacementRepository(
+      db,
+      originDeviceId: 'fault',
+      fault: (point, _) {
+        if (point == EngineeringPlacementFailurePoint.beforeCommit)
+          throw StateError('undo fault');
+      },
+    );
+    await expectLater(
+      failing.undo(result.operationId),
+      throwsA(isA<EngineeringPlacementFailure>()),
+    );
+    expect(await aggregateRows(db), before);
+  });
 
   for (final code in ['CAMERA', 'OUTLET', 'READER', 'LOCK', 'DETECTOR']) {
     test(
@@ -183,22 +177,20 @@ void main() {
       () async {
         final command = atomicCommand(code);
         final result = await repo.place(command);
-        final component =
-            await (db.select(db.componentInstances)
-              ..where((r) => r.id.equals(result.componentId))).getSingle();
+        final component = await (db.select(
+          db.componentInstances,
+        )..where((r) => r.id.equals(result.componentId))).getSingle();
         expect(component.definitionId, canonicalElvComponentDefinitionId);
         expect(component.definitionVersion, 1);
         expect(component.localXmm, command.localPosition.xMm);
-        final membership =
-            await (db.select(db.componentEngineeringMemberships)..where(
-              (r) => r.componentId.equals(result.componentId),
-            )).getSingle();
+        final membership = await (db.select(
+          db.componentEngineeringMemberships,
+        )..where((r) => r.componentId.equals(result.componentId))).getSingle();
         expect(membership.role, 'DEVICE');
         expect(membership.systemId, command.systemId);
-        final row =
-            await (db.select(db.componentReferenceBindings)..where(
-              (r) => r.componentId.equals(result.componentId),
-            )).getSingle();
+        final row = await (db.select(
+          db.componentReferenceBindings,
+        )..where((r) => r.componentId.equals(result.componentId))).getSingle();
         final binding = ComponentReferenceBinding.fromMap(
           jsonDecode(row.payloadJson) as Map<String, dynamic>,
         );
@@ -208,9 +200,9 @@ void main() {
           command.placementContext.toMap(),
         );
         expect(binding.portIds.toSet(), result.portIds.toSet());
-        final ports =
-            await (db.select(db.engineeringPortInstances)
-              ..where((r) => r.componentId.equals(result.componentId))).get();
+        final ports = await (db.select(
+          db.engineeringPortInstances,
+        )..where((r) => r.componentId.equals(result.componentId))).get();
         expect(ports.length, binding.profile.portTemplates.length);
         for (final p in ports) {
           final port = EngineeringPort.fromMap(
@@ -237,11 +229,11 @@ void main() {
   for (final point in EngineeringPlacementFailurePoint.values) {
     final codes =
         [
-              EngineeringPlacementFailurePoint.beforePort,
-              EngineeringPlacementFailurePoint.afterPort,
-            ].contains(point)
-            ? ['IN', 'OUT']
-            : [null];
+          EngineeringPlacementFailurePoint.beforePort,
+          EngineeringPlacementFailurePoint.afterPort,
+        ].contains(point)
+        ? ['IN', 'OUT']
+        : [null];
     for (final code in codes) {
       test('rollback at ${point.name} $code restores every row', () async {
         final before = await aggregateRows(db);
@@ -265,87 +257,82 @@ void main() {
     }
   }
 
-  test(
-    'commit rejects missing evidence, stale topology and exact-version mismatch without writes',
-    () async {
-      final before = await aggregateRows(db);
-      final command = atomicCommand('CAMERA');
-      for (final patch in [
-        {'catalogVersion': 'missing'},
-        {
-          'placementContext': {
-            ...command.placementContext.toMap(),
-            'mountingMethod': 'flush',
-          },
+  test('commit rejects missing evidence, stale topology and exact-version mismatch without writes', () async {
+    final before = await aggregateRows(db);
+    final command = atomicCommand('CAMERA');
+    for (final patch in [
+      {'catalogVersion': 'missing'},
+      {
+        'placementContext': {
+          ...command.placementContext.toMap(),
+          'mountingMethod': 'flush',
         },
-        {
-          'placementContext': {
-            ...command.placementContext.toMap(),
-            'environmentExposure': null,
-          },
+      },
+      {
+        'placementContext': {
+          ...command.placementContext.toMap(),
+          'environmentExposure': null,
         },
-        {
-          'placementContext': {
-            ...command.placementContext.toMap(),
-            'availableClearanceMm': -1,
-          },
+      },
+      {
+        'placementContext': {
+          ...command.placementContext.toMap(),
+          'availableClearanceMm': -1,
         },
-      ]) {
-        await expectLater(
-          repo.place(
-            PlaceEngineeringProfileCommand.fromMap({
-              ...command.toMap(),
-              ...patch,
-            }),
-          ),
-          throwsA(isA<EngineeringPlacementFailure>()),
-        );
-        expect(await aggregateRows(db), before);
-      }
-      final systemRow =
-          await (db.select(db.projectEngineeringSystems)
-            ..where((r) => r.id.equals('system-1'))).getSingle();
-      await (db.update(db.projectEngineeringSystems)
-        ..where((r) => r.id.equals('system-1'))).write(
-        ProjectEngineeringSystemsCompanion(
-          payloadJson: Value(
-            canonicalEngineeringJson({
-              ...jsonDecode(systemRow.payloadJson) as Map<String, dynamic>,
-              'topologyProfile': {'id': 'missing', 'version': '1'},
-            }),
-          ),
-        ),
-      );
+      },
+    ]) {
       await expectLater(
-        repo.place(command),
-        throwsA(
-          isA<EngineeringPlacementFailure>().having(
-            (e) => e.code,
-            'code',
-            EngineeringPlacementFailureCode.placementUnresolved,
-          ),
+        repo.place(
+          PlaceEngineeringProfileCommand.fromMap({
+            ...command.toMap(),
+            ...patch,
+          }),
         ),
+        throwsA(isA<EngineeringPlacementFailure>()),
       );
       expect(await aggregateRows(db), before);
-    },
-  );
+    }
+    final systemRow = await (db.select(
+      db.projectEngineeringSystems,
+    )..where((r) => r.id.equals('system-1'))).getSingle();
+    await (db.update(
+      db.projectEngineeringSystems,
+    )..where((r) => r.id.equals('system-1'))).write(
+      ProjectEngineeringSystemsCompanion(
+        payloadJson: Value(
+          canonicalEngineeringJson({
+            ...jsonDecode(systemRow.payloadJson) as Map<String, dynamic>,
+            'topologyProfile': {'id': 'missing', 'version': '1'},
+          }),
+        ),
+      ),
+    );
+    await expectLater(
+      repo.place(command),
+      throwsA(
+        isA<EngineeringPlacementFailure>().having(
+          (e) => e.code,
+          'code',
+          EngineeringPlacementFailureCode.placementUnresolved,
+        ),
+      ),
+    );
+    expect(await aggregateRows(db), before);
+  });
 
-  test(
-    'concurrent same-operation submissions converge on the same component and ports',
-    () async {
-      final command = atomicCommand('CAMERA');
-      final results = await Future.wait([
-        repo.place(command),
-        repo.place(command),
-      ]);
-      expect(results.first.componentId, results.last.componentId);
-      expect(results.first.portIds, results.last.portIds);
-      expect(
-        await db.select(db.engineeringPlacementOperations).get(),
-        hasLength(1),
-      );
-    },
-  );
+  test('concurrent same-operation submissions converge on the same component and ports', () async {
+    final command = atomicCommand('CAMERA');
+    final results = await Future.wait([
+      repo.place(command),
+      repo.place(command),
+    ]);
+    expect(results.first.componentId, results.last.componentId);
+    expect(results.first.portIds, results.last.portIds);
+    expect(
+      await db.select(db.engineeringPlacementOperations).get(),
+      hasLength(1),
+    );
+  });
 
   test(
     'generated port collision rolls back component and membership',
@@ -374,79 +361,74 @@ void main() {
     },
   );
 
-  test(
-    'one session entry undoes and redoes all identities with monotonic audit revisions',
-    () async {
-      final command = atomicCommand('DETECTOR');
-      final result = await repo.place(command);
-      final history = ComponentPlacementHistory(
-        DriftComponentInstanceRepository(db, originDeviceId: 'history'),
-      );
-      final entry = EngineeringPlacementHistoryEntry(
-        command: command,
-        result: result,
-      );
-      history.recordEngineering(entry, repo);
-      history.recordEngineering(entry, repo);
-      now = now.add(const Duration(seconds: 1));
-      await history.undo();
-      expect(history.canUndo, isFalse);
-      expect(history.canRedo, isTrue);
-      expect(
-        (await repo.findOperation(command.operationId))!.status,
-        EngineeringPlacementOperationStatus.undone,
-      );
-      await expectLater(
-        repo.place(command),
-        throwsA(
-          isA<EngineeringPlacementFailure>().having(
-            (e) => e.code,
-            'code',
-            EngineeringPlacementFailureCode.operationUndone,
-          ),
+  test('one session entry undoes and redoes all identities with monotonic audit revisions', () async {
+    final command = atomicCommand('DETECTOR');
+    final result = await repo.place(command);
+    final history = ComponentPlacementHistory(
+      DriftComponentInstanceRepository(db, originDeviceId: 'history'),
+    );
+    final entry = EngineeringPlacementHistoryEntry(
+      command: command,
+      result: result,
+    );
+    history.recordEngineering(entry, repo);
+    history.recordEngineering(entry, repo);
+    now = now.add(const Duration(seconds: 1));
+    await history.undo();
+    expect(history.canUndo, isFalse);
+    expect(history.canRedo, isTrue);
+    expect(
+      (await repo.findOperation(command.operationId))!.status,
+      EngineeringPlacementOperationStatus.undone,
+    );
+    await expectLater(
+      repo.place(command),
+      throwsA(
+        isA<EngineeringPlacementFailure>().having(
+          (e) => e.code,
+          'code',
+          EngineeringPlacementFailureCode.operationUndone,
         ),
-      );
-      for (final table
-          in DriftEngineeringPlacementAggregate.aggregateTables.entries) {
-        final rows =
-            await db
-                .customSelect(
-                  'SELECT * FROM ${table.key} WHERE ${table.value} = ?',
-                  variables: [Variable.withString(result.componentId)],
-                )
-                .get();
-        for (final row in rows) {
-          expect(row.data['deleted_at'], isNotNull);
-          expect(row.read<int>('revision'), 2);
-          expect(row.data['created_at'], isNot(row.data['updated_at']));
-        }
+      ),
+    );
+    for (final table
+        in DriftEngineeringPlacementAggregate.aggregateTables.entries) {
+      final rows = await db
+          .customSelect(
+            'SELECT * FROM ${table.key} WHERE ${table.value} = ?',
+            variables: [Variable.withString(result.componentId)],
+          )
+          .get();
+      for (final row in rows) {
+        expect(row.data['deleted_at'], isNotNull);
+        expect(row.read<int>('revision'), 2);
+        expect(row.data['created_at'], isNot(row.data['updated_at']));
       }
-      now = now.add(const Duration(seconds: 1));
-      await history.redo();
-      expect(history.canRedo, isFalse);
-      expect(history.canUndo, isTrue);
-      for (final table
-          in DriftEngineeringPlacementAggregate.aggregateTables.entries) {
-        final rows =
-            await db
-                .customSelect(
-                  'SELECT * FROM ${table.key} WHERE ${table.value} = ?',
-                  variables: [Variable.withString(result.componentId)],
-                )
-                .get();
-        for (final row in rows) {
-          expect(row.data['deleted_at'], isNull);
-          expect(row.read<int>('revision'), 3);
-        }
+    }
+    now = now.add(const Duration(seconds: 1));
+    await history.redo();
+    expect(history.canRedo, isFalse);
+    expect(history.canUndo, isTrue);
+    for (final table
+        in DriftEngineeringPlacementAggregate.aggregateTables.entries) {
+      final rows = await db
+          .customSelect(
+            'SELECT * FROM ${table.key} WHERE ${table.value} = ?',
+            variables: [Variable.withString(result.componentId)],
+          )
+          .get();
+      for (final row in rows) {
+        expect(row.data['deleted_at'], isNull);
+        expect(row.read<int>('revision'), 3);
       }
-      expect(
-        engineeringPlacementResultJson(
-          (await repo.findOperation(command.operationId))!.result,
-        ),
-        engineeringPlacementResultJson(result),
-      );
-    },
-  );
+    }
+    expect(
+      engineeringPlacementResultJson(
+        (await repo.findOperation(command.operationId))!.result,
+      ),
+      engineeringPlacementResultJson(result),
+    );
+  });
 
   test(
     'later topology attachment blocks undo and preserves the history entry',
@@ -503,75 +485,68 @@ void main() {
     },
   );
 
-  test(
-    'redo revalidates current surface and fails without changing retired aggregate',
-    () async {
-      final command = atomicCommand('CAMERA');
-      final result = await repo.place(command);
-      await repo.undo(result.operationId);
-      final before = await aggregateRows(db);
-      await (db.update(db.surfacePatches)
-        ..where((r) => r.id.equals('patch-1'))).write(
-        const SurfacePatchesCompanion(
-          boundaryJson: Value('[[0,0],[10,0],[10,10],[0,10]]'),
+  test('redo revalidates current surface and fails without changing retired aggregate', () async {
+    final command = atomicCommand('CAMERA');
+    final result = await repo.place(command);
+    await repo.undo(result.operationId);
+    final before = await aggregateRows(db);
+    await (db.update(
+      db.surfacePatches,
+    )..where((r) => r.id.equals('patch-1'))).write(
+      const SurfacePatchesCompanion(
+        boundaryJson: Value('[[0,0],[10,0],[10,10],[0,10]]'),
+      ),
+    );
+    await expectLater(
+      repo.redo(
+        EngineeringPlacementHistoryEntry(command: command, result: result),
+      ),
+      throwsA(
+        isA<EngineeringPlacementFailure>().having(
+          (e) => e.code,
+          'code',
+          EngineeringPlacementFailureCode.historyConflict,
         ),
-      );
-      await expectLater(
-        repo.redo(
-          EngineeringPlacementHistoryEntry(command: command, result: result),
-        ),
-        throwsA(
-          isA<EngineeringPlacementFailure>().having(
-            (e) => e.code,
-            'code',
-            EngineeringPlacementFailureCode.historyConflict,
-          ),
-        ),
-      );
-      expect(await aggregateRows(db), before);
-    },
-  );
+      ),
+    );
+    expect(await aggregateRows(db), before);
+  });
 
-  test(
-    'four disciplines retain exact aggregate and idempotency after SQLite restart',
-    () async {
-      final directory = await Directory.systemTemp.createTemp(
-        'elv2-p4-restart-',
+  test('four disciplines retain exact aggregate and idempotency after SQLite restart', () async {
+    final directory = await Directory.systemTemp.createTemp('elv2-p4-restart-');
+    final file = File('${directory.path}/project.sqlite');
+    var persistent = AppDatabase(NativeDatabase(file));
+    try {
+      await seedAtomic(persistent);
+      var writer = DriftEngineeringPlacementRepository(
+        persistent,
+        originDeviceId: 'restart',
       );
-      final file = File('${directory.path}/project.sqlite');
-      var persistent = AppDatabase(NativeDatabase(file));
-      try {
-        await seedAtomic(persistent);
-        var writer = DriftEngineeringPlacementRepository(
-          persistent,
-          originDeviceId: 'restart',
+      final commands = [
+        for (final code in ['CAMERA', 'OUTLET', 'READER', 'DETECTOR'])
+          atomicCommand(code),
+      ];
+      final results = [
+        for (final command in commands) await writer.place(command),
+      ];
+      final before = await aggregateRows(persistent);
+      await persistent.close();
+      persistent = AppDatabase(NativeDatabase(file));
+      writer = DriftEngineeringPlacementRepository(
+        persistent,
+        originDeviceId: 'reopened',
+      );
+      expect(await aggregateRows(persistent), before);
+      for (var i = 0; i < commands.length; i++) {
+        expect(
+          engineeringPlacementResultJson(await writer.place(commands[i])),
+          engineeringPlacementResultJson(results[i]),
         );
-        final commands = [
-          for (final code in ['CAMERA', 'OUTLET', 'READER', 'DETECTOR'])
-            atomicCommand(code),
-        ];
-        final results = [
-          for (final command in commands) await writer.place(command),
-        ];
-        final before = await aggregateRows(persistent);
-        await persistent.close();
-        persistent = AppDatabase(NativeDatabase(file));
-        writer = DriftEngineeringPlacementRepository(
-          persistent,
-          originDeviceId: 'reopened',
-        );
-        expect(await aggregateRows(persistent), before);
-        for (var i = 0; i < commands.length; i++) {
-          expect(
-            engineeringPlacementResultJson(await writer.place(commands[i])),
-            engineeringPlacementResultJson(results[i]),
-          );
-        }
-        expect(await aggregateRows(persistent), before);
-      } finally {
-        await persistent.close();
-        await directory.delete(recursive: true);
       }
-    },
-  );
+      expect(await aggregateRows(persistent), before);
+    } finally {
+      await persistent.close();
+      await directory.delete(recursive: true);
+    }
+  });
 }

@@ -6,10 +6,9 @@ void main() {
   test(
     'P6 topology validation snapshot is resolved inside owner transaction',
     () {
-      final source =
-          File(
-            'lib/data/repositories/drift_engineering_reference_adoption_repository.dart',
-          ).readAsStringSync();
+      final source = File(
+        'lib/data/repositories/drift_engineering_reference_adoption_repository.dart',
+      ).readAsStringSync();
 
       final transaction = source.indexOf(
         'return database.transaction(() async {',

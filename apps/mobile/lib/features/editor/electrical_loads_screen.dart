@@ -27,158 +27,129 @@ class ElectricalLoadsScreen extends ConsumerWidget {
           IconButton(
             tooltip: 'Circuits',
             icon: const Icon(Icons.account_tree_outlined),
-            onPressed:
-                () => Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder:
-                        (_) => ElectricalCircuitsScreen(
-                          roomId: roomId,
-                          roomName: roomName,
-                        ),
-                  ),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => ElectricalCircuitsScreen(
+                  roomId: roomId,
+                  roomName: roomName,
                 ),
+              ),
+            ),
           ),
         ],
       ),
       body: components.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error:
-            (error, _) =>
-                Center(child: Text('Unable to load equipment: $error')),
-        data:
-            (items) => groups.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error:
-                  (error, _) =>
-                      Center(child: Text('Unable to load groups: $error')),
-              data:
-                  (roomGroups) => loads.when(
-                    loading:
-                        () => const Center(child: CircularProgressIndicator()),
-                    error:
-                        (error, _) =>
-                            Center(child: Text('Unable to load loads: $error')),
-                    data: (roomLoads) {
-                      final loadByComponent = {
-                        for (final load in roomLoads)
-                          load.componentInstanceId: load,
-                      };
-                      final groupNames = {
-                        for (final group in roomGroups) group.id: group.name,
-                      };
-                      final definitions = {
-                        for (final definition
-                            in electricalSystemComponentLibrary.definitions)
-                          definition.id: definition,
-                      };
-                      return ListView(
-                        padding: const EdgeInsets.all(16),
-                        children: [
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: FilledButton.tonalIcon(
-                              icon: const Icon(
-                                Icons.create_new_folder_outlined,
+        error: (error, _) =>
+            Center(child: Text('Unable to load equipment: $error')),
+        data: (items) => groups.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, _) =>
+              Center(child: Text('Unable to load groups: $error')),
+          data: (roomGroups) => loads.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (error, _) =>
+                Center(child: Text('Unable to load loads: $error')),
+            data: (roomLoads) {
+              final loadByComponent = {
+                for (final load in roomLoads) load.componentInstanceId: load,
+              };
+              final groupNames = {
+                for (final group in roomGroups) group.id: group.name,
+              };
+              final definitions = {
+                for (final definition
+                    in electricalSystemComponentLibrary.definitions)
+                  definition.id: definition,
+              };
+              return ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: FilledButton.tonalIcon(
+                      icon: const Icon(Icons.create_new_folder_outlined),
+                      label: const Text('New consumption group'),
+                      onPressed: () => showDialog<void>(
+                        context: context,
+                        builder: (_) => _GroupDialog(
+                          onSave: (name) => ref
+                              .read(electricalLoadRepositoryProvider)
+                              .saveGroup(
+                                RoomConsumptionGroup(
+                                  id: ref.read(idGeneratorProvider).next(),
+                                  roomId: roomId,
+                                  name: name,
+                                ),
                               ),
-                              label: const Text('New consumption group'),
-                              onPressed:
-                                  () => showDialog<void>(
-                                    context: context,
-                                    builder:
-                                        (_) => _GroupDialog(
-                                          onSave:
-                                              (name) => ref
-                                                  .read(
-                                                    electricalLoadRepositoryProvider,
-                                                  )
-                                                  .saveGroup(
-                                                    RoomConsumptionGroup(
-                                                      id:
-                                                          ref
-                                                              .read(
-                                                                idGeneratorProvider,
-                                                              )
-                                                              .next(),
-                                                      roomId: roomId,
-                                                      name: name,
-                                                    ),
-                                                  ),
-                                        ),
-                                  ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (roomGroups.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: Wrap(
+                        spacing: 8,
+                        children: roomGroups
+                            .map(
+                              (group) => Chip(
+                                label: Text(
+                                  '${group.name} · ${roomLoads.where((load) => load.consumptionGroupId == group.id).length} loads',
+                                ),
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    ),
+                  if (items.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.all(24),
+                      child: Text(
+                        'Place equipment in the room before adding loads.',
+                      ),
+                    ),
+                  for (final component in items)
+                    Builder(
+                      builder: (context) {
+                        final load = loadByComponent[component.id];
+                        final definition = definitions[component.definitionId];
+                        final title =
+                            component.displayNameOverride ??
+                            definition?.displayName ??
+                            component.definitionId;
+                        final profile = load?.profile;
+                        return Card(
+                          child: ListTile(
+                            title: Text(title),
+                            subtitle: Text(
+                              '${component.hostSurfacePatchId} · ${component.localPosition.xMm}, ${component.localPosition.yMm} mm\n${profile == null ? 'Load not configured' : '${profile.nominalVoltageV} V · ${profile.phases} phases · ${profile.ratedPowerW ?? '—'} W · ${profile.ratedCurrentA ?? '—'} A'}\n${groupNames[load?.consumptionGroupId] ?? 'Ungrouped'}',
+                            ),
+                            isThreeLine: true,
+                            trailing: const Icon(Icons.edit_outlined),
+                            onTap: () => showDialog<void>(
+                              context: context,
+                              builder: (_) => ElectricalLoadDialog(
+                                component: component,
+                                title: title,
+                                existing: load,
+                                defaultProfile:
+                                    definition?.electricalLoadProfile,
+                                groups: roomGroups,
+                                onSave: ref
+                                    .read(electricalLoadRepositoryProvider)
+                                    .saveLoad,
+                              ),
                             ),
                           ),
-                          if (roomGroups.isNotEmpty)
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              child: Wrap(
-                                spacing: 8,
-                                children:
-                                    roomGroups
-                                        .map(
-                                          (group) => Chip(
-                                            label: Text(
-                                              '${group.name} · ${roomLoads.where((load) => load.consumptionGroupId == group.id).length} loads',
-                                            ),
-                                          ),
-                                        )
-                                        .toList(),
-                              ),
-                            ),
-                          if (items.isEmpty)
-                            const Padding(
-                              padding: EdgeInsets.all(24),
-                              child: Text(
-                                'Place equipment in the room before adding loads.',
-                              ),
-                            ),
-                          for (final component in items)
-                            Builder(
-                              builder: (context) {
-                                final load = loadByComponent[component.id];
-                                final definition =
-                                    definitions[component.definitionId];
-                                final title =
-                                    component.displayNameOverride ??
-                                    definition?.displayName ??
-                                    component.definitionId;
-                                final profile = load?.profile;
-                                return Card(
-                                  child: ListTile(
-                                    title: Text(title),
-                                    subtitle: Text(
-                                      '${component.hostSurfacePatchId} · ${component.localPosition.xMm}, ${component.localPosition.yMm} mm\n${profile == null ? 'Load not configured' : '${profile.nominalVoltageV} V · ${profile.phases} phases · ${profile.ratedPowerW ?? '—'} W · ${profile.ratedCurrentA ?? '—'} A'}\n${groupNames[load?.consumptionGroupId] ?? 'Ungrouped'}',
-                                    ),
-                                    isThreeLine: true,
-                                    trailing: const Icon(Icons.edit_outlined),
-                                    onTap:
-                                        () => showDialog<void>(
-                                          context: context,
-                                          builder:
-                                              (_) => ElectricalLoadDialog(
-                                                component: component,
-                                                title: title,
-                                                existing: load,
-                                                defaultProfile:
-                                                    definition
-                                                        ?.electricalLoadProfile,
-                                                groups: roomGroups,
-                                                onSave:
-                                                    ref
-                                                        .read(
-                                                          electricalLoadRepositoryProvider,
-                                                        )
-                                                        .saveLoad,
-                                              ),
-                                        ),
-                                  ),
-                                );
-                              },
-                            ),
-                        ],
-                      );
-                    },
-                  ),
-            ),
+                        );
+                      },
+                    ),
+                ],
+              );
+            },
+          ),
+        ),
       ),
     );
   }
@@ -278,10 +249,9 @@ class _ElectricalLoadDialogState extends State<ElectricalLoadDialog> {
       nominalVoltageV: optionalNumber(voltage) ?? double.nan,
       phases: phases,
       supplySystem: supply,
-      phaseConfiguration:
-          supply == base.supplySystem && phases == base.phases
-              ? base.phaseConfiguration
-              : null,
+      phaseConfiguration: supply == base.supplySystem && phases == base.phases
+          ? base.phaseConfiguration
+          : null,
       ratedPowerW: optionalNumber(power),
       ratedCurrentA: optionalNumber(current),
       powerFactor: optionalNumber(powerFactor),
@@ -297,10 +267,9 @@ class _ElectricalLoadDialogState extends State<ElectricalLoadDialog> {
     final violations = ElectricalLoadValidator.validate(profile);
     if (violations.isNotEmpty) {
       setState(
-        () =>
-            error = violations
-                .map((code) => _validationMessages[code] ?? code)
-                .join('\n'),
+        () => error = violations
+            .map((code) => _validationMessages[code] ?? code)
+            .join('\n'),
       );
       return;
     }
@@ -339,50 +308,44 @@ class _ElectricalLoadDialogState extends State<ElectricalLoadDialog> {
               isExpanded: true,
               initialValue: supply,
               decoration: const InputDecoration(labelText: 'Supply system'),
-              items:
-                  SupplySystem.values
-                      .map(
-                        (value) => DropdownMenuItem(
-                          value: value,
-                          child: Text(
-                            _supplyLabel(value),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      )
-                      .toList(),
-              onChanged:
-                  saving
-                      ? null
-                      : (value) {
-                        if (value != null)
-                          setState(() {
-                            supply = value;
-                            if (value == SupplySystem.threePhaseAc) phases = 3;
-                            if (value == SupplySystem.singlePhaseAc) phases = 1;
-                          });
-                      },
+              items: SupplySystem.values
+                  .map(
+                    (value) => DropdownMenuItem(
+                      value: value,
+                      child: Text(
+                        _supplyLabel(value),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  )
+                  .toList(),
+              onChanged: saving
+                  ? null
+                  : (value) {
+                      if (value != null)
+                        setState(() {
+                          supply = value;
+                          if (value == SupplySystem.threePhaseAc) phases = 3;
+                          if (value == SupplySystem.singlePhaseAc) phases = 1;
+                        });
+                    },
             ),
             DropdownButtonFormField<int>(
               isExpanded: true,
               key: ValueKey(phases),
               initialValue: phases,
               decoration: const InputDecoration(labelText: 'Phases'),
-              items:
-                  [1, 2, 3]
-                      .map(
-                        (value) => DropdownMenuItem(
-                          value: value,
-                          child: Text('$value'),
-                        ),
-                      )
-                      .toList(),
-              onChanged:
-                  saving
-                      ? null
-                      : (value) {
-                        if (value != null) setState(() => phases = value);
-                      },
+              items: [1, 2, 3]
+                  .map(
+                    (value) =>
+                        DropdownMenuItem(value: value, child: Text('$value')),
+                  )
+                  .toList(),
+              onChanged: saving
+                  ? null
+                  : (value) {
+                      if (value != null) setState(() => phases = value);
+                    },
             ),
             for (final field in [
               (voltage, 'Nominal voltage (V)'),
@@ -414,16 +377,13 @@ class _ElectricalLoadDialogState extends State<ElectricalLoadDialog> {
                   child: Text('Mechanical output power'),
                 ),
               ],
-              onChanged:
-                  saving
-                      ? null
-                      : (value) => setState(
-                        () =>
-                            powerBasis =
-                                value == null || value.isEmpty
-                                    ? null
-                                    : ElectricalPowerBasis.values.byName(value),
-                      ),
+              onChanged: saving
+                  ? null
+                  : (value) => setState(
+                      () => powerBasis = value == null || value.isEmpty
+                          ? null
+                          : ElectricalPowerBasis.values.byName(value),
+                    ),
             ),
             DropdownButtonFormField<String>(
               isExpanded: true,
@@ -438,12 +398,11 @@ class _ElectricalLoadDialogState extends State<ElectricalLoadDialog> {
                   ),
                 ),
               ],
-              onChanged:
-                  saving
-                      ? null
-                      : (value) {
-                        if (value != null) setState(() => groupId = value);
-                      },
+              onChanged: saving
+                  ? null
+                  : (value) {
+                      if (value != null) setState(() => groupId = value);
+                    },
             ),
             if (error != null)
               Text(

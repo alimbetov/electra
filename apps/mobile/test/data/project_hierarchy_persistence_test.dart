@@ -93,18 +93,16 @@ void main() {
   test('current schema keeps hierarchy tables and indexes', () async {
     final database = AppDatabase(NativeDatabase.memory());
 
-    final tables =
-        await database
-            .customSelect("SELECT name FROM sqlite_master WHERE type = 'table'")
-            .get();
+    final tables = await database
+        .customSelect("SELECT name FROM sqlite_master WHERE type = 'table'")
+        .get();
     final tableNames = tables.map((row) => row.read<String>('name')).toSet();
 
     expect(tableNames, containsAll(['projects', 'floors', 'rooms']));
 
-    final indexes =
-        await database
-            .customSelect("SELECT name FROM sqlite_master WHERE type = 'index'")
-            .get();
+    final indexes = await database
+        .customSelect("SELECT name FROM sqlite_master WHERE type = 'index'")
+        .get();
     final indexNames = indexes.map((row) => row.read<String>('name')).toSet();
 
     expect(

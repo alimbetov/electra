@@ -26,16 +26,15 @@ class ComponentCatalogSheet extends StatefulWidget {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      builder:
-          (context) => FractionallySizedBox(
-            heightFactor: 0.78,
-            child: ComponentCatalogSheet(
-              definitions: definitions,
-              recentDefinitionIds: recentDefinitionIds,
-              favoriteDefinitionIds: favoriteDefinitionIds,
-              onSetFavorite: onSetFavorite,
-            ),
-          ),
+      builder: (context) => FractionallySizedBox(
+        heightFactor: 0.78,
+        child: ComponentCatalogSheet(
+          definitions: definitions,
+          recentDefinitionIds: recentDefinitionIds,
+          favoriteDefinitionIds: favoriteDefinitionIds,
+          onSetFavorite: onSetFavorite,
+        ),
+      ),
     );
   }
 
@@ -153,47 +152,45 @@ class _ComponentCatalogSheetState extends State<ComponentCatalogSheet> {
                   ),
                 ],
                 selected: {scope},
-                onSelectionChanged:
-                    (value) => setState(() => scope = value.single),
+                onSelectionChanged: (value) =>
+                    setState(() => scope = value.single),
               ),
             ),
             const SizedBox(height: 8),
             Expanded(
-              child:
-                  definitions.isEmpty
-                      ? const Center(child: Text('No matching components'))
-                      : ListView.separated(
-                        itemCount: definitions.length,
-                        separatorBuilder: (_, _) => const Divider(height: 1),
-                        itemBuilder: (context, index) {
-                          final definition = definitions[index];
-                          return ListTile(
-                            leading: _CatalogSymbol(
-                              category: definition.category,
+              child: definitions.isEmpty
+                  ? const Center(child: Text('No matching components'))
+                  : ListView.separated(
+                      itemCount: definitions.length,
+                      separatorBuilder: (_, _) => const Divider(height: 1),
+                      itemBuilder: (context, index) {
+                        final definition = definitions[index];
+                        return ListTile(
+                          leading: _CatalogSymbol(
+                            category: definition.category,
+                          ),
+                          title: Text(definition.displayName),
+                          subtitle: Text(
+                            '${definition.code} · ${definition.category}',
+                          ),
+                          trailing: IconButton(
+                            tooltip: favorites.contains(definition.id)
+                                ? 'Remove favorite'
+                                : 'Add favorite',
+                            icon: Icon(
+                              favorites.contains(definition.id)
+                                  ? Icons.star
+                                  : Icons.star_outline,
                             ),
-                            title: Text(definition.displayName),
-                            subtitle: Text(
-                              '${definition.code} · ${definition.category}',
-                            ),
-                            trailing: IconButton(
-                              tooltip:
-                                  favorites.contains(definition.id)
-                                      ? 'Remove favorite'
-                                      : 'Add favorite',
-                              icon: Icon(
-                                favorites.contains(definition.id)
-                                    ? Icons.star
-                                    : Icons.star_outline,
-                              ),
-                              onPressed:
-                                  savingFavorite || widget.onSetFavorite == null
-                                      ? null
-                                      : () => toggleFavorite(definition.id),
-                            ),
-                            onTap: () => Navigator.of(context).pop(definition),
-                          );
-                        },
-                      ),
+                            onPressed:
+                                savingFavorite || widget.onSetFavorite == null
+                                ? null
+                                : () => toggleFavorite(definition.id),
+                          ),
+                          onTap: () => Navigator.of(context).pop(definition),
+                        );
+                      },
+                    ),
             ),
           ],
         ),

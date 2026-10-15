@@ -113,13 +113,12 @@ CatalogRevisionPreview previewCatalogRevision({
   required ProjectEngineeringTopologySnapshot topology,
   required EngineeringReferenceCatalog candidate,
 }) {
-  final sameCode =
-      references.catalogs
-          .where(
-            (catalog) =>
-                catalog.code == candidate.code && catalog.id != candidate.id,
-          )
-          .toList();
+  final sameCode = references.catalogs
+      .where(
+        (catalog) =>
+            catalog.code == candidate.code && catalog.id != candidate.id,
+      )
+      .toList();
   final byId = {for (final catalog in sameCode) catalog.id: catalog};
   final candidateProfiles = {
     for (final profile in candidate.profiles)
@@ -177,8 +176,7 @@ CatalogRevisionPreview previewCatalogRevision({
     if (profileImpact.affectsPlacement) {
       final evidence = binding.placementCommand;
       if (profileErrors.isNotEmpty) {
-        placementBlockerReason =
-            'The candidate profile is not publication-valid and cannot be placement-revalidated.';
+        placementBlockerReason = 'The candidate profile is not publication-valid and cannot be placement-revalidated.';
       } else if (evidence == null) {
         placementBlockerReason =
             'The historical binding has no reviewed placement evidence.';

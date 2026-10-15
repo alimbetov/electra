@@ -21,13 +21,12 @@ ProjectRecalculationSnapshot fixture({bool changed = true}) {
       version: 'v1',
       inputs: const {},
       dependencies: const ['consumer:a'],
-      evaluate:
-          (deps) => DependencyProposal(
-            values: {
-              'designCurrentA':
-                  (deps['consumer:a']!.values['ratedPowerW'] as num) / 230,
-            },
-          ),
+      evaluate: (deps) => DependencyProposal(
+        values: {
+          'designCurrentA':
+              (deps['consumer:a']!.values['ratedPowerW'] as num) / 230,
+        },
+      ),
     ),
   ];
   final saved = RecalculationSession(nodes: nodes(2300)).recalculate();
@@ -66,8 +65,8 @@ void main() {
           body: RecalculationWorkspace(
             snapshot: snapshot,
             onRecalculate: () async => throw StateError('write failed'),
-            onManualDecision:
-                (_, __, ___) async => throw StateError('manual write failed'),
+            onManualDecision: (_, __, ___) async =>
+                throw StateError('manual write failed'),
             onReviewManual: (_) async {},
             onClearManual: (_) async {},
           ),

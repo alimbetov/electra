@@ -13,37 +13,34 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: Builder(
-              builder:
-                  (context) => TextButton(
-                    onPressed:
-                        () => showDialog<void>(
-                          context: context,
-                          builder:
-                              (_) => ElectricalCircuitDialog(
-                                circuitId: 'circuit',
-                                roomId: 'room',
-                                sourceGroup: const RoomConsumptionGroup(
-                                  id: 'group',
-                                  roomId: 'room',
-                                  name: 'Motors',
-                                ),
-                                loads: const [
-                                  EquipmentElectricalLoad(
-                                    componentInstanceId: 'motor',
-                                    consumptionGroupId: 'group',
-                                    profile: ElectricalLoadProfile(
-                                      nominalVoltageV: 400,
-                                      phases: 3,
-                                      supplySystem: SupplySystem.threePhaseAc,
-                                      ratedCurrentA: 15,
-                                    ),
-                                  ),
-                                ],
-                                onSave: (_) async {},
-                              ),
+              builder: (context) => TextButton(
+                onPressed: () => showDialog<void>(
+                  context: context,
+                  builder: (_) => ElectricalCircuitDialog(
+                    circuitId: 'circuit',
+                    roomId: 'room',
+                    sourceGroup: const RoomConsumptionGroup(
+                      id: 'group',
+                      roomId: 'room',
+                      name: 'Motors',
+                    ),
+                    loads: const [
+                      EquipmentElectricalLoad(
+                        componentInstanceId: 'motor',
+                        consumptionGroupId: 'group',
+                        profile: ElectricalLoadProfile(
+                          nominalVoltageV: 400,
+                          phases: 3,
+                          supplySystem: SupplySystem.threePhaseAc,
+                          ratedCurrentA: 15,
                         ),
-                    child: const Text('Open circuits'),
+                      ),
+                    ],
+                    onSave: (_) async {},
                   ),
+                ),
+                child: const Text('Open circuits'),
+              ),
             ),
           ),
         ),
@@ -69,39 +66,34 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: Builder(
-              builder:
-                  (context) => TextButton(
-                    onPressed:
-                        () => showDialog<void>(
-                          context: context,
-                          builder:
-                              (_) => ElectricalCircuitDialog(
-                                circuitId: 'new-circuit',
-                                roomId: 'room',
-                                sourceGroup: const RoomConsumptionGroup(
-                                  id: 'group',
-                                  roomId: 'room',
-                                  name: 'Sockets',
-                                ),
-                                loads: const [
-                                  EquipmentElectricalLoad(
-                                    componentInstanceId: 'socket',
-                                    consumptionGroupId: 'group',
-                                    profile: ElectricalLoadProfile(
-                                      nominalVoltageV: 230,
-                                      phases: 1,
-                                      ratedCurrentA: 10,
-                                    ),
-                                  ),
-                                ],
-                                assignedCircuitIds: const {
-                                  'socket': 'other-circuit',
-                                },
-                                onSave: (value) async => saved.add(value),
-                              ),
+              builder: (context) => TextButton(
+                onPressed: () => showDialog<void>(
+                  context: context,
+                  builder: (_) => ElectricalCircuitDialog(
+                    circuitId: 'new-circuit',
+                    roomId: 'room',
+                    sourceGroup: const RoomConsumptionGroup(
+                      id: 'group',
+                      roomId: 'room',
+                      name: 'Sockets',
+                    ),
+                    loads: const [
+                      EquipmentElectricalLoad(
+                        componentInstanceId: 'socket',
+                        consumptionGroupId: 'group',
+                        profile: ElectricalLoadProfile(
+                          nominalVoltageV: 230,
+                          phases: 1,
+                          ratedCurrentA: 10,
                         ),
-                    child: const Text('From group'),
+                      ),
+                    ],
+                    assignedCircuitIds: const {'socket': 'other-circuit'},
+                    onSave: (value) async => saved.add(value),
                   ),
+                ),
+                child: const Text('From group'),
+              ),
             ),
           ),
         ),
@@ -152,23 +144,20 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: Builder(
-              builder:
-                  (context) => TextButton(
-                    onPressed:
-                        () => showDialog<void>(
-                          context: context,
-                          builder:
-                              (_) => ElectricalCircuitDialog(
-                                circuitId: 'circuit-1',
-                                roomId: 'room',
-                                sourceGroup: group,
-                                loads: const [load],
-                                titles: const {'socket-1': 'Bench socket'},
-                                onSave: (circuit) async => saved.add(circuit),
-                              ),
-                        ),
-                    child: const Text('From group'),
+              builder: (context) => TextButton(
+                onPressed: () => showDialog<void>(
+                  context: context,
+                  builder: (_) => ElectricalCircuitDialog(
+                    circuitId: 'circuit-1',
+                    roomId: 'room',
+                    sourceGroup: group,
+                    loads: const [load],
+                    titles: const {'socket-1': 'Bench socket'},
+                    onSave: (circuit) async => saved.add(circuit),
                   ),
+                ),
+                child: const Text('From group'),
+              ),
             ),
           ),
         ),

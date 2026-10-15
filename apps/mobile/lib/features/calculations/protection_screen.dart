@@ -1,6 +1,7 @@
 import 'package:engineering_core/engineering_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../app/providers.dart';
 import '../../application/protection_repository.dart';
 import 'project_recalculation_screen.dart';
@@ -17,12 +18,11 @@ class ProtectionScreen extends ConsumerWidget {
         IconButton(
           tooltip: 'Manufacturer catalogs',
           icon: const Icon(Icons.inventory_2_outlined),
-          onPressed:
-              () => Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => ManufacturerScreen(projectId: projectId),
-                ),
-              ),
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => ManufacturerScreen(projectId: projectId),
+            ),
+          ),
         ),
       ],
     ),
@@ -30,9 +30,8 @@ class ProtectionScreen extends ConsumerWidget {
         .watch(projectProtectionProvider(projectId))
         .when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error:
-              (error, _) =>
-                  Center(child: Text('Unable to load protection: $error')),
+          error: (error, _) =>
+              Center(child: Text('Unable to load protection: $error')),
           data: (snapshot) {
             if (snapshot.recalculation.project == null)
               return const Center(child: Text('Project is unavailable.'));
@@ -42,19 +41,17 @@ class ProtectionScreen extends ConsumerWidget {
               nextId: ref.read(idGeneratorProvider).next,
               onSaveDocument: repo.saveDocument,
               onSaveRuleset: repo.saveRuleset,
-              onSaveSettings:
-                  (settings) => repo.saveSettings(projectId, settings),
+              onSaveSettings: (settings) =>
+                  repo.saveSettings(projectId, settings),
               onRecalculate: () => repo.recalculate(projectId),
-              onConfirm:
-                  (id, fingerprint) => repo.confirm(projectId, id, fingerprint),
-              onChanges:
-                  () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder:
-                          (_) =>
-                              ProjectRecalculationScreen(projectId: projectId),
-                    ),
-                  ),
+              onConfirm: (id, fingerprint) =>
+                  repo.confirm(projectId, id, fingerprint),
+              onChanges: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) =>
+                      ProjectRecalculationScreen(projectId: projectId),
+                ),
+              ),
             );
           },
         ),
@@ -103,16 +100,15 @@ class _ProtectionWorkspaceState extends State<ProtectionWorkspace> {
   Future<void> edit(String kind, {CircuitProtectionView? circuit}) =>
       showDialog<void>(
         context: context,
-        builder:
-            (_) => ProtectionInputDialog(
-              kind: kind,
-              snapshot: widget.snapshot,
-              id: widget.nextId(),
-              circuit: circuit,
-              onSaveDocument: widget.onSaveDocument,
-              onSaveRuleset: widget.onSaveRuleset,
-              onSaveSettings: widget.onSaveSettings,
-            ),
+        builder: (_) => ProtectionInputDialog(
+          kind: kind,
+          snapshot: widget.snapshot,
+          id: widget.nextId(),
+          circuit: circuit,
+          onSaveDocument: widget.onSaveDocument,
+          onSaveRuleset: widget.onSaveRuleset,
+          onSaveSettings: widget.onSaveSettings,
+        ),
       );
   @override
   Widget build(BuildContext context) {
@@ -207,8 +203,9 @@ class _ProtectionWorkspaceState extends State<ProtectionWorkspace> {
                       spacing: 8,
                       children: [
                         FilledButton.icon(
-                          onPressed:
-                              busy ? null : () => action(widget.onRecalculate),
+                          onPressed: busy
+                              ? null
+                              : () => action(widget.onRecalculate),
                           icon: const Icon(Icons.calculate),
                           label: Text(
                             busy ? 'Recalculating…' : 'Recalculate protection',
@@ -256,24 +253,23 @@ class _ProtectionWorkspaceState extends State<ProtectionWorkspace> {
                                 FilledButton(
                                   onPressed:
                                       busy ||
-                                              c.stale ||
-                                              c
-                                                      .checkpoint
-                                                      ?.proposal
-                                                      .values['proposalState'] !=
-                                                  'proposed' ||
-                                              snapshot.recalculation.session.state(
-                                                    'protection:${c.circuitId}',
-                                                  ) !=
-                                                  EngineeringDerivedState
-                                                      .current
-                                          ? null
-                                          : () => action(
-                                            () => widget.onConfirm(
-                                              c.circuitId,
-                                              c.fingerprint,
-                                            ),
+                                          c.stale ||
+                                          c
+                                                  .checkpoint
+                                                  ?.proposal
+                                                  .values['proposalState'] !=
+                                              'proposed' ||
+                                          snapshot.recalculation.session.state(
+                                                'protection:${c.circuitId}',
+                                              ) !=
+                                              EngineeringDerivedState.current
+                                      ? null
+                                      : () => action(
+                                          () => widget.onConfirm(
+                                            c.circuitId,
+                                            c.fingerprint,
                                           ),
+                                        ),
                                   child: const Text(
                                     'Confirm functional requirement',
                                   ),
@@ -364,16 +360,15 @@ class _ProtectionInputDialogState extends State<ProtectionInputDialog> {
     final s = widget.circuit?.settings;
     rulesetId = s?.rulesetId;
     residual = s?.residualPolicy ?? residual;
-    for (final entry
-        in {
-          'Iz': s?.allowableCurrentA?.toString() ?? '',
-          'Fault kA': s?.prospectiveFaultKa?.toString() ?? '',
-          'Poles': s?.poles?.toString() ?? '',
-          'Curve': s?.tripCurve ?? '',
-          'Residual mA': s?.residualCurrentMa?.toString() ?? '',
-          'Residual type': s?.residualType ?? '',
-          'Evidence': s?.evidence ?? '',
-        }.entries) {
+    for (final entry in {
+      'Iz': s?.allowableCurrentA?.toString() ?? '',
+      'Fault kA': s?.prospectiveFaultKa?.toString() ?? '',
+      'Poles': s?.poles?.toString() ?? '',
+      'Curve': s?.tripCurve ?? '',
+      'Residual mA': s?.residualCurrentMa?.toString() ?? '',
+      'Residual type': s?.residualType ?? '',
+      'Evidence': s?.evidence ?? '',
+    }.entries) {
       fields[entry.key] = TextEditingController(text: entry.value);
     }
   }
@@ -399,9 +394,11 @@ class _ProtectionInputDialogState extends State<ProtectionInputDialog> {
   }
 
   List<String> strings(String name) =>
-      text(
-        name,
-      ).split(',').map((v) => v.trim()).where((v) => v.isNotEmpty).toList();
+      text(name)
+          .split(',')
+          .map((v) => v.trim())
+          .where((v) => v.isNotEmpty)
+          .toList();
   Future<void> save() async {
     setState(() => busy = true);
     try {
@@ -423,17 +420,15 @@ class _ProtectionInputDialogState extends State<ProtectionInputDialog> {
           throw ArgumentError(doc.validate().join(' '));
         await widget.onSaveDocument(doc);
       } else if (widget.kind == 'ruleset') {
-        final doc =
-            widget.snapshot.documents
-                .where((d) => d.id == documentId)
-                .firstOrNull;
+        final doc = widget.snapshot.documents
+            .where((d) => d.id == documentId)
+            .firstOrNull;
         if (doc == null) throw ArgumentError('Choose a catalog document.');
-        final currents =
-            strings('Allowed currents A').map((v) {
-              final n = double.tryParse(v);
-              if (n == null) throw ArgumentError('Invalid nominal current.');
-              return n;
-            }).toList();
+        final currents = strings('Allowed currents A').map((v) {
+          final n = double.tryParse(v);
+          if (n == null) throw ArgumentError('Invalid nominal current.');
+          return n;
+        }).toList();
         final rule = ProtectionRuleset(
           id: widget.id,
           projectId: widget.snapshot.recalculation.project!.id,
@@ -454,8 +449,9 @@ class _ProtectionInputDialogState extends State<ProtectionInputDialog> {
           throw ArgumentError(rule.validate().join(' '));
         await widget.onSaveRuleset(rule);
       } else {
-        final poles =
-            text('Poles').isEmpty ? null : int.tryParse(text('Poles'));
+        final poles = text('Poles').isEmpty
+            ? null
+            : int.tryParse(text('Poles'));
         if (text('Poles').isNotEmpty && poles == null)
           throw ArgumentError('Poles must be an integer.');
         final settings = CircuitProtectionInputs(
@@ -466,15 +462,14 @@ class _ProtectionInputDialogState extends State<ProtectionInputDialog> {
           poles: poles,
           tripCurve: text('Curve').isEmpty ? null : text('Curve'),
           residualPolicy: residual,
-          residualCurrentMa:
-              residual == ResidualProtectionPolicy.required
-                  ? number('Residual mA')
-                  : null,
+          residualCurrentMa: residual == ResidualProtectionPolicy.required
+              ? number('Residual mA')
+              : null,
           residualType:
               residual == ResidualProtectionPolicy.required &&
-                      text('Residual type').isNotEmpty
-                  ? text('Residual type')
-                  : null,
+                  text('Residual type').isNotEmpty
+              ? text('Residual type')
+              : null,
           evidence: text('Evidence'),
         );
         if (settings.validate().isNotEmpty)
@@ -518,15 +513,12 @@ class _ProtectionInputDialogState extends State<ProtectionInputDialog> {
                 initialValue: documentKind,
                 isExpanded: true,
                 decoration: const InputDecoration(labelText: 'Document kind'),
-                items:
-                    NormativeDocumentKind.values
-                        .map(
-                          (v) =>
-                              DropdownMenuItem(value: v, child: Text(v.name)),
-                        )
-                        .toList(),
-                onChanged:
-                    busy ? null : (v) => setState(() => documentKind = v!),
+                items: NormativeDocumentKind.values
+                    .map((v) => DropdownMenuItem(value: v, child: Text(v.name)))
+                    .toList(),
+                onChanged: busy
+                    ? null
+                    : (v) => setState(() => documentKind = v!),
               ),
               CheckboxListTile(
                 title: const Text('Curated basic breaker criteria'),
@@ -542,18 +534,17 @@ class _ProtectionInputDialogState extends State<ProtectionInputDialog> {
                 decoration: const InputDecoration(
                   labelText: 'Normative catalog',
                 ),
-                items:
-                    widget.snapshot.documents
-                        .map(
-                          (d) => DropdownMenuItem(
-                            value: d.id,
-                            child: Text(
-                              '${d.standardCode} · ${d.version}',
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        )
-                        .toList(),
+                items: widget.snapshot.documents
+                    .map(
+                      (d) => DropdownMenuItem(
+                        value: d.id,
+                        child: Text(
+                          '${d.standardCode} · ${d.version}',
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    )
+                    .toList(),
                 onChanged: busy ? null : (v) => setState(() => documentId = v),
               ),
               for (final name in [
@@ -572,22 +563,21 @@ class _ProtectionInputDialogState extends State<ProtectionInputDialog> {
               DropdownButtonFormField<String>(
                 initialValue:
                     widget.snapshot.rulesets.any((r) => r.id == rulesetId)
-                        ? rulesetId
-                        : null,
+                    ? rulesetId
+                    : null,
                 isExpanded: true,
                 decoration: const InputDecoration(labelText: 'Ruleset'),
-                items:
-                    widget.snapshot.rulesets
-                        .map(
-                          (r) => DropdownMenuItem(
-                            value: r.id,
-                            child: Text(
-                              '${r.reference.id} · ${r.reference.version}',
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        )
-                        .toList(),
+                items: widget.snapshot.rulesets
+                    .map(
+                      (r) => DropdownMenuItem(
+                        value: r.id,
+                        child: Text(
+                          '${r.reference.id} · ${r.reference.version}',
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    )
+                    .toList(),
                 onChanged: busy ? null : (v) => setState(() => rulesetId = v),
               ),
               for (final name in ['Iz', 'Fault kA', 'Poles', 'Curve'])
@@ -596,13 +586,9 @@ class _ProtectionInputDialogState extends State<ProtectionInputDialog> {
                 initialValue: residual,
                 isExpanded: true,
                 decoration: const InputDecoration(labelText: 'Residual policy'),
-                items:
-                    ResidualProtectionPolicy.values
-                        .map(
-                          (p) =>
-                              DropdownMenuItem(value: p, child: Text(p.name)),
-                        )
-                        .toList(),
+                items: ResidualProtectionPolicy.values
+                    .map((p) => DropdownMenuItem(value: p, child: Text(p.name)))
+                    .toList(),
                 onChanged: busy ? null : (v) => setState(() => residual = v!),
               ),
               if (residual == ResidualProtectionPolicy.required) ...[

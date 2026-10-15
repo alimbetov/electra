@@ -40,7 +40,9 @@ void main() {
     expect(find.text('24 W'), findsOneWidget);
   });
 
-  testWidgets('P7 NOT_CAPTURED and captured-empty are distinct', (tester) async {
+  testWidgets('P7 NOT_CAPTURED and captured-empty are distinct', (
+    tester,
+  ) async {
     await _pump(
       tester,
       state: _state(lifecycle: 'FROZEN'),
@@ -65,17 +67,18 @@ void main() {
     expect(find.text('Power evidence not captured'), findsNothing);
   });
 
-  testWidgets('P7 source card exposes global budgets and selected contribution', (
-    tester,
-  ) async {
-    final state = _state().showCard(PowerWorkspaceCardCode.sourceCapacity);
-    await _pump(tester, state: state, projection: _projection());
+  testWidgets(
+    'P7 source card exposes global budgets and selected contribution',
+    (tester) async {
+      final state = _state().showCard(PowerWorkspaceCardCode.sourceCapacity);
+      await _pump(tester, state: state, projection: _projection());
 
-    expect(find.text('Shared-source / project budget'), findsOneWidget);
-    expect(find.byKey(const ValueKey('power-budget-pse-a')), findsOneWidget);
-    expect(find.byKey(const ValueKey('power-budget-pse-b')), findsOneWidget);
-    expect(find.byIcon(Icons.my_location), findsOneWidget);
-  });
+      expect(find.text('Shared-source / project budget'), findsOneWidget);
+      expect(find.byKey(const ValueKey('power-budget-pse-a')), findsOneWidget);
+      expect(find.byKey(const ValueKey('power-budget-pse-b')), findsOneWidget);
+      expect(find.byIcon(Icons.my_location), findsOneWidget);
+    },
+  );
 
   testWidgets('P7 finding remediation returns exact entity reference', (
     tester,
@@ -194,18 +197,19 @@ Future<void> _pump(
   ),
 );
 
-PowerWorkspaceState _state({String lifecycle = 'WORKING'}) => PowerWorkspaceState(
-  context: PowerWorkspaceReadContext(
-    projectId: 'project',
-    designRevisionId: 'rev-1',
-    lifecycleState: lifecycle,
-    scenarioId: 'NORMAL',
-    segmentId: 'SEG-1',
-    generation: 1,
-  ),
-  cards: PowerWorkspaceCardCode.values,
-  selectedComponentId: 'camera-1',
-);
+PowerWorkspaceState _state({String lifecycle = 'WORKING'}) =>
+    PowerWorkspaceState(
+      context: PowerWorkspaceReadContext(
+        projectId: 'project',
+        designRevisionId: 'rev-1',
+        lifecycleState: lifecycle,
+        scenarioId: 'NORMAL',
+        segmentId: 'SEG-1',
+        generation: 1,
+      ),
+      cards: PowerWorkspaceCardCode.values,
+      selectedComponentId: 'camera-1',
+    );
 
 PowerWorkspaceProjection _projection({
   PowerWorkspaceReadKind readKind = PowerWorkspaceReadKind.working,

@@ -22,42 +22,37 @@ GoRouter createElectraRouter() => GoRouter(
         ),
         GoRoute(
           path: ':projectId',
-          builder:
-              (context, state) => ProjectWorkspaceScreen(
-                projectId: state.pathParameters['projectId']!,
-              ),
+          builder: (context, state) => ProjectWorkspaceScreen(
+            projectId: state.pathParameters['projectId']!,
+          ),
           routes: [
             GoRoute(
               path: 'floors/new',
-              builder:
-                  (context, state) => FloorCreateScreen(
-                    projectId: state.pathParameters['projectId']!,
-                  ),
+              builder: (context, state) => FloorCreateScreen(
+                projectId: state.pathParameters['projectId']!,
+              ),
             ),
             GoRoute(
               path: 'floors/:floorId',
-              builder:
-                  (context, state) => FloorWorkspaceScreen(
-                    projectId: state.pathParameters['projectId']!,
-                    floorId: state.pathParameters['floorId']!,
-                  ),
+              builder: (context, state) => FloorWorkspaceScreen(
+                projectId: state.pathParameters['projectId']!,
+                floorId: state.pathParameters['floorId']!,
+              ),
               routes: [
                 GoRoute(
                   path: 'rooms/new',
-                  builder:
-                      (context, state) => RoomCreateScreen(
-                        projectId: state.pathParameters['projectId']!,
-                        floorId: state.pathParameters['floorId']!,
-                      ),
+                  builder: (context, state) => RoomCreateScreen(
+                    projectId: state.pathParameters['projectId']!,
+                    floorId: state.pathParameters['floorId']!,
+                  ),
                 ),
                 GoRoute(
                   path: 'rooms/:roomId',
-                  builder:
-                      (context, state) => PersistedRoomEditorScreen(
-                        projectId: state.pathParameters['projectId']!,
-                        floorId: state.pathParameters['floorId']!,
-                        roomId: state.pathParameters['roomId']!,
-                      ),
+                  builder: (context, state) => PersistedRoomEditorScreen(
+                    projectId: state.pathParameters['projectId']!,
+                    floorId: state.pathParameters['floorId']!,
+                    roomId: state.pathParameters['roomId']!,
+                  ),
                 ),
               ],
             ),
@@ -66,8 +61,6 @@ GoRouter createElectraRouter() => GoRouter(
       ],
     ),
   ],
-  errorBuilder:
-      (context, state) => Scaffold(
-        body: Center(child: Text('Navigation error: ${state.error}')),
-      ),
+  errorBuilder: (context, state) =>
+      Scaffold(body: Center(child: Text('Navigation error: ${state.error}'))),
 );

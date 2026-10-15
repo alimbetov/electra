@@ -291,25 +291,24 @@ final class PowerWorkspaceState {
     context: context ?? this.context,
     cards: cards,
     cardIndex: cardIndex ?? this.cardIndex,
-    selectedComponentId:
-        clearSelection ? null : selectedComponentId ?? this.selectedComponentId,
-    selectedPortId:
-        clearSelection || clearPortSelection
-            ? null
-            : selectedPortId ?? this.selectedPortId,
+    selectedComponentId: clearSelection
+        ? null
+        : selectedComponentId ?? this.selectedComponentId,
+    selectedPortId: clearSelection || clearPortSelection
+        ? null
+        : selectedPortId ?? this.selectedPortId,
     overlayMode: overlayMode ?? this.overlayMode,
-    querySnapshot:
-        clearQuerySnapshot ? null : querySnapshot ?? this.querySnapshot,
+    querySnapshot: clearQuerySnapshot
+        ? null
+        : querySnapshot ?? this.querySnapshot,
     draft: draft ?? this.draft,
-    previewFingerprint:
-        clearPreviewFingerprint
-            ? null
-            : previewFingerprint ?? this.previewFingerprint,
+    previewFingerprint: clearPreviewFingerprint
+        ? null
+        : previewFingerprint ?? this.previewFingerprint,
     operationState: operationState ?? this.operationState,
-    operationErrorCode:
-        clearOperationErrorCode
-            ? null
-            : operationErrorCode ?? this.operationErrorCode,
+    operationErrorCode: clearOperationErrorCode
+        ? null
+        : operationErrorCode ?? this.operationErrorCode,
     findings: findings ?? this.findings,
     pointerStates: pointerStates ?? this.pointerStates,
     unsavedDraftWarning: unsavedDraftWarning ?? this.unsavedDraftWarning,
