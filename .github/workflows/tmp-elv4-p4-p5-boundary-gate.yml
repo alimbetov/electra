@@ -1,9 +1,9 @@
 name: Temporary ELV4 P4 P5 Boundary Gate
 
 on:
-  pull_request:
+  push:
     branches:
-      - main
+      - feat/flutter-elv4-power-topology-design
     paths:
       - .github/workflows/tmp-elv4-p4-p5-boundary-gate.yml
       - packages/engineering_core/lib/engineering_core.dart
@@ -12,16 +12,15 @@ on:
 
 permissions:
   contents: write
-  pull-requests: read
 
 jobs:
   core-boundary:
-    if: github.head_ref == 'feat/flutter-elv4-power-topology-design'
+    if: github.ref_name == 'feat/flutter-elv4-power-topology-design'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref }}
+          ref: ${{ github.ref_name }}
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: stable
@@ -52,4 +51,4 @@ jobs:
             packages/engineering_core/lib/src/power_bottom_up_evaluation.dart \
             packages/engineering_core/test/power_bottom_up_evaluation_test.dart
           git commit -m "style(elv4): format P4 P5 boundary slice"
-          git push origin HEAD:${{ github.head_ref }}
+          git push origin HEAD:${{ github.ref_name }}
