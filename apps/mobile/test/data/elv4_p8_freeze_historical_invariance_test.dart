@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:electra_mobile/application/elv_command_result.dart';
 import 'package:electra_mobile/application/elv_design_revision_command.dart';
@@ -116,6 +117,64 @@ void main() {
       final context = await revisions.context('project-p8');
       expect(context.latestFrozenRevisionId, 'REV-1');
       expect(context.workingDesignRevisionId, 'REV-2');
+    },
+  );
+
+  test(
+    'P8 T03/T07 legacy frozen revision stays NOT_CAPTURED after reopen',
+    () async {
+      final dir = await Directory.systemTemp.createTemp('electra-elv4-p8-r0-');
+      addTearDown(() => dir.delete(recursive: true));
+      final file = File('${dir.path}/electra.sqlite');
+      final now = DateTime.utc(2026, 10, 15, 16, 30);
+
+      var db = AppDatabase(NativeDatabase(file));
+      await _seedProject(db, now);
+      await db.into(db.projectDesignRevisions).insert(
+        ProjectDesignRevisionsCompanion.insert(
+          id: 'LEGACY-R0',
+          projectId: 'project-p8',
+          code: 'R0',
+          sequence: 1,
+          state: 'FROZEN',
+          revision: const Value(1),
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'legacy-seed',
+        ),
+      );
+
+      final before = await DriftPowerPublicationRuntime(
+        db,
+        originDeviceId: 'test',
+        now: () => now,
+      ).readRevision(
+        projectId: 'project-p8',
+        designRevisionId: 'LEGACY-R0',
+      );
+      expect(before.kind, PowerRevisionReadKind.notCaptured);
+      expect(before.mutationAllowed, isFalse);
+      expect(before.capturedPayload, isNull);
+      expect(before.reasonCode, 'ELV4_POWER_NOT_CAPTURED');
+      expect(await db.select(db.designRevisionPowerSnapshots).get(), isEmpty);
+
+      await db.close();
+      db = AppDatabase(NativeDatabase(file));
+      addTearDown(db.close);
+
+      final after = await DriftPowerPublicationRuntime(
+        db,
+        originDeviceId: 'test',
+        now: () => now,
+      ).readRevision(
+        projectId: 'project-p8',
+        designRevisionId: 'LEGACY-R0',
+      );
+      expect(after.kind, PowerRevisionReadKind.notCaptured);
+      expect(after.mutationAllowed, isFalse);
+      expect(after.capturedPayload, isNull);
+      expect(after.reasonCode, 'ELV4_POWER_NOT_CAPTURED');
+      expect(await db.select(db.designRevisionPowerSnapshots).get(), isEmpty);
     },
   );
 }
