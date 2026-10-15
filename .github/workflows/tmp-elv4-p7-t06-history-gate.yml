@@ -8,6 +8,8 @@ on:
       - .github/workflows/tmp-elv4-p7-t06-history-gate.yml
       - scripts/ci/apply-elv4-p7-history-schema.py
       - scripts/ci/apply-elv4-p7-history-replay.py
+      - scripts/ci/apply-elv4-p7-history-integrity.py
+      - scripts/ci/apply-elv4-p7-history-acceptance.py
       - scripts/ci/apply-elv4-p7-t06-wiring.py
       - apps/mobile/lib/data/database/elv_history_database_tables.dart
       - apps/mobile/lib/data/repositories/drift_elv_reviewed_routing_runtime.dart
@@ -46,6 +48,12 @@ jobs:
       - name: Apply RM08 lost-response replay
         working-directory: .
         run: python scripts/ci/apply-elv4-p7-history-replay.py
+      - name: Apply RM08 database integrity
+        working-directory: .
+        run: python scripts/ci/apply-elv4-p7-history-integrity.py
+      - name: Apply P7 T06 negative acceptance
+        working-directory: .
+        run: python scripts/ci/apply-elv4-p7-history-acceptance.py
       - name: Apply P7 T06 production wiring
         working-directory: .
         run: python scripts/ci/apply-elv4-p7-t06-wiring.py
@@ -120,7 +128,7 @@ jobs:
             apps/mobile/test/application/power_workspace_controller_test.dart \
             apps/mobile/test/application/elv_reviewed_reroute_command_test.dart \
             apps/mobile/test/data/elv4_p7_t06_history_test.dart
-          git commit -m "feat(elv4): harden P7 revision history replay"
+          git commit -m "test(elv4): close P7 T06 history edge cases"
           git reset --hard HEAD
           git fetch origin "${GITHUB_REF_NAME}"
           git rebase "origin/${GITHUB_REF_NAME}"
