@@ -40,17 +40,18 @@ final class _ThrowAt implements ElvFailureProbe {
 DriftElvDesignRevisionRepository _repository(
   AppDatabase db, {
   ElvFailureProbe? failureProbe,
-}) =>
-    DriftElvDesignRevisionRepository(
-      db,
-      originDeviceId: 'test',
-      failureProbe: failureProbe,
-      now: () => DateTime.utc(2026, 10, 15, 19),
-    );
+}) => DriftElvDesignRevisionRepository(
+  db,
+  originDeviceId: 'test',
+  failureProbe: failureProbe,
+  now: () => DateTime.utc(2026, 10, 15, 19),
+);
 
 Future<void> _seed(AppDatabase db) async {
   final now = DateTime.utc(2026, 10, 15, 18, 45);
-  await db.into(db.projects).insert(
+  await db
+      .into(db.projects)
+      .insert(
         ProjectsCompanion.insert(
           id: _projectId,
           name: 'P8 command outcome durability',
@@ -92,20 +93,17 @@ void _expectSameFailure(ElvFailure left, ElvFailure right) {
 Future<void> _expectNoFreezeArtifacts(AppDatabase db) async {
   expect(
     await (db.select(db.designRevisionPhysicalSnapshots)
-          ..where((row) => row.designRevisionId.equals(_revisionId)))
-        .get(),
+      ..where((row) => row.designRevisionId.equals(_revisionId))).get(),
     isEmpty,
   );
   expect(
     await (db.select(db.designRevisionPowerSnapshots)
-          ..where((row) => row.designRevisionId.equals(_revisionId)))
-        .get(),
+      ..where((row) => row.designRevisionId.equals(_revisionId))).get(),
     isEmpty,
   );
   expect(
     await (db.select(db.designRevisionSnapshotManifests)
-          ..where((row) => row.designRevisionId.equals(_revisionId)))
-        .get(),
+      ..where((row) => row.designRevisionId.equals(_revisionId))).get(),
     isEmpty,
   );
 }
@@ -168,52 +166,59 @@ void main() {
     },
   );
 
-  test('P8 same commandId with another command type is an envelope conflict', () async {
-    final dir = await Directory.systemTemp.createTemp('electra-p8-type-conflict-');
-    addTearDown(() => dir.delete(recursive: true));
-    final file = File('${dir.path}/electra.sqlite');
+  test(
+    'P8 same commandId with another command type is an envelope conflict',
+    () async {
+      final dir = await Directory.systemTemp.createTemp(
+        'electra-p8-type-conflict-',
+      );
+      addTearDown(() => dir.delete(recursive: true));
+      final file = File('${dir.path}/electra.sqlite');
 
-    final db = AppDatabase(_native(file, configureWal: true));
-    addTearDown(db.close);
-    await _seed(db);
-    final repository = _repository(db);
+      final db = AppDatabase(_native(file, configureWal: true));
+      addTearDown(db.close);
+      await _seed(db);
+      final repository = _repository(db);
 
-    const commandId = 'shared-command-id';
-    final rejected = _failure(
-      await repository.freeze(
-        const FreezeProjectDesignRevisionCommand(
-          commandId: commandId,
-          projectId: _projectId,
-          designRevisionId: _revisionId,
-          expectedRevision: 2,
+      const commandId = 'shared-command-id';
+      final rejected = _failure(
+        await repository.freeze(
+          const FreezeProjectDesignRevisionCommand(
+            commandId: commandId,
+            projectId: _projectId,
+            designRevisionId: _revisionId,
+            expectedRevision: 2,
+          ),
         ),
-      ),
-    );
-    expect(rejected.code, 'ELV_DESIGN_REVISION_REVISION_CONFLICT');
+      );
+      expect(rejected.code, 'ELV_DESIGN_REVISION_REVISION_CONFLICT');
 
-    final conflict = _failure(
-      await repository.createNext(
-        const CreateNextWorkingDesignRevisionCommand(
-          commandId: commandId,
-          projectId: _projectId,
-          newRevisionId: 'REV-2',
-          code: 'R2',
-          basedOnRevisionId: _revisionId,
+      final conflict = _failure(
+        await repository.createNext(
+          const CreateNextWorkingDesignRevisionCommand(
+            commandId: commandId,
+            projectId: _projectId,
+            newRevisionId: 'REV-2',
+            code: 'R2',
+            basedOnRevisionId: _revisionId,
+          ),
         ),
-      ),
-    );
-    expect(conflict.code, 'ELV_IDEMPOTENCY_CONFLICT');
-    expect(conflict.category, ElvFailureCategory.commandEnvelope);
-    final rows = await _ledger(db, commandId);
-    expect(rows, hasLength(1));
-    expect(rows.single.outcomeKind, 'REJECTED');
-    expect(rows.single.commandType, 'FREEZE_PROJECT_DESIGN_REVISION');
-  });
+      );
+      expect(conflict.code, 'ELV_IDEMPOTENCY_CONFLICT');
+      expect(conflict.category, ElvFailureCategory.commandEnvelope);
+      final rows = await _ledger(db, commandId);
+      expect(rows, hasLength(1));
+      expect(rows.single.outcomeKind, 'REJECTED');
+      expect(rows.single.commandType, 'FREEZE_PROJECT_DESIGN_REVISION');
+    },
+  );
 
   test(
     'P8 faulted freeze transaction leaves no false ledger outcome after reopen',
     () async {
-      final dir = await Directory.systemTemp.createTemp('electra-p8-fault-ledger-');
+      final dir = await Directory.systemTemp.createTemp(
+        'electra-p8-fault-ledger-',
+      );
       addTearDown(() => dir.delete(recursive: true));
       final file = File('${dir.path}/electra.sqlite');
 
@@ -247,8 +252,7 @@ void main() {
       await _expectNoFreezeArtifacts(db);
       final revision =
           await (db.select(db.projectDesignRevisions)
-                ..where((row) => row.id.equals(_revisionId)))
-              .getSingle();
+            ..where((row) => row.id.equals(_revisionId))).getSingle();
       expect(revision.state, 'WORKING');
       expect(revision.revision, 1);
     },

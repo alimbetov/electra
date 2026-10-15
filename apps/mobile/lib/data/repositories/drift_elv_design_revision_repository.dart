@@ -162,23 +162,53 @@ final class DriftElvDesignRevisionRepository
     if (replay != null) return replay;
     final row = await _findRow(command.projectId, command.designRevisionId);
     if (row == null) {
-      return elvRuntimeFailure(
-        'ELV_DESIGN_REVISION_NOT_FOUND',
-        ElvFailureCategory.notFound,
+      return recordElvRuntimeRejection<ProjectDesignRevision>(
+        database: database,
+        projectId: command.projectId,
+        commandId: command.commandId,
+        commandType: type,
+        schema: schema,
+        payload: payload,
+        failure: const ElvFailure(
+          code: 'ELV_DESIGN_REVISION_NOT_FOUND',
+          category: ElvFailureCategory.notFound,
+        ),
+        originDeviceId: originDeviceId,
+        now: _now(),
       );
     }
     if (row.state != 'WORKING') {
-      return elvRuntimeFailure(
-        'ELV_DESIGN_REVISION_NOT_WORKING',
-        ElvFailureCategory.lifecycle,
+      return recordElvRuntimeRejection<ProjectDesignRevision>(
+        database: database,
+        projectId: command.projectId,
+        commandId: command.commandId,
+        commandType: type,
+        schema: schema,
+        payload: payload,
+        failure: const ElvFailure(
+          code: 'ELV_DESIGN_REVISION_NOT_WORKING',
+          category: ElvFailureCategory.lifecycle,
+        ),
+        originDeviceId: originDeviceId,
+        now: _now(),
       );
     }
     if (row.revision != command.expectedRevision) {
-      return elvRuntimeFailure(
-        'ELV_DESIGN_REVISION_REVISION_CONFLICT',
-        ElvFailureCategory.revisionConflict,
-        expectedRevision: command.expectedRevision,
-        actualRevision: row.revision,
+      return recordElvRuntimeRejection<ProjectDesignRevision>(
+        database: database,
+        projectId: command.projectId,
+        commandId: command.commandId,
+        commandType: type,
+        schema: schema,
+        payload: payload,
+        failure: ElvFailure(
+          code: 'ELV_DESIGN_REVISION_REVISION_CONFLICT',
+          category: ElvFailureCategory.revisionConflict,
+          expectedRevision: command.expectedRevision,
+          actualRevision: row.revision,
+        ),
+        originDeviceId: originDeviceId,
+        now: _now(),
       );
     }
     final snapshot = await _buildP3Snapshot(command.projectId, row.id);
