@@ -7,8 +7,10 @@ on:
     paths:
       - .github/workflows/tmp-elv4-p7-closure-gate.yml
       - apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart
+      - apps/mobile/lib/data/repositories/drift_power_batch_publication_runtime.dart
       - apps/mobile/lib/application/power_workspace_state.dart
       - apps/mobile/test/data/elv4_p7_runtime_test.dart
+      - apps/mobile/test/data/elv4_p7_batch_runtime_test.dart
       - apps/mobile/test/application/power_workspace_state_test.dart
       - apps/mobile/test/data/elv4_p2_persistence_test.dart
 
@@ -33,13 +35,31 @@ jobs:
         run: flutter pub get --enforce-lockfile
       - name: Generate Drift code
         run: dart run build_runner build
+      - name: Apply mechanical analyzer corrections
+        working-directory: .
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          runtime = Path('apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart')
+          text = runtime.read_text()
+          text = text.replace("generation: row!.read<int>('generation'),", "generation: row.read<int>('generation'),")
+          runtime.write_text(text)
+
+          test = Path('apps/mobile/test/data/elv4_p7_runtime_test.dart')
+          text = test.read_text()
+          text = text.replace("expect(captured.reasonCode, isNull);", "expect(captured.reasonCode, null);")
+          test.write_text(text)
+          PY
       - name: Format P7 closure slice
         working-directory: .
         run: |
           dart format \
             apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart \
+            apps/mobile/lib/data/repositories/drift_power_batch_publication_runtime.dart \
             apps/mobile/lib/application/power_workspace_state.dart \
             apps/mobile/test/data/elv4_p7_runtime_test.dart \
+            apps/mobile/test/data/elv4_p7_batch_runtime_test.dart \
             apps/mobile/test/application/power_workspace_state_test.dart
       - name: Analyze mobile app
         run: flutter analyze
@@ -47,15 +67,18 @@ jobs:
         run: |
           flutter test \
             test/data/elv4_p7_runtime_test.dart \
+            test/data/elv4_p7_batch_runtime_test.dart \
             test/application/power_workspace_state_test.dart \
             test/data/elv4_p2_persistence_test.dart
-      - name: Commit formatter output
+      - name: Commit normalized P7 closure slice
         working-directory: .
         run: |
           if git diff --quiet -- \
             apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart \
+            apps/mobile/lib/data/repositories/drift_power_batch_publication_runtime.dart \
             apps/mobile/lib/application/power_workspace_state.dart \
             apps/mobile/test/data/elv4_p7_runtime_test.dart \
+            apps/mobile/test/data/elv4_p7_batch_runtime_test.dart \
             apps/mobile/test/application/power_workspace_state_test.dart; then
             exit 0
           fi
@@ -63,8 +86,10 @@ jobs:
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add \
             apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart \
+            apps/mobile/lib/data/repositories/drift_power_batch_publication_runtime.dart \
             apps/mobile/lib/application/power_workspace_state.dart \
             apps/mobile/test/data/elv4_p7_runtime_test.dart \
+            apps/mobile/test/data/elv4_p7_batch_runtime_test.dart \
             apps/mobile/test/application/power_workspace_state_test.dart
-          git commit -m "style(elv4): format P7 closure slice"
+          git commit -m "fix(elv4): normalize P7 closure slice"
           git push origin HEAD:${{ github.ref_name }}
