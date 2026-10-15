@@ -104,7 +104,8 @@ void main() {
       );
     });
 
-    test('missing P5 upstream basis remains unresolved and never becomes zero', () {
+    test('missing P5 upstream basis remains unresolved and never becomes zero',
+        () {
       final input = _poeInput(
         groupInputBasis: PoeGroupInputBasis.estimatedActual,
       );
@@ -130,7 +131,8 @@ void main() {
       );
     });
 
-    test('reserve changes capability sizing but never physical boundary demand', () {
+    test('reserve changes capability sizing but never physical boundary demand',
+        () {
       final child = PowerBoundaryDemand(
         originId: 'load-a',
         boundaryRef: 'LOAD-A',
@@ -163,7 +165,8 @@ void main() {
   });
 
   group('P6 -> P4 boundary adapters', () {
-    test('DC feeder source demand already contains feeder loss exactly once', () {
+    test('DC feeder source demand already contains feeder loss exactly once',
+        () {
       final dc = solveDcConstantCurrentTree(
         DcTreeInput(
           sourceNodeId: 'source',
@@ -208,7 +211,8 @@ void main() {
       expect(parent.accountingKeys, contains('P6_DC_FEEDER_DC-A'));
     });
 
-    test('charger conversion and idle enter P4 as one pre-accounted demand', () {
+    test('charger conversion and idle enter P4 as one pre-accounted demand',
+        () {
       final charger = PowerChargerDefinition(
         definitionRef: _ref(PowerDefinitionKind.transfer, 'CHARGER'),
         outputVoltage: _dcEnvelope('23', '24', '25'),

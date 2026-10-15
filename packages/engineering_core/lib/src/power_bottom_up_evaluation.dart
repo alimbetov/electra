@@ -180,7 +180,8 @@ PowerBottomUpEvaluationResult evaluateBottomUpPowerBoundary(
         PowerEvaluationFinding(
           code: 'ELV4_BOTTOM_UP_BOUNDARY_W_UNRESOLVED',
           severity: 'UNRESOLVED',
-          message: 'Child boundary demand is unavailable at ${child.boundaryRef}.',
+          message:
+              'Child boundary demand is unavailable at ${child.boundaryRef}.',
           sourceRefs: [child.sourceRef],
         ),
       );
@@ -213,7 +214,8 @@ PowerBottomUpEvaluationResult evaluateBottomUpPowerBoundary(
     ),
   ];
 
-  final completeW = direct.completeW && children.every((child) => child.demandW != null);
+  final completeW =
+      direct.completeW && children.every((child) => child.demandW != null);
   PowerRational? upstreamW;
   PowerRational? localLossW;
   final transfer = input.localTransfer;
@@ -362,10 +364,8 @@ List<String> _sortedUnique(Iterable<String> values, String field) {
   return result;
 }
 
-String _keyToken(String value) => value
-    .trim()
-    .toUpperCase()
-    .replaceAll(RegExp(r'[^A-Z0-9_-]+'), '_');
+String _keyToken(String value) =>
+    value.trim().toUpperCase().replaceAll(RegExp(r'[^A-Z0-9_-]+'), '_');
 
 String _text(String value, String field) {
   final normalized = value.trim();

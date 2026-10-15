@@ -90,7 +90,8 @@ final class ResolvedPowerContribution {
   bool get complete => unresolvedDimensions.isEmpty;
 }
 
-ResolvedPowerContribution resolvePowerContribution(PowerDemandContribution input) {
+ResolvedPowerContribution resolvePowerContribution(
+    PowerDemandContribution input) {
   final demand = input.demand;
   if (demand == null) {
     return ResolvedPowerContribution(
@@ -156,7 +157,8 @@ final class AggregatedPowerDemand {
   final List<PowerArithmeticStep> arithmeticSteps;
 
   bool get completeW => contributions.every(
-        (item) => !item.unresolvedDimensions.contains(PowerQuantityDimension.watt),
+        (item) =>
+            !item.unresolvedDimensions.contains(PowerQuantityDimension.watt),
       );
   bool get completeA => contributions.every(
         (item) =>

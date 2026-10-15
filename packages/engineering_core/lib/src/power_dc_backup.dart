@@ -190,7 +190,8 @@ DcTreeResult solveDcConstantCurrentTree(DcTreeInput input) {
     allNodes.add(section.childNodeId);
   }
   final reachable = _reachable(input.sourceNodeId, children);
-  if (!allNodes.every(reachable.contains) || _hasCycle(input.sourceNodeId, children)) {
+  if (!allNodes.every(reachable.contains) ||
+      _hasCycle(input.sourceNodeId, children)) {
     throw ArgumentError('DC constant-current model requires one radial tree.');
   }
 
@@ -220,13 +221,18 @@ DcTreeResult solveDcConstantCurrentTree(DcTreeInput input) {
     subtreeCurrent[node] = result;
     return result;
   }
+
   final sourceCurrent = currentAt(input.sourceNodeId);
 
-  final minV = <String, PowerRational>{input.sourceNodeId: input.sourceVoltage.minV};
+  final minV = <String, PowerRational>{
+    input.sourceNodeId: input.sourceVoltage.minV
+  };
   final nominalV = <String, PowerRational>{
     input.sourceNodeId: input.sourceVoltage.nominalV,
   };
-  final maxV = <String, PowerRational>{input.sourceNodeId: input.sourceVoltage.maxV};
+  final maxV = <String, PowerRational>{
+    input.sourceNodeId: input.sourceVoltage.maxV
+  };
   final sectionResults = <DcSectionResult>[];
   var totalLoss = PowerRational.zero;
 
@@ -255,6 +261,7 @@ DcTreeResult solveDcConstantCurrentTree(DcTreeInput input) {
       walk(section.childNodeId);
     }
   }
+
   walk(input.sourceNodeId);
 
   var deliveredNominalW = PowerRational.zero;
@@ -322,8 +329,8 @@ ConstantPowerFeederResult solveSingleConstantPowerFeeder({
   if (maxIterations < 1 || maxIterations > 1024) {
     throw ArgumentError('Invalid constant-power iteration bound.');
   }
-  final tolerance = toleranceV ??
-      PowerRational(BigInt.one, BigInt.from(1000000000));
+  final tolerance =
+      toleranceV ?? PowerRational(BigInt.one, BigInt.from(1000000000));
   _positive(tolerance, 'toleranceV');
   if (loadPowerW.isZero) {
     return ConstantPowerFeederResult(
@@ -335,7 +342,8 @@ ConstantPowerFeederResult solveSingleConstantPowerFeeder({
     );
   }
 
-  PowerRational equation(PowerRational voltage) => voltage * voltage -
+  PowerRational equation(PowerRational voltage) =>
+      voltage * voltage -
       sourceVoltageV * voltage +
       loadPowerW * loopResistanceOhm;
   var low = sourceVoltageV / PowerRational.integer(2);
@@ -433,7 +441,8 @@ final class BatteryWhAvailabilityModel {
   final PowerRational agingFactor;
   final PowerRational rateFactor;
 
-  PowerRational get availableWh => modelVoltageV *
+  PowerRational get availableWh =>
+      modelVoltageV *
       bankAh *
       (initialSocFraction - minimumSocFraction) *
       temperatureFactor *
@@ -466,13 +475,15 @@ BatterySequenceResult evaluateBatterySequence({
 }) {
   final sequence = segments.toList();
   if (sequence.isEmpty) throw ArgumentError('Backup sequence cannot be empty.');
-  if (sequence.map((item) => item.segmentId).toSet().length != sequence.length) {
+  if (sequence.map((item) => item.segmentId).toSet().length !=
+      sequence.length) {
     throw ArgumentError('Backup segment identities must be unique.');
   }
   var requiredWh = PowerRational.zero;
   var durationSeconds = PowerRational.zero;
   for (final segment in sequence) {
-    requiredWh += segment.bankInputW * segment.durationSeconds /
+    requiredWh += segment.bankInputW *
+        segment.durationSeconds /
         PowerRational.integer(3600);
     durationSeconds += segment.durationSeconds;
   }
@@ -542,9 +553,8 @@ ChargerEvaluationResult evaluateChargerDemand({
       chargeVoltageV > charger.outputVoltage.maxV) {
     status = PowerEvaluationStatus.fail;
   }
-  final chargeCurrent = chargingSelected
-      ? selectedChargeCurrentA
-      : PowerRational.zero;
+  final chargeCurrent =
+      chargingSelected ? selectedChargeCurrentA : PowerRational.zero;
   final currentMargin = charger.maxChargeCurrentA - chargeCurrent;
   if (currentMargin.isNegative) status = PowerEvaluationStatus.fail;
   final chargingOutputW = chargeVoltageV * chargeCurrent;
@@ -572,6 +582,7 @@ Set<String> _reachable(String root, Map<String, List<DcSection>> children) {
       visit(section.childNodeId);
     }
   }
+
   visit(root);
   return result;
 }
@@ -589,6 +600,7 @@ bool _hasCycle(String root, Map<String, List<DcSection>> children) {
     visiting.remove(node);
     return false;
   }
+
   return visit(root);
 }
 
