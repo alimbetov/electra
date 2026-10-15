@@ -6,6 +6,7 @@ Source baseline: `7f1c701cb4ba492589321f8f9827d20464ddaefb`
 Design baseline: `29e0ad0`
 Parent: [ELV4 specification](elv4-power-topology-design-specification.md)
 Execution: [P0–P9 delivery plan](elv4-p0-p9-delivery-plan.md)
+Implementation detail: [package specifications](elv4-implementation/README.md)
 
 ## 1. One design across ten packages
 
@@ -127,6 +128,7 @@ Each row below inherits projectId, designRevisionId, commandId, canonical payloa
 | SetPowerLoadProfile | Input ownership, scenario coverage, demand basis | Exact load set replacement, revision token | All upstream groups/sources/protected banks and terminal feasibility |
 | ReplacePowerTransferSet | Owned terminals, active directions, affected scenarios | Entire local transfer set and memberships | Union of old/new connected closures; inverse validates current use |
 | ReplacePowerCapacityGroup | Owner and scoped output set, units, nesting | Limits and membership set | Affected group, source and protected output evaluations |
+| ReplacePowerSupplyRequirement | Consumer-owned input set, alternative-source policy, existing selections and reviewed impact | Requirement/input set plus reviewed coordinated selection replacements | Old/new supply closures; no external connection creation |
 | Create/Replace/ArchivePowerScenario | Scenario revision, reference use, all selections | Scenario root, segments and state/source choices | Scenario-specific nodes; archive retains historical result identity |
 | Bind/ReplacePoeDelivery | Exact PSE/PD profiles, combined path, resource evidence | Delivery metadata only; canonical allocation remains owned by ELV3 | PD delivery, shared PSE group, upstream sources/backup |
 | ConfigureBackupAssembly/ReplaceBatteryBank | Scoped existing components, compatibility, protected set | Assembly/bank/requirement membership sets | Backup and charger demand, upstream supply and protected paths |
@@ -269,7 +271,7 @@ All values in this section are fictional fixture data, not equipment recommendat
 |---|---|---|
 | V1 CCTV P1–P5/P7 | PD loads 10W and 15W; guaranteed-PD mode allocates 12W and 18W at PSE; group budget 35W → 30W reserved, 5W margin. PSE efficiency .9 excluding 5W idle → conservative upstream 38.333…W | Change budget to 29W → CURRENT complete evaluation with FAIL finding, not a stale or successful budget |
 | V2 LAN P3/P5 | PSE → patch → outlet → PD with exact passive power continuity and one allocation path | Remove power passage while retaining data → data trace remains; power unresolved. Fiber-only path is unresolved |
-| V3 ACS P3/P6 | Constant-current loads .3A/.5A, 24V source; shared loop .5ohm gives .4V drop; branch loops .2/.3ohm give terminals 23.54V/23.45V | Missing return resistance blocks terminal assessment; relay control adjacency alone never supplies lock |
+| V3 ACS P3/P6 | Constant-current loads .3A/.5A, 24V source; shared loop .5ohm gives .4V drop; branch loops .2/.3ohm give terminals 23.54V/23.45V | Switch to a per-conductor model with missing return resistance blocks terminal assessment; relay control adjacency alone never supplies lock |
 | V4 Fire P4/P6 | Explicit protected output 20W × 2h + 40W × .5h = 60Wh; backup efficiency .8 → bank requirement 75Wh. Two 12V/7Ah units in series → 24V/7Ah; declared simple model with usable factor .8 gives 134.4Wh | Omit duration or usable-model applicability → BLOCKED; do not infer hours from fire discipline |
 | V5 shared source P4/P5/P7 | V1 PDs belong to CCTV/LAN separately but one project PSE group still reserves 30W and counts 5W own load once | System filter must not reduce budget to 12W or 18W |
 | V6 UPS P4/P6 | AC input load with explicit 38.333…W and input PF .8 → 47.9166…VA; compare independent 50W/45VA UPS limits → W passes, VA fails | Remove input PF/VA → W subtotal retained, VA UNRESOLVED, no W-to-VA equality |

@@ -5,6 +5,7 @@ Branch: `feat/flutter-elv4-power-topology-design`
 Baseline: `7f1c701cb4ba492589321f8f9827d20464ddaefb`
 Parent: [ELV4 specification](elv4-power-topology-design-specification.md)
 Shared interfaces: [coordinated P0–P9 contract](elv4-coordinated-p0-p9-contract.md)
+Implementation detail: [P0–P9 package specifications](elv4-implementation/README.md)
 
 ## Delivery rules
 
@@ -204,3 +205,7 @@ Every P0–P9 package is designed now. Runtime dependency order is unchanged. Re
 | P9 | §9 closure/handoff | One source SHA links requirements, code, tests and CI; limitations pass explicitly to later stages |
 
 No design status in this table asserts implementation or review approval. Numerical fixtures are fictional; actual standard editions and discipline policy are external inputs to later verified catalogs.
+
+## Implementation requirement traceability
+
+Each package now has eight numbered MUST requirements, planned acceptance IDs, implementation boundaries and failure/exit behavior in the detailed specification (80 requirements total). [requirements.json](elv4-implementation/requirements.json) is the design traceability source, with empty runtime evidence by intention. [Fictional fixture data](../examples/elv4-power-design-fixtures.json) provides explicit numerical oracles and history/path assertions; it is not an app-import catalog.

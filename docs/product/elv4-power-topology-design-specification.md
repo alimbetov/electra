@@ -6,6 +6,7 @@ Inspected baseline: `7f1c701cb4ba492589321f8f9827d20464ddaefb`
 Entry point: [ELV4 index](elv4-authoritative-spec-index.md)
 Plan: [P0–P9](elv4-p0-p9-delivery-plan.md)
 Detailed interfaces: [coordinated P0–P9 contract](elv4-coordinated-p0-p9-contract.md)
+Implementation detail: [ten package specifications and requirement ledger](elv4-implementation/README.md)
 
 ## 1. Purpose and scope
 
@@ -158,7 +159,7 @@ Unique/partial constraints enforce one current aspect per port/component/revisio
 
 Required command families:
 Bind/Adopt/ReleasePowerProfile; SetPowerLoadProfile; ReplacePowerTransferSet;
-ReplacePowerCapacityGroup; Create/Replace/ArchivePowerScenario;
+ReplacePowerCapacityGroup; ReplacePowerSupplyRequirement; Create/Replace/ArchivePowerScenario;
 Bind/ReplacePoeDelivery; ConfigureBackupAssembly; ReplaceBatteryBank;
 ValidatePowerTopology; CalculatePowerProcess.
 Existing ELV1 connection, ELV2 adoption, ELV3 routing/revision commands receive affected-power guards/invalidation rather than replacement versions.
@@ -213,3 +214,5 @@ Power is a typed root-catalog extension independent of existing discipline compo
 All participating canonical edits affecting power advance the coordinated design-revision row token inside the mutation transaction. Calculation captures a consistent snapshot, runs outside the write transaction and publishes only after token/fingerprint revalidation. Freeze captures all necessary canonical/profile/physical evidence and rejects stale publication. This requirement applies from P2, not only when P7 UI is implemented.
 
 The initial nonlinear DC implementation may remain BLOCKED until a bounded versioned solver is implemented and tested. No runtime iteration through dependency invalidation may substitute for a solver. General parallel sources/mesh/shared-return analysis remains unsupported.
+
+The implementation specification fixes the initial supported slice to radial constant-current DC and guaranteed-PD PoE accounting. Explicit-loss PoE/nonlinear DC require a reviewed implemented model extension before use. Generic draft profiles may record those model tags but evaluation must remain BLOCKED.

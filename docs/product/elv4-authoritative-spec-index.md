@@ -9,7 +9,10 @@ Inspected baseline: `7f1c701cb4ba492589321f8f9827d20464ddaefb`
 1. [Power topology specification](elv4-power-topology-design-specification.md): identities, responsibilities, typed profiles, invariants, calculations, persistence, commands, dependencies and acceptance.
 2. [Expanded P0–P9 delivery plan](elv4-p0-p9-delivery-plan.md): subpackages, sequencing, tests and exact-head gates.
 3. [Coordinated P0–P9 contract](elv4-coordinated-p0-p9-contract.md): shared fields, package interfaces, source map, transactions, evaluation pipeline, history and acceptance manifest.
-4. [Baseline alignment audit](../audit/elv4-baseline-alignment-audit.md): inspected ELV1–ELV3 facts and unresolved entry evidence.
+4. [Implementation technical specification](elv4-implementation/README.md): ten package specifications, shared runtime contract, 80 requirement entries and machine-readable fictional acceptance data.
+5. [Baseline alignment audit](../audit/elv4-baseline-alignment-audit.md): inspected ELV1–ELV3 facts and unresolved entry evidence.
+
+Design consistency evidence: [implementation specification review](../audit/elv4-implementation-design-review.md).
 
 ## Authority and conflict handling
 
@@ -33,3 +36,5 @@ The branch contains design documentation only. All ELV4 P0–P9 runtime packages
 Merged ELV3 PR #10 is the starting source baseline; ELV3 final closure evidence must be reconciled in ELV4-P0.
 
 All ten packages P0–P9 now have coordinated design sections. Design remains DRAFT / REVIEW REQUIRED; completeness of the design outline does not close baseline or runtime gates.
+
+Detailed implementation design now decomposes all P0–P9 packages into numbered requirements and planned tests. Requirements remain NOT_STARTED until implemented and evidenced.

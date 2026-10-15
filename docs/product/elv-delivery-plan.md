@@ -442,7 +442,7 @@ ELV3 is complete when all four scenarios survive restart with exact routes, allo
 
 ## 19. Objective
 
-ELV4 design entry: [authoritative index](elv4-authoritative-spec-index.md), [power specification](elv4-power-topology-design-specification.md), [expanded P0–P9 plan](elv4-p0-p9-delivery-plan.md), [coordinated package contracts](elv4-coordinated-p0-p9-contract.md).
+ELV4 design entry: [authoritative index](elv4-authoritative-spec-index.md), [power specification](elv4-power-topology-design-specification.md), [expanded P0–P9 plan](elv4-p0-p9-delivery-plan.md), [coordinated package contracts](elv4-coordinated-p0-p9-contract.md), [detailed P0–P9 implementation specifications](elv4-implementation/README.md).
 
 Status: DESIGN DRAFT. ELV4 runtime entry requires P0 reconciliation of merged ELV3 code and final closure evidence; see [baseline alignment audit](../audit/elv4-baseline-alignment-audit.md). Historical stage status labels elsewhere in this roadmap do not establish runtime acceptance.
 

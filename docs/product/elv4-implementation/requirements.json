@@ -1,0 +1,1127 @@
+{
+  "schema": "electra.elv4-implementation-requirements.v1",
+  "designStatus": "DRAFT",
+  "runtimeStatus": "NOT_STARTED",
+  "requirements": [
+    {
+      "requirementId": "ELV4-P0-001",
+      "package": "P0",
+      "summary": "Inventory merged source, schema and supported migration origins at an exact commit; distinguish document claims from code and executed tests",
+      "designDocument": "p0-baseline.md",
+      "plannedAcceptanceIds": [
+        "P0-T01"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P0-002",
+      "package": "P0",
+      "summary": "Map each ELV3 RC0–RC9 gate to source, public entry point and exact-head evidence or an explicit unresolved gap",
+      "designDocument": "p0-baseline.md",
+      "plannedAcceptanceIds": [
+        "P0-T02"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P0-003",
+      "package": "P0",
+      "summary": "Identify every mutable port/profile/connection/mapping/load/route fact consumed by power and its current command owner",
+      "designDocument": "p0-baseline.md",
+      "plannedAcceptanceIds": [
+        "P0-T03"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P0-004",
+      "package": "P0",
+      "summary": "Record exact existing error codes and transaction/replay/result interfaces reused by ELV4",
+      "designDocument": "p0-baseline.md",
+      "plannedAcceptanceIds": [
+        "P0-T04"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P0-005",
+      "package": "P0",
+      "summary": "Freeze supported/deferred electrical model boundary and generic power catalog binding strategy",
+      "designDocument": "p0-baseline.md",
+      "plannedAcceptanceIds": [
+        "P0-T05"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P0-006",
+      "package": "P0",
+      "summary": "Design deterministic FK-valid fixture builders for four disciplines, shared budgets, historical/legacy and negative cases",
+      "designDocument": "p0-baseline.md",
+      "plannedAcceptanceIds": [
+        "P0-T06"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P0-007",
+      "package": "P0",
+      "summary": "Identify snapshot freeze/create-next/delete/adopt integration and all operations requiring revision-token advancement",
+      "designDocument": "p0-baseline.md",
+      "plannedAcceptanceIds": [
+        "P0-T07"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P0-008",
+      "package": "P0",
+      "summary": "Record entry outcome with no fabricated runtime closure or implicit resolution of BASE-01…04",
+      "designDocument": "p0-baseline.md",
+      "plannedAcceptanceIds": [
+        "P0-T08"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P1-001",
+      "package": "P1",
+      "summary": "Implement typed validated quantities, edition refs and immutable value objects with explicit absent/zero semantics",
+      "designDocument": "p1-domain-catalog.md",
+      "plannedAcceptanceIds": [
+        "P1-T01"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P1-002",
+      "package": "P1",
+      "summary": "Bind power roles to canonical port/component IDs with one owner per projected field",
+      "designDocument": "p1-domain-catalog.md",
+      "plannedAcceptanceIds": [
+        "P1-T02"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P1-003",
+      "package": "P1",
+      "summary": "Define local transfers, efficiency accounting, capacity groups and unique own-load contribution identity",
+      "designDocument": "p1-domain-catalog.md",
+      "plannedAcceptanceIds": [
+        "P1-T03"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P1-004",
+      "package": "P1",
+      "summary": "Implement scenario segments, state/source selection, durations and charge/discharge interlock",
+      "designDocument": "p1-domain-catalog.md",
+      "plannedAcceptanceIds": [
+        "P1-T04"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P1-005",
+      "package": "P1",
+      "summary": "Add versioned root-catalog power extension and generic equipment template support without changing old discipline codecs",
+      "designDocument": "p1-domain-catalog.md",
+      "plannedAcceptanceIds": [
+        "P1-T05"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P1-006",
+      "package": "P1",
+      "summary": "Model PoE delivery and bank/charger definitions with exact provenance and model applicability",
+      "designDocument": "p1-domain-catalog.md",
+      "plannedAcceptanceIds": [
+        "P1-T06"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P1-007",
+      "package": "P1",
+      "summary": "Provide explicit legacy mapping/adoption preview; missing typed facts stay unresolved",
+      "designDocument": "p1-domain-catalog.md",
+      "plannedAcceptanceIds": [
+        "P1-T07"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P1-008",
+      "package": "P1",
+      "summary": "Freeze process input/output/numeric schemas and exact canonical serialization behavior",
+      "designDocument": "p1-domain-catalog.md",
+      "plannedAcceptanceIds": [
+        "P1-T08"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P2-001",
+      "package": "P2",
+      "summary": "Add scoped aspect/child tables, uniqueness, checks, foreign keys and indexes with additive migration",
+      "designDocument": "p2-persistence-commands.md",
+      "plannedAcceptanceIds": [
+        "P2-T01"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P2-002",
+      "package": "P2",
+      "summary": "Implement transaction-bound power stores and integrate canonical port writers without independent commits",
+      "designDocument": "p2-persistence-commands.md",
+      "plannedAcceptanceIds": [
+        "P2-T02"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P2-003",
+      "package": "P2",
+      "summary": "Implement every mutation family with replay-first ledger, aggregate CAS and complete receipts",
+      "designDocument": "p2-persistence-commands.md",
+      "plannedAcceptanceIds": [
+        "P2-T03"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P2-004",
+      "package": "P2",
+      "summary": "Advance coordinated design token and invalidate old/new dependency closures atomically",
+      "designDocument": "p2-persistence-commands.md",
+      "plannedAcceptanceIds": [
+        "P2-T04"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P2-005",
+      "package": "P2",
+      "summary": "Extend ProjectDerivedResults with immutable evaluation rows and guarded mutable pointers",
+      "designDocument": "p2-persistence-commands.md",
+      "plannedAcceptanceIds": [
+        "P2-T05"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P2-006",
+      "package": "P2",
+      "summary": "Add coordinated power companion snapshot and manifest; preserve old physical hashes",
+      "designDocument": "p2-persistence-commands.md",
+      "plannedAcceptanceIds": [
+        "P2-T06"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P2-007",
+      "package": "P2",
+      "summary": "Persist reversible history and validate ordinary inverse/forward commands atomically",
+      "designDocument": "p2-persistence-commands.md",
+      "plannedAcceptanceIds": [
+        "P2-T07"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P2-008",
+      "package": "P2",
+      "summary": "Integrate adoption/deletion/membership guards and stable storage/error translation",
+      "designDocument": "p2-persistence-commands.md",
+      "plannedAcceptanceIds": [
+        "P2-T08"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P3-001",
+      "package": "P3",
+      "summary": "Build one deterministic derived graph per captured revision/scenario/segment from canonical identities",
+      "designDocument": "p3-topology-trace.md",
+      "plannedAcceptanceIds": [
+        "P3-T01"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P3-002",
+      "package": "P3",
+      "summary": "Resolve availability, alternative-feed selection and transfer direction before connectivity checks",
+      "designDocument": "p3-topology-trace.md",
+      "plannedAcceptanceIds": [
+        "P3-T02"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P3-003",
+      "package": "P3",
+      "summary": "Preserve passive continuity and independently validate power/data direction and domain",
+      "designDocument": "p3-topology-trace.md",
+      "plannedAcceptanceIds": [
+        "P3-T03"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P3-004",
+      "package": "P3",
+      "summary": "Detect active cycles, reconvergent supply paths, ambiguous direction and unsupported returns",
+      "designDocument": "p3-topology-trace.md",
+      "plannedAcceptanceIds": [
+        "P3-T04"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P3-005",
+      "package": "P3",
+      "summary": "Check voltage guarantees, AC frequency, DC polarity and supported transfer envelopes",
+      "designDocument": "p3-topology-trace.md",
+      "plannedAcceptanceIds": [
+        "P3-T05"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P3-006",
+      "package": "P3",
+      "summary": "Trace ordered provenance to explicit source boundaries with unresolved frontiers",
+      "designDocument": "p3-topology-trace.md",
+      "plannedAcceptanceIds": [
+        "P3-T06"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P3-007",
+      "package": "P3",
+      "summary": "Separate topology, realization, capacity and backup dimensions; retain missing-input dependencies",
+      "designDocument": "p3-topology-trace.md",
+      "plannedAcceptanceIds": [
+        "P3-T07"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P3-008",
+      "package": "P3",
+      "summary": "Read frozen trace entirely from verified captured evidence",
+      "designDocument": "p3-topology-trace.md",
+      "plannedAcceptanceIds": [
+        "P3-T08"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P4-001",
+      "package": "P4",
+      "summary": "Resolve leaf state demands into typed contribution records without missing-to-zero coercion",
+      "designDocument": "p4-load-conversion.md",
+      "plannedAcceptanceIds": [
+        "P4-T01"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P4-002",
+      "package": "P4",
+      "summary": "Aggregate distinct contributions per output/group/source across all system memberships",
+      "designDocument": "p4-load-conversion.md",
+      "plannedAcceptanceIds": [
+        "P4-T02"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P4-003",
+      "package": "P4",
+      "summary": "Apply transfer efficiency and own loss at one declared boundary",
+      "designDocument": "p4-load-conversion.md",
+      "plannedAcceptanceIds": [
+        "P4-T03"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P4-004",
+      "package": "P4",
+      "summary": "Compute PSU required/available margins with independent reserve and derating policy",
+      "designDocument": "p4-load-conversion.md",
+      "plannedAcceptanceIds": [
+        "P4-T04"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P4-005",
+      "package": "P4",
+      "summary": "Assess UPS W and VA independently using explicit input PF/VA basis",
+      "designDocument": "p4-load-conversion.md",
+      "plannedAcceptanceIds": [
+        "P4-T05"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P4-006",
+      "package": "P4",
+      "summary": "Assess peak duration/simultaneity separately from continuous demand",
+      "designDocument": "p4-load-conversion.md",
+      "plannedAcceptanceIds": [
+        "P4-T06"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P4-007",
+      "package": "P4",
+      "summary": "Emit deterministic arithmetic trace, applicability and per-dimension result",
+      "designDocument": "p4-load-conversion.md",
+      "plannedAcceptanceIds": [
+        "P4-T07"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P4-008",
+      "package": "P4",
+      "summary": "Integrate P5/P6 through one bottom-up evaluator, with no process dependency cycle",
+      "designDocument": "p4-load-conversion.md",
+      "plannedAcceptanceIds": [
+        "P4-T08"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P5-001",
+      "package": "P5",
+      "summary": "Resolve exact PSE/PD roles and supported declared delivery, never RJ45/Ethernet inference",
+      "designDocument": "p5-poe.md",
+      "plannedAcceptanceIds": [
+        "P5-T01"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P5-002",
+      "package": "P5",
+      "summary": "Validate full combined path, power-pass mappings and conducting resource evidence without new cable claims",
+      "designDocument": "p5-poe.md",
+      "plannedAcceptanceIds": [
+        "P5-T02"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P5-003",
+      "package": "P5",
+      "summary": "Implement GUARANTEED_PD allocation/guarantee accounting with loss allowance applied once",
+      "designDocument": "p5-poe.md",
+      "plannedAcceptanceIds": [
+        "P5-T03"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P5-004",
+      "package": "P5",
+      "summary": "Return BLOCKED for EXPLICIT_PATH_LOSS unless its exact pair/electrical model is implemented and verified",
+      "designDocument": "p5-poe.md",
+      "plannedAcceptanceIds": [
+        "P5-T04"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P5-005",
+      "package": "P5",
+      "summary": "Check PD guarantee, per-port allocation and shared group budget independently",
+      "designDocument": "p5-poe.md",
+      "plannedAcceptanceIds": [
+        "P5-T05"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P5-006",
+      "package": "P5",
+      "summary": "Map PSE output demand to upstream input with own consumption/conversion exactly once",
+      "designDocument": "p5-poe.md",
+      "plannedAcceptanceIds": [
+        "P5-T06"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P5-007",
+      "package": "P5",
+      "summary": "Model midspan/injector supply and data/power boundaries explicitly",
+      "designDocument": "p5-poe.md",
+      "plannedAcceptanceIds": [
+        "P5-T07"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P5-008",
+      "package": "P5",
+      "summary": "Include complete/missing path/group/scenario dependencies and restart-stable result evidence",
+      "designDocument": "p5-poe.md",
+      "plannedAcceptanceIds": [
+        "P5-T08"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P6-001",
+      "package": "P6",
+      "summary": "Build typed radial section resistance/current model from exact installed resources and terminations",
+      "designDocument": "p6-dc-backup.md",
+      "plannedAcceptanceIds": [
+        "P6-T01"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P6-002",
+      "package": "P6",
+      "summary": "Solve constant-current trunks/branches and report every terminal/current limit at source bounds",
+      "designDocument": "p6-dc-backup.md",
+      "plannedAcceptanceIds": [
+        "P6-T02"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P6-003",
+      "package": "P6",
+      "summary": "Block nonlinear/mesh/shared-return models outside the supported first slice",
+      "designDocument": "p6-dc-backup.md",
+      "plannedAcceptanceIds": [
+        "P6-T03"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P6-004",
+      "package": "P6",
+      "summary": "Validate bank series/parallel compatibility, voltage, rating conditions and usable-capacity model",
+      "designDocument": "p6-dc-backup.md",
+      "plannedAcceptanceIds": [
+        "P6-T04"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P6-005",
+      "package": "P6",
+      "summary": "Compute piecewise protected energy and sequence margin with explicit duration/model/loss boundaries",
+      "designDocument": "p6-dc-backup.md",
+      "plannedAcceptanceIds": [
+        "P6-T05"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P6-006",
+      "package": "P6",
+      "summary": "Validate charge/discharge selection and charger operating plus recharge load",
+      "designDocument": "p6-dc-backup.md",
+      "plannedAcceptanceIds": [
+        "P6-T06"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P6-007",
+      "package": "P6",
+      "summary": "Distinguish required capacity, available capacity and supported autonomy estimate",
+      "designDocument": "p6-dc-backup.md",
+      "plannedAcceptanceIds": [
+        "P6-T07"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P6-008",
+      "package": "P6",
+      "summary": "Persist complete arithmetic/model assumptions and target only affected dependencies",
+      "designDocument": "p6-dc-backup.md",
+      "plannedAcceptanceIds": [
+        "P6-T08"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P7-001",
+      "package": "P7",
+      "summary": "Encode typed dependency keys and persist present/missing exact inputs for every process",
+      "designDocument": "p7-dependencies-workspace.md",
+      "plannedAcceptanceIds": [
+        "P7-T01"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P7-002",
+      "package": "P7",
+      "summary": "Invalidate old/new graph closure across shared systems and disconnected paths atomically",
+      "designDocument": "p7-dependencies-workspace.md",
+      "plannedAcceptanceIds": [
+        "P7-T02"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P7-003",
+      "package": "P7",
+      "summary": "Capture/calculate/publish with token/fingerprint/pointer CAS and stale-race rejection",
+      "designDocument": "p7-dependencies-workspace.md",
+      "plannedAcceptanceIds": [
+        "P7-T03"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P7-004",
+      "package": "P7",
+      "summary": "Implement revision/scenario-aware power overlay and shared-source budget view",
+      "designDocument": "p7-dependencies-workspace.md",
+      "plannedAcceptanceIds": [
+        "P7-T04"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P7-005",
+      "package": "P7",
+      "summary": "Implement one progressive side card with back/forward selection retention and explanation",
+      "designDocument": "p7-dependencies-workspace.md",
+      "plannedAcceptanceIds": [
+        "P7-T05"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P7-006",
+      "package": "P7",
+      "summary": "Route preview, commit, failed draft, undo/redo through public application commands",
+      "designDocument": "p7-dependencies-workspace.md",
+      "plannedAcceptanceIds": [
+        "P7-T06"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P7-007",
+      "package": "P7",
+      "summary": "Implement frozen read-only, NOT_CAPTURED and captured-empty states distinctly",
+      "designDocument": "p7-dependencies-workspace.md",
+      "plannedAcceptanceIds": [
+        "P7-T07"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P7-008",
+      "package": "P7",
+      "summary": "Cover compact width, keyboard/focus/back handling and findings remediation navigation",
+      "designDocument": "p7-dependencies-workspace.md",
+      "plannedAcceptanceIds": [
+        "P7-T08"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P8-001",
+      "package": "P8",
+      "summary": "Implement deterministic FK-valid public-command builders and all four discipline verticals",
+      "designDocument": "p8-acceptance.md",
+      "plannedAcceptanceIds": [
+        "P8-T01"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P8-002",
+      "package": "P8",
+      "summary": "Verify shared sources and exact affected/unaffected dependency sets",
+      "designDocument": "p8-acceptance.md",
+      "plannedAcceptanceIds": [
+        "P8-T02"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P8-003",
+      "package": "P8",
+      "summary": "Verify fresh and every supported historical migration origin without synthetic power backfill",
+      "designDocument": "p8-acceptance.md",
+      "plannedAcceptanceIds": [
+        "P8-T03"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P8-004",
+      "package": "P8",
+      "summary": "Close/reopen file SQLite and prove exact revision/profile/resource/result identity",
+      "designDocument": "p8-acceptance.md",
+      "plannedAcceptanceIds": [
+        "P8-T04"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P8-005",
+      "package": "P8",
+      "summary": "Inject every owned durable failure checkpoint and inspect atomic rollback",
+      "designDocument": "p8-acceptance.md",
+      "plannedAcceptanceIds": [
+        "P8-T05"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P8-006",
+      "package": "P8",
+      "summary": "Verify lost-response replay, payload conflict and concurrent mutation/publication boundaries",
+      "designDocument": "p8-acceptance.md",
+      "plannedAcceptanceIds": [
+        "P8-T06"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P8-007",
+      "package": "P8",
+      "summary": "Prove frozen R1 independence from R2/current catalog/archive changes",
+      "designDocument": "p8-acceptance.md",
+      "plannedAcceptanceIds": [
+        "P8-T07"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P8-008",
+      "package": "P8",
+      "summary": "Exercise malformed, missing, unsupported, overload and numerical/property cases with explicit negative controls",
+      "designDocument": "p8-acceptance.md",
+      "plannedAcceptanceIds": [
+        "P8-T08"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P9-001",
+      "package": "P9",
+      "summary": "Resolve every requirement to actual source/test/evidence and review design deviations explicitly",
+      "designDocument": "p9-closure.md",
+      "plannedAcceptanceIds": [
+        "P9-T01"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P9-002",
+      "package": "P9",
+      "summary": "Audit every public command for scope, CAS, replay, rollback, invalidation and lifecycle",
+      "designDocument": "p9-closure.md",
+      "plannedAcceptanceIds": [
+        "P9-T02"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P9-003",
+      "package": "P9",
+      "summary": "Reconcile all six process boundaries, typed results and no-double-count invariants",
+      "designDocument": "p9-closure.md",
+      "plannedAcceptanceIds": [
+        "P9-T03"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P9-004",
+      "package": "P9",
+      "summary": "Reconcile baseline closure, migration, history and frozen hash guarantees",
+      "designDocument": "p9-closure.md",
+      "plannedAcceptanceIds": [
+        "P9-T04"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P9-005",
+      "package": "P9",
+      "summary": "Run required generation/format/analyze/core/mobile/P8 checks at one exact source SHA",
+      "designDocument": "p9-closure.md",
+      "plannedAcceptanceIds": [
+        "P9-T05"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P9-006",
+      "package": "P9",
+      "summary": "Disposition defects and unsupported models without hiding blocked engineering",
+      "designDocument": "p9-closure.md",
+      "plannedAcceptanceIds": [
+        "P9-T06"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P9-007",
+      "package": "P9",
+      "summary": "Update authoritative stage status and publish explicit ELV5–ELV8 handoff",
+      "designDocument": "p9-closure.md",
+      "plannedAcceptanceIds": [
+        "P9-T07"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    },
+    {
+      "requirementId": "ELV4-P9-008",
+      "package": "P9",
+      "summary": "Separate design approval, runtime acceptance, merge and CLOSED events with immutable evidence refs",
+      "designDocument": "p9-closure.md",
+      "plannedAcceptanceIds": [
+        "P9-T08"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": []
+    }
+  ]
+}
