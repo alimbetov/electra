@@ -7,6 +7,7 @@ on:
     paths:
       - .github/workflows/tmp-elv4-p2-command-gate.yml
       - apps/mobile/lib/application/power_mutation_command.dart
+      - apps/mobile/lib/data/database/drift_raw_statement.dart
       - apps/mobile/lib/data/repositories/drift_power_command_service.dart
       - apps/mobile/test/data/elv4_p2_power_command_service_test.dart
 
@@ -28,33 +29,55 @@ jobs:
       - name: Install mobile dependencies
         working-directory: apps/mobile
         run: flutter pub get
-      - name: Normalize SHA fixtures
+      - name: Normalize P2 analyzer fixes
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          p = Path('apps/mobile/test/data/elv4_p2_power_command_service_test.dart')
-          text = p.read_text()
+          test = Path('apps/mobile/test/data/elv4_p2_power_command_service_test.dart')
+          text = test.read_text()
           text = text.replace("'a' * 64", "'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'")
           text = text.replace("'b' * 64", "'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'")
-          p.write_text(text)
+          test.write_text(text)
+
+          service = Path('apps/mobile/lib/data/repositories/drift_power_command_service.dart')
+          text = service.read_text()
+          text = text.replace(
+              "    ReplaceBatteryBankCommand value => _replaceBatteryBank(value),\n  };",
+              "    ReplaceBatteryBankCommand value => _replaceBatteryBank(value),\n    _ => Future<void>.error(\n      const PowerRuntimeStorageException('ELV4_UNSUPPORTED_MUTATION_COMMAND'),\n    ),\n  };",
+              1,
+          )
+          text = text.replace(
+              "          Variable<String?>(segment.durationSeconds == null\n              ? null\n              : canonicalEngineeringJsonV1({'seconds': segment.durationSeconds!.toWireDecimal()})),",
+              "          segment.durationSeconds == null\n              ? null\n              : canonicalEngineeringJsonV1({\n                  'seconds': segment.durationSeconds!.toWireDecimal(),\n                }),",
+          )
+          text = text.replace("          Variable<String?>(member.connectionId),", "          member.connectionId,")
+          text = text.replace("          Variable<String?>(member.allocationId),", "          member.allocationId,")
+          text = text.replace("        Variable<String?>(command.upsComponentId),", "        command.upsComponentId,")
+          text = text.replace("        Variable<String?>(command.chargerComponentId),", "        command.chargerComponentId,")
+          text = text.replace("        Variable<String?>(command.bankComponentId),", "        command.bankComponentId,")
+          marker = "    ReplaceBatteryBankCommand value => [value.bindingId],\n  };"
+          replacement = "    ReplaceBatteryBankCommand value => [value.bindingId],\n    _ => throw const PowerRuntimeStorageException(\n      'ELV4_UNSUPPORTED_MUTATION_COMMAND',\n    ),\n  };"
+          if marker in text:
+              text = text.replace(marker, replacement, 1)
+          service.write_text(text)
           PY
       - name: Format P2 command sources
         working-directory: apps/mobile
-        run: dart format lib/application/power_mutation_command.dart lib/data/repositories/drift_power_command_service.dart test/data/elv4_p2_power_command_service_test.dart
+        run: dart format lib/application/power_mutation_command.dart lib/data/database/drift_raw_statement.dart lib/data/repositories/drift_power_command_service.dart test/data/elv4_p2_power_command_service_test.dart
       - name: Analyze mobile
         working-directory: apps/mobile
         run: flutter analyze
       - name: Run P2 command contract
         working-directory: apps/mobile
         run: flutter test test/data/elv4_p2_power_command_service_test.dart test/data/elv4_p2_persistence_test.dart test/data/elv4_p7_runtime_test.dart
-      - name: Commit verified formatting
+      - name: Commit verified P2 implementation
         run: |
-          if git diff --quiet -- apps/mobile/lib/application/power_mutation_command.dart apps/mobile/lib/data/repositories/drift_power_command_service.dart apps/mobile/test/data/elv4_p2_power_command_service_test.dart; then
-            echo 'P2 command sources already formatted.'
+          if git diff --quiet -- apps/mobile/lib/application/power_mutation_command.dart apps/mobile/lib/data/database/drift_raw_statement.dart apps/mobile/lib/data/repositories/drift_power_command_service.dart apps/mobile/test/data/elv4_p2_power_command_service_test.dart; then
+            echo 'P2 command sources already normalized.'
             exit 0
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add apps/mobile/lib/application/power_mutation_command.dart apps/mobile/lib/data/repositories/drift_power_command_service.dart apps/mobile/test/data/elv4_p2_power_command_service_test.dart
-          git commit -m 'style(elv4): normalize P2 power command service'
+          git add apps/mobile/lib/application/power_mutation_command.dart apps/mobile/lib/data/database/drift_raw_statement.dart apps/mobile/lib/data/repositories/drift_power_command_service.dart apps/mobile/test/data/elv4_p2_power_command_service_test.dart
+          git commit -m 'fix(elv4): stabilize P2 power command boundary'
           git push origin HEAD:feat/flutter-elv4-power-topology-design
