@@ -34,12 +34,14 @@ final class PowerWorkspaceController {
 
   PowerWorkspaceState? _state;
   PowerWorkspaceProjection? _projection;
+  ElvReviewedWorkspaceCommand? _reviewedRouteCommand;
 
   PowerWorkspaceState get state =>
       _state ?? (throw StateError('Power workspace is not open.'));
   PowerWorkspaceProjection get projection =>
       _projection ?? (throw StateError('Power workspace is not open.'));
   bool get isOpen => _state != null && _projection != null;
+  bool get hasReviewedRouteCommand => _reviewedRouteCommand != null;
 
   PowerWorkspaceSessionSnapshot get snapshot => PowerWorkspaceSessionSnapshot(
     state: state,
@@ -48,6 +50,7 @@ final class PowerWorkspaceController {
 
   Future<PowerWorkspaceSessionSnapshot?> open(String projectId) async {
     final result = await repository.open(projectId);
+    _reviewedRouteCommand = null;
     if (result == null) {
       _state = null;
       _projection = null;
@@ -99,15 +102,47 @@ final class PowerWorkspaceController {
     return snapshot;
   }
 
-  PowerWorkspaceSessionSnapshot stageReviewedDraft({
+  /// Stages the exact command that produced the reviewed route preview.
+  ///
+  /// The transient command object remains in the application layer while the
+  /// serializable UI state stores only its display draft and SHA-256 review
+  /// fingerprint. Apply therefore cannot substitute a different command after
+  /// review without first staging another preview.
+  PowerWorkspaceSessionSnapshot stageReviewedRoute({
+    required ElvReviewedWorkspaceCommand command,
     required Map<String, Object?> draft,
-    required String previewFingerprint,
   }) {
+    if (command.projectId != state.context.projectId) {
+      throw ArgumentError('Reviewed route project does not match workspace.');
+    }
+    if (command.designRevisionId != state.context.designRevisionId) {
+      throw ArgumentError('Reviewed route revision does not match workspace.');
+    }
+    _reviewedRouteCommand = command;
     _state = state.setDraft(
       draft: draft,
-      previewFingerprint: previewFingerprint,
+      previewFingerprint: command.reviewedFingerprint,
     );
     return snapshot;
+  }
+
+  PowerWorkspaceSessionSnapshot discardReviewedRoute() {
+    _reviewedRouteCommand = null;
+    _state = state.clearDraft();
+    return snapshot;
+  }
+
+  Future<ElvCommandResult<Object?>> commitStagedReviewedRoute() async {
+    final command = _reviewedRouteCommand;
+    if (command == null) {
+      return const ElvCommandFailureResult<Object?>(
+        ElvFailure(
+          code: 'ELV4_ROUTE_PREVIEW_REQUIRED',
+          category: ElvFailureCategory.validation,
+        ),
+      );
+    }
+    return commitReviewedRoute(command);
   }
 
   /// Commits only the exact reviewed physical-routing command through the
@@ -115,10 +150,10 @@ final class PowerWorkspaceController {
   ///
   /// Project, design revision and reviewed fingerprint are checked before the
   /// command reaches the mutating service. A command failure deliberately
-  /// retains the draft and fingerprint so the engineer can correct/review and
-  /// retry. The persistence-side executor must still CAS the command's own row
-  /// revisions/preconditions; these checks prevent UI context drift, not DB
-  /// concurrency races.
+  /// retains the draft, exact command and fingerprint so the engineer can
+  /// correct/review and retry. The persistence-side executor must still CAS the
+  /// command's own row revisions/preconditions; these checks prevent UI context
+  /// drift, not DB concurrency races.
   Future<ElvCommandResult<Object?>> commitReviewedRoute(
     ElvReviewedWorkspaceCommand command,
   ) async {
@@ -173,11 +208,20 @@ final class PowerWorkspaceController {
         ),
       );
     }
+    if (!identical(command, _reviewedRouteCommand)) {
+      return const ElvCommandFailureResult<Object?>(
+        ElvFailure(
+          code: 'ELV4_ROUTE_REVIEW_COMMAND_CHANGED',
+          category: ElvFailureCategory.revisionConflict,
+        ),
+      );
+    }
 
     _state = state.startOperation();
     final result = await service.execute(command);
     switch (result) {
       case ElvCommandSuccess<Object?>():
+        _reviewedRouteCommand = null;
         _state = state.clearDraft().finishOperation();
         await _reload(state);
       case ElvCommandFailureResult<Object?>():
