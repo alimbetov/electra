@@ -87,10 +87,10 @@ void main() {
         physicalEvidence: [
           DcSectionPhysicalEvidence(
             sectionId: 's1',
-            allocationId: 'allocation-1',
-            traversalRef: 'traversal-1',
-            resourceRefs: const ['pair-1'],
-            terminationRefs: const ['term-a', 'term-b'],
+            allocationId: 'allocation-s1',
+            traversalRef: 'traversal-s1',
+            resourceRefs: const ['resource-s1'],
+            terminationRefs: const ['term-a-s1', 'term-b-s1'],
           ),
         ],
         loadDemandEvaluations: [demand],
