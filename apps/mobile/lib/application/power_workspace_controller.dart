@@ -2,6 +2,7 @@ import 'elv_command_result.dart';
 import 'elv_physical_routing_workspace_service.dart';
 import 'elv_reviewed_workspace_command.dart';
 import 'elv_revision_command_history_service.dart';
+import 'id_generator.dart';
 import 'power_workspace_projection.dart';
 import 'power_workspace_state.dart';
 
@@ -26,15 +27,19 @@ final class PowerWorkspaceController {
     required this.repository,
     this.routingService,
     this.historyService,
-  });
+    IdGenerator? historyCommandIds,
+  }) : historyCommandIds = historyCommandIds ?? UuidV7IdGenerator();
 
   final PowerWorkspaceRepository repository;
   final ElvWorkspaceCommandService? routingService;
   final ElvRevisionCommandHistoryService? historyService;
+  final IdGenerator historyCommandIds;
 
   PowerWorkspaceState? _state;
   PowerWorkspaceProjection? _projection;
   ElvReviewedWorkspaceCommand? _reviewedRouteCommand;
+  String? _pendingUndoCommandId;
+  String? _pendingRedoCommandId;
 
   PowerWorkspaceState get state =>
       _state ?? (throw StateError('Power workspace is not open.'));
@@ -49,6 +54,7 @@ final class PowerWorkspaceController {
   Future<PowerWorkspaceSessionSnapshot?> open(String projectId) async {
     final result = await repository.open(projectId);
     _reviewedRouteCommand = null;
+    _clearPendingHistoryCommands();
     if (result == null) {
       _state = null;
       _projection = null;
@@ -76,9 +82,12 @@ final class PowerWorkspaceController {
   Future<PowerWorkspaceSessionSnapshot> switchScenario({
     required String scenarioId,
     required String segmentId,
-  }) => _reload(
-    state.switchScenario(scenarioId: scenarioId, segmentId: segmentId),
-  );
+  }) {
+    _clearPendingHistoryCommands();
+    return _reload(
+      state.switchScenario(scenarioId: scenarioId, segmentId: segmentId),
+    );
+  }
 
   PowerWorkspaceSessionSnapshot setOverlay(PowerWorkspaceOverlayMode mode) {
     _state = state.setOverlay(mode);
@@ -100,12 +109,6 @@ final class PowerWorkspaceController {
     return snapshot;
   }
 
-  /// Stages the exact command that produced the reviewed route preview.
-  ///
-  /// The transient command object remains in the application layer while the
-  /// serializable UI state stores only its display draft and SHA-256 review
-  /// fingerprint. Apply therefore cannot substitute a different command after
-  /// review without first staging another preview.
   PowerWorkspaceSessionSnapshot stageReviewedRoute({
     required ElvReviewedWorkspaceCommand command,
     required Map<String, Object?> draft,
@@ -143,15 +146,6 @@ final class PowerWorkspaceController {
     return commitReviewedRoute(command);
   }
 
-  /// Commits only the exact reviewed physical-routing command through the
-  /// public ELV workspace service.
-  ///
-  /// Project, design revision and reviewed fingerprint are checked before the
-  /// command reaches the mutating service. A command failure deliberately
-  /// retains the draft, exact command and fingerprint so the engineer can
-  /// correct/review and retry. The persistence-side executor must still CAS the
-  /// command's own row revisions/preconditions; these checks prevent UI context
-  /// drift, not DB concurrency races.
   Future<ElvCommandResult<Object?>> commitReviewedRoute(
     ElvReviewedWorkspaceCommand command,
   ) async {
@@ -220,6 +214,7 @@ final class PowerWorkspaceController {
     switch (result) {
       case ElvCommandSuccess<Object?>():
         _reviewedRouteCommand = null;
+        _clearPendingHistoryCommands();
         _state = state.clearDraft().finishOperation();
         await _reload(state);
       case ElvCommandFailureResult<Object?>():
@@ -270,26 +265,37 @@ final class PowerWorkspaceController {
         ),
       );
     }
+
+    final executionCommandId = undo
+        ? (_pendingUndoCommandId ??= historyCommandIds.next())
+        : (_pendingRedoCommandId ??= historyCommandIds.next());
     _state = state.startOperation();
     final context = state.context;
-    final result =
-        undo
-            ? await history.undo(
-              projectId: context.projectId,
-              designRevisionId: context.designRevisionId,
-            )
-            : await history.redo(
-              projectId: context.projectId,
-              designRevisionId: context.designRevisionId,
-            );
+    final result = undo
+        ? await history.undo(
+            projectId: context.projectId,
+            designRevisionId: context.designRevisionId,
+            executionCommandId: executionCommandId,
+          )
+        : await history.redo(
+            projectId: context.projectId,
+            designRevisionId: context.designRevisionId,
+            executionCommandId: executionCommandId,
+          );
     switch (result) {
       case ElvCommandSuccess<Object?>():
+        _clearPendingHistoryCommands();
         _state = state.finishOperation();
         await _reload(state);
       case ElvCommandFailureResult<Object?>():
         _state = state.failOperation(result.failure.code);
     }
     return result;
+  }
+
+  void _clearPendingHistoryCommands() {
+    _pendingUndoCommandId = null;
+    _pendingRedoCommandId = null;
   }
 
   Future<PowerWorkspaceSessionSnapshot> _reload(
