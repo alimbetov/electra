@@ -19,7 +19,7 @@ on:
       - apps/mobile/test/data/elv4_p2_persistence_test.dart
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   p7-closure:
@@ -39,103 +39,10 @@ jobs:
         run: flutter pub get --enforce-lockfile
       - name: Generate Drift code
         run: dart run build_runner build
-      - name: Apply P7 source normalizations and freeze hook
+      - name: Verify P7 closure formatting
         working-directory: .
         run: |
-          python - <<'PY'
-          from pathlib import Path
-
-          raw_import = "import '../database/drift_raw_statement.dart';\n"
-
-          for relative in [
-              'apps/mobile/lib/data/repositories/drift_power_runtime_store.dart',
-              'apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart',
-              'apps/mobile/lib/data/repositories/drift_power_batch_publication_runtime.dart',
-          ]:
-              path = Path(relative)
-              text = path.read_text()
-              anchor = "import '../database/app_database.dart';\n"
-              if raw_import not in text:
-                  if anchor not in text:
-                      raise SystemExit(f'app_database import anchor missing: {relative}')
-                  text = text.replace(anchor, anchor + raw_import, 1)
-              text = text.replace('database.customStatement(', 'runRawStatement(database, ')
-              text = text.replace("generation: row!.read<int>('generation'),", "generation: row.read<int>('generation'),")
-              path.write_text(text)
-
-          p2_test = Path('apps/mobile/test/data/elv4_p2_persistence_test.dart')
-          text = p2_test.read_text()
-          package_import = "import 'package:electra_mobile/data/database/drift_raw_statement.dart';\n"
-          package_anchor = "import 'package:electra_mobile/data/database/app_database.dart';\n"
-          if package_import not in text:
-              if package_anchor not in text:
-                  raise SystemExit('P2 app_database import anchor missing')
-              text = text.replace(package_anchor, package_anchor + package_import, 1)
-          text = text.replace('db.customStatement(', 'runRawStatement(db, ')
-          p2_test.write_text(text)
-
-          test = Path('apps/mobile/test/data/elv4_p7_runtime_test.dart')
-          text = test.read_text()
-          text = text.replace("expect(captured.reasonCode, isNull);", "expect(captured.reasonCode, null);")
-          test.write_text(text)
-
-          batch_test = Path('apps/mobile/test/data/elv4_p7_batch_runtime_test.dart')
-          text = batch_test.read_text()
-          text = text.replace("    final aBase = _input([_factKey('A', 'FACT')]);\n", "")
-          batch_test.write_text(text)
-
-          workspace = Path('apps/mobile/lib/application/power_workspace_state.dart')
-          text = workspace.read_text()
-          if 'clearPortSelection' not in text:
-              text = text.replace(
-                  "      clearSelection: normalizedComponent == null,\n      clearQuerySnapshot: true,",
-                  "      clearSelection: normalizedComponent == null,\n      clearPortSelection:\n          normalizedComponent != null && normalizedPort == null,\n      clearQuerySnapshot: true,",
-                  1,
-              )
-              text = text.replace(
-                  "    bool clearSelection = false,\n    PowerWorkspaceOverlayMode? overlayMode,",
-                  "    bool clearSelection = false,\n    bool clearPortSelection = false,\n    PowerWorkspaceOverlayMode? overlayMode,",
-                  1,
-              )
-              text = text.replace(
-                  "        selectedPortId:\n            clearSelection ? null : selectedPortId ?? this.selectedPortId,",
-                  "        selectedPortId: clearSelection || clearPortSelection\n            ? null\n            : selectedPortId ?? this.selectedPortId,",
-                  1,
-              )
-          workspace.write_text(text)
-
-          workspace_test = Path('apps/mobile/test/application/power_workspace_state_test.dart')
-          text = workspace_test.read_text()
-          marker = "  test('P7 workspace discards stale async query and technical responses', () {"
-          selection_test = """  test('P7 selecting a new component without a port clears stale port selection', () {\n    var state = _state().select(\n      componentId: 'camera-1',\n      portId: 'power-in',\n    );\n    state = state.select(componentId: 'camera-2');\n\n    expect(state.selectedComponentId, 'camera-2');\n    expect(state.selectedPortId, null);\n  });\n\n"""
-          if selection_test not in text:
-              text = text.replace(marker, selection_test + marker, 1)
-          workspace_test.write_text(text)
-
-          repo = Path('apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart')
-          text = repo.read_text()
-          import_anchor = "import 'drift_elv_runtime_support.dart';\n"
-          power_import = "import 'drift_power_publication_runtime.dart';\n"
-          if power_import not in text:
-              text = text.replace(import_anchor, import_anchor + power_import)
-
-          old_ctor = """    ElvFailureProbe? failureProbe,\n    DateTime Function()? now,\n  }) : failureProbe = failureProbe ?? const NoopElvFailureProbe(),\n       _now = now ?? (() => DateTime.now().toUtc());\n\n  final AppDatabase database;\n  final String originDeviceId;\n  final ElvFailureProbe failureProbe;\n  final DateTime Function() _now;\n"""
-          new_ctor = """    ElvFailureProbe? failureProbe,\n    DateTime Function()? now,\n    DriftPowerPublicationRuntime? powerRuntime,\n  }) : failureProbe = failureProbe ?? const NoopElvFailureProbe(),\n       _now = now ?? (() => DateTime.now().toUtc()),\n       powerRuntime =\n           powerRuntime ??\n           DriftPowerPublicationRuntime(\n             database,\n             originDeviceId: originDeviceId,\n             now: now,\n           );\n\n  final AppDatabase database;\n  final String originDeviceId;\n  final ElvFailureProbe failureProbe;\n  final DateTime Function() _now;\n  final DriftPowerPublicationRuntime powerRuntime;\n"""
-          if old_ctor in text:
-              text = text.replace(old_ctor, new_ctor)
-
-          freeze_anchor = """        );\n    await failureProbe.hit(ElvFailurePoints.p3FreezeAfterSnapshotInsert);\n"""
-          freeze_replacement = """        );\n    await powerRuntime.captureCommittedPowerSectionForFreeze(\n      projectId: row.projectId,\n      designRevisionId: row.id,\n      expectedRevisionToken: row.revision,\n      physicalSha256: snapshot.contentSha256,\n    );\n    await failureProbe.hit(ElvFailurePoints.p3FreezeAfterSnapshotInsert);\n"""
-          if 'captureCommittedPowerSectionForFreeze(' not in text:
-              if freeze_anchor not in text:
-                  raise SystemExit('freeze insertion anchor not found')
-              text = text.replace(freeze_anchor, freeze_replacement, 1)
-          repo.write_text(text)
-          PY
-      - name: Format P7 closure slice
-        working-directory: .
-        run: |
-          dart format \
+          dart format --output=none --set-exit-if-changed \
             apps/mobile/lib/data/database/drift_raw_statement.dart \
             apps/mobile/lib/data/repositories/drift_power_runtime_store.dart \
             apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart \
@@ -158,36 +65,3 @@ jobs:
             test/application/power_workspace_state_test.dart \
             test/data/elv4_p2_persistence_test.dart \
             test/data/elv_p3_runtime_closure_test.dart
-      - name: Commit normalized P7 closure slice
-        working-directory: .
-        run: |
-          if git diff --quiet -- \
-            apps/mobile/lib/data/database/drift_raw_statement.dart \
-            apps/mobile/lib/data/repositories/drift_power_runtime_store.dart \
-            apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart \
-            apps/mobile/lib/data/repositories/drift_power_batch_publication_runtime.dart \
-            apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart \
-            apps/mobile/lib/application/power_workspace_state.dart \
-            apps/mobile/test/data/elv4_p2_persistence_test.dart \
-            apps/mobile/test/data/elv4_p7_runtime_test.dart \
-            apps/mobile/test/data/elv4_p7_batch_runtime_test.dart \
-            apps/mobile/test/data/elv4_p7_freeze_integration_test.dart \
-            apps/mobile/test/application/power_workspace_state_test.dart; then
-            exit 0
-          fi
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add \
-            apps/mobile/lib/data/database/drift_raw_statement.dart \
-            apps/mobile/lib/data/repositories/drift_power_runtime_store.dart \
-            apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart \
-            apps/mobile/lib/data/repositories/drift_power_batch_publication_runtime.dart \
-            apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart \
-            apps/mobile/lib/application/power_workspace_state.dart \
-            apps/mobile/test/data/elv4_p2_persistence_test.dart \
-            apps/mobile/test/data/elv4_p7_runtime_test.dart \
-            apps/mobile/test/data/elv4_p7_batch_runtime_test.dart \
-            apps/mobile/test/data/elv4_p7_freeze_integration_test.dart \
-            apps/mobile/test/application/power_workspace_state_test.dart
-          git commit -m "fix(elv4): close P7 publication lifecycle"
-          git push origin HEAD:${{ github.ref_name }}
