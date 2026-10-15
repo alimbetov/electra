@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:drift/drift.dart';
+import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:electra_mobile/application/elv_command_result.dart';
 import 'package:electra_mobile/application/elv_design_revision_command.dart';
@@ -130,28 +130,27 @@ void main() {
 
       var db = AppDatabase(NativeDatabase(file));
       await _seedProject(db, now);
-      await db.into(db.projectDesignRevisions).insert(
-        ProjectDesignRevisionsCompanion.insert(
-          id: 'LEGACY-R0',
-          projectId: 'project-p8',
-          code: 'R0',
-          sequence: 1,
-          state: 'FROZEN',
-          revision: const Value(1),
-          createdAt: now,
-          updatedAt: now,
-          originDeviceId: 'legacy-seed',
-        ),
-      );
+      await db
+          .into(db.projectDesignRevisions)
+          .insert(
+            ProjectDesignRevisionsCompanion.insert(
+              id: 'LEGACY-R0',
+              projectId: 'project-p8',
+              code: 'R0',
+              sequence: 1,
+              state: 'FROZEN',
+              revision: const Value(1),
+              createdAt: now,
+              updatedAt: now,
+              originDeviceId: 'legacy-seed',
+            ),
+          );
 
       final before = await DriftPowerPublicationRuntime(
         db,
         originDeviceId: 'test',
         now: () => now,
-      ).readRevision(
-        projectId: 'project-p8',
-        designRevisionId: 'LEGACY-R0',
-      );
+      ).readRevision(projectId: 'project-p8', designRevisionId: 'LEGACY-R0');
       expect(before.kind, PowerRevisionReadKind.notCaptured);
       expect(before.mutationAllowed, isFalse);
       expect(before.capturedPayload, isNull);
@@ -166,10 +165,7 @@ void main() {
         db,
         originDeviceId: 'test',
         now: () => now,
-      ).readRevision(
-        projectId: 'project-p8',
-        designRevisionId: 'LEGACY-R0',
-      );
+      ).readRevision(projectId: 'project-p8', designRevisionId: 'LEGACY-R0');
       expect(after.kind, PowerRevisionReadKind.notCaptured);
       expect(after.mutationAllowed, isFalse);
       expect(after.capturedPayload, isNull);
