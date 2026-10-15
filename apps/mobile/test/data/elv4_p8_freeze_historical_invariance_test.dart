@@ -44,12 +44,10 @@ void main() {
 
       final r1PowerBefore =
           await (db.select(db.designRevisionPowerSnapshots)
-                ..where((row) => row.designRevisionId.equals('REV-1')))
-              .getSingle();
+            ..where((row) => row.designRevisionId.equals('REV-1'))).getSingle();
       final r1ManifestBefore =
           await (db.select(db.designRevisionSnapshotManifests)
-                ..where((row) => row.designRevisionId.equals('REV-1')))
-              .getSingle();
+            ..where((row) => row.designRevisionId.equals('REV-1'))).getSingle();
       final runtimeBefore = DriftPowerPublicationRuntime(
         db,
         originDeviceId: 'test',
@@ -100,12 +98,10 @@ void main() {
       );
       final r1PowerAfter =
           await (db.select(db.designRevisionPowerSnapshots)
-                ..where((row) => row.designRevisionId.equals('REV-1')))
-              .getSingle();
+            ..where((row) => row.designRevisionId.equals('REV-1'))).getSingle();
       final r1ManifestAfter =
           await (db.select(db.designRevisionSnapshotManifests)
-                ..where((row) => row.designRevisionId.equals('REV-1')))
-              .getSingle();
+            ..where((row) => row.designRevisionId.equals('REV-1'))).getSingle();
 
       expect(r1After.kind, PowerRevisionReadKind.capturedEmpty);
       expect(r1After.mutationAllowed, isFalse);
