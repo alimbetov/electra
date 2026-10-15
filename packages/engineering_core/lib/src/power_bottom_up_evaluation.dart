@@ -259,28 +259,31 @@ PowerBottomUpEvaluationResult evaluateBottomUpPowerBoundary(
   );
 }
 
-/// P5 -> P4 adapter. PSE conversion/idle is owned by P5 and represented by a
-/// stable accounting key so the parent P4 boundary cannot apply it again.
+/// P5 -> P4 adapter. PSE conversion/idle is owned by P5 and represented by the
+/// shared PSE group identity, not by an individual PD delivery. The P5 result
+/// is group-wide; binding it to [groupId] prevents the same shared PSE input
+/// from being added once per delivery at the P4 parent boundary.
 PowerBoundaryDemand poeUpstreamBoundary({
-  required String originId,
+  required String groupId,
   required PoeEvaluationInput input,
   required PoeEvaluationResult result,
 }) {
+  final canonicalGroupId = _text(groupId, 'groupId');
   final outputBasis = switch (input.groupInputBasis) {
     PoeGroupInputBasis.conservativeReserved => result.groupReservedW,
     PoeGroupInputBasis.estimatedActual => input.estimatedActualGroupOutputW,
   };
   final upstream = result.upstreamInputW;
   return PowerBoundaryDemand(
-    originId: originId,
-    boundaryRef: 'POE:${input.deliveryId}',
+    originId: canonicalGroupId,
+    boundaryRef: 'POE_GROUP:$canonicalGroupId',
     sourceRef: 'PWR06:${input.deliveryId}',
     status: result.status,
     demandW: upstream,
     sourceOutputW: upstream == null ? null : outputBasis,
     accountedLossW:
         upstream == null || outputBasis == null ? null : upstream - outputBasis,
-    accountingKeys: ['P5_PSE_TRANSFER_${_keyToken(input.deliveryId)}'],
+    accountingKeys: ['P5_PSE_GROUP_TRANSFER_${_keyToken(canonicalGroupId)}'],
     findings: result.findings,
   );
 }
