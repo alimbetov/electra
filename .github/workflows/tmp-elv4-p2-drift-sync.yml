@@ -1,3 +1,4 @@
+# One-shot synchronization gate for ELV4 P2 schema and generated Drift bindings.
 name: Temporary ELV4 P2 Drift Sync
 
 on:
