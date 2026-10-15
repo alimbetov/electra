@@ -60,3 +60,6 @@ export 'src/elv_physical_profile_set.dart';
 export 'src/elv_physical_compatibility.dart';
 export 'src/elv_physical_calculations.dart';
 export 'src/elv_physical_evidence.dart';
+export 'src/power_numeric.dart';
+export 'src/power_profiles.dart';
+export 'src/power_definition_ref.dart';

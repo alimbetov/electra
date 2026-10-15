@@ -310,7 +310,17 @@ def main():
     checks.append(f'RM15: {len(manifest["positiveCases"])} positive manifests cover all processes; missing/unresolved qualification rejected; supported backup bound <44Wh')
     ledger = read(BASE / 'requirements.json')
     assert len(ledger['requirements']) == len({r['requirementId'] for r in ledger['requirements']}) == 80
-    assert all(r['runtimeStatus'] == 'NOT_STARTED' for r in ledger['requirements'])
+    # Implementation must be able to advance without weakening acceptance proof.
+    # This is a design/schema check, never a substitute for executed Dart/Flutter.
+    statuses = {'NOT_STARTED', 'IN_PROGRESS', 'BLOCKED', 'IMPLEMENTED', 'ACCEPTED'}
+    assert ledger['runtimeStatus'] in statuses
+    for requirement in ledger['requirements']:
+        assert requirement['runtimeStatus'] in statuses
+        for path in requirement['sourcePaths'] + requirement['testPaths']:
+            assert (ROOT / path).is_file(), f'Missing requirement evidence path: {path}'
+        if requirement['runtimeStatus'] in {'IMPLEMENTED', 'ACCEPTED'}:
+            assert requirement['sourcePaths'] and requirement['testPaths'] and requirement['evidence']
+            assert re.fullmatch(r'[a-f0-9]{40}', requirement['testedSha'] or '')
     resolutions = read(AUDIT / 'remediation.json')
     assert len(resolutions['resolutions']) == 15
     assert all(x['specificationStatus'] == 'SPEC_RESOLVED' and x['runtimeStatus'] == 'NOT_IMPLEMENTED' for x in resolutions['resolutions'])
@@ -328,7 +338,8 @@ def main():
               'scope': 'Specification oracles/schema subset only; not Flutter/Dart/runtime implementation evidence',
               'checks': checks, 'requirementCount': 80, 'specificationResolutions': 15,
               'positiveQualificationCases': len(manifest['positiveCases']), 'localLinksChecked': link_count,
-              'runtimeImplemented': False}
+              'runtimeStatus': ledger['runtimeStatus'],
+              'runtimeAcceptanceVerified': False}
     if args.output:
         args.output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + '\n')
     print(f'PASS: {len(checks)} specification checks, 80 requirements, 15 specification resolutions, {link_count} links; no runtime claim')

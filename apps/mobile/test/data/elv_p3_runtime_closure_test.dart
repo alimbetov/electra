@@ -36,11 +36,11 @@ DriftElvDesignRevisionRepository _repository(AppDatabase db) =>
 
 void main() {
   test(
-    'schema 20 exposes canonical P3 tables and keeps legacy CableRuns',
+    'current schema exposes canonical P3 tables and keeps legacy CableRuns',
     () async {
       final db = AppDatabase(NativeDatabase.memory());
       addTearDown(db.close);
-      expect(db.schemaVersion, 20);
+      expect(db.schemaVersion, greaterThanOrEqualTo(20));
       final names =
           (await db
                   .customSelect(

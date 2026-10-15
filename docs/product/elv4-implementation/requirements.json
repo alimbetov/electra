@@ -1,7 +1,7 @@
 {
   "schema": "electra.elv4-implementation-requirements.v1",
   "designStatus": "DRAFT",
-  "runtimeStatus": "NOT_STARTED",
+  "runtimeStatus": "IN_PROGRESS",
   "requirements": [
     {
       "requirementId": "ELV4-P0-001",
@@ -11,11 +11,15 @@
       "plannedAcceptanceIds": [
         "P0-T01"
       ],
-      "runtimeStatus": "NOT_STARTED",
-      "sourcePaths": [],
+      "runtimeStatus": "IN_PROGRESS",
+      "sourcePaths": [
+        "docs/audit/elv4-p0-implementation-entry.md"
+      ],
       "testPaths": [],
       "testedSha": null,
-      "evidence": [],
+      "evidence": [
+        "P0 source reconciliation; baseline runtime acceptance remains open."
+      ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": []
     },
@@ -27,11 +31,15 @@
       "plannedAcceptanceIds": [
         "P0-T02"
       ],
-      "runtimeStatus": "NOT_STARTED",
-      "sourcePaths": [],
+      "runtimeStatus": "IN_PROGRESS",
+      "sourcePaths": [
+        "docs/audit/elv4-p0-implementation-entry.md"
+      ],
       "testPaths": [],
       "testedSha": null,
-      "evidence": [],
+      "evidence": [
+        "P0 source reconciliation; baseline runtime acceptance remains open."
+      ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": []
     },
@@ -43,11 +51,15 @@
       "plannedAcceptanceIds": [
         "P0-T03"
       ],
-      "runtimeStatus": "NOT_STARTED",
-      "sourcePaths": [],
+      "runtimeStatus": "IN_PROGRESS",
+      "sourcePaths": [
+        "docs/audit/elv4-p0-implementation-entry.md"
+      ],
       "testPaths": [],
       "testedSha": null,
-      "evidence": [],
+      "evidence": [
+        "P0 source reconciliation; baseline runtime acceptance remains open."
+      ],
       "specificationResolutions": [
         "ELV4-AUD-01"
       ],
@@ -63,11 +75,15 @@
       "plannedAcceptanceIds": [
         "P0-T04"
       ],
-      "runtimeStatus": "NOT_STARTED",
-      "sourcePaths": [],
+      "runtimeStatus": "IN_PROGRESS",
+      "sourcePaths": [
+        "docs/audit/elv4-p0-implementation-entry.md"
+      ],
       "testPaths": [],
       "testedSha": null,
-      "evidence": [],
+      "evidence": [
+        "P0 source reconciliation; baseline runtime acceptance remains open."
+      ],
       "specificationResolutions": [
         "ELV4-AUD-01"
       ],
@@ -83,11 +99,15 @@
       "plannedAcceptanceIds": [
         "P0-T05"
       ],
-      "runtimeStatus": "NOT_STARTED",
-      "sourcePaths": [],
+      "runtimeStatus": "IN_PROGRESS",
+      "sourcePaths": [
+        "docs/audit/elv4-p0-implementation-entry.md"
+      ],
       "testPaths": [],
       "testedSha": null,
-      "evidence": [],
+      "evidence": [
+        "P0 source reconciliation; baseline runtime acceptance remains open."
+      ],
       "specificationResolutions": [
         "ELV4-AUD-05",
         "ELV4-AUD-06"
@@ -105,11 +125,15 @@
       "plannedAcceptanceIds": [
         "P0-T06"
       ],
-      "runtimeStatus": "NOT_STARTED",
-      "sourcePaths": [],
+      "runtimeStatus": "IN_PROGRESS",
+      "sourcePaths": [
+        "docs/audit/elv4-p0-implementation-entry.md"
+      ],
       "testPaths": [],
       "testedSha": null,
-      "evidence": [],
+      "evidence": [
+        "P0 source reconciliation; baseline runtime acceptance remains open."
+      ],
       "specificationResolutions": [
         "ELV4-AUD-05",
         "ELV4-AUD-15"
@@ -127,11 +151,15 @@
       "plannedAcceptanceIds": [
         "P0-T07"
       ],
-      "runtimeStatus": "NOT_STARTED",
-      "sourcePaths": [],
+      "runtimeStatus": "IN_PROGRESS",
+      "sourcePaths": [
+        "docs/audit/elv4-p0-implementation-entry.md"
+      ],
       "testPaths": [],
       "testedSha": null,
-      "evidence": [],
+      "evidence": [
+        "P0 source reconciliation; baseline runtime acceptance remains open."
+      ],
       "specificationResolutions": [
         "ELV4-AUD-07",
         "ELV4-AUD-10"
@@ -149,11 +177,15 @@
       "plannedAcceptanceIds": [
         "P0-T08"
       ],
-      "runtimeStatus": "NOT_STARTED",
-      "sourcePaths": [],
+      "runtimeStatus": "IN_PROGRESS",
+      "sourcePaths": [
+        "docs/audit/elv4-p0-implementation-entry.md"
+      ],
       "testPaths": [],
       "testedSha": null,
-      "evidence": [],
+      "evidence": [
+        "P0 source reconciliation; baseline runtime acceptance remains open."
+      ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": []
     },
@@ -165,11 +197,20 @@
       "plannedAcceptanceIds": [
         "P1-T01"
       ],
-      "runtimeStatus": "NOT_STARTED",
-      "sourcePaths": [],
-      "testPaths": [],
+      "runtimeStatus": "IN_PROGRESS",
+      "sourcePaths": [
+        "packages/engineering_core/lib/src/power_numeric.dart",
+        "packages/engineering_core/lib/src/power_profiles.dart",
+        "packages/engineering_core/lib/src/power_definition_ref.dart"
+      ],
+      "testPaths": [
+        "packages/engineering_core/test/power_numeric_test.dart",
+        "packages/engineering_core/test/power_profiles_test.dart"
+      ],
       "testedSha": null,
-      "evidence": [],
+      "evidence": [
+        "Partial pure-domain slice; see docs/audit/elv4-p0-implementation-entry.md. Full requirement acceptance pending."
+      ],
       "specificationResolutions": [
         "ELV4-AUD-02",
         "ELV4-AUD-09"
@@ -209,11 +250,20 @@
       "plannedAcceptanceIds": [
         "P1-T03"
       ],
-      "runtimeStatus": "NOT_STARTED",
-      "sourcePaths": [],
-      "testPaths": [],
+      "runtimeStatus": "IN_PROGRESS",
+      "sourcePaths": [
+        "packages/engineering_core/lib/src/power_numeric.dart",
+        "packages/engineering_core/lib/src/power_profiles.dart",
+        "packages/engineering_core/lib/src/power_definition_ref.dart"
+      ],
+      "testPaths": [
+        "packages/engineering_core/test/power_numeric_test.dart",
+        "packages/engineering_core/test/power_profiles_test.dart"
+      ],
       "testedSha": null,
-      "evidence": [],
+      "evidence": [
+        "Partial pure-domain slice; see docs/audit/elv4-p0-implementation-entry.md. Full requirement acceptance pending."
+      ],
       "specificationResolutions": [
         "ELV4-AUD-12"
       ],
@@ -315,11 +365,20 @@
       "plannedAcceptanceIds": [
         "P1-T08"
       ],
-      "runtimeStatus": "NOT_STARTED",
-      "sourcePaths": [],
-      "testPaths": [],
+      "runtimeStatus": "IN_PROGRESS",
+      "sourcePaths": [
+        "packages/engineering_core/lib/src/power_numeric.dart",
+        "packages/engineering_core/lib/src/power_profiles.dart",
+        "packages/engineering_core/lib/src/power_definition_ref.dart"
+      ],
+      "testPaths": [
+        "packages/engineering_core/test/power_numeric_test.dart",
+        "packages/engineering_core/test/power_profiles_test.dart"
+      ],
       "testedSha": null,
-      "evidence": [],
+      "evidence": [
+        "Partial pure-domain slice; see docs/audit/elv4-p0-implementation-entry.md. Full requirement acceptance pending."
+      ],
       "specificationResolutions": [
         "ELV4-AUD-04",
         "ELV4-AUD-09",

@@ -49,7 +49,9 @@ This file is the P9 inventory required by `docs/product/elv3-code-contract-p7-p9
 - exact profile-set command/repository/service ports
 - physical calculation nodes/service/store
 
-Canonical Drift adapters/tables for these phases are still open.
+P3/P4 have concrete Drift adapters/tables in merged `7f1c70` (schema 21).
+P5 compatibility persistence, complete P6 dependency evidence and P7 persisted
+trace/history integration remain open; see the ELV4 P0 reconciliation below.
 
 ### P7 foundation
 
@@ -93,7 +95,11 @@ Five fixture plans are frozen: CCTV, LAN, ACS, Fire, Fiber. They are fixture-con
 
 ## current Drift schema
 
-Current implemented schema baseline is P2 / schema version 19.
+Current implemented schema baseline is P4 / schema version 21.
+
+Reconciled 2026-10-15 against `7f1c701cb4ba492589321f8f9827d20464ddaefb`.
+The previous P2/schema 19 statement described the earlier foundation checkpoint,
+not the merged runtime baseline. This correction does not establish RC9 closure.
 
 Canonical ELV tables currently implemented:
 
@@ -103,12 +109,15 @@ Canonical ELV tables currently implemented:
 - `CableResourceClaims`
 - `CableTerminationMappings`
 - `CommandExecutionRecords`
+- `ProjectDesignRevisions`, `DesignRevisionPhysicalSnapshots`
+- `CanonicalCableRuns`, `CableRunTraversals`, `RouteHandoffs`, `RouteBendEvidence`
+- `LegacyRouteAdoptions`
+- `PathwayContexts`, `PhysicalCarriers`, `PhysicalCarrierCompartments`
+- `TraversalCarrierAssignments`
 
 Planned but not yet persisted:
 
-- P3 schema 20 tables;
-- P4 schema 21 tables;
-- P5 schema 22 tables;
+- P5 compatibility profile-set/finding tables (next schema number must be allocated from actual baseline);
 - P6 separation-evidence/revision-scoped result persistence;
 - P7 command-history persistence.
 

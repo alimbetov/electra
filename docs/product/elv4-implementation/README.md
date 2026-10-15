@@ -1,6 +1,6 @@
 # ELV4 — Implementation technical specification
 
-Status: IMPLEMENTATION DESIGN DRAFT / RUNTIME NOT STARTED
+Status: IMPLEMENTATION STARTED / P0–P1 IN PROGRESS / APPLICATION INTEGRATION GATED
 Branch: `feat/flutter-elv4-power-topology-design`
 Inspected source: `7f1c701cb4ba492589321f8f9827d20464ddaefb`
 Preceding design: `ce8c971`
@@ -20,7 +20,7 @@ This specification decomposes all ten P0–P9 packages into implementable requir
 | P8 | [Runtime verification](p8-acceptance.md) | Public-command verticals, migration, restart and races |
 | P9 | [Closure and handoff](p9-closure.md) | Requirement-to-evidence reconciliation at exact SHA |
 
-[Shared runtime contracts](shared-contracts.md) and [resolved RM01–RM15 decisions](remediation-contract.md) apply to every package. [Wire registry/schemas](wire-contract.md), [qualification manifest](qualification.json) and [public-builder contract](qualification-builders.md) are normative implementation inputs. [Requirement ledger](requirements.json) records design traceability; every runtime status remains NOT_STARTED. Test IDs denote planned assertions, not tests that have run.
+[Shared runtime contracts](shared-contracts.md) and [resolved RM01–RM15 decisions](remediation-contract.md) apply to every package. [Wire registry/schemas](wire-contract.md), [qualification manifest](qualification.json) and [public-builder contract](qualification-builders.md) are normative implementation inputs. [Requirement ledger](requirements.json) records current traceability; P0 and selected P1 requirements are IN_PROGRESS. See [first implementation entry](../../audit/elv4-p0-implementation-entry.md). No package is accepted. Test IDs denote planned assertions, not tests that have run.
 
 ## Implementation sequence
 

@@ -1,6 +1,6 @@
 # Electra — ELV4 Authoritative Design Index
 
-Status: DESIGN DRAFT / IMPLEMENTATION NOT AUTHORIZED
+Status: IMPLEMENTATION STARTED / P0 AND P1 IN PROGRESS / RUNTIME INTEGRATION GATED
 Branch: `feat/flutter-elv4-power-topology-design`
 Inspected baseline: `7f1c701cb4ba492589321f8f9827d20464ddaefb`
 
@@ -32,12 +32,12 @@ ELV8: manufacturer selection/BOM/deliverables.
 
 ## Current status
 
-The branch contains design documentation only. All ELV4 P0–P9 runtime packages remain unstarted.
+Implementation was authorized on 2026-10-15. P0 reconciliation and the first independent P1 pure-domain slice have started; see [entry reconciliation](../audit/elv4-p0-implementation-entry.md). P2–P9 remain unstarted.
 Merged ELV3 PR #10 is the starting source baseline; ELV3 final closure evidence must be reconciled in ELV4-P0.
 
 All ten packages P0–P9 now have coordinated design sections. Design remains DRAFT / REVIEW REQUIRED; completeness of the design outline does not close baseline or runtime gates.
 
-Detailed implementation design now decomposes all P0–P9 packages into numbered requirements and planned tests. Requirements remain NOT_STARTED until implemented and evidenced.
+Detailed implementation design now decomposes all P0–P9 packages into numbered requirements and planned tests. Requirement statuses distinguish partial IN_PROGRESS work from full acceptance; no ELV4 requirement is accepted yet.
 
 ## Technical audit of implementation readiness
 
