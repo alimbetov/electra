@@ -44,6 +44,14 @@ jobs:
           )
           builder.write_text(text)
 
+          topology = Path('apps/mobile/test/support/elv4_power_qualification_topology.dart')
+          text = topology.read_text()
+          needle = """    final systemId = await ensureSystem(familyCode);\n    final profileId = '$projectId-profile-${familyCode.toLowerCase()}';\n"""
+          replacement = """    final systemId = await ensureSystem(familyCode);\n    final systems = DriftEngineeringSystemRepository(\n      database,\n      originDeviceId: 'qualification',\n    );\n    final snapshot = await topology.load(projectId);\n    final fromPort = snapshot.ports.singleWhere((port) => port.id == fromPortId);\n    final toPort = snapshot.ports.singleWhere((port) => port.id == toPortId);\n    await systems.assign(\n      projectId,\n      ComponentSystemMembership(\n        systemId: systemId,\n        componentId: fromPort.componentId,\n        role: 'DEVICE',\n      ),\n    );\n    await systems.assign(\n      projectId,\n      ComponentSystemMembership(\n        systemId: systemId,\n        componentId: toPort.componentId,\n        role: 'DEVICE',\n      ),\n    );\n    final profileId = '$projectId-profile-${familyCode.toLowerCase()}';\n"""
+          if needle in text:
+              text = text.replace(needle, replacement, 1)
+          topology.write_text(text)
+
           test = Path('apps/mobile/test/data/elv4_p8_public_vertical_acceptance_test.dart')
           text = test.read_text()
           command_import = "import 'package:electra_mobile/data/repositories/drift_power_command_service.dart';\n"
