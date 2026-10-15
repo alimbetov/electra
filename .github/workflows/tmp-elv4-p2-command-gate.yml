@@ -28,6 +28,16 @@ jobs:
       - name: Install mobile dependencies
         working-directory: apps/mobile
         run: flutter pub get
+      - name: Normalize SHA fixtures
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('apps/mobile/test/data/elv4_p2_power_command_service_test.dart')
+          text = p.read_text()
+          text = text.replace("'a' * 64", "'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'")
+          text = text.replace("'b' * 64", "'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'")
+          p.write_text(text)
+          PY
       - name: Format P2 command sources
         working-directory: apps/mobile
         run: dart format lib/application/power_mutation_command.dart lib/data/repositories/drift_power_command_service.dart test/data/elv4_p2_power_command_service_test.dart
