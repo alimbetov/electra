@@ -1,0 +1,54 @@
+name: ELV4 P7 T08 Scope Load Gate
+
+on:
+  push:
+    branches:
+      - feat/flutter-elv4-power-topology-design
+    paths:
+      - .github/workflows/tmp-elv4-p7-t08-scope-load-gate.yml
+      - scripts/ci/apply-elv4-p7-t08-scope-load.py
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/flutter-elv4-power-topology-design
+          fetch-depth: 0
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Apply P7 T08 scope/load contract
+        run: python scripts/ci/apply-elv4-p7-t08-scope-load.py
+      - name: Install mobile dependencies
+        working-directory: apps/mobile
+        run: flutter pub get
+      - name: Format touched Dart
+        working-directory: apps/mobile
+        run: dart format lib/application/power_workspace_state.dart lib/application/power_workspace_controller.dart lib/data/repositories/drift_power_workspace_repository.dart test/application/power_workspace_state_test.dart test/application/power_workspace_controller_test.dart
+      - name: Analyze mobile
+        working-directory: apps/mobile
+        run: flutter analyze
+      - name: Run P7 T08 state/controller tests
+        working-directory: apps/mobile
+        run: flutter test test/application/power_workspace_state_test.dart test/application/power_workspace_controller_test.dart
+      - name: Commit verified implementation
+        run: |
+          if git diff --quiet; then
+            echo 'No implementation diff.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add apps/mobile/lib/application/power_workspace_state.dart \
+                  apps/mobile/lib/application/power_workspace_controller.dart \
+                  apps/mobile/lib/data/repositories/drift_power_workspace_repository.dart \
+                  apps/mobile/test/application/power_workspace_state_test.dart \
+                  apps/mobile/test/application/power_workspace_controller_test.dart
+          git commit -m 'feat(elv4): add P7 T08 scope and load-mode contract'
+          git push origin HEAD:feat/flutter-elv4-power-topology-design
