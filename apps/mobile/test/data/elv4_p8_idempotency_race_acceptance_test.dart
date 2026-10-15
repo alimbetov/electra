@@ -33,7 +33,9 @@ DriftElvDesignRevisionRepository _repository(AppDatabase db) =>
 
 Future<void> _seed(AppDatabase db) async {
   final now = DateTime.utc(2026, 10, 15, 17, 45);
-  await db.into(db.projects).insert(
+  await db
+      .into(db.projects)
+      .insert(
         ProjectsCompanion.insert(
           id: _projectId,
           name: 'P8 idempotency acceptance',
@@ -69,37 +71,31 @@ ProjectDesignRevision _success(ElvCommandResult<ProjectDesignRevision> result) {
 }
 
 Future<void> _expectSingleFreezePersistence(AppDatabase db) async {
-  final revision = await (db.select(db.projectDesignRevisions)
-        ..where((row) => row.id.equals(_revisionId)))
-      .getSingle();
+  final revision =
+      await (db.select(db.projectDesignRevisions)
+        ..where((row) => row.id.equals(_revisionId))).getSingle();
   expect(revision.state, 'FROZEN');
   expect(revision.revision, 2);
 
   expect(
     await (db.select(db.designRevisionPhysicalSnapshots)
-          ..where((row) => row.designRevisionId.equals(_revisionId)))
-        .get(),
+      ..where((row) => row.designRevisionId.equals(_revisionId))).get(),
     hasLength(1),
   );
   expect(
     await (db.select(db.designRevisionPowerSnapshots)
-          ..where((row) => row.designRevisionId.equals(_revisionId)))
-        .get(),
+      ..where((row) => row.designRevisionId.equals(_revisionId))).get(),
     hasLength(1),
   );
   expect(
     await (db.select(db.designRevisionSnapshotManifests)
-          ..where((row) => row.designRevisionId.equals(_revisionId)))
-        .get(),
+      ..where((row) => row.designRevisionId.equals(_revisionId))).get(),
     hasLength(1),
   );
   expect(
     await (db.select(db.commandExecutionRecords)
-          ..where(
-            (row) =>
-                row.projectId.equals(_projectId) &
-                row.commandId.equals(_freezeCommandId),
-          ))
+          ..where((row) => row.projectId.equals(_projectId))
+          ..where((row) => row.commandId.equals(_freezeCommandId)))
         .get(),
     hasLength(1),
   );
@@ -119,137 +115,148 @@ void _expectSameLogicalRevision(
 }
 
 void main() {
-  test('P8 repeated freeze command replays the persisted logical result', () async {
-    final dir = await Directory.systemTemp.createTemp('electra-p8-replay-');
-    addTearDown(() => dir.delete(recursive: true));
-    final file = File('${dir.path}/electra.sqlite');
+  test(
+    'P8 repeated freeze command replays the persisted logical result',
+    () async {
+      final dir = await Directory.systemTemp.createTemp('electra-p8-replay-');
+      addTearDown(() => dir.delete(recursive: true));
+      final file = File('${dir.path}/electra.sqlite');
 
-    var db = AppDatabase(_native(file, configureWal: true));
-    await _seed(db);
-    final repository = _repository(db);
+      var db = AppDatabase(_native(file, configureWal: true));
+      await _seed(db);
+      final repository = _repository(db);
 
-    final first = _success(await repository.freeze(_freeze));
-    await _expectSingleFreezePersistence(db);
-    final ledgerBefore = await (db.select(db.commandExecutionRecords)
-          ..where(
-            (row) =>
-                row.projectId.equals(_projectId) &
-                row.commandId.equals(_freezeCommandId),
-          ))
-        .getSingle();
-    final powerBefore = await (db.select(db.designRevisionPowerSnapshots)
-          ..where((row) => row.designRevisionId.equals(_revisionId)))
-        .getSingle();
-    final manifestBefore = await (db.select(db.designRevisionSnapshotManifests)
-          ..where((row) => row.designRevisionId.equals(_revisionId)))
-        .getSingle();
+      final first = _success(await repository.freeze(_freeze));
+      await _expectSingleFreezePersistence(db);
+      final ledgerBefore =
+          await (db.select(db.commandExecutionRecords)
+                ..where((row) => row.projectId.equals(_projectId))
+                ..where((row) => row.commandId.equals(_freezeCommandId)))
+              .getSingle();
+      final powerBefore =
+          await (db.select(db.designRevisionPowerSnapshots)..where(
+            (row) => row.designRevisionId.equals(_revisionId),
+          )).getSingle();
+      final manifestBefore =
+          await (db.select(db.designRevisionSnapshotManifests)..where(
+            (row) => row.designRevisionId.equals(_revisionId),
+          )).getSingle();
 
-    final replay = _success(await repository.freeze(_freeze));
-    _expectSameLogicalRevision(first, replay);
-    await _expectSingleFreezePersistence(db);
+      final replay = _success(await repository.freeze(_freeze));
+      _expectSameLogicalRevision(first, replay);
+      await _expectSingleFreezePersistence(db);
 
-    final ledgerAfter = await (db.select(db.commandExecutionRecords)
-          ..where(
-            (row) =>
-                row.projectId.equals(_projectId) &
-                row.commandId.equals(_freezeCommandId),
-          ))
-        .getSingle();
-    final powerAfter = await (db.select(db.designRevisionPowerSnapshots)
-          ..where((row) => row.designRevisionId.equals(_revisionId)))
-        .getSingle();
-    final manifestAfter = await (db.select(db.designRevisionSnapshotManifests)
-          ..where((row) => row.designRevisionId.equals(_revisionId)))
-        .getSingle();
+      final ledgerAfter =
+          await (db.select(db.commandExecutionRecords)
+                ..where((row) => row.projectId.equals(_projectId))
+                ..where((row) => row.commandId.equals(_freezeCommandId)))
+              .getSingle();
+      final powerAfter =
+          await (db.select(db.designRevisionPowerSnapshots)..where(
+            (row) => row.designRevisionId.equals(_revisionId),
+          )).getSingle();
+      final manifestAfter =
+          await (db.select(db.designRevisionSnapshotManifests)..where(
+            (row) => row.designRevisionId.equals(_revisionId),
+          )).getSingle();
 
-    expect(ledgerAfter.logicalResultJson, ledgerBefore.logicalResultJson);
-    expect(ledgerAfter.normalizedPayloadSha256, ledgerBefore.normalizedPayloadSha256);
-    expect(powerAfter.payloadJson, powerBefore.payloadJson);
-    expect(powerAfter.powerSha256, powerBefore.powerSha256);
-    expect(manifestAfter.manifestSha256, manifestBefore.manifestSha256);
+      expect(ledgerAfter.logicalResultJson, ledgerBefore.logicalResultJson);
+      expect(
+        ledgerAfter.normalizedPayloadSha256,
+        ledgerBefore.normalizedPayloadSha256,
+      );
+      expect(powerAfter.payloadJson, powerBefore.payloadJson);
+      expect(powerAfter.powerSha256, powerBefore.powerSha256);
+      expect(manifestAfter.manifestSha256, manifestBefore.manifestSha256);
 
-    await db.close();
-    db = AppDatabase(_native(file));
-    addTearDown(db.close);
-    final reopenedReplay = _success(await _repository(db).freeze(_freeze));
-    _expectSameLogicalRevision(first, reopenedReplay);
-    await _expectSingleFreezePersistence(db);
-  });
+      await db.close();
+      db = AppDatabase(_native(file));
+      addTearDown(db.close);
+      final reopenedReplay = _success(await _repository(db).freeze(_freeze));
+      _expectSameLogicalRevision(first, reopenedReplay);
+      await _expectSingleFreezePersistence(db);
+    },
+  );
 
-  test('P8 same commandId with changed freeze payload is an idempotency conflict', () async {
-    final dir = await Directory.systemTemp.createTemp('electra-p8-conflict-');
-    addTearDown(() => dir.delete(recursive: true));
-    final file = File('${dir.path}/electra.sqlite');
+  test(
+    'P8 same commandId with changed freeze payload is an idempotency conflict',
+    () async {
+      final dir = await Directory.systemTemp.createTemp('electra-p8-conflict-');
+      addTearDown(() => dir.delete(recursive: true));
+      final file = File('${dir.path}/electra.sqlite');
 
-    final db = AppDatabase(_native(file, configureWal: true));
-    addTearDown(db.close);
-    await _seed(db);
-    final repository = _repository(db);
+      final db = AppDatabase(_native(file, configureWal: true));
+      addTearDown(db.close);
+      await _seed(db);
+      final repository = _repository(db);
 
-    _success(await repository.freeze(_freeze));
-    final ledgerBefore = await (db.select(db.commandExecutionRecords)
-          ..where(
-            (row) =>
-                row.projectId.equals(_projectId) &
-                row.commandId.equals(_freezeCommandId),
-          ))
-        .getSingle();
+      _success(await repository.freeze(_freeze));
+      final ledgerBefore =
+          await (db.select(db.commandExecutionRecords)
+                ..where((row) => row.projectId.equals(_projectId))
+                ..where((row) => row.commandId.equals(_freezeCommandId)))
+              .getSingle();
 
-    final conflict = await repository.freeze(
-      const FreezeProjectDesignRevisionCommand(
-        commandId: _freezeCommandId,
-        projectId: _projectId,
-        designRevisionId: _revisionId,
-        expectedRevision: 2,
-      ),
-    );
-    expect(conflict, isA<ElvCommandFailureResult<ProjectDesignRevision>>());
-    final failure =
-        (conflict as ElvCommandFailureResult<ProjectDesignRevision>).failure;
-    expect(failure.code, 'ELV_IDEMPOTENCY_CONFLICT');
-    expect(failure.category, ElvFailureCategory.commandEnvelope);
+      final conflict = await repository.freeze(
+        const FreezeProjectDesignRevisionCommand(
+          commandId: _freezeCommandId,
+          projectId: _projectId,
+          designRevisionId: _revisionId,
+          expectedRevision: 2,
+        ),
+      );
+      expect(conflict, isA<ElvCommandFailureResult<ProjectDesignRevision>>());
+      final failure =
+          (conflict as ElvCommandFailureResult<ProjectDesignRevision>).failure;
+      expect(failure.code, 'ELV_IDEMPOTENCY_CONFLICT');
+      expect(failure.category, ElvFailureCategory.commandEnvelope);
 
-    await _expectSingleFreezePersistence(db);
-    final ledgerAfter = await (db.select(db.commandExecutionRecords)
-          ..where(
-            (row) =>
-                row.projectId.equals(_projectId) &
-                row.commandId.equals(_freezeCommandId),
-          ))
-        .getSingle();
-    expect(ledgerAfter.logicalResultJson, ledgerBefore.logicalResultJson);
-    expect(ledgerAfter.normalizedPayloadSha256, ledgerBefore.normalizedPayloadSha256);
-  });
+      await _expectSingleFreezePersistence(db);
+      final ledgerAfter =
+          await (db.select(db.commandExecutionRecords)
+                ..where((row) => row.projectId.equals(_projectId))
+                ..where((row) => row.commandId.equals(_freezeCommandId)))
+              .getSingle();
+      expect(ledgerAfter.logicalResultJson, ledgerBefore.logicalResultJson);
+      expect(
+        ledgerAfter.normalizedPayloadSha256,
+        ledgerBefore.normalizedPayloadSha256,
+      );
+    },
+  );
 
-  test('P8 concurrent duplicate freeze converges to one commit and one replay', () async {
-    final dir = await Directory.systemTemp.createTemp('electra-p8-dup-race-');
-    addTearDown(() => dir.delete(recursive: true));
-    final file = File('${dir.path}/electra.sqlite');
+  test(
+    'P8 concurrent duplicate freeze converges to one commit and one replay',
+    () async {
+      final dir = await Directory.systemTemp.createTemp('electra-p8-dup-race-');
+      addTearDown(() => dir.delete(recursive: true));
+      final file = File('${dir.path}/electra.sqlite');
 
-    final seedDb = AppDatabase(_native(file, configureWal: true));
-    await _seed(seedDb);
-    await seedDb.close();
+      final seedDb = AppDatabase(_native(file, configureWal: true));
+      await _seed(seedDb);
+      await seedDb.close();
 
-    final dbA = AppDatabase(_native(file));
-    final dbB = AppDatabase(_native(file));
-    final repoA = _repository(dbA);
-    final repoB = _repository(dbB);
+      final dbA = AppDatabase(_native(file));
+      final dbB = AppDatabase(_native(file));
+      final repoA = _repository(dbA);
+      final repoB = _repository(dbB);
 
-    final results = await Future.wait([
-      repoA.freeze(_freeze),
-      repoB.freeze(_freeze),
-    ]);
-    final left = _success(results[0]);
-    final right = _success(results[1]);
-    _expectSameLogicalRevision(left, right);
-    await _expectSingleFreezePersistence(dbA);
+      final results = await Future.wait([
+        repoA.freeze(_freeze),
+        repoB.freeze(_freeze),
+      ]);
+      final left = _success(results[0]);
+      final right = _success(results[1]);
+      _expectSameLogicalRevision(left, right);
+      await _expectSingleFreezePersistence(dbA);
 
-    await dbA.close();
-    await dbB.close();
-    final reopened = AppDatabase(_native(file));
-    addTearDown(reopened.close);
-    final replay = _success(await _repository(reopened).freeze(_freeze));
-    _expectSameLogicalRevision(left, replay);
-    await _expectSingleFreezePersistence(reopened);
-  });
+      await dbA.close();
+      await dbB.close();
+      final reopened = AppDatabase(_native(file));
+      addTearDown(reopened.close);
+      final replay = _success(await _repository(reopened).freeze(_freeze));
+      _expectSameLogicalRevision(left, replay);
+      await _expectSingleFreezePersistence(reopened);
+    },
+  );
 }
