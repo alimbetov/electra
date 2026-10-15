@@ -48,10 +48,48 @@ jobs:
           text = text.replace("generation: row!.read<int>('generation'),", "generation: row.read<int>('generation'),")
           runtime.write_text(text)
 
+          batch_runtime = Path('apps/mobile/lib/data/repositories/drift_power_batch_publication_runtime.dart')
+          text = batch_runtime.read_text()
+          text = text.replace("generation: row!.read<int>('generation'),", "generation: row.read<int>('generation'),")
+          batch_runtime.write_text(text)
+
           test = Path('apps/mobile/test/data/elv4_p7_runtime_test.dart')
           text = test.read_text()
           text = text.replace("expect(captured.reasonCode, isNull);", "expect(captured.reasonCode, null);")
           test.write_text(text)
+
+          batch_test = Path('apps/mobile/test/data/elv4_p7_batch_runtime_test.dart')
+          text = batch_test.read_text()
+          text = text.replace("    final aBase = _input([_factKey('A', 'FACT')]);\n", "")
+          batch_test.write_text(text)
+
+          workspace = Path('apps/mobile/lib/application/power_workspace_state.dart')
+          text = workspace.read_text()
+          if 'clearPortSelection' not in text:
+              text = text.replace(
+                  "      clearSelection: normalizedComponent == null,\n      clearQuerySnapshot: true,",
+                  "      clearSelection: normalizedComponent == null,\n      clearPortSelection:\n          normalizedComponent != null && normalizedPort == null,\n      clearQuerySnapshot: true,",
+                  1,
+              )
+              text = text.replace(
+                  "    bool clearSelection = false,\n    PowerWorkspaceOverlayMode? overlayMode,",
+                  "    bool clearSelection = false,\n    bool clearPortSelection = false,\n    PowerWorkspaceOverlayMode? overlayMode,",
+                  1,
+              )
+              text = text.replace(
+                  "        selectedPortId:\n            clearSelection ? null : selectedPortId ?? this.selectedPortId,",
+                  "        selectedPortId: clearSelection || clearPortSelection\n            ? null\n            : selectedPortId ?? this.selectedPortId,",
+                  1,
+              )
+          workspace.write_text(text)
+
+          workspace_test = Path('apps/mobile/test/application/power_workspace_state_test.dart')
+          text = workspace_test.read_text()
+          marker = "  test('P7 workspace discards stale async query and technical responses', () {"
+          selection_test = """  test('P7 selecting a new component without a port clears stale port selection', () {\n    var state = _state().select(\n      componentId: 'camera-1',\n      portId: 'power-in',\n    );\n    state = state.select(componentId: 'camera-2');\n\n    expect(state.selectedComponentId, 'camera-2');\n    expect(state.selectedPortId, null);\n  });\n\n"""
+          if selection_test not in text:
+              text = text.replace(marker, selection_test + marker, 1)
+          workspace_test.write_text(text)
 
           repo = Path('apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart')
           text = repo.read_text()
