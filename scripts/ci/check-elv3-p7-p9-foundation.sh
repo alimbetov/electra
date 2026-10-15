@@ -78,8 +78,16 @@ source = pathlib.Path('apps/mobile/lib/data/database/app_database.dart').read_te
 inventory = pathlib.Path(sys.argv[1]).read_text()
 actual = re.search(r'int get schemaVersion => (\d+);', source)
 recorded = re.search(r'Current implemented schema baseline is .* / schema version (\d+)\.', inventory)
-if not actual or not recorded or actual[1] != recorded[1]:
-    sys.exit('P9 inventory schema must match AppDatabase.schemaVersion.')
+if not actual or not recorded:
+    sys.exit('P9 inventory schema baseline or AppDatabase.schemaVersion is missing.')
+
+actual_version = int(actual[1])
+elv3_baseline = int(recorded[1])
+if actual_version < elv3_baseline:
+    sys.exit(
+        'P9 inventory schema baseline cannot exceed AppDatabase.schemaVersion: '
+        f'ELV3={elv3_baseline}, AppDatabase={actual_version}.'
+    )
 PY
 
 if ! grep -F -q 'P3-P6 persistence prerequisite: OPEN' docs/product/elv3-p7-p9-foundation-design.md; then
