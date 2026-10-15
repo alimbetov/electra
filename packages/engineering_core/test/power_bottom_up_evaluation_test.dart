@@ -7,7 +7,7 @@ void main() {
       final input = _poeInput();
       final poe = evaluatePoeDelivery(input);
       final child = poeUpstreamBoundary(
-        originId: 'switch-group-a',
+        groupId: 'pse-group-a',
         input: input,
         result: poe,
       );
@@ -31,14 +31,47 @@ void main() {
       expect(result.localLossW, PowerRational.zero);
       expect(
         result.accountingKeys,
-        contains('P5_PSE_TRANSFER_DELIVERY-B'),
+        contains('P5_PSE_GROUP_TRANSFER_PSE-GROUP-A'),
+      );
+    });
+
+    test('shared PSE group-wide demand cannot be counted per delivery', () {
+      final input = _poeInput();
+      final first = poeUpstreamBoundary(
+        groupId: 'pse-group-a',
+        input: input,
+        result: evaluatePoeDelivery(input),
+      );
+
+      final repeated = evaluateBottomUpPowerBoundary(
+        PowerBottomUpEvaluationInput(
+          boundaryRef: 'ROOM-A',
+          childBoundaries: [first, first],
+        ),
+      );
+      expect(repeated.upstreamInputW, first.demandW);
+
+      final secondInput = _poeInput(deliveryId: 'delivery-c');
+      final second = poeUpstreamBoundary(
+        groupId: 'pse-group-a',
+        input: secondInput,
+        result: evaluatePoeDelivery(secondInput),
+      );
+      expect(
+        () => evaluateBottomUpPowerBoundary(
+          PowerBottomUpEvaluationInput(
+            boundaryRef: 'ROOM-A',
+            childBoundaries: [first, second],
+          ),
+        ),
+        throwsArgumentError,
       );
     });
 
     test('a different parent transfer is applied once above a P5 boundary', () {
       final input = _poeInput();
       final child = poeUpstreamBoundary(
-        originId: 'switch-group-a',
+        groupId: 'pse-group-a',
         input: input,
         result: evaluatePoeDelivery(input),
       );
@@ -70,7 +103,7 @@ void main() {
       expect(
         result.accountingKeys,
         containsAll([
-          'P5_PSE_TRANSFER_DELIVERY-B',
+          'P5_PSE_GROUP_TRANSFER_PSE-GROUP-A',
           'P4_UPS_TRANSFER_UPS-1',
         ]),
       );
@@ -79,7 +112,7 @@ void main() {
     test('reusing an already-applied accounting key is rejected', () {
       final input = _poeInput();
       final child = poeUpstreamBoundary(
-        originId: 'switch-group-a',
+        groupId: 'pse-group-a',
         input: input,
         result: evaluatePoeDelivery(input),
       );
@@ -110,7 +143,7 @@ void main() {
         groupInputBasis: PoeGroupInputBasis.estimatedActual,
       );
       final child = poeUpstreamBoundary(
-        originId: 'switch-group-a',
+        groupId: 'pse-group-a',
         input: input,
         result: evaluatePoeDelivery(input),
       );
@@ -268,10 +301,11 @@ void main() {
 }
 
 PoeEvaluationInput _poeInput({
+  String deliveryId = 'delivery-b',
   PoeGroupInputBasis groupInputBasis = PoeGroupInputBasis.conservativeReserved,
 }) =>
     PoeEvaluationInput(
-      deliveryId: 'delivery-b',
+      deliveryId: deliveryId,
       definition: PoeDeliveryDefinition(
         definitionRef: _ref(PowerDefinitionKind.poe, 'POE_FIXTURE'),
         guaranteedPdPowerW: _r('15'),
