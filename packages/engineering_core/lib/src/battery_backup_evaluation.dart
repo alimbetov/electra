@@ -103,7 +103,8 @@ final class ChargerBankCompatibilityEvidence {
     required String evidenceRef,
   }) : evidenceRef = _text(evidenceRef, 'evidenceRef') {
     if (seriesCount < 1) {
-      throw ArgumentError('Charger compatibility series count must be positive.');
+      throw ArgumentError(
+          'Charger compatibility series count must be positive.');
     }
   }
 

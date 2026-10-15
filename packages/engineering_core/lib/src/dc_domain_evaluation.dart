@@ -42,8 +42,8 @@ final class DcSingleConstantPowerDomainInput extends DcDomainEvaluationInput {
     PowerRational? toleranceV,
   })  : loadId = _text(loadId, 'loadId'),
         evidenceRef = _text(evidenceRef, 'evidenceRef'),
-        toleranceV = toleranceV ??
-            PowerRational(BigInt.one, BigInt.from(1000000000)),
+        toleranceV =
+            toleranceV ?? PowerRational(BigInt.one, BigInt.from(1000000000)),
         super(
           domainId: domainId,
           modelKind: DcDomainModelKind.singleConstantPowerFeeder,

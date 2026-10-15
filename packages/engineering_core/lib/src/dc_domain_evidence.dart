@@ -43,9 +43,10 @@ final class DcSectionPhysicalEvidence {
         allocationId = _nullableText(allocationId, 'allocationId'),
         cableRunId = _nullableText(cableRunId, 'cableRunId'),
         traversalRef = _nullableText(traversalRef, 'traversalRef'),
-        resourceRefs = List.unmodifiable(_sortedUnique(resourceRefs, 'resourceRefs')),
-        terminationRefs =
-            List.unmodifiable(_sortedUnique(terminationRefs, 'terminationRefs'));
+        resourceRefs =
+            List.unmodifiable(_sortedUnique(resourceRefs, 'resourceRefs')),
+        terminationRefs = List.unmodifiable(
+            _sortedUnique(terminationRefs, 'terminationRefs'));
 
   final String sectionId;
   final String? allocationId;
@@ -116,7 +117,8 @@ DcDomainEvaluationRecord buildDcTreeEvaluationRecord({
 }) {
   _validateContext(context, input.domainId);
   final tree = result.treeResult;
-  if (result.modelKind != DcDomainModelKind.constantCurrentTree || tree == null) {
+  if (result.modelKind != DcDomainModelKind.constantCurrentTree ||
+      tree == null) {
     throw ArgumentError('PWR-03 CC evidence requires a CC-tree result.');
   }
 
@@ -344,7 +346,8 @@ DcDomainEvaluationRecord buildDcConstantPowerEvaluationRecord({
       PowerEvaluationFinding(
         code: 'ELV4_POWER_PATH_UNRESOLVED',
         severity: 'UNRESOLVED',
-        message: 'Constant-power feeder lacks complete installed path evidence.',
+        message:
+            'Constant-power feeder lacks complete installed path evidence.',
         sourceRefs: [context.domainId],
       ),
   ];
@@ -385,8 +388,7 @@ DcDomainEvaluationRecord buildDcConstantPowerEvaluationRecord({
         {'code': 'TERMINAL_V', 'value': raw.terminalVoltage!.toMap()},
       if (raw.current != null)
         {'code': 'CURRENT_A', 'value': raw.current!.toMap()},
-      if (raw.lossW != null)
-        {'code': 'LOSS_W', 'value': raw.lossW!.toMap()},
+      if (raw.lossW != null) {'code': 'LOSS_W', 'value': raw.lossW!.toMap()},
       if (result.sourceDemandIntervalW != null)
         {
           'code': 'SOURCE_DEMAND_W_INTERVAL',
@@ -430,7 +432,8 @@ List<PowerConsumedEvaluationRef> _validateCurrentLoadDependencies({
   final loads = [...input.loads]..sort((a, b) => a.loadId.compareTo(b.loadId));
   if (bySubject.length != loads.length ||
       !loads.every((load) => bySubject.containsKey(load.loadId))) {
-    throw ArgumentError('PWR-03 requires one PWR-01 current result per DC load.');
+    throw ArgumentError(
+        'PWR-03 requires one PWR-01 current result per DC load.');
   }
   return [
     for (final load in loads)
@@ -451,12 +454,14 @@ PowerConsumedEvaluationRef _currentRef(
       key.scopeId != context.segmentId ||
       key.subjectId != load.loadId ||
       evaluation.output['completeA'] != true) {
-    throw ArgumentError('DC load requires complete matching PWR-01 ampere evidence.');
+    throw ArgumentError(
+        'DC load requires complete matching PWR-01 ampere evidence.');
   }
   final known = evaluation.output['knownA'];
   if (known is! Map ||
       PowerRational.fromMap(known.cast<String, Object?>()) != load.currentA) {
-    throw ArgumentError('DC load current differs from consumed PWR-01 evidence.');
+    throw ArgumentError(
+        'DC load current differs from consumed PWR-01 evidence.');
   }
   return PowerConsumedEvaluationRef(
     logicalNodeKey: key.encode(),
@@ -479,12 +484,14 @@ void _validateWattDependency({
       key.scopeId != context.segmentId ||
       key.subjectId != expectedSubjectId ||
       evaluation.output['completeW'] != true) {
-    throw ArgumentError('Constant-power load requires matching PWR-01 watt evidence.');
+    throw ArgumentError(
+        'Constant-power load requires matching PWR-01 watt evidence.');
   }
   final known = evaluation.output['knownW'];
   if (known is! Map ||
       PowerRational.fromMap(known.cast<String, Object?>()) != expectedW) {
-    throw ArgumentError('Constant-power load differs from consumed PWR-01 evidence.');
+    throw ArgumentError(
+        'Constant-power load differs from consumed PWR-01 evidence.');
   }
 }
 
@@ -517,7 +524,8 @@ Iterable<PowerConsumedFact> _sectionFacts(
   Iterable<DcSection> values,
   Map<String, DcSectionPhysicalEvidence> physicalBySection,
 ) sync* {
-  final sections = [...values]..sort((a, b) => a.sectionId.compareTo(b.sectionId));
+  final sections = [...values]
+    ..sort((a, b) => a.sectionId.compareTo(b.sectionId));
   for (final section in sections) {
     yield PowerConsumedFact.present(
       key: _key(
@@ -630,7 +638,8 @@ Map<String, DcSectionPhysicalEvidence> _physicalMap(
   final result = <String, DcSectionPhysicalEvidence>{};
   for (final value in provided) {
     if (!expected.contains(value.sectionId)) {
-      throw ArgumentError('Physical evidence references an unknown DC section.');
+      throw ArgumentError(
+          'Physical evidence references an unknown DC section.');
     }
     if (result.containsKey(value.sectionId)) {
       throw ArgumentError('Duplicate DC section physical evidence.');

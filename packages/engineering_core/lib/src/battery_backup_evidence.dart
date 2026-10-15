@@ -65,7 +65,8 @@ final class BatterySequenceEvaluationRecord {
   }) {
     if (evaluation.nodeKey.processCode != PowerProcessCode.pwr04 ||
         evaluation.nodeKey.scopeKind != PowerEvaluationScopeKind.sequence) {
-      throw ArgumentError('Battery sequence evidence requires sequence PWR-04.');
+      throw ArgumentError(
+          'Battery sequence evidence requires sequence PWR-04.');
     }
     if (evaluation.inputFingerprint != consumedInput.inputFingerprint) {
       throw ArgumentError('PWR-04 fingerprint/consumed-input mismatch.');
@@ -101,7 +102,8 @@ final class ChargerBoundaryEvaluationRecord {
       throw ArgumentError('Charger boundary evidence requires segment PWR-01.');
     }
     if (evaluation.inputFingerprint != consumedInput.inputFingerprint) {
-      throw ArgumentError('Charger boundary fingerprint/consumed-input mismatch.');
+      throw ArgumentError(
+          'Charger boundary fingerprint/consumed-input mismatch.');
     }
   }
 
@@ -395,7 +397,8 @@ ChargerBoundaryEvaluationRecord buildChargerBoundaryEvaluationRecord({
     loss: charger.lossDefinition,
   );
   if (transfer.inputW != raw.upstreamInputW) {
-    throw ArgumentError('Charger transfer evidence differs from evaluation result.');
+    throw ArgumentError(
+        'Charger transfer evidence differs from evaluation result.');
   }
 
   final evaluation = PowerEvaluationEvidence(
@@ -472,7 +475,8 @@ List<PowerConsumedEvaluationRef> _validateSequenceDependencies({
   }
   if (bySegment.length != segments.length ||
       !segments.every((segment) => bySegment.containsKey(segment.segmentId))) {
-    throw ArgumentError('PWR-04 requires one PWR-01 demand per sequence segment.');
+    throw ArgumentError(
+        'PWR-04 requires one PWR-01 demand per sequence segment.');
   }
   return [
     for (final segment in segments)
@@ -492,11 +496,13 @@ PowerConsumedEvaluationRef _sequenceRef(
       key.scenarioId != context.scenarioId ||
       key.scopeId != segment.segmentId ||
       evaluation.output['completeW'] != true) {
-    throw ArgumentError('Backup segment requires complete matching PWR-01 evidence.');
+    throw ArgumentError(
+        'Backup segment requires complete matching PWR-01 evidence.');
   }
   final known = evaluation.output['knownW'];
   if (known is! Map ||
-      PowerRational.fromMap(known.cast<String, Object?>()) != segment.bankInputW) {
+      PowerRational.fromMap(known.cast<String, Object?>()) !=
+          segment.bankInputW) {
     throw ArgumentError('Backup segment demand differs from PWR-01 evidence.');
   }
   return PowerConsumedEvaluationRef(
@@ -523,7 +529,8 @@ void _validateOperatingDemand({
   final known = evaluation.output['knownW'];
   if (known is! Map ||
       PowerRational.fromMap(known.cast<String, Object?>()) != expectedW) {
-    throw ArgumentError('Charger operating demand differs from PWR-01 evidence.');
+    throw ArgumentError(
+        'Charger operating demand differs from PWR-01 evidence.');
   }
 }
 

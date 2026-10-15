@@ -154,7 +154,8 @@ void main() {
   });
 
   group('P6 battery PWR-04', () {
-    test('series bank uses SOC window once and preserves ordered dependencies', () {
+    test('series bank uses SOC window once and preserves ordered dependencies',
+        () {
       final bank = _bank();
       final availability = _availability();
       final standby = BackupEnergySegment(
@@ -211,11 +212,13 @@ void main() {
       expect(first.evaluation.output['marginWh'], _r('59.4').toMap());
       expect(first.evaluation.output['estimatedAutonomySeconds'], isNull);
       expect(first.evaluation.status, PowerEvaluationStatus.pass);
-      expect(first.evaluation.inputFingerprint, reopened.evaluation.inputFingerprint);
+      expect(first.evaluation.inputFingerprint,
+          reopened.evaluation.inputFingerprint);
       expect(reopened.diff(first).requiresRecalculation, isFalse);
     });
 
-    test('duration edit invalidates sequence fact without rewriting bank facts', () {
+    test('duration edit invalidates sequence fact without rewriting bank facts',
+        () {
       final bank = _bank();
       final availability = _availability();
       final context = BackupEvidenceContext(

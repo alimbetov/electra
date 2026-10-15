@@ -51,7 +51,8 @@ PowerIntervalCapabilityAssessment evaluateIntervalPowerCapability(
 ) {
   final reserve = PowerInterval.exact(input.reserveMultiplier);
   final required = input.demandW * reserve;
-  final available = PowerInterval.exact(input.nameplateW * input.deratingFactor);
+  final available =
+      PowerInterval.exact(input.nameplateW * input.deratingFactor);
   final numeric = required.assessAtMost(available);
   final status = switch (numeric) {
     PowerNumericAssessment.pass => PowerEvaluationStatus.pass,
