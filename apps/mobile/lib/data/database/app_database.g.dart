@@ -36658,6 +36658,8279 @@ class CommandExecutionRecordsCompanion
   }
 }
 
+class $ProjectDesignRevisionsTable extends ProjectDesignRevisions
+    with TableInfo<$ProjectDesignRevisionsTable, ProjectDesignRevisionRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ProjectDesignRevisionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _revisionMeta = const VerificationMeta(
+    'revision',
+  );
+  @override
+  late final GeneratedColumn<int> revision = GeneratedColumn<int>(
+    'revision',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _originDeviceIdMeta = const VerificationMeta(
+    'originDeviceId',
+  );
+  @override
+  late final GeneratedColumn<String> originDeviceId = GeneratedColumn<String>(
+    'origin_device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _projectIdMeta = const VerificationMeta(
+    'projectId',
+  );
+  @override
+  late final GeneratedColumn<String> projectId = GeneratedColumn<String>(
+    'project_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES projects (id)',
+    ),
+  );
+  static const VerificationMeta _codeMeta = const VerificationMeta('code');
+  @override
+  late final GeneratedColumn<String> code = GeneratedColumn<String>(
+    'code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sequenceMeta = const VerificationMeta(
+    'sequence',
+  );
+  @override
+  late final GeneratedColumn<int> sequence = GeneratedColumn<int>(
+    'sequence',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _stateMeta = const VerificationMeta('state');
+  @override
+  late final GeneratedColumn<String> state = GeneratedColumn<String>(
+    'state',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _basedOnRevisionIdMeta = const VerificationMeta(
+    'basedOnRevisionId',
+  );
+  @override
+  late final GeneratedColumn<String> basedOnRevisionId =
+      GeneratedColumn<String>(
+        'based_on_revision_id',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES project_design_revisions (id)',
+        ),
+      );
+  static const VerificationMeta _snapshotSchemaVersionMeta =
+      const VerificationMeta('snapshotSchemaVersion');
+  @override
+  late final GeneratedColumn<int> snapshotSchemaVersion = GeneratedColumn<int>(
+    'snapshot_schema_version',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _snapshotHashMeta = const VerificationMeta(
+    'snapshotHash',
+  );
+  @override
+  late final GeneratedColumn<String> snapshotHash = GeneratedColumn<String>(
+    'snapshot_hash',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _frozenAtMeta = const VerificationMeta(
+    'frozenAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> frozenAt = GeneratedColumn<DateTime>(
+    'frozen_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _supersededAtMeta = const VerificationMeta(
+    'supersededAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> supersededAt = GeneratedColumn<DateTime>(
+    'superseded_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _archivedAtMeta = const VerificationMeta(
+    'archivedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> archivedAt = GeneratedColumn<DateTime>(
+    'archived_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    revision,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    originDeviceId,
+    id,
+    projectId,
+    code,
+    sequence,
+    state,
+    basedOnRevisionId,
+    snapshotSchemaVersion,
+    snapshotHash,
+    frozenAt,
+    supersededAt,
+    archivedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'project_design_revisions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ProjectDesignRevisionRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('revision')) {
+      context.handle(
+        _revisionMeta,
+        revision.isAcceptableOrUnknown(data['revision']!, _revisionMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('origin_device_id')) {
+      context.handle(
+        _originDeviceIdMeta,
+        originDeviceId.isAcceptableOrUnknown(
+          data['origin_device_id']!,
+          _originDeviceIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_originDeviceIdMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('project_id')) {
+      context.handle(
+        _projectIdMeta,
+        projectId.isAcceptableOrUnknown(data['project_id']!, _projectIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_projectIdMeta);
+    }
+    if (data.containsKey('code')) {
+      context.handle(
+        _codeMeta,
+        code.isAcceptableOrUnknown(data['code']!, _codeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_codeMeta);
+    }
+    if (data.containsKey('sequence')) {
+      context.handle(
+        _sequenceMeta,
+        sequence.isAcceptableOrUnknown(data['sequence']!, _sequenceMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sequenceMeta);
+    }
+    if (data.containsKey('state')) {
+      context.handle(
+        _stateMeta,
+        state.isAcceptableOrUnknown(data['state']!, _stateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_stateMeta);
+    }
+    if (data.containsKey('based_on_revision_id')) {
+      context.handle(
+        _basedOnRevisionIdMeta,
+        basedOnRevisionId.isAcceptableOrUnknown(
+          data['based_on_revision_id']!,
+          _basedOnRevisionIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('snapshot_schema_version')) {
+      context.handle(
+        _snapshotSchemaVersionMeta,
+        snapshotSchemaVersion.isAcceptableOrUnknown(
+          data['snapshot_schema_version']!,
+          _snapshotSchemaVersionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('snapshot_hash')) {
+      context.handle(
+        _snapshotHashMeta,
+        snapshotHash.isAcceptableOrUnknown(
+          data['snapshot_hash']!,
+          _snapshotHashMeta,
+        ),
+      );
+    }
+    if (data.containsKey('frozen_at')) {
+      context.handle(
+        _frozenAtMeta,
+        frozenAt.isAcceptableOrUnknown(data['frozen_at']!, _frozenAtMeta),
+      );
+    }
+    if (data.containsKey('superseded_at')) {
+      context.handle(
+        _supersededAtMeta,
+        supersededAt.isAcceptableOrUnknown(
+          data['superseded_at']!,
+          _supersededAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('archived_at')) {
+      context.handle(
+        _archivedAtMeta,
+        archivedAt.isAcceptableOrUnknown(data['archived_at']!, _archivedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {projectId, code},
+    {projectId, sequence},
+  ];
+  @override
+  ProjectDesignRevisionRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ProjectDesignRevisionRow(
+      revision:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}revision'],
+          )!,
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      updatedAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}updated_at'],
+          )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      originDeviceId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}origin_device_id'],
+          )!,
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}id'],
+          )!,
+      projectId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}project_id'],
+          )!,
+      code:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}code'],
+          )!,
+      sequence:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}sequence'],
+          )!,
+      state:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}state'],
+          )!,
+      basedOnRevisionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}based_on_revision_id'],
+      ),
+      snapshotSchemaVersion: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}snapshot_schema_version'],
+      ),
+      snapshotHash: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}snapshot_hash'],
+      ),
+      frozenAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}frozen_at'],
+      ),
+      supersededAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}superseded_at'],
+      ),
+      archivedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}archived_at'],
+      ),
+    );
+  }
+
+  @override
+  $ProjectDesignRevisionsTable createAlias(String alias) {
+    return $ProjectDesignRevisionsTable(attachedDatabase, alias);
+  }
+}
+
+class ProjectDesignRevisionRow extends DataClass
+    implements Insertable<ProjectDesignRevisionRow> {
+  final int revision;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  final String originDeviceId;
+  final String id;
+  final String projectId;
+  final String code;
+  final int sequence;
+  final String state;
+  final String? basedOnRevisionId;
+  final int? snapshotSchemaVersion;
+  final String? snapshotHash;
+  final DateTime? frozenAt;
+  final DateTime? supersededAt;
+  final DateTime? archivedAt;
+  const ProjectDesignRevisionRow({
+    required this.revision,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.originDeviceId,
+    required this.id,
+    required this.projectId,
+    required this.code,
+    required this.sequence,
+    required this.state,
+    this.basedOnRevisionId,
+    this.snapshotSchemaVersion,
+    this.snapshotHash,
+    this.frozenAt,
+    this.supersededAt,
+    this.archivedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['revision'] = Variable<int>(revision);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['origin_device_id'] = Variable<String>(originDeviceId);
+    map['id'] = Variable<String>(id);
+    map['project_id'] = Variable<String>(projectId);
+    map['code'] = Variable<String>(code);
+    map['sequence'] = Variable<int>(sequence);
+    map['state'] = Variable<String>(state);
+    if (!nullToAbsent || basedOnRevisionId != null) {
+      map['based_on_revision_id'] = Variable<String>(basedOnRevisionId);
+    }
+    if (!nullToAbsent || snapshotSchemaVersion != null) {
+      map['snapshot_schema_version'] = Variable<int>(snapshotSchemaVersion);
+    }
+    if (!nullToAbsent || snapshotHash != null) {
+      map['snapshot_hash'] = Variable<String>(snapshotHash);
+    }
+    if (!nullToAbsent || frozenAt != null) {
+      map['frozen_at'] = Variable<DateTime>(frozenAt);
+    }
+    if (!nullToAbsent || supersededAt != null) {
+      map['superseded_at'] = Variable<DateTime>(supersededAt);
+    }
+    if (!nullToAbsent || archivedAt != null) {
+      map['archived_at'] = Variable<DateTime>(archivedAt);
+    }
+    return map;
+  }
+
+  ProjectDesignRevisionsCompanion toCompanion(bool nullToAbsent) {
+    return ProjectDesignRevisionsCompanion(
+      revision: Value(revision),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt:
+          deletedAt == null && nullToAbsent
+              ? const Value.absent()
+              : Value(deletedAt),
+      originDeviceId: Value(originDeviceId),
+      id: Value(id),
+      projectId: Value(projectId),
+      code: Value(code),
+      sequence: Value(sequence),
+      state: Value(state),
+      basedOnRevisionId:
+          basedOnRevisionId == null && nullToAbsent
+              ? const Value.absent()
+              : Value(basedOnRevisionId),
+      snapshotSchemaVersion:
+          snapshotSchemaVersion == null && nullToAbsent
+              ? const Value.absent()
+              : Value(snapshotSchemaVersion),
+      snapshotHash:
+          snapshotHash == null && nullToAbsent
+              ? const Value.absent()
+              : Value(snapshotHash),
+      frozenAt:
+          frozenAt == null && nullToAbsent
+              ? const Value.absent()
+              : Value(frozenAt),
+      supersededAt:
+          supersededAt == null && nullToAbsent
+              ? const Value.absent()
+              : Value(supersededAt),
+      archivedAt:
+          archivedAt == null && nullToAbsent
+              ? const Value.absent()
+              : Value(archivedAt),
+    );
+  }
+
+  factory ProjectDesignRevisionRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ProjectDesignRevisionRow(
+      revision: serializer.fromJson<int>(json['revision']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      originDeviceId: serializer.fromJson<String>(json['originDeviceId']),
+      id: serializer.fromJson<String>(json['id']),
+      projectId: serializer.fromJson<String>(json['projectId']),
+      code: serializer.fromJson<String>(json['code']),
+      sequence: serializer.fromJson<int>(json['sequence']),
+      state: serializer.fromJson<String>(json['state']),
+      basedOnRevisionId: serializer.fromJson<String?>(
+        json['basedOnRevisionId'],
+      ),
+      snapshotSchemaVersion: serializer.fromJson<int?>(
+        json['snapshotSchemaVersion'],
+      ),
+      snapshotHash: serializer.fromJson<String?>(json['snapshotHash']),
+      frozenAt: serializer.fromJson<DateTime?>(json['frozenAt']),
+      supersededAt: serializer.fromJson<DateTime?>(json['supersededAt']),
+      archivedAt: serializer.fromJson<DateTime?>(json['archivedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'revision': serializer.toJson<int>(revision),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'originDeviceId': serializer.toJson<String>(originDeviceId),
+      'id': serializer.toJson<String>(id),
+      'projectId': serializer.toJson<String>(projectId),
+      'code': serializer.toJson<String>(code),
+      'sequence': serializer.toJson<int>(sequence),
+      'state': serializer.toJson<String>(state),
+      'basedOnRevisionId': serializer.toJson<String?>(basedOnRevisionId),
+      'snapshotSchemaVersion': serializer.toJson<int?>(snapshotSchemaVersion),
+      'snapshotHash': serializer.toJson<String?>(snapshotHash),
+      'frozenAt': serializer.toJson<DateTime?>(frozenAt),
+      'supersededAt': serializer.toJson<DateTime?>(supersededAt),
+      'archivedAt': serializer.toJson<DateTime?>(archivedAt),
+    };
+  }
+
+  ProjectDesignRevisionRow copyWith({
+    int? revision,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+    String? originDeviceId,
+    String? id,
+    String? projectId,
+    String? code,
+    int? sequence,
+    String? state,
+    Value<String?> basedOnRevisionId = const Value.absent(),
+    Value<int?> snapshotSchemaVersion = const Value.absent(),
+    Value<String?> snapshotHash = const Value.absent(),
+    Value<DateTime?> frozenAt = const Value.absent(),
+    Value<DateTime?> supersededAt = const Value.absent(),
+    Value<DateTime?> archivedAt = const Value.absent(),
+  }) => ProjectDesignRevisionRow(
+    revision: revision ?? this.revision,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    originDeviceId: originDeviceId ?? this.originDeviceId,
+    id: id ?? this.id,
+    projectId: projectId ?? this.projectId,
+    code: code ?? this.code,
+    sequence: sequence ?? this.sequence,
+    state: state ?? this.state,
+    basedOnRevisionId:
+        basedOnRevisionId.present
+            ? basedOnRevisionId.value
+            : this.basedOnRevisionId,
+    snapshotSchemaVersion:
+        snapshotSchemaVersion.present
+            ? snapshotSchemaVersion.value
+            : this.snapshotSchemaVersion,
+    snapshotHash: snapshotHash.present ? snapshotHash.value : this.snapshotHash,
+    frozenAt: frozenAt.present ? frozenAt.value : this.frozenAt,
+    supersededAt: supersededAt.present ? supersededAt.value : this.supersededAt,
+    archivedAt: archivedAt.present ? archivedAt.value : this.archivedAt,
+  );
+  ProjectDesignRevisionRow copyWithCompanion(
+    ProjectDesignRevisionsCompanion data,
+  ) {
+    return ProjectDesignRevisionRow(
+      revision: data.revision.present ? data.revision.value : this.revision,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      originDeviceId:
+          data.originDeviceId.present
+              ? data.originDeviceId.value
+              : this.originDeviceId,
+      id: data.id.present ? data.id.value : this.id,
+      projectId: data.projectId.present ? data.projectId.value : this.projectId,
+      code: data.code.present ? data.code.value : this.code,
+      sequence: data.sequence.present ? data.sequence.value : this.sequence,
+      state: data.state.present ? data.state.value : this.state,
+      basedOnRevisionId:
+          data.basedOnRevisionId.present
+              ? data.basedOnRevisionId.value
+              : this.basedOnRevisionId,
+      snapshotSchemaVersion:
+          data.snapshotSchemaVersion.present
+              ? data.snapshotSchemaVersion.value
+              : this.snapshotSchemaVersion,
+      snapshotHash:
+          data.snapshotHash.present
+              ? data.snapshotHash.value
+              : this.snapshotHash,
+      frozenAt: data.frozenAt.present ? data.frozenAt.value : this.frozenAt,
+      supersededAt:
+          data.supersededAt.present
+              ? data.supersededAt.value
+              : this.supersededAt,
+      archivedAt:
+          data.archivedAt.present ? data.archivedAt.value : this.archivedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ProjectDesignRevisionRow(')
+          ..write('revision: $revision, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('originDeviceId: $originDeviceId, ')
+          ..write('id: $id, ')
+          ..write('projectId: $projectId, ')
+          ..write('code: $code, ')
+          ..write('sequence: $sequence, ')
+          ..write('state: $state, ')
+          ..write('basedOnRevisionId: $basedOnRevisionId, ')
+          ..write('snapshotSchemaVersion: $snapshotSchemaVersion, ')
+          ..write('snapshotHash: $snapshotHash, ')
+          ..write('frozenAt: $frozenAt, ')
+          ..write('supersededAt: $supersededAt, ')
+          ..write('archivedAt: $archivedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    revision,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    originDeviceId,
+    id,
+    projectId,
+    code,
+    sequence,
+    state,
+    basedOnRevisionId,
+    snapshotSchemaVersion,
+    snapshotHash,
+    frozenAt,
+    supersededAt,
+    archivedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ProjectDesignRevisionRow &&
+          other.revision == this.revision &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.originDeviceId == this.originDeviceId &&
+          other.id == this.id &&
+          other.projectId == this.projectId &&
+          other.code == this.code &&
+          other.sequence == this.sequence &&
+          other.state == this.state &&
+          other.basedOnRevisionId == this.basedOnRevisionId &&
+          other.snapshotSchemaVersion == this.snapshotSchemaVersion &&
+          other.snapshotHash == this.snapshotHash &&
+          other.frozenAt == this.frozenAt &&
+          other.supersededAt == this.supersededAt &&
+          other.archivedAt == this.archivedAt);
+}
+
+class ProjectDesignRevisionsCompanion
+    extends UpdateCompanion<ProjectDesignRevisionRow> {
+  final Value<int> revision;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<String> originDeviceId;
+  final Value<String> id;
+  final Value<String> projectId;
+  final Value<String> code;
+  final Value<int> sequence;
+  final Value<String> state;
+  final Value<String?> basedOnRevisionId;
+  final Value<int?> snapshotSchemaVersion;
+  final Value<String?> snapshotHash;
+  final Value<DateTime?> frozenAt;
+  final Value<DateTime?> supersededAt;
+  final Value<DateTime?> archivedAt;
+  final Value<int> rowid;
+  const ProjectDesignRevisionsCompanion({
+    this.revision = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.originDeviceId = const Value.absent(),
+    this.id = const Value.absent(),
+    this.projectId = const Value.absent(),
+    this.code = const Value.absent(),
+    this.sequence = const Value.absent(),
+    this.state = const Value.absent(),
+    this.basedOnRevisionId = const Value.absent(),
+    this.snapshotSchemaVersion = const Value.absent(),
+    this.snapshotHash = const Value.absent(),
+    this.frozenAt = const Value.absent(),
+    this.supersededAt = const Value.absent(),
+    this.archivedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ProjectDesignRevisionsCompanion.insert({
+    this.revision = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.deletedAt = const Value.absent(),
+    required String originDeviceId,
+    required String id,
+    required String projectId,
+    required String code,
+    required int sequence,
+    required String state,
+    this.basedOnRevisionId = const Value.absent(),
+    this.snapshotSchemaVersion = const Value.absent(),
+    this.snapshotHash = const Value.absent(),
+    this.frozenAt = const Value.absent(),
+    this.supersededAt = const Value.absent(),
+    this.archivedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       originDeviceId = Value(originDeviceId),
+       id = Value(id),
+       projectId = Value(projectId),
+       code = Value(code),
+       sequence = Value(sequence),
+       state = Value(state);
+  static Insertable<ProjectDesignRevisionRow> custom({
+    Expression<int>? revision,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<String>? originDeviceId,
+    Expression<String>? id,
+    Expression<String>? projectId,
+    Expression<String>? code,
+    Expression<int>? sequence,
+    Expression<String>? state,
+    Expression<String>? basedOnRevisionId,
+    Expression<int>? snapshotSchemaVersion,
+    Expression<String>? snapshotHash,
+    Expression<DateTime>? frozenAt,
+    Expression<DateTime>? supersededAt,
+    Expression<DateTime>? archivedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (revision != null) 'revision': revision,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (originDeviceId != null) 'origin_device_id': originDeviceId,
+      if (id != null) 'id': id,
+      if (projectId != null) 'project_id': projectId,
+      if (code != null) 'code': code,
+      if (sequence != null) 'sequence': sequence,
+      if (state != null) 'state': state,
+      if (basedOnRevisionId != null) 'based_on_revision_id': basedOnRevisionId,
+      if (snapshotSchemaVersion != null)
+        'snapshot_schema_version': snapshotSchemaVersion,
+      if (snapshotHash != null) 'snapshot_hash': snapshotHash,
+      if (frozenAt != null) 'frozen_at': frozenAt,
+      if (supersededAt != null) 'superseded_at': supersededAt,
+      if (archivedAt != null) 'archived_at': archivedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ProjectDesignRevisionsCompanion copyWith({
+    Value<int>? revision,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<String>? originDeviceId,
+    Value<String>? id,
+    Value<String>? projectId,
+    Value<String>? code,
+    Value<int>? sequence,
+    Value<String>? state,
+    Value<String?>? basedOnRevisionId,
+    Value<int?>? snapshotSchemaVersion,
+    Value<String?>? snapshotHash,
+    Value<DateTime?>? frozenAt,
+    Value<DateTime?>? supersededAt,
+    Value<DateTime?>? archivedAt,
+    Value<int>? rowid,
+  }) {
+    return ProjectDesignRevisionsCompanion(
+      revision: revision ?? this.revision,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      originDeviceId: originDeviceId ?? this.originDeviceId,
+      id: id ?? this.id,
+      projectId: projectId ?? this.projectId,
+      code: code ?? this.code,
+      sequence: sequence ?? this.sequence,
+      state: state ?? this.state,
+      basedOnRevisionId: basedOnRevisionId ?? this.basedOnRevisionId,
+      snapshotSchemaVersion:
+          snapshotSchemaVersion ?? this.snapshotSchemaVersion,
+      snapshotHash: snapshotHash ?? this.snapshotHash,
+      frozenAt: frozenAt ?? this.frozenAt,
+      supersededAt: supersededAt ?? this.supersededAt,
+      archivedAt: archivedAt ?? this.archivedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (revision.present) {
+      map['revision'] = Variable<int>(revision.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (originDeviceId.present) {
+      map['origin_device_id'] = Variable<String>(originDeviceId.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (projectId.present) {
+      map['project_id'] = Variable<String>(projectId.value);
+    }
+    if (code.present) {
+      map['code'] = Variable<String>(code.value);
+    }
+    if (sequence.present) {
+      map['sequence'] = Variable<int>(sequence.value);
+    }
+    if (state.present) {
+      map['state'] = Variable<String>(state.value);
+    }
+    if (basedOnRevisionId.present) {
+      map['based_on_revision_id'] = Variable<String>(basedOnRevisionId.value);
+    }
+    if (snapshotSchemaVersion.present) {
+      map['snapshot_schema_version'] = Variable<int>(
+        snapshotSchemaVersion.value,
+      );
+    }
+    if (snapshotHash.present) {
+      map['snapshot_hash'] = Variable<String>(snapshotHash.value);
+    }
+    if (frozenAt.present) {
+      map['frozen_at'] = Variable<DateTime>(frozenAt.value);
+    }
+    if (supersededAt.present) {
+      map['superseded_at'] = Variable<DateTime>(supersededAt.value);
+    }
+    if (archivedAt.present) {
+      map['archived_at'] = Variable<DateTime>(archivedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ProjectDesignRevisionsCompanion(')
+          ..write('revision: $revision, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('originDeviceId: $originDeviceId, ')
+          ..write('id: $id, ')
+          ..write('projectId: $projectId, ')
+          ..write('code: $code, ')
+          ..write('sequence: $sequence, ')
+          ..write('state: $state, ')
+          ..write('basedOnRevisionId: $basedOnRevisionId, ')
+          ..write('snapshotSchemaVersion: $snapshotSchemaVersion, ')
+          ..write('snapshotHash: $snapshotHash, ')
+          ..write('frozenAt: $frozenAt, ')
+          ..write('supersededAt: $supersededAt, ')
+          ..write('archivedAt: $archivedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $DesignRevisionPhysicalSnapshotsTable
+    extends DesignRevisionPhysicalSnapshots
+    with
+        TableInfo<
+          $DesignRevisionPhysicalSnapshotsTable,
+          DesignRevisionPhysicalSnapshotRow
+        > {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DesignRevisionPhysicalSnapshotsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _designRevisionIdMeta = const VerificationMeta(
+    'designRevisionId',
+  );
+  @override
+  late final GeneratedColumn<String> designRevisionId = GeneratedColumn<String>(
+    'design_revision_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES project_design_revisions (id)',
+    ),
+  );
+  static const VerificationMeta _projectIdMeta = const VerificationMeta(
+    'projectId',
+  );
+  @override
+  late final GeneratedColumn<String> projectId = GeneratedColumn<String>(
+    'project_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES projects (id)',
+    ),
+  );
+  static const VerificationMeta _schemaVersionMeta = const VerificationMeta(
+    'schemaVersion',
+  );
+  @override
+  late final GeneratedColumn<int> schemaVersion = GeneratedColumn<int>(
+    'schema_version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _payloadJsonMeta = const VerificationMeta(
+    'payloadJson',
+  );
+  @override
+  late final GeneratedColumn<String> payloadJson = GeneratedColumn<String>(
+    'payload_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _payloadSha256Meta = const VerificationMeta(
+    'payloadSha256',
+  );
+  @override
+  late final GeneratedColumn<String> payloadSha256 = GeneratedColumn<String>(
+    'payload_sha256',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _originDeviceIdMeta = const VerificationMeta(
+    'originDeviceId',
+  );
+  @override
+  late final GeneratedColumn<String> originDeviceId = GeneratedColumn<String>(
+    'origin_device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    designRevisionId,
+    projectId,
+    schemaVersion,
+    payloadJson,
+    payloadSha256,
+    createdAt,
+    originDeviceId,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'design_revision_physical_snapshots';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DesignRevisionPhysicalSnapshotRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('design_revision_id')) {
+      context.handle(
+        _designRevisionIdMeta,
+        designRevisionId.isAcceptableOrUnknown(
+          data['design_revision_id']!,
+          _designRevisionIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_designRevisionIdMeta);
+    }
+    if (data.containsKey('project_id')) {
+      context.handle(
+        _projectIdMeta,
+        projectId.isAcceptableOrUnknown(data['project_id']!, _projectIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_projectIdMeta);
+    }
+    if (data.containsKey('schema_version')) {
+      context.handle(
+        _schemaVersionMeta,
+        schemaVersion.isAcceptableOrUnknown(
+          data['schema_version']!,
+          _schemaVersionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_schemaVersionMeta);
+    }
+    if (data.containsKey('payload_json')) {
+      context.handle(
+        _payloadJsonMeta,
+        payloadJson.isAcceptableOrUnknown(
+          data['payload_json']!,
+          _payloadJsonMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_payloadJsonMeta);
+    }
+    if (data.containsKey('payload_sha256')) {
+      context.handle(
+        _payloadSha256Meta,
+        payloadSha256.isAcceptableOrUnknown(
+          data['payload_sha256']!,
+          _payloadSha256Meta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_payloadSha256Meta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('origin_device_id')) {
+      context.handle(
+        _originDeviceIdMeta,
+        originDeviceId.isAcceptableOrUnknown(
+          data['origin_device_id']!,
+          _originDeviceIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_originDeviceIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {designRevisionId};
+  @override
+  DesignRevisionPhysicalSnapshotRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DesignRevisionPhysicalSnapshotRow(
+      designRevisionId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}design_revision_id'],
+          )!,
+      projectId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}project_id'],
+          )!,
+      schemaVersion:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}schema_version'],
+          )!,
+      payloadJson:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}payload_json'],
+          )!,
+      payloadSha256:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}payload_sha256'],
+          )!,
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      originDeviceId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}origin_device_id'],
+          )!,
+    );
+  }
+
+  @override
+  $DesignRevisionPhysicalSnapshotsTable createAlias(String alias) {
+    return $DesignRevisionPhysicalSnapshotsTable(attachedDatabase, alias);
+  }
+}
+
+class DesignRevisionPhysicalSnapshotRow extends DataClass
+    implements Insertable<DesignRevisionPhysicalSnapshotRow> {
+  final String designRevisionId;
+  final String projectId;
+  final int schemaVersion;
+  final String payloadJson;
+  final String payloadSha256;
+  final DateTime createdAt;
+  final String originDeviceId;
+  const DesignRevisionPhysicalSnapshotRow({
+    required this.designRevisionId,
+    required this.projectId,
+    required this.schemaVersion,
+    required this.payloadJson,
+    required this.payloadSha256,
+    required this.createdAt,
+    required this.originDeviceId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['design_revision_id'] = Variable<String>(designRevisionId);
+    map['project_id'] = Variable<String>(projectId);
+    map['schema_version'] = Variable<int>(schemaVersion);
+    map['payload_json'] = Variable<String>(payloadJson);
+    map['payload_sha256'] = Variable<String>(payloadSha256);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['origin_device_id'] = Variable<String>(originDeviceId);
+    return map;
+  }
+
+  DesignRevisionPhysicalSnapshotsCompanion toCompanion(bool nullToAbsent) {
+    return DesignRevisionPhysicalSnapshotsCompanion(
+      designRevisionId: Value(designRevisionId),
+      projectId: Value(projectId),
+      schemaVersion: Value(schemaVersion),
+      payloadJson: Value(payloadJson),
+      payloadSha256: Value(payloadSha256),
+      createdAt: Value(createdAt),
+      originDeviceId: Value(originDeviceId),
+    );
+  }
+
+  factory DesignRevisionPhysicalSnapshotRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DesignRevisionPhysicalSnapshotRow(
+      designRevisionId: serializer.fromJson<String>(json['designRevisionId']),
+      projectId: serializer.fromJson<String>(json['projectId']),
+      schemaVersion: serializer.fromJson<int>(json['schemaVersion']),
+      payloadJson: serializer.fromJson<String>(json['payloadJson']),
+      payloadSha256: serializer.fromJson<String>(json['payloadSha256']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      originDeviceId: serializer.fromJson<String>(json['originDeviceId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'designRevisionId': serializer.toJson<String>(designRevisionId),
+      'projectId': serializer.toJson<String>(projectId),
+      'schemaVersion': serializer.toJson<int>(schemaVersion),
+      'payloadJson': serializer.toJson<String>(payloadJson),
+      'payloadSha256': serializer.toJson<String>(payloadSha256),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'originDeviceId': serializer.toJson<String>(originDeviceId),
+    };
+  }
+
+  DesignRevisionPhysicalSnapshotRow copyWith({
+    String? designRevisionId,
+    String? projectId,
+    int? schemaVersion,
+    String? payloadJson,
+    String? payloadSha256,
+    DateTime? createdAt,
+    String? originDeviceId,
+  }) => DesignRevisionPhysicalSnapshotRow(
+    designRevisionId: designRevisionId ?? this.designRevisionId,
+    projectId: projectId ?? this.projectId,
+    schemaVersion: schemaVersion ?? this.schemaVersion,
+    payloadJson: payloadJson ?? this.payloadJson,
+    payloadSha256: payloadSha256 ?? this.payloadSha256,
+    createdAt: createdAt ?? this.createdAt,
+    originDeviceId: originDeviceId ?? this.originDeviceId,
+  );
+  DesignRevisionPhysicalSnapshotRow copyWithCompanion(
+    DesignRevisionPhysicalSnapshotsCompanion data,
+  ) {
+    return DesignRevisionPhysicalSnapshotRow(
+      designRevisionId:
+          data.designRevisionId.present
+              ? data.designRevisionId.value
+              : this.designRevisionId,
+      projectId: data.projectId.present ? data.projectId.value : this.projectId,
+      schemaVersion:
+          data.schemaVersion.present
+              ? data.schemaVersion.value
+              : this.schemaVersion,
+      payloadJson:
+          data.payloadJson.present ? data.payloadJson.value : this.payloadJson,
+      payloadSha256:
+          data.payloadSha256.present
+              ? data.payloadSha256.value
+              : this.payloadSha256,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      originDeviceId:
+          data.originDeviceId.present
+              ? data.originDeviceId.value
+              : this.originDeviceId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DesignRevisionPhysicalSnapshotRow(')
+          ..write('designRevisionId: $designRevisionId, ')
+          ..write('projectId: $projectId, ')
+          ..write('schemaVersion: $schemaVersion, ')
+          ..write('payloadJson: $payloadJson, ')
+          ..write('payloadSha256: $payloadSha256, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('originDeviceId: $originDeviceId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    designRevisionId,
+    projectId,
+    schemaVersion,
+    payloadJson,
+    payloadSha256,
+    createdAt,
+    originDeviceId,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DesignRevisionPhysicalSnapshotRow &&
+          other.designRevisionId == this.designRevisionId &&
+          other.projectId == this.projectId &&
+          other.schemaVersion == this.schemaVersion &&
+          other.payloadJson == this.payloadJson &&
+          other.payloadSha256 == this.payloadSha256 &&
+          other.createdAt == this.createdAt &&
+          other.originDeviceId == this.originDeviceId);
+}
+
+class DesignRevisionPhysicalSnapshotsCompanion
+    extends UpdateCompanion<DesignRevisionPhysicalSnapshotRow> {
+  final Value<String> designRevisionId;
+  final Value<String> projectId;
+  final Value<int> schemaVersion;
+  final Value<String> payloadJson;
+  final Value<String> payloadSha256;
+  final Value<DateTime> createdAt;
+  final Value<String> originDeviceId;
+  final Value<int> rowid;
+  const DesignRevisionPhysicalSnapshotsCompanion({
+    this.designRevisionId = const Value.absent(),
+    this.projectId = const Value.absent(),
+    this.schemaVersion = const Value.absent(),
+    this.payloadJson = const Value.absent(),
+    this.payloadSha256 = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.originDeviceId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DesignRevisionPhysicalSnapshotsCompanion.insert({
+    required String designRevisionId,
+    required String projectId,
+    required int schemaVersion,
+    required String payloadJson,
+    required String payloadSha256,
+    required DateTime createdAt,
+    required String originDeviceId,
+    this.rowid = const Value.absent(),
+  }) : designRevisionId = Value(designRevisionId),
+       projectId = Value(projectId),
+       schemaVersion = Value(schemaVersion),
+       payloadJson = Value(payloadJson),
+       payloadSha256 = Value(payloadSha256),
+       createdAt = Value(createdAt),
+       originDeviceId = Value(originDeviceId);
+  static Insertable<DesignRevisionPhysicalSnapshotRow> custom({
+    Expression<String>? designRevisionId,
+    Expression<String>? projectId,
+    Expression<int>? schemaVersion,
+    Expression<String>? payloadJson,
+    Expression<String>? payloadSha256,
+    Expression<DateTime>? createdAt,
+    Expression<String>? originDeviceId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (designRevisionId != null) 'design_revision_id': designRevisionId,
+      if (projectId != null) 'project_id': projectId,
+      if (schemaVersion != null) 'schema_version': schemaVersion,
+      if (payloadJson != null) 'payload_json': payloadJson,
+      if (payloadSha256 != null) 'payload_sha256': payloadSha256,
+      if (createdAt != null) 'created_at': createdAt,
+      if (originDeviceId != null) 'origin_device_id': originDeviceId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DesignRevisionPhysicalSnapshotsCompanion copyWith({
+    Value<String>? designRevisionId,
+    Value<String>? projectId,
+    Value<int>? schemaVersion,
+    Value<String>? payloadJson,
+    Value<String>? payloadSha256,
+    Value<DateTime>? createdAt,
+    Value<String>? originDeviceId,
+    Value<int>? rowid,
+  }) {
+    return DesignRevisionPhysicalSnapshotsCompanion(
+      designRevisionId: designRevisionId ?? this.designRevisionId,
+      projectId: projectId ?? this.projectId,
+      schemaVersion: schemaVersion ?? this.schemaVersion,
+      payloadJson: payloadJson ?? this.payloadJson,
+      payloadSha256: payloadSha256 ?? this.payloadSha256,
+      createdAt: createdAt ?? this.createdAt,
+      originDeviceId: originDeviceId ?? this.originDeviceId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (designRevisionId.present) {
+      map['design_revision_id'] = Variable<String>(designRevisionId.value);
+    }
+    if (projectId.present) {
+      map['project_id'] = Variable<String>(projectId.value);
+    }
+    if (schemaVersion.present) {
+      map['schema_version'] = Variable<int>(schemaVersion.value);
+    }
+    if (payloadJson.present) {
+      map['payload_json'] = Variable<String>(payloadJson.value);
+    }
+    if (payloadSha256.present) {
+      map['payload_sha256'] = Variable<String>(payloadSha256.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (originDeviceId.present) {
+      map['origin_device_id'] = Variable<String>(originDeviceId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DesignRevisionPhysicalSnapshotsCompanion(')
+          ..write('designRevisionId: $designRevisionId, ')
+          ..write('projectId: $projectId, ')
+          ..write('schemaVersion: $schemaVersion, ')
+          ..write('payloadJson: $payloadJson, ')
+          ..write('payloadSha256: $payloadSha256, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('originDeviceId: $originDeviceId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CanonicalCableRunsTable extends CanonicalCableRuns
+    with TableInfo<$CanonicalCableRunsTable, CanonicalCableRunRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CanonicalCableRunsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _revisionMeta = const VerificationMeta(
+    'revision',
+  );
+  @override
+  late final GeneratedColumn<int> revision = GeneratedColumn<int>(
+    'revision',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _originDeviceIdMeta = const VerificationMeta(
+    'originDeviceId',
+  );
+  @override
+  late final GeneratedColumn<String> originDeviceId = GeneratedColumn<String>(
+    'origin_device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _projectIdMeta = const VerificationMeta(
+    'projectId',
+  );
+  @override
+  late final GeneratedColumn<String> projectId = GeneratedColumn<String>(
+    'project_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES projects (id)',
+    ),
+  );
+  static const VerificationMeta _cableIdMeta = const VerificationMeta(
+    'cableId',
+  );
+  @override
+  late final GeneratedColumn<String> cableId = GeneratedColumn<String>(
+    'cable_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES elv_cables (id)',
+    ),
+  );
+  static const VerificationMeta _designRevisionIdMeta = const VerificationMeta(
+    'designRevisionId',
+  );
+  @override
+  late final GeneratedColumn<String> designRevisionId = GeneratedColumn<String>(
+    'design_revision_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES project_design_revisions (id)',
+    ),
+  );
+  static const VerificationMeta _basedOnCableRunIdMeta = const VerificationMeta(
+    'basedOnCableRunId',
+  );
+  @override
+  late final GeneratedColumn<String> basedOnCableRunId =
+      GeneratedColumn<String>(
+        'based_on_cable_run_id',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES canonical_cable_runs (id)',
+        ),
+      );
+  static const VerificationMeta _lifecycleStateMeta = const VerificationMeta(
+    'lifecycleState',
+  );
+  @override
+  late final GeneratedColumn<String> lifecycleState = GeneratedColumn<String>(
+    'lifecycle_state',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _reservePercentMeta = const VerificationMeta(
+    'reservePercent',
+  );
+  @override
+  late final GeneratedColumn<double> reservePercent = GeneratedColumn<double>(
+    'reserve_percent',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _terminationAllowanceMmMeta =
+      const VerificationMeta('terminationAllowanceMm');
+  @override
+  late final GeneratedColumn<int> terminationAllowanceMm = GeneratedColumn<int>(
+    'termination_allowance_mm',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    revision,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    originDeviceId,
+    id,
+    projectId,
+    cableId,
+    designRevisionId,
+    basedOnCableRunId,
+    lifecycleState,
+    reservePercent,
+    terminationAllowanceMm,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'canonical_cable_runs';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CanonicalCableRunRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('revision')) {
+      context.handle(
+        _revisionMeta,
+        revision.isAcceptableOrUnknown(data['revision']!, _revisionMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('origin_device_id')) {
+      context.handle(
+        _originDeviceIdMeta,
+        originDeviceId.isAcceptableOrUnknown(
+          data['origin_device_id']!,
+          _originDeviceIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_originDeviceIdMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('project_id')) {
+      context.handle(
+        _projectIdMeta,
+        projectId.isAcceptableOrUnknown(data['project_id']!, _projectIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_projectIdMeta);
+    }
+    if (data.containsKey('cable_id')) {
+      context.handle(
+        _cableIdMeta,
+        cableId.isAcceptableOrUnknown(data['cable_id']!, _cableIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_cableIdMeta);
+    }
+    if (data.containsKey('design_revision_id')) {
+      context.handle(
+        _designRevisionIdMeta,
+        designRevisionId.isAcceptableOrUnknown(
+          data['design_revision_id']!,
+          _designRevisionIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_designRevisionIdMeta);
+    }
+    if (data.containsKey('based_on_cable_run_id')) {
+      context.handle(
+        _basedOnCableRunIdMeta,
+        basedOnCableRunId.isAcceptableOrUnknown(
+          data['based_on_cable_run_id']!,
+          _basedOnCableRunIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('lifecycle_state')) {
+      context.handle(
+        _lifecycleStateMeta,
+        lifecycleState.isAcceptableOrUnknown(
+          data['lifecycle_state']!,
+          _lifecycleStateMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_lifecycleStateMeta);
+    }
+    if (data.containsKey('reserve_percent')) {
+      context.handle(
+        _reservePercentMeta,
+        reservePercent.isAcceptableOrUnknown(
+          data['reserve_percent']!,
+          _reservePercentMeta,
+        ),
+      );
+    }
+    if (data.containsKey('termination_allowance_mm')) {
+      context.handle(
+        _terminationAllowanceMmMeta,
+        terminationAllowanceMm.isAcceptableOrUnknown(
+          data['termination_allowance_mm']!,
+          _terminationAllowanceMmMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CanonicalCableRunRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CanonicalCableRunRow(
+      revision:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}revision'],
+          )!,
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      updatedAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}updated_at'],
+          )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      originDeviceId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}origin_device_id'],
+          )!,
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}id'],
+          )!,
+      projectId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}project_id'],
+          )!,
+      cableId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}cable_id'],
+          )!,
+      designRevisionId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}design_revision_id'],
+          )!,
+      basedOnCableRunId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}based_on_cable_run_id'],
+      ),
+      lifecycleState:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}lifecycle_state'],
+          )!,
+      reservePercent:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.double,
+            data['${effectivePrefix}reserve_percent'],
+          )!,
+      terminationAllowanceMm:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}termination_allowance_mm'],
+          )!,
+    );
+  }
+
+  @override
+  $CanonicalCableRunsTable createAlias(String alias) {
+    return $CanonicalCableRunsTable(attachedDatabase, alias);
+  }
+}
+
+class CanonicalCableRunRow extends DataClass
+    implements Insertable<CanonicalCableRunRow> {
+  final int revision;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  final String originDeviceId;
+  final String id;
+  final String projectId;
+  final String cableId;
+  final String designRevisionId;
+  final String? basedOnCableRunId;
+  final String lifecycleState;
+  final double reservePercent;
+  final int terminationAllowanceMm;
+  const CanonicalCableRunRow({
+    required this.revision,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.originDeviceId,
+    required this.id,
+    required this.projectId,
+    required this.cableId,
+    required this.designRevisionId,
+    this.basedOnCableRunId,
+    required this.lifecycleState,
+    required this.reservePercent,
+    required this.terminationAllowanceMm,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['revision'] = Variable<int>(revision);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['origin_device_id'] = Variable<String>(originDeviceId);
+    map['id'] = Variable<String>(id);
+    map['project_id'] = Variable<String>(projectId);
+    map['cable_id'] = Variable<String>(cableId);
+    map['design_revision_id'] = Variable<String>(designRevisionId);
+    if (!nullToAbsent || basedOnCableRunId != null) {
+      map['based_on_cable_run_id'] = Variable<String>(basedOnCableRunId);
+    }
+    map['lifecycle_state'] = Variable<String>(lifecycleState);
+    map['reserve_percent'] = Variable<double>(reservePercent);
+    map['termination_allowance_mm'] = Variable<int>(terminationAllowanceMm);
+    return map;
+  }
+
+  CanonicalCableRunsCompanion toCompanion(bool nullToAbsent) {
+    return CanonicalCableRunsCompanion(
+      revision: Value(revision),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt:
+          deletedAt == null && nullToAbsent
+              ? const Value.absent()
+              : Value(deletedAt),
+      originDeviceId: Value(originDeviceId),
+      id: Value(id),
+      projectId: Value(projectId),
+      cableId: Value(cableId),
+      designRevisionId: Value(designRevisionId),
+      basedOnCableRunId:
+          basedOnCableRunId == null && nullToAbsent
+              ? const Value.absent()
+              : Value(basedOnCableRunId),
+      lifecycleState: Value(lifecycleState),
+      reservePercent: Value(reservePercent),
+      terminationAllowanceMm: Value(terminationAllowanceMm),
+    );
+  }
+
+  factory CanonicalCableRunRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CanonicalCableRunRow(
+      revision: serializer.fromJson<int>(json['revision']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      originDeviceId: serializer.fromJson<String>(json['originDeviceId']),
+      id: serializer.fromJson<String>(json['id']),
+      projectId: serializer.fromJson<String>(json['projectId']),
+      cableId: serializer.fromJson<String>(json['cableId']),
+      designRevisionId: serializer.fromJson<String>(json['designRevisionId']),
+      basedOnCableRunId: serializer.fromJson<String?>(
+        json['basedOnCableRunId'],
+      ),
+      lifecycleState: serializer.fromJson<String>(json['lifecycleState']),
+      reservePercent: serializer.fromJson<double>(json['reservePercent']),
+      terminationAllowanceMm: serializer.fromJson<int>(
+        json['terminationAllowanceMm'],
+      ),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'revision': serializer.toJson<int>(revision),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'originDeviceId': serializer.toJson<String>(originDeviceId),
+      'id': serializer.toJson<String>(id),
+      'projectId': serializer.toJson<String>(projectId),
+      'cableId': serializer.toJson<String>(cableId),
+      'designRevisionId': serializer.toJson<String>(designRevisionId),
+      'basedOnCableRunId': serializer.toJson<String?>(basedOnCableRunId),
+      'lifecycleState': serializer.toJson<String>(lifecycleState),
+      'reservePercent': serializer.toJson<double>(reservePercent),
+      'terminationAllowanceMm': serializer.toJson<int>(terminationAllowanceMm),
+    };
+  }
+
+  CanonicalCableRunRow copyWith({
+    int? revision,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+    String? originDeviceId,
+    String? id,
+    String? projectId,
+    String? cableId,
+    String? designRevisionId,
+    Value<String?> basedOnCableRunId = const Value.absent(),
+    String? lifecycleState,
+    double? reservePercent,
+    int? terminationAllowanceMm,
+  }) => CanonicalCableRunRow(
+    revision: revision ?? this.revision,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    originDeviceId: originDeviceId ?? this.originDeviceId,
+    id: id ?? this.id,
+    projectId: projectId ?? this.projectId,
+    cableId: cableId ?? this.cableId,
+    designRevisionId: designRevisionId ?? this.designRevisionId,
+    basedOnCableRunId:
+        basedOnCableRunId.present
+            ? basedOnCableRunId.value
+            : this.basedOnCableRunId,
+    lifecycleState: lifecycleState ?? this.lifecycleState,
+    reservePercent: reservePercent ?? this.reservePercent,
+    terminationAllowanceMm:
+        terminationAllowanceMm ?? this.terminationAllowanceMm,
+  );
+  CanonicalCableRunRow copyWithCompanion(CanonicalCableRunsCompanion data) {
+    return CanonicalCableRunRow(
+      revision: data.revision.present ? data.revision.value : this.revision,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      originDeviceId:
+          data.originDeviceId.present
+              ? data.originDeviceId.value
+              : this.originDeviceId,
+      id: data.id.present ? data.id.value : this.id,
+      projectId: data.projectId.present ? data.projectId.value : this.projectId,
+      cableId: data.cableId.present ? data.cableId.value : this.cableId,
+      designRevisionId:
+          data.designRevisionId.present
+              ? data.designRevisionId.value
+              : this.designRevisionId,
+      basedOnCableRunId:
+          data.basedOnCableRunId.present
+              ? data.basedOnCableRunId.value
+              : this.basedOnCableRunId,
+      lifecycleState:
+          data.lifecycleState.present
+              ? data.lifecycleState.value
+              : this.lifecycleState,
+      reservePercent:
+          data.reservePercent.present
+              ? data.reservePercent.value
+              : this.reservePercent,
+      terminationAllowanceMm:
+          data.terminationAllowanceMm.present
+              ? data.terminationAllowanceMm.value
+              : this.terminationAllowanceMm,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CanonicalCableRunRow(')
+          ..write('revision: $revision, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('originDeviceId: $originDeviceId, ')
+          ..write('id: $id, ')
+          ..write('projectId: $projectId, ')
+          ..write('cableId: $cableId, ')
+          ..write('designRevisionId: $designRevisionId, ')
+          ..write('basedOnCableRunId: $basedOnCableRunId, ')
+          ..write('lifecycleState: $lifecycleState, ')
+          ..write('reservePercent: $reservePercent, ')
+          ..write('terminationAllowanceMm: $terminationAllowanceMm')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    revision,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    originDeviceId,
+    id,
+    projectId,
+    cableId,
+    designRevisionId,
+    basedOnCableRunId,
+    lifecycleState,
+    reservePercent,
+    terminationAllowanceMm,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CanonicalCableRunRow &&
+          other.revision == this.revision &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.originDeviceId == this.originDeviceId &&
+          other.id == this.id &&
+          other.projectId == this.projectId &&
+          other.cableId == this.cableId &&
+          other.designRevisionId == this.designRevisionId &&
+          other.basedOnCableRunId == this.basedOnCableRunId &&
+          other.lifecycleState == this.lifecycleState &&
+          other.reservePercent == this.reservePercent &&
+          other.terminationAllowanceMm == this.terminationAllowanceMm);
+}
+
+class CanonicalCableRunsCompanion
+    extends UpdateCompanion<CanonicalCableRunRow> {
+  final Value<int> revision;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<String> originDeviceId;
+  final Value<String> id;
+  final Value<String> projectId;
+  final Value<String> cableId;
+  final Value<String> designRevisionId;
+  final Value<String?> basedOnCableRunId;
+  final Value<String> lifecycleState;
+  final Value<double> reservePercent;
+  final Value<int> terminationAllowanceMm;
+  final Value<int> rowid;
+  const CanonicalCableRunsCompanion({
+    this.revision = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.originDeviceId = const Value.absent(),
+    this.id = const Value.absent(),
+    this.projectId = const Value.absent(),
+    this.cableId = const Value.absent(),
+    this.designRevisionId = const Value.absent(),
+    this.basedOnCableRunId = const Value.absent(),
+    this.lifecycleState = const Value.absent(),
+    this.reservePercent = const Value.absent(),
+    this.terminationAllowanceMm = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CanonicalCableRunsCompanion.insert({
+    this.revision = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.deletedAt = const Value.absent(),
+    required String originDeviceId,
+    required String id,
+    required String projectId,
+    required String cableId,
+    required String designRevisionId,
+    this.basedOnCableRunId = const Value.absent(),
+    required String lifecycleState,
+    this.reservePercent = const Value.absent(),
+    this.terminationAllowanceMm = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       originDeviceId = Value(originDeviceId),
+       id = Value(id),
+       projectId = Value(projectId),
+       cableId = Value(cableId),
+       designRevisionId = Value(designRevisionId),
+       lifecycleState = Value(lifecycleState);
+  static Insertable<CanonicalCableRunRow> custom({
+    Expression<int>? revision,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<String>? originDeviceId,
+    Expression<String>? id,
+    Expression<String>? projectId,
+    Expression<String>? cableId,
+    Expression<String>? designRevisionId,
+    Expression<String>? basedOnCableRunId,
+    Expression<String>? lifecycleState,
+    Expression<double>? reservePercent,
+    Expression<int>? terminationAllowanceMm,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (revision != null) 'revision': revision,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (originDeviceId != null) 'origin_device_id': originDeviceId,
+      if (id != null) 'id': id,
+      if (projectId != null) 'project_id': projectId,
+      if (cableId != null) 'cable_id': cableId,
+      if (designRevisionId != null) 'design_revision_id': designRevisionId,
+      if (basedOnCableRunId != null) 'based_on_cable_run_id': basedOnCableRunId,
+      if (lifecycleState != null) 'lifecycle_state': lifecycleState,
+      if (reservePercent != null) 'reserve_percent': reservePercent,
+      if (terminationAllowanceMm != null)
+        'termination_allowance_mm': terminationAllowanceMm,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CanonicalCableRunsCompanion copyWith({
+    Value<int>? revision,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<String>? originDeviceId,
+    Value<String>? id,
+    Value<String>? projectId,
+    Value<String>? cableId,
+    Value<String>? designRevisionId,
+    Value<String?>? basedOnCableRunId,
+    Value<String>? lifecycleState,
+    Value<double>? reservePercent,
+    Value<int>? terminationAllowanceMm,
+    Value<int>? rowid,
+  }) {
+    return CanonicalCableRunsCompanion(
+      revision: revision ?? this.revision,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      originDeviceId: originDeviceId ?? this.originDeviceId,
+      id: id ?? this.id,
+      projectId: projectId ?? this.projectId,
+      cableId: cableId ?? this.cableId,
+      designRevisionId: designRevisionId ?? this.designRevisionId,
+      basedOnCableRunId: basedOnCableRunId ?? this.basedOnCableRunId,
+      lifecycleState: lifecycleState ?? this.lifecycleState,
+      reservePercent: reservePercent ?? this.reservePercent,
+      terminationAllowanceMm:
+          terminationAllowanceMm ?? this.terminationAllowanceMm,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (revision.present) {
+      map['revision'] = Variable<int>(revision.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (originDeviceId.present) {
+      map['origin_device_id'] = Variable<String>(originDeviceId.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (projectId.present) {
+      map['project_id'] = Variable<String>(projectId.value);
+    }
+    if (cableId.present) {
+      map['cable_id'] = Variable<String>(cableId.value);
+    }
+    if (designRevisionId.present) {
+      map['design_revision_id'] = Variable<String>(designRevisionId.value);
+    }
+    if (basedOnCableRunId.present) {
+      map['based_on_cable_run_id'] = Variable<String>(basedOnCableRunId.value);
+    }
+    if (lifecycleState.present) {
+      map['lifecycle_state'] = Variable<String>(lifecycleState.value);
+    }
+    if (reservePercent.present) {
+      map['reserve_percent'] = Variable<double>(reservePercent.value);
+    }
+    if (terminationAllowanceMm.present) {
+      map['termination_allowance_mm'] = Variable<int>(
+        terminationAllowanceMm.value,
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CanonicalCableRunsCompanion(')
+          ..write('revision: $revision, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('originDeviceId: $originDeviceId, ')
+          ..write('id: $id, ')
+          ..write('projectId: $projectId, ')
+          ..write('cableId: $cableId, ')
+          ..write('designRevisionId: $designRevisionId, ')
+          ..write('basedOnCableRunId: $basedOnCableRunId, ')
+          ..write('lifecycleState: $lifecycleState, ')
+          ..write('reservePercent: $reservePercent, ')
+          ..write('terminationAllowanceMm: $terminationAllowanceMm, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CableRunTraversalsTable extends CableRunTraversals
+    with TableInfo<$CableRunTraversalsTable, CableRunTraversalRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CableRunTraversalsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _revisionMeta = const VerificationMeta(
+    'revision',
+  );
+  @override
+  late final GeneratedColumn<int> revision = GeneratedColumn<int>(
+    'revision',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _originDeviceIdMeta = const VerificationMeta(
+    'originDeviceId',
+  );
+  @override
+  late final GeneratedColumn<String> originDeviceId = GeneratedColumn<String>(
+    'origin_device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _cableRunIdMeta = const VerificationMeta(
+    'cableRunId',
+  );
+  @override
+  late final GeneratedColumn<String> cableRunId = GeneratedColumn<String>(
+    'cable_run_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES canonical_cable_runs (id)',
+    ),
+  );
+  static const VerificationMeta _sequenceMeta = const VerificationMeta(
+    'sequence',
+  );
+  @override
+  late final GeneratedColumn<int> sequence = GeneratedColumn<int>(
+    'sequence',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _routeSegmentIdMeta = const VerificationMeta(
+    'routeSegmentId',
+  );
+  @override
+  late final GeneratedColumn<String> routeSegmentId = GeneratedColumn<String>(
+    'route_segment_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES cable_route_segments (id)',
+    ),
+  );
+  static const VerificationMeta _directionMeta = const VerificationMeta(
+    'direction',
+  );
+  @override
+  late final GeneratedColumn<String> direction = GeneratedColumn<String>(
+    'direction',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _physicalCarrierIdMeta = const VerificationMeta(
+    'physicalCarrierId',
+  );
+  @override
+  late final GeneratedColumn<String> physicalCarrierId =
+      GeneratedColumn<String>(
+        'physical_carrier_id',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _carrierCompartmentIdMeta =
+      const VerificationMeta('carrierCompartmentId');
+  @override
+  late final GeneratedColumn<String> carrierCompartmentId =
+      GeneratedColumn<String>(
+        'carrier_compartment_id',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+    revision,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    originDeviceId,
+    id,
+    cableRunId,
+    sequence,
+    routeSegmentId,
+    direction,
+    physicalCarrierId,
+    carrierCompartmentId,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cable_run_traversals';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CableRunTraversalRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('revision')) {
+      context.handle(
+        _revisionMeta,
+        revision.isAcceptableOrUnknown(data['revision']!, _revisionMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('origin_device_id')) {
+      context.handle(
+        _originDeviceIdMeta,
+        originDeviceId.isAcceptableOrUnknown(
+          data['origin_device_id']!,
+          _originDeviceIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_originDeviceIdMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('cable_run_id')) {
+      context.handle(
+        _cableRunIdMeta,
+        cableRunId.isAcceptableOrUnknown(
+          data['cable_run_id']!,
+          _cableRunIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_cableRunIdMeta);
+    }
+    if (data.containsKey('sequence')) {
+      context.handle(
+        _sequenceMeta,
+        sequence.isAcceptableOrUnknown(data['sequence']!, _sequenceMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sequenceMeta);
+    }
+    if (data.containsKey('route_segment_id')) {
+      context.handle(
+        _routeSegmentIdMeta,
+        routeSegmentId.isAcceptableOrUnknown(
+          data['route_segment_id']!,
+          _routeSegmentIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_routeSegmentIdMeta);
+    }
+    if (data.containsKey('direction')) {
+      context.handle(
+        _directionMeta,
+        direction.isAcceptableOrUnknown(data['direction']!, _directionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_directionMeta);
+    }
+    if (data.containsKey('physical_carrier_id')) {
+      context.handle(
+        _physicalCarrierIdMeta,
+        physicalCarrierId.isAcceptableOrUnknown(
+          data['physical_carrier_id']!,
+          _physicalCarrierIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('carrier_compartment_id')) {
+      context.handle(
+        _carrierCompartmentIdMeta,
+        carrierCompartmentId.isAcceptableOrUnknown(
+          data['carrier_compartment_id']!,
+          _carrierCompartmentIdMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {cableRunId, sequence},
+  ];
+  @override
+  CableRunTraversalRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CableRunTraversalRow(
+      revision:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}revision'],
+          )!,
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      updatedAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}updated_at'],
+          )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      originDeviceId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}origin_device_id'],
+          )!,
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}id'],
+          )!,
+      cableRunId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}cable_run_id'],
+          )!,
+      sequence:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}sequence'],
+          )!,
+      routeSegmentId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}route_segment_id'],
+          )!,
+      direction:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}direction'],
+          )!,
+      physicalCarrierId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}physical_carrier_id'],
+      ),
+      carrierCompartmentId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}carrier_compartment_id'],
+      ),
+    );
+  }
+
+  @override
+  $CableRunTraversalsTable createAlias(String alias) {
+    return $CableRunTraversalsTable(attachedDatabase, alias);
+  }
+}
+
+class CableRunTraversalRow extends DataClass
+    implements Insertable<CableRunTraversalRow> {
+  final int revision;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  final String originDeviceId;
+  final String id;
+  final String cableRunId;
+  final int sequence;
+  final String routeSegmentId;
+  final String direction;
+  final String? physicalCarrierId;
+  final String? carrierCompartmentId;
+  const CableRunTraversalRow({
+    required this.revision,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.originDeviceId,
+    required this.id,
+    required this.cableRunId,
+    required this.sequence,
+    required this.routeSegmentId,
+    required this.direction,
+    this.physicalCarrierId,
+    this.carrierCompartmentId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['revision'] = Variable<int>(revision);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['origin_device_id'] = Variable<String>(originDeviceId);
+    map['id'] = Variable<String>(id);
+    map['cable_run_id'] = Variable<String>(cableRunId);
+    map['sequence'] = Variable<int>(sequence);
+    map['route_segment_id'] = Variable<String>(routeSegmentId);
+    map['direction'] = Variable<String>(direction);
+    if (!nullToAbsent || physicalCarrierId != null) {
+      map['physical_carrier_id'] = Variable<String>(physicalCarrierId);
+    }
+    if (!nullToAbsent || carrierCompartmentId != null) {
+      map['carrier_compartment_id'] = Variable<String>(carrierCompartmentId);
+    }
+    return map;
+  }
+
+  CableRunTraversalsCompanion toCompanion(bool nullToAbsent) {
+    return CableRunTraversalsCompanion(
+      revision: Value(revision),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt:
+          deletedAt == null && nullToAbsent
+              ? const Value.absent()
+              : Value(deletedAt),
+      originDeviceId: Value(originDeviceId),
+      id: Value(id),
+      cableRunId: Value(cableRunId),
+      sequence: Value(sequence),
+      routeSegmentId: Value(routeSegmentId),
+      direction: Value(direction),
+      physicalCarrierId:
+          physicalCarrierId == null && nullToAbsent
+              ? const Value.absent()
+              : Value(physicalCarrierId),
+      carrierCompartmentId:
+          carrierCompartmentId == null && nullToAbsent
+              ? const Value.absent()
+              : Value(carrierCompartmentId),
+    );
+  }
+
+  factory CableRunTraversalRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CableRunTraversalRow(
+      revision: serializer.fromJson<int>(json['revision']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      originDeviceId: serializer.fromJson<String>(json['originDeviceId']),
+      id: serializer.fromJson<String>(json['id']),
+      cableRunId: serializer.fromJson<String>(json['cableRunId']),
+      sequence: serializer.fromJson<int>(json['sequence']),
+      routeSegmentId: serializer.fromJson<String>(json['routeSegmentId']),
+      direction: serializer.fromJson<String>(json['direction']),
+      physicalCarrierId: serializer.fromJson<String?>(
+        json['physicalCarrierId'],
+      ),
+      carrierCompartmentId: serializer.fromJson<String?>(
+        json['carrierCompartmentId'],
+      ),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'revision': serializer.toJson<int>(revision),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'originDeviceId': serializer.toJson<String>(originDeviceId),
+      'id': serializer.toJson<String>(id),
+      'cableRunId': serializer.toJson<String>(cableRunId),
+      'sequence': serializer.toJson<int>(sequence),
+      'routeSegmentId': serializer.toJson<String>(routeSegmentId),
+      'direction': serializer.toJson<String>(direction),
+      'physicalCarrierId': serializer.toJson<String?>(physicalCarrierId),
+      'carrierCompartmentId': serializer.toJson<String?>(carrierCompartmentId),
+    };
+  }
+
+  CableRunTraversalRow copyWith({
+    int? revision,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+    String? originDeviceId,
+    String? id,
+    String? cableRunId,
+    int? sequence,
+    String? routeSegmentId,
+    String? direction,
+    Value<String?> physicalCarrierId = const Value.absent(),
+    Value<String?> carrierCompartmentId = const Value.absent(),
+  }) => CableRunTraversalRow(
+    revision: revision ?? this.revision,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    originDeviceId: originDeviceId ?? this.originDeviceId,
+    id: id ?? this.id,
+    cableRunId: cableRunId ?? this.cableRunId,
+    sequence: sequence ?? this.sequence,
+    routeSegmentId: routeSegmentId ?? this.routeSegmentId,
+    direction: direction ?? this.direction,
+    physicalCarrierId:
+        physicalCarrierId.present
+            ? physicalCarrierId.value
+            : this.physicalCarrierId,
+    carrierCompartmentId:
+        carrierCompartmentId.present
+            ? carrierCompartmentId.value
+            : this.carrierCompartmentId,
+  );
+  CableRunTraversalRow copyWithCompanion(CableRunTraversalsCompanion data) {
+    return CableRunTraversalRow(
+      revision: data.revision.present ? data.revision.value : this.revision,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      originDeviceId:
+          data.originDeviceId.present
+              ? data.originDeviceId.value
+              : this.originDeviceId,
+      id: data.id.present ? data.id.value : this.id,
+      cableRunId:
+          data.cableRunId.present ? data.cableRunId.value : this.cableRunId,
+      sequence: data.sequence.present ? data.sequence.value : this.sequence,
+      routeSegmentId:
+          data.routeSegmentId.present
+              ? data.routeSegmentId.value
+              : this.routeSegmentId,
+      direction: data.direction.present ? data.direction.value : this.direction,
+      physicalCarrierId:
+          data.physicalCarrierId.present
+              ? data.physicalCarrierId.value
+              : this.physicalCarrierId,
+      carrierCompartmentId:
+          data.carrierCompartmentId.present
+              ? data.carrierCompartmentId.value
+              : this.carrierCompartmentId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CableRunTraversalRow(')
+          ..write('revision: $revision, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('originDeviceId: $originDeviceId, ')
+          ..write('id: $id, ')
+          ..write('cableRunId: $cableRunId, ')
+          ..write('sequence: $sequence, ')
+          ..write('routeSegmentId: $routeSegmentId, ')
+          ..write('direction: $direction, ')
+          ..write('physicalCarrierId: $physicalCarrierId, ')
+          ..write('carrierCompartmentId: $carrierCompartmentId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    revision,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    originDeviceId,
+    id,
+    cableRunId,
+    sequence,
+    routeSegmentId,
+    direction,
+    physicalCarrierId,
+    carrierCompartmentId,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CableRunTraversalRow &&
+          other.revision == this.revision &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.originDeviceId == this.originDeviceId &&
+          other.id == this.id &&
+          other.cableRunId == this.cableRunId &&
+          other.sequence == this.sequence &&
+          other.routeSegmentId == this.routeSegmentId &&
+          other.direction == this.direction &&
+          other.physicalCarrierId == this.physicalCarrierId &&
+          other.carrierCompartmentId == this.carrierCompartmentId);
+}
+
+class CableRunTraversalsCompanion
+    extends UpdateCompanion<CableRunTraversalRow> {
+  final Value<int> revision;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<String> originDeviceId;
+  final Value<String> id;
+  final Value<String> cableRunId;
+  final Value<int> sequence;
+  final Value<String> routeSegmentId;
+  final Value<String> direction;
+  final Value<String?> physicalCarrierId;
+  final Value<String?> carrierCompartmentId;
+  final Value<int> rowid;
+  const CableRunTraversalsCompanion({
+    this.revision = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.originDeviceId = const Value.absent(),
+    this.id = const Value.absent(),
+    this.cableRunId = const Value.absent(),
+    this.sequence = const Value.absent(),
+    this.routeSegmentId = const Value.absent(),
+    this.direction = const Value.absent(),
+    this.physicalCarrierId = const Value.absent(),
+    this.carrierCompartmentId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CableRunTraversalsCompanion.insert({
+    this.revision = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.deletedAt = const Value.absent(),
+    required String originDeviceId,
+    required String id,
+    required String cableRunId,
+    required int sequence,
+    required String routeSegmentId,
+    required String direction,
+    this.physicalCarrierId = const Value.absent(),
+    this.carrierCompartmentId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       originDeviceId = Value(originDeviceId),
+       id = Value(id),
+       cableRunId = Value(cableRunId),
+       sequence = Value(sequence),
+       routeSegmentId = Value(routeSegmentId),
+       direction = Value(direction);
+  static Insertable<CableRunTraversalRow> custom({
+    Expression<int>? revision,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<String>? originDeviceId,
+    Expression<String>? id,
+    Expression<String>? cableRunId,
+    Expression<int>? sequence,
+    Expression<String>? routeSegmentId,
+    Expression<String>? direction,
+    Expression<String>? physicalCarrierId,
+    Expression<String>? carrierCompartmentId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (revision != null) 'revision': revision,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (originDeviceId != null) 'origin_device_id': originDeviceId,
+      if (id != null) 'id': id,
+      if (cableRunId != null) 'cable_run_id': cableRunId,
+      if (sequence != null) 'sequence': sequence,
+      if (routeSegmentId != null) 'route_segment_id': routeSegmentId,
+      if (direction != null) 'direction': direction,
+      if (physicalCarrierId != null) 'physical_carrier_id': physicalCarrierId,
+      if (carrierCompartmentId != null)
+        'carrier_compartment_id': carrierCompartmentId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CableRunTraversalsCompanion copyWith({
+    Value<int>? revision,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<String>? originDeviceId,
+    Value<String>? id,
+    Value<String>? cableRunId,
+    Value<int>? sequence,
+    Value<String>? routeSegmentId,
+    Value<String>? direction,
+    Value<String?>? physicalCarrierId,
+    Value<String?>? carrierCompartmentId,
+    Value<int>? rowid,
+  }) {
+    return CableRunTraversalsCompanion(
+      revision: revision ?? this.revision,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      originDeviceId: originDeviceId ?? this.originDeviceId,
+      id: id ?? this.id,
+      cableRunId: cableRunId ?? this.cableRunId,
+      sequence: sequence ?? this.sequence,
+      routeSegmentId: routeSegmentId ?? this.routeSegmentId,
+      direction: direction ?? this.direction,
+      physicalCarrierId: physicalCarrierId ?? this.physicalCarrierId,
+      carrierCompartmentId: carrierCompartmentId ?? this.carrierCompartmentId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (revision.present) {
+      map['revision'] = Variable<int>(revision.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (originDeviceId.present) {
+      map['origin_device_id'] = Variable<String>(originDeviceId.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (cableRunId.present) {
+      map['cable_run_id'] = Variable<String>(cableRunId.value);
+    }
+    if (sequence.present) {
+      map['sequence'] = Variable<int>(sequence.value);
+    }
+    if (routeSegmentId.present) {
+      map['route_segment_id'] = Variable<String>(routeSegmentId.value);
+    }
+    if (direction.present) {
+      map['direction'] = Variable<String>(direction.value);
+    }
+    if (physicalCarrierId.present) {
+      map['physical_carrier_id'] = Variable<String>(physicalCarrierId.value);
+    }
+    if (carrierCompartmentId.present) {
+      map['carrier_compartment_id'] = Variable<String>(
+        carrierCompartmentId.value,
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CableRunTraversalsCompanion(')
+          ..write('revision: $revision, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('originDeviceId: $originDeviceId, ')
+          ..write('id: $id, ')
+          ..write('cableRunId: $cableRunId, ')
+          ..write('sequence: $sequence, ')
+          ..write('routeSegmentId: $routeSegmentId, ')
+          ..write('direction: $direction, ')
+          ..write('physicalCarrierId: $physicalCarrierId, ')
+          ..write('carrierCompartmentId: $carrierCompartmentId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $RouteHandoffsTable extends RouteHandoffs
+    with TableInfo<$RouteHandoffsTable, RouteHandoffRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $RouteHandoffsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _revisionMeta = const VerificationMeta(
+    'revision',
+  );
+  @override
+  late final GeneratedColumn<int> revision = GeneratedColumn<int>(
+    'revision',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _originDeviceIdMeta = const VerificationMeta(
+    'originDeviceId',
+  );
+  @override
+  late final GeneratedColumn<String> originDeviceId = GeneratedColumn<String>(
+    'origin_device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _projectIdMeta = const VerificationMeta(
+    'projectId',
+  );
+  @override
+  late final GeneratedColumn<String> projectId = GeneratedColumn<String>(
+    'project_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES projects (id)',
+    ),
+  );
+  static const VerificationMeta _fromRouteNodeIdMeta = const VerificationMeta(
+    'fromRouteNodeId',
+  );
+  @override
+  late final GeneratedColumn<String> fromRouteNodeId = GeneratedColumn<String>(
+    'from_route_node_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES cable_route_nodes (id)',
+    ),
+  );
+  static const VerificationMeta _toRouteNodeIdMeta = const VerificationMeta(
+    'toRouteNodeId',
+  );
+  @override
+  late final GeneratedColumn<String> toRouteNodeId = GeneratedColumn<String>(
+    'to_route_node_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES cable_route_nodes (id)',
+    ),
+  );
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  @override
+  late final GeneratedColumn<String> kind = GeneratedColumn<String>(
+    'kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _bidirectionalMeta = const VerificationMeta(
+    'bidirectional',
+  );
+  @override
+  late final GeneratedColumn<bool> bidirectional = GeneratedColumn<bool>(
+    'bidirectional',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("bidirectional" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _adjacencyRefMeta = const VerificationMeta(
+    'adjacencyRef',
+  );
+  @override
+  late final GeneratedColumn<String> adjacencyRef = GeneratedColumn<String>(
+    'adjacency_ref',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _evidenceJsonMeta = const VerificationMeta(
+    'evidenceJson',
+  );
+  @override
+  late final GeneratedColumn<String> evidenceJson = GeneratedColumn<String>(
+    'evidence_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('{}'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    revision,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    originDeviceId,
+    id,
+    projectId,
+    fromRouteNodeId,
+    toRouteNodeId,
+    kind,
+    bidirectional,
+    adjacencyRef,
+    evidenceJson,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'route_handoffs';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<RouteHandoffRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('revision')) {
+      context.handle(
+        _revisionMeta,
+        revision.isAcceptableOrUnknown(data['revision']!, _revisionMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('origin_device_id')) {
+      context.handle(
+        _originDeviceIdMeta,
+        originDeviceId.isAcceptableOrUnknown(
+          data['origin_device_id']!,
+          _originDeviceIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_originDeviceIdMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('project_id')) {
+      context.handle(
+        _projectIdMeta,
+        projectId.isAcceptableOrUnknown(data['project_id']!, _projectIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_projectIdMeta);
+    }
+    if (data.containsKey('from_route_node_id')) {
+      context.handle(
+        _fromRouteNodeIdMeta,
+        fromRouteNodeId.isAcceptableOrUnknown(
+          data['from_route_node_id']!,
+          _fromRouteNodeIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_fromRouteNodeIdMeta);
+    }
+    if (data.containsKey('to_route_node_id')) {
+      context.handle(
+        _toRouteNodeIdMeta,
+        toRouteNodeId.isAcceptableOrUnknown(
+          data['to_route_node_id']!,
+          _toRouteNodeIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_toRouteNodeIdMeta);
+    }
+    if (data.containsKey('kind')) {
+      context.handle(
+        _kindMeta,
+        kind.isAcceptableOrUnknown(data['kind']!, _kindMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_kindMeta);
+    }
+    if (data.containsKey('bidirectional')) {
+      context.handle(
+        _bidirectionalMeta,
+        bidirectional.isAcceptableOrUnknown(
+          data['bidirectional']!,
+          _bidirectionalMeta,
+        ),
+      );
+    }
+    if (data.containsKey('adjacency_ref')) {
+      context.handle(
+        _adjacencyRefMeta,
+        adjacencyRef.isAcceptableOrUnknown(
+          data['adjacency_ref']!,
+          _adjacencyRefMeta,
+        ),
+      );
+    }
+    if (data.containsKey('evidence_json')) {
+      context.handle(
+        _evidenceJsonMeta,
+        evidenceJson.isAcceptableOrUnknown(
+          data['evidence_json']!,
+          _evidenceJsonMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  RouteHandoffRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return RouteHandoffRow(
+      revision:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}revision'],
+          )!,
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      updatedAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}updated_at'],
+          )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      originDeviceId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}origin_device_id'],
+          )!,
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}id'],
+          )!,
+      projectId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}project_id'],
+          )!,
+      fromRouteNodeId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}from_route_node_id'],
+          )!,
+      toRouteNodeId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}to_route_node_id'],
+          )!,
+      kind:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}kind'],
+          )!,
+      bidirectional:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.bool,
+            data['${effectivePrefix}bidirectional'],
+          )!,
+      adjacencyRef: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}adjacency_ref'],
+      ),
+      evidenceJson:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}evidence_json'],
+          )!,
+    );
+  }
+
+  @override
+  $RouteHandoffsTable createAlias(String alias) {
+    return $RouteHandoffsTable(attachedDatabase, alias);
+  }
+}
+
+class RouteHandoffRow extends DataClass implements Insertable<RouteHandoffRow> {
+  final int revision;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  final String originDeviceId;
+  final String id;
+  final String projectId;
+  final String fromRouteNodeId;
+  final String toRouteNodeId;
+  final String kind;
+  final bool bidirectional;
+  final String? adjacencyRef;
+  final String evidenceJson;
+  const RouteHandoffRow({
+    required this.revision,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.originDeviceId,
+    required this.id,
+    required this.projectId,
+    required this.fromRouteNodeId,
+    required this.toRouteNodeId,
+    required this.kind,
+    required this.bidirectional,
+    this.adjacencyRef,
+    required this.evidenceJson,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['revision'] = Variable<int>(revision);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['origin_device_id'] = Variable<String>(originDeviceId);
+    map['id'] = Variable<String>(id);
+    map['project_id'] = Variable<String>(projectId);
+    map['from_route_node_id'] = Variable<String>(fromRouteNodeId);
+    map['to_route_node_id'] = Variable<String>(toRouteNodeId);
+    map['kind'] = Variable<String>(kind);
+    map['bidirectional'] = Variable<bool>(bidirectional);
+    if (!nullToAbsent || adjacencyRef != null) {
+      map['adjacency_ref'] = Variable<String>(adjacencyRef);
+    }
+    map['evidence_json'] = Variable<String>(evidenceJson);
+    return map;
+  }
+
+  RouteHandoffsCompanion toCompanion(bool nullToAbsent) {
+    return RouteHandoffsCompanion(
+      revision: Value(revision),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt:
+          deletedAt == null && nullToAbsent
+              ? const Value.absent()
+              : Value(deletedAt),
+      originDeviceId: Value(originDeviceId),
+      id: Value(id),
+      projectId: Value(projectId),
+      fromRouteNodeId: Value(fromRouteNodeId),
+      toRouteNodeId: Value(toRouteNodeId),
+      kind: Value(kind),
+      bidirectional: Value(bidirectional),
+      adjacencyRef:
+          adjacencyRef == null && nullToAbsent
+              ? const Value.absent()
+              : Value(adjacencyRef),
+      evidenceJson: Value(evidenceJson),
+    );
+  }
+
+  factory RouteHandoffRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return RouteHandoffRow(
+      revision: serializer.fromJson<int>(json['revision']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      originDeviceId: serializer.fromJson<String>(json['originDeviceId']),
+      id: serializer.fromJson<String>(json['id']),
+      projectId: serializer.fromJson<String>(json['projectId']),
+      fromRouteNodeId: serializer.fromJson<String>(json['fromRouteNodeId']),
+      toRouteNodeId: serializer.fromJson<String>(json['toRouteNodeId']),
+      kind: serializer.fromJson<String>(json['kind']),
+      bidirectional: serializer.fromJson<bool>(json['bidirectional']),
+      adjacencyRef: serializer.fromJson<String?>(json['adjacencyRef']),
+      evidenceJson: serializer.fromJson<String>(json['evidenceJson']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'revision': serializer.toJson<int>(revision),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'originDeviceId': serializer.toJson<String>(originDeviceId),
+      'id': serializer.toJson<String>(id),
+      'projectId': serializer.toJson<String>(projectId),
+      'fromRouteNodeId': serializer.toJson<String>(fromRouteNodeId),
+      'toRouteNodeId': serializer.toJson<String>(toRouteNodeId),
+      'kind': serializer.toJson<String>(kind),
+      'bidirectional': serializer.toJson<bool>(bidirectional),
+      'adjacencyRef': serializer.toJson<String?>(adjacencyRef),
+      'evidenceJson': serializer.toJson<String>(evidenceJson),
+    };
+  }
+
+  RouteHandoffRow copyWith({
+    int? revision,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+    String? originDeviceId,
+    String? id,
+    String? projectId,
+    String? fromRouteNodeId,
+    String? toRouteNodeId,
+    String? kind,
+    bool? bidirectional,
+    Value<String?> adjacencyRef = const Value.absent(),
+    String? evidenceJson,
+  }) => RouteHandoffRow(
+    revision: revision ?? this.revision,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    originDeviceId: originDeviceId ?? this.originDeviceId,
+    id: id ?? this.id,
+    projectId: projectId ?? this.projectId,
+    fromRouteNodeId: fromRouteNodeId ?? this.fromRouteNodeId,
+    toRouteNodeId: toRouteNodeId ?? this.toRouteNodeId,
+    kind: kind ?? this.kind,
+    bidirectional: bidirectional ?? this.bidirectional,
+    adjacencyRef: adjacencyRef.present ? adjacencyRef.value : this.adjacencyRef,
+    evidenceJson: evidenceJson ?? this.evidenceJson,
+  );
+  RouteHandoffRow copyWithCompanion(RouteHandoffsCompanion data) {
+    return RouteHandoffRow(
+      revision: data.revision.present ? data.revision.value : this.revision,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      originDeviceId:
+          data.originDeviceId.present
+              ? data.originDeviceId.value
+              : this.originDeviceId,
+      id: data.id.present ? data.id.value : this.id,
+      projectId: data.projectId.present ? data.projectId.value : this.projectId,
+      fromRouteNodeId:
+          data.fromRouteNodeId.present
+              ? data.fromRouteNodeId.value
+              : this.fromRouteNodeId,
+      toRouteNodeId:
+          data.toRouteNodeId.present
+              ? data.toRouteNodeId.value
+              : this.toRouteNodeId,
+      kind: data.kind.present ? data.kind.value : this.kind,
+      bidirectional:
+          data.bidirectional.present
+              ? data.bidirectional.value
+              : this.bidirectional,
+      adjacencyRef:
+          data.adjacencyRef.present
+              ? data.adjacencyRef.value
+              : this.adjacencyRef,
+      evidenceJson:
+          data.evidenceJson.present
+              ? data.evidenceJson.value
+              : this.evidenceJson,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RouteHandoffRow(')
+          ..write('revision: $revision, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('originDeviceId: $originDeviceId, ')
+          ..write('id: $id, ')
+          ..write('projectId: $projectId, ')
+          ..write('fromRouteNodeId: $fromRouteNodeId, ')
+          ..write('toRouteNodeId: $toRouteNodeId, ')
+          ..write('kind: $kind, ')
+          ..write('bidirectional: $bidirectional, ')
+          ..write('adjacencyRef: $adjacencyRef, ')
+          ..write('evidenceJson: $evidenceJson')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    revision,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    originDeviceId,
+    id,
+    projectId,
+    fromRouteNodeId,
+    toRouteNodeId,
+    kind,
+    bidirectional,
+    adjacencyRef,
+    evidenceJson,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is RouteHandoffRow &&
+          other.revision == this.revision &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.originDeviceId == this.originDeviceId &&
+          other.id == this.id &&
+          other.projectId == this.projectId &&
+          other.fromRouteNodeId == this.fromRouteNodeId &&
+          other.toRouteNodeId == this.toRouteNodeId &&
+          other.kind == this.kind &&
+          other.bidirectional == this.bidirectional &&
+          other.adjacencyRef == this.adjacencyRef &&
+          other.evidenceJson == this.evidenceJson);
+}
+
+class RouteHandoffsCompanion extends UpdateCompanion<RouteHandoffRow> {
+  final Value<int> revision;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<String> originDeviceId;
+  final Value<String> id;
+  final Value<String> projectId;
+  final Value<String> fromRouteNodeId;
+  final Value<String> toRouteNodeId;
+  final Value<String> kind;
+  final Value<bool> bidirectional;
+  final Value<String?> adjacencyRef;
+  final Value<String> evidenceJson;
+  final Value<int> rowid;
+  const RouteHandoffsCompanion({
+    this.revision = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.originDeviceId = const Value.absent(),
+    this.id = const Value.absent(),
+    this.projectId = const Value.absent(),
+    this.fromRouteNodeId = const Value.absent(),
+    this.toRouteNodeId = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.bidirectional = const Value.absent(),
+    this.adjacencyRef = const Value.absent(),
+    this.evidenceJson = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  RouteHandoffsCompanion.insert({
+    this.revision = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.deletedAt = const Value.absent(),
+    required String originDeviceId,
+    required String id,
+    required String projectId,
+    required String fromRouteNodeId,
+    required String toRouteNodeId,
+    required String kind,
+    this.bidirectional = const Value.absent(),
+    this.adjacencyRef = const Value.absent(),
+    this.evidenceJson = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       originDeviceId = Value(originDeviceId),
+       id = Value(id),
+       projectId = Value(projectId),
+       fromRouteNodeId = Value(fromRouteNodeId),
+       toRouteNodeId = Value(toRouteNodeId),
+       kind = Value(kind);
+  static Insertable<RouteHandoffRow> custom({
+    Expression<int>? revision,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<String>? originDeviceId,
+    Expression<String>? id,
+    Expression<String>? projectId,
+    Expression<String>? fromRouteNodeId,
+    Expression<String>? toRouteNodeId,
+    Expression<String>? kind,
+    Expression<bool>? bidirectional,
+    Expression<String>? adjacencyRef,
+    Expression<String>? evidenceJson,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (revision != null) 'revision': revision,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (originDeviceId != null) 'origin_device_id': originDeviceId,
+      if (id != null) 'id': id,
+      if (projectId != null) 'project_id': projectId,
+      if (fromRouteNodeId != null) 'from_route_node_id': fromRouteNodeId,
+      if (toRouteNodeId != null) 'to_route_node_id': toRouteNodeId,
+      if (kind != null) 'kind': kind,
+      if (bidirectional != null) 'bidirectional': bidirectional,
+      if (adjacencyRef != null) 'adjacency_ref': adjacencyRef,
+      if (evidenceJson != null) 'evidence_json': evidenceJson,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  RouteHandoffsCompanion copyWith({
+    Value<int>? revision,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<String>? originDeviceId,
+    Value<String>? id,
+    Value<String>? projectId,
+    Value<String>? fromRouteNodeId,
+    Value<String>? toRouteNodeId,
+    Value<String>? kind,
+    Value<bool>? bidirectional,
+    Value<String?>? adjacencyRef,
+    Value<String>? evidenceJson,
+    Value<int>? rowid,
+  }) {
+    return RouteHandoffsCompanion(
+      revision: revision ?? this.revision,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      originDeviceId: originDeviceId ?? this.originDeviceId,
+      id: id ?? this.id,
+      projectId: projectId ?? this.projectId,
+      fromRouteNodeId: fromRouteNodeId ?? this.fromRouteNodeId,
+      toRouteNodeId: toRouteNodeId ?? this.toRouteNodeId,
+      kind: kind ?? this.kind,
+      bidirectional: bidirectional ?? this.bidirectional,
+      adjacencyRef: adjacencyRef ?? this.adjacencyRef,
+      evidenceJson: evidenceJson ?? this.evidenceJson,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (revision.present) {
+      map['revision'] = Variable<int>(revision.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (originDeviceId.present) {
+      map['origin_device_id'] = Variable<String>(originDeviceId.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (projectId.present) {
+      map['project_id'] = Variable<String>(projectId.value);
+    }
+    if (fromRouteNodeId.present) {
+      map['from_route_node_id'] = Variable<String>(fromRouteNodeId.value);
+    }
+    if (toRouteNodeId.present) {
+      map['to_route_node_id'] = Variable<String>(toRouteNodeId.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<String>(kind.value);
+    }
+    if (bidirectional.present) {
+      map['bidirectional'] = Variable<bool>(bidirectional.value);
+    }
+    if (adjacencyRef.present) {
+      map['adjacency_ref'] = Variable<String>(adjacencyRef.value);
+    }
+    if (evidenceJson.present) {
+      map['evidence_json'] = Variable<String>(evidenceJson.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RouteHandoffsCompanion(')
+          ..write('revision: $revision, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('originDeviceId: $originDeviceId, ')
+          ..write('id: $id, ')
+          ..write('projectId: $projectId, ')
+          ..write('fromRouteNodeId: $fromRouteNodeId, ')
+          ..write('toRouteNodeId: $toRouteNodeId, ')
+          ..write('kind: $kind, ')
+          ..write('bidirectional: $bidirectional, ')
+          ..write('adjacencyRef: $adjacencyRef, ')
+          ..write('evidenceJson: $evidenceJson, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $RouteBendEvidenceTable extends RouteBendEvidence
+    with TableInfo<$RouteBendEvidenceTable, RouteBendEvidenceRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $RouteBendEvidenceTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _revisionMeta = const VerificationMeta(
+    'revision',
+  );
+  @override
+  late final GeneratedColumn<int> revision = GeneratedColumn<int>(
+    'revision',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _originDeviceIdMeta = const VerificationMeta(
+    'originDeviceId',
+  );
+  @override
+  late final GeneratedColumn<String> originDeviceId = GeneratedColumn<String>(
+    'origin_device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _projectIdMeta = const VerificationMeta(
+    'projectId',
+  );
+  @override
+  late final GeneratedColumn<String> projectId = GeneratedColumn<String>(
+    'project_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES projects (id)',
+    ),
+  );
+  static const VerificationMeta _routeNodeIdMeta = const VerificationMeta(
+    'routeNodeId',
+  );
+  @override
+  late final GeneratedColumn<String> routeNodeId = GeneratedColumn<String>(
+    'route_node_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES cable_route_nodes (id)',
+    ),
+  );
+  static const VerificationMeta _radiusMmMeta = const VerificationMeta(
+    'radiusMm',
+  );
+  @override
+  late final GeneratedColumn<double> radiusMm = GeneratedColumn<double>(
+    'radius_mm',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _evidenceKindMeta = const VerificationMeta(
+    'evidenceKind',
+  );
+  @override
+  late final GeneratedColumn<String> evidenceKind = GeneratedColumn<String>(
+    'evidence_kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sourceRefMeta = const VerificationMeta(
+    'sourceRef',
+  );
+  @override
+  late final GeneratedColumn<String> sourceRef = GeneratedColumn<String>(
+    'source_ref',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _provenanceMeta = const VerificationMeta(
+    'provenance',
+  );
+  @override
+  late final GeneratedColumn<String> provenance = GeneratedColumn<String>(
+    'provenance',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    revision,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    originDeviceId,
+    id,
+    projectId,
+    routeNodeId,
+    radiusMm,
+    evidenceKind,
+    sourceRef,
+    provenance,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'route_bend_evidence';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<RouteBendEvidenceRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('revision')) {
+      context.handle(
+        _revisionMeta,
+        revision.isAcceptableOrUnknown(data['revision']!, _revisionMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('origin_device_id')) {
+      context.handle(
+        _originDeviceIdMeta,
+        originDeviceId.isAcceptableOrUnknown(
+          data['origin_device_id']!,
+          _originDeviceIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_originDeviceIdMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('project_id')) {
+      context.handle(
+        _projectIdMeta,
+        projectId.isAcceptableOrUnknown(data['project_id']!, _projectIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_projectIdMeta);
+    }
+    if (data.containsKey('route_node_id')) {
+      context.handle(
+        _routeNodeIdMeta,
+        routeNodeId.isAcceptableOrUnknown(
+          data['route_node_id']!,
+          _routeNodeIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_routeNodeIdMeta);
+    }
+    if (data.containsKey('radius_mm')) {
+      context.handle(
+        _radiusMmMeta,
+        radiusMm.isAcceptableOrUnknown(data['radius_mm']!, _radiusMmMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_radiusMmMeta);
+    }
+    if (data.containsKey('evidence_kind')) {
+      context.handle(
+        _evidenceKindMeta,
+        evidenceKind.isAcceptableOrUnknown(
+          data['evidence_kind']!,
+          _evidenceKindMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_evidenceKindMeta);
+    }
+    if (data.containsKey('source_ref')) {
+      context.handle(
+        _sourceRefMeta,
+        sourceRef.isAcceptableOrUnknown(data['source_ref']!, _sourceRefMeta),
+      );
+    }
+    if (data.containsKey('provenance')) {
+      context.handle(
+        _provenanceMeta,
+        provenance.isAcceptableOrUnknown(data['provenance']!, _provenanceMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_provenanceMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  RouteBendEvidenceRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return RouteBendEvidenceRow(
+      revision:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}revision'],
+          )!,
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      updatedAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}updated_at'],
+          )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      originDeviceId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}origin_device_id'],
+          )!,
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}id'],
+          )!,
+      projectId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}project_id'],
+          )!,
+      routeNodeId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}route_node_id'],
+          )!,
+      radiusMm:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.double,
+            data['${effectivePrefix}radius_mm'],
+          )!,
+      evidenceKind:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}evidence_kind'],
+          )!,
+      sourceRef: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_ref'],
+      ),
+      provenance:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}provenance'],
+          )!,
+    );
+  }
+
+  @override
+  $RouteBendEvidenceTable createAlias(String alias) {
+    return $RouteBendEvidenceTable(attachedDatabase, alias);
+  }
+}
+
+class RouteBendEvidenceRow extends DataClass
+    implements Insertable<RouteBendEvidenceRow> {
+  final int revision;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  final String originDeviceId;
+  final String id;
+  final String projectId;
+  final String routeNodeId;
+  final double radiusMm;
+  final String evidenceKind;
+  final String? sourceRef;
+  final String provenance;
+  const RouteBendEvidenceRow({
+    required this.revision,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.originDeviceId,
+    required this.id,
+    required this.projectId,
+    required this.routeNodeId,
+    required this.radiusMm,
+    required this.evidenceKind,
+    this.sourceRef,
+    required this.provenance,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['revision'] = Variable<int>(revision);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['origin_device_id'] = Variable<String>(originDeviceId);
+    map['id'] = Variable<String>(id);
+    map['project_id'] = Variable<String>(projectId);
+    map['route_node_id'] = Variable<String>(routeNodeId);
+    map['radius_mm'] = Variable<double>(radiusMm);
+    map['evidence_kind'] = Variable<String>(evidenceKind);
+    if (!nullToAbsent || sourceRef != null) {
+      map['source_ref'] = Variable<String>(sourceRef);
+    }
+    map['provenance'] = Variable<String>(provenance);
+    return map;
+  }
+
+  RouteBendEvidenceCompanion toCompanion(bool nullToAbsent) {
+    return RouteBendEvidenceCompanion(
+      revision: Value(revision),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt:
+          deletedAt == null && nullToAbsent
+              ? const Value.absent()
+              : Value(deletedAt),
+      originDeviceId: Value(originDeviceId),
+      id: Value(id),
+      projectId: Value(projectId),
+      routeNodeId: Value(routeNodeId),
+      radiusMm: Value(radiusMm),
+      evidenceKind: Value(evidenceKind),
+      sourceRef:
+          sourceRef == null && nullToAbsent
+              ? const Value.absent()
+              : Value(sourceRef),
+      provenance: Value(provenance),
+    );
+  }
+
+  factory RouteBendEvidenceRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return RouteBendEvidenceRow(
+      revision: serializer.fromJson<int>(json['revision']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      originDeviceId: serializer.fromJson<String>(json['originDeviceId']),
+      id: serializer.fromJson<String>(json['id']),
+      projectId: serializer.fromJson<String>(json['projectId']),
+      routeNodeId: serializer.fromJson<String>(json['routeNodeId']),
+      radiusMm: serializer.fromJson<double>(json['radiusMm']),
+      evidenceKind: serializer.fromJson<String>(json['evidenceKind']),
+      sourceRef: serializer.fromJson<String?>(json['sourceRef']),
+      provenance: serializer.fromJson<String>(json['provenance']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'revision': serializer.toJson<int>(revision),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'originDeviceId': serializer.toJson<String>(originDeviceId),
+      'id': serializer.toJson<String>(id),
+      'projectId': serializer.toJson<String>(projectId),
+      'routeNodeId': serializer.toJson<String>(routeNodeId),
+      'radiusMm': serializer.toJson<double>(radiusMm),
+      'evidenceKind': serializer.toJson<String>(evidenceKind),
+      'sourceRef': serializer.toJson<String?>(sourceRef),
+      'provenance': serializer.toJson<String>(provenance),
+    };
+  }
+
+  RouteBendEvidenceRow copyWith({
+    int? revision,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+    String? originDeviceId,
+    String? id,
+    String? projectId,
+    String? routeNodeId,
+    double? radiusMm,
+    String? evidenceKind,
+    Value<String?> sourceRef = const Value.absent(),
+    String? provenance,
+  }) => RouteBendEvidenceRow(
+    revision: revision ?? this.revision,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    originDeviceId: originDeviceId ?? this.originDeviceId,
+    id: id ?? this.id,
+    projectId: projectId ?? this.projectId,
+    routeNodeId: routeNodeId ?? this.routeNodeId,
+    radiusMm: radiusMm ?? this.radiusMm,
+    evidenceKind: evidenceKind ?? this.evidenceKind,
+    sourceRef: sourceRef.present ? sourceRef.value : this.sourceRef,
+    provenance: provenance ?? this.provenance,
+  );
+  RouteBendEvidenceRow copyWithCompanion(RouteBendEvidenceCompanion data) {
+    return RouteBendEvidenceRow(
+      revision: data.revision.present ? data.revision.value : this.revision,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      originDeviceId:
+          data.originDeviceId.present
+              ? data.originDeviceId.value
+              : this.originDeviceId,
+      id: data.id.present ? data.id.value : this.id,
+      projectId: data.projectId.present ? data.projectId.value : this.projectId,
+      routeNodeId:
+          data.routeNodeId.present ? data.routeNodeId.value : this.routeNodeId,
+      radiusMm: data.radiusMm.present ? data.radiusMm.value : this.radiusMm,
+      evidenceKind:
+          data.evidenceKind.present
+              ? data.evidenceKind.value
+              : this.evidenceKind,
+      sourceRef: data.sourceRef.present ? data.sourceRef.value : this.sourceRef,
+      provenance:
+          data.provenance.present ? data.provenance.value : this.provenance,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RouteBendEvidenceRow(')
+          ..write('revision: $revision, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('originDeviceId: $originDeviceId, ')
+          ..write('id: $id, ')
+          ..write('projectId: $projectId, ')
+          ..write('routeNodeId: $routeNodeId, ')
+          ..write('radiusMm: $radiusMm, ')
+          ..write('evidenceKind: $evidenceKind, ')
+          ..write('sourceRef: $sourceRef, ')
+          ..write('provenance: $provenance')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    revision,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    originDeviceId,
+    id,
+    projectId,
+    routeNodeId,
+    radiusMm,
+    evidenceKind,
+    sourceRef,
+    provenance,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is RouteBendEvidenceRow &&
+          other.revision == this.revision &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.originDeviceId == this.originDeviceId &&
+          other.id == this.id &&
+          other.projectId == this.projectId &&
+          other.routeNodeId == this.routeNodeId &&
+          other.radiusMm == this.radiusMm &&
+          other.evidenceKind == this.evidenceKind &&
+          other.sourceRef == this.sourceRef &&
+          other.provenance == this.provenance);
+}
+
+class RouteBendEvidenceCompanion extends UpdateCompanion<RouteBendEvidenceRow> {
+  final Value<int> revision;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<String> originDeviceId;
+  final Value<String> id;
+  final Value<String> projectId;
+  final Value<String> routeNodeId;
+  final Value<double> radiusMm;
+  final Value<String> evidenceKind;
+  final Value<String?> sourceRef;
+  final Value<String> provenance;
+  final Value<int> rowid;
+  const RouteBendEvidenceCompanion({
+    this.revision = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.originDeviceId = const Value.absent(),
+    this.id = const Value.absent(),
+    this.projectId = const Value.absent(),
+    this.routeNodeId = const Value.absent(),
+    this.radiusMm = const Value.absent(),
+    this.evidenceKind = const Value.absent(),
+    this.sourceRef = const Value.absent(),
+    this.provenance = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  RouteBendEvidenceCompanion.insert({
+    this.revision = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.deletedAt = const Value.absent(),
+    required String originDeviceId,
+    required String id,
+    required String projectId,
+    required String routeNodeId,
+    required double radiusMm,
+    required String evidenceKind,
+    this.sourceRef = const Value.absent(),
+    required String provenance,
+    this.rowid = const Value.absent(),
+  }) : createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       originDeviceId = Value(originDeviceId),
+       id = Value(id),
+       projectId = Value(projectId),
+       routeNodeId = Value(routeNodeId),
+       radiusMm = Value(radiusMm),
+       evidenceKind = Value(evidenceKind),
+       provenance = Value(provenance);
+  static Insertable<RouteBendEvidenceRow> custom({
+    Expression<int>? revision,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<String>? originDeviceId,
+    Expression<String>? id,
+    Expression<String>? projectId,
+    Expression<String>? routeNodeId,
+    Expression<double>? radiusMm,
+    Expression<String>? evidenceKind,
+    Expression<String>? sourceRef,
+    Expression<String>? provenance,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (revision != null) 'revision': revision,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (originDeviceId != null) 'origin_device_id': originDeviceId,
+      if (id != null) 'id': id,
+      if (projectId != null) 'project_id': projectId,
+      if (routeNodeId != null) 'route_node_id': routeNodeId,
+      if (radiusMm != null) 'radius_mm': radiusMm,
+      if (evidenceKind != null) 'evidence_kind': evidenceKind,
+      if (sourceRef != null) 'source_ref': sourceRef,
+      if (provenance != null) 'provenance': provenance,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  RouteBendEvidenceCompanion copyWith({
+    Value<int>? revision,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<String>? originDeviceId,
+    Value<String>? id,
+    Value<String>? projectId,
+    Value<String>? routeNodeId,
+    Value<double>? radiusMm,
+    Value<String>? evidenceKind,
+    Value<String?>? sourceRef,
+    Value<String>? provenance,
+    Value<int>? rowid,
+  }) {
+    return RouteBendEvidenceCompanion(
+      revision: revision ?? this.revision,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      originDeviceId: originDeviceId ?? this.originDeviceId,
+      id: id ?? this.id,
+      projectId: projectId ?? this.projectId,
+      routeNodeId: routeNodeId ?? this.routeNodeId,
+      radiusMm: radiusMm ?? this.radiusMm,
+      evidenceKind: evidenceKind ?? this.evidenceKind,
+      sourceRef: sourceRef ?? this.sourceRef,
+      provenance: provenance ?? this.provenance,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (revision.present) {
+      map['revision'] = Variable<int>(revision.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (originDeviceId.present) {
+      map['origin_device_id'] = Variable<String>(originDeviceId.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (projectId.present) {
+      map['project_id'] = Variable<String>(projectId.value);
+    }
+    if (routeNodeId.present) {
+      map['route_node_id'] = Variable<String>(routeNodeId.value);
+    }
+    if (radiusMm.present) {
+      map['radius_mm'] = Variable<double>(radiusMm.value);
+    }
+    if (evidenceKind.present) {
+      map['evidence_kind'] = Variable<String>(evidenceKind.value);
+    }
+    if (sourceRef.present) {
+      map['source_ref'] = Variable<String>(sourceRef.value);
+    }
+    if (provenance.present) {
+      map['provenance'] = Variable<String>(provenance.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RouteBendEvidenceCompanion(')
+          ..write('revision: $revision, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('originDeviceId: $originDeviceId, ')
+          ..write('id: $id, ')
+          ..write('projectId: $projectId, ')
+          ..write('routeNodeId: $routeNodeId, ')
+          ..write('radiusMm: $radiusMm, ')
+          ..write('evidenceKind: $evidenceKind, ')
+          ..write('sourceRef: $sourceRef, ')
+          ..write('provenance: $provenance, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $LegacyRouteAdoptionsTable extends LegacyRouteAdoptions
+    with TableInfo<$LegacyRouteAdoptionsTable, LegacyRouteAdoptionRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LegacyRouteAdoptionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _legacySourceIdentityMeta =
+      const VerificationMeta('legacySourceIdentity');
+  @override
+  late final GeneratedColumn<String> legacySourceIdentity =
+      GeneratedColumn<String>(
+        'legacy_source_identity',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _projectIdMeta = const VerificationMeta(
+    'projectId',
+  );
+  @override
+  late final GeneratedColumn<String> projectId = GeneratedColumn<String>(
+    'project_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES projects (id)',
+    ),
+  );
+  static const VerificationMeta _designRevisionIdMeta = const VerificationMeta(
+    'designRevisionId',
+  );
+  @override
+  late final GeneratedColumn<String> designRevisionId = GeneratedColumn<String>(
+    'design_revision_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES project_design_revisions (id)',
+    ),
+  );
+  static const VerificationMeta _cableIdMeta = const VerificationMeta(
+    'cableId',
+  );
+  @override
+  late final GeneratedColumn<String> cableId = GeneratedColumn<String>(
+    'cable_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES elv_cables (id)',
+    ),
+  );
+  static const VerificationMeta _canonicalCableRunIdMeta =
+      const VerificationMeta('canonicalCableRunId');
+  @override
+  late final GeneratedColumn<String> canonicalCableRunId =
+      GeneratedColumn<String>(
+        'canonical_cable_run_id',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES canonical_cable_runs (id)',
+        ),
+      );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _originDeviceIdMeta = const VerificationMeta(
+    'originDeviceId',
+  );
+  @override
+  late final GeneratedColumn<String> originDeviceId = GeneratedColumn<String>(
+    'origin_device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    legacySourceIdentity,
+    projectId,
+    designRevisionId,
+    cableId,
+    canonicalCableRunId,
+    createdAt,
+    originDeviceId,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'legacy_route_adoptions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LegacyRouteAdoptionRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('legacy_source_identity')) {
+      context.handle(
+        _legacySourceIdentityMeta,
+        legacySourceIdentity.isAcceptableOrUnknown(
+          data['legacy_source_identity']!,
+          _legacySourceIdentityMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_legacySourceIdentityMeta);
+    }
+    if (data.containsKey('project_id')) {
+      context.handle(
+        _projectIdMeta,
+        projectId.isAcceptableOrUnknown(data['project_id']!, _projectIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_projectIdMeta);
+    }
+    if (data.containsKey('design_revision_id')) {
+      context.handle(
+        _designRevisionIdMeta,
+        designRevisionId.isAcceptableOrUnknown(
+          data['design_revision_id']!,
+          _designRevisionIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_designRevisionIdMeta);
+    }
+    if (data.containsKey('cable_id')) {
+      context.handle(
+        _cableIdMeta,
+        cableId.isAcceptableOrUnknown(data['cable_id']!, _cableIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_cableIdMeta);
+    }
+    if (data.containsKey('canonical_cable_run_id')) {
+      context.handle(
+        _canonicalCableRunIdMeta,
+        canonicalCableRunId.isAcceptableOrUnknown(
+          data['canonical_cable_run_id']!,
+          _canonicalCableRunIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_canonicalCableRunIdMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('origin_device_id')) {
+      context.handle(
+        _originDeviceIdMeta,
+        originDeviceId.isAcceptableOrUnknown(
+          data['origin_device_id']!,
+          _originDeviceIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_originDeviceIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {legacySourceIdentity};
+  @override
+  LegacyRouteAdoptionRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LegacyRouteAdoptionRow(
+      legacySourceIdentity:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}legacy_source_identity'],
+          )!,
+      projectId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}project_id'],
+          )!,
+      designRevisionId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}design_revision_id'],
+          )!,
+      cableId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}cable_id'],
+          )!,
+      canonicalCableRunId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}canonical_cable_run_id'],
+          )!,
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      originDeviceId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}origin_device_id'],
+          )!,
+    );
+  }
+
+  @override
+  $LegacyRouteAdoptionsTable createAlias(String alias) {
+    return $LegacyRouteAdoptionsTable(attachedDatabase, alias);
+  }
+}
+
+class LegacyRouteAdoptionRow extends DataClass
+    implements Insertable<LegacyRouteAdoptionRow> {
+  final String legacySourceIdentity;
+  final String projectId;
+  final String designRevisionId;
+  final String cableId;
+  final String canonicalCableRunId;
+  final DateTime createdAt;
+  final String originDeviceId;
+  const LegacyRouteAdoptionRow({
+    required this.legacySourceIdentity,
+    required this.projectId,
+    required this.designRevisionId,
+    required this.cableId,
+    required this.canonicalCableRunId,
+    required this.createdAt,
+    required this.originDeviceId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['legacy_source_identity'] = Variable<String>(legacySourceIdentity);
+    map['project_id'] = Variable<String>(projectId);
+    map['design_revision_id'] = Variable<String>(designRevisionId);
+    map['cable_id'] = Variable<String>(cableId);
+    map['canonical_cable_run_id'] = Variable<String>(canonicalCableRunId);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['origin_device_id'] = Variable<String>(originDeviceId);
+    return map;
+  }
+
+  LegacyRouteAdoptionsCompanion toCompanion(bool nullToAbsent) {
+    return LegacyRouteAdoptionsCompanion(
+      legacySourceIdentity: Value(legacySourceIdentity),
+      projectId: Value(projectId),
+      designRevisionId: Value(designRevisionId),
+      cableId: Value(cableId),
+      canonicalCableRunId: Value(canonicalCableRunId),
+      createdAt: Value(createdAt),
+      originDeviceId: Value(originDeviceId),
+    );
+  }
+
+  factory LegacyRouteAdoptionRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LegacyRouteAdoptionRow(
+      legacySourceIdentity: serializer.fromJson<String>(
+        json['legacySourceIdentity'],
+      ),
+      projectId: serializer.fromJson<String>(json['projectId']),
+      designRevisionId: serializer.fromJson<String>(json['designRevisionId']),
+      cableId: serializer.fromJson<String>(json['cableId']),
+      canonicalCableRunId: serializer.fromJson<String>(
+        json['canonicalCableRunId'],
+      ),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      originDeviceId: serializer.fromJson<String>(json['originDeviceId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'legacySourceIdentity': serializer.toJson<String>(legacySourceIdentity),
+      'projectId': serializer.toJson<String>(projectId),
+      'designRevisionId': serializer.toJson<String>(designRevisionId),
+      'cableId': serializer.toJson<String>(cableId),
+      'canonicalCableRunId': serializer.toJson<String>(canonicalCableRunId),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'originDeviceId': serializer.toJson<String>(originDeviceId),
+    };
+  }
+
+  LegacyRouteAdoptionRow copyWith({
+    String? legacySourceIdentity,
+    String? projectId,
+    String? designRevisionId,
+    String? cableId,
+    String? canonicalCableRunId,
+    DateTime? createdAt,
+    String? originDeviceId,
+  }) => LegacyRouteAdoptionRow(
+    legacySourceIdentity: legacySourceIdentity ?? this.legacySourceIdentity,
+    projectId: projectId ?? this.projectId,
+    designRevisionId: designRevisionId ?? this.designRevisionId,
+    cableId: cableId ?? this.cableId,
+    canonicalCableRunId: canonicalCableRunId ?? this.canonicalCableRunId,
+    createdAt: createdAt ?? this.createdAt,
+    originDeviceId: originDeviceId ?? this.originDeviceId,
+  );
+  LegacyRouteAdoptionRow copyWithCompanion(LegacyRouteAdoptionsCompanion data) {
+    return LegacyRouteAdoptionRow(
+      legacySourceIdentity:
+          data.legacySourceIdentity.present
+              ? data.legacySourceIdentity.value
+              : this.legacySourceIdentity,
+      projectId: data.projectId.present ? data.projectId.value : this.projectId,
+      designRevisionId:
+          data.designRevisionId.present
+              ? data.designRevisionId.value
+              : this.designRevisionId,
+      cableId: data.cableId.present ? data.cableId.value : this.cableId,
+      canonicalCableRunId:
+          data.canonicalCableRunId.present
+              ? data.canonicalCableRunId.value
+              : this.canonicalCableRunId,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      originDeviceId:
+          data.originDeviceId.present
+              ? data.originDeviceId.value
+              : this.originDeviceId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LegacyRouteAdoptionRow(')
+          ..write('legacySourceIdentity: $legacySourceIdentity, ')
+          ..write('projectId: $projectId, ')
+          ..write('designRevisionId: $designRevisionId, ')
+          ..write('cableId: $cableId, ')
+          ..write('canonicalCableRunId: $canonicalCableRunId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('originDeviceId: $originDeviceId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    legacySourceIdentity,
+    projectId,
+    designRevisionId,
+    cableId,
+    canonicalCableRunId,
+    createdAt,
+    originDeviceId,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LegacyRouteAdoptionRow &&
+          other.legacySourceIdentity == this.legacySourceIdentity &&
+          other.projectId == this.projectId &&
+          other.designRevisionId == this.designRevisionId &&
+          other.cableId == this.cableId &&
+          other.canonicalCableRunId == this.canonicalCableRunId &&
+          other.createdAt == this.createdAt &&
+          other.originDeviceId == this.originDeviceId);
+}
+
+class LegacyRouteAdoptionsCompanion
+    extends UpdateCompanion<LegacyRouteAdoptionRow> {
+  final Value<String> legacySourceIdentity;
+  final Value<String> projectId;
+  final Value<String> designRevisionId;
+  final Value<String> cableId;
+  final Value<String> canonicalCableRunId;
+  final Value<DateTime> createdAt;
+  final Value<String> originDeviceId;
+  final Value<int> rowid;
+  const LegacyRouteAdoptionsCompanion({
+    this.legacySourceIdentity = const Value.absent(),
+    this.projectId = const Value.absent(),
+    this.designRevisionId = const Value.absent(),
+    this.cableId = const Value.absent(),
+    this.canonicalCableRunId = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.originDeviceId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  LegacyRouteAdoptionsCompanion.insert({
+    required String legacySourceIdentity,
+    required String projectId,
+    required String designRevisionId,
+    required String cableId,
+    required String canonicalCableRunId,
+    required DateTime createdAt,
+    required String originDeviceId,
+    this.rowid = const Value.absent(),
+  }) : legacySourceIdentity = Value(legacySourceIdentity),
+       projectId = Value(projectId),
+       designRevisionId = Value(designRevisionId),
+       cableId = Value(cableId),
+       canonicalCableRunId = Value(canonicalCableRunId),
+       createdAt = Value(createdAt),
+       originDeviceId = Value(originDeviceId);
+  static Insertable<LegacyRouteAdoptionRow> custom({
+    Expression<String>? legacySourceIdentity,
+    Expression<String>? projectId,
+    Expression<String>? designRevisionId,
+    Expression<String>? cableId,
+    Expression<String>? canonicalCableRunId,
+    Expression<DateTime>? createdAt,
+    Expression<String>? originDeviceId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (legacySourceIdentity != null)
+        'legacy_source_identity': legacySourceIdentity,
+      if (projectId != null) 'project_id': projectId,
+      if (designRevisionId != null) 'design_revision_id': designRevisionId,
+      if (cableId != null) 'cable_id': cableId,
+      if (canonicalCableRunId != null)
+        'canonical_cable_run_id': canonicalCableRunId,
+      if (createdAt != null) 'created_at': createdAt,
+      if (originDeviceId != null) 'origin_device_id': originDeviceId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  LegacyRouteAdoptionsCompanion copyWith({
+    Value<String>? legacySourceIdentity,
+    Value<String>? projectId,
+    Value<String>? designRevisionId,
+    Value<String>? cableId,
+    Value<String>? canonicalCableRunId,
+    Value<DateTime>? createdAt,
+    Value<String>? originDeviceId,
+    Value<int>? rowid,
+  }) {
+    return LegacyRouteAdoptionsCompanion(
+      legacySourceIdentity: legacySourceIdentity ?? this.legacySourceIdentity,
+      projectId: projectId ?? this.projectId,
+      designRevisionId: designRevisionId ?? this.designRevisionId,
+      cableId: cableId ?? this.cableId,
+      canonicalCableRunId: canonicalCableRunId ?? this.canonicalCableRunId,
+      createdAt: createdAt ?? this.createdAt,
+      originDeviceId: originDeviceId ?? this.originDeviceId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (legacySourceIdentity.present) {
+      map['legacy_source_identity'] = Variable<String>(
+        legacySourceIdentity.value,
+      );
+    }
+    if (projectId.present) {
+      map['project_id'] = Variable<String>(projectId.value);
+    }
+    if (designRevisionId.present) {
+      map['design_revision_id'] = Variable<String>(designRevisionId.value);
+    }
+    if (cableId.present) {
+      map['cable_id'] = Variable<String>(cableId.value);
+    }
+    if (canonicalCableRunId.present) {
+      map['canonical_cable_run_id'] = Variable<String>(
+        canonicalCableRunId.value,
+      );
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (originDeviceId.present) {
+      map['origin_device_id'] = Variable<String>(originDeviceId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LegacyRouteAdoptionsCompanion(')
+          ..write('legacySourceIdentity: $legacySourceIdentity, ')
+          ..write('projectId: $projectId, ')
+          ..write('designRevisionId: $designRevisionId, ')
+          ..write('cableId: $cableId, ')
+          ..write('canonicalCableRunId: $canonicalCableRunId, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('originDeviceId: $originDeviceId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PathwayContextsTable extends PathwayContexts
+    with TableInfo<$PathwayContextsTable, PathwayContextRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PathwayContextsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _revisionMeta = const VerificationMeta(
+    'revision',
+  );
+  @override
+  late final GeneratedColumn<int> revision = GeneratedColumn<int>(
+    'revision',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _originDeviceIdMeta = const VerificationMeta(
+    'originDeviceId',
+  );
+  @override
+  late final GeneratedColumn<String> originDeviceId = GeneratedColumn<String>(
+    'origin_device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _projectIdMeta = const VerificationMeta(
+    'projectId',
+  );
+  @override
+  late final GeneratedColumn<String> projectId = GeneratedColumn<String>(
+    'project_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES projects (id)',
+    ),
+  );
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  @override
+  late final GeneratedColumn<String> kind = GeneratedColumn<String>(
+    'kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _hostTypeMeta = const VerificationMeta(
+    'hostType',
+  );
+  @override
+  late final GeneratedColumn<String> hostType = GeneratedColumn<String>(
+    'host_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _hostJsonMeta = const VerificationMeta(
+    'hostJson',
+  );
+  @override
+  late final GeneratedColumn<String> hostJson = GeneratedColumn<String>(
+    'host_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _parentContextIdMeta = const VerificationMeta(
+    'parentContextId',
+  );
+  @override
+  late final GeneratedColumn<String> parentContextId = GeneratedColumn<String>(
+    'parent_context_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES pathway_contexts (id)',
+    ),
+  );
+  static const VerificationMeta _provenanceMeta = const VerificationMeta(
+    'provenance',
+  );
+  @override
+  late final GeneratedColumn<String> provenance = GeneratedColumn<String>(
+    'provenance',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _lifecycleStateMeta = const VerificationMeta(
+    'lifecycleState',
+  );
+  @override
+  late final GeneratedColumn<String> lifecycleState = GeneratedColumn<String>(
+    'lifecycle_state',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    revision,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    originDeviceId,
+    id,
+    projectId,
+    kind,
+    hostType,
+    hostJson,
+    parentContextId,
+    provenance,
+    lifecycleState,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'pathway_contexts';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PathwayContextRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('revision')) {
+      context.handle(
+        _revisionMeta,
+        revision.isAcceptableOrUnknown(data['revision']!, _revisionMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('origin_device_id')) {
+      context.handle(
+        _originDeviceIdMeta,
+        originDeviceId.isAcceptableOrUnknown(
+          data['origin_device_id']!,
+          _originDeviceIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_originDeviceIdMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('project_id')) {
+      context.handle(
+        _projectIdMeta,
+        projectId.isAcceptableOrUnknown(data['project_id']!, _projectIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_projectIdMeta);
+    }
+    if (data.containsKey('kind')) {
+      context.handle(
+        _kindMeta,
+        kind.isAcceptableOrUnknown(data['kind']!, _kindMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_kindMeta);
+    }
+    if (data.containsKey('host_type')) {
+      context.handle(
+        _hostTypeMeta,
+        hostType.isAcceptableOrUnknown(data['host_type']!, _hostTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_hostTypeMeta);
+    }
+    if (data.containsKey('host_json')) {
+      context.handle(
+        _hostJsonMeta,
+        hostJson.isAcceptableOrUnknown(data['host_json']!, _hostJsonMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_hostJsonMeta);
+    }
+    if (data.containsKey('parent_context_id')) {
+      context.handle(
+        _parentContextIdMeta,
+        parentContextId.isAcceptableOrUnknown(
+          data['parent_context_id']!,
+          _parentContextIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('provenance')) {
+      context.handle(
+        _provenanceMeta,
+        provenance.isAcceptableOrUnknown(data['provenance']!, _provenanceMeta),
+      );
+    }
+    if (data.containsKey('lifecycle_state')) {
+      context.handle(
+        _lifecycleStateMeta,
+        lifecycleState.isAcceptableOrUnknown(
+          data['lifecycle_state']!,
+          _lifecycleStateMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_lifecycleStateMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PathwayContextRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PathwayContextRow(
+      revision:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}revision'],
+          )!,
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      updatedAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}updated_at'],
+          )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      originDeviceId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}origin_device_id'],
+          )!,
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}id'],
+          )!,
+      projectId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}project_id'],
+          )!,
+      kind:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}kind'],
+          )!,
+      hostType:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}host_type'],
+          )!,
+      hostJson:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}host_json'],
+          )!,
+      parentContextId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}parent_context_id'],
+      ),
+      provenance: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}provenance'],
+      ),
+      lifecycleState:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}lifecycle_state'],
+          )!,
+    );
+  }
+
+  @override
+  $PathwayContextsTable createAlias(String alias) {
+    return $PathwayContextsTable(attachedDatabase, alias);
+  }
+}
+
+class PathwayContextRow extends DataClass
+    implements Insertable<PathwayContextRow> {
+  final int revision;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  final String originDeviceId;
+  final String id;
+  final String projectId;
+  final String kind;
+  final String hostType;
+  final String hostJson;
+  final String? parentContextId;
+  final String? provenance;
+  final String lifecycleState;
+  const PathwayContextRow({
+    required this.revision,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.originDeviceId,
+    required this.id,
+    required this.projectId,
+    required this.kind,
+    required this.hostType,
+    required this.hostJson,
+    this.parentContextId,
+    this.provenance,
+    required this.lifecycleState,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['revision'] = Variable<int>(revision);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['origin_device_id'] = Variable<String>(originDeviceId);
+    map['id'] = Variable<String>(id);
+    map['project_id'] = Variable<String>(projectId);
+    map['kind'] = Variable<String>(kind);
+    map['host_type'] = Variable<String>(hostType);
+    map['host_json'] = Variable<String>(hostJson);
+    if (!nullToAbsent || parentContextId != null) {
+      map['parent_context_id'] = Variable<String>(parentContextId);
+    }
+    if (!nullToAbsent || provenance != null) {
+      map['provenance'] = Variable<String>(provenance);
+    }
+    map['lifecycle_state'] = Variable<String>(lifecycleState);
+    return map;
+  }
+
+  PathwayContextsCompanion toCompanion(bool nullToAbsent) {
+    return PathwayContextsCompanion(
+      revision: Value(revision),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt:
+          deletedAt == null && nullToAbsent
+              ? const Value.absent()
+              : Value(deletedAt),
+      originDeviceId: Value(originDeviceId),
+      id: Value(id),
+      projectId: Value(projectId),
+      kind: Value(kind),
+      hostType: Value(hostType),
+      hostJson: Value(hostJson),
+      parentContextId:
+          parentContextId == null && nullToAbsent
+              ? const Value.absent()
+              : Value(parentContextId),
+      provenance:
+          provenance == null && nullToAbsent
+              ? const Value.absent()
+              : Value(provenance),
+      lifecycleState: Value(lifecycleState),
+    );
+  }
+
+  factory PathwayContextRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PathwayContextRow(
+      revision: serializer.fromJson<int>(json['revision']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      originDeviceId: serializer.fromJson<String>(json['originDeviceId']),
+      id: serializer.fromJson<String>(json['id']),
+      projectId: serializer.fromJson<String>(json['projectId']),
+      kind: serializer.fromJson<String>(json['kind']),
+      hostType: serializer.fromJson<String>(json['hostType']),
+      hostJson: serializer.fromJson<String>(json['hostJson']),
+      parentContextId: serializer.fromJson<String?>(json['parentContextId']),
+      provenance: serializer.fromJson<String?>(json['provenance']),
+      lifecycleState: serializer.fromJson<String>(json['lifecycleState']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'revision': serializer.toJson<int>(revision),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'originDeviceId': serializer.toJson<String>(originDeviceId),
+      'id': serializer.toJson<String>(id),
+      'projectId': serializer.toJson<String>(projectId),
+      'kind': serializer.toJson<String>(kind),
+      'hostType': serializer.toJson<String>(hostType),
+      'hostJson': serializer.toJson<String>(hostJson),
+      'parentContextId': serializer.toJson<String?>(parentContextId),
+      'provenance': serializer.toJson<String?>(provenance),
+      'lifecycleState': serializer.toJson<String>(lifecycleState),
+    };
+  }
+
+  PathwayContextRow copyWith({
+    int? revision,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+    String? originDeviceId,
+    String? id,
+    String? projectId,
+    String? kind,
+    String? hostType,
+    String? hostJson,
+    Value<String?> parentContextId = const Value.absent(),
+    Value<String?> provenance = const Value.absent(),
+    String? lifecycleState,
+  }) => PathwayContextRow(
+    revision: revision ?? this.revision,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    originDeviceId: originDeviceId ?? this.originDeviceId,
+    id: id ?? this.id,
+    projectId: projectId ?? this.projectId,
+    kind: kind ?? this.kind,
+    hostType: hostType ?? this.hostType,
+    hostJson: hostJson ?? this.hostJson,
+    parentContextId:
+        parentContextId.present ? parentContextId.value : this.parentContextId,
+    provenance: provenance.present ? provenance.value : this.provenance,
+    lifecycleState: lifecycleState ?? this.lifecycleState,
+  );
+  PathwayContextRow copyWithCompanion(PathwayContextsCompanion data) {
+    return PathwayContextRow(
+      revision: data.revision.present ? data.revision.value : this.revision,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      originDeviceId:
+          data.originDeviceId.present
+              ? data.originDeviceId.value
+              : this.originDeviceId,
+      id: data.id.present ? data.id.value : this.id,
+      projectId: data.projectId.present ? data.projectId.value : this.projectId,
+      kind: data.kind.present ? data.kind.value : this.kind,
+      hostType: data.hostType.present ? data.hostType.value : this.hostType,
+      hostJson: data.hostJson.present ? data.hostJson.value : this.hostJson,
+      parentContextId:
+          data.parentContextId.present
+              ? data.parentContextId.value
+              : this.parentContextId,
+      provenance:
+          data.provenance.present ? data.provenance.value : this.provenance,
+      lifecycleState:
+          data.lifecycleState.present
+              ? data.lifecycleState.value
+              : this.lifecycleState,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PathwayContextRow(')
+          ..write('revision: $revision, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('originDeviceId: $originDeviceId, ')
+          ..write('id: $id, ')
+          ..write('projectId: $projectId, ')
+          ..write('kind: $kind, ')
+          ..write('hostType: $hostType, ')
+          ..write('hostJson: $hostJson, ')
+          ..write('parentContextId: $parentContextId, ')
+          ..write('provenance: $provenance, ')
+          ..write('lifecycleState: $lifecycleState')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    revision,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    originDeviceId,
+    id,
+    projectId,
+    kind,
+    hostType,
+    hostJson,
+    parentContextId,
+    provenance,
+    lifecycleState,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PathwayContextRow &&
+          other.revision == this.revision &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.originDeviceId == this.originDeviceId &&
+          other.id == this.id &&
+          other.projectId == this.projectId &&
+          other.kind == this.kind &&
+          other.hostType == this.hostType &&
+          other.hostJson == this.hostJson &&
+          other.parentContextId == this.parentContextId &&
+          other.provenance == this.provenance &&
+          other.lifecycleState == this.lifecycleState);
+}
+
+class PathwayContextsCompanion extends UpdateCompanion<PathwayContextRow> {
+  final Value<int> revision;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<String> originDeviceId;
+  final Value<String> id;
+  final Value<String> projectId;
+  final Value<String> kind;
+  final Value<String> hostType;
+  final Value<String> hostJson;
+  final Value<String?> parentContextId;
+  final Value<String?> provenance;
+  final Value<String> lifecycleState;
+  final Value<int> rowid;
+  const PathwayContextsCompanion({
+    this.revision = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.originDeviceId = const Value.absent(),
+    this.id = const Value.absent(),
+    this.projectId = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.hostType = const Value.absent(),
+    this.hostJson = const Value.absent(),
+    this.parentContextId = const Value.absent(),
+    this.provenance = const Value.absent(),
+    this.lifecycleState = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PathwayContextsCompanion.insert({
+    this.revision = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.deletedAt = const Value.absent(),
+    required String originDeviceId,
+    required String id,
+    required String projectId,
+    required String kind,
+    required String hostType,
+    required String hostJson,
+    this.parentContextId = const Value.absent(),
+    this.provenance = const Value.absent(),
+    required String lifecycleState,
+    this.rowid = const Value.absent(),
+  }) : createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       originDeviceId = Value(originDeviceId),
+       id = Value(id),
+       projectId = Value(projectId),
+       kind = Value(kind),
+       hostType = Value(hostType),
+       hostJson = Value(hostJson),
+       lifecycleState = Value(lifecycleState);
+  static Insertable<PathwayContextRow> custom({
+    Expression<int>? revision,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<String>? originDeviceId,
+    Expression<String>? id,
+    Expression<String>? projectId,
+    Expression<String>? kind,
+    Expression<String>? hostType,
+    Expression<String>? hostJson,
+    Expression<String>? parentContextId,
+    Expression<String>? provenance,
+    Expression<String>? lifecycleState,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (revision != null) 'revision': revision,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (originDeviceId != null) 'origin_device_id': originDeviceId,
+      if (id != null) 'id': id,
+      if (projectId != null) 'project_id': projectId,
+      if (kind != null) 'kind': kind,
+      if (hostType != null) 'host_type': hostType,
+      if (hostJson != null) 'host_json': hostJson,
+      if (parentContextId != null) 'parent_context_id': parentContextId,
+      if (provenance != null) 'provenance': provenance,
+      if (lifecycleState != null) 'lifecycle_state': lifecycleState,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PathwayContextsCompanion copyWith({
+    Value<int>? revision,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<String>? originDeviceId,
+    Value<String>? id,
+    Value<String>? projectId,
+    Value<String>? kind,
+    Value<String>? hostType,
+    Value<String>? hostJson,
+    Value<String?>? parentContextId,
+    Value<String?>? provenance,
+    Value<String>? lifecycleState,
+    Value<int>? rowid,
+  }) {
+    return PathwayContextsCompanion(
+      revision: revision ?? this.revision,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      originDeviceId: originDeviceId ?? this.originDeviceId,
+      id: id ?? this.id,
+      projectId: projectId ?? this.projectId,
+      kind: kind ?? this.kind,
+      hostType: hostType ?? this.hostType,
+      hostJson: hostJson ?? this.hostJson,
+      parentContextId: parentContextId ?? this.parentContextId,
+      provenance: provenance ?? this.provenance,
+      lifecycleState: lifecycleState ?? this.lifecycleState,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (revision.present) {
+      map['revision'] = Variable<int>(revision.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (originDeviceId.present) {
+      map['origin_device_id'] = Variable<String>(originDeviceId.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (projectId.present) {
+      map['project_id'] = Variable<String>(projectId.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<String>(kind.value);
+    }
+    if (hostType.present) {
+      map['host_type'] = Variable<String>(hostType.value);
+    }
+    if (hostJson.present) {
+      map['host_json'] = Variable<String>(hostJson.value);
+    }
+    if (parentContextId.present) {
+      map['parent_context_id'] = Variable<String>(parentContextId.value);
+    }
+    if (provenance.present) {
+      map['provenance'] = Variable<String>(provenance.value);
+    }
+    if (lifecycleState.present) {
+      map['lifecycle_state'] = Variable<String>(lifecycleState.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PathwayContextsCompanion(')
+          ..write('revision: $revision, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('originDeviceId: $originDeviceId, ')
+          ..write('id: $id, ')
+          ..write('projectId: $projectId, ')
+          ..write('kind: $kind, ')
+          ..write('hostType: $hostType, ')
+          ..write('hostJson: $hostJson, ')
+          ..write('parentContextId: $parentContextId, ')
+          ..write('provenance: $provenance, ')
+          ..write('lifecycleState: $lifecycleState, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PhysicalCarriersTable extends PhysicalCarriers
+    with TableInfo<$PhysicalCarriersTable, PhysicalCarrierRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PhysicalCarriersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _revisionMeta = const VerificationMeta(
+    'revision',
+  );
+  @override
+  late final GeneratedColumn<int> revision = GeneratedColumn<int>(
+    'revision',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _originDeviceIdMeta = const VerificationMeta(
+    'originDeviceId',
+  );
+  @override
+  late final GeneratedColumn<String> originDeviceId = GeneratedColumn<String>(
+    'origin_device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _projectIdMeta = const VerificationMeta(
+    'projectId',
+  );
+  @override
+  late final GeneratedColumn<String> projectId = GeneratedColumn<String>(
+    'project_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES projects (id)',
+    ),
+  );
+  static const VerificationMeta _pathwayContextIdMeta = const VerificationMeta(
+    'pathwayContextId',
+  );
+  @override
+  late final GeneratedColumn<String> pathwayContextId = GeneratedColumn<String>(
+    'pathway_context_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES pathway_contexts (id)',
+    ),
+  );
+  static const VerificationMeta _codeMeta = const VerificationMeta('code');
+  @override
+  late final GeneratedColumn<String> code = GeneratedColumn<String>(
+    'code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _normalizedCodeMeta = const VerificationMeta(
+    'normalizedCode',
+  );
+  @override
+  late final GeneratedColumn<String> normalizedCode = GeneratedColumn<String>(
+    'normalized_code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  @override
+  late final GeneratedColumn<String> kind = GeneratedColumn<String>(
+    'kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _payloadJsonMeta = const VerificationMeta(
+    'payloadJson',
+  );
+  @override
+  late final GeneratedColumn<String> payloadJson = GeneratedColumn<String>(
+    'payload_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lifecycleStateMeta = const VerificationMeta(
+    'lifecycleState',
+  );
+  @override
+  late final GeneratedColumn<String> lifecycleState = GeneratedColumn<String>(
+    'lifecycle_state',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    revision,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    originDeviceId,
+    id,
+    projectId,
+    pathwayContextId,
+    code,
+    normalizedCode,
+    name,
+    kind,
+    payloadJson,
+    lifecycleState,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'physical_carriers';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PhysicalCarrierRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('revision')) {
+      context.handle(
+        _revisionMeta,
+        revision.isAcceptableOrUnknown(data['revision']!, _revisionMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('origin_device_id')) {
+      context.handle(
+        _originDeviceIdMeta,
+        originDeviceId.isAcceptableOrUnknown(
+          data['origin_device_id']!,
+          _originDeviceIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_originDeviceIdMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('project_id')) {
+      context.handle(
+        _projectIdMeta,
+        projectId.isAcceptableOrUnknown(data['project_id']!, _projectIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_projectIdMeta);
+    }
+    if (data.containsKey('pathway_context_id')) {
+      context.handle(
+        _pathwayContextIdMeta,
+        pathwayContextId.isAcceptableOrUnknown(
+          data['pathway_context_id']!,
+          _pathwayContextIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_pathwayContextIdMeta);
+    }
+    if (data.containsKey('code')) {
+      context.handle(
+        _codeMeta,
+        code.isAcceptableOrUnknown(data['code']!, _codeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_codeMeta);
+    }
+    if (data.containsKey('normalized_code')) {
+      context.handle(
+        _normalizedCodeMeta,
+        normalizedCode.isAcceptableOrUnknown(
+          data['normalized_code']!,
+          _normalizedCodeMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_normalizedCodeMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('kind')) {
+      context.handle(
+        _kindMeta,
+        kind.isAcceptableOrUnknown(data['kind']!, _kindMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_kindMeta);
+    }
+    if (data.containsKey('payload_json')) {
+      context.handle(
+        _payloadJsonMeta,
+        payloadJson.isAcceptableOrUnknown(
+          data['payload_json']!,
+          _payloadJsonMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_payloadJsonMeta);
+    }
+    if (data.containsKey('lifecycle_state')) {
+      context.handle(
+        _lifecycleStateMeta,
+        lifecycleState.isAcceptableOrUnknown(
+          data['lifecycle_state']!,
+          _lifecycleStateMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_lifecycleStateMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PhysicalCarrierRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PhysicalCarrierRow(
+      revision:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}revision'],
+          )!,
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      updatedAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}updated_at'],
+          )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      originDeviceId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}origin_device_id'],
+          )!,
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}id'],
+          )!,
+      projectId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}project_id'],
+          )!,
+      pathwayContextId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}pathway_context_id'],
+          )!,
+      code:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}code'],
+          )!,
+      normalizedCode:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}normalized_code'],
+          )!,
+      name:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}name'],
+          )!,
+      kind:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}kind'],
+          )!,
+      payloadJson:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}payload_json'],
+          )!,
+      lifecycleState:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}lifecycle_state'],
+          )!,
+    );
+  }
+
+  @override
+  $PhysicalCarriersTable createAlias(String alias) {
+    return $PhysicalCarriersTable(attachedDatabase, alias);
+  }
+}
+
+class PhysicalCarrierRow extends DataClass
+    implements Insertable<PhysicalCarrierRow> {
+  final int revision;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  final String originDeviceId;
+  final String id;
+  final String projectId;
+  final String pathwayContextId;
+  final String code;
+  final String normalizedCode;
+  final String name;
+  final String kind;
+  final String payloadJson;
+  final String lifecycleState;
+  const PhysicalCarrierRow({
+    required this.revision,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.originDeviceId,
+    required this.id,
+    required this.projectId,
+    required this.pathwayContextId,
+    required this.code,
+    required this.normalizedCode,
+    required this.name,
+    required this.kind,
+    required this.payloadJson,
+    required this.lifecycleState,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['revision'] = Variable<int>(revision);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['origin_device_id'] = Variable<String>(originDeviceId);
+    map['id'] = Variable<String>(id);
+    map['project_id'] = Variable<String>(projectId);
+    map['pathway_context_id'] = Variable<String>(pathwayContextId);
+    map['code'] = Variable<String>(code);
+    map['normalized_code'] = Variable<String>(normalizedCode);
+    map['name'] = Variable<String>(name);
+    map['kind'] = Variable<String>(kind);
+    map['payload_json'] = Variable<String>(payloadJson);
+    map['lifecycle_state'] = Variable<String>(lifecycleState);
+    return map;
+  }
+
+  PhysicalCarriersCompanion toCompanion(bool nullToAbsent) {
+    return PhysicalCarriersCompanion(
+      revision: Value(revision),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt:
+          deletedAt == null && nullToAbsent
+              ? const Value.absent()
+              : Value(deletedAt),
+      originDeviceId: Value(originDeviceId),
+      id: Value(id),
+      projectId: Value(projectId),
+      pathwayContextId: Value(pathwayContextId),
+      code: Value(code),
+      normalizedCode: Value(normalizedCode),
+      name: Value(name),
+      kind: Value(kind),
+      payloadJson: Value(payloadJson),
+      lifecycleState: Value(lifecycleState),
+    );
+  }
+
+  factory PhysicalCarrierRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PhysicalCarrierRow(
+      revision: serializer.fromJson<int>(json['revision']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      originDeviceId: serializer.fromJson<String>(json['originDeviceId']),
+      id: serializer.fromJson<String>(json['id']),
+      projectId: serializer.fromJson<String>(json['projectId']),
+      pathwayContextId: serializer.fromJson<String>(json['pathwayContextId']),
+      code: serializer.fromJson<String>(json['code']),
+      normalizedCode: serializer.fromJson<String>(json['normalizedCode']),
+      name: serializer.fromJson<String>(json['name']),
+      kind: serializer.fromJson<String>(json['kind']),
+      payloadJson: serializer.fromJson<String>(json['payloadJson']),
+      lifecycleState: serializer.fromJson<String>(json['lifecycleState']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'revision': serializer.toJson<int>(revision),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'originDeviceId': serializer.toJson<String>(originDeviceId),
+      'id': serializer.toJson<String>(id),
+      'projectId': serializer.toJson<String>(projectId),
+      'pathwayContextId': serializer.toJson<String>(pathwayContextId),
+      'code': serializer.toJson<String>(code),
+      'normalizedCode': serializer.toJson<String>(normalizedCode),
+      'name': serializer.toJson<String>(name),
+      'kind': serializer.toJson<String>(kind),
+      'payloadJson': serializer.toJson<String>(payloadJson),
+      'lifecycleState': serializer.toJson<String>(lifecycleState),
+    };
+  }
+
+  PhysicalCarrierRow copyWith({
+    int? revision,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+    String? originDeviceId,
+    String? id,
+    String? projectId,
+    String? pathwayContextId,
+    String? code,
+    String? normalizedCode,
+    String? name,
+    String? kind,
+    String? payloadJson,
+    String? lifecycleState,
+  }) => PhysicalCarrierRow(
+    revision: revision ?? this.revision,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    originDeviceId: originDeviceId ?? this.originDeviceId,
+    id: id ?? this.id,
+    projectId: projectId ?? this.projectId,
+    pathwayContextId: pathwayContextId ?? this.pathwayContextId,
+    code: code ?? this.code,
+    normalizedCode: normalizedCode ?? this.normalizedCode,
+    name: name ?? this.name,
+    kind: kind ?? this.kind,
+    payloadJson: payloadJson ?? this.payloadJson,
+    lifecycleState: lifecycleState ?? this.lifecycleState,
+  );
+  PhysicalCarrierRow copyWithCompanion(PhysicalCarriersCompanion data) {
+    return PhysicalCarrierRow(
+      revision: data.revision.present ? data.revision.value : this.revision,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      originDeviceId:
+          data.originDeviceId.present
+              ? data.originDeviceId.value
+              : this.originDeviceId,
+      id: data.id.present ? data.id.value : this.id,
+      projectId: data.projectId.present ? data.projectId.value : this.projectId,
+      pathwayContextId:
+          data.pathwayContextId.present
+              ? data.pathwayContextId.value
+              : this.pathwayContextId,
+      code: data.code.present ? data.code.value : this.code,
+      normalizedCode:
+          data.normalizedCode.present
+              ? data.normalizedCode.value
+              : this.normalizedCode,
+      name: data.name.present ? data.name.value : this.name,
+      kind: data.kind.present ? data.kind.value : this.kind,
+      payloadJson:
+          data.payloadJson.present ? data.payloadJson.value : this.payloadJson,
+      lifecycleState:
+          data.lifecycleState.present
+              ? data.lifecycleState.value
+              : this.lifecycleState,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PhysicalCarrierRow(')
+          ..write('revision: $revision, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('originDeviceId: $originDeviceId, ')
+          ..write('id: $id, ')
+          ..write('projectId: $projectId, ')
+          ..write('pathwayContextId: $pathwayContextId, ')
+          ..write('code: $code, ')
+          ..write('normalizedCode: $normalizedCode, ')
+          ..write('name: $name, ')
+          ..write('kind: $kind, ')
+          ..write('payloadJson: $payloadJson, ')
+          ..write('lifecycleState: $lifecycleState')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    revision,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    originDeviceId,
+    id,
+    projectId,
+    pathwayContextId,
+    code,
+    normalizedCode,
+    name,
+    kind,
+    payloadJson,
+    lifecycleState,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PhysicalCarrierRow &&
+          other.revision == this.revision &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.originDeviceId == this.originDeviceId &&
+          other.id == this.id &&
+          other.projectId == this.projectId &&
+          other.pathwayContextId == this.pathwayContextId &&
+          other.code == this.code &&
+          other.normalizedCode == this.normalizedCode &&
+          other.name == this.name &&
+          other.kind == this.kind &&
+          other.payloadJson == this.payloadJson &&
+          other.lifecycleState == this.lifecycleState);
+}
+
+class PhysicalCarriersCompanion extends UpdateCompanion<PhysicalCarrierRow> {
+  final Value<int> revision;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<String> originDeviceId;
+  final Value<String> id;
+  final Value<String> projectId;
+  final Value<String> pathwayContextId;
+  final Value<String> code;
+  final Value<String> normalizedCode;
+  final Value<String> name;
+  final Value<String> kind;
+  final Value<String> payloadJson;
+  final Value<String> lifecycleState;
+  final Value<int> rowid;
+  const PhysicalCarriersCompanion({
+    this.revision = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.originDeviceId = const Value.absent(),
+    this.id = const Value.absent(),
+    this.projectId = const Value.absent(),
+    this.pathwayContextId = const Value.absent(),
+    this.code = const Value.absent(),
+    this.normalizedCode = const Value.absent(),
+    this.name = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.payloadJson = const Value.absent(),
+    this.lifecycleState = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PhysicalCarriersCompanion.insert({
+    this.revision = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.deletedAt = const Value.absent(),
+    required String originDeviceId,
+    required String id,
+    required String projectId,
+    required String pathwayContextId,
+    required String code,
+    required String normalizedCode,
+    required String name,
+    required String kind,
+    required String payloadJson,
+    required String lifecycleState,
+    this.rowid = const Value.absent(),
+  }) : createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       originDeviceId = Value(originDeviceId),
+       id = Value(id),
+       projectId = Value(projectId),
+       pathwayContextId = Value(pathwayContextId),
+       code = Value(code),
+       normalizedCode = Value(normalizedCode),
+       name = Value(name),
+       kind = Value(kind),
+       payloadJson = Value(payloadJson),
+       lifecycleState = Value(lifecycleState);
+  static Insertable<PhysicalCarrierRow> custom({
+    Expression<int>? revision,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<String>? originDeviceId,
+    Expression<String>? id,
+    Expression<String>? projectId,
+    Expression<String>? pathwayContextId,
+    Expression<String>? code,
+    Expression<String>? normalizedCode,
+    Expression<String>? name,
+    Expression<String>? kind,
+    Expression<String>? payloadJson,
+    Expression<String>? lifecycleState,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (revision != null) 'revision': revision,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (originDeviceId != null) 'origin_device_id': originDeviceId,
+      if (id != null) 'id': id,
+      if (projectId != null) 'project_id': projectId,
+      if (pathwayContextId != null) 'pathway_context_id': pathwayContextId,
+      if (code != null) 'code': code,
+      if (normalizedCode != null) 'normalized_code': normalizedCode,
+      if (name != null) 'name': name,
+      if (kind != null) 'kind': kind,
+      if (payloadJson != null) 'payload_json': payloadJson,
+      if (lifecycleState != null) 'lifecycle_state': lifecycleState,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PhysicalCarriersCompanion copyWith({
+    Value<int>? revision,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<String>? originDeviceId,
+    Value<String>? id,
+    Value<String>? projectId,
+    Value<String>? pathwayContextId,
+    Value<String>? code,
+    Value<String>? normalizedCode,
+    Value<String>? name,
+    Value<String>? kind,
+    Value<String>? payloadJson,
+    Value<String>? lifecycleState,
+    Value<int>? rowid,
+  }) {
+    return PhysicalCarriersCompanion(
+      revision: revision ?? this.revision,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      originDeviceId: originDeviceId ?? this.originDeviceId,
+      id: id ?? this.id,
+      projectId: projectId ?? this.projectId,
+      pathwayContextId: pathwayContextId ?? this.pathwayContextId,
+      code: code ?? this.code,
+      normalizedCode: normalizedCode ?? this.normalizedCode,
+      name: name ?? this.name,
+      kind: kind ?? this.kind,
+      payloadJson: payloadJson ?? this.payloadJson,
+      lifecycleState: lifecycleState ?? this.lifecycleState,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (revision.present) {
+      map['revision'] = Variable<int>(revision.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (originDeviceId.present) {
+      map['origin_device_id'] = Variable<String>(originDeviceId.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (projectId.present) {
+      map['project_id'] = Variable<String>(projectId.value);
+    }
+    if (pathwayContextId.present) {
+      map['pathway_context_id'] = Variable<String>(pathwayContextId.value);
+    }
+    if (code.present) {
+      map['code'] = Variable<String>(code.value);
+    }
+    if (normalizedCode.present) {
+      map['normalized_code'] = Variable<String>(normalizedCode.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<String>(kind.value);
+    }
+    if (payloadJson.present) {
+      map['payload_json'] = Variable<String>(payloadJson.value);
+    }
+    if (lifecycleState.present) {
+      map['lifecycle_state'] = Variable<String>(lifecycleState.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PhysicalCarriersCompanion(')
+          ..write('revision: $revision, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('originDeviceId: $originDeviceId, ')
+          ..write('id: $id, ')
+          ..write('projectId: $projectId, ')
+          ..write('pathwayContextId: $pathwayContextId, ')
+          ..write('code: $code, ')
+          ..write('normalizedCode: $normalizedCode, ')
+          ..write('name: $name, ')
+          ..write('kind: $kind, ')
+          ..write('payloadJson: $payloadJson, ')
+          ..write('lifecycleState: $lifecycleState, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PhysicalCarrierCompartmentsTable extends PhysicalCarrierCompartments
+    with
+        TableInfo<
+          $PhysicalCarrierCompartmentsTable,
+          PhysicalCarrierCompartmentRow
+        > {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PhysicalCarrierCompartmentsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _revisionMeta = const VerificationMeta(
+    'revision',
+  );
+  @override
+  late final GeneratedColumn<int> revision = GeneratedColumn<int>(
+    'revision',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _originDeviceIdMeta = const VerificationMeta(
+    'originDeviceId',
+  );
+  @override
+  late final GeneratedColumn<String> originDeviceId = GeneratedColumn<String>(
+    'origin_device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _carrierIdMeta = const VerificationMeta(
+    'carrierId',
+  );
+  @override
+  late final GeneratedColumn<String> carrierId = GeneratedColumn<String>(
+    'carrier_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES physical_carriers (id)',
+    ),
+  );
+  static const VerificationMeta _codeMeta = const VerificationMeta('code');
+  @override
+  late final GeneratedColumn<String> code = GeneratedColumn<String>(
+    'code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _normalizedCodeMeta = const VerificationMeta(
+    'normalizedCode',
+  );
+  @override
+  late final GeneratedColumn<String> normalizedCode = GeneratedColumn<String>(
+    'normalized_code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sequenceMeta = const VerificationMeta(
+    'sequence',
+  );
+  @override
+  late final GeneratedColumn<int> sequence = GeneratedColumn<int>(
+    'sequence',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _payloadJsonMeta = const VerificationMeta(
+    'payloadJson',
+  );
+  @override
+  late final GeneratedColumn<String> payloadJson = GeneratedColumn<String>(
+    'payload_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lifecycleStateMeta = const VerificationMeta(
+    'lifecycleState',
+  );
+  @override
+  late final GeneratedColumn<String> lifecycleState = GeneratedColumn<String>(
+    'lifecycle_state',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    revision,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    originDeviceId,
+    id,
+    carrierId,
+    code,
+    normalizedCode,
+    sequence,
+    payloadJson,
+    lifecycleState,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'physical_carrier_compartments';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PhysicalCarrierCompartmentRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('revision')) {
+      context.handle(
+        _revisionMeta,
+        revision.isAcceptableOrUnknown(data['revision']!, _revisionMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('origin_device_id')) {
+      context.handle(
+        _originDeviceIdMeta,
+        originDeviceId.isAcceptableOrUnknown(
+          data['origin_device_id']!,
+          _originDeviceIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_originDeviceIdMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('carrier_id')) {
+      context.handle(
+        _carrierIdMeta,
+        carrierId.isAcceptableOrUnknown(data['carrier_id']!, _carrierIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_carrierIdMeta);
+    }
+    if (data.containsKey('code')) {
+      context.handle(
+        _codeMeta,
+        code.isAcceptableOrUnknown(data['code']!, _codeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_codeMeta);
+    }
+    if (data.containsKey('normalized_code')) {
+      context.handle(
+        _normalizedCodeMeta,
+        normalizedCode.isAcceptableOrUnknown(
+          data['normalized_code']!,
+          _normalizedCodeMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_normalizedCodeMeta);
+    }
+    if (data.containsKey('sequence')) {
+      context.handle(
+        _sequenceMeta,
+        sequence.isAcceptableOrUnknown(data['sequence']!, _sequenceMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sequenceMeta);
+    }
+    if (data.containsKey('payload_json')) {
+      context.handle(
+        _payloadJsonMeta,
+        payloadJson.isAcceptableOrUnknown(
+          data['payload_json']!,
+          _payloadJsonMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_payloadJsonMeta);
+    }
+    if (data.containsKey('lifecycle_state')) {
+      context.handle(
+        _lifecycleStateMeta,
+        lifecycleState.isAcceptableOrUnknown(
+          data['lifecycle_state']!,
+          _lifecycleStateMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_lifecycleStateMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PhysicalCarrierCompartmentRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PhysicalCarrierCompartmentRow(
+      revision:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}revision'],
+          )!,
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      updatedAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}updated_at'],
+          )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      originDeviceId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}origin_device_id'],
+          )!,
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}id'],
+          )!,
+      carrierId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}carrier_id'],
+          )!,
+      code:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}code'],
+          )!,
+      normalizedCode:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}normalized_code'],
+          )!,
+      sequence:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}sequence'],
+          )!,
+      payloadJson:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}payload_json'],
+          )!,
+      lifecycleState:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}lifecycle_state'],
+          )!,
+    );
+  }
+
+  @override
+  $PhysicalCarrierCompartmentsTable createAlias(String alias) {
+    return $PhysicalCarrierCompartmentsTable(attachedDatabase, alias);
+  }
+}
+
+class PhysicalCarrierCompartmentRow extends DataClass
+    implements Insertable<PhysicalCarrierCompartmentRow> {
+  final int revision;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  final String originDeviceId;
+  final String id;
+  final String carrierId;
+  final String code;
+  final String normalizedCode;
+  final int sequence;
+  final String payloadJson;
+  final String lifecycleState;
+  const PhysicalCarrierCompartmentRow({
+    required this.revision,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.originDeviceId,
+    required this.id,
+    required this.carrierId,
+    required this.code,
+    required this.normalizedCode,
+    required this.sequence,
+    required this.payloadJson,
+    required this.lifecycleState,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['revision'] = Variable<int>(revision);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['origin_device_id'] = Variable<String>(originDeviceId);
+    map['id'] = Variable<String>(id);
+    map['carrier_id'] = Variable<String>(carrierId);
+    map['code'] = Variable<String>(code);
+    map['normalized_code'] = Variable<String>(normalizedCode);
+    map['sequence'] = Variable<int>(sequence);
+    map['payload_json'] = Variable<String>(payloadJson);
+    map['lifecycle_state'] = Variable<String>(lifecycleState);
+    return map;
+  }
+
+  PhysicalCarrierCompartmentsCompanion toCompanion(bool nullToAbsent) {
+    return PhysicalCarrierCompartmentsCompanion(
+      revision: Value(revision),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt:
+          deletedAt == null && nullToAbsent
+              ? const Value.absent()
+              : Value(deletedAt),
+      originDeviceId: Value(originDeviceId),
+      id: Value(id),
+      carrierId: Value(carrierId),
+      code: Value(code),
+      normalizedCode: Value(normalizedCode),
+      sequence: Value(sequence),
+      payloadJson: Value(payloadJson),
+      lifecycleState: Value(lifecycleState),
+    );
+  }
+
+  factory PhysicalCarrierCompartmentRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PhysicalCarrierCompartmentRow(
+      revision: serializer.fromJson<int>(json['revision']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      originDeviceId: serializer.fromJson<String>(json['originDeviceId']),
+      id: serializer.fromJson<String>(json['id']),
+      carrierId: serializer.fromJson<String>(json['carrierId']),
+      code: serializer.fromJson<String>(json['code']),
+      normalizedCode: serializer.fromJson<String>(json['normalizedCode']),
+      sequence: serializer.fromJson<int>(json['sequence']),
+      payloadJson: serializer.fromJson<String>(json['payloadJson']),
+      lifecycleState: serializer.fromJson<String>(json['lifecycleState']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'revision': serializer.toJson<int>(revision),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'originDeviceId': serializer.toJson<String>(originDeviceId),
+      'id': serializer.toJson<String>(id),
+      'carrierId': serializer.toJson<String>(carrierId),
+      'code': serializer.toJson<String>(code),
+      'normalizedCode': serializer.toJson<String>(normalizedCode),
+      'sequence': serializer.toJson<int>(sequence),
+      'payloadJson': serializer.toJson<String>(payloadJson),
+      'lifecycleState': serializer.toJson<String>(lifecycleState),
+    };
+  }
+
+  PhysicalCarrierCompartmentRow copyWith({
+    int? revision,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+    String? originDeviceId,
+    String? id,
+    String? carrierId,
+    String? code,
+    String? normalizedCode,
+    int? sequence,
+    String? payloadJson,
+    String? lifecycleState,
+  }) => PhysicalCarrierCompartmentRow(
+    revision: revision ?? this.revision,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    originDeviceId: originDeviceId ?? this.originDeviceId,
+    id: id ?? this.id,
+    carrierId: carrierId ?? this.carrierId,
+    code: code ?? this.code,
+    normalizedCode: normalizedCode ?? this.normalizedCode,
+    sequence: sequence ?? this.sequence,
+    payloadJson: payloadJson ?? this.payloadJson,
+    lifecycleState: lifecycleState ?? this.lifecycleState,
+  );
+  PhysicalCarrierCompartmentRow copyWithCompanion(
+    PhysicalCarrierCompartmentsCompanion data,
+  ) {
+    return PhysicalCarrierCompartmentRow(
+      revision: data.revision.present ? data.revision.value : this.revision,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      originDeviceId:
+          data.originDeviceId.present
+              ? data.originDeviceId.value
+              : this.originDeviceId,
+      id: data.id.present ? data.id.value : this.id,
+      carrierId: data.carrierId.present ? data.carrierId.value : this.carrierId,
+      code: data.code.present ? data.code.value : this.code,
+      normalizedCode:
+          data.normalizedCode.present
+              ? data.normalizedCode.value
+              : this.normalizedCode,
+      sequence: data.sequence.present ? data.sequence.value : this.sequence,
+      payloadJson:
+          data.payloadJson.present ? data.payloadJson.value : this.payloadJson,
+      lifecycleState:
+          data.lifecycleState.present
+              ? data.lifecycleState.value
+              : this.lifecycleState,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PhysicalCarrierCompartmentRow(')
+          ..write('revision: $revision, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('originDeviceId: $originDeviceId, ')
+          ..write('id: $id, ')
+          ..write('carrierId: $carrierId, ')
+          ..write('code: $code, ')
+          ..write('normalizedCode: $normalizedCode, ')
+          ..write('sequence: $sequence, ')
+          ..write('payloadJson: $payloadJson, ')
+          ..write('lifecycleState: $lifecycleState')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    revision,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    originDeviceId,
+    id,
+    carrierId,
+    code,
+    normalizedCode,
+    sequence,
+    payloadJson,
+    lifecycleState,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PhysicalCarrierCompartmentRow &&
+          other.revision == this.revision &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.originDeviceId == this.originDeviceId &&
+          other.id == this.id &&
+          other.carrierId == this.carrierId &&
+          other.code == this.code &&
+          other.normalizedCode == this.normalizedCode &&
+          other.sequence == this.sequence &&
+          other.payloadJson == this.payloadJson &&
+          other.lifecycleState == this.lifecycleState);
+}
+
+class PhysicalCarrierCompartmentsCompanion
+    extends UpdateCompanion<PhysicalCarrierCompartmentRow> {
+  final Value<int> revision;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<String> originDeviceId;
+  final Value<String> id;
+  final Value<String> carrierId;
+  final Value<String> code;
+  final Value<String> normalizedCode;
+  final Value<int> sequence;
+  final Value<String> payloadJson;
+  final Value<String> lifecycleState;
+  final Value<int> rowid;
+  const PhysicalCarrierCompartmentsCompanion({
+    this.revision = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.originDeviceId = const Value.absent(),
+    this.id = const Value.absent(),
+    this.carrierId = const Value.absent(),
+    this.code = const Value.absent(),
+    this.normalizedCode = const Value.absent(),
+    this.sequence = const Value.absent(),
+    this.payloadJson = const Value.absent(),
+    this.lifecycleState = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PhysicalCarrierCompartmentsCompanion.insert({
+    this.revision = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.deletedAt = const Value.absent(),
+    required String originDeviceId,
+    required String id,
+    required String carrierId,
+    required String code,
+    required String normalizedCode,
+    required int sequence,
+    required String payloadJson,
+    required String lifecycleState,
+    this.rowid = const Value.absent(),
+  }) : createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       originDeviceId = Value(originDeviceId),
+       id = Value(id),
+       carrierId = Value(carrierId),
+       code = Value(code),
+       normalizedCode = Value(normalizedCode),
+       sequence = Value(sequence),
+       payloadJson = Value(payloadJson),
+       lifecycleState = Value(lifecycleState);
+  static Insertable<PhysicalCarrierCompartmentRow> custom({
+    Expression<int>? revision,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<String>? originDeviceId,
+    Expression<String>? id,
+    Expression<String>? carrierId,
+    Expression<String>? code,
+    Expression<String>? normalizedCode,
+    Expression<int>? sequence,
+    Expression<String>? payloadJson,
+    Expression<String>? lifecycleState,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (revision != null) 'revision': revision,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (originDeviceId != null) 'origin_device_id': originDeviceId,
+      if (id != null) 'id': id,
+      if (carrierId != null) 'carrier_id': carrierId,
+      if (code != null) 'code': code,
+      if (normalizedCode != null) 'normalized_code': normalizedCode,
+      if (sequence != null) 'sequence': sequence,
+      if (payloadJson != null) 'payload_json': payloadJson,
+      if (lifecycleState != null) 'lifecycle_state': lifecycleState,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PhysicalCarrierCompartmentsCompanion copyWith({
+    Value<int>? revision,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<String>? originDeviceId,
+    Value<String>? id,
+    Value<String>? carrierId,
+    Value<String>? code,
+    Value<String>? normalizedCode,
+    Value<int>? sequence,
+    Value<String>? payloadJson,
+    Value<String>? lifecycleState,
+    Value<int>? rowid,
+  }) {
+    return PhysicalCarrierCompartmentsCompanion(
+      revision: revision ?? this.revision,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      originDeviceId: originDeviceId ?? this.originDeviceId,
+      id: id ?? this.id,
+      carrierId: carrierId ?? this.carrierId,
+      code: code ?? this.code,
+      normalizedCode: normalizedCode ?? this.normalizedCode,
+      sequence: sequence ?? this.sequence,
+      payloadJson: payloadJson ?? this.payloadJson,
+      lifecycleState: lifecycleState ?? this.lifecycleState,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (revision.present) {
+      map['revision'] = Variable<int>(revision.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (originDeviceId.present) {
+      map['origin_device_id'] = Variable<String>(originDeviceId.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (carrierId.present) {
+      map['carrier_id'] = Variable<String>(carrierId.value);
+    }
+    if (code.present) {
+      map['code'] = Variable<String>(code.value);
+    }
+    if (normalizedCode.present) {
+      map['normalized_code'] = Variable<String>(normalizedCode.value);
+    }
+    if (sequence.present) {
+      map['sequence'] = Variable<int>(sequence.value);
+    }
+    if (payloadJson.present) {
+      map['payload_json'] = Variable<String>(payloadJson.value);
+    }
+    if (lifecycleState.present) {
+      map['lifecycle_state'] = Variable<String>(lifecycleState.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PhysicalCarrierCompartmentsCompanion(')
+          ..write('revision: $revision, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('originDeviceId: $originDeviceId, ')
+          ..write('id: $id, ')
+          ..write('carrierId: $carrierId, ')
+          ..write('code: $code, ')
+          ..write('normalizedCode: $normalizedCode, ')
+          ..write('sequence: $sequence, ')
+          ..write('payloadJson: $payloadJson, ')
+          ..write('lifecycleState: $lifecycleState, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $TraversalCarrierAssignmentsTable extends TraversalCarrierAssignments
+    with
+        TableInfo<
+          $TraversalCarrierAssignmentsTable,
+          TraversalCarrierAssignmentRow
+        > {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TraversalCarrierAssignmentsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _revisionMeta = const VerificationMeta(
+    'revision',
+  );
+  @override
+  late final GeneratedColumn<int> revision = GeneratedColumn<int>(
+    'revision',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _originDeviceIdMeta = const VerificationMeta(
+    'originDeviceId',
+  );
+  @override
+  late final GeneratedColumn<String> originDeviceId = GeneratedColumn<String>(
+    'origin_device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _traversalIdMeta = const VerificationMeta(
+    'traversalId',
+  );
+  @override
+  late final GeneratedColumn<String> traversalId = GeneratedColumn<String>(
+    'traversal_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES cable_run_traversals (id)',
+    ),
+  );
+  static const VerificationMeta _cableRunIdMeta = const VerificationMeta(
+    'cableRunId',
+  );
+  @override
+  late final GeneratedColumn<String> cableRunId = GeneratedColumn<String>(
+    'cable_run_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES canonical_cable_runs (id)',
+    ),
+  );
+  static const VerificationMeta _projectIdMeta = const VerificationMeta(
+    'projectId',
+  );
+  @override
+  late final GeneratedColumn<String> projectId = GeneratedColumn<String>(
+    'project_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES projects (id)',
+    ),
+  );
+  static const VerificationMeta _designRevisionIdMeta = const VerificationMeta(
+    'designRevisionId',
+  );
+  @override
+  late final GeneratedColumn<String> designRevisionId = GeneratedColumn<String>(
+    'design_revision_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES project_design_revisions (id)',
+    ),
+  );
+  static const VerificationMeta _carrierIdMeta = const VerificationMeta(
+    'carrierId',
+  );
+  @override
+  late final GeneratedColumn<String> carrierId = GeneratedColumn<String>(
+    'carrier_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES physical_carriers (id)',
+    ),
+  );
+  static const VerificationMeta _compartmentIdMeta = const VerificationMeta(
+    'compartmentId',
+  );
+  @override
+  late final GeneratedColumn<String> compartmentId = GeneratedColumn<String>(
+    'compartment_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES physical_carrier_compartments (id)',
+    ),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    revision,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    originDeviceId,
+    traversalId,
+    cableRunId,
+    projectId,
+    designRevisionId,
+    carrierId,
+    compartmentId,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'traversal_carrier_assignments';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<TraversalCarrierAssignmentRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('revision')) {
+      context.handle(
+        _revisionMeta,
+        revision.isAcceptableOrUnknown(data['revision']!, _revisionMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('origin_device_id')) {
+      context.handle(
+        _originDeviceIdMeta,
+        originDeviceId.isAcceptableOrUnknown(
+          data['origin_device_id']!,
+          _originDeviceIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_originDeviceIdMeta);
+    }
+    if (data.containsKey('traversal_id')) {
+      context.handle(
+        _traversalIdMeta,
+        traversalId.isAcceptableOrUnknown(
+          data['traversal_id']!,
+          _traversalIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_traversalIdMeta);
+    }
+    if (data.containsKey('cable_run_id')) {
+      context.handle(
+        _cableRunIdMeta,
+        cableRunId.isAcceptableOrUnknown(
+          data['cable_run_id']!,
+          _cableRunIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_cableRunIdMeta);
+    }
+    if (data.containsKey('project_id')) {
+      context.handle(
+        _projectIdMeta,
+        projectId.isAcceptableOrUnknown(data['project_id']!, _projectIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_projectIdMeta);
+    }
+    if (data.containsKey('design_revision_id')) {
+      context.handle(
+        _designRevisionIdMeta,
+        designRevisionId.isAcceptableOrUnknown(
+          data['design_revision_id']!,
+          _designRevisionIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_designRevisionIdMeta);
+    }
+    if (data.containsKey('carrier_id')) {
+      context.handle(
+        _carrierIdMeta,
+        carrierId.isAcceptableOrUnknown(data['carrier_id']!, _carrierIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_carrierIdMeta);
+    }
+    if (data.containsKey('compartment_id')) {
+      context.handle(
+        _compartmentIdMeta,
+        compartmentId.isAcceptableOrUnknown(
+          data['compartment_id']!,
+          _compartmentIdMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {traversalId};
+  @override
+  TraversalCarrierAssignmentRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TraversalCarrierAssignmentRow(
+      revision:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}revision'],
+          )!,
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      updatedAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}updated_at'],
+          )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      originDeviceId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}origin_device_id'],
+          )!,
+      traversalId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}traversal_id'],
+          )!,
+      cableRunId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}cable_run_id'],
+          )!,
+      projectId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}project_id'],
+          )!,
+      designRevisionId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}design_revision_id'],
+          )!,
+      carrierId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}carrier_id'],
+          )!,
+      compartmentId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}compartment_id'],
+      ),
+    );
+  }
+
+  @override
+  $TraversalCarrierAssignmentsTable createAlias(String alias) {
+    return $TraversalCarrierAssignmentsTable(attachedDatabase, alias);
+  }
+}
+
+class TraversalCarrierAssignmentRow extends DataClass
+    implements Insertable<TraversalCarrierAssignmentRow> {
+  final int revision;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
+  final String originDeviceId;
+  final String traversalId;
+  final String cableRunId;
+  final String projectId;
+  final String designRevisionId;
+  final String carrierId;
+  final String? compartmentId;
+  const TraversalCarrierAssignmentRow({
+    required this.revision,
+    required this.createdAt,
+    required this.updatedAt,
+    this.deletedAt,
+    required this.originDeviceId,
+    required this.traversalId,
+    required this.cableRunId,
+    required this.projectId,
+    required this.designRevisionId,
+    required this.carrierId,
+    this.compartmentId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['revision'] = Variable<int>(revision);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['origin_device_id'] = Variable<String>(originDeviceId);
+    map['traversal_id'] = Variable<String>(traversalId);
+    map['cable_run_id'] = Variable<String>(cableRunId);
+    map['project_id'] = Variable<String>(projectId);
+    map['design_revision_id'] = Variable<String>(designRevisionId);
+    map['carrier_id'] = Variable<String>(carrierId);
+    if (!nullToAbsent || compartmentId != null) {
+      map['compartment_id'] = Variable<String>(compartmentId);
+    }
+    return map;
+  }
+
+  TraversalCarrierAssignmentsCompanion toCompanion(bool nullToAbsent) {
+    return TraversalCarrierAssignmentsCompanion(
+      revision: Value(revision),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      deletedAt:
+          deletedAt == null && nullToAbsent
+              ? const Value.absent()
+              : Value(deletedAt),
+      originDeviceId: Value(originDeviceId),
+      traversalId: Value(traversalId),
+      cableRunId: Value(cableRunId),
+      projectId: Value(projectId),
+      designRevisionId: Value(designRevisionId),
+      carrierId: Value(carrierId),
+      compartmentId:
+          compartmentId == null && nullToAbsent
+              ? const Value.absent()
+              : Value(compartmentId),
+    );
+  }
+
+  factory TraversalCarrierAssignmentRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TraversalCarrierAssignmentRow(
+      revision: serializer.fromJson<int>(json['revision']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      originDeviceId: serializer.fromJson<String>(json['originDeviceId']),
+      traversalId: serializer.fromJson<String>(json['traversalId']),
+      cableRunId: serializer.fromJson<String>(json['cableRunId']),
+      projectId: serializer.fromJson<String>(json['projectId']),
+      designRevisionId: serializer.fromJson<String>(json['designRevisionId']),
+      carrierId: serializer.fromJson<String>(json['carrierId']),
+      compartmentId: serializer.fromJson<String?>(json['compartmentId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'revision': serializer.toJson<int>(revision),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'originDeviceId': serializer.toJson<String>(originDeviceId),
+      'traversalId': serializer.toJson<String>(traversalId),
+      'cableRunId': serializer.toJson<String>(cableRunId),
+      'projectId': serializer.toJson<String>(projectId),
+      'designRevisionId': serializer.toJson<String>(designRevisionId),
+      'carrierId': serializer.toJson<String>(carrierId),
+      'compartmentId': serializer.toJson<String?>(compartmentId),
+    };
+  }
+
+  TraversalCarrierAssignmentRow copyWith({
+    int? revision,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+    String? originDeviceId,
+    String? traversalId,
+    String? cableRunId,
+    String? projectId,
+    String? designRevisionId,
+    String? carrierId,
+    Value<String?> compartmentId = const Value.absent(),
+  }) => TraversalCarrierAssignmentRow(
+    revision: revision ?? this.revision,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    originDeviceId: originDeviceId ?? this.originDeviceId,
+    traversalId: traversalId ?? this.traversalId,
+    cableRunId: cableRunId ?? this.cableRunId,
+    projectId: projectId ?? this.projectId,
+    designRevisionId: designRevisionId ?? this.designRevisionId,
+    carrierId: carrierId ?? this.carrierId,
+    compartmentId:
+        compartmentId.present ? compartmentId.value : this.compartmentId,
+  );
+  TraversalCarrierAssignmentRow copyWithCompanion(
+    TraversalCarrierAssignmentsCompanion data,
+  ) {
+    return TraversalCarrierAssignmentRow(
+      revision: data.revision.present ? data.revision.value : this.revision,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      originDeviceId:
+          data.originDeviceId.present
+              ? data.originDeviceId.value
+              : this.originDeviceId,
+      traversalId:
+          data.traversalId.present ? data.traversalId.value : this.traversalId,
+      cableRunId:
+          data.cableRunId.present ? data.cableRunId.value : this.cableRunId,
+      projectId: data.projectId.present ? data.projectId.value : this.projectId,
+      designRevisionId:
+          data.designRevisionId.present
+              ? data.designRevisionId.value
+              : this.designRevisionId,
+      carrierId: data.carrierId.present ? data.carrierId.value : this.carrierId,
+      compartmentId:
+          data.compartmentId.present
+              ? data.compartmentId.value
+              : this.compartmentId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TraversalCarrierAssignmentRow(')
+          ..write('revision: $revision, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('originDeviceId: $originDeviceId, ')
+          ..write('traversalId: $traversalId, ')
+          ..write('cableRunId: $cableRunId, ')
+          ..write('projectId: $projectId, ')
+          ..write('designRevisionId: $designRevisionId, ')
+          ..write('carrierId: $carrierId, ')
+          ..write('compartmentId: $compartmentId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    revision,
+    createdAt,
+    updatedAt,
+    deletedAt,
+    originDeviceId,
+    traversalId,
+    cableRunId,
+    projectId,
+    designRevisionId,
+    carrierId,
+    compartmentId,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TraversalCarrierAssignmentRow &&
+          other.revision == this.revision &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.deletedAt == this.deletedAt &&
+          other.originDeviceId == this.originDeviceId &&
+          other.traversalId == this.traversalId &&
+          other.cableRunId == this.cableRunId &&
+          other.projectId == this.projectId &&
+          other.designRevisionId == this.designRevisionId &&
+          other.carrierId == this.carrierId &&
+          other.compartmentId == this.compartmentId);
+}
+
+class TraversalCarrierAssignmentsCompanion
+    extends UpdateCompanion<TraversalCarrierAssignmentRow> {
+  final Value<int> revision;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<DateTime?> deletedAt;
+  final Value<String> originDeviceId;
+  final Value<String> traversalId;
+  final Value<String> cableRunId;
+  final Value<String> projectId;
+  final Value<String> designRevisionId;
+  final Value<String> carrierId;
+  final Value<String?> compartmentId;
+  final Value<int> rowid;
+  const TraversalCarrierAssignmentsCompanion({
+    this.revision = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.originDeviceId = const Value.absent(),
+    this.traversalId = const Value.absent(),
+    this.cableRunId = const Value.absent(),
+    this.projectId = const Value.absent(),
+    this.designRevisionId = const Value.absent(),
+    this.carrierId = const Value.absent(),
+    this.compartmentId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  TraversalCarrierAssignmentsCompanion.insert({
+    this.revision = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.deletedAt = const Value.absent(),
+    required String originDeviceId,
+    required String traversalId,
+    required String cableRunId,
+    required String projectId,
+    required String designRevisionId,
+    required String carrierId,
+    this.compartmentId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       originDeviceId = Value(originDeviceId),
+       traversalId = Value(traversalId),
+       cableRunId = Value(cableRunId),
+       projectId = Value(projectId),
+       designRevisionId = Value(designRevisionId),
+       carrierId = Value(carrierId);
+  static Insertable<TraversalCarrierAssignmentRow> custom({
+    Expression<int>? revision,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<DateTime>? deletedAt,
+    Expression<String>? originDeviceId,
+    Expression<String>? traversalId,
+    Expression<String>? cableRunId,
+    Expression<String>? projectId,
+    Expression<String>? designRevisionId,
+    Expression<String>? carrierId,
+    Expression<String>? compartmentId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (revision != null) 'revision': revision,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (originDeviceId != null) 'origin_device_id': originDeviceId,
+      if (traversalId != null) 'traversal_id': traversalId,
+      if (cableRunId != null) 'cable_run_id': cableRunId,
+      if (projectId != null) 'project_id': projectId,
+      if (designRevisionId != null) 'design_revision_id': designRevisionId,
+      if (carrierId != null) 'carrier_id': carrierId,
+      if (compartmentId != null) 'compartment_id': compartmentId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  TraversalCarrierAssignmentsCompanion copyWith({
+    Value<int>? revision,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<DateTime?>? deletedAt,
+    Value<String>? originDeviceId,
+    Value<String>? traversalId,
+    Value<String>? cableRunId,
+    Value<String>? projectId,
+    Value<String>? designRevisionId,
+    Value<String>? carrierId,
+    Value<String?>? compartmentId,
+    Value<int>? rowid,
+  }) {
+    return TraversalCarrierAssignmentsCompanion(
+      revision: revision ?? this.revision,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+      originDeviceId: originDeviceId ?? this.originDeviceId,
+      traversalId: traversalId ?? this.traversalId,
+      cableRunId: cableRunId ?? this.cableRunId,
+      projectId: projectId ?? this.projectId,
+      designRevisionId: designRevisionId ?? this.designRevisionId,
+      carrierId: carrierId ?? this.carrierId,
+      compartmentId: compartmentId ?? this.compartmentId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (revision.present) {
+      map['revision'] = Variable<int>(revision.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (originDeviceId.present) {
+      map['origin_device_id'] = Variable<String>(originDeviceId.value);
+    }
+    if (traversalId.present) {
+      map['traversal_id'] = Variable<String>(traversalId.value);
+    }
+    if (cableRunId.present) {
+      map['cable_run_id'] = Variable<String>(cableRunId.value);
+    }
+    if (projectId.present) {
+      map['project_id'] = Variable<String>(projectId.value);
+    }
+    if (designRevisionId.present) {
+      map['design_revision_id'] = Variable<String>(designRevisionId.value);
+    }
+    if (carrierId.present) {
+      map['carrier_id'] = Variable<String>(carrierId.value);
+    }
+    if (compartmentId.present) {
+      map['compartment_id'] = Variable<String>(compartmentId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TraversalCarrierAssignmentsCompanion(')
+          ..write('revision: $revision, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('originDeviceId: $originDeviceId, ')
+          ..write('traversalId: $traversalId, ')
+          ..write('cableRunId: $cableRunId, ')
+          ..write('projectId: $projectId, ')
+          ..write('designRevisionId: $designRevisionId, ')
+          ..write('carrierId: $carrierId, ')
+          ..write('compartmentId: $compartmentId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -36768,6 +45041,29 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $CableTerminationMappingsTable(this);
   late final $CommandExecutionRecordsTable commandExecutionRecords =
       $CommandExecutionRecordsTable(this);
+  late final $ProjectDesignRevisionsTable projectDesignRevisions =
+      $ProjectDesignRevisionsTable(this);
+  late final $DesignRevisionPhysicalSnapshotsTable
+  designRevisionPhysicalSnapshots = $DesignRevisionPhysicalSnapshotsTable(this);
+  late final $CanonicalCableRunsTable canonicalCableRuns =
+      $CanonicalCableRunsTable(this);
+  late final $CableRunTraversalsTable cableRunTraversals =
+      $CableRunTraversalsTable(this);
+  late final $RouteHandoffsTable routeHandoffs = $RouteHandoffsTable(this);
+  late final $RouteBendEvidenceTable routeBendEvidence =
+      $RouteBendEvidenceTable(this);
+  late final $LegacyRouteAdoptionsTable legacyRouteAdoptions =
+      $LegacyRouteAdoptionsTable(this);
+  late final $PathwayContextsTable pathwayContexts = $PathwayContextsTable(
+    this,
+  );
+  late final $PhysicalCarriersTable physicalCarriers = $PhysicalCarriersTable(
+    this,
+  );
+  late final $PhysicalCarrierCompartmentsTable physicalCarrierCompartments =
+      $PhysicalCarrierCompartmentsTable(this);
+  late final $TraversalCarrierAssignmentsTable traversalCarrierAssignments =
+      $TraversalCarrierAssignmentsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -36826,6 +45122,17 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     cableResourceClaims,
     cableTerminationMappings,
     commandExecutionRecords,
+    projectDesignRevisions,
+    designRevisionPhysicalSnapshots,
+    canonicalCableRuns,
+    cableRunTraversals,
+    routeHandoffs,
+    routeBendEvidence,
+    legacyRouteAdoptions,
+    pathwayContexts,
+    physicalCarriers,
+    physicalCarrierCompartments,
+    traversalCarrierAssignments,
   ];
 }
 
@@ -37340,6 +45647,213 @@ final class $$ProjectsTableReferences
 
     final cache = $_typedResult.readTableOrNull(
       _commandExecutionRecordsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $ProjectDesignRevisionsTable,
+    List<ProjectDesignRevisionRow>
+  >
+  _projectDesignRevisionsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.projectDesignRevisions,
+        aliasName: 'projects__id__project_design_revisions__project_id',
+      );
+
+  $$ProjectDesignRevisionsTableProcessedTableManager
+  get projectDesignRevisionsRefs {
+    final manager = $$ProjectDesignRevisionsTableTableManager(
+      $_db,
+      $_db.projectDesignRevisions,
+    ).filter((f) => f.projectId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _projectDesignRevisionsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $DesignRevisionPhysicalSnapshotsTable,
+    List<DesignRevisionPhysicalSnapshotRow>
+  >
+  _designRevisionPhysicalSnapshotsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.designRevisionPhysicalSnapshots,
+        aliasName:
+            'projects__id__design_revision_physical_snapshots__project_id',
+      );
+
+  $$DesignRevisionPhysicalSnapshotsTableProcessedTableManager
+  get designRevisionPhysicalSnapshotsRefs {
+    final manager = $$DesignRevisionPhysicalSnapshotsTableTableManager(
+      $_db,
+      $_db.designRevisionPhysicalSnapshots,
+    ).filter((f) => f.projectId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _designRevisionPhysicalSnapshotsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $CanonicalCableRunsTable,
+    List<CanonicalCableRunRow>
+  >
+  _canonicalCableRunsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.canonicalCableRuns,
+        aliasName: 'projects__id__canonical_cable_runs__project_id',
+      );
+
+  $$CanonicalCableRunsTableProcessedTableManager get canonicalCableRunsRefs {
+    final manager = $$CanonicalCableRunsTableTableManager(
+      $_db,
+      $_db.canonicalCableRuns,
+    ).filter((f) => f.projectId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _canonicalCableRunsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$RouteHandoffsTable, List<RouteHandoffRow>>
+  _routeHandoffsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.routeHandoffs,
+    aliasName: 'projects__id__route_handoffs__project_id',
+  );
+
+  $$RouteHandoffsTableProcessedTableManager get routeHandoffsRefs {
+    final manager = $$RouteHandoffsTableTableManager(
+      $_db,
+      $_db.routeHandoffs,
+    ).filter((f) => f.projectId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_routeHandoffsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $RouteBendEvidenceTable,
+    List<RouteBendEvidenceRow>
+  >
+  _routeBendEvidenceRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.routeBendEvidence,
+        aliasName: 'projects__id__route_bend_evidence__project_id',
+      );
+
+  $$RouteBendEvidenceTableProcessedTableManager get routeBendEvidenceRefs {
+    final manager = $$RouteBendEvidenceTableTableManager(
+      $_db,
+      $_db.routeBendEvidence,
+    ).filter((f) => f.projectId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _routeBendEvidenceRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $LegacyRouteAdoptionsTable,
+    List<LegacyRouteAdoptionRow>
+  >
+  _legacyRouteAdoptionsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.legacyRouteAdoptions,
+        aliasName: 'projects__id__legacy_route_adoptions__project_id',
+      );
+
+  $$LegacyRouteAdoptionsTableProcessedTableManager
+  get legacyRouteAdoptionsRefs {
+    final manager = $$LegacyRouteAdoptionsTableTableManager(
+      $_db,
+      $_db.legacyRouteAdoptions,
+    ).filter((f) => f.projectId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _legacyRouteAdoptionsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$PathwayContextsTable, List<PathwayContextRow>>
+  _pathwayContextsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.pathwayContexts,
+    aliasName: 'projects__id__pathway_contexts__project_id',
+  );
+
+  $$PathwayContextsTableProcessedTableManager get pathwayContextsRefs {
+    final manager = $$PathwayContextsTableTableManager(
+      $_db,
+      $_db.pathwayContexts,
+    ).filter((f) => f.projectId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _pathwayContextsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$PhysicalCarriersTable, List<PhysicalCarrierRow>>
+  _physicalCarriersRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.physicalCarriers,
+    aliasName: 'projects__id__physical_carriers__project_id',
+  );
+
+  $$PhysicalCarriersTableProcessedTableManager get physicalCarriersRefs {
+    final manager = $$PhysicalCarriersTableTableManager(
+      $_db,
+      $_db.physicalCarriers,
+    ).filter((f) => f.projectId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _physicalCarriersRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $TraversalCarrierAssignmentsTable,
+    List<TraversalCarrierAssignmentRow>
+  >
+  _traversalCarrierAssignmentsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.traversalCarrierAssignments,
+        aliasName: 'projects__id__traversal_carrier_assignments__project_id',
+      );
+
+  $$TraversalCarrierAssignmentsTableProcessedTableManager
+  get traversalCarrierAssignmentsRefs {
+    final manager = $$TraversalCarrierAssignmentsTableTableManager(
+      $_db,
+      $_db.traversalCarrierAssignments,
+    ).filter((f) => f.projectId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _traversalCarrierAssignmentsRefsTable($_db),
     );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
@@ -37943,6 +46457,240 @@ class $$ProjectsTableFilterComposer
               }) => $$CommandExecutionRecordsTableFilterComposer(
                 $db: $db,
                 $table: $db.commandExecutionRecords,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> projectDesignRevisionsRefs(
+    Expression<bool> Function($$ProjectDesignRevisionsTableFilterComposer f) f,
+  ) {
+    final $$ProjectDesignRevisionsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.projectDesignRevisions,
+          getReferencedColumn: (t) => t.projectId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ProjectDesignRevisionsTableFilterComposer(
+                $db: $db,
+                $table: $db.projectDesignRevisions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> designRevisionPhysicalSnapshotsRefs(
+    Expression<bool> Function(
+      $$DesignRevisionPhysicalSnapshotsTableFilterComposer f,
+    )
+    f,
+  ) {
+    final $$DesignRevisionPhysicalSnapshotsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.designRevisionPhysicalSnapshots,
+          getReferencedColumn: (t) => t.projectId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$DesignRevisionPhysicalSnapshotsTableFilterComposer(
+                $db: $db,
+                $table: $db.designRevisionPhysicalSnapshots,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> canonicalCableRunsRefs(
+    Expression<bool> Function($$CanonicalCableRunsTableFilterComposer f) f,
+  ) {
+    final $$CanonicalCableRunsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.canonicalCableRuns,
+      getReferencedColumn: (t) => t.projectId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CanonicalCableRunsTableFilterComposer(
+            $db: $db,
+            $table: $db.canonicalCableRuns,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> routeHandoffsRefs(
+    Expression<bool> Function($$RouteHandoffsTableFilterComposer f) f,
+  ) {
+    final $$RouteHandoffsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.routeHandoffs,
+      getReferencedColumn: (t) => t.projectId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RouteHandoffsTableFilterComposer(
+            $db: $db,
+            $table: $db.routeHandoffs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> routeBendEvidenceRefs(
+    Expression<bool> Function($$RouteBendEvidenceTableFilterComposer f) f,
+  ) {
+    final $$RouteBendEvidenceTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.routeBendEvidence,
+      getReferencedColumn: (t) => t.projectId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RouteBendEvidenceTableFilterComposer(
+            $db: $db,
+            $table: $db.routeBendEvidence,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> legacyRouteAdoptionsRefs(
+    Expression<bool> Function($$LegacyRouteAdoptionsTableFilterComposer f) f,
+  ) {
+    final $$LegacyRouteAdoptionsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.legacyRouteAdoptions,
+      getReferencedColumn: (t) => t.projectId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LegacyRouteAdoptionsTableFilterComposer(
+            $db: $db,
+            $table: $db.legacyRouteAdoptions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> pathwayContextsRefs(
+    Expression<bool> Function($$PathwayContextsTableFilterComposer f) f,
+  ) {
+    final $$PathwayContextsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.pathwayContexts,
+      getReferencedColumn: (t) => t.projectId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PathwayContextsTableFilterComposer(
+            $db: $db,
+            $table: $db.pathwayContexts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> physicalCarriersRefs(
+    Expression<bool> Function($$PhysicalCarriersTableFilterComposer f) f,
+  ) {
+    final $$PhysicalCarriersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.physicalCarriers,
+      getReferencedColumn: (t) => t.projectId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PhysicalCarriersTableFilterComposer(
+            $db: $db,
+            $table: $db.physicalCarriers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> traversalCarrierAssignmentsRefs(
+    Expression<bool> Function(
+      $$TraversalCarrierAssignmentsTableFilterComposer f,
+    )
+    f,
+  ) {
+    final $$TraversalCarrierAssignmentsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.traversalCarrierAssignments,
+          getReferencedColumn: (t) => t.projectId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$TraversalCarrierAssignmentsTableFilterComposer(
+                $db: $db,
+                $table: $db.traversalCarrierAssignments,
                 $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
                 joinBuilder: joinBuilder,
                 $removeJoinBuilderFromRootComposer:
@@ -38615,6 +47363,243 @@ class $$ProjectsTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> projectDesignRevisionsRefs<T extends Object>(
+    Expression<T> Function($$ProjectDesignRevisionsTableAnnotationComposer a) f,
+  ) {
+    final $$ProjectDesignRevisionsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.projectDesignRevisions,
+          getReferencedColumn: (t) => t.projectId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ProjectDesignRevisionsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.projectDesignRevisions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> designRevisionPhysicalSnapshotsRefs<T extends Object>(
+    Expression<T> Function(
+      $$DesignRevisionPhysicalSnapshotsTableAnnotationComposer a,
+    )
+    f,
+  ) {
+    final $$DesignRevisionPhysicalSnapshotsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.designRevisionPhysicalSnapshots,
+          getReferencedColumn: (t) => t.projectId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$DesignRevisionPhysicalSnapshotsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.designRevisionPhysicalSnapshots,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> canonicalCableRunsRefs<T extends Object>(
+    Expression<T> Function($$CanonicalCableRunsTableAnnotationComposer a) f,
+  ) {
+    final $$CanonicalCableRunsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.canonicalCableRuns,
+          getReferencedColumn: (t) => t.projectId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CanonicalCableRunsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.canonicalCableRuns,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> routeHandoffsRefs<T extends Object>(
+    Expression<T> Function($$RouteHandoffsTableAnnotationComposer a) f,
+  ) {
+    final $$RouteHandoffsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.routeHandoffs,
+      getReferencedColumn: (t) => t.projectId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RouteHandoffsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.routeHandoffs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> routeBendEvidenceRefs<T extends Object>(
+    Expression<T> Function($$RouteBendEvidenceTableAnnotationComposer a) f,
+  ) {
+    final $$RouteBendEvidenceTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.routeBendEvidence,
+          getReferencedColumn: (t) => t.projectId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$RouteBendEvidenceTableAnnotationComposer(
+                $db: $db,
+                $table: $db.routeBendEvidence,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> legacyRouteAdoptionsRefs<T extends Object>(
+    Expression<T> Function($$LegacyRouteAdoptionsTableAnnotationComposer a) f,
+  ) {
+    final $$LegacyRouteAdoptionsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.legacyRouteAdoptions,
+          getReferencedColumn: (t) => t.projectId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$LegacyRouteAdoptionsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.legacyRouteAdoptions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> pathwayContextsRefs<T extends Object>(
+    Expression<T> Function($$PathwayContextsTableAnnotationComposer a) f,
+  ) {
+    final $$PathwayContextsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.pathwayContexts,
+      getReferencedColumn: (t) => t.projectId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PathwayContextsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.pathwayContexts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> physicalCarriersRefs<T extends Object>(
+    Expression<T> Function($$PhysicalCarriersTableAnnotationComposer a) f,
+  ) {
+    final $$PhysicalCarriersTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.physicalCarriers,
+      getReferencedColumn: (t) => t.projectId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PhysicalCarriersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.physicalCarriers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> traversalCarrierAssignmentsRefs<T extends Object>(
+    Expression<T> Function(
+      $$TraversalCarrierAssignmentsTableAnnotationComposer a,
+    )
+    f,
+  ) {
+    final $$TraversalCarrierAssignmentsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.traversalCarrierAssignments,
+          getReferencedColumn: (t) => t.projectId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$TraversalCarrierAssignmentsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.traversalCarrierAssignments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$ProjectsTableTableManager
@@ -38651,6 +47636,15 @@ class $$ProjectsTableTableManager
             bool elvCablesRefs,
             bool cableAllocationsRefs,
             bool commandExecutionRecordsRefs,
+            bool projectDesignRevisionsRefs,
+            bool designRevisionPhysicalSnapshotsRefs,
+            bool canonicalCableRunsRefs,
+            bool routeHandoffsRefs,
+            bool routeBendEvidenceRefs,
+            bool legacyRouteAdoptionsRefs,
+            bool pathwayContextsRefs,
+            bool physicalCarriersRefs,
+            bool traversalCarrierAssignmentsRefs,
           })
         > {
   $$ProjectsTableTableManager(_$AppDatabase db, $ProjectsTable table)
@@ -38752,6 +47746,15 @@ class $$ProjectsTableTableManager
             elvCablesRefs = false,
             cableAllocationsRefs = false,
             commandExecutionRecordsRefs = false,
+            projectDesignRevisionsRefs = false,
+            designRevisionPhysicalSnapshotsRefs = false,
+            canonicalCableRunsRefs = false,
+            routeHandoffsRefs = false,
+            routeBendEvidenceRefs = false,
+            legacyRouteAdoptionsRefs = false,
+            pathwayContextsRefs = false,
+            physicalCarriersRefs = false,
+            traversalCarrierAssignmentsRefs = false,
           }) {
             return PrefetchHooks(
               db: db,
@@ -38785,6 +47788,17 @@ class $$ProjectsTableTableManager
                 if (elvCablesRefs) db.elvCables,
                 if (cableAllocationsRefs) db.cableAllocations,
                 if (commandExecutionRecordsRefs) db.commandExecutionRecords,
+                if (projectDesignRevisionsRefs) db.projectDesignRevisions,
+                if (designRevisionPhysicalSnapshotsRefs)
+                  db.designRevisionPhysicalSnapshots,
+                if (canonicalCableRunsRefs) db.canonicalCableRuns,
+                if (routeHandoffsRefs) db.routeHandoffs,
+                if (routeBendEvidenceRefs) db.routeBendEvidence,
+                if (legacyRouteAdoptionsRefs) db.legacyRouteAdoptions,
+                if (pathwayContextsRefs) db.pathwayContexts,
+                if (physicalCarriersRefs) db.physicalCarriers,
+                if (traversalCarrierAssignmentsRefs)
+                  db.traversalCarrierAssignments,
               ],
               addJoins: null,
               getPrefetchedDataCallback: (items) async {
@@ -39225,6 +48239,204 @@ class $$ProjectsTableTableManager
                           ),
                       typedResults: items,
                     ),
+                  if (projectDesignRevisionsRefs)
+                    await $_getPrefetchedData<
+                      Project,
+                      $ProjectsTable,
+                      ProjectDesignRevisionRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$ProjectsTableReferences
+                          ._projectDesignRevisionsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$ProjectsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).projectDesignRevisionsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.projectId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                  if (designRevisionPhysicalSnapshotsRefs)
+                    await $_getPrefetchedData<
+                      Project,
+                      $ProjectsTable,
+                      DesignRevisionPhysicalSnapshotRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$ProjectsTableReferences
+                          ._designRevisionPhysicalSnapshotsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$ProjectsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).designRevisionPhysicalSnapshotsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.projectId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                  if (canonicalCableRunsRefs)
+                    await $_getPrefetchedData<
+                      Project,
+                      $ProjectsTable,
+                      CanonicalCableRunRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$ProjectsTableReferences
+                          ._canonicalCableRunsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$ProjectsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).canonicalCableRunsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.projectId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                  if (routeHandoffsRefs)
+                    await $_getPrefetchedData<
+                      Project,
+                      $ProjectsTable,
+                      RouteHandoffRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$ProjectsTableReferences
+                          ._routeHandoffsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$ProjectsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).routeHandoffsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.projectId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                  if (routeBendEvidenceRefs)
+                    await $_getPrefetchedData<
+                      Project,
+                      $ProjectsTable,
+                      RouteBendEvidenceRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$ProjectsTableReferences
+                          ._routeBendEvidenceRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$ProjectsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).routeBendEvidenceRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.projectId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                  if (legacyRouteAdoptionsRefs)
+                    await $_getPrefetchedData<
+                      Project,
+                      $ProjectsTable,
+                      LegacyRouteAdoptionRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$ProjectsTableReferences
+                          ._legacyRouteAdoptionsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$ProjectsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).legacyRouteAdoptionsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.projectId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                  if (pathwayContextsRefs)
+                    await $_getPrefetchedData<
+                      Project,
+                      $ProjectsTable,
+                      PathwayContextRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$ProjectsTableReferences
+                          ._pathwayContextsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$ProjectsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).pathwayContextsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.projectId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                  if (physicalCarriersRefs)
+                    await $_getPrefetchedData<
+                      Project,
+                      $ProjectsTable,
+                      PhysicalCarrierRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$ProjectsTableReferences
+                          ._physicalCarriersRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$ProjectsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).physicalCarriersRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.projectId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                  if (traversalCarrierAssignmentsRefs)
+                    await $_getPrefetchedData<
+                      Project,
+                      $ProjectsTable,
+                      TraversalCarrierAssignmentRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$ProjectsTableReferences
+                          ._traversalCarrierAssignmentsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$ProjectsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).traversalCarrierAssignmentsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.projectId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
                 ];
               },
             );
@@ -39266,6 +48478,15 @@ typedef $$ProjectsTableProcessedTableManager =
         bool elvCablesRefs,
         bool cableAllocationsRefs,
         bool commandExecutionRecordsRefs,
+        bool projectDesignRevisionsRefs,
+        bool designRevisionPhysicalSnapshotsRefs,
+        bool canonicalCableRunsRefs,
+        bool routeHandoffsRefs,
+        bool routeBendEvidenceRefs,
+        bool legacyRouteAdoptionsRefs,
+        bool pathwayContextsRefs,
+        bool physicalCarriersRefs,
+        bool traversalCarrierAssignmentsRefs,
       })
     >;
 typedef $$FloorsTableCreateCompanionBuilder =
@@ -51290,6 +60511,70 @@ final class $$CableRouteNodesTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$RouteHandoffsTable, List<RouteHandoffRow>>
+  _handoffFromRouteNodeTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.routeHandoffs,
+    aliasName: 'cable_route_nodes__id__route_handoffs__from_route_node_id',
+  );
+
+  $$RouteHandoffsTableProcessedTableManager get handoffFromRouteNode {
+    final manager = $$RouteHandoffsTableTableManager(
+      $_db,
+      $_db.routeHandoffs,
+    ).filter(
+      (f) => f.fromRouteNodeId.id.sqlEquals($_itemColumn<String>('id')!),
+    );
+
+    final cache = $_typedResult.readTableOrNull(
+      _handoffFromRouteNodeTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$RouteHandoffsTable, List<RouteHandoffRow>>
+  _handoffToRouteNodeTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.routeHandoffs,
+    aliasName: 'cable_route_nodes__id__route_handoffs__to_route_node_id',
+  );
+
+  $$RouteHandoffsTableProcessedTableManager get handoffToRouteNode {
+    final manager = $$RouteHandoffsTableTableManager(
+      $_db,
+      $_db.routeHandoffs,
+    ).filter((f) => f.toRouteNodeId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_handoffToRouteNodeTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $RouteBendEvidenceTable,
+    List<RouteBendEvidenceRow>
+  >
+  _routeBendEvidenceRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.routeBendEvidence,
+        aliasName: 'cable_route_nodes__id__route_bend_evidence__route_node_id',
+      );
+
+  $$RouteBendEvidenceTableProcessedTableManager get routeBendEvidenceRefs {
+    final manager = $$RouteBendEvidenceTableTableManager(
+      $_db,
+      $_db.routeBendEvidence,
+    ).filter((f) => f.routeNodeId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _routeBendEvidenceRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$CableRouteNodesTableFilterComposer
@@ -51534,6 +60819,81 @@ class $$CableRouteNodesTableFilterComposer
           }) => $$JunctionConnectionsTableFilterComposer(
             $db: $db,
             $table: $db.junctionConnections,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> handoffFromRouteNode(
+    Expression<bool> Function($$RouteHandoffsTableFilterComposer f) f,
+  ) {
+    final $$RouteHandoffsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.routeHandoffs,
+      getReferencedColumn: (t) => t.fromRouteNodeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RouteHandoffsTableFilterComposer(
+            $db: $db,
+            $table: $db.routeHandoffs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> handoffToRouteNode(
+    Expression<bool> Function($$RouteHandoffsTableFilterComposer f) f,
+  ) {
+    final $$RouteHandoffsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.routeHandoffs,
+      getReferencedColumn: (t) => t.toRouteNodeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RouteHandoffsTableFilterComposer(
+            $db: $db,
+            $table: $db.routeHandoffs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> routeBendEvidenceRefs(
+    Expression<bool> Function($$RouteBendEvidenceTableFilterComposer f) f,
+  ) {
+    final $$RouteBendEvidenceTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.routeBendEvidence,
+      getReferencedColumn: (t) => t.routeNodeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RouteBendEvidenceTableFilterComposer(
+            $db: $db,
+            $table: $db.routeBendEvidence,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -51951,6 +61311,82 @@ class $$CableRouteNodesTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> handoffFromRouteNode<T extends Object>(
+    Expression<T> Function($$RouteHandoffsTableAnnotationComposer a) f,
+  ) {
+    final $$RouteHandoffsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.routeHandoffs,
+      getReferencedColumn: (t) => t.fromRouteNodeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RouteHandoffsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.routeHandoffs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> handoffToRouteNode<T extends Object>(
+    Expression<T> Function($$RouteHandoffsTableAnnotationComposer a) f,
+  ) {
+    final $$RouteHandoffsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.routeHandoffs,
+      getReferencedColumn: (t) => t.toRouteNodeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RouteHandoffsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.routeHandoffs,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> routeBendEvidenceRefs<T extends Object>(
+    Expression<T> Function($$RouteBendEvidenceTableAnnotationComposer a) f,
+  ) {
+    final $$RouteBendEvidenceTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.routeBendEvidence,
+          getReferencedColumn: (t) => t.routeNodeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$RouteBendEvidenceTableAnnotationComposer(
+                $db: $db,
+                $table: $db.routeBendEvidence,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$CableRouteNodesTableTableManager
@@ -51974,6 +61410,9 @@ class $$CableRouteNodesTableTableManager
             bool outgoingRouteSegments,
             bool incomingRouteSegments,
             bool junctionConnectionsRefs,
+            bool handoffFromRouteNode,
+            bool handoffToRouteNode,
+            bool routeBendEvidenceRefs,
           })
         > {
   $$CableRouteNodesTableTableManager(
@@ -52104,6 +61543,9 @@ class $$CableRouteNodesTableTableManager
             outgoingRouteSegments = false,
             incomingRouteSegments = false,
             junctionConnectionsRefs = false,
+            handoffFromRouteNode = false,
+            handoffToRouteNode = false,
+            routeBendEvidenceRefs = false,
           }) {
             return PrefetchHooks(
               db: db,
@@ -52111,6 +61553,9 @@ class $$CableRouteNodesTableTableManager
                 if (outgoingRouteSegments) db.cableRouteSegments,
                 if (incomingRouteSegments) db.cableRouteSegments,
                 if (junctionConnectionsRefs) db.junctionConnections,
+                if (handoffFromRouteNode) db.routeHandoffs,
+                if (handoffToRouteNode) db.routeHandoffs,
+                if (routeBendEvidenceRefs) db.routeBendEvidence,
               ],
               addJoins: <
                 T extends TableManagerState<
@@ -52253,6 +61698,72 @@ class $$CableRouteNodesTableTableManager
                               referencedItems.where((e) => e.nodeId == item.id),
                       typedResults: items,
                     ),
+                  if (handoffFromRouteNode)
+                    await $_getPrefetchedData<
+                      CableRouteNodeRow,
+                      $CableRouteNodesTable,
+                      RouteHandoffRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$CableRouteNodesTableReferences
+                          ._handoffFromRouteNodeTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$CableRouteNodesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).handoffFromRouteNode,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.fromRouteNodeId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                  if (handoffToRouteNode)
+                    await $_getPrefetchedData<
+                      CableRouteNodeRow,
+                      $CableRouteNodesTable,
+                      RouteHandoffRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$CableRouteNodesTableReferences
+                          ._handoffToRouteNodeTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$CableRouteNodesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).handoffToRouteNode,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.toRouteNodeId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                  if (routeBendEvidenceRefs)
+                    await $_getPrefetchedData<
+                      CableRouteNodeRow,
+                      $CableRouteNodesTable,
+                      RouteBendEvidenceRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$CableRouteNodesTableReferences
+                          ._routeBendEvidenceRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$CableRouteNodesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).routeBendEvidenceRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.routeNodeId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
                 ];
               },
             );
@@ -52281,6 +61792,9 @@ typedef $$CableRouteNodesTableProcessedTableManager =
         bool outgoingRouteSegments,
         bool incomingRouteSegments,
         bool junctionConnectionsRefs,
+        bool handoffFromRouteNode,
+        bool handoffToRouteNode,
+        bool routeBendEvidenceRefs,
       })
     >;
 typedef $$CableRouteSegmentsTableCreateCompanionBuilder =
@@ -52419,6 +61933,31 @@ final class $$CableRouteSegmentsTableReferences
     if (item == null) return manager;
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $CableRunTraversalsTable,
+    List<CableRunTraversalRow>
+  >
+  _cableRunTraversalsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.cableRunTraversals,
+        aliasName:
+            'cable_route_segments__id__cable_run_traversals__route_segment_id',
+      );
+
+  $$CableRunTraversalsTableProcessedTableManager get cableRunTraversalsRefs {
+    final manager = $$CableRunTraversalsTableTableManager(
+      $_db,
+      $_db.cableRunTraversals,
+    ).filter((f) => f.routeSegmentId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _cableRunTraversalsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
     );
   }
 }
@@ -52585,6 +62124,31 @@ class $$CableRouteSegmentsTableFilterComposer
           ),
     );
     return composer;
+  }
+
+  Expression<bool> cableRunTraversalsRefs(
+    Expression<bool> Function($$CableRunTraversalsTableFilterComposer f) f,
+  ) {
+    final $$CableRunTraversalsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.cableRunTraversals,
+      getReferencedColumn: (t) => t.routeSegmentId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableRunTraversalsTableFilterComposer(
+            $db: $db,
+            $table: $db.cableRunTraversals,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
   }
 }
 
@@ -52904,6 +62468,32 @@ class $$CableRouteSegmentsTableAnnotationComposer
     );
     return composer;
   }
+
+  Expression<T> cableRunTraversalsRefs<T extends Object>(
+    Expression<T> Function($$CableRunTraversalsTableAnnotationComposer a) f,
+  ) {
+    final $$CableRunTraversalsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.cableRunTraversals,
+          getReferencedColumn: (t) => t.routeSegmentId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CableRunTraversalsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.cableRunTraversals,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$CableRouteSegmentsTableTableManager
@@ -52925,6 +62515,7 @@ class $$CableRouteSegmentsTableTableManager
             bool toNodeId,
             bool surfacePatchId,
             bool physicalChannelId,
+            bool cableRunTraversalsRefs,
           })
         > {
   $$CableRouteSegmentsTableTableManager(
@@ -53032,10 +62623,13 @@ class $$CableRouteSegmentsTableTableManager
             toNodeId = false,
             surfacePatchId = false,
             physicalChannelId = false,
+            cableRunTraversalsRefs = false,
           }) {
             return PrefetchHooks(
               db: db,
-              explicitlyWatchedTables: [],
+              explicitlyWatchedTables: [
+                if (cableRunTraversalsRefs) db.cableRunTraversals,
+              ],
               addJoins: <
                 T extends TableManagerState<
                   dynamic,
@@ -53125,7 +62719,30 @@ class $$CableRouteSegmentsTableTableManager
                 return state;
               },
               getPrefetchedDataCallback: (items) async {
-                return [];
+                return [
+                  if (cableRunTraversalsRefs)
+                    await $_getPrefetchedData<
+                      CableRouteSegmentRow,
+                      $CableRouteSegmentsTable,
+                      CableRunTraversalRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$CableRouteSegmentsTableReferences
+                          ._cableRunTraversalsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$CableRouteSegmentsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).cableRunTraversalsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.routeSegmentId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
               },
             );
           },
@@ -53151,6 +62768,7 @@ typedef $$CableRouteSegmentsTableProcessedTableManager =
         bool toNodeId,
         bool surfacePatchId,
         bool physicalChannelId,
+        bool cableRunTraversalsRefs,
       })
     >;
 typedef $$CableRunsTableCreateCompanionBuilder =
@@ -72242,6 +81860,55 @@ final class $$ElvCablesTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<
+    $CanonicalCableRunsTable,
+    List<CanonicalCableRunRow>
+  >
+  _canonicalCableRunsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.canonicalCableRuns,
+        aliasName: 'elv_cables__id__canonical_cable_runs__cable_id',
+      );
+
+  $$CanonicalCableRunsTableProcessedTableManager get canonicalCableRunsRefs {
+    final manager = $$CanonicalCableRunsTableTableManager(
+      $_db,
+      $_db.canonicalCableRuns,
+    ).filter((f) => f.cableId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _canonicalCableRunsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $LegacyRouteAdoptionsTable,
+    List<LegacyRouteAdoptionRow>
+  >
+  _legacyRouteAdoptionsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.legacyRouteAdoptions,
+        aliasName: 'elv_cables__id__legacy_route_adoptions__cable_id',
+      );
+
+  $$LegacyRouteAdoptionsTableProcessedTableManager
+  get legacyRouteAdoptionsRefs {
+    final manager = $$LegacyRouteAdoptionsTableTableManager(
+      $_db,
+      $_db.legacyRouteAdoptions,
+    ).filter((f) => f.cableId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _legacyRouteAdoptionsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$ElvCablesTableFilterComposer
@@ -72406,6 +82073,56 @@ class $$ElvCablesTableFilterComposer
           }) => $$CableResourceClaimsTableFilterComposer(
             $db: $db,
             $table: $db.cableResourceClaims,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> canonicalCableRunsRefs(
+    Expression<bool> Function($$CanonicalCableRunsTableFilterComposer f) f,
+  ) {
+    final $$CanonicalCableRunsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.canonicalCableRuns,
+      getReferencedColumn: (t) => t.cableId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CanonicalCableRunsTableFilterComposer(
+            $db: $db,
+            $table: $db.canonicalCableRuns,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> legacyRouteAdoptionsRefs(
+    Expression<bool> Function($$LegacyRouteAdoptionsTableFilterComposer f) f,
+  ) {
+    final $$LegacyRouteAdoptionsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.legacyRouteAdoptions,
+      getReferencedColumn: (t) => t.cableId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LegacyRouteAdoptionsTableFilterComposer(
+            $db: $db,
+            $table: $db.legacyRouteAdoptions,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -72696,6 +82413,58 @@ class $$ElvCablesTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> canonicalCableRunsRefs<T extends Object>(
+    Expression<T> Function($$CanonicalCableRunsTableAnnotationComposer a) f,
+  ) {
+    final $$CanonicalCableRunsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.canonicalCableRuns,
+          getReferencedColumn: (t) => t.cableId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CanonicalCableRunsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.canonicalCableRuns,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> legacyRouteAdoptionsRefs<T extends Object>(
+    Expression<T> Function($$LegacyRouteAdoptionsTableAnnotationComposer a) f,
+  ) {
+    final $$LegacyRouteAdoptionsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.legacyRouteAdoptions,
+          getReferencedColumn: (t) => t.cableId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$LegacyRouteAdoptionsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.legacyRouteAdoptions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$ElvCablesTableTableManager
@@ -72716,6 +82485,8 @@ class $$ElvCablesTableTableManager
             bool definitionCatalogId,
             bool cableAllocationsRefs,
             bool cableResourceClaimsRefs,
+            bool canonicalCableRunsRefs,
+            bool legacyRouteAdoptionsRefs,
           })
         > {
   $$ElvCablesTableTableManager(_$AppDatabase db, $ElvCablesTable table)
@@ -72816,12 +82587,16 @@ class $$ElvCablesTableTableManager
             definitionCatalogId = false,
             cableAllocationsRefs = false,
             cableResourceClaimsRefs = false,
+            canonicalCableRunsRefs = false,
+            legacyRouteAdoptionsRefs = false,
           }) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [
                 if (cableAllocationsRefs) db.cableAllocations,
                 if (cableResourceClaimsRefs) db.cableResourceClaims,
+                if (canonicalCableRunsRefs) db.canonicalCableRuns,
+                if (legacyRouteAdoptionsRefs) db.legacyRouteAdoptions,
               ],
               addJoins: <
                 T extends TableManagerState<
@@ -72915,6 +82690,50 @@ class $$ElvCablesTableTableManager
                           ),
                       typedResults: items,
                     ),
+                  if (canonicalCableRunsRefs)
+                    await $_getPrefetchedData<
+                      ElvCableRow,
+                      $ElvCablesTable,
+                      CanonicalCableRunRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$ElvCablesTableReferences
+                          ._canonicalCableRunsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$ElvCablesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).canonicalCableRunsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.cableId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                  if (legacyRouteAdoptionsRefs)
+                    await $_getPrefetchedData<
+                      ElvCableRow,
+                      $ElvCablesTable,
+                      LegacyRouteAdoptionRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$ElvCablesTableReferences
+                          ._legacyRouteAdoptionsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$ElvCablesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).legacyRouteAdoptionsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.cableId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
                 ];
               },
             );
@@ -72940,6 +82759,8 @@ typedef $$ElvCablesTableProcessedTableManager =
         bool definitionCatalogId,
         bool cableAllocationsRefs,
         bool cableResourceClaimsRefs,
+        bool canonicalCableRunsRefs,
+        bool legacyRouteAdoptionsRefs,
       })
     >;
 typedef $$CableAllocationsTableCreateCompanionBuilder =
@@ -75808,6 +85629,8439 @@ typedef $$CommandExecutionRecordsTableProcessedTableManager =
       CommandExecutionRecordRow,
       PrefetchHooks Function({bool projectId})
     >;
+typedef $$ProjectDesignRevisionsTableCreateCompanionBuilder =
+    ProjectDesignRevisionsCompanion Function({
+      Value<int> revision,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<DateTime?> deletedAt,
+      required String originDeviceId,
+      required String id,
+      required String projectId,
+      required String code,
+      required int sequence,
+      required String state,
+      Value<String?> basedOnRevisionId,
+      Value<int?> snapshotSchemaVersion,
+      Value<String?> snapshotHash,
+      Value<DateTime?> frozenAt,
+      Value<DateTime?> supersededAt,
+      Value<DateTime?> archivedAt,
+      Value<int> rowid,
+    });
+typedef $$ProjectDesignRevisionsTableUpdateCompanionBuilder =
+    ProjectDesignRevisionsCompanion Function({
+      Value<int> revision,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<String> originDeviceId,
+      Value<String> id,
+      Value<String> projectId,
+      Value<String> code,
+      Value<int> sequence,
+      Value<String> state,
+      Value<String?> basedOnRevisionId,
+      Value<int?> snapshotSchemaVersion,
+      Value<String?> snapshotHash,
+      Value<DateTime?> frozenAt,
+      Value<DateTime?> supersededAt,
+      Value<DateTime?> archivedAt,
+      Value<int> rowid,
+    });
+
+final class $$ProjectDesignRevisionsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $ProjectDesignRevisionsTable,
+          ProjectDesignRevisionRow
+        > {
+  $$ProjectDesignRevisionsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProjectsTable _projectIdTable(_$AppDatabase db) => db.projects
+      .createAlias('project_design_revisions__project_id__projects__id');
+
+  $$ProjectsTableProcessedTableManager get projectId {
+    final $_column = $_itemColumn<String>('project_id')!;
+
+    final manager = $$ProjectsTableTableManager(
+      $_db,
+      $_db.projects,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_projectIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $ProjectDesignRevisionsTable _basedOnRevisionIdTable(
+    _$AppDatabase db,
+  ) => db.projectDesignRevisions.createAlias(
+    'project_design_revisions__based_on_revision_id__project_design_revisions__id',
+  );
+
+  $$ProjectDesignRevisionsTableProcessedTableManager? get basedOnRevisionId {
+    final $_column = $_itemColumn<String>('based_on_revision_id');
+    if ($_column == null) return null;
+    final manager = $$ProjectDesignRevisionsTableTableManager(
+      $_db,
+      $_db.projectDesignRevisions,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_basedOnRevisionIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $DesignRevisionPhysicalSnapshotsTable,
+    List<DesignRevisionPhysicalSnapshotRow>
+  >
+  _designRevisionPhysicalSnapshotsRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.designRevisionPhysicalSnapshots,
+    aliasName:
+        'project_design_revisions__id__design_revision_physical_snapshots__design_revision_id',
+  );
+
+  $$DesignRevisionPhysicalSnapshotsTableProcessedTableManager
+  get designRevisionPhysicalSnapshotsRefs {
+    final manager = $$DesignRevisionPhysicalSnapshotsTableTableManager(
+      $_db,
+      $_db.designRevisionPhysicalSnapshots,
+    ).filter(
+      (f) => f.designRevisionId.id.sqlEquals($_itemColumn<String>('id')!),
+    );
+
+    final cache = $_typedResult.readTableOrNull(
+      _designRevisionPhysicalSnapshotsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $CanonicalCableRunsTable,
+    List<CanonicalCableRunRow>
+  >
+  _canonicalCableRunsRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.canonicalCableRuns,
+    aliasName:
+        'project_design_revisions__id__canonical_cable_runs__design_revision_id',
+  );
+
+  $$CanonicalCableRunsTableProcessedTableManager get canonicalCableRunsRefs {
+    final manager = $$CanonicalCableRunsTableTableManager(
+      $_db,
+      $_db.canonicalCableRuns,
+    ).filter(
+      (f) => f.designRevisionId.id.sqlEquals($_itemColumn<String>('id')!),
+    );
+
+    final cache = $_typedResult.readTableOrNull(
+      _canonicalCableRunsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $LegacyRouteAdoptionsTable,
+    List<LegacyRouteAdoptionRow>
+  >
+  _legacyRouteAdoptionsRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.legacyRouteAdoptions,
+    aliasName:
+        'project_design_revisions__id__legacy_route_adoptions__design_revision_id',
+  );
+
+  $$LegacyRouteAdoptionsTableProcessedTableManager
+  get legacyRouteAdoptionsRefs {
+    final manager = $$LegacyRouteAdoptionsTableTableManager(
+      $_db,
+      $_db.legacyRouteAdoptions,
+    ).filter(
+      (f) => f.designRevisionId.id.sqlEquals($_itemColumn<String>('id')!),
+    );
+
+    final cache = $_typedResult.readTableOrNull(
+      _legacyRouteAdoptionsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $TraversalCarrierAssignmentsTable,
+    List<TraversalCarrierAssignmentRow>
+  >
+  _traversalCarrierAssignmentsRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.traversalCarrierAssignments,
+    aliasName:
+        'project_design_revisions__id__traversal_carrier_assignments__design_revision_id',
+  );
+
+  $$TraversalCarrierAssignmentsTableProcessedTableManager
+  get traversalCarrierAssignmentsRefs {
+    final manager = $$TraversalCarrierAssignmentsTableTableManager(
+      $_db,
+      $_db.traversalCarrierAssignments,
+    ).filter(
+      (f) => f.designRevisionId.id.sqlEquals($_itemColumn<String>('id')!),
+    );
+
+    final cache = $_typedResult.readTableOrNull(
+      _traversalCarrierAssignmentsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$ProjectDesignRevisionsTableFilterComposer
+    extends Composer<_$AppDatabase, $ProjectDesignRevisionsTable> {
+  $$ProjectDesignRevisionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get revision => $composableBuilder(
+    column: $table.revision,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sequence => $composableBuilder(
+    column: $table.sequence,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get state => $composableBuilder(
+    column: $table.state,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get snapshotSchemaVersion => $composableBuilder(
+    column: $table.snapshotSchemaVersion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get snapshotHash => $composableBuilder(
+    column: $table.snapshotHash,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get frozenAt => $composableBuilder(
+    column: $table.frozenAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get supersededAt => $composableBuilder(
+    column: $table.supersededAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get archivedAt => $composableBuilder(
+    column: $table.archivedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProjectsTableFilterComposer get projectId {
+    final $$ProjectsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableFilterComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ProjectDesignRevisionsTableFilterComposer get basedOnRevisionId {
+    final $$ProjectDesignRevisionsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.basedOnRevisionId,
+          referencedTable: $db.projectDesignRevisions,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ProjectDesignRevisionsTableFilterComposer(
+                $db: $db,
+                $table: $db.projectDesignRevisions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  Expression<bool> designRevisionPhysicalSnapshotsRefs(
+    Expression<bool> Function(
+      $$DesignRevisionPhysicalSnapshotsTableFilterComposer f,
+    )
+    f,
+  ) {
+    final $$DesignRevisionPhysicalSnapshotsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.designRevisionPhysicalSnapshots,
+          getReferencedColumn: (t) => t.designRevisionId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$DesignRevisionPhysicalSnapshotsTableFilterComposer(
+                $db: $db,
+                $table: $db.designRevisionPhysicalSnapshots,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> canonicalCableRunsRefs(
+    Expression<bool> Function($$CanonicalCableRunsTableFilterComposer f) f,
+  ) {
+    final $$CanonicalCableRunsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.canonicalCableRuns,
+      getReferencedColumn: (t) => t.designRevisionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CanonicalCableRunsTableFilterComposer(
+            $db: $db,
+            $table: $db.canonicalCableRuns,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> legacyRouteAdoptionsRefs(
+    Expression<bool> Function($$LegacyRouteAdoptionsTableFilterComposer f) f,
+  ) {
+    final $$LegacyRouteAdoptionsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.legacyRouteAdoptions,
+      getReferencedColumn: (t) => t.designRevisionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LegacyRouteAdoptionsTableFilterComposer(
+            $db: $db,
+            $table: $db.legacyRouteAdoptions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> traversalCarrierAssignmentsRefs(
+    Expression<bool> Function(
+      $$TraversalCarrierAssignmentsTableFilterComposer f,
+    )
+    f,
+  ) {
+    final $$TraversalCarrierAssignmentsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.traversalCarrierAssignments,
+          getReferencedColumn: (t) => t.designRevisionId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$TraversalCarrierAssignmentsTableFilterComposer(
+                $db: $db,
+                $table: $db.traversalCarrierAssignments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$ProjectDesignRevisionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ProjectDesignRevisionsTable> {
+  $$ProjectDesignRevisionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get revision => $composableBuilder(
+    column: $table.revision,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sequence => $composableBuilder(
+    column: $table.sequence,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get state => $composableBuilder(
+    column: $table.state,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get snapshotSchemaVersion => $composableBuilder(
+    column: $table.snapshotSchemaVersion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get snapshotHash => $composableBuilder(
+    column: $table.snapshotHash,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get frozenAt => $composableBuilder(
+    column: $table.frozenAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get supersededAt => $composableBuilder(
+    column: $table.supersededAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get archivedAt => $composableBuilder(
+    column: $table.archivedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProjectsTableOrderingComposer get projectId {
+    final $$ProjectsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableOrderingComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ProjectDesignRevisionsTableOrderingComposer get basedOnRevisionId {
+    final $$ProjectDesignRevisionsTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.basedOnRevisionId,
+          referencedTable: $db.projectDesignRevisions,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ProjectDesignRevisionsTableOrderingComposer(
+                $db: $db,
+                $table: $db.projectDesignRevisions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$ProjectDesignRevisionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ProjectDesignRevisionsTable> {
+  $$ProjectDesignRevisionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get revision =>
+      $composableBuilder(column: $table.revision, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get code =>
+      $composableBuilder(column: $table.code, builder: (column) => column);
+
+  GeneratedColumn<int> get sequence =>
+      $composableBuilder(column: $table.sequence, builder: (column) => column);
+
+  GeneratedColumn<String> get state =>
+      $composableBuilder(column: $table.state, builder: (column) => column);
+
+  GeneratedColumn<int> get snapshotSchemaVersion => $composableBuilder(
+    column: $table.snapshotSchemaVersion,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get snapshotHash => $composableBuilder(
+    column: $table.snapshotHash,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get frozenAt =>
+      $composableBuilder(column: $table.frozenAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get supersededAt => $composableBuilder(
+    column: $table.supersededAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get archivedAt => $composableBuilder(
+    column: $table.archivedAt,
+    builder: (column) => column,
+  );
+
+  $$ProjectsTableAnnotationComposer get projectId {
+    final $$ProjectsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ProjectDesignRevisionsTableAnnotationComposer get basedOnRevisionId {
+    final $$ProjectDesignRevisionsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.basedOnRevisionId,
+          referencedTable: $db.projectDesignRevisions,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ProjectDesignRevisionsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.projectDesignRevisions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  Expression<T> designRevisionPhysicalSnapshotsRefs<T extends Object>(
+    Expression<T> Function(
+      $$DesignRevisionPhysicalSnapshotsTableAnnotationComposer a,
+    )
+    f,
+  ) {
+    final $$DesignRevisionPhysicalSnapshotsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.designRevisionPhysicalSnapshots,
+          getReferencedColumn: (t) => t.designRevisionId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$DesignRevisionPhysicalSnapshotsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.designRevisionPhysicalSnapshots,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> canonicalCableRunsRefs<T extends Object>(
+    Expression<T> Function($$CanonicalCableRunsTableAnnotationComposer a) f,
+  ) {
+    final $$CanonicalCableRunsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.canonicalCableRuns,
+          getReferencedColumn: (t) => t.designRevisionId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CanonicalCableRunsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.canonicalCableRuns,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> legacyRouteAdoptionsRefs<T extends Object>(
+    Expression<T> Function($$LegacyRouteAdoptionsTableAnnotationComposer a) f,
+  ) {
+    final $$LegacyRouteAdoptionsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.legacyRouteAdoptions,
+          getReferencedColumn: (t) => t.designRevisionId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$LegacyRouteAdoptionsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.legacyRouteAdoptions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> traversalCarrierAssignmentsRefs<T extends Object>(
+    Expression<T> Function(
+      $$TraversalCarrierAssignmentsTableAnnotationComposer a,
+    )
+    f,
+  ) {
+    final $$TraversalCarrierAssignmentsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.traversalCarrierAssignments,
+          getReferencedColumn: (t) => t.designRevisionId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$TraversalCarrierAssignmentsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.traversalCarrierAssignments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$ProjectDesignRevisionsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ProjectDesignRevisionsTable,
+          ProjectDesignRevisionRow,
+          $$ProjectDesignRevisionsTableFilterComposer,
+          $$ProjectDesignRevisionsTableOrderingComposer,
+          $$ProjectDesignRevisionsTableAnnotationComposer,
+          $$ProjectDesignRevisionsTableCreateCompanionBuilder,
+          $$ProjectDesignRevisionsTableUpdateCompanionBuilder,
+          (ProjectDesignRevisionRow, $$ProjectDesignRevisionsTableReferences),
+          ProjectDesignRevisionRow,
+          PrefetchHooks Function({
+            bool projectId,
+            bool basedOnRevisionId,
+            bool designRevisionPhysicalSnapshotsRefs,
+            bool canonicalCableRunsRefs,
+            bool legacyRouteAdoptionsRefs,
+            bool traversalCarrierAssignmentsRefs,
+          })
+        > {
+  $$ProjectDesignRevisionsTableTableManager(
+    _$AppDatabase db,
+    $ProjectDesignRevisionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$ProjectDesignRevisionsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer:
+              () => $$ProjectDesignRevisionsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer:
+              () => $$ProjectDesignRevisionsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> revision = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<String> originDeviceId = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> projectId = const Value.absent(),
+                Value<String> code = const Value.absent(),
+                Value<int> sequence = const Value.absent(),
+                Value<String> state = const Value.absent(),
+                Value<String?> basedOnRevisionId = const Value.absent(),
+                Value<int?> snapshotSchemaVersion = const Value.absent(),
+                Value<String?> snapshotHash = const Value.absent(),
+                Value<DateTime?> frozenAt = const Value.absent(),
+                Value<DateTime?> supersededAt = const Value.absent(),
+                Value<DateTime?> archivedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ProjectDesignRevisionsCompanion(
+                revision: revision,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                originDeviceId: originDeviceId,
+                id: id,
+                projectId: projectId,
+                code: code,
+                sequence: sequence,
+                state: state,
+                basedOnRevisionId: basedOnRevisionId,
+                snapshotSchemaVersion: snapshotSchemaVersion,
+                snapshotHash: snapshotHash,
+                frozenAt: frozenAt,
+                supersededAt: supersededAt,
+                archivedAt: archivedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> revision = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<DateTime?> deletedAt = const Value.absent(),
+                required String originDeviceId,
+                required String id,
+                required String projectId,
+                required String code,
+                required int sequence,
+                required String state,
+                Value<String?> basedOnRevisionId = const Value.absent(),
+                Value<int?> snapshotSchemaVersion = const Value.absent(),
+                Value<String?> snapshotHash = const Value.absent(),
+                Value<DateTime?> frozenAt = const Value.absent(),
+                Value<DateTime?> supersededAt = const Value.absent(),
+                Value<DateTime?> archivedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ProjectDesignRevisionsCompanion.insert(
+                revision: revision,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                originDeviceId: originDeviceId,
+                id: id,
+                projectId: projectId,
+                code: code,
+                sequence: sequence,
+                state: state,
+                basedOnRevisionId: basedOnRevisionId,
+                snapshotSchemaVersion: snapshotSchemaVersion,
+                snapshotHash: snapshotHash,
+                frozenAt: frozenAt,
+                supersededAt: supersededAt,
+                archivedAt: archivedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable<
+                            $ProjectDesignRevisionsTable,
+                            ProjectDesignRevisionRow
+                          >(table),
+                          $$ProjectDesignRevisionsTableReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: ({
+            projectId = false,
+            basedOnRevisionId = false,
+            designRevisionPhysicalSnapshotsRefs = false,
+            canonicalCableRunsRefs = false,
+            legacyRouteAdoptionsRefs = false,
+            traversalCarrierAssignmentsRefs = false,
+          }) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (designRevisionPhysicalSnapshotsRefs)
+                  db.designRevisionPhysicalSnapshots,
+                if (canonicalCableRunsRefs) db.canonicalCableRuns,
+                if (legacyRouteAdoptionsRefs) db.legacyRouteAdoptions,
+                if (traversalCarrierAssignmentsRefs)
+                  db.traversalCarrierAssignments,
+              ],
+              addJoins: <
+                T extends TableManagerState<
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic
+                >
+              >(state) {
+                if (projectId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.projectId,
+                            referencedTable:
+                                $$ProjectDesignRevisionsTableReferences
+                                    ._projectIdTable(db),
+                            referencedColumn:
+                                $$ProjectDesignRevisionsTableReferences
+                                    ._projectIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+                if (basedOnRevisionId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.basedOnRevisionId,
+                            referencedTable:
+                                $$ProjectDesignRevisionsTableReferences
+                                    ._basedOnRevisionIdTable(db),
+                            referencedColumn:
+                                $$ProjectDesignRevisionsTableReferences
+                                    ._basedOnRevisionIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (designRevisionPhysicalSnapshotsRefs)
+                    await $_getPrefetchedData<
+                      ProjectDesignRevisionRow,
+                      $ProjectDesignRevisionsTable,
+                      DesignRevisionPhysicalSnapshotRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$ProjectDesignRevisionsTableReferences
+                          ._designRevisionPhysicalSnapshotsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$ProjectDesignRevisionsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).designRevisionPhysicalSnapshotsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.designRevisionId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                  if (canonicalCableRunsRefs)
+                    await $_getPrefetchedData<
+                      ProjectDesignRevisionRow,
+                      $ProjectDesignRevisionsTable,
+                      CanonicalCableRunRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$ProjectDesignRevisionsTableReferences
+                          ._canonicalCableRunsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$ProjectDesignRevisionsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).canonicalCableRunsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.designRevisionId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                  if (legacyRouteAdoptionsRefs)
+                    await $_getPrefetchedData<
+                      ProjectDesignRevisionRow,
+                      $ProjectDesignRevisionsTable,
+                      LegacyRouteAdoptionRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$ProjectDesignRevisionsTableReferences
+                          ._legacyRouteAdoptionsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$ProjectDesignRevisionsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).legacyRouteAdoptionsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.designRevisionId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                  if (traversalCarrierAssignmentsRefs)
+                    await $_getPrefetchedData<
+                      ProjectDesignRevisionRow,
+                      $ProjectDesignRevisionsTable,
+                      TraversalCarrierAssignmentRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$ProjectDesignRevisionsTableReferences
+                          ._traversalCarrierAssignmentsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$ProjectDesignRevisionsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).traversalCarrierAssignmentsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.designRevisionId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ProjectDesignRevisionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ProjectDesignRevisionsTable,
+      ProjectDesignRevisionRow,
+      $$ProjectDesignRevisionsTableFilterComposer,
+      $$ProjectDesignRevisionsTableOrderingComposer,
+      $$ProjectDesignRevisionsTableAnnotationComposer,
+      $$ProjectDesignRevisionsTableCreateCompanionBuilder,
+      $$ProjectDesignRevisionsTableUpdateCompanionBuilder,
+      (ProjectDesignRevisionRow, $$ProjectDesignRevisionsTableReferences),
+      ProjectDesignRevisionRow,
+      PrefetchHooks Function({
+        bool projectId,
+        bool basedOnRevisionId,
+        bool designRevisionPhysicalSnapshotsRefs,
+        bool canonicalCableRunsRefs,
+        bool legacyRouteAdoptionsRefs,
+        bool traversalCarrierAssignmentsRefs,
+      })
+    >;
+typedef $$DesignRevisionPhysicalSnapshotsTableCreateCompanionBuilder =
+    DesignRevisionPhysicalSnapshotsCompanion Function({
+      required String designRevisionId,
+      required String projectId,
+      required int schemaVersion,
+      required String payloadJson,
+      required String payloadSha256,
+      required DateTime createdAt,
+      required String originDeviceId,
+      Value<int> rowid,
+    });
+typedef $$DesignRevisionPhysicalSnapshotsTableUpdateCompanionBuilder =
+    DesignRevisionPhysicalSnapshotsCompanion Function({
+      Value<String> designRevisionId,
+      Value<String> projectId,
+      Value<int> schemaVersion,
+      Value<String> payloadJson,
+      Value<String> payloadSha256,
+      Value<DateTime> createdAt,
+      Value<String> originDeviceId,
+      Value<int> rowid,
+    });
+
+final class $$DesignRevisionPhysicalSnapshotsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $DesignRevisionPhysicalSnapshotsTable,
+          DesignRevisionPhysicalSnapshotRow
+        > {
+  $$DesignRevisionPhysicalSnapshotsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProjectDesignRevisionsTable _designRevisionIdTable(
+    _$AppDatabase db,
+  ) => db.projectDesignRevisions.createAlias(
+    'design_revision_physical_snapshots__design_revision_id__project_design_revisions__id',
+  );
+
+  $$ProjectDesignRevisionsTableProcessedTableManager get designRevisionId {
+    final $_column = $_itemColumn<String>('design_revision_id')!;
+
+    final manager = $$ProjectDesignRevisionsTableTableManager(
+      $_db,
+      $_db.projectDesignRevisions,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_designRevisionIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $ProjectsTable _projectIdTable(_$AppDatabase db) =>
+      db.projects.createAlias(
+        'design_revision_physical_snapshots__project_id__projects__id',
+      );
+
+  $$ProjectsTableProcessedTableManager get projectId {
+    final $_column = $_itemColumn<String>('project_id')!;
+
+    final manager = $$ProjectsTableTableManager(
+      $_db,
+      $_db.projects,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_projectIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$DesignRevisionPhysicalSnapshotsTableFilterComposer
+    extends Composer<_$AppDatabase, $DesignRevisionPhysicalSnapshotsTable> {
+  $$DesignRevisionPhysicalSnapshotsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get schemaVersion => $composableBuilder(
+    column: $table.schemaVersion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payloadJson => $composableBuilder(
+    column: $table.payloadJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payloadSha256 => $composableBuilder(
+    column: $table.payloadSha256,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProjectDesignRevisionsTableFilterComposer get designRevisionId {
+    final $$ProjectDesignRevisionsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.designRevisionId,
+          referencedTable: $db.projectDesignRevisions,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ProjectDesignRevisionsTableFilterComposer(
+                $db: $db,
+                $table: $db.projectDesignRevisions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$ProjectsTableFilterComposer get projectId {
+    final $$ProjectsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableFilterComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DesignRevisionPhysicalSnapshotsTableOrderingComposer
+    extends Composer<_$AppDatabase, $DesignRevisionPhysicalSnapshotsTable> {
+  $$DesignRevisionPhysicalSnapshotsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get schemaVersion => $composableBuilder(
+    column: $table.schemaVersion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get payloadJson => $composableBuilder(
+    column: $table.payloadJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get payloadSha256 => $composableBuilder(
+    column: $table.payloadSha256,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProjectDesignRevisionsTableOrderingComposer get designRevisionId {
+    final $$ProjectDesignRevisionsTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.designRevisionId,
+          referencedTable: $db.projectDesignRevisions,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ProjectDesignRevisionsTableOrderingComposer(
+                $db: $db,
+                $table: $db.projectDesignRevisions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$ProjectsTableOrderingComposer get projectId {
+    final $$ProjectsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableOrderingComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DesignRevisionPhysicalSnapshotsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DesignRevisionPhysicalSnapshotsTable> {
+  $$DesignRevisionPhysicalSnapshotsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get schemaVersion => $composableBuilder(
+    column: $table.schemaVersion,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get payloadJson => $composableBuilder(
+    column: $table.payloadJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get payloadSha256 => $composableBuilder(
+    column: $table.payloadSha256,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => column,
+  );
+
+  $$ProjectDesignRevisionsTableAnnotationComposer get designRevisionId {
+    final $$ProjectDesignRevisionsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.designRevisionId,
+          referencedTable: $db.projectDesignRevisions,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ProjectDesignRevisionsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.projectDesignRevisions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$ProjectsTableAnnotationComposer get projectId {
+    final $$ProjectsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DesignRevisionPhysicalSnapshotsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DesignRevisionPhysicalSnapshotsTable,
+          DesignRevisionPhysicalSnapshotRow,
+          $$DesignRevisionPhysicalSnapshotsTableFilterComposer,
+          $$DesignRevisionPhysicalSnapshotsTableOrderingComposer,
+          $$DesignRevisionPhysicalSnapshotsTableAnnotationComposer,
+          $$DesignRevisionPhysicalSnapshotsTableCreateCompanionBuilder,
+          $$DesignRevisionPhysicalSnapshotsTableUpdateCompanionBuilder,
+          (
+            DesignRevisionPhysicalSnapshotRow,
+            $$DesignRevisionPhysicalSnapshotsTableReferences,
+          ),
+          DesignRevisionPhysicalSnapshotRow,
+          PrefetchHooks Function({bool designRevisionId, bool projectId})
+        > {
+  $$DesignRevisionPhysicalSnapshotsTableTableManager(
+    _$AppDatabase db,
+    $DesignRevisionPhysicalSnapshotsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$DesignRevisionPhysicalSnapshotsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer:
+              () => $$DesignRevisionPhysicalSnapshotsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer:
+              () => $$DesignRevisionPhysicalSnapshotsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> designRevisionId = const Value.absent(),
+                Value<String> projectId = const Value.absent(),
+                Value<int> schemaVersion = const Value.absent(),
+                Value<String> payloadJson = const Value.absent(),
+                Value<String> payloadSha256 = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<String> originDeviceId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DesignRevisionPhysicalSnapshotsCompanion(
+                designRevisionId: designRevisionId,
+                projectId: projectId,
+                schemaVersion: schemaVersion,
+                payloadJson: payloadJson,
+                payloadSha256: payloadSha256,
+                createdAt: createdAt,
+                originDeviceId: originDeviceId,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String designRevisionId,
+                required String projectId,
+                required int schemaVersion,
+                required String payloadJson,
+                required String payloadSha256,
+                required DateTime createdAt,
+                required String originDeviceId,
+                Value<int> rowid = const Value.absent(),
+              }) => DesignRevisionPhysicalSnapshotsCompanion.insert(
+                designRevisionId: designRevisionId,
+                projectId: projectId,
+                schemaVersion: schemaVersion,
+                payloadJson: payloadJson,
+                payloadSha256: payloadSha256,
+                createdAt: createdAt,
+                originDeviceId: originDeviceId,
+                rowid: rowid,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable<
+                            $DesignRevisionPhysicalSnapshotsTable,
+                            DesignRevisionPhysicalSnapshotRow
+                          >(table),
+                          $$DesignRevisionPhysicalSnapshotsTableReferences(
+                            db,
+                            table,
+                            e,
+                          ),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: ({
+            designRevisionId = false,
+            projectId = false,
+          }) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                T extends TableManagerState<
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic
+                >
+              >(state) {
+                if (designRevisionId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.designRevisionId,
+                            referencedTable:
+                                $$DesignRevisionPhysicalSnapshotsTableReferences
+                                    ._designRevisionIdTable(db),
+                            referencedColumn:
+                                $$DesignRevisionPhysicalSnapshotsTableReferences
+                                    ._designRevisionIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+                if (projectId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.projectId,
+                            referencedTable:
+                                $$DesignRevisionPhysicalSnapshotsTableReferences
+                                    ._projectIdTable(db),
+                            referencedColumn:
+                                $$DesignRevisionPhysicalSnapshotsTableReferences
+                                    ._projectIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$DesignRevisionPhysicalSnapshotsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DesignRevisionPhysicalSnapshotsTable,
+      DesignRevisionPhysicalSnapshotRow,
+      $$DesignRevisionPhysicalSnapshotsTableFilterComposer,
+      $$DesignRevisionPhysicalSnapshotsTableOrderingComposer,
+      $$DesignRevisionPhysicalSnapshotsTableAnnotationComposer,
+      $$DesignRevisionPhysicalSnapshotsTableCreateCompanionBuilder,
+      $$DesignRevisionPhysicalSnapshotsTableUpdateCompanionBuilder,
+      (
+        DesignRevisionPhysicalSnapshotRow,
+        $$DesignRevisionPhysicalSnapshotsTableReferences,
+      ),
+      DesignRevisionPhysicalSnapshotRow,
+      PrefetchHooks Function({bool designRevisionId, bool projectId})
+    >;
+typedef $$CanonicalCableRunsTableCreateCompanionBuilder =
+    CanonicalCableRunsCompanion Function({
+      Value<int> revision,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<DateTime?> deletedAt,
+      required String originDeviceId,
+      required String id,
+      required String projectId,
+      required String cableId,
+      required String designRevisionId,
+      Value<String?> basedOnCableRunId,
+      required String lifecycleState,
+      Value<double> reservePercent,
+      Value<int> terminationAllowanceMm,
+      Value<int> rowid,
+    });
+typedef $$CanonicalCableRunsTableUpdateCompanionBuilder =
+    CanonicalCableRunsCompanion Function({
+      Value<int> revision,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<String> originDeviceId,
+      Value<String> id,
+      Value<String> projectId,
+      Value<String> cableId,
+      Value<String> designRevisionId,
+      Value<String?> basedOnCableRunId,
+      Value<String> lifecycleState,
+      Value<double> reservePercent,
+      Value<int> terminationAllowanceMm,
+      Value<int> rowid,
+    });
+
+final class $$CanonicalCableRunsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $CanonicalCableRunsTable,
+          CanonicalCableRunRow
+        > {
+  $$CanonicalCableRunsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProjectsTable _projectIdTable(_$AppDatabase db) =>
+      db.projects.createAlias('canonical_cable_runs__project_id__projects__id');
+
+  $$ProjectsTableProcessedTableManager get projectId {
+    final $_column = $_itemColumn<String>('project_id')!;
+
+    final manager = $$ProjectsTableTableManager(
+      $_db,
+      $_db.projects,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_projectIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $ElvCablesTable _cableIdTable(_$AppDatabase db) => db.elvCables
+      .createAlias('canonical_cable_runs__cable_id__elv_cables__id');
+
+  $$ElvCablesTableProcessedTableManager get cableId {
+    final $_column = $_itemColumn<String>('cable_id')!;
+
+    final manager = $$ElvCablesTableTableManager(
+      $_db,
+      $_db.elvCables,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_cableIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $ProjectDesignRevisionsTable _designRevisionIdTable(
+    _$AppDatabase db,
+  ) => db.projectDesignRevisions.createAlias(
+    'canonical_cable_runs__design_revision_id__project_design_revisions__id',
+  );
+
+  $$ProjectDesignRevisionsTableProcessedTableManager get designRevisionId {
+    final $_column = $_itemColumn<String>('design_revision_id')!;
+
+    final manager = $$ProjectDesignRevisionsTableTableManager(
+      $_db,
+      $_db.projectDesignRevisions,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_designRevisionIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $CanonicalCableRunsTable _basedOnCableRunIdTable(_$AppDatabase db) =>
+      db.canonicalCableRuns.createAlias(
+        'canonical_cable_runs__based_on_cable_run_id__canonical_cable_runs__id',
+      );
+
+  $$CanonicalCableRunsTableProcessedTableManager? get basedOnCableRunId {
+    final $_column = $_itemColumn<String>('based_on_cable_run_id');
+    if ($_column == null) return null;
+    final manager = $$CanonicalCableRunsTableTableManager(
+      $_db,
+      $_db.canonicalCableRuns,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_basedOnCableRunIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $CableRunTraversalsTable,
+    List<CableRunTraversalRow>
+  >
+  _cableRunTraversalsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.cableRunTraversals,
+        aliasName:
+            'canonical_cable_runs__id__cable_run_traversals__cable_run_id',
+      );
+
+  $$CableRunTraversalsTableProcessedTableManager get cableRunTraversalsRefs {
+    final manager = $$CableRunTraversalsTableTableManager(
+      $_db,
+      $_db.cableRunTraversals,
+    ).filter((f) => f.cableRunId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _cableRunTraversalsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $LegacyRouteAdoptionsTable,
+    List<LegacyRouteAdoptionRow>
+  >
+  _legacyRouteAdoptionsRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.legacyRouteAdoptions,
+    aliasName:
+        'canonical_cable_runs__id__legacy_route_adoptions__canonical_cable_run_id',
+  );
+
+  $$LegacyRouteAdoptionsTableProcessedTableManager
+  get legacyRouteAdoptionsRefs {
+    final manager = $$LegacyRouteAdoptionsTableTableManager(
+      $_db,
+      $_db.legacyRouteAdoptions,
+    ).filter(
+      (f) => f.canonicalCableRunId.id.sqlEquals($_itemColumn<String>('id')!),
+    );
+
+    final cache = $_typedResult.readTableOrNull(
+      _legacyRouteAdoptionsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $TraversalCarrierAssignmentsTable,
+    List<TraversalCarrierAssignmentRow>
+  >
+  _traversalCarrierAssignmentsRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.traversalCarrierAssignments,
+    aliasName:
+        'canonical_cable_runs__id__traversal_carrier_assignments__cable_run_id',
+  );
+
+  $$TraversalCarrierAssignmentsTableProcessedTableManager
+  get traversalCarrierAssignmentsRefs {
+    final manager = $$TraversalCarrierAssignmentsTableTableManager(
+      $_db,
+      $_db.traversalCarrierAssignments,
+    ).filter((f) => f.cableRunId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _traversalCarrierAssignmentsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$CanonicalCableRunsTableFilterComposer
+    extends Composer<_$AppDatabase, $CanonicalCableRunsTable> {
+  $$CanonicalCableRunsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get revision => $composableBuilder(
+    column: $table.revision,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lifecycleState => $composableBuilder(
+    column: $table.lifecycleState,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get reservePercent => $composableBuilder(
+    column: $table.reservePercent,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get terminationAllowanceMm => $composableBuilder(
+    column: $table.terminationAllowanceMm,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProjectsTableFilterComposer get projectId {
+    final $$ProjectsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableFilterComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ElvCablesTableFilterComposer get cableId {
+    final $$ElvCablesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.cableId,
+      referencedTable: $db.elvCables,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ElvCablesTableFilterComposer(
+            $db: $db,
+            $table: $db.elvCables,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ProjectDesignRevisionsTableFilterComposer get designRevisionId {
+    final $$ProjectDesignRevisionsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.designRevisionId,
+          referencedTable: $db.projectDesignRevisions,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ProjectDesignRevisionsTableFilterComposer(
+                $db: $db,
+                $table: $db.projectDesignRevisions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$CanonicalCableRunsTableFilterComposer get basedOnCableRunId {
+    final $$CanonicalCableRunsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.basedOnCableRunId,
+      referencedTable: $db.canonicalCableRuns,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CanonicalCableRunsTableFilterComposer(
+            $db: $db,
+            $table: $db.canonicalCableRuns,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> cableRunTraversalsRefs(
+    Expression<bool> Function($$CableRunTraversalsTableFilterComposer f) f,
+  ) {
+    final $$CableRunTraversalsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.cableRunTraversals,
+      getReferencedColumn: (t) => t.cableRunId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableRunTraversalsTableFilterComposer(
+            $db: $db,
+            $table: $db.cableRunTraversals,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> legacyRouteAdoptionsRefs(
+    Expression<bool> Function($$LegacyRouteAdoptionsTableFilterComposer f) f,
+  ) {
+    final $$LegacyRouteAdoptionsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.legacyRouteAdoptions,
+      getReferencedColumn: (t) => t.canonicalCableRunId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LegacyRouteAdoptionsTableFilterComposer(
+            $db: $db,
+            $table: $db.legacyRouteAdoptions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> traversalCarrierAssignmentsRefs(
+    Expression<bool> Function(
+      $$TraversalCarrierAssignmentsTableFilterComposer f,
+    )
+    f,
+  ) {
+    final $$TraversalCarrierAssignmentsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.traversalCarrierAssignments,
+          getReferencedColumn: (t) => t.cableRunId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$TraversalCarrierAssignmentsTableFilterComposer(
+                $db: $db,
+                $table: $db.traversalCarrierAssignments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$CanonicalCableRunsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CanonicalCableRunsTable> {
+  $$CanonicalCableRunsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get revision => $composableBuilder(
+    column: $table.revision,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get lifecycleState => $composableBuilder(
+    column: $table.lifecycleState,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get reservePercent => $composableBuilder(
+    column: $table.reservePercent,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get terminationAllowanceMm => $composableBuilder(
+    column: $table.terminationAllowanceMm,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProjectsTableOrderingComposer get projectId {
+    final $$ProjectsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableOrderingComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ElvCablesTableOrderingComposer get cableId {
+    final $$ElvCablesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.cableId,
+      referencedTable: $db.elvCables,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ElvCablesTableOrderingComposer(
+            $db: $db,
+            $table: $db.elvCables,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ProjectDesignRevisionsTableOrderingComposer get designRevisionId {
+    final $$ProjectDesignRevisionsTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.designRevisionId,
+          referencedTable: $db.projectDesignRevisions,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ProjectDesignRevisionsTableOrderingComposer(
+                $db: $db,
+                $table: $db.projectDesignRevisions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$CanonicalCableRunsTableOrderingComposer get basedOnCableRunId {
+    final $$CanonicalCableRunsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.basedOnCableRunId,
+      referencedTable: $db.canonicalCableRuns,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CanonicalCableRunsTableOrderingComposer(
+            $db: $db,
+            $table: $db.canonicalCableRuns,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CanonicalCableRunsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CanonicalCableRunsTable> {
+  $$CanonicalCableRunsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get revision =>
+      $composableBuilder(column: $table.revision, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get lifecycleState => $composableBuilder(
+    column: $table.lifecycleState,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get reservePercent => $composableBuilder(
+    column: $table.reservePercent,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get terminationAllowanceMm => $composableBuilder(
+    column: $table.terminationAllowanceMm,
+    builder: (column) => column,
+  );
+
+  $$ProjectsTableAnnotationComposer get projectId {
+    final $$ProjectsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ElvCablesTableAnnotationComposer get cableId {
+    final $$ElvCablesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.cableId,
+      referencedTable: $db.elvCables,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ElvCablesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.elvCables,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ProjectDesignRevisionsTableAnnotationComposer get designRevisionId {
+    final $$ProjectDesignRevisionsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.designRevisionId,
+          referencedTable: $db.projectDesignRevisions,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ProjectDesignRevisionsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.projectDesignRevisions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$CanonicalCableRunsTableAnnotationComposer get basedOnCableRunId {
+    final $$CanonicalCableRunsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.basedOnCableRunId,
+          referencedTable: $db.canonicalCableRuns,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CanonicalCableRunsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.canonicalCableRuns,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  Expression<T> cableRunTraversalsRefs<T extends Object>(
+    Expression<T> Function($$CableRunTraversalsTableAnnotationComposer a) f,
+  ) {
+    final $$CableRunTraversalsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.cableRunTraversals,
+          getReferencedColumn: (t) => t.cableRunId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CableRunTraversalsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.cableRunTraversals,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> legacyRouteAdoptionsRefs<T extends Object>(
+    Expression<T> Function($$LegacyRouteAdoptionsTableAnnotationComposer a) f,
+  ) {
+    final $$LegacyRouteAdoptionsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.legacyRouteAdoptions,
+          getReferencedColumn: (t) => t.canonicalCableRunId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$LegacyRouteAdoptionsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.legacyRouteAdoptions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> traversalCarrierAssignmentsRefs<T extends Object>(
+    Expression<T> Function(
+      $$TraversalCarrierAssignmentsTableAnnotationComposer a,
+    )
+    f,
+  ) {
+    final $$TraversalCarrierAssignmentsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.traversalCarrierAssignments,
+          getReferencedColumn: (t) => t.cableRunId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$TraversalCarrierAssignmentsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.traversalCarrierAssignments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$CanonicalCableRunsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CanonicalCableRunsTable,
+          CanonicalCableRunRow,
+          $$CanonicalCableRunsTableFilterComposer,
+          $$CanonicalCableRunsTableOrderingComposer,
+          $$CanonicalCableRunsTableAnnotationComposer,
+          $$CanonicalCableRunsTableCreateCompanionBuilder,
+          $$CanonicalCableRunsTableUpdateCompanionBuilder,
+          (CanonicalCableRunRow, $$CanonicalCableRunsTableReferences),
+          CanonicalCableRunRow,
+          PrefetchHooks Function({
+            bool projectId,
+            bool cableId,
+            bool designRevisionId,
+            bool basedOnCableRunId,
+            bool cableRunTraversalsRefs,
+            bool legacyRouteAdoptionsRefs,
+            bool traversalCarrierAssignmentsRefs,
+          })
+        > {
+  $$CanonicalCableRunsTableTableManager(
+    _$AppDatabase db,
+    $CanonicalCableRunsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$CanonicalCableRunsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer:
+              () => $$CanonicalCableRunsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer:
+              () => $$CanonicalCableRunsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> revision = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<String> originDeviceId = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> projectId = const Value.absent(),
+                Value<String> cableId = const Value.absent(),
+                Value<String> designRevisionId = const Value.absent(),
+                Value<String?> basedOnCableRunId = const Value.absent(),
+                Value<String> lifecycleState = const Value.absent(),
+                Value<double> reservePercent = const Value.absent(),
+                Value<int> terminationAllowanceMm = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CanonicalCableRunsCompanion(
+                revision: revision,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                originDeviceId: originDeviceId,
+                id: id,
+                projectId: projectId,
+                cableId: cableId,
+                designRevisionId: designRevisionId,
+                basedOnCableRunId: basedOnCableRunId,
+                lifecycleState: lifecycleState,
+                reservePercent: reservePercent,
+                terminationAllowanceMm: terminationAllowanceMm,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> revision = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<DateTime?> deletedAt = const Value.absent(),
+                required String originDeviceId,
+                required String id,
+                required String projectId,
+                required String cableId,
+                required String designRevisionId,
+                Value<String?> basedOnCableRunId = const Value.absent(),
+                required String lifecycleState,
+                Value<double> reservePercent = const Value.absent(),
+                Value<int> terminationAllowanceMm = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CanonicalCableRunsCompanion.insert(
+                revision: revision,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                originDeviceId: originDeviceId,
+                id: id,
+                projectId: projectId,
+                cableId: cableId,
+                designRevisionId: designRevisionId,
+                basedOnCableRunId: basedOnCableRunId,
+                lifecycleState: lifecycleState,
+                reservePercent: reservePercent,
+                terminationAllowanceMm: terminationAllowanceMm,
+                rowid: rowid,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable<
+                            $CanonicalCableRunsTable,
+                            CanonicalCableRunRow
+                          >(table),
+                          $$CanonicalCableRunsTableReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: ({
+            projectId = false,
+            cableId = false,
+            designRevisionId = false,
+            basedOnCableRunId = false,
+            cableRunTraversalsRefs = false,
+            legacyRouteAdoptionsRefs = false,
+            traversalCarrierAssignmentsRefs = false,
+          }) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (cableRunTraversalsRefs) db.cableRunTraversals,
+                if (legacyRouteAdoptionsRefs) db.legacyRouteAdoptions,
+                if (traversalCarrierAssignmentsRefs)
+                  db.traversalCarrierAssignments,
+              ],
+              addJoins: <
+                T extends TableManagerState<
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic
+                >
+              >(state) {
+                if (projectId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.projectId,
+                            referencedTable: $$CanonicalCableRunsTableReferences
+                                ._projectIdTable(db),
+                            referencedColumn:
+                                $$CanonicalCableRunsTableReferences
+                                    ._projectIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+                if (cableId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.cableId,
+                            referencedTable: $$CanonicalCableRunsTableReferences
+                                ._cableIdTable(db),
+                            referencedColumn:
+                                $$CanonicalCableRunsTableReferences
+                                    ._cableIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+                if (designRevisionId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.designRevisionId,
+                            referencedTable: $$CanonicalCableRunsTableReferences
+                                ._designRevisionIdTable(db),
+                            referencedColumn:
+                                $$CanonicalCableRunsTableReferences
+                                    ._designRevisionIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+                if (basedOnCableRunId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.basedOnCableRunId,
+                            referencedTable: $$CanonicalCableRunsTableReferences
+                                ._basedOnCableRunIdTable(db),
+                            referencedColumn:
+                                $$CanonicalCableRunsTableReferences
+                                    ._basedOnCableRunIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (cableRunTraversalsRefs)
+                    await $_getPrefetchedData<
+                      CanonicalCableRunRow,
+                      $CanonicalCableRunsTable,
+                      CableRunTraversalRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$CanonicalCableRunsTableReferences
+                          ._cableRunTraversalsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$CanonicalCableRunsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).cableRunTraversalsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.cableRunId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                  if (legacyRouteAdoptionsRefs)
+                    await $_getPrefetchedData<
+                      CanonicalCableRunRow,
+                      $CanonicalCableRunsTable,
+                      LegacyRouteAdoptionRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$CanonicalCableRunsTableReferences
+                          ._legacyRouteAdoptionsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$CanonicalCableRunsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).legacyRouteAdoptionsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.canonicalCableRunId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                  if (traversalCarrierAssignmentsRefs)
+                    await $_getPrefetchedData<
+                      CanonicalCableRunRow,
+                      $CanonicalCableRunsTable,
+                      TraversalCarrierAssignmentRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$CanonicalCableRunsTableReferences
+                          ._traversalCarrierAssignmentsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$CanonicalCableRunsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).traversalCarrierAssignmentsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.cableRunId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$CanonicalCableRunsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CanonicalCableRunsTable,
+      CanonicalCableRunRow,
+      $$CanonicalCableRunsTableFilterComposer,
+      $$CanonicalCableRunsTableOrderingComposer,
+      $$CanonicalCableRunsTableAnnotationComposer,
+      $$CanonicalCableRunsTableCreateCompanionBuilder,
+      $$CanonicalCableRunsTableUpdateCompanionBuilder,
+      (CanonicalCableRunRow, $$CanonicalCableRunsTableReferences),
+      CanonicalCableRunRow,
+      PrefetchHooks Function({
+        bool projectId,
+        bool cableId,
+        bool designRevisionId,
+        bool basedOnCableRunId,
+        bool cableRunTraversalsRefs,
+        bool legacyRouteAdoptionsRefs,
+        bool traversalCarrierAssignmentsRefs,
+      })
+    >;
+typedef $$CableRunTraversalsTableCreateCompanionBuilder =
+    CableRunTraversalsCompanion Function({
+      Value<int> revision,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<DateTime?> deletedAt,
+      required String originDeviceId,
+      required String id,
+      required String cableRunId,
+      required int sequence,
+      required String routeSegmentId,
+      required String direction,
+      Value<String?> physicalCarrierId,
+      Value<String?> carrierCompartmentId,
+      Value<int> rowid,
+    });
+typedef $$CableRunTraversalsTableUpdateCompanionBuilder =
+    CableRunTraversalsCompanion Function({
+      Value<int> revision,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<String> originDeviceId,
+      Value<String> id,
+      Value<String> cableRunId,
+      Value<int> sequence,
+      Value<String> routeSegmentId,
+      Value<String> direction,
+      Value<String?> physicalCarrierId,
+      Value<String?> carrierCompartmentId,
+      Value<int> rowid,
+    });
+
+final class $$CableRunTraversalsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $CableRunTraversalsTable,
+          CableRunTraversalRow
+        > {
+  $$CableRunTraversalsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $CanonicalCableRunsTable _cableRunIdTable(_$AppDatabase db) =>
+      db.canonicalCableRuns.createAlias(
+        'cable_run_traversals__cable_run_id__canonical_cable_runs__id',
+      );
+
+  $$CanonicalCableRunsTableProcessedTableManager get cableRunId {
+    final $_column = $_itemColumn<String>('cable_run_id')!;
+
+    final manager = $$CanonicalCableRunsTableTableManager(
+      $_db,
+      $_db.canonicalCableRuns,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_cableRunIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $CableRouteSegmentsTable _routeSegmentIdTable(_$AppDatabase db) =>
+      db.cableRouteSegments.createAlias(
+        'cable_run_traversals__route_segment_id__cable_route_segments__id',
+      );
+
+  $$CableRouteSegmentsTableProcessedTableManager get routeSegmentId {
+    final $_column = $_itemColumn<String>('route_segment_id')!;
+
+    final manager = $$CableRouteSegmentsTableTableManager(
+      $_db,
+      $_db.cableRouteSegments,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_routeSegmentIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $TraversalCarrierAssignmentsTable,
+    List<TraversalCarrierAssignmentRow>
+  >
+  _traversalCarrierAssignmentsRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.traversalCarrierAssignments,
+    aliasName:
+        'cable_run_traversals__id__traversal_carrier_assignments__traversal_id',
+  );
+
+  $$TraversalCarrierAssignmentsTableProcessedTableManager
+  get traversalCarrierAssignmentsRefs {
+    final manager = $$TraversalCarrierAssignmentsTableTableManager(
+      $_db,
+      $_db.traversalCarrierAssignments,
+    ).filter((f) => f.traversalId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _traversalCarrierAssignmentsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$CableRunTraversalsTableFilterComposer
+    extends Composer<_$AppDatabase, $CableRunTraversalsTable> {
+  $$CableRunTraversalsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get revision => $composableBuilder(
+    column: $table.revision,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sequence => $composableBuilder(
+    column: $table.sequence,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get direction => $composableBuilder(
+    column: $table.direction,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get physicalCarrierId => $composableBuilder(
+    column: $table.physicalCarrierId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get carrierCompartmentId => $composableBuilder(
+    column: $table.carrierCompartmentId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$CanonicalCableRunsTableFilterComposer get cableRunId {
+    final $$CanonicalCableRunsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.cableRunId,
+      referencedTable: $db.canonicalCableRuns,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CanonicalCableRunsTableFilterComposer(
+            $db: $db,
+            $table: $db.canonicalCableRuns,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CableRouteSegmentsTableFilterComposer get routeSegmentId {
+    final $$CableRouteSegmentsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.routeSegmentId,
+      referencedTable: $db.cableRouteSegments,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableRouteSegmentsTableFilterComposer(
+            $db: $db,
+            $table: $db.cableRouteSegments,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> traversalCarrierAssignmentsRefs(
+    Expression<bool> Function(
+      $$TraversalCarrierAssignmentsTableFilterComposer f,
+    )
+    f,
+  ) {
+    final $$TraversalCarrierAssignmentsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.traversalCarrierAssignments,
+          getReferencedColumn: (t) => t.traversalId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$TraversalCarrierAssignmentsTableFilterComposer(
+                $db: $db,
+                $table: $db.traversalCarrierAssignments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$CableRunTraversalsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CableRunTraversalsTable> {
+  $$CableRunTraversalsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get revision => $composableBuilder(
+    column: $table.revision,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sequence => $composableBuilder(
+    column: $table.sequence,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get direction => $composableBuilder(
+    column: $table.direction,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get physicalCarrierId => $composableBuilder(
+    column: $table.physicalCarrierId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get carrierCompartmentId => $composableBuilder(
+    column: $table.carrierCompartmentId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$CanonicalCableRunsTableOrderingComposer get cableRunId {
+    final $$CanonicalCableRunsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.cableRunId,
+      referencedTable: $db.canonicalCableRuns,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CanonicalCableRunsTableOrderingComposer(
+            $db: $db,
+            $table: $db.canonicalCableRuns,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CableRouteSegmentsTableOrderingComposer get routeSegmentId {
+    final $$CableRouteSegmentsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.routeSegmentId,
+      referencedTable: $db.cableRouteSegments,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableRouteSegmentsTableOrderingComposer(
+            $db: $db,
+            $table: $db.cableRouteSegments,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CableRunTraversalsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CableRunTraversalsTable> {
+  $$CableRunTraversalsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get revision =>
+      $composableBuilder(column: $table.revision, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get sequence =>
+      $composableBuilder(column: $table.sequence, builder: (column) => column);
+
+  GeneratedColumn<String> get direction =>
+      $composableBuilder(column: $table.direction, builder: (column) => column);
+
+  GeneratedColumn<String> get physicalCarrierId => $composableBuilder(
+    column: $table.physicalCarrierId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get carrierCompartmentId => $composableBuilder(
+    column: $table.carrierCompartmentId,
+    builder: (column) => column,
+  );
+
+  $$CanonicalCableRunsTableAnnotationComposer get cableRunId {
+    final $$CanonicalCableRunsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.cableRunId,
+          referencedTable: $db.canonicalCableRuns,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CanonicalCableRunsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.canonicalCableRuns,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$CableRouteSegmentsTableAnnotationComposer get routeSegmentId {
+    final $$CableRouteSegmentsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.routeSegmentId,
+          referencedTable: $db.cableRouteSegments,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CableRouteSegmentsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.cableRouteSegments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  Expression<T> traversalCarrierAssignmentsRefs<T extends Object>(
+    Expression<T> Function(
+      $$TraversalCarrierAssignmentsTableAnnotationComposer a,
+    )
+    f,
+  ) {
+    final $$TraversalCarrierAssignmentsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.traversalCarrierAssignments,
+          getReferencedColumn: (t) => t.traversalId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$TraversalCarrierAssignmentsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.traversalCarrierAssignments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$CableRunTraversalsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CableRunTraversalsTable,
+          CableRunTraversalRow,
+          $$CableRunTraversalsTableFilterComposer,
+          $$CableRunTraversalsTableOrderingComposer,
+          $$CableRunTraversalsTableAnnotationComposer,
+          $$CableRunTraversalsTableCreateCompanionBuilder,
+          $$CableRunTraversalsTableUpdateCompanionBuilder,
+          (CableRunTraversalRow, $$CableRunTraversalsTableReferences),
+          CableRunTraversalRow,
+          PrefetchHooks Function({
+            bool cableRunId,
+            bool routeSegmentId,
+            bool traversalCarrierAssignmentsRefs,
+          })
+        > {
+  $$CableRunTraversalsTableTableManager(
+    _$AppDatabase db,
+    $CableRunTraversalsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$CableRunTraversalsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer:
+              () => $$CableRunTraversalsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer:
+              () => $$CableRunTraversalsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> revision = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<String> originDeviceId = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> cableRunId = const Value.absent(),
+                Value<int> sequence = const Value.absent(),
+                Value<String> routeSegmentId = const Value.absent(),
+                Value<String> direction = const Value.absent(),
+                Value<String?> physicalCarrierId = const Value.absent(),
+                Value<String?> carrierCompartmentId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CableRunTraversalsCompanion(
+                revision: revision,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                originDeviceId: originDeviceId,
+                id: id,
+                cableRunId: cableRunId,
+                sequence: sequence,
+                routeSegmentId: routeSegmentId,
+                direction: direction,
+                physicalCarrierId: physicalCarrierId,
+                carrierCompartmentId: carrierCompartmentId,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> revision = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<DateTime?> deletedAt = const Value.absent(),
+                required String originDeviceId,
+                required String id,
+                required String cableRunId,
+                required int sequence,
+                required String routeSegmentId,
+                required String direction,
+                Value<String?> physicalCarrierId = const Value.absent(),
+                Value<String?> carrierCompartmentId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CableRunTraversalsCompanion.insert(
+                revision: revision,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                originDeviceId: originDeviceId,
+                id: id,
+                cableRunId: cableRunId,
+                sequence: sequence,
+                routeSegmentId: routeSegmentId,
+                direction: direction,
+                physicalCarrierId: physicalCarrierId,
+                carrierCompartmentId: carrierCompartmentId,
+                rowid: rowid,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable<
+                            $CableRunTraversalsTable,
+                            CableRunTraversalRow
+                          >(table),
+                          $$CableRunTraversalsTableReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: ({
+            cableRunId = false,
+            routeSegmentId = false,
+            traversalCarrierAssignmentsRefs = false,
+          }) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (traversalCarrierAssignmentsRefs)
+                  db.traversalCarrierAssignments,
+              ],
+              addJoins: <
+                T extends TableManagerState<
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic
+                >
+              >(state) {
+                if (cableRunId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.cableRunId,
+                            referencedTable: $$CableRunTraversalsTableReferences
+                                ._cableRunIdTable(db),
+                            referencedColumn:
+                                $$CableRunTraversalsTableReferences
+                                    ._cableRunIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+                if (routeSegmentId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.routeSegmentId,
+                            referencedTable: $$CableRunTraversalsTableReferences
+                                ._routeSegmentIdTable(db),
+                            referencedColumn:
+                                $$CableRunTraversalsTableReferences
+                                    ._routeSegmentIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (traversalCarrierAssignmentsRefs)
+                    await $_getPrefetchedData<
+                      CableRunTraversalRow,
+                      $CableRunTraversalsTable,
+                      TraversalCarrierAssignmentRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$CableRunTraversalsTableReferences
+                          ._traversalCarrierAssignmentsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$CableRunTraversalsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).traversalCarrierAssignmentsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.traversalId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$CableRunTraversalsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CableRunTraversalsTable,
+      CableRunTraversalRow,
+      $$CableRunTraversalsTableFilterComposer,
+      $$CableRunTraversalsTableOrderingComposer,
+      $$CableRunTraversalsTableAnnotationComposer,
+      $$CableRunTraversalsTableCreateCompanionBuilder,
+      $$CableRunTraversalsTableUpdateCompanionBuilder,
+      (CableRunTraversalRow, $$CableRunTraversalsTableReferences),
+      CableRunTraversalRow,
+      PrefetchHooks Function({
+        bool cableRunId,
+        bool routeSegmentId,
+        bool traversalCarrierAssignmentsRefs,
+      })
+    >;
+typedef $$RouteHandoffsTableCreateCompanionBuilder =
+    RouteHandoffsCompanion Function({
+      Value<int> revision,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<DateTime?> deletedAt,
+      required String originDeviceId,
+      required String id,
+      required String projectId,
+      required String fromRouteNodeId,
+      required String toRouteNodeId,
+      required String kind,
+      Value<bool> bidirectional,
+      Value<String?> adjacencyRef,
+      Value<String> evidenceJson,
+      Value<int> rowid,
+    });
+typedef $$RouteHandoffsTableUpdateCompanionBuilder =
+    RouteHandoffsCompanion Function({
+      Value<int> revision,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<String> originDeviceId,
+      Value<String> id,
+      Value<String> projectId,
+      Value<String> fromRouteNodeId,
+      Value<String> toRouteNodeId,
+      Value<String> kind,
+      Value<bool> bidirectional,
+      Value<String?> adjacencyRef,
+      Value<String> evidenceJson,
+      Value<int> rowid,
+    });
+
+final class $$RouteHandoffsTableReferences
+    extends
+        BaseReferences<_$AppDatabase, $RouteHandoffsTable, RouteHandoffRow> {
+  $$RouteHandoffsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProjectsTable _projectIdTable(_$AppDatabase db) =>
+      db.projects.createAlias('route_handoffs__project_id__projects__id');
+
+  $$ProjectsTableProcessedTableManager get projectId {
+    final $_column = $_itemColumn<String>('project_id')!;
+
+    final manager = $$ProjectsTableTableManager(
+      $_db,
+      $_db.projects,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_projectIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $CableRouteNodesTable _fromRouteNodeIdTable(_$AppDatabase db) => db
+      .cableRouteNodes
+      .createAlias('route_handoffs__from_route_node_id__cable_route_nodes__id');
+
+  $$CableRouteNodesTableProcessedTableManager get fromRouteNodeId {
+    final $_column = $_itemColumn<String>('from_route_node_id')!;
+
+    final manager = $$CableRouteNodesTableTableManager(
+      $_db,
+      $_db.cableRouteNodes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_fromRouteNodeIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $CableRouteNodesTable _toRouteNodeIdTable(_$AppDatabase db) => db
+      .cableRouteNodes
+      .createAlias('route_handoffs__to_route_node_id__cable_route_nodes__id');
+
+  $$CableRouteNodesTableProcessedTableManager get toRouteNodeId {
+    final $_column = $_itemColumn<String>('to_route_node_id')!;
+
+    final manager = $$CableRouteNodesTableTableManager(
+      $_db,
+      $_db.cableRouteNodes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_toRouteNodeIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$RouteHandoffsTableFilterComposer
+    extends Composer<_$AppDatabase, $RouteHandoffsTable> {
+  $$RouteHandoffsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get revision => $composableBuilder(
+    column: $table.revision,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get bidirectional => $composableBuilder(
+    column: $table.bidirectional,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get adjacencyRef => $composableBuilder(
+    column: $table.adjacencyRef,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get evidenceJson => $composableBuilder(
+    column: $table.evidenceJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProjectsTableFilterComposer get projectId {
+    final $$ProjectsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableFilterComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CableRouteNodesTableFilterComposer get fromRouteNodeId {
+    final $$CableRouteNodesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.fromRouteNodeId,
+      referencedTable: $db.cableRouteNodes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableRouteNodesTableFilterComposer(
+            $db: $db,
+            $table: $db.cableRouteNodes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CableRouteNodesTableFilterComposer get toRouteNodeId {
+    final $$CableRouteNodesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.toRouteNodeId,
+      referencedTable: $db.cableRouteNodes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableRouteNodesTableFilterComposer(
+            $db: $db,
+            $table: $db.cableRouteNodes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$RouteHandoffsTableOrderingComposer
+    extends Composer<_$AppDatabase, $RouteHandoffsTable> {
+  $$RouteHandoffsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get revision => $composableBuilder(
+    column: $table.revision,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get bidirectional => $composableBuilder(
+    column: $table.bidirectional,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get adjacencyRef => $composableBuilder(
+    column: $table.adjacencyRef,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get evidenceJson => $composableBuilder(
+    column: $table.evidenceJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProjectsTableOrderingComposer get projectId {
+    final $$ProjectsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableOrderingComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CableRouteNodesTableOrderingComposer get fromRouteNodeId {
+    final $$CableRouteNodesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.fromRouteNodeId,
+      referencedTable: $db.cableRouteNodes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableRouteNodesTableOrderingComposer(
+            $db: $db,
+            $table: $db.cableRouteNodes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CableRouteNodesTableOrderingComposer get toRouteNodeId {
+    final $$CableRouteNodesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.toRouteNodeId,
+      referencedTable: $db.cableRouteNodes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableRouteNodesTableOrderingComposer(
+            $db: $db,
+            $table: $db.cableRouteNodes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$RouteHandoffsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $RouteHandoffsTable> {
+  $$RouteHandoffsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get revision =>
+      $composableBuilder(column: $table.revision, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<bool> get bidirectional => $composableBuilder(
+    column: $table.bidirectional,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get adjacencyRef => $composableBuilder(
+    column: $table.adjacencyRef,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get evidenceJson => $composableBuilder(
+    column: $table.evidenceJson,
+    builder: (column) => column,
+  );
+
+  $$ProjectsTableAnnotationComposer get projectId {
+    final $$ProjectsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CableRouteNodesTableAnnotationComposer get fromRouteNodeId {
+    final $$CableRouteNodesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.fromRouteNodeId,
+      referencedTable: $db.cableRouteNodes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableRouteNodesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.cableRouteNodes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CableRouteNodesTableAnnotationComposer get toRouteNodeId {
+    final $$CableRouteNodesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.toRouteNodeId,
+      referencedTable: $db.cableRouteNodes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableRouteNodesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.cableRouteNodes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$RouteHandoffsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $RouteHandoffsTable,
+          RouteHandoffRow,
+          $$RouteHandoffsTableFilterComposer,
+          $$RouteHandoffsTableOrderingComposer,
+          $$RouteHandoffsTableAnnotationComposer,
+          $$RouteHandoffsTableCreateCompanionBuilder,
+          $$RouteHandoffsTableUpdateCompanionBuilder,
+          (RouteHandoffRow, $$RouteHandoffsTableReferences),
+          RouteHandoffRow,
+          PrefetchHooks Function({
+            bool projectId,
+            bool fromRouteNodeId,
+            bool toRouteNodeId,
+          })
+        > {
+  $$RouteHandoffsTableTableManager(_$AppDatabase db, $RouteHandoffsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$RouteHandoffsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer:
+              () =>
+                  $$RouteHandoffsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer:
+              () => $$RouteHandoffsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> revision = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<String> originDeviceId = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> projectId = const Value.absent(),
+                Value<String> fromRouteNodeId = const Value.absent(),
+                Value<String> toRouteNodeId = const Value.absent(),
+                Value<String> kind = const Value.absent(),
+                Value<bool> bidirectional = const Value.absent(),
+                Value<String?> adjacencyRef = const Value.absent(),
+                Value<String> evidenceJson = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => RouteHandoffsCompanion(
+                revision: revision,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                originDeviceId: originDeviceId,
+                id: id,
+                projectId: projectId,
+                fromRouteNodeId: fromRouteNodeId,
+                toRouteNodeId: toRouteNodeId,
+                kind: kind,
+                bidirectional: bidirectional,
+                adjacencyRef: adjacencyRef,
+                evidenceJson: evidenceJson,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> revision = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<DateTime?> deletedAt = const Value.absent(),
+                required String originDeviceId,
+                required String id,
+                required String projectId,
+                required String fromRouteNodeId,
+                required String toRouteNodeId,
+                required String kind,
+                Value<bool> bidirectional = const Value.absent(),
+                Value<String?> adjacencyRef = const Value.absent(),
+                Value<String> evidenceJson = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => RouteHandoffsCompanion.insert(
+                revision: revision,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                originDeviceId: originDeviceId,
+                id: id,
+                projectId: projectId,
+                fromRouteNodeId: fromRouteNodeId,
+                toRouteNodeId: toRouteNodeId,
+                kind: kind,
+                bidirectional: bidirectional,
+                adjacencyRef: adjacencyRef,
+                evidenceJson: evidenceJson,
+                rowid: rowid,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable<$RouteHandoffsTable, RouteHandoffRow>(
+                            table,
+                          ),
+                          $$RouteHandoffsTableReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: ({
+            projectId = false,
+            fromRouteNodeId = false,
+            toRouteNodeId = false,
+          }) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                T extends TableManagerState<
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic
+                >
+              >(state) {
+                if (projectId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.projectId,
+                            referencedTable: $$RouteHandoffsTableReferences
+                                ._projectIdTable(db),
+                            referencedColumn:
+                                $$RouteHandoffsTableReferences
+                                    ._projectIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+                if (fromRouteNodeId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.fromRouteNodeId,
+                            referencedTable: $$RouteHandoffsTableReferences
+                                ._fromRouteNodeIdTable(db),
+                            referencedColumn:
+                                $$RouteHandoffsTableReferences
+                                    ._fromRouteNodeIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+                if (toRouteNodeId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.toRouteNodeId,
+                            referencedTable: $$RouteHandoffsTableReferences
+                                ._toRouteNodeIdTable(db),
+                            referencedColumn:
+                                $$RouteHandoffsTableReferences
+                                    ._toRouteNodeIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$RouteHandoffsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $RouteHandoffsTable,
+      RouteHandoffRow,
+      $$RouteHandoffsTableFilterComposer,
+      $$RouteHandoffsTableOrderingComposer,
+      $$RouteHandoffsTableAnnotationComposer,
+      $$RouteHandoffsTableCreateCompanionBuilder,
+      $$RouteHandoffsTableUpdateCompanionBuilder,
+      (RouteHandoffRow, $$RouteHandoffsTableReferences),
+      RouteHandoffRow,
+      PrefetchHooks Function({
+        bool projectId,
+        bool fromRouteNodeId,
+        bool toRouteNodeId,
+      })
+    >;
+typedef $$RouteBendEvidenceTableCreateCompanionBuilder =
+    RouteBendEvidenceCompanion Function({
+      Value<int> revision,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<DateTime?> deletedAt,
+      required String originDeviceId,
+      required String id,
+      required String projectId,
+      required String routeNodeId,
+      required double radiusMm,
+      required String evidenceKind,
+      Value<String?> sourceRef,
+      required String provenance,
+      Value<int> rowid,
+    });
+typedef $$RouteBendEvidenceTableUpdateCompanionBuilder =
+    RouteBendEvidenceCompanion Function({
+      Value<int> revision,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<String> originDeviceId,
+      Value<String> id,
+      Value<String> projectId,
+      Value<String> routeNodeId,
+      Value<double> radiusMm,
+      Value<String> evidenceKind,
+      Value<String?> sourceRef,
+      Value<String> provenance,
+      Value<int> rowid,
+    });
+
+final class $$RouteBendEvidenceTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $RouteBendEvidenceTable,
+          RouteBendEvidenceRow
+        > {
+  $$RouteBendEvidenceTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProjectsTable _projectIdTable(_$AppDatabase db) =>
+      db.projects.createAlias('route_bend_evidence__project_id__projects__id');
+
+  $$ProjectsTableProcessedTableManager get projectId {
+    final $_column = $_itemColumn<String>('project_id')!;
+
+    final manager = $$ProjectsTableTableManager(
+      $_db,
+      $_db.projects,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_projectIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $CableRouteNodesTable _routeNodeIdTable(_$AppDatabase db) => db
+      .cableRouteNodes
+      .createAlias('route_bend_evidence__route_node_id__cable_route_nodes__id');
+
+  $$CableRouteNodesTableProcessedTableManager get routeNodeId {
+    final $_column = $_itemColumn<String>('route_node_id')!;
+
+    final manager = $$CableRouteNodesTableTableManager(
+      $_db,
+      $_db.cableRouteNodes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_routeNodeIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$RouteBendEvidenceTableFilterComposer
+    extends Composer<_$AppDatabase, $RouteBendEvidenceTable> {
+  $$RouteBendEvidenceTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get revision => $composableBuilder(
+    column: $table.revision,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get radiusMm => $composableBuilder(
+    column: $table.radiusMm,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get evidenceKind => $composableBuilder(
+    column: $table.evidenceKind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sourceRef => $composableBuilder(
+    column: $table.sourceRef,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get provenance => $composableBuilder(
+    column: $table.provenance,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProjectsTableFilterComposer get projectId {
+    final $$ProjectsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableFilterComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CableRouteNodesTableFilterComposer get routeNodeId {
+    final $$CableRouteNodesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.routeNodeId,
+      referencedTable: $db.cableRouteNodes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableRouteNodesTableFilterComposer(
+            $db: $db,
+            $table: $db.cableRouteNodes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$RouteBendEvidenceTableOrderingComposer
+    extends Composer<_$AppDatabase, $RouteBendEvidenceTable> {
+  $$RouteBendEvidenceTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get revision => $composableBuilder(
+    column: $table.revision,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get radiusMm => $composableBuilder(
+    column: $table.radiusMm,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get evidenceKind => $composableBuilder(
+    column: $table.evidenceKind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sourceRef => $composableBuilder(
+    column: $table.sourceRef,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get provenance => $composableBuilder(
+    column: $table.provenance,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProjectsTableOrderingComposer get projectId {
+    final $$ProjectsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableOrderingComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CableRouteNodesTableOrderingComposer get routeNodeId {
+    final $$CableRouteNodesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.routeNodeId,
+      referencedTable: $db.cableRouteNodes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableRouteNodesTableOrderingComposer(
+            $db: $db,
+            $table: $db.cableRouteNodes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$RouteBendEvidenceTableAnnotationComposer
+    extends Composer<_$AppDatabase, $RouteBendEvidenceTable> {
+  $$RouteBendEvidenceTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get revision =>
+      $composableBuilder(column: $table.revision, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<double> get radiusMm =>
+      $composableBuilder(column: $table.radiusMm, builder: (column) => column);
+
+  GeneratedColumn<String> get evidenceKind => $composableBuilder(
+    column: $table.evidenceKind,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get sourceRef =>
+      $composableBuilder(column: $table.sourceRef, builder: (column) => column);
+
+  GeneratedColumn<String> get provenance => $composableBuilder(
+    column: $table.provenance,
+    builder: (column) => column,
+  );
+
+  $$ProjectsTableAnnotationComposer get projectId {
+    final $$ProjectsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CableRouteNodesTableAnnotationComposer get routeNodeId {
+    final $$CableRouteNodesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.routeNodeId,
+      referencedTable: $db.cableRouteNodes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableRouteNodesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.cableRouteNodes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$RouteBendEvidenceTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $RouteBendEvidenceTable,
+          RouteBendEvidenceRow,
+          $$RouteBendEvidenceTableFilterComposer,
+          $$RouteBendEvidenceTableOrderingComposer,
+          $$RouteBendEvidenceTableAnnotationComposer,
+          $$RouteBendEvidenceTableCreateCompanionBuilder,
+          $$RouteBendEvidenceTableUpdateCompanionBuilder,
+          (RouteBendEvidenceRow, $$RouteBendEvidenceTableReferences),
+          RouteBendEvidenceRow,
+          PrefetchHooks Function({bool projectId, bool routeNodeId})
+        > {
+  $$RouteBendEvidenceTableTableManager(
+    _$AppDatabase db,
+    $RouteBendEvidenceTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$RouteBendEvidenceTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer:
+              () => $$RouteBendEvidenceTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer:
+              () => $$RouteBendEvidenceTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> revision = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<String> originDeviceId = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> projectId = const Value.absent(),
+                Value<String> routeNodeId = const Value.absent(),
+                Value<double> radiusMm = const Value.absent(),
+                Value<String> evidenceKind = const Value.absent(),
+                Value<String?> sourceRef = const Value.absent(),
+                Value<String> provenance = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => RouteBendEvidenceCompanion(
+                revision: revision,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                originDeviceId: originDeviceId,
+                id: id,
+                projectId: projectId,
+                routeNodeId: routeNodeId,
+                radiusMm: radiusMm,
+                evidenceKind: evidenceKind,
+                sourceRef: sourceRef,
+                provenance: provenance,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> revision = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<DateTime?> deletedAt = const Value.absent(),
+                required String originDeviceId,
+                required String id,
+                required String projectId,
+                required String routeNodeId,
+                required double radiusMm,
+                required String evidenceKind,
+                Value<String?> sourceRef = const Value.absent(),
+                required String provenance,
+                Value<int> rowid = const Value.absent(),
+              }) => RouteBendEvidenceCompanion.insert(
+                revision: revision,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                originDeviceId: originDeviceId,
+                id: id,
+                projectId: projectId,
+                routeNodeId: routeNodeId,
+                radiusMm: radiusMm,
+                evidenceKind: evidenceKind,
+                sourceRef: sourceRef,
+                provenance: provenance,
+                rowid: rowid,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable<
+                            $RouteBendEvidenceTable,
+                            RouteBendEvidenceRow
+                          >(table),
+                          $$RouteBendEvidenceTableReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: ({projectId = false, routeNodeId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                T extends TableManagerState<
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic
+                >
+              >(state) {
+                if (projectId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.projectId,
+                            referencedTable: $$RouteBendEvidenceTableReferences
+                                ._projectIdTable(db),
+                            referencedColumn:
+                                $$RouteBendEvidenceTableReferences
+                                    ._projectIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+                if (routeNodeId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.routeNodeId,
+                            referencedTable: $$RouteBendEvidenceTableReferences
+                                ._routeNodeIdTable(db),
+                            referencedColumn:
+                                $$RouteBendEvidenceTableReferences
+                                    ._routeNodeIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$RouteBendEvidenceTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $RouteBendEvidenceTable,
+      RouteBendEvidenceRow,
+      $$RouteBendEvidenceTableFilterComposer,
+      $$RouteBendEvidenceTableOrderingComposer,
+      $$RouteBendEvidenceTableAnnotationComposer,
+      $$RouteBendEvidenceTableCreateCompanionBuilder,
+      $$RouteBendEvidenceTableUpdateCompanionBuilder,
+      (RouteBendEvidenceRow, $$RouteBendEvidenceTableReferences),
+      RouteBendEvidenceRow,
+      PrefetchHooks Function({bool projectId, bool routeNodeId})
+    >;
+typedef $$LegacyRouteAdoptionsTableCreateCompanionBuilder =
+    LegacyRouteAdoptionsCompanion Function({
+      required String legacySourceIdentity,
+      required String projectId,
+      required String designRevisionId,
+      required String cableId,
+      required String canonicalCableRunId,
+      required DateTime createdAt,
+      required String originDeviceId,
+      Value<int> rowid,
+    });
+typedef $$LegacyRouteAdoptionsTableUpdateCompanionBuilder =
+    LegacyRouteAdoptionsCompanion Function({
+      Value<String> legacySourceIdentity,
+      Value<String> projectId,
+      Value<String> designRevisionId,
+      Value<String> cableId,
+      Value<String> canonicalCableRunId,
+      Value<DateTime> createdAt,
+      Value<String> originDeviceId,
+      Value<int> rowid,
+    });
+
+final class $$LegacyRouteAdoptionsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $LegacyRouteAdoptionsTable,
+          LegacyRouteAdoptionRow
+        > {
+  $$LegacyRouteAdoptionsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProjectsTable _projectIdTable(_$AppDatabase db) => db.projects
+      .createAlias('legacy_route_adoptions__project_id__projects__id');
+
+  $$ProjectsTableProcessedTableManager get projectId {
+    final $_column = $_itemColumn<String>('project_id')!;
+
+    final manager = $$ProjectsTableTableManager(
+      $_db,
+      $_db.projects,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_projectIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $ProjectDesignRevisionsTable _designRevisionIdTable(
+    _$AppDatabase db,
+  ) => db.projectDesignRevisions.createAlias(
+    'legacy_route_adoptions__design_revision_id__project_design_revisions__id',
+  );
+
+  $$ProjectDesignRevisionsTableProcessedTableManager get designRevisionId {
+    final $_column = $_itemColumn<String>('design_revision_id')!;
+
+    final manager = $$ProjectDesignRevisionsTableTableManager(
+      $_db,
+      $_db.projectDesignRevisions,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_designRevisionIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $ElvCablesTable _cableIdTable(_$AppDatabase db) => db.elvCables
+      .createAlias('legacy_route_adoptions__cable_id__elv_cables__id');
+
+  $$ElvCablesTableProcessedTableManager get cableId {
+    final $_column = $_itemColumn<String>('cable_id')!;
+
+    final manager = $$ElvCablesTableTableManager(
+      $_db,
+      $_db.elvCables,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_cableIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $CanonicalCableRunsTable _canonicalCableRunIdTable(
+    _$AppDatabase db,
+  ) => db.canonicalCableRuns.createAlias(
+    'legacy_route_adoptions__canonical_cable_run_id__canonical_cable_runs__id',
+  );
+
+  $$CanonicalCableRunsTableProcessedTableManager get canonicalCableRunId {
+    final $_column = $_itemColumn<String>('canonical_cable_run_id')!;
+
+    final manager = $$CanonicalCableRunsTableTableManager(
+      $_db,
+      $_db.canonicalCableRuns,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_canonicalCableRunIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$LegacyRouteAdoptionsTableFilterComposer
+    extends Composer<_$AppDatabase, $LegacyRouteAdoptionsTable> {
+  $$LegacyRouteAdoptionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get legacySourceIdentity => $composableBuilder(
+    column: $table.legacySourceIdentity,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProjectsTableFilterComposer get projectId {
+    final $$ProjectsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableFilterComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ProjectDesignRevisionsTableFilterComposer get designRevisionId {
+    final $$ProjectDesignRevisionsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.designRevisionId,
+          referencedTable: $db.projectDesignRevisions,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ProjectDesignRevisionsTableFilterComposer(
+                $db: $db,
+                $table: $db.projectDesignRevisions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$ElvCablesTableFilterComposer get cableId {
+    final $$ElvCablesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.cableId,
+      referencedTable: $db.elvCables,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ElvCablesTableFilterComposer(
+            $db: $db,
+            $table: $db.elvCables,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CanonicalCableRunsTableFilterComposer get canonicalCableRunId {
+    final $$CanonicalCableRunsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.canonicalCableRunId,
+      referencedTable: $db.canonicalCableRuns,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CanonicalCableRunsTableFilterComposer(
+            $db: $db,
+            $table: $db.canonicalCableRuns,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$LegacyRouteAdoptionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $LegacyRouteAdoptionsTable> {
+  $$LegacyRouteAdoptionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get legacySourceIdentity => $composableBuilder(
+    column: $table.legacySourceIdentity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProjectsTableOrderingComposer get projectId {
+    final $$ProjectsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableOrderingComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ProjectDesignRevisionsTableOrderingComposer get designRevisionId {
+    final $$ProjectDesignRevisionsTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.designRevisionId,
+          referencedTable: $db.projectDesignRevisions,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ProjectDesignRevisionsTableOrderingComposer(
+                $db: $db,
+                $table: $db.projectDesignRevisions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$ElvCablesTableOrderingComposer get cableId {
+    final $$ElvCablesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.cableId,
+      referencedTable: $db.elvCables,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ElvCablesTableOrderingComposer(
+            $db: $db,
+            $table: $db.elvCables,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CanonicalCableRunsTableOrderingComposer get canonicalCableRunId {
+    final $$CanonicalCableRunsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.canonicalCableRunId,
+      referencedTable: $db.canonicalCableRuns,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CanonicalCableRunsTableOrderingComposer(
+            $db: $db,
+            $table: $db.canonicalCableRuns,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$LegacyRouteAdoptionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $LegacyRouteAdoptionsTable> {
+  $$LegacyRouteAdoptionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get legacySourceIdentity => $composableBuilder(
+    column: $table.legacySourceIdentity,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => column,
+  );
+
+  $$ProjectsTableAnnotationComposer get projectId {
+    final $$ProjectsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ProjectDesignRevisionsTableAnnotationComposer get designRevisionId {
+    final $$ProjectDesignRevisionsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.designRevisionId,
+          referencedTable: $db.projectDesignRevisions,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ProjectDesignRevisionsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.projectDesignRevisions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$ElvCablesTableAnnotationComposer get cableId {
+    final $$ElvCablesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.cableId,
+      referencedTable: $db.elvCables,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ElvCablesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.elvCables,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CanonicalCableRunsTableAnnotationComposer get canonicalCableRunId {
+    final $$CanonicalCableRunsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.canonicalCableRunId,
+          referencedTable: $db.canonicalCableRuns,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CanonicalCableRunsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.canonicalCableRuns,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$LegacyRouteAdoptionsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $LegacyRouteAdoptionsTable,
+          LegacyRouteAdoptionRow,
+          $$LegacyRouteAdoptionsTableFilterComposer,
+          $$LegacyRouteAdoptionsTableOrderingComposer,
+          $$LegacyRouteAdoptionsTableAnnotationComposer,
+          $$LegacyRouteAdoptionsTableCreateCompanionBuilder,
+          $$LegacyRouteAdoptionsTableUpdateCompanionBuilder,
+          (LegacyRouteAdoptionRow, $$LegacyRouteAdoptionsTableReferences),
+          LegacyRouteAdoptionRow,
+          PrefetchHooks Function({
+            bool projectId,
+            bool designRevisionId,
+            bool cableId,
+            bool canonicalCableRunId,
+          })
+        > {
+  $$LegacyRouteAdoptionsTableTableManager(
+    _$AppDatabase db,
+    $LegacyRouteAdoptionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$LegacyRouteAdoptionsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer:
+              () => $$LegacyRouteAdoptionsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer:
+              () => $$LegacyRouteAdoptionsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> legacySourceIdentity = const Value.absent(),
+                Value<String> projectId = const Value.absent(),
+                Value<String> designRevisionId = const Value.absent(),
+                Value<String> cableId = const Value.absent(),
+                Value<String> canonicalCableRunId = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<String> originDeviceId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => LegacyRouteAdoptionsCompanion(
+                legacySourceIdentity: legacySourceIdentity,
+                projectId: projectId,
+                designRevisionId: designRevisionId,
+                cableId: cableId,
+                canonicalCableRunId: canonicalCableRunId,
+                createdAt: createdAt,
+                originDeviceId: originDeviceId,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String legacySourceIdentity,
+                required String projectId,
+                required String designRevisionId,
+                required String cableId,
+                required String canonicalCableRunId,
+                required DateTime createdAt,
+                required String originDeviceId,
+                Value<int> rowid = const Value.absent(),
+              }) => LegacyRouteAdoptionsCompanion.insert(
+                legacySourceIdentity: legacySourceIdentity,
+                projectId: projectId,
+                designRevisionId: designRevisionId,
+                cableId: cableId,
+                canonicalCableRunId: canonicalCableRunId,
+                createdAt: createdAt,
+                originDeviceId: originDeviceId,
+                rowid: rowid,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable<
+                            $LegacyRouteAdoptionsTable,
+                            LegacyRouteAdoptionRow
+                          >(table),
+                          $$LegacyRouteAdoptionsTableReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: ({
+            projectId = false,
+            designRevisionId = false,
+            cableId = false,
+            canonicalCableRunId = false,
+          }) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                T extends TableManagerState<
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic
+                >
+              >(state) {
+                if (projectId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.projectId,
+                            referencedTable:
+                                $$LegacyRouteAdoptionsTableReferences
+                                    ._projectIdTable(db),
+                            referencedColumn:
+                                $$LegacyRouteAdoptionsTableReferences
+                                    ._projectIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+                if (designRevisionId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.designRevisionId,
+                            referencedTable:
+                                $$LegacyRouteAdoptionsTableReferences
+                                    ._designRevisionIdTable(db),
+                            referencedColumn:
+                                $$LegacyRouteAdoptionsTableReferences
+                                    ._designRevisionIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+                if (cableId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.cableId,
+                            referencedTable:
+                                $$LegacyRouteAdoptionsTableReferences
+                                    ._cableIdTable(db),
+                            referencedColumn:
+                                $$LegacyRouteAdoptionsTableReferences
+                                    ._cableIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+                if (canonicalCableRunId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.canonicalCableRunId,
+                            referencedTable:
+                                $$LegacyRouteAdoptionsTableReferences
+                                    ._canonicalCableRunIdTable(db),
+                            referencedColumn:
+                                $$LegacyRouteAdoptionsTableReferences
+                                    ._canonicalCableRunIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$LegacyRouteAdoptionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $LegacyRouteAdoptionsTable,
+      LegacyRouteAdoptionRow,
+      $$LegacyRouteAdoptionsTableFilterComposer,
+      $$LegacyRouteAdoptionsTableOrderingComposer,
+      $$LegacyRouteAdoptionsTableAnnotationComposer,
+      $$LegacyRouteAdoptionsTableCreateCompanionBuilder,
+      $$LegacyRouteAdoptionsTableUpdateCompanionBuilder,
+      (LegacyRouteAdoptionRow, $$LegacyRouteAdoptionsTableReferences),
+      LegacyRouteAdoptionRow,
+      PrefetchHooks Function({
+        bool projectId,
+        bool designRevisionId,
+        bool cableId,
+        bool canonicalCableRunId,
+      })
+    >;
+typedef $$PathwayContextsTableCreateCompanionBuilder =
+    PathwayContextsCompanion Function({
+      Value<int> revision,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<DateTime?> deletedAt,
+      required String originDeviceId,
+      required String id,
+      required String projectId,
+      required String kind,
+      required String hostType,
+      required String hostJson,
+      Value<String?> parentContextId,
+      Value<String?> provenance,
+      required String lifecycleState,
+      Value<int> rowid,
+    });
+typedef $$PathwayContextsTableUpdateCompanionBuilder =
+    PathwayContextsCompanion Function({
+      Value<int> revision,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<String> originDeviceId,
+      Value<String> id,
+      Value<String> projectId,
+      Value<String> kind,
+      Value<String> hostType,
+      Value<String> hostJson,
+      Value<String?> parentContextId,
+      Value<String?> provenance,
+      Value<String> lifecycleState,
+      Value<int> rowid,
+    });
+
+final class $$PathwayContextsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $PathwayContextsTable,
+          PathwayContextRow
+        > {
+  $$PathwayContextsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProjectsTable _projectIdTable(_$AppDatabase db) =>
+      db.projects.createAlias('pathway_contexts__project_id__projects__id');
+
+  $$ProjectsTableProcessedTableManager get projectId {
+    final $_column = $_itemColumn<String>('project_id')!;
+
+    final manager = $$ProjectsTableTableManager(
+      $_db,
+      $_db.projects,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_projectIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $PathwayContextsTable _parentContextIdTable(_$AppDatabase db) => db
+      .pathwayContexts
+      .createAlias('pathway_contexts__parent_context_id__pathway_contexts__id');
+
+  $$PathwayContextsTableProcessedTableManager? get parentContextId {
+    final $_column = $_itemColumn<String>('parent_context_id');
+    if ($_column == null) return null;
+    final manager = $$PathwayContextsTableTableManager(
+      $_db,
+      $_db.pathwayContexts,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_parentContextIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$PhysicalCarriersTable, List<PhysicalCarrierRow>>
+  _physicalCarriersRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.physicalCarriers,
+    aliasName: 'pathway_contexts__id__physical_carriers__pathway_context_id',
+  );
+
+  $$PhysicalCarriersTableProcessedTableManager get physicalCarriersRefs {
+    final manager = $$PhysicalCarriersTableTableManager(
+      $_db,
+      $_db.physicalCarriers,
+    ).filter(
+      (f) => f.pathwayContextId.id.sqlEquals($_itemColumn<String>('id')!),
+    );
+
+    final cache = $_typedResult.readTableOrNull(
+      _physicalCarriersRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$PathwayContextsTableFilterComposer
+    extends Composer<_$AppDatabase, $PathwayContextsTable> {
+  $$PathwayContextsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get revision => $composableBuilder(
+    column: $table.revision,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get hostType => $composableBuilder(
+    column: $table.hostType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get hostJson => $composableBuilder(
+    column: $table.hostJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get provenance => $composableBuilder(
+    column: $table.provenance,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lifecycleState => $composableBuilder(
+    column: $table.lifecycleState,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProjectsTableFilterComposer get projectId {
+    final $$ProjectsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableFilterComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PathwayContextsTableFilterComposer get parentContextId {
+    final $$PathwayContextsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.parentContextId,
+      referencedTable: $db.pathwayContexts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PathwayContextsTableFilterComposer(
+            $db: $db,
+            $table: $db.pathwayContexts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> physicalCarriersRefs(
+    Expression<bool> Function($$PhysicalCarriersTableFilterComposer f) f,
+  ) {
+    final $$PhysicalCarriersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.physicalCarriers,
+      getReferencedColumn: (t) => t.pathwayContextId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PhysicalCarriersTableFilterComposer(
+            $db: $db,
+            $table: $db.physicalCarriers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$PathwayContextsTableOrderingComposer
+    extends Composer<_$AppDatabase, $PathwayContextsTable> {
+  $$PathwayContextsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get revision => $composableBuilder(
+    column: $table.revision,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get hostType => $composableBuilder(
+    column: $table.hostType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get hostJson => $composableBuilder(
+    column: $table.hostJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get provenance => $composableBuilder(
+    column: $table.provenance,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get lifecycleState => $composableBuilder(
+    column: $table.lifecycleState,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProjectsTableOrderingComposer get projectId {
+    final $$ProjectsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableOrderingComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PathwayContextsTableOrderingComposer get parentContextId {
+    final $$PathwayContextsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.parentContextId,
+      referencedTable: $db.pathwayContexts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PathwayContextsTableOrderingComposer(
+            $db: $db,
+            $table: $db.pathwayContexts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PathwayContextsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PathwayContextsTable> {
+  $$PathwayContextsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get revision =>
+      $composableBuilder(column: $table.revision, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<String> get hostType =>
+      $composableBuilder(column: $table.hostType, builder: (column) => column);
+
+  GeneratedColumn<String> get hostJson =>
+      $composableBuilder(column: $table.hostJson, builder: (column) => column);
+
+  GeneratedColumn<String> get provenance => $composableBuilder(
+    column: $table.provenance,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get lifecycleState => $composableBuilder(
+    column: $table.lifecycleState,
+    builder: (column) => column,
+  );
+
+  $$ProjectsTableAnnotationComposer get projectId {
+    final $$ProjectsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PathwayContextsTableAnnotationComposer get parentContextId {
+    final $$PathwayContextsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.parentContextId,
+      referencedTable: $db.pathwayContexts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PathwayContextsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.pathwayContexts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> physicalCarriersRefs<T extends Object>(
+    Expression<T> Function($$PhysicalCarriersTableAnnotationComposer a) f,
+  ) {
+    final $$PhysicalCarriersTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.physicalCarriers,
+      getReferencedColumn: (t) => t.pathwayContextId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PhysicalCarriersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.physicalCarriers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$PathwayContextsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PathwayContextsTable,
+          PathwayContextRow,
+          $$PathwayContextsTableFilterComposer,
+          $$PathwayContextsTableOrderingComposer,
+          $$PathwayContextsTableAnnotationComposer,
+          $$PathwayContextsTableCreateCompanionBuilder,
+          $$PathwayContextsTableUpdateCompanionBuilder,
+          (PathwayContextRow, $$PathwayContextsTableReferences),
+          PathwayContextRow,
+          PrefetchHooks Function({
+            bool projectId,
+            bool parentContextId,
+            bool physicalCarriersRefs,
+          })
+        > {
+  $$PathwayContextsTableTableManager(
+    _$AppDatabase db,
+    $PathwayContextsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () =>
+                  $$PathwayContextsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer:
+              () => $$PathwayContextsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer:
+              () => $$PathwayContextsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> revision = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<String> originDeviceId = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> projectId = const Value.absent(),
+                Value<String> kind = const Value.absent(),
+                Value<String> hostType = const Value.absent(),
+                Value<String> hostJson = const Value.absent(),
+                Value<String?> parentContextId = const Value.absent(),
+                Value<String?> provenance = const Value.absent(),
+                Value<String> lifecycleState = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PathwayContextsCompanion(
+                revision: revision,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                originDeviceId: originDeviceId,
+                id: id,
+                projectId: projectId,
+                kind: kind,
+                hostType: hostType,
+                hostJson: hostJson,
+                parentContextId: parentContextId,
+                provenance: provenance,
+                lifecycleState: lifecycleState,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> revision = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<DateTime?> deletedAt = const Value.absent(),
+                required String originDeviceId,
+                required String id,
+                required String projectId,
+                required String kind,
+                required String hostType,
+                required String hostJson,
+                Value<String?> parentContextId = const Value.absent(),
+                Value<String?> provenance = const Value.absent(),
+                required String lifecycleState,
+                Value<int> rowid = const Value.absent(),
+              }) => PathwayContextsCompanion.insert(
+                revision: revision,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                originDeviceId: originDeviceId,
+                id: id,
+                projectId: projectId,
+                kind: kind,
+                hostType: hostType,
+                hostJson: hostJson,
+                parentContextId: parentContextId,
+                provenance: provenance,
+                lifecycleState: lifecycleState,
+                rowid: rowid,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable<$PathwayContextsTable, PathwayContextRow>(
+                            table,
+                          ),
+                          $$PathwayContextsTableReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: ({
+            projectId = false,
+            parentContextId = false,
+            physicalCarriersRefs = false,
+          }) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (physicalCarriersRefs) db.physicalCarriers,
+              ],
+              addJoins: <
+                T extends TableManagerState<
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic
+                >
+              >(state) {
+                if (projectId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.projectId,
+                            referencedTable: $$PathwayContextsTableReferences
+                                ._projectIdTable(db),
+                            referencedColumn:
+                                $$PathwayContextsTableReferences
+                                    ._projectIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+                if (parentContextId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.parentContextId,
+                            referencedTable: $$PathwayContextsTableReferences
+                                ._parentContextIdTable(db),
+                            referencedColumn:
+                                $$PathwayContextsTableReferences
+                                    ._parentContextIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (physicalCarriersRefs)
+                    await $_getPrefetchedData<
+                      PathwayContextRow,
+                      $PathwayContextsTable,
+                      PhysicalCarrierRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$PathwayContextsTableReferences
+                          ._physicalCarriersRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$PathwayContextsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).physicalCarriersRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.pathwayContextId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$PathwayContextsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PathwayContextsTable,
+      PathwayContextRow,
+      $$PathwayContextsTableFilterComposer,
+      $$PathwayContextsTableOrderingComposer,
+      $$PathwayContextsTableAnnotationComposer,
+      $$PathwayContextsTableCreateCompanionBuilder,
+      $$PathwayContextsTableUpdateCompanionBuilder,
+      (PathwayContextRow, $$PathwayContextsTableReferences),
+      PathwayContextRow,
+      PrefetchHooks Function({
+        bool projectId,
+        bool parentContextId,
+        bool physicalCarriersRefs,
+      })
+    >;
+typedef $$PhysicalCarriersTableCreateCompanionBuilder =
+    PhysicalCarriersCompanion Function({
+      Value<int> revision,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<DateTime?> deletedAt,
+      required String originDeviceId,
+      required String id,
+      required String projectId,
+      required String pathwayContextId,
+      required String code,
+      required String normalizedCode,
+      required String name,
+      required String kind,
+      required String payloadJson,
+      required String lifecycleState,
+      Value<int> rowid,
+    });
+typedef $$PhysicalCarriersTableUpdateCompanionBuilder =
+    PhysicalCarriersCompanion Function({
+      Value<int> revision,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<String> originDeviceId,
+      Value<String> id,
+      Value<String> projectId,
+      Value<String> pathwayContextId,
+      Value<String> code,
+      Value<String> normalizedCode,
+      Value<String> name,
+      Value<String> kind,
+      Value<String> payloadJson,
+      Value<String> lifecycleState,
+      Value<int> rowid,
+    });
+
+final class $$PhysicalCarriersTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $PhysicalCarriersTable,
+          PhysicalCarrierRow
+        > {
+  $$PhysicalCarriersTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProjectsTable _projectIdTable(_$AppDatabase db) =>
+      db.projects.createAlias('physical_carriers__project_id__projects__id');
+
+  $$ProjectsTableProcessedTableManager get projectId {
+    final $_column = $_itemColumn<String>('project_id')!;
+
+    final manager = $$ProjectsTableTableManager(
+      $_db,
+      $_db.projects,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_projectIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $PathwayContextsTable _pathwayContextIdTable(_$AppDatabase db) =>
+      db.pathwayContexts.createAlias(
+        'physical_carriers__pathway_context_id__pathway_contexts__id',
+      );
+
+  $$PathwayContextsTableProcessedTableManager get pathwayContextId {
+    final $_column = $_itemColumn<String>('pathway_context_id')!;
+
+    final manager = $$PathwayContextsTableTableManager(
+      $_db,
+      $_db.pathwayContexts,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_pathwayContextIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $PhysicalCarrierCompartmentsTable,
+    List<PhysicalCarrierCompartmentRow>
+  >
+  _physicalCarrierCompartmentsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.physicalCarrierCompartments,
+        aliasName:
+            'physical_carriers__id__physical_carrier_compartments__carrier_id',
+      );
+
+  $$PhysicalCarrierCompartmentsTableProcessedTableManager
+  get physicalCarrierCompartmentsRefs {
+    final manager = $$PhysicalCarrierCompartmentsTableTableManager(
+      $_db,
+      $_db.physicalCarrierCompartments,
+    ).filter((f) => f.carrierId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _physicalCarrierCompartmentsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $TraversalCarrierAssignmentsTable,
+    List<TraversalCarrierAssignmentRow>
+  >
+  _traversalCarrierAssignmentsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.traversalCarrierAssignments,
+        aliasName:
+            'physical_carriers__id__traversal_carrier_assignments__carrier_id',
+      );
+
+  $$TraversalCarrierAssignmentsTableProcessedTableManager
+  get traversalCarrierAssignmentsRefs {
+    final manager = $$TraversalCarrierAssignmentsTableTableManager(
+      $_db,
+      $_db.traversalCarrierAssignments,
+    ).filter((f) => f.carrierId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _traversalCarrierAssignmentsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$PhysicalCarriersTableFilterComposer
+    extends Composer<_$AppDatabase, $PhysicalCarriersTable> {
+  $$PhysicalCarriersTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get revision => $composableBuilder(
+    column: $table.revision,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get normalizedCode => $composableBuilder(
+    column: $table.normalizedCode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payloadJson => $composableBuilder(
+    column: $table.payloadJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lifecycleState => $composableBuilder(
+    column: $table.lifecycleState,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProjectsTableFilterComposer get projectId {
+    final $$ProjectsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableFilterComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PathwayContextsTableFilterComposer get pathwayContextId {
+    final $$PathwayContextsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.pathwayContextId,
+      referencedTable: $db.pathwayContexts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PathwayContextsTableFilterComposer(
+            $db: $db,
+            $table: $db.pathwayContexts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> physicalCarrierCompartmentsRefs(
+    Expression<bool> Function(
+      $$PhysicalCarrierCompartmentsTableFilterComposer f,
+    )
+    f,
+  ) {
+    final $$PhysicalCarrierCompartmentsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.physicalCarrierCompartments,
+          getReferencedColumn: (t) => t.carrierId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$PhysicalCarrierCompartmentsTableFilterComposer(
+                $db: $db,
+                $table: $db.physicalCarrierCompartments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> traversalCarrierAssignmentsRefs(
+    Expression<bool> Function(
+      $$TraversalCarrierAssignmentsTableFilterComposer f,
+    )
+    f,
+  ) {
+    final $$TraversalCarrierAssignmentsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.traversalCarrierAssignments,
+          getReferencedColumn: (t) => t.carrierId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$TraversalCarrierAssignmentsTableFilterComposer(
+                $db: $db,
+                $table: $db.traversalCarrierAssignments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$PhysicalCarriersTableOrderingComposer
+    extends Composer<_$AppDatabase, $PhysicalCarriersTable> {
+  $$PhysicalCarriersTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get revision => $composableBuilder(
+    column: $table.revision,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get normalizedCode => $composableBuilder(
+    column: $table.normalizedCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get payloadJson => $composableBuilder(
+    column: $table.payloadJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get lifecycleState => $composableBuilder(
+    column: $table.lifecycleState,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProjectsTableOrderingComposer get projectId {
+    final $$ProjectsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableOrderingComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PathwayContextsTableOrderingComposer get pathwayContextId {
+    final $$PathwayContextsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.pathwayContextId,
+      referencedTable: $db.pathwayContexts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PathwayContextsTableOrderingComposer(
+            $db: $db,
+            $table: $db.pathwayContexts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PhysicalCarriersTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PhysicalCarriersTable> {
+  $$PhysicalCarriersTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get revision =>
+      $composableBuilder(column: $table.revision, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get code =>
+      $composableBuilder(column: $table.code, builder: (column) => column);
+
+  GeneratedColumn<String> get normalizedCode => $composableBuilder(
+    column: $table.normalizedCode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<String> get payloadJson => $composableBuilder(
+    column: $table.payloadJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get lifecycleState => $composableBuilder(
+    column: $table.lifecycleState,
+    builder: (column) => column,
+  );
+
+  $$ProjectsTableAnnotationComposer get projectId {
+    final $$ProjectsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PathwayContextsTableAnnotationComposer get pathwayContextId {
+    final $$PathwayContextsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.pathwayContextId,
+      referencedTable: $db.pathwayContexts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PathwayContextsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.pathwayContexts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> physicalCarrierCompartmentsRefs<T extends Object>(
+    Expression<T> Function(
+      $$PhysicalCarrierCompartmentsTableAnnotationComposer a,
+    )
+    f,
+  ) {
+    final $$PhysicalCarrierCompartmentsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.physicalCarrierCompartments,
+          getReferencedColumn: (t) => t.carrierId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$PhysicalCarrierCompartmentsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.physicalCarrierCompartments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> traversalCarrierAssignmentsRefs<T extends Object>(
+    Expression<T> Function(
+      $$TraversalCarrierAssignmentsTableAnnotationComposer a,
+    )
+    f,
+  ) {
+    final $$TraversalCarrierAssignmentsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.traversalCarrierAssignments,
+          getReferencedColumn: (t) => t.carrierId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$TraversalCarrierAssignmentsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.traversalCarrierAssignments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$PhysicalCarriersTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PhysicalCarriersTable,
+          PhysicalCarrierRow,
+          $$PhysicalCarriersTableFilterComposer,
+          $$PhysicalCarriersTableOrderingComposer,
+          $$PhysicalCarriersTableAnnotationComposer,
+          $$PhysicalCarriersTableCreateCompanionBuilder,
+          $$PhysicalCarriersTableUpdateCompanionBuilder,
+          (PhysicalCarrierRow, $$PhysicalCarriersTableReferences),
+          PhysicalCarrierRow,
+          PrefetchHooks Function({
+            bool projectId,
+            bool pathwayContextId,
+            bool physicalCarrierCompartmentsRefs,
+            bool traversalCarrierAssignmentsRefs,
+          })
+        > {
+  $$PhysicalCarriersTableTableManager(
+    _$AppDatabase db,
+    $PhysicalCarriersTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () =>
+                  $$PhysicalCarriersTableFilterComposer($db: db, $table: table),
+          createOrderingComposer:
+              () => $$PhysicalCarriersTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer:
+              () => $$PhysicalCarriersTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> revision = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<String> originDeviceId = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> projectId = const Value.absent(),
+                Value<String> pathwayContextId = const Value.absent(),
+                Value<String> code = const Value.absent(),
+                Value<String> normalizedCode = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> kind = const Value.absent(),
+                Value<String> payloadJson = const Value.absent(),
+                Value<String> lifecycleState = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PhysicalCarriersCompanion(
+                revision: revision,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                originDeviceId: originDeviceId,
+                id: id,
+                projectId: projectId,
+                pathwayContextId: pathwayContextId,
+                code: code,
+                normalizedCode: normalizedCode,
+                name: name,
+                kind: kind,
+                payloadJson: payloadJson,
+                lifecycleState: lifecycleState,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> revision = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<DateTime?> deletedAt = const Value.absent(),
+                required String originDeviceId,
+                required String id,
+                required String projectId,
+                required String pathwayContextId,
+                required String code,
+                required String normalizedCode,
+                required String name,
+                required String kind,
+                required String payloadJson,
+                required String lifecycleState,
+                Value<int> rowid = const Value.absent(),
+              }) => PhysicalCarriersCompanion.insert(
+                revision: revision,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                originDeviceId: originDeviceId,
+                id: id,
+                projectId: projectId,
+                pathwayContextId: pathwayContextId,
+                code: code,
+                normalizedCode: normalizedCode,
+                name: name,
+                kind: kind,
+                payloadJson: payloadJson,
+                lifecycleState: lifecycleState,
+                rowid: rowid,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable<
+                            $PhysicalCarriersTable,
+                            PhysicalCarrierRow
+                          >(table),
+                          $$PhysicalCarriersTableReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: ({
+            projectId = false,
+            pathwayContextId = false,
+            physicalCarrierCompartmentsRefs = false,
+            traversalCarrierAssignmentsRefs = false,
+          }) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (physicalCarrierCompartmentsRefs)
+                  db.physicalCarrierCompartments,
+                if (traversalCarrierAssignmentsRefs)
+                  db.traversalCarrierAssignments,
+              ],
+              addJoins: <
+                T extends TableManagerState<
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic
+                >
+              >(state) {
+                if (projectId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.projectId,
+                            referencedTable: $$PhysicalCarriersTableReferences
+                                ._projectIdTable(db),
+                            referencedColumn:
+                                $$PhysicalCarriersTableReferences
+                                    ._projectIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+                if (pathwayContextId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.pathwayContextId,
+                            referencedTable: $$PhysicalCarriersTableReferences
+                                ._pathwayContextIdTable(db),
+                            referencedColumn:
+                                $$PhysicalCarriersTableReferences
+                                    ._pathwayContextIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (physicalCarrierCompartmentsRefs)
+                    await $_getPrefetchedData<
+                      PhysicalCarrierRow,
+                      $PhysicalCarriersTable,
+                      PhysicalCarrierCompartmentRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$PhysicalCarriersTableReferences
+                          ._physicalCarrierCompartmentsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$PhysicalCarriersTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).physicalCarrierCompartmentsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.carrierId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                  if (traversalCarrierAssignmentsRefs)
+                    await $_getPrefetchedData<
+                      PhysicalCarrierRow,
+                      $PhysicalCarriersTable,
+                      TraversalCarrierAssignmentRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$PhysicalCarriersTableReferences
+                          ._traversalCarrierAssignmentsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$PhysicalCarriersTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).traversalCarrierAssignmentsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.carrierId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$PhysicalCarriersTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PhysicalCarriersTable,
+      PhysicalCarrierRow,
+      $$PhysicalCarriersTableFilterComposer,
+      $$PhysicalCarriersTableOrderingComposer,
+      $$PhysicalCarriersTableAnnotationComposer,
+      $$PhysicalCarriersTableCreateCompanionBuilder,
+      $$PhysicalCarriersTableUpdateCompanionBuilder,
+      (PhysicalCarrierRow, $$PhysicalCarriersTableReferences),
+      PhysicalCarrierRow,
+      PrefetchHooks Function({
+        bool projectId,
+        bool pathwayContextId,
+        bool physicalCarrierCompartmentsRefs,
+        bool traversalCarrierAssignmentsRefs,
+      })
+    >;
+typedef $$PhysicalCarrierCompartmentsTableCreateCompanionBuilder =
+    PhysicalCarrierCompartmentsCompanion Function({
+      Value<int> revision,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<DateTime?> deletedAt,
+      required String originDeviceId,
+      required String id,
+      required String carrierId,
+      required String code,
+      required String normalizedCode,
+      required int sequence,
+      required String payloadJson,
+      required String lifecycleState,
+      Value<int> rowid,
+    });
+typedef $$PhysicalCarrierCompartmentsTableUpdateCompanionBuilder =
+    PhysicalCarrierCompartmentsCompanion Function({
+      Value<int> revision,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<String> originDeviceId,
+      Value<String> id,
+      Value<String> carrierId,
+      Value<String> code,
+      Value<String> normalizedCode,
+      Value<int> sequence,
+      Value<String> payloadJson,
+      Value<String> lifecycleState,
+      Value<int> rowid,
+    });
+
+final class $$PhysicalCarrierCompartmentsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $PhysicalCarrierCompartmentsTable,
+          PhysicalCarrierCompartmentRow
+        > {
+  $$PhysicalCarrierCompartmentsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $PhysicalCarriersTable _carrierIdTable(_$AppDatabase db) =>
+      db.physicalCarriers.createAlias(
+        'physical_carrier_compartments__carrier_id__physical_carriers__id',
+      );
+
+  $$PhysicalCarriersTableProcessedTableManager get carrierId {
+    final $_column = $_itemColumn<String>('carrier_id')!;
+
+    final manager = $$PhysicalCarriersTableTableManager(
+      $_db,
+      $_db.physicalCarriers,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_carrierIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $TraversalCarrierAssignmentsTable,
+    List<TraversalCarrierAssignmentRow>
+  >
+  _traversalCarrierAssignmentsRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.traversalCarrierAssignments,
+    aliasName:
+        'physical_carrier_compartments__id__traversal_carrier_assignments__compartment_id',
+  );
+
+  $$TraversalCarrierAssignmentsTableProcessedTableManager
+  get traversalCarrierAssignmentsRefs {
+    final manager = $$TraversalCarrierAssignmentsTableTableManager(
+      $_db,
+      $_db.traversalCarrierAssignments,
+    ).filter((f) => f.compartmentId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _traversalCarrierAssignmentsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$PhysicalCarrierCompartmentsTableFilterComposer
+    extends Composer<_$AppDatabase, $PhysicalCarrierCompartmentsTable> {
+  $$PhysicalCarrierCompartmentsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get revision => $composableBuilder(
+    column: $table.revision,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get normalizedCode => $composableBuilder(
+    column: $table.normalizedCode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sequence => $composableBuilder(
+    column: $table.sequence,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payloadJson => $composableBuilder(
+    column: $table.payloadJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lifecycleState => $composableBuilder(
+    column: $table.lifecycleState,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$PhysicalCarriersTableFilterComposer get carrierId {
+    final $$PhysicalCarriersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.carrierId,
+      referencedTable: $db.physicalCarriers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PhysicalCarriersTableFilterComposer(
+            $db: $db,
+            $table: $db.physicalCarriers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> traversalCarrierAssignmentsRefs(
+    Expression<bool> Function(
+      $$TraversalCarrierAssignmentsTableFilterComposer f,
+    )
+    f,
+  ) {
+    final $$TraversalCarrierAssignmentsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.traversalCarrierAssignments,
+          getReferencedColumn: (t) => t.compartmentId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$TraversalCarrierAssignmentsTableFilterComposer(
+                $db: $db,
+                $table: $db.traversalCarrierAssignments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$PhysicalCarrierCompartmentsTableOrderingComposer
+    extends Composer<_$AppDatabase, $PhysicalCarrierCompartmentsTable> {
+  $$PhysicalCarrierCompartmentsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get revision => $composableBuilder(
+    column: $table.revision,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get normalizedCode => $composableBuilder(
+    column: $table.normalizedCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sequence => $composableBuilder(
+    column: $table.sequence,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get payloadJson => $composableBuilder(
+    column: $table.payloadJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get lifecycleState => $composableBuilder(
+    column: $table.lifecycleState,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$PhysicalCarriersTableOrderingComposer get carrierId {
+    final $$PhysicalCarriersTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.carrierId,
+      referencedTable: $db.physicalCarriers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PhysicalCarriersTableOrderingComposer(
+            $db: $db,
+            $table: $db.physicalCarriers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PhysicalCarrierCompartmentsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PhysicalCarrierCompartmentsTable> {
+  $$PhysicalCarrierCompartmentsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get revision =>
+      $composableBuilder(column: $table.revision, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get code =>
+      $composableBuilder(column: $table.code, builder: (column) => column);
+
+  GeneratedColumn<String> get normalizedCode => $composableBuilder(
+    column: $table.normalizedCode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get sequence =>
+      $composableBuilder(column: $table.sequence, builder: (column) => column);
+
+  GeneratedColumn<String> get payloadJson => $composableBuilder(
+    column: $table.payloadJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get lifecycleState => $composableBuilder(
+    column: $table.lifecycleState,
+    builder: (column) => column,
+  );
+
+  $$PhysicalCarriersTableAnnotationComposer get carrierId {
+    final $$PhysicalCarriersTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.carrierId,
+      referencedTable: $db.physicalCarriers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PhysicalCarriersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.physicalCarriers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> traversalCarrierAssignmentsRefs<T extends Object>(
+    Expression<T> Function(
+      $$TraversalCarrierAssignmentsTableAnnotationComposer a,
+    )
+    f,
+  ) {
+    final $$TraversalCarrierAssignmentsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.traversalCarrierAssignments,
+          getReferencedColumn: (t) => t.compartmentId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$TraversalCarrierAssignmentsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.traversalCarrierAssignments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$PhysicalCarrierCompartmentsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PhysicalCarrierCompartmentsTable,
+          PhysicalCarrierCompartmentRow,
+          $$PhysicalCarrierCompartmentsTableFilterComposer,
+          $$PhysicalCarrierCompartmentsTableOrderingComposer,
+          $$PhysicalCarrierCompartmentsTableAnnotationComposer,
+          $$PhysicalCarrierCompartmentsTableCreateCompanionBuilder,
+          $$PhysicalCarrierCompartmentsTableUpdateCompanionBuilder,
+          (
+            PhysicalCarrierCompartmentRow,
+            $$PhysicalCarrierCompartmentsTableReferences,
+          ),
+          PhysicalCarrierCompartmentRow,
+          PrefetchHooks Function({
+            bool carrierId,
+            bool traversalCarrierAssignmentsRefs,
+          })
+        > {
+  $$PhysicalCarrierCompartmentsTableTableManager(
+    _$AppDatabase db,
+    $PhysicalCarrierCompartmentsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$PhysicalCarrierCompartmentsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer:
+              () => $$PhysicalCarrierCompartmentsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer:
+              () => $$PhysicalCarrierCompartmentsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> revision = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<String> originDeviceId = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> carrierId = const Value.absent(),
+                Value<String> code = const Value.absent(),
+                Value<String> normalizedCode = const Value.absent(),
+                Value<int> sequence = const Value.absent(),
+                Value<String> payloadJson = const Value.absent(),
+                Value<String> lifecycleState = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PhysicalCarrierCompartmentsCompanion(
+                revision: revision,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                originDeviceId: originDeviceId,
+                id: id,
+                carrierId: carrierId,
+                code: code,
+                normalizedCode: normalizedCode,
+                sequence: sequence,
+                payloadJson: payloadJson,
+                lifecycleState: lifecycleState,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> revision = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<DateTime?> deletedAt = const Value.absent(),
+                required String originDeviceId,
+                required String id,
+                required String carrierId,
+                required String code,
+                required String normalizedCode,
+                required int sequence,
+                required String payloadJson,
+                required String lifecycleState,
+                Value<int> rowid = const Value.absent(),
+              }) => PhysicalCarrierCompartmentsCompanion.insert(
+                revision: revision,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                originDeviceId: originDeviceId,
+                id: id,
+                carrierId: carrierId,
+                code: code,
+                normalizedCode: normalizedCode,
+                sequence: sequence,
+                payloadJson: payloadJson,
+                lifecycleState: lifecycleState,
+                rowid: rowid,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable<
+                            $PhysicalCarrierCompartmentsTable,
+                            PhysicalCarrierCompartmentRow
+                          >(table),
+                          $$PhysicalCarrierCompartmentsTableReferences(
+                            db,
+                            table,
+                            e,
+                          ),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: ({
+            carrierId = false,
+            traversalCarrierAssignmentsRefs = false,
+          }) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (traversalCarrierAssignmentsRefs)
+                  db.traversalCarrierAssignments,
+              ],
+              addJoins: <
+                T extends TableManagerState<
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic
+                >
+              >(state) {
+                if (carrierId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.carrierId,
+                            referencedTable:
+                                $$PhysicalCarrierCompartmentsTableReferences
+                                    ._carrierIdTable(db),
+                            referencedColumn:
+                                $$PhysicalCarrierCompartmentsTableReferences
+                                    ._carrierIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (traversalCarrierAssignmentsRefs)
+                    await $_getPrefetchedData<
+                      PhysicalCarrierCompartmentRow,
+                      $PhysicalCarrierCompartmentsTable,
+                      TraversalCarrierAssignmentRow
+                    >(
+                      currentTable: table,
+                      referencedTable:
+                          $$PhysicalCarrierCompartmentsTableReferences
+                              ._traversalCarrierAssignmentsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$PhysicalCarrierCompartmentsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).traversalCarrierAssignmentsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.compartmentId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$PhysicalCarrierCompartmentsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PhysicalCarrierCompartmentsTable,
+      PhysicalCarrierCompartmentRow,
+      $$PhysicalCarrierCompartmentsTableFilterComposer,
+      $$PhysicalCarrierCompartmentsTableOrderingComposer,
+      $$PhysicalCarrierCompartmentsTableAnnotationComposer,
+      $$PhysicalCarrierCompartmentsTableCreateCompanionBuilder,
+      $$PhysicalCarrierCompartmentsTableUpdateCompanionBuilder,
+      (
+        PhysicalCarrierCompartmentRow,
+        $$PhysicalCarrierCompartmentsTableReferences,
+      ),
+      PhysicalCarrierCompartmentRow,
+      PrefetchHooks Function({
+        bool carrierId,
+        bool traversalCarrierAssignmentsRefs,
+      })
+    >;
+typedef $$TraversalCarrierAssignmentsTableCreateCompanionBuilder =
+    TraversalCarrierAssignmentsCompanion Function({
+      Value<int> revision,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<DateTime?> deletedAt,
+      required String originDeviceId,
+      required String traversalId,
+      required String cableRunId,
+      required String projectId,
+      required String designRevisionId,
+      required String carrierId,
+      Value<String?> compartmentId,
+      Value<int> rowid,
+    });
+typedef $$TraversalCarrierAssignmentsTableUpdateCompanionBuilder =
+    TraversalCarrierAssignmentsCompanion Function({
+      Value<int> revision,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<DateTime?> deletedAt,
+      Value<String> originDeviceId,
+      Value<String> traversalId,
+      Value<String> cableRunId,
+      Value<String> projectId,
+      Value<String> designRevisionId,
+      Value<String> carrierId,
+      Value<String?> compartmentId,
+      Value<int> rowid,
+    });
+
+final class $$TraversalCarrierAssignmentsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $TraversalCarrierAssignmentsTable,
+          TraversalCarrierAssignmentRow
+        > {
+  $$TraversalCarrierAssignmentsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $CableRunTraversalsTable _traversalIdTable(_$AppDatabase db) =>
+      db.cableRunTraversals.createAlias(
+        'traversal_carrier_assignments__traversal_id__cable_run_traversals__id',
+      );
+
+  $$CableRunTraversalsTableProcessedTableManager get traversalId {
+    final $_column = $_itemColumn<String>('traversal_id')!;
+
+    final manager = $$CableRunTraversalsTableTableManager(
+      $_db,
+      $_db.cableRunTraversals,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_traversalIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $CanonicalCableRunsTable _cableRunIdTable(_$AppDatabase db) =>
+      db.canonicalCableRuns.createAlias(
+        'traversal_carrier_assignments__cable_run_id__canonical_cable_runs__id',
+      );
+
+  $$CanonicalCableRunsTableProcessedTableManager get cableRunId {
+    final $_column = $_itemColumn<String>('cable_run_id')!;
+
+    final manager = $$CanonicalCableRunsTableTableManager(
+      $_db,
+      $_db.canonicalCableRuns,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_cableRunIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $ProjectsTable _projectIdTable(_$AppDatabase db) => db.projects
+      .createAlias('traversal_carrier_assignments__project_id__projects__id');
+
+  $$ProjectsTableProcessedTableManager get projectId {
+    final $_column = $_itemColumn<String>('project_id')!;
+
+    final manager = $$ProjectsTableTableManager(
+      $_db,
+      $_db.projects,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_projectIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $ProjectDesignRevisionsTable _designRevisionIdTable(
+    _$AppDatabase db,
+  ) => db.projectDesignRevisions.createAlias(
+    'traversal_carrier_assignments__design_revision_id__project_design_revisions__id',
+  );
+
+  $$ProjectDesignRevisionsTableProcessedTableManager get designRevisionId {
+    final $_column = $_itemColumn<String>('design_revision_id')!;
+
+    final manager = $$ProjectDesignRevisionsTableTableManager(
+      $_db,
+      $_db.projectDesignRevisions,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_designRevisionIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $PhysicalCarriersTable _carrierIdTable(_$AppDatabase db) =>
+      db.physicalCarriers.createAlias(
+        'traversal_carrier_assignments__carrier_id__physical_carriers__id',
+      );
+
+  $$PhysicalCarriersTableProcessedTableManager get carrierId {
+    final $_column = $_itemColumn<String>('carrier_id')!;
+
+    final manager = $$PhysicalCarriersTableTableManager(
+      $_db,
+      $_db.physicalCarriers,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_carrierIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $PhysicalCarrierCompartmentsTable _compartmentIdTable(
+    _$AppDatabase db,
+  ) => db.physicalCarrierCompartments.createAlias(
+    'traversal_carrier_assignments__compartment_id__physical_carrier_compartments__id',
+  );
+
+  $$PhysicalCarrierCompartmentsTableProcessedTableManager? get compartmentId {
+    final $_column = $_itemColumn<String>('compartment_id');
+    if ($_column == null) return null;
+    final manager = $$PhysicalCarrierCompartmentsTableTableManager(
+      $_db,
+      $_db.physicalCarrierCompartments,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_compartmentIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$TraversalCarrierAssignmentsTableFilterComposer
+    extends Composer<_$AppDatabase, $TraversalCarrierAssignmentsTable> {
+  $$TraversalCarrierAssignmentsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get revision => $composableBuilder(
+    column: $table.revision,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$CableRunTraversalsTableFilterComposer get traversalId {
+    final $$CableRunTraversalsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.traversalId,
+      referencedTable: $db.cableRunTraversals,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableRunTraversalsTableFilterComposer(
+            $db: $db,
+            $table: $db.cableRunTraversals,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CanonicalCableRunsTableFilterComposer get cableRunId {
+    final $$CanonicalCableRunsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.cableRunId,
+      referencedTable: $db.canonicalCableRuns,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CanonicalCableRunsTableFilterComposer(
+            $db: $db,
+            $table: $db.canonicalCableRuns,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ProjectsTableFilterComposer get projectId {
+    final $$ProjectsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableFilterComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ProjectDesignRevisionsTableFilterComposer get designRevisionId {
+    final $$ProjectDesignRevisionsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.designRevisionId,
+          referencedTable: $db.projectDesignRevisions,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ProjectDesignRevisionsTableFilterComposer(
+                $db: $db,
+                $table: $db.projectDesignRevisions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$PhysicalCarriersTableFilterComposer get carrierId {
+    final $$PhysicalCarriersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.carrierId,
+      referencedTable: $db.physicalCarriers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PhysicalCarriersTableFilterComposer(
+            $db: $db,
+            $table: $db.physicalCarriers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PhysicalCarrierCompartmentsTableFilterComposer get compartmentId {
+    final $$PhysicalCarrierCompartmentsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.compartmentId,
+          referencedTable: $db.physicalCarrierCompartments,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$PhysicalCarrierCompartmentsTableFilterComposer(
+                $db: $db,
+                $table: $db.physicalCarrierCompartments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$TraversalCarrierAssignmentsTableOrderingComposer
+    extends Composer<_$AppDatabase, $TraversalCarrierAssignmentsTable> {
+  $$TraversalCarrierAssignmentsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get revision => $composableBuilder(
+    column: $table.revision,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$CableRunTraversalsTableOrderingComposer get traversalId {
+    final $$CableRunTraversalsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.traversalId,
+      referencedTable: $db.cableRunTraversals,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CableRunTraversalsTableOrderingComposer(
+            $db: $db,
+            $table: $db.cableRunTraversals,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CanonicalCableRunsTableOrderingComposer get cableRunId {
+    final $$CanonicalCableRunsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.cableRunId,
+      referencedTable: $db.canonicalCableRuns,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CanonicalCableRunsTableOrderingComposer(
+            $db: $db,
+            $table: $db.canonicalCableRuns,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ProjectsTableOrderingComposer get projectId {
+    final $$ProjectsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableOrderingComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ProjectDesignRevisionsTableOrderingComposer get designRevisionId {
+    final $$ProjectDesignRevisionsTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.designRevisionId,
+          referencedTable: $db.projectDesignRevisions,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ProjectDesignRevisionsTableOrderingComposer(
+                $db: $db,
+                $table: $db.projectDesignRevisions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$PhysicalCarriersTableOrderingComposer get carrierId {
+    final $$PhysicalCarriersTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.carrierId,
+      referencedTable: $db.physicalCarriers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PhysicalCarriersTableOrderingComposer(
+            $db: $db,
+            $table: $db.physicalCarriers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PhysicalCarrierCompartmentsTableOrderingComposer get compartmentId {
+    final $$PhysicalCarrierCompartmentsTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.compartmentId,
+          referencedTable: $db.physicalCarrierCompartments,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$PhysicalCarrierCompartmentsTableOrderingComposer(
+                $db: $db,
+                $table: $db.physicalCarrierCompartments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$TraversalCarrierAssignmentsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $TraversalCarrierAssignmentsTable> {
+  $$TraversalCarrierAssignmentsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get revision =>
+      $composableBuilder(column: $table.revision, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get originDeviceId => $composableBuilder(
+    column: $table.originDeviceId,
+    builder: (column) => column,
+  );
+
+  $$CableRunTraversalsTableAnnotationComposer get traversalId {
+    final $$CableRunTraversalsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.traversalId,
+          referencedTable: $db.cableRunTraversals,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CableRunTraversalsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.cableRunTraversals,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$CanonicalCableRunsTableAnnotationComposer get cableRunId {
+    final $$CanonicalCableRunsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.cableRunId,
+          referencedTable: $db.canonicalCableRuns,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$CanonicalCableRunsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.canonicalCableRuns,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$ProjectsTableAnnotationComposer get projectId {
+    final $$ProjectsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.projectId,
+      referencedTable: $db.projects,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjectsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.projects,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ProjectDesignRevisionsTableAnnotationComposer get designRevisionId {
+    final $$ProjectDesignRevisionsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.designRevisionId,
+          referencedTable: $db.projectDesignRevisions,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ProjectDesignRevisionsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.projectDesignRevisions,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  $$PhysicalCarriersTableAnnotationComposer get carrierId {
+    final $$PhysicalCarriersTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.carrierId,
+      referencedTable: $db.physicalCarriers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PhysicalCarriersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.physicalCarriers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PhysicalCarrierCompartmentsTableAnnotationComposer get compartmentId {
+    final $$PhysicalCarrierCompartmentsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.compartmentId,
+          referencedTable: $db.physicalCarrierCompartments,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$PhysicalCarrierCompartmentsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.physicalCarrierCompartments,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$TraversalCarrierAssignmentsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $TraversalCarrierAssignmentsTable,
+          TraversalCarrierAssignmentRow,
+          $$TraversalCarrierAssignmentsTableFilterComposer,
+          $$TraversalCarrierAssignmentsTableOrderingComposer,
+          $$TraversalCarrierAssignmentsTableAnnotationComposer,
+          $$TraversalCarrierAssignmentsTableCreateCompanionBuilder,
+          $$TraversalCarrierAssignmentsTableUpdateCompanionBuilder,
+          (
+            TraversalCarrierAssignmentRow,
+            $$TraversalCarrierAssignmentsTableReferences,
+          ),
+          TraversalCarrierAssignmentRow,
+          PrefetchHooks Function({
+            bool traversalId,
+            bool cableRunId,
+            bool projectId,
+            bool designRevisionId,
+            bool carrierId,
+            bool compartmentId,
+          })
+        > {
+  $$TraversalCarrierAssignmentsTableTableManager(
+    _$AppDatabase db,
+    $TraversalCarrierAssignmentsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$TraversalCarrierAssignmentsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer:
+              () => $$TraversalCarrierAssignmentsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer:
+              () => $$TraversalCarrierAssignmentsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> revision = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<String> originDeviceId = const Value.absent(),
+                Value<String> traversalId = const Value.absent(),
+                Value<String> cableRunId = const Value.absent(),
+                Value<String> projectId = const Value.absent(),
+                Value<String> designRevisionId = const Value.absent(),
+                Value<String> carrierId = const Value.absent(),
+                Value<String?> compartmentId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TraversalCarrierAssignmentsCompanion(
+                revision: revision,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                originDeviceId: originDeviceId,
+                traversalId: traversalId,
+                cableRunId: cableRunId,
+                projectId: projectId,
+                designRevisionId: designRevisionId,
+                carrierId: carrierId,
+                compartmentId: compartmentId,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> revision = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<DateTime?> deletedAt = const Value.absent(),
+                required String originDeviceId,
+                required String traversalId,
+                required String cableRunId,
+                required String projectId,
+                required String designRevisionId,
+                required String carrierId,
+                Value<String?> compartmentId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TraversalCarrierAssignmentsCompanion.insert(
+                revision: revision,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                deletedAt: deletedAt,
+                originDeviceId: originDeviceId,
+                traversalId: traversalId,
+                cableRunId: cableRunId,
+                projectId: projectId,
+                designRevisionId: designRevisionId,
+                carrierId: carrierId,
+                compartmentId: compartmentId,
+                rowid: rowid,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable<
+                            $TraversalCarrierAssignmentsTable,
+                            TraversalCarrierAssignmentRow
+                          >(table),
+                          $$TraversalCarrierAssignmentsTableReferences(
+                            db,
+                            table,
+                            e,
+                          ),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: ({
+            traversalId = false,
+            cableRunId = false,
+            projectId = false,
+            designRevisionId = false,
+            carrierId = false,
+            compartmentId = false,
+          }) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                T extends TableManagerState<
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic,
+                  dynamic
+                >
+              >(state) {
+                if (traversalId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.traversalId,
+                            referencedTable:
+                                $$TraversalCarrierAssignmentsTableReferences
+                                    ._traversalIdTable(db),
+                            referencedColumn:
+                                $$TraversalCarrierAssignmentsTableReferences
+                                    ._traversalIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+                if (cableRunId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.cableRunId,
+                            referencedTable:
+                                $$TraversalCarrierAssignmentsTableReferences
+                                    ._cableRunIdTable(db),
+                            referencedColumn:
+                                $$TraversalCarrierAssignmentsTableReferences
+                                    ._cableRunIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+                if (projectId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.projectId,
+                            referencedTable:
+                                $$TraversalCarrierAssignmentsTableReferences
+                                    ._projectIdTable(db),
+                            referencedColumn:
+                                $$TraversalCarrierAssignmentsTableReferences
+                                    ._projectIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+                if (designRevisionId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.designRevisionId,
+                            referencedTable:
+                                $$TraversalCarrierAssignmentsTableReferences
+                                    ._designRevisionIdTable(db),
+                            referencedColumn:
+                                $$TraversalCarrierAssignmentsTableReferences
+                                    ._designRevisionIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+                if (carrierId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.carrierId,
+                            referencedTable:
+                                $$TraversalCarrierAssignmentsTableReferences
+                                    ._carrierIdTable(db),
+                            referencedColumn:
+                                $$TraversalCarrierAssignmentsTableReferences
+                                    ._carrierIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+                if (compartmentId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.compartmentId,
+                            referencedTable:
+                                $$TraversalCarrierAssignmentsTableReferences
+                                    ._compartmentIdTable(db),
+                            referencedColumn:
+                                $$TraversalCarrierAssignmentsTableReferences
+                                    ._compartmentIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$TraversalCarrierAssignmentsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $TraversalCarrierAssignmentsTable,
+      TraversalCarrierAssignmentRow,
+      $$TraversalCarrierAssignmentsTableFilterComposer,
+      $$TraversalCarrierAssignmentsTableOrderingComposer,
+      $$TraversalCarrierAssignmentsTableAnnotationComposer,
+      $$TraversalCarrierAssignmentsTableCreateCompanionBuilder,
+      $$TraversalCarrierAssignmentsTableUpdateCompanionBuilder,
+      (
+        TraversalCarrierAssignmentRow,
+        $$TraversalCarrierAssignmentsTableReferences,
+      ),
+      TraversalCarrierAssignmentRow,
+      PrefetchHooks Function({
+        bool traversalId,
+        bool cableRunId,
+        bool projectId,
+        bool designRevisionId,
+        bool carrierId,
+        bool compartmentId,
+      })
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -75999,5 +94253,42 @@ class $AppDatabaseManager {
       $$CommandExecutionRecordsTableTableManager(
         _db,
         _db.commandExecutionRecords,
+      );
+  $$ProjectDesignRevisionsTableTableManager get projectDesignRevisions =>
+      $$ProjectDesignRevisionsTableTableManager(
+        _db,
+        _db.projectDesignRevisions,
+      );
+  $$DesignRevisionPhysicalSnapshotsTableTableManager
+  get designRevisionPhysicalSnapshots =>
+      $$DesignRevisionPhysicalSnapshotsTableTableManager(
+        _db,
+        _db.designRevisionPhysicalSnapshots,
+      );
+  $$CanonicalCableRunsTableTableManager get canonicalCableRuns =>
+      $$CanonicalCableRunsTableTableManager(_db, _db.canonicalCableRuns);
+  $$CableRunTraversalsTableTableManager get cableRunTraversals =>
+      $$CableRunTraversalsTableTableManager(_db, _db.cableRunTraversals);
+  $$RouteHandoffsTableTableManager get routeHandoffs =>
+      $$RouteHandoffsTableTableManager(_db, _db.routeHandoffs);
+  $$RouteBendEvidenceTableTableManager get routeBendEvidence =>
+      $$RouteBendEvidenceTableTableManager(_db, _db.routeBendEvidence);
+  $$LegacyRouteAdoptionsTableTableManager get legacyRouteAdoptions =>
+      $$LegacyRouteAdoptionsTableTableManager(_db, _db.legacyRouteAdoptions);
+  $$PathwayContextsTableTableManager get pathwayContexts =>
+      $$PathwayContextsTableTableManager(_db, _db.pathwayContexts);
+  $$PhysicalCarriersTableTableManager get physicalCarriers =>
+      $$PhysicalCarriersTableTableManager(_db, _db.physicalCarriers);
+  $$PhysicalCarrierCompartmentsTableTableManager
+  get physicalCarrierCompartments =>
+      $$PhysicalCarrierCompartmentsTableTableManager(
+        _db,
+        _db.physicalCarrierCompartments,
+      );
+  $$TraversalCarrierAssignmentsTableTableManager
+  get traversalCarrierAssignments =>
+      $$TraversalCarrierAssignmentsTableTableManager(
+        _db,
+        _db.traversalCarrierAssignments,
       );
 }
