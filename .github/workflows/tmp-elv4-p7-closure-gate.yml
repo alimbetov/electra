@@ -1,0 +1,70 @@
+name: Temporary ELV4 P7 Closure Gate
+
+on:
+  push:
+    branches:
+      - feat/flutter-elv4-power-topology-design
+    paths:
+      - .github/workflows/tmp-elv4-p7-closure-gate.yml
+      - apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart
+      - apps/mobile/lib/application/power_workspace_state.dart
+      - apps/mobile/test/data/elv4_p7_runtime_test.dart
+      - apps/mobile/test/application/power_workspace_state_test.dart
+      - apps/mobile/test/data/elv4_p2_persistence_test.dart
+
+permissions:
+  contents: write
+
+jobs:
+  p7-closure:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Install mobile dependencies
+        run: flutter pub get --enforce-lockfile
+      - name: Generate Drift code
+        run: dart run build_runner build
+      - name: Format P7 closure slice
+        working-directory: .
+        run: |
+          dart format \
+            apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart \
+            apps/mobile/lib/application/power_workspace_state.dart \
+            apps/mobile/test/data/elv4_p7_runtime_test.dart \
+            apps/mobile/test/application/power_workspace_state_test.dart
+      - name: Analyze mobile app
+        run: flutter analyze
+      - name: Test P7 closure and P2 persistence regression
+        run: |
+          flutter test \
+            test/data/elv4_p7_runtime_test.dart \
+            test/application/power_workspace_state_test.dart \
+            test/data/elv4_p2_persistence_test.dart
+      - name: Commit formatter output
+        working-directory: .
+        run: |
+          if git diff --quiet -- \
+            apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart \
+            apps/mobile/lib/application/power_workspace_state.dart \
+            apps/mobile/test/data/elv4_p7_runtime_test.dart \
+            apps/mobile/test/application/power_workspace_state_test.dart; then
+            exit 0
+          fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add \
+            apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart \
+            apps/mobile/lib/application/power_workspace_state.dart \
+            apps/mobile/test/data/elv4_p7_runtime_test.dart \
+            apps/mobile/test/application/power_workspace_state_test.dart
+          git commit -m "style(elv4): format P7 closure slice"
+          git push origin HEAD:${{ github.ref_name }}
