@@ -79,6 +79,88 @@ jobs:
               'PowerRational.fromFraction(1, 5)',
               'PowerRational(BigInt.one, BigInt.from(5))',
           )
+          call_anchor = """      final frozen = await builder.revisions.freeze(\n"""
+          call = """      await _publishVerticalEvidence(builder, db);\n      expect(\n        await _countWhere(\n          db,\n          'power_evaluation_pointers',\n          \"state = 'CURRENT'\",\n        ),\n        4,\n      );\n\n      final frozen = await builder.revisions.freeze(\n"""
+          if '_publishVerticalEvidence(builder, db)' not in text:
+              text = text.replace(call_anchor, call, 1)
+          helper = r'''
+
+Future<void> _publishVerticalEvidence(
+  Elv4QualificationBuilder builder,
+  AppDatabase db,
+) async {
+  final runtime = DriftPowerPublicationRuntime(
+    db,
+    originDeviceId: 'qualification',
+    now: () => DateTime.utc(2026, 10, 15, 21, 15),
+  );
+  final cases = <(String, String, String, String)>[
+    ('CCTV', 'NORMAL', 'cctv-camera', 'LOAD-CCTV_CAMERA_LOAD'),
+    ('LAN', 'NORMAL', 'lan-pd', 'LOAD-LAN_PD_LOAD'),
+    ('ACS', 'ACS_BACKUP', 'acs-controller', 'SCENARIO-ACS-BACKUP'),
+    ('FIRE', 'FIRE_SEQUENCE', 'fire-panel', 'SCENARIO-FIRE-SEQUENCE'),
+  ];
+  for (final item in cases) {
+    final node = PowerNodeKeyV2(
+      revisionId: builder.revisionId,
+      scenarioId: item.$2,
+      scopeKind: PowerEvaluationScopeKind.segment,
+      scopeId: '${item.$1}-QUALIFICATION',
+      processCode: PowerProcessCode.pwr01,
+      subjectKind: 'COMPONENT',
+      subjectId: item.$3,
+    );
+    final fact = builder.dependency(item.$4, purpose: 'QUALIFICATION_INPUT');
+    final input = PowerConsumedInput(
+      algorithmVersion: 'elv4-p8-qualification-v1',
+      inputSchemaVersion: 'electra.elv4-p8-qualification-input.v1',
+      numericPolicyVersion: powerNumericPolicyVersion,
+      facts: [
+        PowerConsumedFact.present(
+          key: fact,
+          valueSchema: 'electra.elv4-p8-qualification-fact.v1',
+          value: {
+            'discipline': item.$1,
+            'entityId': fact.entityId,
+            'purpose': fact.purpose,
+          },
+        ),
+      ],
+      evaluations: const [],
+    );
+    final capture = await runtime.captureForCalculation(
+      projectId: builder.projectId,
+      designRevisionId: builder.revisionId,
+      targetNodeKey: node,
+      captureInput: () async => input,
+    );
+    final evidence = PowerEvaluationEvidence(
+      evaluationId: 'P8-${item.$1}-PWR01',
+      nodeKey: node,
+      algorithmVersion: input.algorithmVersion,
+      inputSchemaVersion: input.inputSchemaVersion,
+      outputSchemaVersion: 'electra.elv4-p8-qualification-output.v1',
+      numericPolicyVersion: input.numericPolicyVersion,
+      inputFingerprint: input.inputFingerprint,
+      status: PowerEvaluationStatus.pass,
+      applicability: PowerEvaluationApplicability.applicable,
+      inputs: {'dependencyKeys': input.dependencyKeys},
+      output: {'qualified': true, 'discipline': item.$1},
+      dependencies: const [],
+    );
+    final receipt = await runtime.publishGuarded(
+      capture: capture,
+      evidence: evidence,
+      operationId: 'p8-qualify-${item.$1.toLowerCase()}',
+      commandFingerprint: sha256HexUtf8('p8-qualify-${item.$1}'),
+      recaptureInput: () async => input,
+    );
+    expect(receipt.replayed, isFalse);
+  }
+}
+'''
+          if 'Future<void> _publishVerticalEvidence(' not in text:
+              text += helper
           test.write_text(text)
           PY
       - name: Format P8 public qualification
