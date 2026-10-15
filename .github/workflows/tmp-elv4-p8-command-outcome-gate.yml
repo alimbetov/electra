@@ -1,0 +1,54 @@
+name: ELV4 P8 Command Outcome Gate
+
+on:
+  push:
+    branches:
+      - feat/flutter-elv4-power-topology-design
+    paths:
+      - .github/workflows/tmp-elv4-p8-command-outcome-gate.yml
+      - scripts/ci/apply-elv4-p8-command-outcomes.py
+      - apps/mobile/test/data/elv4_p8_command_outcome_durability_test.dart
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/flutter-elv4-power-topology-design
+          fetch-depth: 0
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Install mobile dependencies
+        working-directory: apps/mobile
+        run: flutter pub get
+      - name: Apply P8 command outcome patch
+        run: python3 scripts/ci/apply-elv4-p8-command-outcomes.py
+      - name: Format changed Dart sources
+        working-directory: apps/mobile
+        run: dart format lib/data/repositories/drift_elv_runtime_support.dart lib/data/repositories/drift_elv_design_revision_repository.dart test/data/elv4_p8_command_outcome_durability_test.dart
+      - name: Analyze mobile
+        working-directory: apps/mobile
+        run: flutter analyze
+      - name: Run P8 command outcome acceptance
+        working-directory: apps/mobile
+        run: flutter test test/data/elv4_p8_command_outcome_durability_test.dart test/data/elv4_p8_idempotency_race_acceptance_test.dart test/data/elv4_p8_failure_race_acceptance_test.dart test/data/elv4_p8_freeze_historical_invariance_test.dart
+      - name: Commit verified implementation
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            apps/mobile/lib/data/repositories/drift_elv_runtime_support.dart \
+            apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart \
+            apps/mobile/test/data/elv4_p8_command_outcome_durability_test.dart
+          if git diff --cached --quiet; then
+            echo 'No implementation diff to commit.'
+            exit 0
+          fi
+          git commit -m 'fix(elv4): persist deterministic freeze rejections'
+          git push origin HEAD:feat/flutter-elv4-power-topology-design
