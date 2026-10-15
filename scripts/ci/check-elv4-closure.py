@@ -5,6 +5,9 @@ Source/test paths and a green technical run alone never certify qualification.
 Historical audit reports are deliberately not edited or treated as live status.
 """
 import argparse
+import datetime
+import hashlib
+import os
 import json
 from pathlib import Path
 import re
@@ -99,11 +102,29 @@ def check_acceptance(ledger, closure, technical, qualification, source_sha):
     require(set(technical['phases']) == PHASES and
             all(v == 'PASS' for v in technical['phases'].values()), 'Incomplete technical gate')
     check_qualification(read(BASE / 'qualification.json'), qualification, source_sha)
-    require(all(r['runtimeStatus'] == 'ACCEPTED' and r['testedSha'] == source_sha
-                for r in ledger['requirements']), 'Requirements not accepted at exact source')
-    accepted = [e for e in closure['events'] if e['event'] == 'RUNTIME_ACCEPTED']
-    require(accepted and accepted[-1]['sourceSha'] == source_sha and
-            accepted[-1]['evidenceRefs'] and accepted[-1]['timestamp'], 'No explicit RUNTIME_ACCEPTED event')
+    # The committed ledger may reference a previous tested source. Requiring it
+    # to embed its own final commit SHA would make closure impossible. Current
+    # execution evidence lives in the run artifact, outside the source tree.
+    require(all(r['runtimeStatus'] in {'IMPLEMENTED', 'ACCEPTED'} and
+                not r['openFindingIds'] for r in ledger['requirements']),
+            'Committed requirements still contain implementation gaps')
+    results = qualification['requirementResults']
+    expected = {r['requirementId'] for r in ledger['requirements']}
+    require(len(results) == len(expected) and
+            {r['requirementId'] for r in results} == expected,
+            'Missing, duplicate or unexpected executed requirement result')
+    require(all(r['status'] == 'PASS' and isinstance(r['evidenceRefs'], list) and
+                r['evidenceRefs'] and all(isinstance(ref, str) and ref.strip()
+                                         for ref in r['evidenceRefs'])
+                for r in results), 'Requirement execution lacks passing evidence')
+    digest = lambda value: hashlib.sha256(json.dumps(
+        value, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+    return {'event': 'RUNTIME_ACCEPTED', 'sourceSha': source_sha,
+            'timestamp': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            'workflowRunId': os.getenv('GITHUB_RUN_ID'),
+            'evidenceRefs': {'technicalReportSha256': digest(technical),
+                             'qualificationReportSha256': digest(qualification)}}
+
 
 
 def main():
@@ -111,17 +132,20 @@ def main():
     parser.add_argument('--require-accepted', action='store_true')
     parser.add_argument('--technical-report', type=Path)
     parser.add_argument('--qualification-report', type=Path)
+    parser.add_argument('--acceptance-output', type=Path)
     args = parser.parse_args()
     ledger, closure = read(BASE / 'requirements.json'), read(BASE / 'closure.json')
     check_reconciliation(ledger, closure)
     print('PASS: 80 requirement mappings, explicit gaps, source/test paths, CI cleanup')
     if args.require_accepted:
         source_sha = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
-        check_acceptance(ledger, closure,
+        event = check_acceptance(ledger, closure,
                          read(args.technical_report) if args.technical_report else None,
                          read(args.qualification_report) if args.qualification_report else None,
                          source_sha)
-        print('RUNTIME_ACCEPTED: exact-head technical and qualification reports verified')
+        if args.acceptance_output:
+            args.acceptance_output.write_text(json.dumps(event, indent=2) + '\n')
+        print(json.dumps(event, indent=2))
     else:
         print('Runtime acceptance: PENDING; reconciliation PASS is not runtime acceptance')
 

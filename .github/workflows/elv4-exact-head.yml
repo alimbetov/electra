@@ -56,8 +56,15 @@ jobs:
         env:
           REPORT_DIR: ${{ runner.temp }}/elv4-exact-head
         run: |
-          args=(--require-accepted --technical-report "$REPORT_DIR/technical-report.json")
+          args=(--require-accepted --technical-report "$REPORT_DIR/technical-report.json" --acceptance-output "$REPORT_DIR/runtime-acceptance.json")
           if [[ -f "$REPORT_DIR/qualification-report.json" ]]; then
             args+=(--qualification-report "$REPORT_DIR/qualification-report.json")
           fi
           python3 scripts/ci/check-elv4-closure.py "${args[@]}"
+      - name: Preserve accepted event separately from source
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: elv4-runtime-accepted-${{ github.event.pull_request.head.sha || github.sha }}
+          path: ${{ runner.temp }}/elv4-exact-head/runtime-acceptance.json
+          if-no-files-found: error

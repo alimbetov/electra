@@ -69,3 +69,14 @@ Current outcome: all 80 rows reconciled to source/tests, with concrete blocking 
 ## Remediation closure interpretation
 
 A finding is SPEC_RESOLVED only when all linked governing/shared/package contracts and wire/qualification artifacts agree. It stays RUNTIME_NOT_IMPLEMENTED until source and RMxx-T evidence pass. Consume qualification.json as the sole positive process×dimension gate; required UNRESOLVED/BLOCKED/NOT_CALCULATED prevents closure. Recheck all existing result consumers for RM01 and both revision creation/port writer paths for RM03/RM07/RM10. Historical audit reports remain immutable evidence of the old design; later remediation status is recorded separately.
+
+## Exact-head evidence storage
+
+The committed ledger records implementation and earlier executed evidence. It
+cannot embed its own final Git SHA. The current run's qualification report must
+also contain `requirementResults`: exactly the 80 requirement IDs, each with
+`status: PASS` and nonempty `evidenceRefs`. The closure validator verifies these,
+the seven-case process/context/dimension matrix, the technical report's SHA and
+all blocking dispositions before emitting a timestamped `RUNTIME_ACCEPTED`
+event into a separate CI artifact. The source ledger's prior `testedSha` is not
+misrepresented as the new run. MERGED and CLOSED remain separate later events.

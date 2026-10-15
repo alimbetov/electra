@@ -54,6 +54,29 @@ class ClosureGateTest(unittest.TestCase):
             with self.assertRaises((ValueError, KeyError)):
                 closure.check_qualification(self.manifest, report, self.sha)
 
+    def test_acceptance_uses_current_run_evidence_without_source_self_reference(self):
+        record = closure.read(closure.BASE / 'closure.json')
+        for finding in record['findings']:
+            finding['status'] = 'RESOLVED'
+        ledger = closure.read(closure.BASE / 'requirements.json')
+        for requirement in ledger['requirements']:
+            requirement.update(runtimeStatus='IMPLEMENTED', openFindingIds=[])
+            # Historical testedSha stays different from the current run SHA.
+            self.assertNotEqual(requirement['testedSha'], self.sha)
+        self.report['requirementResults'] = [
+            dict(requirementId=r['requirementId'], status='PASS',
+                 evidenceRefs=['executed-test:' + r['requirementId']])
+            for r in ledger['requirements']]
+        technical = dict(sourceSha=self.sha, technicalResult='PASS',
+                         phases={p: 'PASS' for p in closure.PHASES})
+        event = closure.check_acceptance(ledger, record, technical, self.report, self.sha)
+        self.assertEqual(event['sourceSha'], self.sha)
+        self.assertEqual(event['event'], 'RUNTIME_ACCEPTED')
+        self.assertTrue(event['evidenceRefs'])
+        self.report['requirementResults'].pop()
+        with self.assertRaises(ValueError):
+            closure.check_acceptance(ledger, record, technical, self.report, self.sha)
+
     def test_open_findings_prevent_acceptance_even_with_green_reports(self):
         record = closure.read(closure.BASE / 'closure.json')
         ledger = closure.read(closure.BASE / 'requirements.json')
