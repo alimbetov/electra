@@ -1,0 +1,78 @@
+name: Temporary ELV4 P5 Closure Gate
+
+on:
+  push:
+    branches:
+      - feat/flutter-elv4-power-topology-design
+    paths:
+      - .github/workflows/tmp-elv4-p5-closure-gate.yml
+      - packages/engineering_core/lib/engineering_core.dart
+      - packages/engineering_core/lib/src/power_dependency.dart
+      - packages/engineering_core/lib/src/poe_evidence.dart
+      - packages/engineering_core/lib/src/power_bottom_up_evidence.dart
+      - packages/engineering_core/lib/src/poe_orchestration.dart
+      - packages/engineering_core/lib/src/power_load_evidence.dart
+      - packages/engineering_core/test/power_dependency_test.dart
+      - packages/engineering_core/test/poe_evidence_test.dart
+      - packages/engineering_core/test/poe_orchestration_test.dart
+
+permissions:
+  contents: write
+
+jobs:
+  p5-closure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+      - name: Install engineering core dependencies
+        working-directory: packages/engineering_core
+        run: dart pub get
+      - name: Format P5 closure slice
+        run: |
+          dart format \
+            packages/engineering_core/lib/engineering_core.dart \
+            packages/engineering_core/lib/src/power_dependency.dart \
+            packages/engineering_core/lib/src/poe_evidence.dart \
+            packages/engineering_core/lib/src/power_bottom_up_evidence.dart \
+            packages/engineering_core/lib/src/poe_orchestration.dart \
+            packages/engineering_core/lib/src/power_load_evidence.dart \
+            packages/engineering_core/test/power_dependency_test.dart \
+            packages/engineering_core/test/poe_evidence_test.dart \
+            packages/engineering_core/test/poe_orchestration_test.dart
+      - name: Analyze engineering core
+        working-directory: packages/engineering_core
+        run: dart analyze
+      - name: Test P5 closure and adjacent boundaries
+        working-directory: packages/engineering_core
+        run: |
+          dart test \
+            test/power_dependency_test.dart \
+            test/poe_evidence_test.dart \
+            test/poe_orchestration_test.dart \
+            test/poe_evaluation_test.dart \
+            test/power_bottom_up_evaluation_test.dart \
+            test/power_load_evidence_test.dart
+      - name: Commit formatter output
+        run: |
+          if git diff --quiet; then
+            exit 0
+          fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add \
+            packages/engineering_core/lib/engineering_core.dart \
+            packages/engineering_core/lib/src/power_dependency.dart \
+            packages/engineering_core/lib/src/poe_evidence.dart \
+            packages/engineering_core/lib/src/power_bottom_up_evidence.dart \
+            packages/engineering_core/lib/src/poe_orchestration.dart \
+            packages/engineering_core/lib/src/power_load_evidence.dart \
+            packages/engineering_core/test/power_dependency_test.dart \
+            packages/engineering_core/test/poe_evidence_test.dart \
+            packages/engineering_core/test/poe_orchestration_test.dart
+          git commit -m "style(elv4): format P5 closure slice"
+          git push origin HEAD:${{ github.ref_name }}
