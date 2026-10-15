@@ -5,6 +5,7 @@ Branch: `feat/flutter-elv4-power-topology-design`
 Inspected baseline: `7f1c701cb4ba492589321f8f9827d20464ddaefb`
 Entry point: [ELV4 index](elv4-authoritative-spec-index.md)
 Plan: [P0–P9](elv4-p0-p9-delivery-plan.md)
+Detailed interfaces: [coordinated P0–P9 contract](elv4-coordinated-p0-p9-contract.md)
 
 ## 1. Purpose and scope
 
@@ -134,20 +135,20 @@ Baseline formula conventions:
 Result identity:
 projectId + designRevisionId + scenarioId + processCode + subjectId + algorithmVersion + inputSchemaVersion + outputSchemaVersion.
 
-Persist inputFingerprint, frozen input/provenance refs, structured steps, dependency keys, quantity/unit, status and findings, calculatedAt and result schema version. Timestamp is audit metadata, excluded from deterministic numerical fingerprint. CURRENT/STALE/BLOCKED/FAILED concern validity; severity is a separate dimension. Evaluations are immutable evidence; a current pointer may advance in WORKING. Use ProjectDerivedResults and the existing dependency infrastructure.
+Persist inputFingerprint, frozen input/provenance refs, structured steps, dependency keys, quantity/unit, status and findings, calculatedAt and result schema version. Timestamp is audit metadata, excluded from deterministic numerical fingerprint. Freshness CURRENT/STALE is separate from completion COMPLETE/PARTIAL/BLOCKED, assessment PASS/FAIL/UNRESOLVED and finding severity. FAILED identifies calculation execution failure. A current complete calculation may correctly report an engineering overload. Evaluations are immutable evidence; a current pointer may advance in WORKING. Use ProjectDerivedResults and the existing dependency infrastructure.
 
 ## 6. Persistence and historical contract
 
 Proposed additive roots, subject to P0/P2 SQL review:
 PowerPortBindings; PowerComponentBindings; PowerTransferBindings; PowerLoadBindings;
-PowerCapacityGroups and memberships; PowerOperatingScenarios and state/source selections;
+PowerCapacityGroups and memberships; PowerSupplyRequirements; PowerOperatingScenarios and state/source selections;
 PoeDeliveryBindings; BackupAssemblies; BatteryBankBindings.
 
-These are typed aspects referencing existing identities, not replacements. Catalog definitions remain within ELV2 edition storage. Derived traces/findings/calculations remain projections/results. No second permanent calculation result database.
+These are typed aspects referencing existing identities, not replacements. Catalog definitions remain within ELV2 edition storage. Derived traces/findings/calculations remain projections/results. No second permanent calculation result database. The inspected adapter currently upserts one row per node and stores empty dependency lists; ELV4 must explicitly add immutable evaluation keys and mutable current-pointer keys within ProjectDerivedResults, with complete inputs/dependencies and optimistic publication checks. Existing behavior is not sufficient evidence of historical evaluation support.
 
 Use project + design revision scoping for editable power aspects; stable logical aspect identity survives deterministic create-next materialization. Shared project components/ports remain project-owned. Mutable ELV1/ELV2 facts required by power must be frozen in the revision evidence and guarded on mutation.
 
-Extend the existing coordinated freeze operation with a versioned power section. Capture component/port profiles, connection layers, transfers, scenarios, capacity groups, bank data, exact cable/resource/termination/length facts and all current power evidence needed for replay. Retain old snapshot hashes. Historical pre-ELV4 snapshots return POWER_NOT_CAPTURED; never backfill from current tables. New WORKING revision may explicitly initialize power from a complete selected frozen section or an audited empty draft.
+Extend the existing coordinated freeze operation with a versioned power section stored as a companion snapshot and manifest under the same designRevisionId. Keep the existing snapshotHash as the physical hash; a separately versioned manifest binds physicalHash and powerHash. Freeze all records in one transaction, as detailed in the coordinated contract. Capture component/port profiles, connection layers, transfers, scenarios, capacity groups, bank data, exact cable/resource/termination/length facts and all current power evidence needed for replay. Retain old snapshot hashes. Historical pre-ELV4 snapshots return POWER_NOT_CAPTURED; never backfill from current tables. New WORKING revision may explicitly initialize power from a complete selected frozen section or an audited empty draft.
 
 DB schema integers are chosen from actual migration order after P0; the inspected baseline is 21, not the schema 19/23 mentioned in historical plans. Snapshot payload version is distinct from Drift schemaVersion.
 
@@ -202,3 +203,13 @@ Mandatory real-DB scenarios:
 7. Historical: freeze R1, materialize R2, change profiles/routes/source/bank, reopen and reconstruct identical R1 power trace/results.
 
 Fixtures are fictional product-neutral data. Each positive vertical must use public commands and real FK-valid SQLite state, not raw cardinality seeds or disabled foreign keys. P9 closes only after runtime, history and exact-head evidence; document completion never substitutes for it.
+
+## 10. Cross-package implementation boundary
+
+The [coordinated P0–P9 contract](elv4-coordinated-p0-p9-contract.md) specifies all ten packages together. Its P1 field matrix feeds P2 persistence/commands; P3 supplies the graph; P4/P5/P6 follow one acyclic evaluation pipeline; P7 consumes persisted dependencies and results; P8 verifies each producer/consumer boundary; P9 reconciles every obligation at the accepted source SHA.
+
+Power is a typed root-catalog extension independent of existing discipline component-class validation. Generic source/converter/store capabilities bind existing placed component IDs without inventing a fifth discipline or impersonating a camera/controller class. Existing ELV2 and power binding ownership must agree before projection updates.
+
+All participating canonical edits affecting power advance the coordinated design-revision row token inside the mutation transaction. Calculation captures a consistent snapshot, runs outside the write transaction and publishes only after token/fingerprint revalidation. Freeze captures all necessary canonical/profile/physical evidence and rejects stale publication. This requirement applies from P2, not only when P7 UI is implemented.
+
+The initial nonlinear DC implementation may remain BLOCKED until a bounded versioned solver is implemented and tested. No runtime iteration through dependency invalidation may substitute for a solver. General parallel sources/mesh/shared-return analysis remains unsupported.

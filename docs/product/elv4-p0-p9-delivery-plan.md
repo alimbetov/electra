@@ -4,6 +4,7 @@ Status: DESIGN DRAFT / ALL PACKAGES OPEN
 Branch: `feat/flutter-elv4-power-topology-design`
 Baseline: `7f1c701cb4ba492589321f8f9827d20464ddaefb`
 Parent: [ELV4 specification](elv4-power-topology-design-specification.md)
+Shared interfaces: [coordinated P0–P9 contract](elv4-coordinated-p0-p9-contract.md)
 
 ## Delivery rules
 
@@ -172,15 +173,34 @@ Recommended checkpoints: A P0/P1 design; B P2 persistence; C P3 graph; D P4 phys
 
 | Package | Design | Runtime | Exact SHA / evidence |
 |---|---|---|---|
-| P0 | DRAFT | NOT STARTED | Baseline alignment audit only |
-| P1 | DRAFT | NOT STARTED | — |
-| P2 | DRAFT | NOT STARTED | — |
-| P3 | DRAFT | NOT STARTED | — |
-| P4 | DRAFT | NOT STARTED | — |
-| P5 | DRAFT | NOT STARTED | — |
-| P6 | DRAFT | NOT STARTED | — |
-| P7 | DRAFT | NOT STARTED | — |
-| P8 | DRAFT | NOT STARTED | — |
-| P9 | DRAFT | NOT STARTED | — |
+| P0 | DRAFT — DESIGNED | NOT STARTED | Baseline alignment audit only |
+| P1 | DRAFT — DESIGNED | NOT STARTED | — |
+| P2 | DRAFT — DESIGNED | NOT STARTED | — |
+| P3 | DRAFT — DESIGNED | NOT STARTED | — |
+| P4 | DRAFT — DESIGNED | NOT STARTED | — |
+| P5 | DRAFT — DESIGNED | NOT STARTED | — |
+| P6 | DRAFT — DESIGNED | NOT STARTED | — |
+| P7 | DRAFT — DESIGNED | NOT STARTED | — |
+| P8 | DRAFT — DESIGNED | NOT STARTED | — |
+| P9 | DRAFT — DESIGNED | NOT STARTED | — |
 
 Each evidence entry must link source implementation, tests and CI at the same accepted SHA; planned filenames and examples are not proof.
+
+## Coordinated design acceptance matrix
+
+Every P0–P9 package is designed now. Runtime dependency order is unchanged. Read the corresponding section of the coordinated contract together with the subpackages above; the following obligations cannot be deferred to a later package.
+
+| Package | Design section | Cross-package obligation before runtime acceptance |
+|---|---|---|
+| P0 | §2 source map/baseline | Resolve baseline evidence without rewriting historical closure claims |
+| P1 | §3 types/fields/scenarios | All typed fields have one owner, unit, scope and exact edition; generic power catalogs do not break discipline codecs |
+| P2 | §4 persistence/commands/history | Revision token, old/new invalidation, ledger and history commit atomically; immutable evaluation evidence is added explicitly |
+| P3 | §5 active graph | Scenario source selection, passive/active boundaries and reconvergent source rejection feed all calculations consistently |
+| P4 | §6.1–6.2 evaluation/load | Consume PoE/electrical boundary demand once; keep W/VA, reserve and derating distinct |
+| P5 | §6.3 PoE | Select guaranteed-PD or explicit-loss accounting; preserve one canonical cable/resource claim |
+| P6 | §6.4 DC/backup | Shared trunk current, supported solver bounds, capacity factors, charging direction and explicit duration policy |
+| P7 | §7 dependencies/workspace | Current freshness is separate from engineering pass; shared project budgets remain visible under system filters |
+| P8 | §8 acceptance manifest | Positive arithmetic, public-command verticals and all rollback/replay/race/history boundaries |
+| P9 | §9 closure/handoff | One source SHA links requirements, code, tests and CI; limitations pass explicitly to later stages |
+
+No design status in this table asserts implementation or review approval. Numerical fixtures are fictional; actual standard editions and discipline policy are external inputs to later verified catalogs.

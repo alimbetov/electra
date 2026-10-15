@@ -8,7 +8,8 @@ Inspected baseline: `7f1c701cb4ba492589321f8f9827d20464ddaefb`
 
 1. [Power topology specification](elv4-power-topology-design-specification.md): identities, responsibilities, typed profiles, invariants, calculations, persistence, commands, dependencies and acceptance.
 2. [Expanded P0–P9 delivery plan](elv4-p0-p9-delivery-plan.md): subpackages, sequencing, tests and exact-head gates.
-3. [Baseline alignment audit](../audit/elv4-baseline-alignment-audit.md): inspected ELV1–ELV3 facts and unresolved entry evidence.
+3. [Coordinated P0–P9 contract](elv4-coordinated-p0-p9-contract.md): shared fields, package interfaces, source map, transactions, evaluation pipeline, history and acceptance manifest.
+4. [Baseline alignment audit](../audit/elv4-baseline-alignment-audit.md): inspected ELV1–ELV3 facts and unresolved entry evidence.
 
 ## Authority and conflict handling
 
@@ -16,7 +17,7 @@ Existing accepted ELV1/ELV2 and ELV3 domain/ownership contracts remain authorita
 
 For ELV3, enter through elv3-authoritative-spec-index.md and elv3-code-implementation-index.md, including later accepted runtime remediation. Historical status labels are not proof of final runtime completion. New design details in this index do not repair or accept ELV3 runtime gaps.
 
-Within ELV4, the specification governs semantics; the delivery plan governs package sequencing and proof. A semantic conflict requires explicit contract revision before implementation, never retrospective acceptance in P9.
+Within ELV4, the specification governs semantics; the coordinated contract refines cross-package interfaces; the delivery plan governs package sequencing and proof. A semantic conflict requires explicit contract revision before implementation, never retrospective acceptance in P9.
 
 ## Stage boundaries
 
@@ -30,3 +31,5 @@ ELV8: manufacturer selection/BOM/deliverables.
 
 The branch contains design documentation only. All ELV4 P0–P9 runtime packages remain unstarted.
 Merged ELV3 PR #10 is the starting source baseline; ELV3 final closure evidence must be reconciled in ELV4-P0.
+
+All ten packages P0–P9 now have coordinated design sections. Design remains DRAFT / REVIEW REQUIRED; completeness of the design outline does not close baseline or runtime gates.

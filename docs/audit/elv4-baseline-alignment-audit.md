@@ -55,3 +55,14 @@ ELV1–ELV3 alignment is specified for ELV4 design.
 ELV4 design: expanded draft prepared.
 ELV4 runtime: NOT AUTHORIZED pending baseline reconciliation and contract review.
 No Flutter/Dart tests or standards-compliance verification were run for this documentation change.
+
+## Coordinated-design source follow-up
+
+The P0–P9 design refinement additionally inspected the revision repository, runtime support, physical calculation node keys and result-store adapter at the same source baseline.
+
+- `DriftElvPhysicalCalculationResultStore.put` uses `insertOnConflictUpdate` and currently serializes `dependenciesJson` as `[]`. Immutable evaluations and complete dependency tracking therefore require explicit adapter work. ELV4 will use versioned evaluation and current-pointer keys inside ProjectDerivedResults; this is planned behavior, not an existing capability.
+- Freeze currently builds `_buildP3Snapshot` and records the physical hash. The coordinated contract preserves that meaning and adds a same-revision power companion snapshot/manifest in the freeze transaction. Historical hashes are not rewritten.
+- Current ReferenceDiscipline has four values and CanonicalComponentClass lacks generic PSU/UPS/battery classes. The design uses a typed root-catalog power extension independent of discipline-class validation, binding existing placed component identities. Codec/ownership integration remains a P1/P2 review obligation.
+- Concurrent canonical edits must advance the same design-revision token used by freeze and result publication. The follow-up specifies this requirement; it does not claim the baseline already enforces it for every command.
+
+See [coordinated P0–P9 contract](../product/elv4-coordinated-p0-p9-contract.md). All ten packages have a design section and explicit producer/consumer obligations. BASE-01…04 and runtime statuses remain open; no runtime or CI proof was fabricated by this documentation update.
