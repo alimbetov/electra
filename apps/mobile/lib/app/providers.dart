@@ -24,6 +24,10 @@ import '../application/electrical_load_repository.dart';
 import '../data/repositories/drift_electrical_load_repository.dart';
 import '../application/catalog_preferences_repository.dart';
 import '../data/repositories/drift_catalog_preferences_repository.dart';
+import '../application/power_workspace_overlay_geometry.dart';
+import '../application/power_workspace_projection.dart';
+import '../data/repositories/drift_power_workspace_overlay_geometry_repository.dart';
+import '../data/repositories/drift_power_workspace_repository.dart';
 
 import 'package:engineering_core/engineering_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -206,6 +210,20 @@ final roomRoutingProvider = StreamProvider.family<RoomRoutingSnapshot, String>(
   (ref, roomId) =>
       ref.watch(cableRoutingRepositoryProvider).watchRoomRouting(roomId),
 );
+
+final powerWorkspaceRepositoryProvider = Provider<PowerWorkspaceRepository>(
+  (ref) => DriftPowerWorkspaceRepository(
+    ref.watch(databaseProvider),
+    originDeviceId: 'local-device',
+  ),
+);
+
+final powerWorkspaceOverlayGeometryRepositoryProvider =
+    Provider<PowerWorkspaceOverlayGeometryRepository>(
+      (ref) => DriftPowerWorkspaceOverlayGeometryRepository(
+        ref.watch(databaseProvider),
+      ),
+    );
 
 final floorRoutingRepositoryProvider = Provider<FloorRoutingRepository>(
   (ref) => DriftFloorRoutingRepository(
