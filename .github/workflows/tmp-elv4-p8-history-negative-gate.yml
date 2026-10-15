@@ -1,0 +1,29 @@
+name: ELV4 P8 History Negative Gate
+
+on:
+  push:
+    branches:
+      - feat/flutter-elv4-power-topology-design
+    paths:
+      - .github/workflows/tmp-elv4-p8-history-negative-gate.yml
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/flutter-elv4-power-topology-design
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Install mobile dependencies
+        working-directory: apps/mobile
+        run: flutter pub get
+      - name: Verify P8 history formatting
+        working-directory: apps/mobile
+        run: dart format --output=none --set-exit-if-changed test/data/elv4_p8_freeze_historical_invariance_test.dart
+      - name: Run P8 historical acceptance
+        working-directory: apps/mobile
+        run: flutter test test/data/elv4_p8_freeze_historical_invariance_test.dart
