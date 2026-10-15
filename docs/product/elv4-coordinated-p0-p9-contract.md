@@ -1,6 +1,6 @@
 # Electra — ELV4 Coordinated P0–P9 Design Contract
 
-Status: DESIGN DRAFT / REVIEW REQUIRED / RUNTIME NOT STARTED
+Status: IMPLEMENTATION RECONCILED / RUNTIME ACCEPTANCE BLOCKED — see [current audit](../audit/elv4-p9-reconciliation.md).
 Branch: `feat/flutter-elv4-power-topology-design`
 Source baseline: `7f1c701cb4ba492589321f8f9827d20464ddaefb`
 Design baseline: `29e0ad0`
@@ -316,3 +316,7 @@ All P0–P9 design sections are present in this revision. They remain DESIGN DRA
 ## 10. Audit-remediation refinement
 
 The [RM01–RM15 contract](elv4-implementation/remediation-contract.md) supplies exact choices for all audited integration gaps. P2 includes owner/kind isolation, complete forward/inverse history payloads, project sequence allocator and typed old-to-new physical identity remapping. Source selection from an older base requires a reviewed canonical restore plan. Startup is ALL_SIMULTANEOUS with conservative max startup demand over the longest pulse window. P8/P9 share qualification.json; required positive dimensions must be COMPLETE/PASS and cannot be waived by a partial boundary oracle.
+
+## Current implementation reconciliation (2026-10-15)
+
+The [P9 audit](../audit/elv4-p9-reconciliation.md), [80-row source/test ledger](elv4-implementation/requirements.json) and [closure record](elv4-implementation/closure.json) supersede historical progress statements. Core/runtime/UI code exists; integration and qualification gaps remain explicit. `RUNTIME_ACCEPTED`, `MERGED` and `CLOSED` are separate events and none is inferred from a targeted test run. Governing acceptance obligations are unchanged.

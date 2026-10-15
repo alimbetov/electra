@@ -1,6 +1,6 @@
 # ELV4 — Resolved implementation contracts (audit remediation)
 
-Status: SPECIFICATION REMEDIATION / RUNTIME NOT IMPLEMENTED
+Status: IMPLEMENTATION RECONCILED / RUNTIME ACCEPTANCE PENDING — see [current P9 audit](../../audit/elv4-p9-reconciliation.md).
 Date: 2026-10-15. Resolves findings ELV4-AUD-01…15 from the [audit](../../audit/elv4-technical-audit/report.md).
 Parent: [implementation index](README.md). The corresponding governing/shared/package statements are updated with these decisions; this document does not authorize bypassing ELV1–ELV3 invariants.
 

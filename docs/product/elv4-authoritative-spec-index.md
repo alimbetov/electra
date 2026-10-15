@@ -1,6 +1,6 @@
 # Electra — ELV4 Authoritative Design Index
 
-Status: IMPLEMENTATION STARTED / P0 AND P1 IN PROGRESS / RUNTIME INTEGRATION GATED
+Status: IMPLEMENTATION RECONCILED / RUNTIME ACCEPTANCE BLOCKED — see [current audit](../audit/elv4-p9-reconciliation.md).
 Branch: `feat/flutter-elv4-power-topology-design`
 Inspected baseline: `7f1c701cb4ba492589321f8f9827d20464ddaefb`
 
@@ -44,3 +44,7 @@ Detailed implementation design now decomposes all P0–P9 packages into numbered
 The [2026-10-15 architecture/development/analysis audit](../audit/elv4-technical-audit/report.md) reviewed all 80 requirements at design HEAD `4404c02`. Historical outcome at that audited HEAD: **NOT READY FOR IMPLEMENTATION**, with 1 BLOCKER, 10 HIGH and 4 MEDIUM findings. See the [per-requirement matrix](../audit/elv4-technical-audit/requirements-review.md) and [machine-readable findings](../audit/elv4-technical-audit/findings-and-coverage.json).
 
 This audit does not change runtime statuses or resolve the known baseline gates. That historical audit is retained unchanged; its 15 design findings are now addressed by the [remediation contract](elv4-implementation/remediation-contract.md) and [resolution review](../audit/elv4-technical-audit/remediation-review.md). Source implementation, BASE-01…04 and runtime acceptance remain unproven/open.
+
+## Current implementation reconciliation (2026-10-15)
+
+The [P9 audit](../audit/elv4-p9-reconciliation.md), [80-row source/test ledger](elv4-implementation/requirements.json) and [closure record](elv4-implementation/closure.json) supersede historical progress statements. Core/runtime/UI code exists; integration and qualification gaps remain explicit. `RUNTIME_ACCEPTED`, `MERGED` and `CLOSED` are separate events and none is inferred from a targeted test run. Governing acceptance obligations are unchanged.

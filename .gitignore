@@ -9,3 +9,6 @@
 
 # Keep intentionally source-controlled generated Drift output under lib/**.
 # Runtime/intermediate build products remain ignored by the directory rules above.
+
+# Python CI checker bytecode
+__pycache__/

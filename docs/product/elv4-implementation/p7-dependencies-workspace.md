@@ -1,6 +1,6 @@
 # P7 — Dependencies, safe publication and progressive workspace
 
-Status: RUNTIME / DATA / WORKSPACE-STATE CLOSURE IMPLEMENTED; POWER-SPECIFIC UI WIRING OPEN
+Status: IMPLEMENTATION RECONCILED / RUNTIME ACCEPTANCE PENDING — see [current P9 audit](../../audit/elv4-p9-reconciliation.md).
 Dependency integration begins in P2; complete workspace follows P3–P6.
 Shared rules: [runtime contracts](shared-contracts.md).
 Resolved audit decisions: [RM01–RM15](remediation-contract.md).
@@ -18,14 +18,17 @@ The durable P7 runtime boundary is implemented and acceptance-tested on the feat
 
 Final read-only targeted validation run `38733525610` passed clean checkout, Drift generation, format verification, full `flutter analyze`, P7 single publication/invalidation/race tests, atomic batch tests, freeze integration, workspace-state acceptance, P2 persistence regression and P3 runtime-closure regression. The temporary P7 workflow was removed after success.
 
-Still intentionally open before claiming full visual P7 closure:
+The later P7 UI/history slice is present in `power_workspace_panel.dart`,
+`power_workspace_overlay_painter.dart`, `power_workspace_editor_binding.dart`,
+`power_workspace_panel_host.dart` and the reviewed routing/history runtime.
+The panel/controller/history tests cover progressive navigation, compact controls,
+keyboard/focus/back behavior, failed drafts and undo/redo. These are implemented
+behaviors, not the old open UI TODO list. P9 still requires final-head execution.
 
-- P7-T04 actual editor rendering of the revision/scenario-aware power overlay and shared-source/global budget view;
-- P7-T05 the concrete progressive power side-card widget and explanation presentation in the editor;
-- P7-T06 route preview/review/commit/failure/undo-redo wiring from the power workspace into the existing public ELV physical-routing command service;
-- P7-T08 compact-width widget acceptance, keyboard traversal, focus restoration, back handling and concrete finding-remediation navigation.
-
-The existing editor already provides wide/compact responsive shells and the existing `DefaultElvPhysicalRoutingWorkspaceService` provides the public command/trace boundary. The remaining UI slice must reuse those contracts and must not introduce widget-owned persistence or power arithmetic.
+Remaining integration limitations are C01–C03 in the current audit: complete
+process input capture, all canonical writer invalidation and frozen workspace
+independence. The reverse-index algorithm works for supplied dependency keys;
+its existence does not establish that every ELV1–ELV3 writer supplies them.
 
 ## Required work and acceptance
 

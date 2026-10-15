@@ -320,10 +320,17 @@ def main():
             assert (ROOT / path).is_file(), f'Missing requirement evidence path: {path}'
         if requirement['runtimeStatus'] in {'IMPLEMENTED', 'ACCEPTED'}:
             assert requirement['sourcePaths'] and requirement['testPaths'] and requirement['evidence']
+            assert re.fullmatch(r'[a-f0-9]{40}', requirement['sourceReviewedSha'])
+        if requirement['runtimeStatus'] == 'ACCEPTED':
             assert re.fullmatch(r'[a-f0-9]{40}', requirement['testedSha'] or '')
+            assert requirement['acceptanceStatus'] == 'PASS'
     resolutions = read(AUDIT / 'remediation.json')
     assert len(resolutions['resolutions']) == 15
-    assert all(x['specificationStatus'] == 'SPEC_RESOLVED' and x['runtimeStatus'] == 'NOT_IMPLEMENTED' for x in resolutions['resolutions'])
+    assert all(x['specificationStatus'] == 'SPEC_RESOLVED' and x['runtimeStatus'] in statuses for x in resolutions['resolutions'])
+    for resolution in resolutions['resolutions']:
+        assert resolution['sourcePaths'] and resolution['testPaths'] and resolution['evidence']
+        for path in resolution['sourcePaths'] + resolution['testPaths']:
+            assert (ROOT / path).is_file(), f'Missing remediation evidence: {path}'
     link_count = 0
     files = list(BASE.glob('*.md')) + list((ROOT / 'docs/product').glob('elv4-*.md')) + [AUDIT / 'remediation-review.md']
     for file in files:

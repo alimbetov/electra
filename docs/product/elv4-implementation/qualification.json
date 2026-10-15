@@ -1,6 +1,6 @@
 {
   "schema": "electra.elv4-qualification.v1",
-  "status": "DESIGN_INPUTS_RUNTIME_NOT_IMPLEMENTED",
+  "status": "MANDATORY_RUNTIME_MATRIX_PENDING",
   "dataProvenance": "FICTIONAL_PRODUCT_NEUTRAL",
   "requiredPositiveCaseIds": [
     "Q-CCTV",

@@ -1,6 +1,6 @@
 # P5 — PoE delivery, patching and shared PSE budgets
 
-Status: CORE RUNTIME CLOSURE IMPLEMENTED (P5-T01–P5-T08); application publication, reverse-index persistence and workspace qualification continue in P7/P8.
+Status: IMPLEMENTATION RECONCILED / RUNTIME ACCEPTANCE PENDING — see [current P9 audit](../../audit/elv4-p9-reconciliation.md).
 Consumes P1 exact profiles, P3 graph, P4 leaf demands and ELV3 physical evidence.
 Shared rules: [runtime contracts](shared-contracts.md).
 Resolved audit decisions: [RM01–RM15](remediation-contract.md).

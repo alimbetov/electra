@@ -1,6 +1,6 @@
 # P6 — DC terminal voltage, chargers and battery backup
 
-Status: CORE RUNTIME CLOSURE IMPLEMENTED (P6-T01–P6-T08)
+Status: IMPLEMENTATION RECONCILED / RUNTIME ACCEPTANCE PENDING — see [current P9 audit](../../audit/elv4-p9-reconciliation.md).
 Consumes P3 radial graph, P4 protected/boundary demand, P5 delivery accounting and exact ELV3 path evidence.
 Shared rules: [runtime contracts](shared-contracts.md).
 Resolved audit decisions: [RM01–RM15](remediation-contract.md).

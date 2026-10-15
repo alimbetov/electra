@@ -1,6 +1,6 @@
 # P8 — Executable runtime acceptance specification
 
-Status: IMPLEMENTATION DESIGN DRAFT / NO RUNTIME TEST EXECUTION CLAIMED
+Status: IMPLEMENTATION RECONCILED / RUNTIME ACCEPTANCE PENDING — see [current P9 audit](../../audit/elv4-p9-reconciliation.md).
 Consumes P0–P7; fixture design begins during P0/P1.
 Shared rules: [runtime contracts](shared-contracts.md).
 Resolved audit decisions: [RM01–RM15](remediation-contract.md).

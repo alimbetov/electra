@@ -1,6 +1,6 @@
 # P0 — Baseline, ownership and implementation entry
 
-Status: DESIGN DRAFT / EVIDENCE GATE OPEN
+Status: IMPLEMENTATION RECONCILED / RUNTIME ACCEPTANCE PENDING — see [current P9 audit](../../audit/elv4-p9-reconciliation.md).
 Depends on existing ELV1–ELV3 source and closure evidence. Supplies all later packages.
 Shared rules: [runtime contracts](shared-contracts.md).
 Resolved audit decisions: [RM01–RM15](remediation-contract.md).

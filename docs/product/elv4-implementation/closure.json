@@ -1,0 +1,97 @@
+{
+  "schema": "electra.elv4-runtime-closure.v1",
+  "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+  "runtimeStatus": "IN_PROGRESS",
+  "runtimeAcceptanceVerified": false,
+  "events": [],
+  "findings": [
+    {
+      "id": "C01",
+      "severity": "HIGH",
+      "status": "OPEN",
+      "owner": "P8",
+      "summary": "Full seven-case qualification manifest is not executed through persisted public-command topology and all required process/context/dimension rows.",
+      "evidence": [
+        "apps/mobile/test/data/elv4_p8_public_vertical_acceptance_test.dart",
+        "docs/product/elv4-implementation/qualification.json"
+      ],
+      "requiredResolution": "Build and execute Q-CCTV/Q-LAN/Q-ACS/Q-FIRE/Q-SHARED/Q-GENERIC/Q-CHARGE from persisted canonical/physical facts. Persisted PWR-01 load publication is not whole-design qualification."
+    },
+    {
+      "id": "C02",
+      "severity": "HIGH",
+      "status": "OPEN",
+      "owner": "P1/P2/P7",
+      "summary": "Power bindings do not project static canonical fields; legacy topology/reference/membership writers do not coordinate power token and old/new invalidation. Caller-supplied dependency lists are insufficient.",
+      "evidence": [
+        "apps/mobile/lib/data/repositories/drift_power_command_service.dart",
+        "apps/mobile/lib/data/repositories/drift_engineering_topology_repository.dart",
+        "apps/mobile/lib/data/repositories/drift_engineering_reference_adoption_repository.dart"
+      ],
+      "requiredResolution": "Implement reviewed projection/ownership and shared transaction coordination for every canonical writer; prove direct-repository races and exact affected/unaffected sets."
+    },
+    {
+      "id": "C03",
+      "severity": "HIGH",
+      "status": "OPEN",
+      "owner": "P2/P3/P7",
+      "summary": "Freeze captures pointers only; create-next copies physical runs but no power aspects. Frozen workspace scenario/membership/budget queries still read operational tables.",
+      "evidence": [
+        "apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart",
+        "apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart",
+        "apps/mobile/lib/data/repositories/drift_power_workspace_repository.dart"
+      ],
+      "requiredResolution": "Version companion snapshot for all required immutable facts; materialize scoped power aspects with physical reference remapping; serve historical workspace solely from captured facts. Prove nonempty R1 versus modified R2/catalog/membership after reopen."
+    },
+    {
+      "id": "C04",
+      "severity": "HIGH",
+      "status": "OPEN",
+      "owner": "P8",
+      "summary": "ELV4 persistence tests create current databases; no complete supported-origin upgrade matrix for v22/v23 power/history migrations is present.",
+      "evidence": [
+        "apps/mobile/test/data/elv4_p2_persistence_test.dart",
+        "apps/mobile/lib/data/database/app_database.dart"
+      ],
+      "requiredResolution": "Execute real historical schemas, including baseline v21 and preceding v22, with old identities/hashes retained and no synthetic power backfill."
+    },
+    {
+      "id": "C05",
+      "severity": "HIGH",
+      "status": "OPEN",
+      "owner": "P1/P2",
+      "summary": "Documented power-command/evaluation wire schemas are not demonstrated as the actual public application serialization/version-dispatch boundary.",
+      "evidence": [
+        "docs/product/elv4-implementation/schemas/power-command.schema.json",
+        "apps/mobile/lib/application/power_mutation_command.dart"
+      ],
+      "requiredResolution": "Reconcile canonical envelope and persisted schema versions with actual decoder/dispatch; execute unknown-version and malformed-public-payload controls."
+    },
+    {
+      "id": "C06",
+      "severity": "GATE",
+      "status": "PENDING",
+      "owner": "P9",
+      "summary": "Final immutable-source technical gate has not yet been recorded for the reconciliation head.",
+      "evidence": [
+        ".github/workflows/elv4-exact-head.yml"
+      ],
+      "requiredResolution": "Run generation, format, both analyzers, full mobile/core and explicit P7/P8 tests on one clean SHA; preserve report and logs with run metadata."
+    }
+  ],
+  "repairedInThisReview": [
+    "Project-maximum sequence allocation when restoring an older frozen base (RM10).",
+    "Recompute versioned physical snapshot hash before create-next (RM07 integrity).",
+    "Replay committed power-operation receipt before mutable lifecycle checks; reject command type/schema reuse.",
+    "Validate canonical component ownership for load/transfer/group/supply ports.",
+    "Replace synthetic four-vertical PASS with calculated persisted-load evidence and explicit partial scope.",
+    "ELV1 savePort/archive rejects active ELV4 power bindings; exact no-op and explicit release remain supported."
+  ],
+  "architectureDeviations": [
+    {
+      "area": "RM01 result ownership",
+      "implemented": "Dedicated power_evaluation_records/pointers plus reverse index, isolated from legacy ProjectDerivedResults.",
+      "disposition": "Recorded deviation from planned shared ProjectDerivedResults owner/kind extension; no assumption of shared invalidation. C02 remains blocking."
+    }
+  ]
+}

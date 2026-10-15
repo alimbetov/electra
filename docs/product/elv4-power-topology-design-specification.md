@@ -1,6 +1,6 @@
 # Electra — ELV4 Power Topology Design Specification
 
-Status: DESIGN DRAFT / IMPLEMENTATION NOT AUTHORIZED
+Status: IMPLEMENTATION RECONCILED / RUNTIME ACCEPTANCE BLOCKED — see [current audit](../audit/elv4-p9-reconciliation.md).
 Branch: `feat/flutter-elv4-power-topology-design`
 Inspected baseline: `7f1c701cb4ba492589321f8f9827d20464ddaefb`
 Entry point: [ELV4 index](elv4-authoritative-spec-index.md)
@@ -220,3 +220,7 @@ The supported slice is radial constant-current DC, RM06 single-CP unbranched fee
 ## 11. Resolved technical audit decisions
 
 [RM01–RM15](elv4-implementation/remediation-contract.md) are mandatory refinements implemented consistently in the detailed package specifications: result ownership, static nameplate/scenario separation, segment keys, generic power canonical bridge, supported CP feeder, physical-reference remapping, durable redo, exact numeric v2, project-wide revision allocation, strict wire schemas, conservative startup, consumed facts, nonblocking freeze and positive qualification manifest. Historical audits remain pinned to their audited source; design remediation is not runtime closure.
+
+## Current implementation reconciliation (2026-10-15)
+
+The [P9 audit](../audit/elv4-p9-reconciliation.md), [80-row source/test ledger](elv4-implementation/requirements.json) and [closure record](elv4-implementation/closure.json) supersede historical progress statements. Core/runtime/UI code exists; integration and qualification gaps remain explicit. `RUNTIME_ACCEPTED`, `MERGED` and `CLOSED` are separate events and none is inferred from a targeted test run. Governing acceptance obligations are unchanged.

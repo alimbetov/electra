@@ -1,6 +1,6 @@
 # P9 — Requirement reconciliation, exact-head gate and handoff
 
-Status: IMPLEMENTATION DESIGN DRAFT / CLOSURE OPEN
+Status: IMPLEMENTATION RECONCILED / RUNTIME ACCEPTANCE PENDING — see [current P9 audit](../../audit/elv4-p9-reconciliation.md).
 Consumes P0–P8 implementation and evidence.
 Shared rules: [runtime contracts](shared-contracts.md).
 Resolved audit decisions: [RM01–RM15](remediation-contract.md).
@@ -64,7 +64,7 @@ ELV5 receives typed physical results, required-input findings and scenario/polic
 
 Record separate events with timestamp, source SHA and evidence refs: DESIGN_REVIEWED, IMPLEMENTED, RUNTIME_ACCEPTED, MERGED and CLOSED. Merge commit and tested source may differ; identify both and any required post-merge evidence. Documentation-only status updates link back to accepted source evidence and do not masquerade as a new runtime run.
 
-Current outcome: specification prepared for all ten packages; no runtime acceptance evidence is claimed by this branch update.
+Current outcome: all 80 rows reconciled to source/tests, with concrete blocking gaps in [closure.json](closure.json). No RUNTIME_ACCEPTED, MERGED or CLOSED event has occurred. The permanent exact-head workflow verifies technical regressions; it cannot erase unresolved integration findings.
 
 ## Remediation closure interpretation
 
