@@ -86,4 +86,6 @@ jobs:
             apps/mobile/lib/features/editor/power_workspace_editor_binding.dart \
             apps/mobile/lib/application/power_workspace_overlay_geometry.dart
           git commit -m "feat(elv4): integrate P7 power workspace with room editor"
-          git push origin HEAD:${{ github.ref_name }}
+          git fetch origin "${GITHUB_REF_NAME}"
+          git rebase "origin/${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
