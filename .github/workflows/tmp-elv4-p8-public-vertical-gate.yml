@@ -52,9 +52,14 @@ jobs:
                   import_line,
                   import_line + "import 'package:electra_mobile/data/repositories/drift_power_publication_runtime.dart';\n",
               )
+          text = text.replace(import_line, '')
           text = text.replace(
               "      final powerView = await reopened.readPowerRevision(\n        builder.projectId,\n        builder.revisionId,\n      );",
               "      final powerView = await DriftPowerPublicationRuntime(\n        db,\n        originDeviceId: 'qualification',\n      ).readRevision(\n        projectId: builder.projectId,\n        designRevisionId: builder.revisionId,\n      );",
+          )
+          text = text.replace(
+              "      final reopened = DriftElvDesignRevisionRepository(\n        db,\n        originDeviceId: 'qualification',\n      );\n",
+              '',
           )
           text = text.replace(
               'PowerRational.fromFraction(4, 5)',
