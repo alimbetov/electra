@@ -122,3 +122,29 @@ catalog's voltage/loss bodies. This is not full catalog-import or SQLite proof.
 P0 and P1 remain IN_PROGRESS; no requirement is marked ACCEPTED. P2–P9 remain
 NOT_STARTED. Remaining P1 work: port/transfer/capacity/scenario graph contracts,
 generic catalog bridge, PoE/battery definitions and reviewed legacy adoption.
+
+## Baseline defects repaired during entry
+
+- `6d0f15e`: first power domain slice and schema/inventory guard reconciliation.
+- `6fa4ffc`: synchronized generated Drift bindings. Output was recovered from
+  CI job `116020580724` and verified against Git blob
+  `46101618c7e7251158d199dce1d60f9ceddcce4e`; no handwritten generated changes.
+  CI run `38692928764` subsequently passed generation, formatting and app analysis.
+- That run executed the app suite: 187 passed / 16 failed. The failures exposed
+  twelve stale schema-17 expectations, record equality using List identity,
+  two same-isolate blocking SQLite race setups, and false success on an ignored
+  cable-resource claim.
+- `655db4a`: repaired those assertions/setup and switched cable/draft/evidence/
+  resource-claim inserts to `insertReturningOrNull`. SQLite `last_insert_rowid`
+  is not a count of inserted rows and can remain positive after `OR IGNORE`.
+  Conflict handling now depends on the returned row, preserving the existing
+  cleanup and domain-error path. Existing overlap assertions were not relaxed.
+- Additional regression exercises a later-atom conflict: the first new claim
+  must be removed, the original owner's claim retained, contender revision/state
+  and absent selection preserved before and after reopen; the freed atom must
+  then be reservable by a new command.
+
+Local Flutter bootstrap was blocked by automatic review for an unexpected cloud
+metadata request. It was not retried. Local Dart core checks remain valid;
+application acceptance is evaluated by the existing repository workflow on draft
+PR #11. Passing that suite does not fill missing RC4–RC9 runtime implementations.

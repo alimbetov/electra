@@ -51,7 +51,7 @@ EngineeringReferenceCatalog _catalog() => EngineeringReferenceCatalog(
   cableDefinitions: [_definition()],
 );
 
-NativeDatabase _native(File file) => NativeDatabase(
+QueryExecutor _native(File file) => NativeDatabase.createInBackground(
   file,
   setup: (raw) {
     raw.execute('PRAGMA journal_mode=WAL');
