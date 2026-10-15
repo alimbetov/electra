@@ -3,6 +3,7 @@
 Status: IMPLEMENTATION DESIGN DRAFT
 Consumes P1 exact profiles, P3 graph, P4 leaf demands and ELV3 physical evidence.
 Shared rules: [runtime contracts](shared-contracts.md).
+Resolved audit decisions: [RM01–RM15](remediation-contract.md).
 
 ## Required work and acceptance
 
@@ -46,3 +47,7 @@ Injector has data input, combined output and separately powered supply input. It
 Mismatched PSE/PD roles or contradictory profile hash is structural/integrity failure for binding. Missing installed path can persist as a draft; evaluation is unresolved. Known over-budget is a complete numerical result with FAIL. Unsupported delivery is BLOCKED with exact model reference and remediation.
 
 Exit: CCTV and LAN can share a single project PSE/UPS basis, preserve one canonical path realization, explain all power boundaries and reopen identical evidence.
+
+## Resolved qualification and identity contract
+
+PoE evidence is per SEGMENT (RM04); guaranteedPdW, reservedPseW, per-port/group limits, pair/path applicability and complete passive passage are explicit in qualification inputs. New catalog/command wire uses RM05/RM11 schemas and RM09 decimal values. Generic injector supply/membership/compatibility is a public-command positive case. Existing data/power resources remain single claims. EXPLICIT_PATH_LOSS stays unsupported in the first scope and is a separate negative case, never a substitute for a passing guaranteed-PD qualification.

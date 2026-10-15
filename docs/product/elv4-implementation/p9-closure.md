@@ -3,6 +3,7 @@
 Status: IMPLEMENTATION DESIGN DRAFT / CLOSURE OPEN
 Consumes P0–P8 implementation and evidence.
 Shared rules: [runtime contracts](shared-contracts.md).
+Resolved audit decisions: [RM01–RM15](remediation-contract.md).
 
 ## Required work and acceptance
 
@@ -53,7 +54,7 @@ Do not substitute a successful run on the parent SHA. Do not infer runtime succe
 
 ## Defect disposition and supported limitations
 
-Zero open BLOCKER/HIGH at runtime closure. Lower findings require explicit decision, owner and target scope. Unsupported general meshes/parallel sources, initial nonlinear DC, unimplemented explicit-loss PoE, detailed battery curves and guaranteed recharge-time predictions are declared scope limits, not silently passing capabilities. A required vertical that depends on an unsupported model blocks acceptance; it cannot be waived by calling the model a limitation after implementation.
+Zero open BLOCKER/HIGH at runtime closure. Lower findings require explicit decision, owner and target scope. Unsupported general meshes/parallel sources, nonlinear DC outside RM06 single-CP feeders, unimplemented explicit-loss PoE, detailed battery curves and guaranteed recharge-time predictions are declared scope limits, not silently passing capabilities. A required vertical that depends on an unsupported model blocks acceptance; it cannot be waived by calling the model a limitation after implementation.
 
 No national compliance or manufacturer guarantee is asserted without verified edition provenance and the later responsible-stage process. ELV4 physical estimates retain their assumptions and unresolved dimensions in exported evidence.
 
@@ -64,3 +65,7 @@ ELV5 receives typed physical results, required-input findings and scenario/polic
 Record separate events with timestamp, source SHA and evidence refs: DESIGN_REVIEWED, IMPLEMENTED, RUNTIME_ACCEPTED, MERGED and CLOSED. Merge commit and tested source may differ; identify both and any required post-merge evidence. Documentation-only status updates link back to accepted source evidence and do not masquerade as a new runtime run.
 
 Current outcome: specification prepared for all ten packages; no runtime acceptance evidence is claimed by this branch update.
+
+## Remediation closure interpretation
+
+A finding is SPEC_RESOLVED only when all linked governing/shared/package contracts and wire/qualification artifacts agree. It stays RUNTIME_NOT_IMPLEMENTED until source and RMxx-T evidence pass. Consume qualification.json as the sole positive process×dimension gate; required UNRESOLVED/BLOCKED/NOT_CALCULATED prevents closure. Recheck all existing result consumers for RM01 and both revision creation/port writer paths for RM03/RM07/RM10. Historical audit reports remain immutable evidence of the old design; later remediation status is recorded separately.

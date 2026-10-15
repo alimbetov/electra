@@ -20,7 +20,7 @@ This specification decomposes all ten P0–P9 packages into implementable requir
 | P8 | [Runtime verification](p8-acceptance.md) | Public-command verticals, migration, restart and races |
 | P9 | [Closure and handoff](p9-closure.md) | Requirement-to-evidence reconciliation at exact SHA |
 
-[Shared runtime contracts](shared-contracts.md) apply to every package. [Requirement ledger](requirements.json) records design traceability; every runtime status remains NOT_STARTED. Test IDs denote planned assertions, not tests that have run.
+[Shared runtime contracts](shared-contracts.md) and [resolved RM01–RM15 decisions](remediation-contract.md) apply to every package. [Wire registry/schemas](wire-contract.md), [qualification manifest](qualification.json) and [public-builder contract](qualification-builders.md) are normative implementation inputs. [Requirement ledger](requirements.json) records design traceability; every runtime status remains NOT_STARTED. Test IDs denote planned assertions, not tests that have run.
 
 ## Implementation sequence
 
@@ -36,3 +36,7 @@ Within P4–P6, compute by supported voltage domain in bottom-up graph order. E0
 - Illustrative equipment data is fictional. No implicit national policy, standard class, manufacturer guarantee or certification follows from a fixture.
 - Runtime entry still requires P0 baseline reconciliation. Design review may proceed for all packages now.
 - Design review, implementation, runtime acceptance, merge and stage CLOSED are separate states.
+
+## Technical audit disposition
+
+All 15 findings from the 2026-10-15 audit are addressed in specification contracts and acceptance refinements. See [remediation record](../../audit/elv4-technical-audit/remediation-review.md). This does not assert implementation, baseline closure, or runtime acceptance.

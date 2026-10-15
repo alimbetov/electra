@@ -3,6 +3,7 @@
 Status: IMPLEMENTATION DESIGN DRAFT
 Consumes P3 radial graph, P4 protected/boundary demand, P5 delivery accounting and exact ELV3 path evidence.
 Shared rules: [runtime contracts](shared-contracts.md).
+Resolved audit decisions: [RM01–RM15](remediation-contract.md).
 
 ## Required work and acceptance
 
@@ -10,7 +11,7 @@ Shared rules: [runtime contracts](shared-contracts.md).
 |---|---|---|
 | ELV4-P6-001 | Build typed radial section resistance/current model from exact installed resources and terminations | P6-T01 resistance convention |
 | ELV4-P6-002 | Solve constant-current trunks/branches and report every terminal/current limit at source bounds | P6-T02 radial golden |
-| ELV4-P6-003 | Block nonlinear/mesh/shared-return models outside the supported first slice | P6-T03 unsupported model |
+| ELV4-P6-003 | Support CC trees and the bounded single-CP feeder; block all other nonlinear/mesh/shared-return domains | P6-T03 unsupported model |
 | ELV4-P6-004 | Validate bank series/parallel compatibility, voltage, rating conditions and usable-capacity model | P6-T04 bank arrangement |
 | ELV4-P6-005 | Compute piecewise protected energy and sequence margin with explicit duration/model/loss boundaries | P6-T05 standby/alarm energy |
 | ELV4-P6-006 | Validate charge/discharge selection and charger operating plus recharge load | P6-T06 charger/interlock |
@@ -21,7 +22,7 @@ Shared rules: [runtime contracts](shared-contracts.md).
 
 | Process | Proposed operation | Output |
 |---|---|---|
-| ELV-PWR-03 | solveRadialConstantCurrent(DcDomainInput) | Section I/R/drop/loss; terminal V bounds; rating findings; resolved source demand |
+| ELV-PWR-03 | solveDcDomain(DcDomainInput): CC tree or RM06 single-CP feeder | Section I/R/drop/loss; terminal V bounds; rating findings; resolved source demand |
 | ELV-PWR-04 | evaluateBatterySequence(BackupSequenceInput) | Protected/bank required Wh or supported Ah; available capacity; sequence margin; optional supported duration |
 | Supporting charge basis | evaluateChargerDemand(ChargerScenarioInput) | Operating output, charging output, input demand and current/voltage compatibility |
 
@@ -47,9 +48,9 @@ Fictional golden: 24V, .3A/.5A loads, .5ohm shared loop → .8A/.4V trunk drop. 
 
 ## Supported solver boundary
 
-First runtime implementation supports radial constant-current DC only. DC constant-power or voltage-dependent loads, shared-return meshes and parallel source networks return ELV4_UNSUPPORTED_ELECTRICAL_MODEL. A converter input behaving as constant power cannot be silently retyped as constant current.
+First runtime implementation supports radial constant-current trees AND RM06 one-terminal constant-power unbranched feeders with an explicit quadratic-root/interval solver. Other nonlinear or voltage-dependent loads, shared-return meshes and parallel sources return ELV4_UNSUPPORTED_ELECTRICAL_MODEL. A converter input behaving as constant power is never silently retyped as constant current.
 
-A future solver extension must add an exact model version, lower/upper voltage/current bounds, iteration cap, convergence/residual rules, no-solution cases and physical validation tests before enabling its profile. The dependency engine must not iterate cached processes as an implicit numerical solver. Initial ELV4 may close with this explicitly supported-scope limitation if all required acceptance cases use supported models and do not claim unsupported safety results.
+A future solver extension must add an exact model version, lower/upper voltage/current bounds, iteration cap, convergence/residual rules, no-solution cases and physical validation tests before enabling its profile. The dependency engine must not iterate cached processes as an implicit numerical solver. Qualification requires COMPLETE/PASS on the fixed manifest dimensions; supported-scope limitations cannot waive a required positive case. General CP trees remain explicitly unsupported.
 
 ## Battery arrangement and usable model
 
@@ -71,8 +72,12 @@ Energy sufficiency does not prove bank voltage at end of discharge fits converte
 
 ## Charging and backup state
 
-NORMAL/recharge selects charger and bank charge direction; BACKUP selects bank discharge and makes the relevant mains path unavailable. Operating outputW plus chargeVoltageV * selectedChargeCurrentA forms charger output demand. Compare charger combined/port limits, then apply conversion efficiency/own load once upstream.
+An explicitly configured NORMAL/recharge scenario may select charging; an explicitly configured BACKUP scenario selects discharge and unavailable mains. Role labels alone never activate either direction. Operating outputW plus chargeVoltageV * selectedChargeCurrentA forms charger output demand. Compare charger combined/port limits, then apply conversion efficiency/own load once upstream.
 
 Charge voltage and technology/unit count must be compatible. Peak charge/discharge currents use applicable limits. Exact recharge-time prediction remains unsupported without acceptance/taper evidence; Ah/current may be displayed only as a labelled ideal lower-bound calculation when explicitly requested by policy, never a guaranteed ready time.
 
 Exit: ACS shared-trunk and fire standby/alarm bases are explainable, scoped and reproducible; unsupported models never become successful physical feasibility.
+
+## Supported backup solver and numerical evidence
+
+RM06 supplies exact equation, root selection, preconditions, 128-iteration/1e-9V interval-bound termination, conservative rating checks and no-solution/nonconvergence outcomes. RM09 rational arithmetic prevents false limit verdicts. PWR-03 has SEGMENT scope; PWR-04 consumes the complete ordered SEQUENCE with exact segment evidence/durations, including source-side feeder losses once. Required positive bank/UPS tests provide source minimum/maximum/EOD/current and capacity-model applicability, not just nominal Ah or a boundary Wh oracle.

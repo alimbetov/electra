@@ -7,12 +7,12 @@ Parents: [index](README.md), [coordinated design](../elv4-coordinated-p0-p9-cont
 
 | Layer | Proposed source units | Boundary |
 |---|---|---|
-| Pure core | `power_profiles.dart`, `power_scenario.dart`, `power_graph.dart`, `power_trace.dart`, `power_calculations.dart`, `power_snapshot.dart`, `power_result.dart` under engineering_core/lib/src | Immutable inputs/results; no Drift, clocks, UUID generation, file IO or Flutter |
+| Pure core | `power_numeric.dart`, `power_profiles.dart`, `power_scenario.dart`, `power_graph.dart`, `power_trace.dart`, `power_calculations.dart`, `power_snapshot.dart`, `power_result.dart` under engineering_core/lib/src | Immutable inputs/results; no Drift, clocks, UUID generation, file IO or Flutter |
 | Application | `elv_power_command.dart`, `elv_power_command_service.dart`, `elv_power_read_service.dart`, `elv_power_calculation_service.dart`, `elv_power_dependency_inspector.dart` under mobile/lib/application | Capture/validate/orchestrate; existing ElvCommandResult and UoW conventions |
 | Data | `drift_elv_power_repository.dart`, `drift_elv_power_write_unit_of_work.dart`, `drift_elv_power_result_store.dart`, `drift_elv_power_snapshot_store.dart` under mobile/lib/data/repositories | One AppDatabase, scoped SQL, transaction-bound stores |
 | Presentation | Power overlay/side-card/state adapters within existing engineering editor feature | Application commands only; no direct multi-table writes |
 
-Implement existing shared behaviors once. New application services must not create replacement ELV1 connection or ELV3 allocation/revision lifecycles.
+Storage owner/kind isolation applies to every existing reader/writer/retirement path (RM01), not merely the new adapter. SQL pointer states CURRENT/STALE and immutable CAPTURED are decoded only by their owners. Implement existing shared behaviors once. New application services must not create replacement ELV1 connection or ELV3 allocation/revision lifecycles.
 
 ## S2. Command and query envelopes
 
@@ -31,29 +31,27 @@ Mutation envelope: projectId, designRevisionId, commandId, commandType, payloadS
 
 Receipt: changed logical IDs/row revisions, resulting design rowRevision, invalidated logical node keys, history operation ID if applicable, and provenance references. The ledger stores the complete replayable receipt. Do not return a cached success from another project or a partial reconstructed response.
 
-Query context: projectId, designRevisionId, scenarioId, optional segmentId/subject, trace direction. Frozen query chooses its immutable reader before resolving any canonical row. WORKING read captures a consistent view. Display filtering by system is a presentation constraint, not a different calculation scope.
+Query context: projectId, designRevisionId, scenarioId, optional segmentId for scenario-summary reads and explicit subject, trace direction. Frozen query chooses its immutable reader before resolving any canonical row. WORKING read captures a consistent view. Display filtering by system is a presentation constraint, not a different calculation scope.
 
 Preview response: canonical proposed mutation, expected design/row revisions, old/new impact keys and source hashes, findings, reviewedImpactFingerprint. Commit reloads those facts; a matching label or row count is insufficient. Preview has no durable writes.
 
 ## S3. Pure calculation input and output
 
-`PowerInputSnapshot` contains scope, designToken, scenario/segment payloads, exact port/component/connection/internal mapping data, aspect sets, installed physical evidence, exact definition contents/hashes, policy refs and algorithm/numeric versions. Missing required inputs are represented by typed unresolved entries with dependency identities, not dropped rows.
+`PowerInputSnapshot` is a consistent full capture container. Each evaluator consumes only a PowerConsumedInput projection whose facts map and recorded dependency keys coincide exactly (RM13); full capture is never hashed wholesale. Capture contains scope/designToken, scenario/segments, exact canonical/aspect/physical facts, definitions, policy refs and versions. Missing required inputs are represented by typed unresolved entries with dependency identities, not dropped rows.
 
-`PowerProcessEvaluation` contains processCode, subject, scenario/segment, algorithmVersion, inputSchemaVersion, outputSchemaVersion, numericPolicyVersion, inputFingerprint, quantities, contribution records, assumptions, findings and dependency keys. Each quantity records unit and boundary. Every contribution has a unique origin `(port/load/transfer ID, segmentId, accountingKind)`.
+`PowerProcessEvaluation` contains processCode, subject, scenario/segment, algorithmVersion, inputSchemaVersion, outputSchemaVersion, numericPolicyVersion, inputFingerprint, quantities, contribution records, assumptions, findings and dependency keys. Each quantity records unit and boundary. Logical keys require SEGMENT/segmentId or SEQUENCE/scenarioId (RM04). Every contribution has a unique origin `(port/load/transfer ID, segmentId, accountingKind)`.
 
 `PowerFinding` fields: stable code, severity, entity refs, field path, segment, expected/actual typed quantities when known, dependency refs, remediation kind and message parameters. Localized text is generated outside core; fingerprint technical values and codes only.
 
 Freshness lives on the current pointer: CURRENT or STALE. Evaluation completion: COMPLETE, PARTIAL or BLOCKED; assessment: PASS, FAIL or UNRESOLVED. Execution: SUCCEEDED or FAILED. Structural/input-domain failures prevent a result from asserting PASS. A proved violated limit can report FAIL even when other dimensions are unresolved; per-dimension status remains available. Overall PASS requires every required dimension complete and passing.
 
-## S4. Versioned numeric policy v1
+## S4. Versioned numeric policy v2
 
-Use finite IEEE-754 double arithmetic consistent with existing core APIs. Canonical serialization uses existing canonicalEngineeringJsonV1; sort unordered identity sets before serialization; preserve semantically ordered segments/path traversals. Reject NaN/infinity and invalid divisors before math. Normalize negative zero in newly defined numeric payloads; never rewrite old catalog/snapshot bytes.
+New power quantities use canonical decimal-string input parsed to reduced BigInt rational values. Arithmetic and rating decisions are exact; UI doubles never determine engineering assessment. Solver roots use conservative rational intervals. Full input/output and legacy-adoption rules are normative in [RM09](remediation-contract.md#rm09--numeric-policy-v2-exact-decimal-decisions-bounded-solver-outputs).
 
-Validation consistency and solver residual comparisons use `abs(a-b) <= max(1e-9, 1e-9 * max(abs(a),abs(b)))` in the quantity's canonical unit. This tolerance is not permission to exceed a rating. Capacity pass uses the unrounded computed demand <= declared available capacity; near-boundary uncertainty is exposed as a finding when input precision requires it. UI rounding never changes verdict. Source min/max range checks use unrounded bounds.
+Capacity equality is PASS for exact rationals. For uncertain solver/input intervals: PASS only if demand.upper <= available.lower; FAIL if demand.lower > available.upper; otherwise UNRESOLVED. No engineering epsilon hides real overload. Reject nonfinite/invalid input, zero divisors and out-of-model operations. Old canonical JSON/hashes are never rewritten.
 
-Use stable identity ordering for summation and finding order; assess physically distinct voltage/state cases separately. Decimal business rounding and standards-specific tolerances may be introduced only by an explicit later version with tests and provenance.
-
-Input fingerprint includes scope IDs, resolved technical input, missing-input markers, exact editions, selected scenario/policy, algorithm/input/output/numeric versions. It excludes calculatedAt, commandId, evaluationId, display labels and UI selection. A design token guards publication but is excluded from the technical fingerprint: unrelated edits can advance it without changing input. Revalidation may then recapture/retry safely.
+The fingerprint is computed only from the exact consumed facts map and versions (RM13), including scope, missing markers and relevant membership sets; it excludes designToken, display labels, UI selection, command/evaluation IDs and timestamps. Publication separately CAS-checks designToken/lifecycle and consumed pointer generations.
 
 ## S5. Error versus finding registry
 
@@ -85,3 +83,9 @@ Every power-affecting canonical write advances ProjectDesignRevisions.revision w
 SQLite BUSY retries at most three fresh transaction attempts for the same command ID. Do not retry an old partial session; reread ledger/preconditions. On exhaustion map to a stable storage failure with retryable=true. Validation/revision failures are not automatically retried as successful edits. This is a bounded runtime policy, not a performance benchmark.
 
 Capture → pure calculation → guarded publish uses separate short transactions around the pure stage. Publish verifies WORKING lifecycle, expected token, exact input fingerprint and prior pointer generation; stores immutable evaluations, current pointer and successful calculate ledger atomically. Concurrent calculations serialize by pointer generation; a loser returns typed conflict or exact ledger replay. A replay of an old calculate command never changes pointer freshness.
+
+## S7. Resolved audit contracts
+
+[RM01–RM15](remediation-contract.md) define mandatory storage isolation, static/nameplate projection, segment/sequence identity, generic canonical bridge, supported single-CP feeder, remapping/lineage, durable history, exact numeric/wire schemas, conservative startup model, consumed-input projection, nonblocking freeze and qualification manifest. These decisions refine the same requirements and introduce no runtime completion claim.
+
+Additional stable findings/errors: ELV4_NO_FEASIBLE_ELECTRICAL_SOLUTION (physical FAIL), ELV4_SOLVER_NOT_CONVERGED (BLOCKED), ELV4_NUMERIC_BOUNDARY_UNCERTAIN (UNRESOLVED), ELV4_BASE_CANONICAL_STATE_CONFLICT (reviewed restoration conflict), ELV4_OPERATING_POINT_AT_BOUNDARY (unsupported collapse boundary) and ELV4_COMMAND_VERSION_OBSOLETE (fresh legacy revision request rejected after replay lookup). Persisted operation codecs reject unknown versions; actual schema version is passed to the ledger writer.

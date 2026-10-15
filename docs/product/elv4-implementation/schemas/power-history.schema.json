@@ -1,0 +1,2603 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:electra:elv4-history-v1",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "electra.elv4-history.v1"
+    },
+    "projectId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "designRevisionId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "originalCommandId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "state": {
+      "enum": [
+        "APPLIED",
+        "UNDONE",
+        "REDO_ABANDONED"
+      ]
+    },
+    "forwardCommand": {
+      "$ref": "#/$defs/command"
+    },
+    "inverseCommand": {
+      "$ref": "#/$defs/command"
+    },
+    "forwardPayloadSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "inversePayloadSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "beforeAggregateHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "afterAggregateHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "cursorGeneration": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "affectedIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 512
+      },
+      "minItems": 1
+    },
+    "beforeAggregateEvidenceRef": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "afterAggregateEvidenceRef": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    }
+  },
+  "required": [
+    "schema",
+    "projectId",
+    "designRevisionId",
+    "sequence",
+    "originalCommandId",
+    "state",
+    "forwardCommand",
+    "inverseCommand",
+    "forwardPayloadSha256",
+    "inversePayloadSha256",
+    "beforeAggregateHash",
+    "afterAggregateHash",
+    "cursorGeneration",
+    "affectedIds",
+    "beforeAggregateEvidenceRef",
+    "afterAggregateEvidenceRef"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "decimal": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]{0,29})(\\.[0-9]{1,12})?$"
+    },
+    "code": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+    },
+    "definitionRef": {
+      "type": "object",
+      "properties": {
+        "catalogId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "catalogVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "definitionKind": {
+          "enum": [
+            "PORT",
+            "COMPONENT",
+            "TRANSFER",
+            "POE",
+            "BATTERY",
+            "POLICY",
+            "INTERFACE",
+            "PROTOCOL",
+            "COMPATIBILITY"
+          ]
+        },
+        "definitionCode": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+        },
+        "definitionVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "definitionSchema": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "contentSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "sourceRef": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        }
+      },
+      "required": [
+        "catalogId",
+        "catalogVersion",
+        "definitionKind",
+        "definitionCode",
+        "definitionVersion",
+        "definitionSchema",
+        "contentSha256",
+        "sourceRef"
+      ],
+      "additionalProperties": false
+    },
+    "voltage": {
+      "type": "object",
+      "properties": {
+        "currentKind": {
+          "enum": [
+            "AC",
+            "DC"
+          ]
+        },
+        "minV": {
+          "$ref": "#/$defs/decimal"
+        },
+        "nominalV": {
+          "$ref": "#/$defs/decimal"
+        },
+        "maxV": {
+          "$ref": "#/$defs/decimal"
+        },
+        "frequencyMinHz": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/decimal"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "frequencyMaxHz": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/decimal"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "terminalConvention": {
+          "enum": [
+            "PLUS_MINUS",
+            "AC_LN"
+          ]
+        }
+      },
+      "required": [
+        "currentKind",
+        "minV",
+        "nominalV",
+        "maxV",
+        "frequencyMinHz",
+        "frequencyMaxHz",
+        "terminalConvention"
+      ],
+      "additionalProperties": false
+    },
+    "loss": {
+      "type": "object",
+      "properties": {
+        "efficiency": {
+          "$ref": "#/$defs/decimal"
+        },
+        "idleW": {
+          "$ref": "#/$defs/decimal"
+        },
+        "idleAccounting": {
+          "enum": [
+            "EXCLUDES_SEPARATE_IDLE",
+            "INCLUDES_IDLE"
+          ]
+        }
+      },
+      "required": [
+        "efficiency",
+        "idleW",
+        "idleAccounting"
+      ],
+      "additionalProperties": false
+    },
+    "demand": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "DC_CONSTANT_CURRENT"
+            },
+            "currentA": {
+              "$ref": "#/$defs/decimal"
+            }
+          },
+          "required": [
+            "kind",
+            "currentA"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "DC_CONSTANT_POWER"
+            },
+            "powerW": {
+              "$ref": "#/$defs/decimal"
+            }
+          },
+          "required": [
+            "kind",
+            "powerW"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "AC_POWER"
+            },
+            "powerW": {
+              "$ref": "#/$defs/decimal"
+            },
+            "apparentVa": {
+              "$ref": "#/$defs/decimal"
+            }
+          },
+          "required": [
+            "kind",
+            "powerW",
+            "apparentVa"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "AC_POWER_PF"
+            },
+            "powerW": {
+              "$ref": "#/$defs/decimal"
+            },
+            "powerFactor": {
+              "$ref": "#/$defs/decimal"
+            }
+          },
+          "required": [
+            "kind",
+            "powerW",
+            "powerFactor"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "transfer": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "componentId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "inputPortId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "outputPortIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 1
+        },
+        "kind": {
+          "enum": [
+            "AC_DC",
+            "DC_DC",
+            "TRANSFORMER",
+            "UPS",
+            "CHARGER",
+            "DISTRIBUTOR",
+            "POE_PSE",
+            "SELECTOR"
+          ]
+        },
+        "activeStates": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+          },
+          "minItems": 1
+        },
+        "loss": {
+          "$ref": "#/$defs/loss"
+        },
+        "capacityGroupIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "id",
+        "componentId",
+        "inputPortId",
+        "outputPortIds",
+        "kind",
+        "activeStates",
+        "loss",
+        "capacityGroupIds"
+      ],
+      "additionalProperties": false
+    },
+    "limit": {
+      "type": "object",
+      "properties": {
+        "dimension": {
+          "enum": [
+            "W",
+            "A",
+            "VA"
+          ]
+        },
+        "value": {
+          "$ref": "#/$defs/decimal"
+        }
+      },
+      "required": [
+        "dimension",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "componentId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "stateCode": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+        }
+      },
+      "required": [
+        "componentId",
+        "stateCode"
+      ],
+      "additionalProperties": false
+    },
+    "selection": {
+      "type": "object",
+      "properties": {
+        "requirementId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "sourcePortId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "transferIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "requirementId",
+        "sourcePortId",
+        "transferIds"
+      ],
+      "additionalProperties": false
+    },
+    "segment": {
+      "type": "object",
+      "properties": {
+        "segmentId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "ordinal": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "durationSeconds": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/decimal"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "states": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/state"
+          },
+          "minItems": 1
+        },
+        "sourceSelections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/selection"
+          },
+          "minItems": 0
+        },
+        "unavailableSourcePortIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "segmentId",
+        "ordinal",
+        "durationSeconds",
+        "states",
+        "sourceSelections",
+        "unavailableSourcePortIds"
+      ],
+      "additionalProperties": false
+    },
+    "scope": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "SEGMENT"
+            },
+            "segmentId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            }
+          },
+          "required": [
+            "kind",
+            "segmentId"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "SEQUENCE"
+            },
+            "scenarioId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            }
+          },
+          "required": [
+            "kind",
+            "scenarioId"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "pathMember": {
+      "type": "object",
+      "properties": {
+        "connectionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "allocationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "runId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "traversalIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 1
+        },
+        "powerPassMappingIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 0
+        },
+        "resourceIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 1
+        },
+        "terminationIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "connectionId",
+        "allocationId",
+        "runId",
+        "traversalIds",
+        "powerPassMappingIds",
+        "resourceIds",
+        "terminationIds"
+      ],
+      "additionalProperties": false
+    },
+    "bank": {
+      "type": "object",
+      "properties": {
+        "bankComponentId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "unitDefinitionRef": {
+          "$ref": "#/$defs/definitionRef"
+        },
+        "seriesCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "parallelCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "modelVoltageV": {
+          "$ref": "#/$defs/decimal"
+        },
+        "minimumSourceV": {
+          "$ref": "#/$defs/decimal"
+        },
+        "maximumSourceV": {
+          "$ref": "#/$defs/decimal"
+        },
+        "initialSoc": {
+          "$ref": "#/$defs/decimal"
+        },
+        "minimumSoc": {
+          "$ref": "#/$defs/decimal"
+        },
+        "temperatureFactor": {
+          "$ref": "#/$defs/decimal"
+        },
+        "agingFactor": {
+          "$ref": "#/$defs/decimal"
+        },
+        "rateFactor": {
+          "$ref": "#/$defs/decimal"
+        },
+        "applicabilitySourceRef": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        }
+      },
+      "required": [
+        "bankComponentId",
+        "unitDefinitionRef",
+        "seriesCount",
+        "parallelCount",
+        "modelVoltageV",
+        "minimumSourceV",
+        "maximumSourceV",
+        "initialSoc",
+        "minimumSoc",
+        "temperatureFactor",
+        "agingFactor",
+        "rateFactor",
+        "applicabilitySourceRef"
+      ],
+      "additionalProperties": false
+    },
+    "load": {
+      "type": "object",
+      "properties": {
+        "loadId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "inputPortId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "stateCode": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+        },
+        "accountingKind": {
+          "enum": [
+            "CONSUMER_INPUT",
+            "TRANSFER_IDLE"
+          ]
+        },
+        "originId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "demand": {
+          "$ref": "#/$defs/demand"
+        }
+      },
+      "required": [
+        "loadId",
+        "inputPortId",
+        "stateCode",
+        "accountingKind",
+        "originId",
+        "demand"
+      ],
+      "additionalProperties": false
+    },
+    "command": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "schema": {
+              "const": "electra.elv4-command.v1"
+            },
+            "operation": {
+              "const": "BIND_POWER_PROFILE"
+            },
+            "payloadSchemaVersion": {
+              "const": 1
+            },
+            "projectId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "designRevisionId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "commandId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "expectedDesignRowRevision": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "expectedRows": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "reviewedImpactFingerprint": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "componentId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "bindingId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "definitionRef": {
+                  "$ref": "#/$defs/definitionRef"
+                },
+                "templatePortMap": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string",
+                    "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+                  },
+                  "additionalProperties": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  }
+                },
+                "createPorts": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "templateCode": {
+                        "type": "string",
+                        "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+                      },
+                      "newPortId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 512
+                      }
+                    },
+                    "required": [
+                      "templateCode",
+                      "newPortId"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "minItems": 0
+                }
+              },
+              "required": [
+                "componentId",
+                "bindingId",
+                "definitionRef",
+                "templatePortMap",
+                "createPorts"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schema",
+            "operation",
+            "payloadSchemaVersion",
+            "projectId",
+            "designRevisionId",
+            "commandId",
+            "expectedDesignRowRevision",
+            "expectedRows",
+            "reviewedImpactFingerprint",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schema": {
+              "const": "electra.elv4-command.v1"
+            },
+            "operation": {
+              "const": "ADOPT_POWER_PROFILE"
+            },
+            "payloadSchemaVersion": {
+              "const": 1
+            },
+            "projectId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "designRevisionId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "commandId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "expectedDesignRowRevision": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "expectedRows": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "reviewedImpactFingerprint": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "bindingId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "newDefinitionRef": {
+                  "$ref": "#/$defs/definitionRef"
+                },
+                "templatePortMap": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string",
+                    "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+                  },
+                  "additionalProperties": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  }
+                }
+              },
+              "required": [
+                "bindingId",
+                "newDefinitionRef",
+                "templatePortMap"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schema",
+            "operation",
+            "payloadSchemaVersion",
+            "projectId",
+            "designRevisionId",
+            "commandId",
+            "expectedDesignRowRevision",
+            "expectedRows",
+            "reviewedImpactFingerprint",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schema": {
+              "const": "electra.elv4-command.v1"
+            },
+            "operation": {
+              "const": "RELEASE_POWER_PROFILE"
+            },
+            "payloadSchemaVersion": {
+              "const": 1
+            },
+            "projectId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "designRevisionId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "commandId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "expectedDesignRowRevision": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "expectedRows": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "reviewedImpactFingerprint": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "bindingId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "fieldReleasePolicy": {
+                  "enum": [
+                    "KEEP_SHARED_CLEAR_POWER_OWNED"
+                  ]
+                }
+              },
+              "required": [
+                "bindingId",
+                "fieldReleasePolicy"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schema",
+            "operation",
+            "payloadSchemaVersion",
+            "projectId",
+            "designRevisionId",
+            "commandId",
+            "expectedDesignRowRevision",
+            "expectedRows",
+            "reviewedImpactFingerprint",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schema": {
+              "const": "electra.elv4-command.v1"
+            },
+            "operation": {
+              "const": "SET_POWER_LOAD_PROFILE"
+            },
+            "payloadSchemaVersion": {
+              "const": 1
+            },
+            "projectId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "designRevisionId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "commandId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "expectedDesignRowRevision": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "expectedRows": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "reviewedImpactFingerprint": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "componentId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "loads": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/load"
+                  },
+                  "minItems": 0
+                }
+              },
+              "required": [
+                "componentId",
+                "loads"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schema",
+            "operation",
+            "payloadSchemaVersion",
+            "projectId",
+            "designRevisionId",
+            "commandId",
+            "expectedDesignRowRevision",
+            "expectedRows",
+            "reviewedImpactFingerprint",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schema": {
+              "const": "electra.elv4-command.v1"
+            },
+            "operation": {
+              "const": "REPLACE_POWER_TRANSFERS"
+            },
+            "payloadSchemaVersion": {
+              "const": 1
+            },
+            "projectId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "designRevisionId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "commandId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "expectedDesignRowRevision": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "expectedRows": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "reviewedImpactFingerprint": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "componentId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "transfers": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/transfer"
+                  },
+                  "minItems": 0
+                }
+              },
+              "required": [
+                "componentId",
+                "transfers"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schema",
+            "operation",
+            "payloadSchemaVersion",
+            "projectId",
+            "designRevisionId",
+            "commandId",
+            "expectedDesignRowRevision",
+            "expectedRows",
+            "reviewedImpactFingerprint",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schema": {
+              "const": "electra.elv4-command.v1"
+            },
+            "operation": {
+              "const": "REPLACE_POWER_CAPACITY_GROUP"
+            },
+            "payloadSchemaVersion": {
+              "const": 1
+            },
+            "projectId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "designRevisionId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "commandId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "expectedDesignRowRevision": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "expectedRows": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "reviewedImpactFingerprint": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "groupId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "componentId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "outputPortIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "minItems": 1
+                },
+                "limits": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/limit"
+                  },
+                  "minItems": 1
+                },
+                "derating": {
+                  "$ref": "#/$defs/decimal"
+                },
+                "reserveMultiplier": {
+                  "$ref": "#/$defs/decimal"
+                },
+                "policyRef": {
+                  "$ref": "#/$defs/definitionRef"
+                }
+              },
+              "required": [
+                "groupId",
+                "componentId",
+                "outputPortIds",
+                "limits",
+                "derating",
+                "reserveMultiplier",
+                "policyRef"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schema",
+            "operation",
+            "payloadSchemaVersion",
+            "projectId",
+            "designRevisionId",
+            "commandId",
+            "expectedDesignRowRevision",
+            "expectedRows",
+            "reviewedImpactFingerprint",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schema": {
+              "const": "electra.elv4-command.v1"
+            },
+            "operation": {
+              "const": "REPLACE_POWER_SUPPLY_REQUIREMENT"
+            },
+            "payloadSchemaVersion": {
+              "const": 1
+            },
+            "projectId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "designRevisionId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "commandId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "expectedDesignRowRevision": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "expectedRows": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "reviewedImpactFingerprint": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "requirementId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "componentId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "inputPortIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "minItems": 1
+                },
+                "selectionPolicy": {
+                  "enum": [
+                    "SINGLE",
+                    "ALTERNATIVE"
+                  ]
+                },
+                "allowedSourcePortIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "minItems": 1
+                },
+                "replacementSelections": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "scenarioId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 512
+                      },
+                      "segmentId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 512
+                      },
+                      "selection": {
+                        "$ref": "#/$defs/selection"
+                      }
+                    },
+                    "required": [
+                      "scenarioId",
+                      "segmentId",
+                      "selection"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "minItems": 0
+                }
+              },
+              "required": [
+                "requirementId",
+                "componentId",
+                "inputPortIds",
+                "selectionPolicy",
+                "allowedSourcePortIds",
+                "replacementSelections"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schema",
+            "operation",
+            "payloadSchemaVersion",
+            "projectId",
+            "designRevisionId",
+            "commandId",
+            "expectedDesignRowRevision",
+            "expectedRows",
+            "reviewedImpactFingerprint",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schema": {
+              "const": "electra.elv4-command.v1"
+            },
+            "operation": {
+              "const": "CREATE_POWER_SCENARIO"
+            },
+            "payloadSchemaVersion": {
+              "const": 1
+            },
+            "projectId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "designRevisionId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "commandId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "expectedDesignRowRevision": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "expectedRows": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "reviewedImpactFingerprint": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "scenarioId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "role": {
+                  "enum": [
+                    "NORMAL",
+                    "STANDBY",
+                    "ALARM",
+                    "STARTUP",
+                    "BACKUP",
+                    "RECHARGE"
+                  ]
+                },
+                "segments": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/segment"
+                  },
+                  "minItems": 1
+                },
+                "peakModel": {
+                  "enum": [
+                    "ALL_SIMULTANEOUS"
+                  ]
+                },
+                "policyRefs": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/definitionRef"
+                  },
+                  "minItems": 0
+                }
+              },
+              "required": [
+                "scenarioId",
+                "role",
+                "segments",
+                "peakModel",
+                "policyRefs"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schema",
+            "operation",
+            "payloadSchemaVersion",
+            "projectId",
+            "designRevisionId",
+            "commandId",
+            "expectedDesignRowRevision",
+            "expectedRows",
+            "reviewedImpactFingerprint",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schema": {
+              "const": "electra.elv4-command.v1"
+            },
+            "operation": {
+              "const": "REPLACE_POWER_SCENARIO"
+            },
+            "payloadSchemaVersion": {
+              "const": 1
+            },
+            "projectId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "designRevisionId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "commandId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "expectedDesignRowRevision": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "expectedRows": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "reviewedImpactFingerprint": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "scenarioId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "role": {
+                  "enum": [
+                    "NORMAL",
+                    "STANDBY",
+                    "ALARM",
+                    "STARTUP",
+                    "BACKUP",
+                    "RECHARGE"
+                  ]
+                },
+                "segments": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/segment"
+                  },
+                  "minItems": 1
+                },
+                "peakModel": {
+                  "enum": [
+                    "ALL_SIMULTANEOUS"
+                  ]
+                },
+                "policyRefs": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/definitionRef"
+                  },
+                  "minItems": 0
+                }
+              },
+              "required": [
+                "scenarioId",
+                "role",
+                "segments",
+                "peakModel",
+                "policyRefs"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schema",
+            "operation",
+            "payloadSchemaVersion",
+            "projectId",
+            "designRevisionId",
+            "commandId",
+            "expectedDesignRowRevision",
+            "expectedRows",
+            "reviewedImpactFingerprint",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schema": {
+              "const": "electra.elv4-command.v1"
+            },
+            "operation": {
+              "const": "ARCHIVE_POWER_SCENARIO"
+            },
+            "payloadSchemaVersion": {
+              "const": 1
+            },
+            "projectId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "designRevisionId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "commandId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "expectedDesignRowRevision": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "expectedRows": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "reviewedImpactFingerprint": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "scenarioId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                }
+              },
+              "required": [
+                "scenarioId"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schema",
+            "operation",
+            "payloadSchemaVersion",
+            "projectId",
+            "designRevisionId",
+            "commandId",
+            "expectedDesignRowRevision",
+            "expectedRows",
+            "reviewedImpactFingerprint",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schema": {
+              "const": "electra.elv4-command.v1"
+            },
+            "operation": {
+              "const": "BIND_POE_DELIVERY"
+            },
+            "payloadSchemaVersion": {
+              "const": 1
+            },
+            "projectId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "designRevisionId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "commandId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "expectedDesignRowRevision": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "expectedRows": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "reviewedImpactFingerprint": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "deliveryId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "psePortId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "pdPortId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "definitionRef": {
+                  "$ref": "#/$defs/definitionRef"
+                },
+                "accountingMode": {
+                  "enum": [
+                    "GUARANTEED_PD",
+                    "EXPLICIT_PATH_LOSS"
+                  ]
+                },
+                "upstreamBasis": {
+                  "enum": [
+                    "CONSERVATIVE_RESERVED"
+                  ]
+                },
+                "path": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/pathMember"
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": [
+                "deliveryId",
+                "psePortId",
+                "pdPortId",
+                "definitionRef",
+                "accountingMode",
+                "upstreamBasis",
+                "path"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schema",
+            "operation",
+            "payloadSchemaVersion",
+            "projectId",
+            "designRevisionId",
+            "commandId",
+            "expectedDesignRowRevision",
+            "expectedRows",
+            "reviewedImpactFingerprint",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schema": {
+              "const": "electra.elv4-command.v1"
+            },
+            "operation": {
+              "const": "REPLACE_POE_DELIVERY"
+            },
+            "payloadSchemaVersion": {
+              "const": 1
+            },
+            "projectId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "designRevisionId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "commandId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "expectedDesignRowRevision": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "expectedRows": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "reviewedImpactFingerprint": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "deliveryId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "psePortId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "pdPortId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "definitionRef": {
+                  "$ref": "#/$defs/definitionRef"
+                },
+                "accountingMode": {
+                  "enum": [
+                    "GUARANTEED_PD",
+                    "EXPLICIT_PATH_LOSS"
+                  ]
+                },
+                "upstreamBasis": {
+                  "enum": [
+                    "CONSERVATIVE_RESERVED"
+                  ]
+                },
+                "path": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/pathMember"
+                  },
+                  "minItems": 1
+                }
+              },
+              "required": [
+                "deliveryId",
+                "psePortId",
+                "pdPortId",
+                "definitionRef",
+                "accountingMode",
+                "upstreamBasis",
+                "path"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schema",
+            "operation",
+            "payloadSchemaVersion",
+            "projectId",
+            "designRevisionId",
+            "commandId",
+            "expectedDesignRowRevision",
+            "expectedRows",
+            "reviewedImpactFingerprint",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schema": {
+              "const": "electra.elv4-command.v1"
+            },
+            "operation": {
+              "const": "CONFIGURE_BACKUP_ASSEMBLY"
+            },
+            "payloadSchemaVersion": {
+              "const": 1
+            },
+            "projectId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "designRevisionId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "commandId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "expectedDesignRowRevision": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "expectedRows": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "reviewedImpactFingerprint": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "assemblyId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "upsComponentId": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "chargerComponentId": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 512
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "bankComponentId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "protectedOutputs": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "portId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 512
+                      },
+                      "expectedPortRevision": {
+                        "type": "integer",
+                        "minimum": 1
+                      }
+                    },
+                    "required": [
+                      "portId",
+                      "expectedPortRevision"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "minItems": 1
+                },
+                "transferIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 512
+                  },
+                  "minItems": 1
+                },
+                "bank": {
+                  "$ref": "#/$defs/bank"
+                },
+                "chargeVoltageV": {
+                  "$ref": "#/$defs/decimal"
+                },
+                "chargeCurrentA": {
+                  "$ref": "#/$defs/decimal"
+                },
+                "policyRef": {
+                  "$ref": "#/$defs/definitionRef"
+                }
+              },
+              "required": [
+                "assemblyId",
+                "upsComponentId",
+                "chargerComponentId",
+                "bankComponentId",
+                "protectedOutputs",
+                "transferIds",
+                "bank",
+                "chargeVoltageV",
+                "chargeCurrentA",
+                "policyRef"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schema",
+            "operation",
+            "payloadSchemaVersion",
+            "projectId",
+            "designRevisionId",
+            "commandId",
+            "expectedDesignRowRevision",
+            "expectedRows",
+            "reviewedImpactFingerprint",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schema": {
+              "const": "electra.elv4-command.v1"
+            },
+            "operation": {
+              "const": "REPLACE_BATTERY_BANK"
+            },
+            "payloadSchemaVersion": {
+              "const": 1
+            },
+            "projectId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "designRevisionId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "commandId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "expectedDesignRowRevision": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "expectedRows": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "reviewedImpactFingerprint": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "bankId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "configuration": {
+                  "$ref": "#/$defs/bank"
+                }
+              },
+              "required": [
+                "bankId",
+                "configuration"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schema",
+            "operation",
+            "payloadSchemaVersion",
+            "projectId",
+            "designRevisionId",
+            "commandId",
+            "expectedDesignRowRevision",
+            "expectedRows",
+            "reviewedImpactFingerprint",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schema": {
+              "const": "electra.elv4-command.v1"
+            },
+            "operation": {
+              "const": "CALCULATE_POWER_PROCESS"
+            },
+            "payloadSchemaVersion": {
+              "const": 1
+            },
+            "projectId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "designRevisionId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "commandId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "expectedDesignRowRevision": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "expectedRows": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "reviewedImpactFingerprint": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "scenarioId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "scope": {
+                  "$ref": "#/$defs/scope"
+                },
+                "processCodes": {
+                  "type": "array",
+                  "items": {
+                    "enum": [
+                      "ELV-PWR-01",
+                      "ELV-PWR-02",
+                      "ELV-PWR-03",
+                      "ELV-PWR-04",
+                      "ELV-PWR-05",
+                      "ELV-PWR-06"
+                    ]
+                  },
+                  "minItems": 1
+                },
+                "subjects": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "enum": [
+                          "SOURCE",
+                          "GROUP",
+                          "PORT",
+                          "DC_DOMAIN",
+                          "BACKUP_ASSEMBLY",
+                          "PSE",
+                          "UPS"
+                        ]
+                      },
+                      "id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 512
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "id"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "minItems": 1
+                },
+                "expectedPointerGenerations": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                }
+              },
+              "required": [
+                "scenarioId",
+                "scope",
+                "processCodes",
+                "subjects",
+                "expectedPointerGenerations"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schema",
+            "operation",
+            "payloadSchemaVersion",
+            "projectId",
+            "designRevisionId",
+            "commandId",
+            "expectedDesignRowRevision",
+            "expectedRows",
+            "reviewedImpactFingerprint",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schema": {
+              "const": "electra.elv4-revision-command.v2"
+            },
+            "operation": {
+              "const": "FREEZE_DESIGN_REVISION"
+            },
+            "payloadSchemaVersion": {
+              "const": 2
+            },
+            "projectId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "designRevisionId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "commandId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "expectedDesignRowRevision": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "expectedRows": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "reviewedImpactFingerprint": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "powerSectionIntent": {
+                  "enum": [
+                    "CAPTURE_CURRENT",
+                    "CAPTURE_EMPTY"
+                  ]
+                }
+              },
+              "required": [
+                "powerSectionIntent"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schema",
+            "operation",
+            "payloadSchemaVersion",
+            "projectId",
+            "designRevisionId",
+            "commandId",
+            "expectedDesignRowRevision",
+            "expectedRows",
+            "reviewedImpactFingerprint",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schema": {
+              "const": "electra.elv4-revision-command.v2"
+            },
+            "operation": {
+              "const": "CREATE_NEXT_WORKING_DESIGN_REVISION"
+            },
+            "payloadSchemaVersion": {
+              "const": 2
+            },
+            "projectId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "designRevisionId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "commandId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "expectedDesignRowRevision": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "expectedRows": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "reviewedImpactFingerprint": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "newRevisionId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "code": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "basedOnRevisionId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512
+                },
+                "initializePowerAsEmpty": {
+                  "type": "boolean"
+                },
+                "expectedAllocatorGeneration": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "canonicalRestorePlan": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "entityKind": {
+                        "enum": [
+                          "PORT",
+                          "CONNECTION",
+                          "MAPPING",
+                          "ALLOCATION",
+                          "COMPONENT_BINDING"
+                        ]
+                      },
+                      "entityId": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 512
+                      },
+                      "expectedCurrentRevision": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "capturedValueSchema": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 512
+                      },
+                      "capturedCanonicalValueJson": {
+                        "type": "string",
+                        "minLength": 2
+                      }
+                    },
+                    "required": [
+                      "entityKind",
+                      "entityId",
+                      "expectedCurrentRevision",
+                      "capturedValueSchema",
+                      "capturedCanonicalValueJson"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "minItems": 0
+                }
+              },
+              "required": [
+                "newRevisionId",
+                "code",
+                "basedOnRevisionId",
+                "initializePowerAsEmpty",
+                "expectedAllocatorGeneration",
+                "canonicalRestorePlan"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schema",
+            "operation",
+            "payloadSchemaVersion",
+            "projectId",
+            "designRevisionId",
+            "commandId",
+            "expectedDesignRowRevision",
+            "expectedRows",
+            "reviewedImpactFingerprint",
+            "payload"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}

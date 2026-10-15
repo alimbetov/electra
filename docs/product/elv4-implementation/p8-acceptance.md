@@ -3,6 +3,7 @@
 Status: IMPLEMENTATION DESIGN DRAFT / NO RUNTIME TEST EXECUTION CLAIMED
 Consumes P0–P7; fixture design begins during P0/P1.
 Shared rules: [runtime contracts](shared-contracts.md).
+Resolved audit decisions: [RM01–RM15](remediation-contract.md).
 
 ## Required work and acceptance
 
@@ -47,9 +48,9 @@ The actual public path must exist before a vertical is accepted. Internal raw IN
 | Shared | CCTV + LAN consume same PSE/UPS | Single project group total and own load, independent-source negative control |
 | Historical | R0 pre-power, frozen R1, working R2 | NOT_CAPTURED versus CAPTURED_EMPTY; old hashes and traces independent of current rows |
 
-V1/V3/V4/V6 numerical cases are boundary arithmetic oracles. Full vertical builders must provide explicit remaining compatible profiles, ratings, source bounds and physical evidence; the oracle alone cannot assert whole-design PASS. In particular, a constant-W energy sequence does not prove a supported nonlinear DC terminal solution. Use supported constant-current radial loads for terminal-voltage acceptance, or keep that dimension explicitly unresolved.
+V1/V3/V4/V6 numerical cases are boundary arithmetic oracles. Full vertical builders must provide explicit remaining compatible profiles, ratings, source bounds and physical evidence; the oracle alone cannot assert whole-design PASS. In particular, a constant-W energy sequence does not prove a supported nonlinear DC terminal solution. Positive qualification uses supported CC trees or RM06 single-CP feeders with every manifest-required dimension COMPLETE/PASS. Unresolved model/boundary estimates are separate non-qualifying cases.
 
-Numerical data is specified in [design fixtures](../../examples/elv4-power-design-fixtures.json). This JSON is a design/test oracle, not an importable application catalog or proof that a vertical already executes.
+Binding positive qualification is specified in [qualification.json](qualification.json). Historical boundary numerical data remains in [design fixtures](../../examples/elv4-power-design-fixtures.json). This JSON is a design/test oracle, not an importable application catalog or proof that a vertical already executes.
 
 ## Migration and restart matrix
 
@@ -85,3 +86,9 @@ Permutation of input iteration order preserves fingerprints/quantities/findings;
 Include missing versus zero, nonfinite values, wrong units, voltage-overlap trap, no source, active cycle, same-source reconvergence, source unavailable, port/group overload, missing PF, missing resistance/temperature evidence, unsupported nonlinear load, incompatible bank and missing duration/extension policy.
 
 Exit: all planned assertions are implemented and passing at the source SHA evaluated by P9. Fixture/code existence without execution leaves runtime gate open.
+
+## Mandatory audit regression gates
+
+Add RM01-T…RM15-T to existing P0–P9 acceptance IDs; they are refinements of the 80 requirement rows, not runtime PASS evidence. Include mixed-owner legacy recalculate/manual retirement; explicit zero and read-only scenario projection; two distinct segment keys plus sequence; power-only generic import/connect; bounded CP feeder and no-solution; run/traversal remapping and older-base restoration; durable redo after two restarts; exact-decimal boundary; project sequence allocator races; schema version dispatch; conservative startup; consumed-input completeness; nonblocking freeze serialization; and qualification validator rejection of required unresolved dimensions.
+
+Every positive case in qualification.json must run through the public-command builder and real FK-valid file SQLite; record complete profile/policy/model facts and exact required process/dimension outcomes. Negative fixtures have their own IDs and cannot satisfy a positive row by being skipped or BLOCKED.

@@ -1,0 +1,26 @@
+{
+  "schema": "electra.elv4-specification-checks.v1",
+  "result": "PASS",
+  "scope": "Specification oracles/schema subset only; not Flutter/Dart/runtime implementation evidence",
+  "checks": [
+    "RM11: 8 structural valid/invalid examples and unknown-version rejection",
+    "RM05: strict power-only catalog has resolving canonical interface/compatibility references",
+    "RM01: specified owner/kind partition isolates old consumers (contract model only)",
+    "RM02/RM03: explicit zero remains a state fact, static nameplate stays separate (contract model)",
+    "RM04: standby/alarm result keys differ",
+    "RM06: exact CP oracle, power conservation, no-real-solution and collapse-boundary rejection",
+    "RM07: required operational remapping contract model; app materializer not executed",
+    "RM08: durable complete forward/inverse payloads survive JSON reopen with matching hashes",
+    "RM09: exact-decimal equality and real overload are distinguished",
+    "RM10: older base does not reuse sequence 2 in isolated allocator oracle",
+    "RM12: simultaneous startup event totals and conservative 35W/5s requirement",
+    "RM13: example facts equal declared dependencies; membership addition changes technical hash",
+    "RM14: durable evaluation excludes transient RUNNING; app freeze race remains runtime obligation",
+    "RM15: 7 positive manifests cover all processes; missing/unresolved qualification rejected; supported backup bound <44Wh"
+  ],
+  "requirementCount": 80,
+  "specificationResolutions": 15,
+  "positiveQualificationCases": 7,
+  "localLinksChecked": 109,
+  "runtimeImplemented": false
+}

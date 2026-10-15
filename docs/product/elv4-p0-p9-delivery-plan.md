@@ -68,7 +68,7 @@ P2.6 Reversible command history and atomic inverse/forward state transitions.
 P2.7 Derived-result node codec/key convention and immutable evaluation evidence using existing store.
 
 Tests: fresh + oldest supported + latest baseline migration; legacy electrical/ELV1–ELV3 preservation; exact reopen; duplicate aspect protection; cross-project/revision rejection; atomic failure; replay after response loss.
-Exit: no widget orchestration, no empty historical fallback, no split state/ledger/invalidation transaction. Historical pre-ELV4 snapshot reports NOT_CAPTURED.
+Exit: no widget orchestration, no empty historical fallback, no split state/ledger/invalidation transaction; mixed-owner result consumers, durable redo and typed remapping/sequence allocation must satisfy RM01/07/08/10. Historical pre-ELV4 snapshot reports NOT_CAPTURED.
 
 ## P3 — Scenario power topology, compatibility and trace
 
@@ -111,7 +111,7 @@ Exit: PoE never follows from RJ45/Ethernet label alone; shared budgets survive r
 
 P6.1 ELV-PWR-03 exact installed length/resource/terminal resistance; temperature and forward/return convention.
 P6.2 Radial branch current accumulation and worst terminal voltage; constant-current solver.
-P6.3 Explicit bounded solver contract or BLOCKED for constant-power/nonlinear loads.
+P6.3 Mandatory bounded single-terminal constant-power feeder solver (RM06); other nonlinear/shared-return/mesh models remain BLOCKED.
 P6.4 Battery bank series/parallel composition, compatible units, voltage/capacity/usable model.
 P6.5 Charger operating load plus recharge demand; scenario charge/discharge direction and limits.
 P6.6 ELV-PWR-04 piecewise standby/alarm energy or supported Ah basis with explicit duration policy.
@@ -209,3 +209,7 @@ No design status in this table asserts implementation or review approval. Numeri
 ## Implementation requirement traceability
 
 Each package now has eight numbered MUST requirements, planned acceptance IDs, implementation boundaries and failure/exit behavior in the detailed specification (80 requirements total). [requirements.json](elv4-implementation/requirements.json) is the design traceability source, with empty runtime evidence by intention. [Fictional fixture data](../examples/elv4-power-design-fixtures.json) provides explicit numerical oracles and history/path assertions; it is not an app-import catalog.
+
+## Technical audit remediation gates
+
+All packages include applicable RM01-T…RM15-T acceptance refinements. The [resolved contract](elv4-implementation/remediation-contract.md), strict wire schemas/examples and [qualification manifest](elv4-implementation/qualification.json) are required design inputs. All 80 original requirement IDs remain stable; their runtime states remain NOT_STARTED. A specification resolution never substitutes for P0 baseline evidence or an exact-SHA runtime gate.

@@ -1,0 +1,148 @@
+{
+  "schema": "electra.elv4-power-catalog.v1",
+  "id": "fictional-power-v1",
+  "code": "TEST_POWER",
+  "version": "1",
+  "source": "FICTIONAL_PRODUCT_NEUTRAL; no standards/manufacturer guarantee",
+  "power": {
+    "schema": "electra.elv4-power-definitions.v1",
+    "connectors": [
+      {
+        "code": "TERMINAL_2",
+        "contactCount": 2,
+        "sourceRef": "fictional:terminal"
+      }
+    ],
+    "protocols": [
+      {
+        "code": "DC_POWER",
+        "portKinds": [
+          "power"
+        ],
+        "sourceRef": "fictional:dc"
+      }
+    ],
+    "interfaces": [
+      {
+        "code": "DC_OUT_IF",
+        "portCode": "DC_OUT",
+        "sourceRef": "fictional:interface"
+      },
+      {
+        "code": "DC_IN_IF",
+        "portCode": "DC_IN",
+        "sourceRef": "fictional:interface"
+      }
+    ],
+    "portDefinitions": [
+      {
+        "code": "DC_OUT",
+        "sourceRef": "fictional:dc-fixture",
+        "kind": "power",
+        "direction": "output",
+        "capacity": 1,
+        "connectorCode": "TERMINAL_2",
+        "protocolCode": "DC_POWER",
+        "interfaceCode": "DC_OUT_IF",
+        "powerDirection": "output",
+        "voltage": {
+          "currentKind": "DC",
+          "minV": "24",
+          "nominalV": "24",
+          "maxV": "24",
+          "frequencyMinHz": null,
+          "frequencyMaxHz": null,
+          "terminalConvention": "PLUS_MINUS"
+        },
+        "nameplateDemandW": null,
+        "nameplateLimitW": "20"
+      },
+      {
+        "code": "DC_IN",
+        "sourceRef": "fictional:dc-fixture",
+        "kind": "power",
+        "direction": "input",
+        "capacity": 1,
+        "connectorCode": "TERMINAL_2",
+        "protocolCode": "DC_POWER",
+        "interfaceCode": "DC_IN_IF",
+        "powerDirection": "input",
+        "voltage": {
+          "currentKind": "DC",
+          "minV": "23",
+          "nominalV": "24",
+          "maxV": "25",
+          "frequencyMinHz": null,
+          "frequencyMaxHz": null,
+          "terminalConvention": "PLUS_MINUS"
+        },
+        "nameplateDemandW": "10",
+        "nameplateLimitW": null
+      }
+    ],
+    "componentDefinitions": [
+      {
+        "code": "GENERIC_PSU",
+        "sourceRef": "fictional:psu",
+        "portCodes": [
+          "DC_OUT"
+        ],
+        "transferCodes": [],
+        "capabilities": [
+          "SOURCE"
+        ],
+        "supplyOrigin": "EXTERNAL_DECLARED"
+      },
+      {
+        "code": "GENERIC_LOAD",
+        "sourceRef": "fictional:load",
+        "portCodes": [
+          "DC_IN"
+        ],
+        "transferCodes": [],
+        "capabilities": [
+          "CONSUMER"
+        ],
+        "supplyOrigin": "NOT_SOURCE"
+      }
+    ],
+    "transferDefinitions": [],
+    "poeDefinitions": [],
+    "batteryDefinitions": [],
+    "policyDefinitions": [
+      {
+        "code": "NO_RESERVE",
+        "sourceRef": "fictional:policy",
+        "purpose": "SUPPLY_RESERVE",
+        "reserveMultiplier": "1",
+        "extensionPolicy": "NONE"
+      }
+    ],
+    "compatibilityDefinitions": [
+      {
+        "code": "DC_FEED",
+        "sourceRef": "fictional:compat",
+        "familyCodes": [
+          "ACS",
+          "FIRE",
+          "LAN",
+          "CCTV"
+        ],
+        "media": [
+          "wired"
+        ],
+        "layer": "power",
+        "flow": "directed",
+        "portCodeA": "DC_OUT",
+        "portCodeB": "DC_IN",
+        "protocolCodeA": "DC_POWER",
+        "protocolCodeB": "DC_POWER",
+        "interfaceCodeA": "DC_OUT_IF",
+        "interfaceCodeB": "DC_IN_IF"
+      }
+    ]
+  },
+  "metadata": {
+    "label": "Minimal fictional power-only catalog"
+  }
+}

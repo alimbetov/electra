@@ -41,6 +41,6 @@ Detailed implementation design now decomposes all P0–P9 packages into numbered
 
 ## Technical audit of implementation readiness
 
-The [2026-10-15 architecture/development/analysis audit](../audit/elv4-technical-audit/report.md) reviewed all 80 requirements at design HEAD `4404c02`. Outcome: **NOT READY FOR IMPLEMENTATION**, with 1 BLOCKER, 10 HIGH and 4 MEDIUM findings. See the [per-requirement matrix](../audit/elv4-technical-audit/requirements-review.md) and [machine-readable findings](../audit/elv4-technical-audit/findings-and-coverage.json).
+The [2026-10-15 architecture/development/analysis audit](../audit/elv4-technical-audit/report.md) reviewed all 80 requirements at design HEAD `4404c02`. Historical outcome at that audited HEAD: **NOT READY FOR IMPLEMENTATION**, with 1 BLOCKER, 10 HIGH and 4 MEDIUM findings. See the [per-requirement matrix](../audit/elv4-technical-audit/requirements-review.md) and [machine-readable findings](../audit/elv4-technical-audit/findings-and-coverage.json).
 
-This audit does not change runtime statuses or resolve the known baseline gates. Detailed specifications are present, but integration and contract defects require explicit remediation before their affected packages can be accepted.
+This audit does not change runtime statuses or resolve the known baseline gates. That historical audit is retained unchanged; its 15 design findings are now addressed by the [remediation contract](elv4-implementation/remediation-contract.md) and [resolution review](../audit/elv4-technical-audit/remediation-review.md). Source implementation, BASE-01…04 and runtime acceptance remain unproven/open.

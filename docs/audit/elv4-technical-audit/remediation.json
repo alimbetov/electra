@@ -1,0 +1,383 @@
+{
+  "schema": "electra.elv4-specification-remediation.v1",
+  "remediationDate": "2026-10-15",
+  "basedOnAuditCommit": "75cac79",
+  "originalAuditedDesignHead": "4404c02bba777515f70e58150dd8a25bff0a1573",
+  "verdict": "SPEC_FINDINGS_RESOLVED_BASELINE_AND_RUNTIME_GATES_OPEN",
+  "resolutions": [
+    {
+      "findingId": "ELV4-AUD-01",
+      "originalSeverity": "BLOCKER",
+      "requirements": [
+        "ELV4-P0-003",
+        "ELV4-P0-004",
+        "ELV4-P2-005",
+        "ELV4-P7-001",
+        "ELV4-P7-002",
+        "ELV4-P8-008",
+        "ELV4-P9-002",
+        "ELV4-P9-004"
+      ],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED",
+      "resolutionContract": "docs/product/elv4-implementation/remediation-contract.md#RM01",
+      "acceptanceId": "RM01-T",
+      "affectedContracts": [
+        "docs/product/elv4-implementation/shared-contracts.md",
+        "docs/product/elv4-implementation/p0-baseline.md",
+        "docs/product/elv4-implementation/p2-persistence-commands.md",
+        "docs/product/elv4-implementation/p7-dependencies-workspace.md",
+        "docs/product/elv4-implementation/p8-acceptance.md",
+        "docs/product/elv4-implementation/p9-closure.md"
+      ],
+      "sourceEvidenceRequired": true
+    },
+    {
+      "findingId": "ELV4-AUD-02",
+      "originalSeverity": "HIGH",
+      "requirements": [
+        "ELV4-P1-001",
+        "ELV4-P1-002",
+        "ELV4-P1-007",
+        "ELV4-P2-002",
+        "ELV4-P2-008",
+        "ELV4-P8-008"
+      ],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED",
+      "resolutionContract": "docs/product/elv4-implementation/remediation-contract.md#RM02",
+      "acceptanceId": "RM02-T",
+      "affectedContracts": [
+        "docs/product/elv4-implementation/shared-contracts.md",
+        "docs/product/elv4-implementation/p1-domain-catalog.md",
+        "docs/product/elv4-implementation/p2-persistence-commands.md",
+        "docs/product/elv4-implementation/p8-acceptance.md"
+      ],
+      "sourceEvidenceRequired": true
+    },
+    {
+      "findingId": "ELV4-AUD-03",
+      "originalSeverity": "HIGH",
+      "requirements": [
+        "ELV4-P1-002",
+        "ELV4-P1-004",
+        "ELV4-P1-007",
+        "ELV4-P2-003",
+        "ELV4-P2-008",
+        "ELV4-P3-002",
+        "ELV4-P3-005",
+        "ELV4-P7-004"
+      ],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED",
+      "resolutionContract": "docs/product/elv4-implementation/remediation-contract.md#RM03",
+      "acceptanceId": "RM03-T",
+      "affectedContracts": [
+        "docs/product/elv4-implementation/shared-contracts.md",
+        "docs/product/elv4-implementation/p1-domain-catalog.md",
+        "docs/product/elv4-implementation/p2-persistence-commands.md",
+        "docs/product/elv4-implementation/p3-topology-trace.md",
+        "docs/product/elv4-implementation/p7-dependencies-workspace.md"
+      ],
+      "sourceEvidenceRequired": true
+    },
+    {
+      "findingId": "ELV4-AUD-04",
+      "originalSeverity": "HIGH",
+      "requirements": [
+        "ELV4-P1-008",
+        "ELV4-P2-005",
+        "ELV4-P4-007",
+        "ELV4-P6-005",
+        "ELV4-P7-001",
+        "ELV4-P7-003",
+        "ELV4-P8-004",
+        "ELV4-P8-007"
+      ],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED",
+      "resolutionContract": "docs/product/elv4-implementation/remediation-contract.md#RM04",
+      "acceptanceId": "RM04-T",
+      "affectedContracts": [
+        "docs/product/elv4-implementation/shared-contracts.md",
+        "docs/product/elv4-implementation/p1-domain-catalog.md",
+        "docs/product/elv4-implementation/p2-persistence-commands.md",
+        "docs/product/elv4-implementation/p4-load-conversion.md",
+        "docs/product/elv4-implementation/p6-dc-backup.md",
+        "docs/product/elv4-implementation/p7-dependencies-workspace.md",
+        "docs/product/elv4-implementation/p8-acceptance.md"
+      ],
+      "sourceEvidenceRequired": true
+    },
+    {
+      "findingId": "ELV4-AUD-05",
+      "originalSeverity": "HIGH",
+      "requirements": [
+        "ELV4-P0-005",
+        "ELV4-P0-006",
+        "ELV4-P1-005",
+        "ELV4-P2-002",
+        "ELV4-P2-003",
+        "ELV4-P3-001",
+        "ELV4-P3-003",
+        "ELV4-P5-007",
+        "ELV4-P8-001"
+      ],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED",
+      "resolutionContract": "docs/product/elv4-implementation/remediation-contract.md#RM05",
+      "acceptanceId": "RM05-T",
+      "affectedContracts": [
+        "docs/product/elv4-implementation/shared-contracts.md",
+        "docs/product/elv4-implementation/p0-baseline.md",
+        "docs/product/elv4-implementation/p1-domain-catalog.md",
+        "docs/product/elv4-implementation/p2-persistence-commands.md",
+        "docs/product/elv4-implementation/p3-topology-trace.md",
+        "docs/product/elv4-implementation/p5-poe.md",
+        "docs/product/elv4-implementation/p8-acceptance.md"
+      ],
+      "sourceEvidenceRequired": true
+    },
+    {
+      "findingId": "ELV4-AUD-06",
+      "originalSeverity": "HIGH",
+      "requirements": [
+        "ELV4-P0-005",
+        "ELV4-P4-008",
+        "ELV4-P6-003",
+        "ELV4-P6-005",
+        "ELV4-P6-006",
+        "ELV4-P6-007",
+        "ELV4-P8-001",
+        "ELV4-P9-006"
+      ],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED",
+      "resolutionContract": "docs/product/elv4-implementation/remediation-contract.md#RM06",
+      "acceptanceId": "RM06-T",
+      "affectedContracts": [
+        "docs/product/elv4-implementation/shared-contracts.md",
+        "docs/product/elv4-implementation/p0-baseline.md",
+        "docs/product/elv4-implementation/p4-load-conversion.md",
+        "docs/product/elv4-implementation/p6-dc-backup.md",
+        "docs/product/elv4-implementation/p8-acceptance.md",
+        "docs/product/elv4-implementation/p9-closure.md"
+      ],
+      "sourceEvidenceRequired": true
+    },
+    {
+      "findingId": "ELV4-AUD-07",
+      "originalSeverity": "HIGH",
+      "requirements": [
+        "ELV4-P0-007",
+        "ELV4-P2-006",
+        "ELV4-P5-008",
+        "ELV4-P6-008",
+        "ELV4-P7-007",
+        "ELV4-P8-004",
+        "ELV4-P8-007"
+      ],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED",
+      "resolutionContract": "docs/product/elv4-implementation/remediation-contract.md#RM07",
+      "acceptanceId": "RM07-T",
+      "affectedContracts": [
+        "docs/product/elv4-implementation/shared-contracts.md",
+        "docs/product/elv4-implementation/p0-baseline.md",
+        "docs/product/elv4-implementation/p2-persistence-commands.md",
+        "docs/product/elv4-implementation/p5-poe.md",
+        "docs/product/elv4-implementation/p6-dc-backup.md",
+        "docs/product/elv4-implementation/p7-dependencies-workspace.md",
+        "docs/product/elv4-implementation/p8-acceptance.md"
+      ],
+      "sourceEvidenceRequired": true
+    },
+    {
+      "findingId": "ELV4-AUD-08",
+      "originalSeverity": "HIGH",
+      "requirements": [
+        "ELV4-P2-007",
+        "ELV4-P7-006",
+        "ELV4-P8-004",
+        "ELV4-P8-006",
+        "ELV4-P9-002"
+      ],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED",
+      "resolutionContract": "docs/product/elv4-implementation/remediation-contract.md#RM08",
+      "acceptanceId": "RM08-T",
+      "affectedContracts": [
+        "docs/product/elv4-implementation/shared-contracts.md",
+        "docs/product/elv4-implementation/p2-persistence-commands.md",
+        "docs/product/elv4-implementation/p7-dependencies-workspace.md",
+        "docs/product/elv4-implementation/p8-acceptance.md",
+        "docs/product/elv4-implementation/p9-closure.md"
+      ],
+      "sourceEvidenceRequired": true
+    },
+    {
+      "findingId": "ELV4-AUD-09",
+      "originalSeverity": "HIGH",
+      "requirements": [
+        "ELV4-P1-001",
+        "ELV4-P1-008",
+        "ELV4-P4-004",
+        "ELV4-P5-005",
+        "ELV4-P6-002",
+        "ELV4-P8-008"
+      ],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED",
+      "resolutionContract": "docs/product/elv4-implementation/remediation-contract.md#RM09",
+      "acceptanceId": "RM09-T",
+      "affectedContracts": [
+        "docs/product/elv4-implementation/shared-contracts.md",
+        "docs/product/elv4-implementation/p1-domain-catalog.md",
+        "docs/product/elv4-implementation/p4-load-conversion.md",
+        "docs/product/elv4-implementation/p5-poe.md",
+        "docs/product/elv4-implementation/p6-dc-backup.md",
+        "docs/product/elv4-implementation/p8-acceptance.md"
+      ],
+      "sourceEvidenceRequired": true
+    },
+    {
+      "findingId": "ELV4-AUD-10",
+      "originalSeverity": "HIGH",
+      "requirements": [
+        "ELV4-P0-007",
+        "ELV4-P2-006",
+        "ELV4-P8-006",
+        "ELV4-P9-004"
+      ],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED",
+      "resolutionContract": "docs/product/elv4-implementation/remediation-contract.md#RM10",
+      "acceptanceId": "RM10-T",
+      "affectedContracts": [
+        "docs/product/elv4-implementation/shared-contracts.md",
+        "docs/product/elv4-implementation/p0-baseline.md",
+        "docs/product/elv4-implementation/p2-persistence-commands.md",
+        "docs/product/elv4-implementation/p8-acceptance.md",
+        "docs/product/elv4-implementation/p9-closure.md"
+      ],
+      "sourceEvidenceRequired": true
+    },
+    {
+      "findingId": "ELV4-AUD-11",
+      "originalSeverity": "MEDIUM",
+      "requirements": [
+        "ELV4-P1-005",
+        "ELV4-P1-006",
+        "ELV4-P1-008",
+        "ELV4-P2-001",
+        "ELV4-P2-003",
+        "ELV4-P8-003"
+      ],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED",
+      "resolutionContract": "docs/product/elv4-implementation/remediation-contract.md#RM11",
+      "acceptanceId": "RM11-T",
+      "affectedContracts": [
+        "docs/product/elv4-implementation/shared-contracts.md",
+        "docs/product/elv4-implementation/p1-domain-catalog.md",
+        "docs/product/elv4-implementation/p2-persistence-commands.md",
+        "docs/product/elv4-implementation/p8-acceptance.md"
+      ],
+      "sourceEvidenceRequired": true
+    },
+    {
+      "findingId": "ELV4-AUD-12",
+      "originalSeverity": "MEDIUM",
+      "requirements": [
+        "ELV4-P1-003",
+        "ELV4-P1-004",
+        "ELV4-P4-006",
+        "ELV4-P6-006",
+        "ELV4-P8-008"
+      ],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED",
+      "resolutionContract": "docs/product/elv4-implementation/remediation-contract.md#RM12",
+      "acceptanceId": "RM12-T",
+      "affectedContracts": [
+        "docs/product/elv4-implementation/shared-contracts.md",
+        "docs/product/elv4-implementation/p1-domain-catalog.md",
+        "docs/product/elv4-implementation/p4-load-conversion.md",
+        "docs/product/elv4-implementation/p6-dc-backup.md",
+        "docs/product/elv4-implementation/p8-acceptance.md"
+      ],
+      "sourceEvidenceRequired": true
+    },
+    {
+      "findingId": "ELV4-AUD-13",
+      "originalSeverity": "MEDIUM",
+      "requirements": [
+        "ELV4-P4-007",
+        "ELV4-P7-001",
+        "ELV4-P7-002",
+        "ELV4-P7-003",
+        "ELV4-P8-002",
+        "ELV4-P8-008"
+      ],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED",
+      "resolutionContract": "docs/product/elv4-implementation/remediation-contract.md#RM13",
+      "acceptanceId": "RM13-T",
+      "affectedContracts": [
+        "docs/product/elv4-implementation/shared-contracts.md",
+        "docs/product/elv4-implementation/p4-load-conversion.md",
+        "docs/product/elv4-implementation/p7-dependencies-workspace.md",
+        "docs/product/elv4-implementation/p8-acceptance.md"
+      ],
+      "sourceEvidenceRequired": true
+    },
+    {
+      "findingId": "ELV4-AUD-14",
+      "originalSeverity": "MEDIUM",
+      "requirements": [
+        "ELV4-P2-006",
+        "ELV4-P7-003",
+        "ELV4-P7-007",
+        "ELV4-P8-006",
+        "ELV4-P9-008"
+      ],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED",
+      "resolutionContract": "docs/product/elv4-implementation/remediation-contract.md#RM14",
+      "acceptanceId": "RM14-T",
+      "affectedContracts": [
+        "docs/product/elv4-implementation/shared-contracts.md",
+        "docs/product/elv4-implementation/p2-persistence-commands.md",
+        "docs/product/elv4-implementation/p7-dependencies-workspace.md",
+        "docs/product/elv4-implementation/p8-acceptance.md",
+        "docs/product/elv4-implementation/p9-closure.md"
+      ],
+      "sourceEvidenceRequired": true
+    },
+    {
+      "findingId": "ELV4-AUD-15",
+      "originalSeverity": "HIGH",
+      "requirements": [
+        "ELV4-P0-006",
+        "ELV4-P8-001",
+        "ELV4-P8-008",
+        "ELV4-P9-001",
+        "ELV4-P9-003",
+        "ELV4-P9-006",
+        "ELV4-P9-007",
+        "ELV4-P9-008"
+      ],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED",
+      "resolutionContract": "docs/product/elv4-implementation/remediation-contract.md#RM15",
+      "acceptanceId": "RM15-T",
+      "affectedContracts": [
+        "docs/product/elv4-implementation/shared-contracts.md",
+        "docs/product/elv4-implementation/p0-baseline.md",
+        "docs/product/elv4-implementation/p8-acceptance.md",
+        "docs/product/elv4-implementation/p9-closure.md"
+      ],
+      "sourceEvidenceRequired": true
+    }
+  ]
+}

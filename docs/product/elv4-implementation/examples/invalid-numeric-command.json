@@ -1,0 +1,29 @@
+{
+  "schema": "electra.elv4-command.v1",
+  "operation": "SET_POWER_LOAD_PROFILE",
+  "payloadSchemaVersion": 1,
+  "projectId": "p",
+  "designRevisionId": "r1",
+  "commandId": "set-load-1",
+  "expectedDesignRowRevision": 1,
+  "expectedRows": {
+    "component:c1": 1
+  },
+  "reviewedImpactFingerprint": null,
+  "payload": {
+    "componentId": "c1",
+    "loads": [
+      {
+        "loadId": "load1",
+        "inputPortId": "port1",
+        "stateCode": "OFF",
+        "accountingKind": "CONSUMER_INPUT",
+        "originId": "device-own",
+        "demand": {
+          "kind": "DC_CONSTANT_CURRENT",
+          "currentA": 0
+        }
+      }
+    ]
+  }
+}

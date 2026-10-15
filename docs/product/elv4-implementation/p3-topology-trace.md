@@ -3,6 +3,7 @@
 Status: IMPLEMENTATION DESIGN DRAFT
 Consumes P1 typed inputs and P2 consistent reader. Supplies P4–P7.
 Shared rules: [runtime contracts](shared-contracts.md).
+Resolved audit decisions: [RM01–RM15](remediation-contract.md).
 
 ## Required work and acceptance
 
@@ -62,3 +63,7 @@ Show one project graph with selected-system highlighting. Shared budgets and oth
 Implement scenario resolver → graph builder → direction/passive normalization → SCC/path multiplicity → compatibility → trace. P3-T04 includes a cycle, self-loop, same-source diamond, two-source feed and closed signal loop with radial power. P3-T05 uses source 22–26V versus consumer 23–25V to reject mere overlap; exact bound containment passes. P3-T07 preserves topology with missing cable and blocks physical delivery only. P3-T08 modifies R2/current catalog and proves identical R1 trace/provenance.
 
 Exit: each consumer has an explained selected source or concrete unresolved/incompatible state, with graph facts shared identically by all six processes.
+
+## Canonical projection and required physical domains
+
+Scenario graph uses RM03's static canonical interfaces plus selected transfer/demand aspects; graph build/query never writes ports. Generic sources participate explicitly in each owning connection system and use imported exact compatibility editions (RM05). Physical evaluation distinguishes CC trees and RM06 single-CP unbranched feeder; it never drops unsupported branches. Frozen trace uses RM04 segment/sequence keys and verified captured mapped evidence.

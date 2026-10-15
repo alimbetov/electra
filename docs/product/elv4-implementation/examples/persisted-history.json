@@ -1,0 +1,78 @@
+{
+  "schema": "electra.elv4-history.v1",
+  "projectId": "p",
+  "designRevisionId": "r1",
+  "sequence": 1,
+  "originalCommandId": "set-load-1",
+  "state": "APPLIED",
+  "forwardCommand": {
+    "schema": "electra.elv4-command.v1",
+    "operation": "SET_POWER_LOAD_PROFILE",
+    "payloadSchemaVersion": 1,
+    "projectId": "p",
+    "designRevisionId": "r1",
+    "commandId": "set-load-1",
+    "expectedDesignRowRevision": 1,
+    "expectedRows": {
+      "component:c1": 1
+    },
+    "reviewedImpactFingerprint": null,
+    "payload": {
+      "componentId": "c1",
+      "loads": [
+        {
+          "loadId": "load1",
+          "inputPortId": "port1",
+          "stateCode": "OFF",
+          "accountingKind": "CONSUMER_INPUT",
+          "originId": "device-own",
+          "demand": {
+            "kind": "DC_CONSTANT_CURRENT",
+            "currentA": "0.4"
+          }
+        }
+      ]
+    }
+  },
+  "inverseCommand": {
+    "schema": "electra.elv4-command.v1",
+    "operation": "SET_POWER_LOAD_PROFILE",
+    "payloadSchemaVersion": 1,
+    "projectId": "p",
+    "designRevisionId": "r1",
+    "commandId": "inverse-original-payload",
+    "expectedDesignRowRevision": 1,
+    "expectedRows": {
+      "component:c1": 1
+    },
+    "reviewedImpactFingerprint": null,
+    "payload": {
+      "componentId": "c1",
+      "loads": [
+        {
+          "loadId": "load1",
+          "inputPortId": "port1",
+          "stateCode": "OFF",
+          "accountingKind": "CONSUMER_INPUT",
+          "originId": "device-own",
+          "demand": {
+            "kind": "DC_CONSTANT_CURRENT",
+            "currentA": "0"
+          }
+        }
+      ]
+    }
+  },
+  "forwardPayloadSha256": "f9fba9ba5959fd3207548eff2a05ce40351d067d027d91311e683f3c135eabcd",
+  "inversePayloadSha256": "d39eaf7766c8d10cc66131ebd0d1b07409bbc651bab683e5744f639f1f436948",
+  "beforeAggregateHash": "e6245361c34db6eab0cc6ac46af768647cd92b24d5a819e35ffc087f80a02d77",
+  "afterAggregateHash": "5168e305372f5b99fc75609465460f314efe4f314a41102e384323e54e1a3acf",
+  "beforeAggregateEvidenceRef": "history:before:1",
+  "afterAggregateEvidenceRef": "history:after:1",
+  "cursorGeneration": 1,
+  "affectedIds": [
+    "c1",
+    "port1",
+    "load1"
+  ]
+}

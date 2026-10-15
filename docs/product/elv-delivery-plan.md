@@ -444,6 +444,8 @@ ELV3 is complete when all four scenarios survive restart with exact routes, allo
 
 ELV4 design entry: [authoritative index](elv4-authoritative-spec-index.md), [power specification](elv4-power-topology-design-specification.md), [expanded P0–P9 plan](elv4-p0-p9-delivery-plan.md), [coordinated package contracts](elv4-coordinated-p0-p9-contract.md), [detailed P0–P9 implementation specifications](elv4-implementation/README.md).
 
+Design audit remediation: [resolved RM01–RM15 contracts](elv4-implementation/remediation-contract.md), strict wire schemas and qualification manifest now supplement all P0–P9 packages; specification resolution is separate from source/runtime acceptance.
+
 Status: DESIGN DRAFT. ELV4 runtime entry requires P0 reconciliation of merged ELV3 code and final closure evidence; see [baseline alignment audit](../audit/elv4-baseline-alignment-audit.md). Historical stage status labels elsewhere in this roadmap do not establish runtime acceptance.
 
 Make ELV power topology a first-class graph separate from signal/data topology.

@@ -3,6 +3,7 @@
 Status: DESIGN DRAFT / EVIDENCE GATE OPEN
 Depends on existing ELV1–ELV3 source and closure evidence. Supplies all later packages.
 Shared rules: [runtime contracts](shared-contracts.md).
+Resolved audit decisions: [RM01–RM15](remediation-contract.md).
 
 ## Required work and acceptance
 
@@ -51,3 +52,7 @@ Fixture builder design returns named handles for project/revision, catalog refs,
 5. Freeze fixture/public-command design and publish entry disposition.
 
 P0 design acceptance means the maps and unresolved obligations are concrete. P0 runtime entry requires baseline blockers closed with evidence; design of P1–P9 does not close them. No app code is implemented in this documentation package.
+
+## Remediation entry checks
+
+P0 inventories **all** ProjectDerivedResults owners/consumers, including legacy recalculation/manual/removedKeys, and records RM01 migration classification before P2. It verifies canonical static projection and generic membership/compatibility bridge (RM02/03/05), actual run/traversal remapping and sequence allocation (RM07/10), and source-version replay changes (RM11). Supported initial electrical scope includes RM06's one-terminal CP feeder; general nonlinear meshes remain excluded. Baseline evidence gates remain open independently of the design resolutions.

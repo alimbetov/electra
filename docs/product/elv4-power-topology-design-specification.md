@@ -111,7 +111,7 @@ ELV4-INV-18: topology availability, capacity compatibility and autonomy are sepa
 
 ## 5. Common calculation contracts
 
-All engines are pure engineering_core functions over typed snapshots. They never query Drift. Internal units: V, A, W, VA, ohm, m, Ah, Wh and seconds; explicit conversions only. Reject nonfinite/negative invalid inputs and zero divisors. Internal precision, canonical serialization and output rounding are versioned; UI rounding cannot change feasibility.
+All engines are pure engineering_core functions over typed snapshots. They never query Drift. Internal units: V, A, W, VA, ohm, m, Ah, Wh and seconds; explicit conversions only. Reject nonfinite/negative invalid inputs and zero divisors. New numeric policy v2 uses exact decimal/rational arithmetic and conservative solver intervals (RM09); output display rounding cannot change feasibility. Existing legacy hashes are preserved.
 
 | Process | Inputs | Outputs and blocking conditions |
 |---|---|---|
@@ -127,14 +127,14 @@ Baseline formula conventions:
 - A simple converter: inputW = outputW / efficiency + separately declared idleW, only when efficiency excludes that idle loss.
 - Derated available output = nameplate output × applicable derating; reserve modifies required capability according to explicit policy, once.
 - Simple DC section: dropV = currentA × loopResistanceOhm; loadV = sourceV − sum(section drops). loopResistance already includes forward and return; do not double it again. If inputs are per-conductor resistance/m, compute forward + return explicitly.
-- Constant-current radial calculations are supported. Constant-power loads requiring iterative voltage/current solution must select a versioned convergent solver with bounds or return BLOCKED; do not silently approximate them as constant current.
+- Constant-current radial trees and RM06 single-terminal unbranched constant-power feeders are supported. The latter requires the specified high-root quadratic/interval solver; all other nonlinear domains stay BLOCKED. Never approximate constant power as constant current.
 - Mixed conductor paths, parallel conductors, contacts and temperature corrections require their typed evidence. Missing resistance does not become zero. Balanced-pair PoE resistance requires the actual profile/resource arrangement, not a generic two-wire assumption.
 - Piecewise energy: requiredWh = sum(inputW(segment) × durationSeconds / 3600). Convert to Ah only with explicit supported voltage/model. Simple current/Ah basis is allowed only when its voltage/discharge assumptions apply.
 - AC apparent power VA = W / PF when PF is supplied and valid. W and VA are never interchangeable.
 - Available battery capacity applies only applicable factors once; capacity at a stated rate is not a universal autonomy curve.
 
 Result identity:
-projectId + designRevisionId + scenarioId + processCode + subjectId + algorithmVersion + inputSchemaVersion + outputSchemaVersion.
+projectId + designRevisionId + scenarioId + scopeKind + scopeId + processCode + subjectKind + subjectId + algorithmVersion + inputSchemaVersion + outputSchemaVersion + numericPolicyVersion. SEGMENT requires segmentId; PWR-04 SEQUENCE consumes the complete scenario segment set (RM04).
 
 Persist inputFingerprint, frozen input/provenance refs, structured steps, dependency keys, quantity/unit, status and findings, calculatedAt and result schema version. Timestamp is audit metadata, excluded from deterministic numerical fingerprint. Freshness CURRENT/STALE is separate from completion COMPLETE/PARTIAL/BLOCKED, assessment PASS/FAIL/UNRESOLVED and finding severity. FAILED identifies calculation execution failure. A current complete calculation may correctly report an engineering overload. Evaluations are immutable evidence; a current pointer may advance in WORKING. Use ProjectDerivedResults and the existing dependency infrastructure.
 
@@ -145,7 +145,7 @@ PowerPortBindings; PowerComponentBindings; PowerTransferBindings; PowerLoadBindi
 PowerCapacityGroups and memberships; PowerSupplyRequirements; PowerOperatingScenarios and state/source selections;
 PoeDeliveryBindings; BackupAssemblies; BatteryBankBindings.
 
-These are typed aspects referencing existing identities, not replacements. Catalog definitions remain within ELV2 edition storage. Derived traces/findings/calculations remain projections/results. No second permanent calculation result database. The inspected adapter currently upserts one row per node and stores empty dependency lists; ELV4 must explicitly add immutable evaluation keys and mutable current-pointer keys within ProjectDerivedResults, with complete inputs/dependencies and optimistic publication checks. Existing behavior is not sufficient evidence of historical evaluation support.
+These are typed aspects referencing existing identities, not replacements. Catalog definitions remain within ELV2 edition storage. Derived traces/findings/calculations remain projections/results. No second permanent calculation result database. All existing consumers must first adopt explicit resultOwner/recordKind filtering (RM01); the inspected adapter currently upserts one row per node and stores empty dependency lists; ELV4 must explicitly add immutable evaluation keys and mutable current-pointer keys within ProjectDerivedResults, with complete inputs/dependencies and optimistic publication checks. Existing behavior is not sufficient evidence of historical evaluation support.
 
 Use project + design revision scoping for editable power aspects; stable logical aspect identity survives deterministic create-next materialization. Shared project components/ports remain project-owned. Mutable ELV1/ELV2 facts required by power must be frozen in the revision evidence and guarded on mutation.
 
@@ -186,7 +186,7 @@ Reversible: unreferenced load/scenario edits and validated aspect-set replacemen
 | Unrelated room label | No numerical power invalidation |
 | Shared carrier facts alone | Only power results with explicit physical applicability dependency |
 
-Voltage-drop/load feedback is solved inside a bounded process contract, not by introducing dependency cycles. Freeze rejects RUNNING evidence; incomplete designs may freeze with explicit BLOCKED/NOT_CALCULATED findings, but cannot claim successful engineering acceptance.
+Voltage-drop/load feedback is solved inside a bounded process contract, not by introducing dependency cycles. Freeze captures committed evidence without waiting for transient RUNNING workspace operations and rejects late publication through lifecycle/token checks (RM14); incomplete designs may freeze with explicit BLOCKED/NOT_CALCULATED findings, but cannot claim successful engineering acceptance.
 
 ## 9. UI and vertical acceptance
 
@@ -213,6 +213,10 @@ Power is a typed root-catalog extension independent of existing discipline compo
 
 All participating canonical edits affecting power advance the coordinated design-revision row token inside the mutation transaction. Calculation captures a consistent snapshot, runs outside the write transaction and publishes only after token/fingerprint revalidation. Freeze captures all necessary canonical/profile/physical evidence and rejects stale publication. This requirement applies from P2, not only when P7 UI is implemented.
 
-The initial nonlinear DC implementation may remain BLOCKED until a bounded versioned solver is implemented and tested. No runtime iteration through dependency invalidation may substitute for a solver. General parallel sources/mesh/shared-return analysis remains unsupported.
+Initial implementation must include RM06 bounded single-CP feeder to satisfy mandatory UPS backup qualification; other nonlinear domains remain BLOCKED. No runtime iteration through dependency invalidation may substitute for a solver. General parallel sources/mesh/shared-return analysis remains unsupported.
 
-The implementation specification fixes the initial supported slice to radial constant-current DC and guaranteed-PD PoE accounting. Explicit-loss PoE/nonlinear DC require a reviewed implemented model extension before use. Generic draft profiles may record those model tags but evaluation must remain BLOCKED.
+The supported slice is radial constant-current DC, RM06 single-CP unbranched feeder, and guaranteed-PD PoE accounting. Explicit-loss PoE and nonlinear domains beyond RM06 require a reviewed implementation extension; their draft tags cannot yield a successful evaluation.
+
+## 11. Resolved technical audit decisions
+
+[RM01–RM15](elv4-implementation/remediation-contract.md) are mandatory refinements implemented consistently in the detailed package specifications: result ownership, static nameplate/scenario separation, segment keys, generic power canonical bridge, supported CP feeder, physical-reference remapping, durable redo, exact numeric v2, project-wide revision allocation, strict wire schemas, conservative startup, consumed facts, nonblocking freeze and positive qualification manifest. Historical audits remain pinned to their audited source; design remediation is not runtime closure.

@@ -3,6 +3,7 @@
 Status: IMPLEMENTATION DESIGN DRAFT
 Dependency integration begins in P2; complete workspace follows P3–P6.
 Shared rules: [runtime contracts](shared-contracts.md).
+Resolved audit decisions: [RM01–RM15](remediation-contract.md).
 
 ## Required work and acceptance
 
@@ -19,9 +20,9 @@ Shared rules: [runtime contracts](shared-contracts.md).
 
 ## Dependency encoding and storage
 
-Proposed key is a canonical JSON tuple with schema tag and scope: `["elv4-dep-v1", projectId, revisionId, kind, entityId, fieldOrPurpose]`. Include scenario/segment only for scenario-specific inputs. Never parse concatenated unrestricted IDs by colon splitting. Definition dependencies include exact edition/hash; physical keys include canonical run/resource/termination/resistance inputs.
+Dependency key is a canonical JSON tuple distinct from the RM04 segment/sequence result key: `["elv4-dep-v1", projectId, revisionId, kind, entityId, fieldOrPurpose]`. Include scenario/segment only for scenario-specific inputs. Never parse concatenated unrestricted IDs by colon splitting. Definition dependencies include exact edition/hash; physical keys include canonical run/resource/termination/resistance inputs.
 
-Index logical current pointers by their consumed keys through the existing dependency architecture or a scoped additive reverse-index adapter within the same DB. If an additive dependency-index table is needed, it is an index of current nodes, not another result source of truth; update it atomically with pointer publication/invalidation. Immutable evaluations retain their own complete dependency list.
+Index ELV4/POINTER rows by RM13 exact consumed facts through a scoped additive reverse-index adapter within the same DB; all existing result clients obey RM01 owner/kind filtering. If an additive dependency-index table is needed, it is an index of current nodes, not another result source of truth; update it atomically with pointer publication/invalidation. Immutable evaluations retain their own complete dependency list.
 
 Missing-input keys use the identity/purpose that will become resolved, e.g. required profile for a specific port. Binding that profile invalidates its previously BLOCKED result. Adding/removing members in a shared group invalidates consumers of the group set, not only the old individual member keys.
 
@@ -34,7 +35,7 @@ Missing-input keys use the identity/purpose that will become resolved, e.g. requ
 5. Mark only affected WORKING logical pointers STALE and update reverse-index entries in the same transaction.
 6. Leave immutable evaluations and frozen evidence untouched.
 
-Changed source voltage affects downstream compatibility/DC terminal results and loss-sensitive upstream/backup basis. Changed bank usable model affects protected energy capacity and explicit charging dependencies; unrelated normal demand stays current. Changed unrelated room label is a required negative control. A broad revision token is a concurrency guard, not permission to mark all numerical results stale.
+Changed source voltage affects downstream compatibility/DC terminal results and loss-sensitive upstream/backup basis. Changed bank usable model affects protected energy capacity and explicit charging dependencies; unrelated normal demand stays current. Changed unrelated room label is a required negative control. A broad revision token is a concurrency guard, not a fingerprint input or permission to mark all numerical results stale. RM13 facts-map keys exactly equal the recorded consumed dependency set.
 
 ## Calculation orchestration
 
@@ -42,7 +43,7 @@ Create request contains scope, process/subject set, command ID and expected inpu
 
 If token changed for unrelated reasons, return ELV4_RESULT_INPUT_CHANGED or perform a fresh bounded capture/recalculation before publish. Never publish merely because an earlier cached fingerprint looked equal. A failure or user cancellation before publish makes no partial pointer changes. A batch evaluation publishes its declared mutually dependent result set atomically so PWR-02 cannot point at a different PWR-01 input generation.
 
-Calculate ledger is committed only with evaluation/pointer publication. Frozen/history ad hoc calculation is a pure read over captured data and cannot mutate frozen rows; any new comparison must be an explicit separate read-only output, clearly distinguished from captured accepted evidence.
+Calculate ledger is committed only with evaluation/pointer publication. Freeze follows RM14 nonblocking capture; RUNNING is transient UI state only. Frozen/history ad hoc calculation is a pure read over captured data and cannot mutate frozen rows; any new comparison must be an explicit separate read-only output, clearly distinguished from captured accepted evidence.
 
 ## Workspace state model
 
@@ -68,3 +69,7 @@ At existing desktop and compact editor breakpoints, one active card remains navi
 P7-T02 asserts exact affected node IDs plus unchanged fingerprints of independent sources/scenarios and frozen revisions. P7-T03 edits run length after capture but before publish; publish must not resurrect CURRENT. P7-T05 verifies one card visible and forward/back state preservation. P7-T06 injects command failure and verifies unchanged DB plus retained draft. P7-T07 compares frozen and legacy missing-capture UI.
 
 Exit: place/bind → connect → realize → evaluate → trace/explain → freeze/reopen uses application contracts end to end, with no widget-owned persistence arithmetic.
+
+## Resolved UI/history behavior
+
+Scenario switch leaves static canonical port rows unchanged (RM02/03); display zero and unknown separately. Scenario summary returns explicit segment-keyed results (RM04). Undo/redo uses RM08 durable forward/inverse payloads and revision-local cursor. A late publisher after freeze returns the specified conflict and never changes captured results (RM14). Findings distinguish physical overload, numeric-boundary uncertainty and unsupported models; the qualification manifest controls readiness indicators rather than the presence of any numeric subtotal.

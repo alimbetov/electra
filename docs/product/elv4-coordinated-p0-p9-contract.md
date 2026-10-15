@@ -73,7 +73,7 @@ All mutable aspect records contain `id`, `projectId`, `designRevisionId`, `rowRe
 
 Exact edition reference: catalogId, catalogVersion, definitionCode, definitionVersion, definitionSchema, contentSha256, sourceRef. Normalize codes with the existing canonical normalizer. Hash technical values and units, not translated labels. Immutable definitions can be deprecated but cannot be overwritten.
 
-Quantities use typed units and finite numbers. Null means absent; zero is an explicit value. V/A/W/VA/ohm/m/Ah/Wh/seconds are canonical units. Numeric comparisons use a versioned tolerance policy and unrounded values. Invalid negative capacity, efficiency outside `(0,1]`, PF outside `(0,1]`, or nonpositive required voltage/duration is rejected. Explicit zero-duration segments are omitted, not used to erase missing load evidence.
+New quantities use canonical decimal strings parsed to exact rationals, or conservative computed intervals under numeric policy v2 (RM09). Legacy finite numbers require explicit reviewed adoption. Null means absent; zero is an explicit value. V/A/W/VA/ohm/m/Ah/Wh/seconds are canonical units. Rating decisions use exact rational/interval comparisons, with no engineering epsilon; decimal equality passes and interval overlap with a limit is UNRESOLVED. Invalid negative capacity, efficiency outside `(0,1]`, PF outside `(0,1]`, or nonpositive required voltage/duration is rejected. Explicit zero-duration segments are omitted, not used to erase missing load evidence.
 
 ### 3.2 Field, owner and cardinality matrix
 
@@ -140,14 +140,14 @@ Command execution: open transaction → replay committed ledger → reload WORKI
 
 Successful exact replay returns the original response even if the revision is now frozen. Reusing a command ID with another payload conflicts. Rejected commands do not create successful ledger entries. Durable successful ledger and state must both survive lost responses.
 
-Every participating ELV1/ELV2/ELV3 edit that affects power must advance the same design-revision row token inside its transaction. Per-row checks alone cannot prevent write-versus-freeze races or phantom graph reads. Non-power edits need not invalidate numerical power nodes.
+Static canonical projection/nameplate remains independent of scenario demand including zero (RM02/03). Every participating ELV1/ELV2/ELV3 edit that affects power must advance the same design-revision row token inside its transaction. Per-row checks alone cannot prevent write-versus-freeze races or phantom graph reads. Non-power edits need not invalidate numerical power nodes.
 
 ### 4.3 Evaluation persistence without a second store
 
 The baseline ProjectDerivedResults adapter upserts by nodeKey and writes `dependenciesJson: []`. This does not already implement append-only power evaluation history. P2 must extend the adapter explicitly:
 
-- A logical node key is canonical encoded tuple `(elv4, revisionId, scenarioId, processCode, subjectKind, subjectId)` within project scope. Use a versioned tuple encoder, not delimiter concatenation of unrestricted IDs.
-- Each immutable evaluation uses another nodeKey tuple `(elv4-evaluation, logicalNodeKey, evaluationId)`. Its inputsJson contains the complete resolved input snapshot or immutable content-addressed refs; dependenciesJson is populated, sorted and unique. No update/upsert overwrites this evaluation.
+- Logical node key v2 is canonical tuple `["elv4-node-v2", revisionId, scenarioId, scopeKind, scopeId, processCode, subjectKind, subjectId]` within project scope; SEGMENT requires segmentId, PWR-04 SEQUENCE uses scenarioId and the complete ordered segment set. Use a versioned tuple encoder, not delimiter concatenation of unrestricted IDs.
+- Each immutable evaluation uses `["elv4-evaluation-v2", logicalNodeKey, evaluationId]` with explicit ELV4/EVALUATION owner/kind; pointers use ELV4/POINTER. Every legacy/ELV3 consumer filters its own owner/kind before decode/retirement/manual writes (RM01). Its inputsJson contains the complete resolved input snapshot or immutable content-addressed refs; dependenciesJson is populated, sorted and unique. No update/upsert overwrites this evaluation.
 - The logical node row is the mutable current pointer and freshness state. It references an evaluation row. Invalidation updates this pointer only. Same-table evidence rows are not passed through blanket invalidation.
 - Each evaluation records algorithm/input/output/numeric-policy versions, input fingerprint, quantities, arithmetic steps, findings, assumptions and applicability. Failure and blocked evaluations may also be recorded, without replacing a newer valid pointer under a stale input race.
 - Capture input and revision token transactionally; calculate purely outside the write transaction; publish in a short transaction only if token and resolved input fingerprint still match. Otherwise discard publication and return stale/retry guidance. No late result resurrects CURRENT after an edit.
@@ -159,7 +159,7 @@ This is a deliberate storage design using existing infrastructure. Migration/ind
 
 Preserve physical snapshot v1 bytes and hashes for historical revisions. Add a power snapshot record keyed by the same designRevisionId, with schema, payload, powerHash and physicalHash reference. A coordinated revision manifest identifies physicalHash and powerHash, with a separately versioned manifest hash. Do not reinterpret the existing `snapshotHash` as a combined hash; it retains its physical meaning for existing consumers.
 
-Freeze transaction writes physical snapshot + power snapshot + manifest + revision transition + ledger. Power snapshot captures the complete resolved graph/profile/scenario/physical inputs, not merely references to mutable ports or latest catalog rows. It also captures current evaluation pointers and immutable evaluations with applicability/freshness. No RUNNING work is captured as success; a publisher racing freeze must fail token validation.
+Freeze transaction writes physical snapshot + power snapshot + manifest + revision transition + ledger. Nonblocking freeze captures only committed facts/evaluations and makes in-flight publishers fail lifecycle/token checks (RM14). Power snapshot captures the complete resolved graph/profile/scenario/physical inputs, not merely references to mutable ports or latest catalog rows. It also captures current evaluation pointers and immutable evaluations with applicability/freshness. No RUNNING work is captured as success; a publisher racing freeze must fail token validation.
 
 Old revisions without a power section return `ELV4_POWER_NOT_CAPTURED`. An initialized empty power design is `CAPTURED_EMPTY`, distinguishable from missing history. Create-next maps scoped records to the new revision with stable logical IDs, preserves source revision and exact edition refs, and never reuses a mutable R1 pointer in R2. No current-table fallback is permitted when reading frozen history.
 
@@ -228,7 +228,7 @@ For constant-current radial sections, `I(section) = sum(active downstream load c
 
 Report each section current against its rating and every terminal voltage against the consumer range, at the declared source envelope. Constant-current feasibility may use minimum source voltage for worst undervoltage; overvoltage uses maximum source voltage and appropriate minimum-load state. Never assume one operating point proves both bounds.
 
-First runtime slice may block DC constant-power/nonlinear networks. If enabled, the selected versioned solver must declare voltage/current bounds, convergence tolerance, iteration cap, residual checks, no-solution behavior and validated golden cases. No approximate safe result on divergence. General shared returns, meshes and circulating paths remain unsupported even if a solver exists for radial trees.
+First runtime slice supports CC trees and the mandatory RM06 single-terminal constant-power feeder with explicit quadratic high-root, 128-iteration bounded rational intervals and declared voltage/current applicability. Nonlinear networks outside that scope remain BLOCKED. No approximate safe result on divergence. General shared returns, meshes and circulating paths remain unsupported even if a solver exists for radial trees.
 
 Battery bank for compatible identical units: `bankV = unitV × seriesCount`; `bankAh = unitAh × parallelCount`. A simple Wh model is permitted only with an explicit applicability statement and model voltage. Apply usable factors once to the capacity side; do not inflate demand with those same factors. Initial SOC, allowed depth/EOD, temperature, aging and discharge-rate evidence are explicit. Voltage compatibility with transfer input is mandatory in addition to energy sufficiency.
 
@@ -312,3 +312,7 @@ Handoff:
 | ELV8 | Required capability, selected profile evidence and explicit margins | Manufacturer selection, BOM, schedules and deliverables |
 
 All P0–P9 design sections are present in this revision. They remain DESIGN DRAFT pending review and baseline proof; runtime is NOT STARTED. Unsupported parallel/mesh power, unimplemented nonlinear solving, unsupported charging curves and unverified standard editions must remain visible limitations in the final handoff.
+
+## 10. Audit-remediation refinement
+
+The [RM01–RM15 contract](elv4-implementation/remediation-contract.md) supplies exact choices for all audited integration gaps. P2 includes owner/kind isolation, complete forward/inverse history payloads, project sequence allocator and typed old-to-new physical identity remapping. Source selection from an older base requires a reviewed canonical restore plan. Startup is ALL_SIMULTANEOUS with conservative max startup demand over the longest pulse window. P8/P9 share qualification.json; required positive dimensions must be COMPLETE/PASS and cannot be waived by a partial boundary oracle.

@@ -1,0 +1,1117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:electra:elv4-evaluation-v2",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "electra.elv4-evaluation.v2"
+    },
+    "projectId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "designRevisionId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "scenarioId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "scope": {
+      "$ref": "#/$defs/scope"
+    },
+    "logicalNodeKey": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "evaluationId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "processCode": {
+      "enum": [
+        "ELV-PWR-01",
+        "ELV-PWR-02",
+        "ELV-PWR-03",
+        "ELV-PWR-04",
+        "ELV-PWR-05",
+        "ELV-PWR-06"
+      ]
+    },
+    "subjectKind": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "subjectId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "algorithmVersion": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "inputSchemaVersion": {
+      "const": 2
+    },
+    "outputSchemaVersion": {
+      "const": 2
+    },
+    "numericPolicyVersion": {
+      "const": "elv4.exact-rational.v2"
+    },
+    "inputFingerprint": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "completion": {
+      "enum": [
+        "COMPLETE",
+        "PARTIAL",
+        "BLOCKED"
+      ]
+    },
+    "assessment": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "UNRESOLVED"
+      ]
+    },
+    "execution": {
+      "enum": [
+        "SUCCEEDED",
+        "FAILED"
+      ]
+    },
+    "dimensions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "completion": {
+            "enum": [
+              "COMPLETE",
+              "PARTIAL",
+              "BLOCKED"
+            ]
+          },
+          "assessment": {
+            "enum": [
+              "PASS",
+              "FAIL",
+              "UNRESOLVED"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "completion",
+          "assessment"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "quantities": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/quantity"
+      },
+      "minItems": 0
+    },
+    "contributions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "originId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "segmentId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "accountingKind": {
+            "enum": [
+              "CONSUMER_INPUT",
+              "TRANSFER_IDLE",
+              "CABLE_LOSS"
+            ]
+          },
+          "quantityIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "minItems": 1
+          }
+        },
+        "required": [
+          "originId",
+          "segmentId",
+          "accountingKind",
+          "quantityIds"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "operation": {
+            "enum": [
+              "ADD",
+              "SUBTRACT",
+              "MULTIPLY",
+              "DIVIDE",
+              "SQRT_BOUND",
+              "COMPARE"
+            ]
+          },
+          "inputQuantityIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            "minItems": 1
+          },
+          "outputQuantityId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          }
+        },
+        "required": [
+          "id",
+          "operation",
+          "inputQuantityIds",
+          "outputQuantityId"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/finding"
+      },
+      "minItems": 0
+    },
+    "dependencyKeys": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 512
+      },
+      "minItems": 1
+    },
+    "consumedFacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "valueSchema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "canonicalValueJson": {
+            "type": "string"
+          },
+          "presence": {
+            "enum": [
+              "PRESENT",
+              "MISSING"
+            ]
+          }
+        },
+        "required": [
+          "key",
+          "valueSchema",
+          "canonicalValueJson",
+          "presence"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "consumedEvaluations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "logicalNodeKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "evaluationId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "inputFingerprint": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "required": [
+          "logicalNodeKey",
+          "evaluationId",
+          "inputFingerprint"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    }
+  },
+  "required": [
+    "schema",
+    "projectId",
+    "designRevisionId",
+    "scenarioId",
+    "scope",
+    "logicalNodeKey",
+    "evaluationId",
+    "processCode",
+    "subjectKind",
+    "subjectId",
+    "algorithmVersion",
+    "inputSchemaVersion",
+    "outputSchemaVersion",
+    "numericPolicyVersion",
+    "inputFingerprint",
+    "completion",
+    "assessment",
+    "execution",
+    "dimensions",
+    "quantities",
+    "contributions",
+    "steps",
+    "findings",
+    "dependencyKeys",
+    "consumedFacts",
+    "consumedEvaluations"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "decimal": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]{0,29})(\\.[0-9]{1,12})?$"
+    },
+    "code": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+    },
+    "definitionRef": {
+      "type": "object",
+      "properties": {
+        "catalogId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "catalogVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "definitionKind": {
+          "enum": [
+            "PORT",
+            "COMPONENT",
+            "TRANSFER",
+            "POE",
+            "BATTERY",
+            "POLICY",
+            "INTERFACE",
+            "PROTOCOL",
+            "COMPATIBILITY"
+          ]
+        },
+        "definitionCode": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+        },
+        "definitionVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "definitionSchema": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "contentSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "sourceRef": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        }
+      },
+      "required": [
+        "catalogId",
+        "catalogVersion",
+        "definitionKind",
+        "definitionCode",
+        "definitionVersion",
+        "definitionSchema",
+        "contentSha256",
+        "sourceRef"
+      ],
+      "additionalProperties": false
+    },
+    "voltage": {
+      "type": "object",
+      "properties": {
+        "currentKind": {
+          "enum": [
+            "AC",
+            "DC"
+          ]
+        },
+        "minV": {
+          "$ref": "#/$defs/decimal"
+        },
+        "nominalV": {
+          "$ref": "#/$defs/decimal"
+        },
+        "maxV": {
+          "$ref": "#/$defs/decimal"
+        },
+        "frequencyMinHz": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/decimal"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "frequencyMaxHz": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/decimal"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "terminalConvention": {
+          "enum": [
+            "PLUS_MINUS",
+            "AC_LN"
+          ]
+        }
+      },
+      "required": [
+        "currentKind",
+        "minV",
+        "nominalV",
+        "maxV",
+        "frequencyMinHz",
+        "frequencyMaxHz",
+        "terminalConvention"
+      ],
+      "additionalProperties": false
+    },
+    "loss": {
+      "type": "object",
+      "properties": {
+        "efficiency": {
+          "$ref": "#/$defs/decimal"
+        },
+        "idleW": {
+          "$ref": "#/$defs/decimal"
+        },
+        "idleAccounting": {
+          "enum": [
+            "EXCLUDES_SEPARATE_IDLE",
+            "INCLUDES_IDLE"
+          ]
+        }
+      },
+      "required": [
+        "efficiency",
+        "idleW",
+        "idleAccounting"
+      ],
+      "additionalProperties": false
+    },
+    "demand": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "DC_CONSTANT_CURRENT"
+            },
+            "currentA": {
+              "$ref": "#/$defs/decimal"
+            }
+          },
+          "required": [
+            "kind",
+            "currentA"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "DC_CONSTANT_POWER"
+            },
+            "powerW": {
+              "$ref": "#/$defs/decimal"
+            }
+          },
+          "required": [
+            "kind",
+            "powerW"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "AC_POWER"
+            },
+            "powerW": {
+              "$ref": "#/$defs/decimal"
+            },
+            "apparentVa": {
+              "$ref": "#/$defs/decimal"
+            }
+          },
+          "required": [
+            "kind",
+            "powerW",
+            "apparentVa"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "AC_POWER_PF"
+            },
+            "powerW": {
+              "$ref": "#/$defs/decimal"
+            },
+            "powerFactor": {
+              "$ref": "#/$defs/decimal"
+            }
+          },
+          "required": [
+            "kind",
+            "powerW",
+            "powerFactor"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "transfer": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "componentId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "inputPortId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "outputPortIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 1
+        },
+        "kind": {
+          "enum": [
+            "AC_DC",
+            "DC_DC",
+            "TRANSFORMER",
+            "UPS",
+            "CHARGER",
+            "DISTRIBUTOR",
+            "POE_PSE",
+            "SELECTOR"
+          ]
+        },
+        "activeStates": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+          },
+          "minItems": 1
+        },
+        "loss": {
+          "$ref": "#/$defs/loss"
+        },
+        "capacityGroupIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "id",
+        "componentId",
+        "inputPortId",
+        "outputPortIds",
+        "kind",
+        "activeStates",
+        "loss",
+        "capacityGroupIds"
+      ],
+      "additionalProperties": false
+    },
+    "limit": {
+      "type": "object",
+      "properties": {
+        "dimension": {
+          "enum": [
+            "W",
+            "A",
+            "VA"
+          ]
+        },
+        "value": {
+          "$ref": "#/$defs/decimal"
+        }
+      },
+      "required": [
+        "dimension",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "componentId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "stateCode": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+        }
+      },
+      "required": [
+        "componentId",
+        "stateCode"
+      ],
+      "additionalProperties": false
+    },
+    "selection": {
+      "type": "object",
+      "properties": {
+        "requirementId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "sourcePortId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "transferIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "requirementId",
+        "sourcePortId",
+        "transferIds"
+      ],
+      "additionalProperties": false
+    },
+    "segment": {
+      "type": "object",
+      "properties": {
+        "segmentId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "ordinal": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "durationSeconds": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/decimal"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "states": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/state"
+          },
+          "minItems": 1
+        },
+        "sourceSelections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/selection"
+          },
+          "minItems": 0
+        },
+        "unavailableSourcePortIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "segmentId",
+        "ordinal",
+        "durationSeconds",
+        "states",
+        "sourceSelections",
+        "unavailableSourcePortIds"
+      ],
+      "additionalProperties": false
+    },
+    "scope": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "SEGMENT"
+            },
+            "segmentId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            }
+          },
+          "required": [
+            "kind",
+            "segmentId"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "SEQUENCE"
+            },
+            "scenarioId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            }
+          },
+          "required": [
+            "kind",
+            "scenarioId"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "pathMember": {
+      "type": "object",
+      "properties": {
+        "connectionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "allocationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "runId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "traversalIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 1
+        },
+        "powerPassMappingIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 0
+        },
+        "resourceIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 1
+        },
+        "terminationIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "connectionId",
+        "allocationId",
+        "runId",
+        "traversalIds",
+        "powerPassMappingIds",
+        "resourceIds",
+        "terminationIds"
+      ],
+      "additionalProperties": false
+    },
+    "bank": {
+      "type": "object",
+      "properties": {
+        "bankComponentId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "unitDefinitionRef": {
+          "$ref": "#/$defs/definitionRef"
+        },
+        "seriesCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "parallelCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "modelVoltageV": {
+          "$ref": "#/$defs/decimal"
+        },
+        "minimumSourceV": {
+          "$ref": "#/$defs/decimal"
+        },
+        "maximumSourceV": {
+          "$ref": "#/$defs/decimal"
+        },
+        "initialSoc": {
+          "$ref": "#/$defs/decimal"
+        },
+        "minimumSoc": {
+          "$ref": "#/$defs/decimal"
+        },
+        "temperatureFactor": {
+          "$ref": "#/$defs/decimal"
+        },
+        "agingFactor": {
+          "$ref": "#/$defs/decimal"
+        },
+        "rateFactor": {
+          "$ref": "#/$defs/decimal"
+        },
+        "applicabilitySourceRef": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        }
+      },
+      "required": [
+        "bankComponentId",
+        "unitDefinitionRef",
+        "seriesCount",
+        "parallelCount",
+        "modelVoltageV",
+        "minimumSourceV",
+        "maximumSourceV",
+        "initialSoc",
+        "minimumSoc",
+        "temperatureFactor",
+        "agingFactor",
+        "rateFactor",
+        "applicabilitySourceRef"
+      ],
+      "additionalProperties": false
+    },
+    "load": {
+      "type": "object",
+      "properties": {
+        "loadId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "inputPortId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "stateCode": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+        },
+        "accountingKind": {
+          "enum": [
+            "CONSUMER_INPUT",
+            "TRANSFER_IDLE"
+          ]
+        },
+        "originId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "demand": {
+          "$ref": "#/$defs/demand"
+        }
+      },
+      "required": [
+        "loadId",
+        "inputPortId",
+        "stateCode",
+        "accountingKind",
+        "originId",
+        "demand"
+      ],
+      "additionalProperties": false
+    },
+    "rational": {
+      "type": "object",
+      "properties": {
+        "numerator": {
+          "type": "string",
+          "pattern": "^-?(0|[1-9][0-9]*)$"
+        },
+        "denominator": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]*$"
+        }
+      },
+      "required": [
+        "numerator",
+        "denominator"
+      ],
+      "additionalProperties": false
+    },
+    "interval": {
+      "type": "object",
+      "properties": {
+        "lower": {
+          "$ref": "#/$defs/rational"
+        },
+        "upper": {
+          "$ref": "#/$defs/rational"
+        }
+      },
+      "required": [
+        "lower",
+        "upper"
+      ],
+      "additionalProperties": false
+    },
+    "quantity": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "unit": {
+          "enum": [
+            "V",
+            "A",
+            "W",
+            "VA",
+            "ohm",
+            "m",
+            "Ah",
+            "Wh",
+            "s",
+            "ratio"
+          ]
+        },
+        "boundary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "value": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/rational"
+            },
+            {
+              "$ref": "#/$defs/interval"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "unit",
+        "boundary",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "finding": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "severity": {
+          "enum": [
+            "INFO",
+            "WARNING",
+            "ERROR"
+          ]
+        },
+        "entityIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 0
+        },
+        "field": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "scope": {
+          "$ref": "#/$defs/scope"
+        },
+        "messageParameters": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "dependencyKeys": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "code",
+        "severity",
+        "entityIds",
+        "field",
+        "scope",
+        "messageParameters",
+        "dependencyKeys"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

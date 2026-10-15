@@ -3,6 +3,7 @@
 Status: IMPLEMENTATION DESIGN DRAFT
 Consumes P3 graph, P1 loads and boundary outputs from P5/P6. Supplies source sizing and backup energy.
 Shared rules: [runtime contracts](shared-contracts.md).
+Resolved audit decisions: [RM01–RM15](remediation-contract.md).
 
 ## Required work and acceptance
 
@@ -31,7 +32,7 @@ Each records algorithm/input/output/numeric versions and the exact scenario segm
 
 Resolve state-specific load; explicit inactive zero is valid only if declared by scenario/profile. If a consumer is active but its demand is absent, retain an unresolved contribution. Aggregate sorted unique origin IDs. A component belonging to CCTV and LAN contributes once; two physically distinct equal loads contribute twice.
 
-DC constant-current watts require solved terminal voltage when physical delivered power is reported. Do not multiply by nominal voltage and call it a solved value. Source-side power includes cable dissipation where the supported physical model supplies it. DC constant-power demand remains typed and blocks coupled domains until supported.
+DC constant-current watts require solved terminal voltage when physical delivered power is reported. Do not multiply by nominal voltage and call it a solved value. Source-side power includes cable dissipation where the supported physical model supplies it. DC constant-power demand is solved only by RM06 single-terminal unbranched feeder; other coupled domains remain BLOCKED.
 
 For each converter, evaluate delivered outputs once and map to input demand. With idle-exclusive efficiency eta, inputW = sum(outputW)/eta + idleW. Idle-inclusive model forbids adding the same idle separately. A generic transformer additionally requires a supported rating/loss/PF model; its label alone cannot synthesize AC input VA.
 
@@ -47,7 +48,7 @@ Port current and W constraints are both checked when the model supports the conv
 
 ## AC/UPS apparent power
 
-Use supplied VA, or VA=W/PF with valid explicit PF. If both are supplied, validate consistency via numeric policy. Independent loads use explicit conservative sum-of-VA aggregation; cancellation, harmonics and phase-vector analysis are unsupported unless a future model explicitly adds them.
+Use supplied VA, or VA=W/PF with valid explicit PF. If both are supplied through legacy adoption, validate consistency under exact numeric policy v2; strict new wire selects VA or PF union. Independent loads use explicit conservative sum-of-VA aggregation; cancellation, harmonics and phase-vector analysis are unsupported unless a future model explicitly adds them.
 
 UPS output ratings constrain protected output W and VA, not upstream UPS input after losses. The next upstream source consumes UPS inputW and inputVA, with UPS input PF evidence separate from downstream PF. Backup battery energy uses the selected backup conversion path; never count both mains and battery as simultaneous supply.
 
@@ -55,8 +56,12 @@ Fictional check: protected 38.333…W at PF .8 needs 47.9166…VA. A 50W/45VA UP
 
 ## Peak and explanation
 
-Peak record contains pulse W/A/VA, durationSeconds, simultaneous group and recurrence/applicability when required. Compare against a declared source peak envelope at the same duration. Unsupported duration/interpolation yields UNRESOLVED; do not average into steady watts. Safety-critical diversity requires explicit applicable policy.
+Peak initially uses RM12 ALL_SIMULTANEOUS only: explicit TOTAL/INCREMENTAL pulses, steady baseline and no diversity/stagger credit. Build end-event intervals for explanation; source sizing conservatively checks maximum combined startup demand for the longest startup window against a supported at-least-as-long peak rating, then continuous load. Unsupported duration/rate evidence is UNRESOLVED; do not average into steady watts.
 
 Each arithmetic step lists operation, input quantity refs, output quantity/unit, origin boundary and source definition. Calculation enumeration order must not affect fingerprint or sorted findings. Trace can explain leaf → cable losses → transfer losses → source without reconstructing from UI labels.
 
 Exit: P5/P6 can consume explicit demand and loss boundaries without applying reserve, conversion or own consumption a second time.
+
+## Identity, numbers and pipeline gate
+
+Every segment PWR-01/02/05 result uses its own RM04 key. Required/available/margin use RM09 exact rationals or conservative intervals; exact equality is not made a false overload by binary rounding. Input fingerprint covers RM13 consumed facts only. P4/P5/P6 integrated acceptance must satisfy the qualification manifest, including a supported backup CP feeder rather than a nominal-current approximation.

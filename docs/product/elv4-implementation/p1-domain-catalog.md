@@ -3,6 +3,7 @@
 Status: IMPLEMENTATION DESIGN DRAFT
 Consumes P0 ownership map; supplies P2 schema, P3 graph and P4–P6 arithmetic.
 Shared rules: [runtime contracts](shared-contracts.md).
+Resolved audit decisions: [RM01–RM15](remediation-contract.md).
 
 ## Required work and acceptance
 
@@ -37,7 +38,7 @@ Capacity-group nesting uses member port sets, not recursive budget arithmetic. C
 
 ## Catalog extension wire contract
 
-New catalog payloads declare a new explicit catalog schema understood by the new decoder. Proposed `power` section contains `schema: electra.elv4-power-definitions.v1`, arrays `portDefinitions`, `componentDefinitions`, `transferDefinitions`, `poeDefinitions`, `batteryDefinitions` and `policyDefinitions`. Every definition has a unique normalized code, version, sourceRef and typed body. References resolve within the exact root edition; no latest-version lookup.
+New catalog payloads declare a new explicit catalog schema understood by the new decoder. Proposed `power` section contains `schema: electra.elv4-power-definitions.v1`, arrays `portDefinitions`, `componentDefinitions`, `transferDefinitions`, `poeDefinitions`, `batteryDefinitions` and `policyDefinitions`. Every definition has a unique normalized code, sourceRef and typed body; definitionVersion equals its exact root catalog version in v1 (no separate wire field). The root hash and consumed definition hash preserve their distinct provenance purposes. References resolve within the exact root edition; no latest-version lookup.
 
 A generic power component definition contains template ports and local transfers without a ReferenceDiscipline or CanonicalComponentClass requirement. Instantiation creates canonical ELV1 ports through a transaction-bound existing port writer. Existing ports require explicit template-to-port mapping, or an explicitly reviewed creation of missing ports; never match by label alone.
 
@@ -58,3 +59,13 @@ Implement quantities/ref → typed profiles → scenario resolver → extension 
 P1-T01 includes NaN/infinity/negative and zero cases, PF/efficiency boundaries and voltage ordering. P1-T04 includes a BACKUP role containing separate standby/alarm segments and explicit unavailable mains. P1-T05 compares historical canonical bytes/hashes exactly, rejects unknown mandatory schema and checks generic PSU without a fake camera class. P1-T08 permutes unordered definitions and preserves ordered segment meaning.
 
 Exit: P2 can derive tables and commands without inventing domain fields; P3–P6 consume the same typed unions and provenance. Solver support and national policies remain explicit rather than inferred from profile labels.
+
+## Resolved domain/codec behavior
+
+RM02/03 split nullable positive static nameplate from scenario demand including exact zero. Canonical projection has a field-by-field owner agreement; scenario selection is read-only. Bidirectional supply uses explicit bidirectional physical interfaces; no implicit direction rewrite. RM04 defines mandatory segment/sequence identities and RM09 exact-rational numeric v2.
+
+RM05 and the strict [catalog schema](schemas/power-catalog.schema.json) replace an unspecified technical body with complete connector/protocol/interface/port/component/transfer/compatibility sections and power-only publication semantics. [Valid/invalid examples](examples/minimal-power-catalog.json) are supplied; invalid examples have an explicit invalid filename. Generic port instantiation must pass existing membership/family/compatibility checks.
+
+Scenario role labels never select states/sources implicitly. Startup initially uses only RM12 ALL_SIMULTANEOUS. DC_CONSTANT_POWER is supported only in RM06's single unbranched feeder; all other such domains remain explicit model-limit cases. New wire models use decimal strings and semantic cross-field checks, not free-form maps.
+
+Wire demand tags AC_POWER (explicit VA) and AC_POWER_PF (explicit PF) both resolve to the internal AC power-demand union with an explicit basis discriminator; no W=VA assumption. Exact new decimal parsing is separate from legacy canonical numeric projections.
