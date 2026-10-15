@@ -128,8 +128,9 @@ void main() {
       final replay = await service.create(_create());
       expect(replay, isA<ElvCommandSuccess<Cable>>());
 
-      final cables = await DriftElvCableRepository(db)
-          .loadProjectCables('project-1');
+      final cables = await DriftElvCableRepository(
+        db,
+      ).loadProjectCables('project-1');
       expect(cables, hasLength(1));
       expect(cables.single.definitionRef.definitionCode, 'CAT6-UUTP');
       expect(cables.single.definitionRef.definitionContentHash, hasLength(64));

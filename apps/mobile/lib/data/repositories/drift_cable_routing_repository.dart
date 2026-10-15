@@ -57,9 +57,8 @@ final class DriftCableRoutingRepository implements CableRoutingRepository {
       database.transaction(() async {
         final room =
             await (database.select(database.rooms)..where(
-                  (row) => row.id.equals(roomId) & row.deletedAt.isNull(),
-                ))
-                .getSingleOrNull();
+              (row) => row.id.equals(roomId) & row.deletedAt.isNull(),
+            )).getSingleOrNull();
         if (room == null)
           return RoomRoutingSnapshot(
             geometry: RoomGeometrySnapshot(roomId: roomId),
@@ -79,30 +78,32 @@ final class DriftCableRoutingRepository implements CableRoutingRepository {
                   ]))
                 .get();
         final routeIds = routeRows.map((row) => row.id).toList();
-        final nodeRows = routeIds.isEmpty
-            ? <CableRouteNodeRow>[]
-            : await (database.select(database.cableRouteNodes)
-                    ..where(
-                      (row) =>
-                          row.routeId.isIn(routeIds) & row.deletedAt.isNull(),
-                    )
-                    ..orderBy([
-                      (row) => OrderingTerm.asc(row.sequence),
-                      (row) => OrderingTerm.asc(row.id),
-                    ]))
-                  .get();
-        final segmentRows = routeIds.isEmpty
-            ? <CableRouteSegmentRow>[]
-            : await (database.select(database.cableRouteSegments)
-                    ..where(
-                      (row) =>
-                          row.routeId.isIn(routeIds) & row.deletedAt.isNull(),
-                    )
-                    ..orderBy([
-                      (row) => OrderingTerm.asc(row.sequence),
-                      (row) => OrderingTerm.asc(row.id),
-                    ]))
-                  .get();
+        final nodeRows =
+            routeIds.isEmpty
+                ? <CableRouteNodeRow>[]
+                : await (database.select(database.cableRouteNodes)
+                      ..where(
+                        (row) =>
+                            row.routeId.isIn(routeIds) & row.deletedAt.isNull(),
+                      )
+                      ..orderBy([
+                        (row) => OrderingTerm.asc(row.sequence),
+                        (row) => OrderingTerm.asc(row.id),
+                      ]))
+                    .get();
+        final segmentRows =
+            routeIds.isEmpty
+                ? <CableRouteSegmentRow>[]
+                : await (database.select(database.cableRouteSegments)
+                      ..where(
+                        (row) =>
+                            row.routeId.isIn(routeIds) & row.deletedAt.isNull(),
+                      )
+                      ..orderBy([
+                        (row) => OrderingTerm.asc(row.sequence),
+                        (row) => OrderingTerm.asc(row.id),
+                      ]))
+                    .get();
         final channels =
             await (database.select(database.physicalChannels)
                   ..where(
@@ -122,9 +123,8 @@ final class DriftCableRoutingRepository implements CableRoutingRepository {
                 .get();
         final circuits =
             await (database.select(database.electricalCircuits)..where(
-                  (row) => row.roomId.equals(roomId) & row.deletedAt.isNull(),
-                ))
-                .get();
+              (row) => row.roomId.equals(roomId) & row.deletedAt.isNull(),
+            )).get();
         final junctionRows =
             await (database.select(database.routingJunctions)
                   ..where(
@@ -134,9 +134,8 @@ final class DriftCableRoutingRepository implements CableRoutingRepository {
                 .get();
         final connections =
             await (database.select(database.junctionConnections)..where(
-                  (row) => row.junctionId.isIn(junctionRows.map((j) => j.id)),
-                ))
-                .get();
+              (row) => row.junctionId.isIn(junctionRows.map((j) => j.id)),
+            )).get();
         return RoomRoutingSnapshot(
           geometry: geometry,
           junctions: junctionRows
@@ -223,12 +222,13 @@ final class DriftCableRoutingRepository implements CableRoutingRepository {
         patchId: row.patchId,
         localPosition: Point2Mm(row.localXmm, row.localYmm),
       ),
-      otherAnchor: row.otherPatchId == null
-          ? null
-          : SurfaceRouteAnchor(
-              patchId: row.otherPatchId!,
-              localPosition: Point2Mm(row.otherLocalXmm!, row.otherLocalYmm!),
-            ),
+      otherAnchor:
+          row.otherPatchId == null
+              ? null
+              : SurfaceRouteAnchor(
+                patchId: row.otherPatchId!,
+                localPosition: Point2Mm(row.otherLocalXmm!, row.otherLocalYmm!),
+              ),
       adjacencyId: row.adjacencyId,
     );
   }
@@ -253,9 +253,9 @@ final class DriftCableRoutingRepository implements CableRoutingRepository {
         )) {
           throw StateError('Junction code must be unique in this room.');
         }
-        final old = await (database.select(
-          database.routingJunctions,
-        )..where((r) => r.id.equals(junction.id))).getSingleOrNull();
+        final old =
+            await (database.select(database.routingJunctions)
+              ..where((r) => r.id.equals(junction.id))).getSingleOrNull();
         if (old != null && old.roomId != junction.roomId) {
           throw StateError('Cannot move a junction between rooms.');
         }
@@ -282,9 +282,8 @@ final class DriftCableRoutingRepository implements CableRoutingRepository {
                 originDeviceId: Value(originDeviceId),
               ),
             );
-        await (database.delete(
-          database.junctionConnections,
-        )..where((r) => r.junctionId.equals(junction.id))).go();
+        await (database.delete(database.junctionConnections)
+          ..where((r) => r.junctionId.equals(junction.id))).go();
         for (final c in junction.connections) {
           await database
               .into(database.junctionConnections)
@@ -312,13 +311,12 @@ final class DriftCableRoutingRepository implements CableRoutingRepository {
     await database.transaction(() async {
       final room =
           await (database.select(database.rooms)..where(
-                (row) => row.id.equals(channel.roomId) & row.deletedAt.isNull(),
-              ))
-              .getSingleOrNull();
+            (row) => row.id.equals(channel.roomId) & row.deletedAt.isNull(),
+          )).getSingleOrNull();
       if (room == null) throw StateError('Channel room is not active.');
-      final existing = await (database.select(
-        database.physicalChannels,
-      )..where((row) => row.id.equals(channel.id))).getSingleOrNull();
+      final existing =
+          await (database.select(database.physicalChannels)
+            ..where((row) => row.id.equals(channel.id))).getSingleOrNull();
       if (existing != null && existing.roomId != channel.roomId)
         throw StateError('Cannot move a channel between rooms.');
       final now = DateTime.now().toUtc();
@@ -360,39 +358,35 @@ final class DriftCableRoutingRepository implements CableRoutingRepository {
         throw StateError(
           'Invalid cable route: ${calculation.issues.map((issue) => issue.message).join(' ')}',
         );
-      final existing = await (database.select(
-        database.cableRoutes,
-      )..where((row) => row.id.equals(route.id))).getSingleOrNull();
+      final existing =
+          await (database.select(database.cableRoutes)
+            ..where((row) => row.id.equals(route.id))).getSingleOrNull();
       if (existing != null && existing.roomId != route.roomId)
         throw StateError('Cannot move a route between rooms.');
-      final existingRun = await (database.select(
-        database.cableRuns,
-      )..where((row) => row.id.equals(run.id))).getSingleOrNull();
+      final existingRun =
+          await (database.select(database.cableRuns)
+            ..where((row) => row.id.equals(run.id))).getSingleOrNull();
       if (existingRun != null && existingRun.roomId != run.roomId)
         throw StateError('Cannot move a CableRun between rooms.');
-      final oldNodes = await (database.select(
-        database.cableRouteNodes,
-      )..where((row) => row.routeId.equals(route.id))).get();
-      final oldSegments = await (database.select(
-        database.cableRouteSegments,
-      )..where((row) => row.routeId.equals(route.id))).get();
+      final oldNodes =
+          await (database.select(database.cableRouteNodes)
+            ..where((row) => row.routeId.equals(route.id))).get();
+      final oldSegments =
+          await (database.select(database.cableRouteSegments)
+            ..where((row) => row.routeId.equals(route.id))).get();
       final ownedNodes = {for (final row in oldNodes) row.id: row};
       final ownedSegments = {for (final row in oldSegments) row.id: row};
       final nodeIds = route.nodes.map((node) => node.id).toSet();
       final segmentIds = route.segments.map((segment) => segment.id).toSet();
       final collidingNodes =
           await (database.select(database.cableRouteNodes)..where(
-                (row) =>
-                    row.id.isIn(nodeIds) & row.routeId.equals(route.id).not(),
-              ))
-              .get();
+            (row) => row.id.isIn(nodeIds) & row.routeId.equals(route.id).not(),
+          )).get();
       final collidingSegments =
           await (database.select(database.cableRouteSegments)..where(
-                (row) =>
-                    row.id.isIn(segmentIds) &
-                    row.routeId.equals(route.id).not(),
-              ))
-              .get();
+            (row) =>
+                row.id.isIn(segmentIds) & row.routeId.equals(route.id).not(),
+          )).get();
       if (collidingNodes.isNotEmpty || collidingSegments.isNotEmpty)
         throw StateError(
           'Node and segment IDs cannot be reused from another route.',
@@ -415,9 +409,8 @@ final class DriftCableRoutingRepository implements CableRoutingRepository {
       for (final row in oldSegments.where(
         (row) => row.deletedAt == null && !segmentIds.contains(row.id),
       )) {
-        await (database.update(
-          database.cableRouteSegments,
-        )..where((item) => item.id.equals(row.id))).write(
+        await (database.update(database.cableRouteSegments)
+          ..where((item) => item.id.equals(row.id))).write(
           CableRouteSegmentsCompanion(
             revision: Value(row.revision + 1),
             updatedAt: Value(now),
@@ -429,9 +422,8 @@ final class DriftCableRoutingRepository implements CableRoutingRepository {
       for (final row in oldNodes.where(
         (row) => row.deletedAt == null && !nodeIds.contains(row.id),
       )) {
-        await (database.update(
-          database.cableRouteNodes,
-        )..where((item) => item.id.equals(row.id))).write(
+        await (database.update(database.cableRouteNodes)
+          ..where((item) => item.id.equals(row.id))).write(
           CableRouteNodesCompanion(
             revision: Value(row.revision + 1),
             updatedAt: Value(now),

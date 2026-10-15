@@ -101,41 +101,47 @@ class _RoomCreateScreenState extends ConsumerState<RoomCreateScreen> {
                 TextFormField(
                   controller: nameController,
                   decoration: const InputDecoration(labelText: 'Room name'),
-                  validator: (value) => value == null || value.trim().isEmpty
-                      ? 'Room name is required'
-                      : null,
+                  validator:
+                      (value) =>
+                          value == null || value.trim().isEmpty
+                              ? 'Room name is required'
+                              : null,
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<RoomCategory>(
                   initialValue: roomCategory,
                   decoration: const InputDecoration(labelText: 'Room category'),
-                  items: RoomCategory.values
-                      .map(
-                        (value) => DropdownMenuItem(
-                          value: value,
-                          child: Text(value.name),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (value) => setState(() {
-                    roomCategory = value ?? RoomCategory.other;
-                  }),
+                  items:
+                      RoomCategory.values
+                          .map(
+                            (value) => DropdownMenuItem(
+                              value: value,
+                              child: Text(value.name),
+                            ),
+                          )
+                          .toList(),
+                  onChanged:
+                      (value) => setState(() {
+                        roomCategory = value ?? RoomCategory.other;
+                      }),
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<RoomType>(
                   initialValue: roomType,
                   decoration: const InputDecoration(labelText: 'Room type'),
-                  items: RoomType.values
-                      .map(
-                        (value) => DropdownMenuItem(
-                          value: value,
-                          child: Text(value.name),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: (value) => setState(() {
-                    roomType = value ?? RoomType.custom;
-                  }),
+                  items:
+                      RoomType.values
+                          .map(
+                            (value) => DropdownMenuItem(
+                              value: value,
+                              child: Text(value.name),
+                            ),
+                          )
+                          .toList(),
+                  onChanged:
+                      (value) => setState(() {
+                        roomType = value ?? RoomType.custom;
+                      }),
                 ),
                 const SizedBox(height: 12),
                 Row(
@@ -148,9 +154,11 @@ class _RoomCreateScreenState extends ConsumerState<RoomCreateScreen> {
                           labelText: 'Width',
                           suffixText: 'mm',
                         ),
-                        validator: (value) => positiveMm(value ?? '') == null
-                            ? 'Invalid width'
-                            : null,
+                        validator:
+                            (value) =>
+                                positiveMm(value ?? '') == null
+                                    ? 'Invalid width'
+                                    : null,
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -162,9 +170,11 @@ class _RoomCreateScreenState extends ConsumerState<RoomCreateScreen> {
                           labelText: 'Depth',
                           suffixText: 'mm',
                         ),
-                        validator: (value) => positiveMm(value ?? '') == null
-                            ? 'Invalid depth'
-                            : null,
+                        validator:
+                            (value) =>
+                                positiveMm(value ?? '') == null
+                                    ? 'Invalid depth'
+                                    : null,
                       ),
                     ),
                   ],

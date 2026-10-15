@@ -115,17 +115,20 @@ void main() {
         );
         final catalog = EngineeringReferenceCatalog.fromMap(
           jsonDecode(
-            File('../../docs/examples/elv2-reference-catalog.json')
-                .readAsStringSync(),
-          ) as Map<String, dynamic>,
+                File(
+                  '../../docs/examples/elv2-reference-catalog.json',
+                ).readAsStringSync(),
+              )
+              as Map<String, dynamic>,
         );
         await references.importCatalog(project.id, catalog);
         final networks = DriftEngineeringSystemRepository(
           database,
           originDeviceId: 'test',
         );
-        final family = (await networks.load(project.id)).families
-            .singleWhere((f) => f.code == 'CCTV');
+        final family = (await networks.load(
+          project.id,
+        )).families.singleWhere((f) => f.code == 'CCTV');
         await networks.saveSystem(
           EngineeringSystem(
             id: 'CCTV',
@@ -146,11 +149,10 @@ void main() {
       });
       await tester.binding.setSurfaceSize(const Size(1200, 900));
       addTearDown(() => tester.binding.setSurfaceSize(null));
-      Future<int> changes() async =>
-          (await database
-                  .customSelect('SELECT total_changes() AS count')
-                  .getSingle())
-              .read<int>('count');
+      Future<int> changes() async => (await database
+              .customSelect('SELECT total_changes() AS count')
+              .getSingle())
+          .read<int>('count');
       final before = await changes();
       await tester.pumpWidget(
         ProviderScope(

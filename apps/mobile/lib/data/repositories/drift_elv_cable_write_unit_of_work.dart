@@ -63,11 +63,10 @@ final class _DriftElvCommandLedgerStore implements ElvCommandLedgerStore {
   ) async {
     final row =
         await (database.select(database.commandExecutionRecords)..where(
-              (candidate) =>
-                  candidate.projectId.equals(projectId) &
-                  candidate.commandId.equals(commandId),
-            ))
-            .getSingleOrNull();
+          (candidate) =>
+              candidate.projectId.equals(projectId) &
+              candidate.commandId.equals(commandId),
+        )).getSingleOrNull();
     if (row == null) return null;
     return _entry(row);
   }
@@ -136,13 +135,12 @@ final class _DriftElvReferenceReadStore implements ElvReferenceReadStore {
     final normalized = ref.normalized();
     final row =
         await (database.select(database.engineeringReferenceCatalogs)..where(
-              (candidate) =>
-                  candidate.projectId.equals(projectId) &
-                  candidate.id.equals(normalized.catalogId) &
-                  candidate.catalogVersion.equals(normalized.catalogVersion) &
-                  candidate.deletedAt.isNull(),
-            ))
-            .getSingleOrNull();
+          (candidate) =>
+              candidate.projectId.equals(projectId) &
+              candidate.id.equals(normalized.catalogId) &
+              candidate.catalogVersion.equals(normalized.catalogVersion) &
+              candidate.deletedAt.isNull(),
+        )).getSingleOrNull();
     if (row == null) throw StateError('Catalog edition not found.');
     final catalog = EngineeringReferenceCatalog.fromMap(
       jsonDecode(row.payloadJson) as Map<String, dynamic>,
@@ -164,21 +162,20 @@ final class _DriftElvCableWriteStore implements ElvCableWriteStore {
 
   @override
   Future<bool> projectExists(String projectId) async =>
-      await (database.select(database.projects)
-            ..where((row) => row.id.equals(projectId) & row.deletedAt.isNull()))
-          .getSingleOrNull() !=
+      await (database.select(database.projects)..where(
+        (row) => row.id.equals(projectId) & row.deletedAt.isNull(),
+      )).getSingleOrNull() !=
       null;
 
   @override
   Future<Cable?> findCable(String projectId, String cableId) async {
     final row =
         await (database.select(database.elvCables)..where(
-              (candidate) =>
-                  candidate.projectId.equals(projectId) &
-                  candidate.id.equals(cableId) &
-                  candidate.deletedAt.isNull(),
-            ))
-            .getSingleOrNull();
+          (candidate) =>
+              candidate.projectId.equals(projectId) &
+              candidate.id.equals(cableId) &
+              candidate.deletedAt.isNull(),
+        )).getSingleOrNull();
     return row == null ? null : _fromRow(row);
   }
 
@@ -188,13 +185,12 @@ final class _DriftElvCableWriteStore implements ElvCableWriteStore {
     String normalizedLabel,
   ) async =>
       await (database.select(database.elvCables)..where(
-            (row) =>
-                row.projectId.equals(projectId) &
-                row.normalizedLabel.equals(normalizedLabel) &
-                row.lifecycleState.equals('ACTIVE') &
-                row.deletedAt.isNull(),
-          ))
-          .getSingleOrNull() !=
+        (row) =>
+            row.projectId.equals(projectId) &
+            row.normalizedLabel.equals(normalizedLabel) &
+            row.lifecycleState.equals('ACTIVE') &
+            row.deletedAt.isNull(),
+      )).getSingleOrNull() !=
       null;
 
   @override
@@ -231,28 +227,24 @@ final class _DriftElvCableWriteStore implements ElvCableWriteStore {
     required int expectedRevision,
     required CableDefinitionRef definitionRef,
   }) async {
-    final affected =
-        await (database.update(database.elvCables)..where(
-              (row) =>
-                  row.id.equals(cableId) &
-                  row.projectId.equals(projectId) &
-                  row.revision.equals(expectedRevision) &
-                  row.lifecycleState.equals('ACTIVE') &
-                  row.deletedAt.isNull(),
-            ))
-            .write(
-              ElvCablesCompanion(
-                definitionCatalogId: Value(definitionRef.catalogId),
-                definitionCatalogVersion: Value(definitionRef.catalogVersion),
-                definitionCode: Value(definitionRef.definitionCode),
-                definitionContentHash: Value(
-                  definitionRef.definitionContentHash,
-                ),
-                revision: Value(expectedRevision + 1),
-                updatedAt: Value(DateTime.now().toUtc()),
-                originDeviceId: Value(originDeviceId),
-              ),
-            );
+    final affected = await (database.update(database.elvCables)..where(
+      (row) =>
+          row.id.equals(cableId) &
+          row.projectId.equals(projectId) &
+          row.revision.equals(expectedRevision) &
+          row.lifecycleState.equals('ACTIVE') &
+          row.deletedAt.isNull(),
+    )).write(
+      ElvCablesCompanion(
+        definitionCatalogId: Value(definitionRef.catalogId),
+        definitionCatalogVersion: Value(definitionRef.catalogVersion),
+        definitionCode: Value(definitionRef.definitionCode),
+        definitionContentHash: Value(definitionRef.definitionContentHash),
+        revision: Value(expectedRevision + 1),
+        updatedAt: Value(DateTime.now().toUtc()),
+        originDeviceId: Value(originDeviceId),
+      ),
+    );
     return affected == 1;
   }
 
@@ -262,23 +254,21 @@ final class _DriftElvCableWriteStore implements ElvCableWriteStore {
     required String cableId,
     required int expectedRevision,
   }) async {
-    final affected =
-        await (database.update(database.elvCables)..where(
-              (row) =>
-                  row.id.equals(cableId) &
-                  row.projectId.equals(projectId) &
-                  row.revision.equals(expectedRevision) &
-                  row.lifecycleState.equals('ACTIVE') &
-                  row.deletedAt.isNull(),
-            ))
-            .write(
-              ElvCablesCompanion(
-                lifecycleState: const Value('ARCHIVED'),
-                revision: Value(expectedRevision + 1),
-                updatedAt: Value(DateTime.now().toUtc()),
-                originDeviceId: Value(originDeviceId),
-              ),
-            );
+    final affected = await (database.update(database.elvCables)..where(
+      (row) =>
+          row.id.equals(cableId) &
+          row.projectId.equals(projectId) &
+          row.revision.equals(expectedRevision) &
+          row.lifecycleState.equals('ACTIVE') &
+          row.deletedAt.isNull(),
+    )).write(
+      ElvCablesCompanion(
+        lifecycleState: const Value('ARCHIVED'),
+        revision: Value(expectedRevision + 1),
+        updatedAt: Value(DateTime.now().toUtc()),
+        originDeviceId: Value(originDeviceId),
+      ),
+    );
     return affected == 1;
   }
 
@@ -312,25 +302,23 @@ final class _P2AwareCableDependencyStore implements ElvCableDependencyStore {
   ) async {
     final rows =
         await (database.select(database.cableAllocations)..where(
-              (row) =>
-                  row.projectId.equals(projectId) &
-                  row.cableId.equals(cableId) &
-                  row.lifecycleState.isIn(const ['RESERVED', 'ACTIVE']) &
-                  row.deletedAt.isNull(),
-            ))
-            .get();
+          (row) =>
+              row.projectId.equals(projectId) &
+              row.cableId.equals(cableId) &
+              row.lifecycleState.isIn(const ['RESERVED', 'ACTIVE']) &
+              row.deletedAt.isNull(),
+        )).get();
     return rows.map((row) => row.id).toList(growable: false);
   }
 
   @override
   Future<bool> hasCanonicalRunHistory(String projectId, String cableId) async =>
       await (database.select(database.canonicalCableRuns)..where(
-            (row) =>
-                row.projectId.equals(projectId) &
-                row.cableId.equals(cableId) &
-                row.deletedAt.isNull(),
-          ))
-          .getSingleOrNull() !=
+        (row) =>
+            row.projectId.equals(projectId) &
+            row.cableId.equals(cableId) &
+            row.deletedAt.isNull(),
+      )).getSingleOrNull() !=
       null;
 
   @override
@@ -343,21 +331,21 @@ final class _P2AwareCableDependencyStore implements ElvCableDependencyStore {
     String cableId,
   ) async {
     final allocationIds = database.cableAllocations.id;
-    final query = database.selectOnly(database.cableAllocations)
-      ..addColumns([allocationIds])
-      ..where(
-        database.cableAllocations.projectId.equals(projectId) &
-            database.cableAllocations.cableId.equals(cableId) &
-            database.cableAllocations.deletedAt.isNull(),
-      );
+    final query =
+        database.selectOnly(database.cableAllocations)
+          ..addColumns([allocationIds])
+          ..where(
+            database.cableAllocations.projectId.equals(projectId) &
+                database.cableAllocations.cableId.equals(cableId) &
+                database.cableAllocations.deletedAt.isNull(),
+          );
     final ids = (await query.get())
         .map((row) => row.read(allocationIds))
         .whereType<String>()
         .toList(growable: false);
     if (ids.isEmpty) return false;
-    return await (database.select(
-          database.cableAllocationResourceSelections,
-        )..where((row) => row.allocationId.isIn(ids))).getSingleOrNull() !=
+    return await (database.select(database.cableAllocationResourceSelections)
+          ..where((row) => row.allocationId.isIn(ids))).getSingleOrNull() !=
         null;
   }
 }

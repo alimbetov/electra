@@ -227,24 +227,23 @@ final class DriftElvReviewedRoutingRuntime
       operation.sequence,
     );
     final nextGeneration = cursor.generation + 1;
-    final changed =
-        await (database.update(database.elvRevisionCommandHistoryOperations)
-              ..where(
-                (row) =>
-                    row.projectId.equals(projectId) &
-                    row.designRevisionId.equals(designRevisionId) &
-                    row.sequence.equals(operation.sequence) &
-                    row.state.equals('APPLIED') &
-                    row.cursorGeneration.equals(operation.cursorGeneration),
-              ))
-            .write(
-              ElvRevisionCommandHistoryOperationsCompanion(
-                state: const Value('UNDONE'),
-                cursorGeneration: Value(nextGeneration),
-                updatedAt: Value(_now()),
-                originDeviceId: Value(originDeviceId),
-              ),
-            );
+    final changed = await (database.update(
+      database.elvRevisionCommandHistoryOperations,
+    )..where(
+      (row) =>
+          row.projectId.equals(projectId) &
+          row.designRevisionId.equals(designRevisionId) &
+          row.sequence.equals(operation.sequence) &
+          row.state.equals('APPLIED') &
+          row.cursorGeneration.equals(operation.cursorGeneration),
+    )).write(
+      ElvRevisionCommandHistoryOperationsCompanion(
+        state: const Value('UNDONE'),
+        cursorGeneration: Value(nextGeneration),
+        updatedAt: Value(_now()),
+        originDeviceId: Value(originDeviceId),
+      ),
+    );
     if (changed != 1) {
       throw StateError('Undo history CAS failed after canonical mutation.');
     }
@@ -338,23 +337,22 @@ final class DriftElvReviewedRoutingRuntime
     }
 
     final nextGeneration = cursor.generation + 1;
-    final changed =
-        await (database.update(database.elvRevisionCommandHistoryOperations)
-              ..where(
-                (row) =>
-                    row.projectId.equals(projectId) &
-                    row.designRevisionId.equals(designRevisionId) &
-                    row.sequence.equals(operation.sequence) &
-                    row.state.equals('UNDONE'),
-              ))
-            .write(
-              ElvRevisionCommandHistoryOperationsCompanion(
-                state: const Value('APPLIED'),
-                cursorGeneration: Value(nextGeneration),
-                updatedAt: Value(_now()),
-                originDeviceId: Value(originDeviceId),
-              ),
-            );
+    final changed = await (database.update(
+      database.elvRevisionCommandHistoryOperations,
+    )..where(
+      (row) =>
+          row.projectId.equals(projectId) &
+          row.designRevisionId.equals(designRevisionId) &
+          row.sequence.equals(operation.sequence) &
+          row.state.equals('UNDONE'),
+    )).write(
+      ElvRevisionCommandHistoryOperationsCompanion(
+        state: const Value('APPLIED'),
+        cursorGeneration: Value(nextGeneration),
+        updatedAt: Value(_now()),
+        originDeviceId: Value(originDeviceId),
+      ),
+    );
     if (changed != 1) {
       throw StateError('Redo history CAS failed after canonical mutation.');
     }
@@ -389,26 +387,24 @@ final class DriftElvReviewedRoutingRuntime
     final nextGeneration = (cursor?.generation ?? 0) + 1;
     final priorHead = cursor?.headSequence ?? 0;
 
-    final abandoned =
-        await (database.update(database.elvRevisionCommandHistoryOperations)
-              ..where(
-                (row) =>
-                    row.projectId.equals(command.projectId) &
-                    row.designRevisionId.equals(command.designRevisionId) &
-                    row.sequence.isBiggerThanValue(priorHead) &
-                    row.state.equals('UNDONE'),
-              ))
-            .write(
-              ElvRevisionCommandHistoryOperationsCompanion(
-                state: const Value('REDO_ABANDONED'),
-                updatedAt: Value(_now()),
-                originDeviceId: Value(originDeviceId),
-              ),
-            );
+    final abandoned = await (database.update(
+      database.elvRevisionCommandHistoryOperations,
+    )..where(
+      (row) =>
+          row.projectId.equals(command.projectId) &
+          row.designRevisionId.equals(command.designRevisionId) &
+          row.sequence.isBiggerThanValue(priorHead) &
+          row.state.equals('UNDONE'),
+    )).write(
+      ElvRevisionCommandHistoryOperationsCompanion(
+        state: const Value('REDO_ABANDONED'),
+        updatedAt: Value(_now()),
+        originDeviceId: Value(originDeviceId),
+      ),
+    );
 
-    final branchId = cursor == null || abandoned > 0
-        ? idGenerator.next()
-        : cursor.branchId;
+    final branchId =
+        cursor == null || abandoned > 0 ? idGenerator.next() : cursor.branchId;
     final beforeRef = idGenerator.next();
     final afterRef = idGenerator.next();
     await _insertEvidence(beforeRef, before);
@@ -602,11 +598,10 @@ final class DriftElvReviewedRoutingRuntime
     String executionCommandId,
   ) =>
       (database.select(database.elvRevisionCommandHistoryExecutions)..where(
-            (row) =>
-                row.projectId.equals(projectId) &
-                row.executionCommandId.equals(executionCommandId),
-          ))
-          .getSingleOrNull();
+        (row) =>
+            row.projectId.equals(projectId) &
+            row.executionCommandId.equals(executionCommandId),
+      )).getSingleOrNull();
 
   Future<void> _moveCursor(
     ElvRevisionCommandHistoryCursorRow cursor, {
@@ -614,36 +609,34 @@ final class DriftElvReviewedRoutingRuntime
     required int headSequence,
     required String branchId,
   }) async {
-    final changed =
-        await (database.update(database.elvRevisionCommandHistoryCursors)
-              ..where(
-                (row) =>
-                    row.projectId.equals(cursor.projectId) &
-                    row.designRevisionId.equals(cursor.designRevisionId) &
-                    row.generation.equals(cursor.generation),
-              ))
-            .write(
-              ElvRevisionCommandHistoryCursorsCompanion(
-                generation: Value(generation),
-                headSequence: Value(headSequence),
-                branchId: Value(branchId),
-                updatedAt: Value(_now()),
-                originDeviceId: Value(originDeviceId),
-              ),
-            );
+    final changed = await (database.update(
+      database.elvRevisionCommandHistoryCursors,
+    )..where(
+      (row) =>
+          row.projectId.equals(cursor.projectId) &
+          row.designRevisionId.equals(cursor.designRevisionId) &
+          row.generation.equals(cursor.generation),
+    )).write(
+      ElvRevisionCommandHistoryCursorsCompanion(
+        generation: Value(generation),
+        headSequence: Value(headSequence),
+        branchId: Value(branchId),
+        updatedAt: Value(_now()),
+        originDeviceId: Value(originDeviceId),
+      ),
+    );
     if (changed != 1) throw StateError('History cursor CAS conflict.');
   }
 
   Future<bool> _isWorking(String projectId, String designRevisionId) async {
     final row =
         await (database.select(database.projectDesignRevisions)..where(
-              (candidate) =>
-                  candidate.projectId.equals(projectId) &
-                  candidate.id.equals(designRevisionId) &
-                  candidate.state.equals('WORKING') &
-                  candidate.deletedAt.isNull(),
-            ))
-            .getSingleOrNull();
+          (candidate) =>
+              candidate.projectId.equals(projectId) &
+              candidate.id.equals(designRevisionId) &
+              candidate.state.equals('WORKING') &
+              candidate.deletedAt.isNull(),
+        )).getSingleOrNull();
     return row != null;
   }
 
@@ -660,11 +653,10 @@ final class DriftElvReviewedRoutingRuntime
     String designRevisionId,
   ) =>
       (database.select(database.elvRevisionCommandHistoryCursors)..where(
-            (row) =>
-                row.projectId.equals(projectId) &
-                row.designRevisionId.equals(designRevisionId),
-          ))
-          .getSingleOrNull();
+        (row) =>
+            row.projectId.equals(projectId) &
+            row.designRevisionId.equals(designRevisionId),
+      )).getSingleOrNull();
 
   Future<ElvRevisionCommandHistoryOperationRow?> _operation(
     String projectId,
@@ -672,12 +664,11 @@ final class DriftElvReviewedRoutingRuntime
     int sequence,
   ) =>
       (database.select(database.elvRevisionCommandHistoryOperations)..where(
-            (row) =>
-                row.projectId.equals(projectId) &
-                row.designRevisionId.equals(designRevisionId) &
-                row.sequence.equals(sequence),
-          ))
-          .getSingleOrNull();
+        (row) =>
+            row.projectId.equals(projectId) &
+            row.designRevisionId.equals(designRevisionId) &
+            row.sequence.equals(sequence),
+      )).getSingleOrNull();
 
   Future<ElvRevisionCommandHistoryOperationRow?> _historyByOriginalCommand(
     String projectId,
@@ -712,17 +703,18 @@ final class DriftElvReviewedRoutingRuntime
           .getSingleOrNull();
 
   Future<int> _maxSequence(String projectId, String designRevisionId) async {
-    final row = await database
-        .customSelect(
-          'SELECT MAX(sequence) AS value FROM elv_revision_command_history_operations '
-          'WHERE project_id = ? AND design_revision_id = ?',
-          variables: [
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-          ],
-          readsFrom: {database.elvRevisionCommandHistoryOperations},
-        )
-        .getSingle();
+    final row =
+        await database
+            .customSelect(
+              'SELECT MAX(sequence) AS value FROM elv_revision_command_history_operations '
+              'WHERE project_id = ? AND design_revision_id = ?',
+              variables: [
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+              ],
+              readsFrom: {database.elvRevisionCommandHistoryOperations},
+            )
+            .getSingle();
     return row.readNullable<int>('value') ?? 0;
   }
 
@@ -731,18 +723,19 @@ final class DriftElvReviewedRoutingRuntime
     String designRevisionId,
     int beforeSequence,
   ) async {
-    final row = await database
-        .customSelect(
-          'SELECT MAX(sequence) AS value FROM elv_revision_command_history_operations '
-          "WHERE project_id = ? AND design_revision_id = ? AND sequence < ? AND state = 'APPLIED'",
-          variables: [
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            Variable.withInt(beforeSequence),
-          ],
-          readsFrom: {database.elvRevisionCommandHistoryOperations},
-        )
-        .getSingle();
+    final row =
+        await database
+            .customSelect(
+              'SELECT MAX(sequence) AS value FROM elv_revision_command_history_operations '
+              "WHERE project_id = ? AND design_revision_id = ? AND sequence < ? AND state = 'APPLIED'",
+              variables: [
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                Variable.withInt(beforeSequence),
+              ],
+              readsFrom: {database.elvRevisionCommandHistoryOperations},
+            )
+            .getSingle();
     return row.readNullable<int>('value') ?? 0;
   }
 }

@@ -31,11 +31,12 @@ import 'power_workspace_panel.dart';
 import 'power_workspace_panel_host.dart';
 import 'room_routing_screen.dart';
 
-typedef ComponentPlacementCallback = Future<void> Function(
-  ComponentDefinition definition,
-  String hostSurfacePatchId,
-  Point2Mm localPosition,
-);
+typedef ComponentPlacementCallback =
+    Future<void> Function(
+      ComponentDefinition definition,
+      String hostSurfacePatchId,
+      Point2Mm localPosition,
+    );
 
 class RoomEditorScreen extends StatefulWidget {
   const RoomEditorScreen({
@@ -123,17 +124,18 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
     candidatePoint = null;
     candidateLocked = false;
     final patch = activePatch, choice = engineeringChoice;
-    candidateContext = patch == null || choice == null
-        ? null
-        : emptyPaletteContext(
-            projectId: widget.project.id,
-            roomId: widget.room.id,
-            surfaceId: patch.id,
-            topologyShape: resolvePaletteTopology(
-              choice.system,
-              widget.engineeringTopologyProfiles,
-            ),
-          );
+    candidateContext =
+        patch == null || choice == null
+            ? null
+            : emptyPaletteContext(
+              projectId: widget.project.id,
+              roomId: widget.room.id,
+              surfaceId: patch.id,
+              topologyShape: resolvePaletteTopology(
+                choice.system,
+                widget.engineeringTopologyProfiles,
+              ),
+            );
   }
 
   @override
@@ -250,11 +252,12 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
     if (choice == null || initial == null) return;
     final value = await showDialog<PlacementCandidateContext>(
       context: context,
-      builder: (_) => CandidateConditionsDialog(
-        initial: initial,
-        system: choice.system,
-        topologyProfiles: widget.engineeringTopologyProfiles,
-      ),
+      builder:
+          (_) => CandidateConditionsDialog(
+            initial: initial,
+            system: choice.system,
+            topologyProfiles: widget.engineeringTopologyProfiles,
+          ),
     );
     if (!mounted ||
         value == null ||
@@ -280,8 +283,8 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
         placingComponent ||
         placementPreview?.compatible != true)
       return;
-    final command = pendingEngineeringCommand ??=
-        PlaceEngineeringProfileCommand(
+    final command =
+        pendingEngineeringCommand ??= PlaceEngineeringProfileCommand(
           operationId: engineeringOperationIds.next(),
           projectId: widget.project.id,
           roomId: widget.room.id,
@@ -335,10 +338,11 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
-    builder: (_) => FractionallySizedBox(
-      heightFactor: .78,
-      child: SafeArea(child: previewDetails()),
-    ),
+    builder:
+        (_) => FractionallySizedBox(
+          heightFactor: .78,
+          child: SafeArea(child: previewDetails()),
+        ),
   );
 
   bool placingComponent = false;
@@ -384,10 +388,11 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
       setState(clearEngineeringPreview);
       Navigator.of(context).push(
         MaterialPageRoute<void>(
-          builder: (_) => RoomRoutingScreen(
-            roomId: widget.room.id,
-            roomName: widget.room.name,
-          ),
+          builder:
+              (_) => RoomRoutingScreen(
+                roomId: widget.room.id,
+                roomName: widget.room.name,
+              ),
         ),
       );
       return;
@@ -636,28 +641,30 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
   Widget build(BuildContext context) {
     final patch = activePatch;
     final previewPatch = adjacentPreviewPatch;
-    final baseInspector = engineeringChoice != null
-        ? previewDetails()
-        : _Inspector(
-            project: widget.project,
-            room: widget.room,
-            geometry: widget.geometry,
-            activePatch: patch,
-            discipline: discipline,
-            selection: selection,
-            measurement: measurement,
-            measurementStart: measurementStart,
-            navigationCandidate: navigationCandidate,
-            adjacentPreviewPatch: previewPatch,
-            components: widget.components,
-            activeComponentDefinition: activeComponentDefinition,
-          );
-    final inspector = powerInspectorVisible && widget.powerWorkspace != null
-        ? PowerWorkspacePanelHost(
-            binding: widget.powerWorkspace!,
-            onFindingSelected: handlePowerFinding,
-          )
-        : baseInspector;
+    final baseInspector =
+        engineeringChoice != null
+            ? previewDetails()
+            : _Inspector(
+              project: widget.project,
+              room: widget.room,
+              geometry: widget.geometry,
+              activePatch: patch,
+              discipline: discipline,
+              selection: selection,
+              measurement: measurement,
+              measurementStart: measurementStart,
+              navigationCandidate: navigationCandidate,
+              adjacentPreviewPatch: previewPatch,
+              components: widget.components,
+              activeComponentDefinition: activeComponentDefinition,
+            );
+    final inspector =
+        powerInspectorVisible && widget.powerWorkspace != null
+            ? PowerWorkspacePanelHost(
+              binding: widget.powerWorkspace!,
+              onFindingSelected: handlePowerFinding,
+            )
+            : baseInspector;
 
     return Scaffold(
       appBar: AppBar(
@@ -689,20 +696,20 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
             icon: const Icon(Icons.undo),
             onPressed:
                 !placingComponent &&
-                    widget.canUndoPlacement &&
-                    widget.onUndoPlacement != null
-                ? () => runHistory(widget.onUndoPlacement!)
-                : null,
+                        widget.canUndoPlacement &&
+                        widget.onUndoPlacement != null
+                    ? () => runHistory(widget.onUndoPlacement!)
+                    : null,
           ),
           IconButton(
             tooltip: 'Redo placement',
             icon: const Icon(Icons.redo),
             onPressed:
                 !placingComponent &&
-                    widget.canRedoPlacement &&
-                    widget.onRedoPlacement != null
-                ? () => runHistory(widget.onRedoPlacement!)
-                : null,
+                        widget.canRedoPlacement &&
+                        widget.onRedoPlacement != null
+                    ? () => runHistory(widget.onRedoPlacement!)
+                    : null,
           ),
           PopupMenuButton<String>(
             tooltip: 'Project tools',
@@ -710,37 +717,41 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
               if (value == 'routes') {
                 Navigator.of(context).push(
                   MaterialPageRoute<void>(
-                    builder: (_) => RoomRoutingScreen(
-                      roomId: widget.room.id,
-                      roomName: widget.room.name,
-                    ),
+                    builder:
+                        (_) => RoomRoutingScreen(
+                          roomId: widget.room.id,
+                          roomName: widget.room.name,
+                        ),
                   ),
                 );
               } else if (value == 'circuits') {
                 Navigator.of(context).push(
                   MaterialPageRoute<void>(
-                    builder: (_) => ElectricalCircuitsScreen(
-                      roomId: widget.room.id,
-                      roomName: widget.room.name,
-                    ),
+                    builder:
+                        (_) => ElectricalCircuitsScreen(
+                          roomId: widget.room.id,
+                          roomName: widget.room.name,
+                        ),
                   ),
                 );
               } else if (value == 'loads') {
                 Navigator.of(context).push(
                   MaterialPageRoute<void>(
-                    builder: (_) => ElectricalLoadsScreen(
-                      roomId: widget.room.id,
-                      roomName: widget.room.name,
-                    ),
+                    builder:
+                        (_) => ElectricalLoadsScreen(
+                          roomId: widget.room.id,
+                          roomName: widget.room.name,
+                        ),
                   ),
                 );
               } else if (value == 'calculations') {
                 Navigator.of(context).push(
                   MaterialPageRoute<void>(
-                    builder: (_) => CalculationsScreen(
-                      roomName: widget.room.name,
-                      projectId: widget.project.id,
-                    ),
+                    builder:
+                        (_) => CalculationsScreen(
+                          roomName: widget.room.name,
+                          projectId: widget.project.id,
+                        ),
                   ),
                 );
               } else if (value == 'reports') {
@@ -751,13 +762,20 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
                 );
               }
             },
-            itemBuilder: (_) => const [
-              PopupMenuItem(value: 'routes', child: Text('Cable routing')),
-              PopupMenuItem(value: 'circuits', child: Text('Circuits')),
-              PopupMenuItem(value: 'loads', child: Text('Electrical loads')),
-              PopupMenuItem(value: 'calculations', child: Text('Calculations')),
-              PopupMenuItem(value: 'reports', child: Text('Reports')),
-            ],
+            itemBuilder:
+                (_) => const [
+                  PopupMenuItem(value: 'routes', child: Text('Cable routing')),
+                  PopupMenuItem(value: 'circuits', child: Text('Circuits')),
+                  PopupMenuItem(
+                    value: 'loads',
+                    child: Text('Electrical loads'),
+                  ),
+                  PopupMenuItem(
+                    value: 'calculations',
+                    child: Text('Calculations'),
+                  ),
+                  PopupMenuItem(value: 'reports', child: Text('Reports')),
+                ],
           ),
         ],
       ),
@@ -781,28 +799,29 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
             placingComponent: placingComponent,
             onSurfaceTap: handleSurfaceTap,
             onSurfacePointer: handleSurfacePointer,
-            engineeringFeedback: engineeringChoice == null
-                ? null
-                : EngineeringPlacementFeedback(
-                    choice: engineeringChoice!,
-                    result: placementPreview,
-                    hasCandidate: candidatePoint != null,
-                    onContext: editCandidateConditions,
-                    onDetails: openPreviewDetails,
-                    canPlace:
-                        widget.onPlaceEngineeringProfile != null &&
-                        placementPreview?.compatible == true &&
-                        candidatePoint != null &&
-                        !placingComponent,
-                    isSaving: placingComponent,
-                    onPlace: widget.onPlaceEngineeringProfile == null
-                        ? null
-                        : commitEngineeringCandidate,
-                  ),
+            engineeringFeedback:
+                engineeringChoice == null
+                    ? null
+                    : EngineeringPlacementFeedback(
+                      choice: engineeringChoice!,
+                      result: placementPreview,
+                      hasCandidate: candidatePoint != null,
+                      onContext: editCandidateConditions,
+                      onDetails: openPreviewDetails,
+                      canPlace:
+                          widget.onPlaceEngineeringProfile != null &&
+                          placementPreview?.compatible == true &&
+                          candidatePoint != null &&
+                          !placingComponent,
+                      isSaving: placingComponent,
+                      onPlace:
+                          widget.onPlaceEngineeringProfile == null
+                              ? null
+                              : commitEngineeringCandidate,
+                    ),
             candidatePoint: candidatePoint,
-            candidateStatus: candidatePoint == null
-                ? null
-                : placementPreview?.status,
+            candidateStatus:
+                candidatePoint == null ? null : placementPreview?.status,
             powerOverlaySegments: widget.powerOverlaySegments,
             powerOverlay: widget.powerWorkspace?.projection.overlay,
             powerOverlayMode:
@@ -818,68 +837,76 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
                 tool: tool,
                 discipline: discipline,
                 onToolChanged: changeTool,
-                onDisciplineChanged: (value) => setState(() {
-                  discipline = value;
-                  clearEngineeringPreview();
-                }),
+                onDisciplineChanged:
+                    (value) => setState(() {
+                      discipline = value;
+                      clearEngineeringPreview();
+                    }),
                 activeComponentDefinition: activeComponentDefinition,
                 onOpenComponentCatalog: openComponentCatalog,
                 onOpenEngineeringPalette: openEngineeringPalette,
                 engineeringProfileLabel: engineeringChoice?.profile.label,
                 onFinishComponentPlacement: finishComponentPlacement,
-                onFeatureChanged: (value) => setState(() {
-                  tool = EditorTool.architecturalFeature;
-                  featureType = value;
-                  measurementStart = null;
-                  navigationCandidate = null;
-                  currentPreviewEdgeId = null;
-                }),
+                onFeatureChanged:
+                    (value) => setState(() {
+                      tool = EditorTool.architecturalFeature;
+                      featureType = value;
+                      measurementStart = null;
+                      navigationCandidate = null;
+                      currentPreviewEdgeId = null;
+                    }),
               ),
               Expanded(
-                child: wide
-                    ? Row(
-                        children: [
-                          Expanded(child: editor),
-                          SizedBox(
-                            width:
-                                powerInspectorVisible &&
-                                    widget.powerWorkspace != null
-                                ? 360
-                                : 320,
-                            child: inspector,
-                          ),
-                        ],
-                      )
-                    : Column(
-                        children: [
-                          Expanded(child: editor),
-                          _CompactContextBar(
-                            engineeringPreview: engineeringChoice != null,
-                            tool: tool,
-                            selection: selection,
-                            measurement: measurement,
-                            measurementStart: measurementStart,
-                            navigationCandidate: navigationCandidate,
-                            adjacentPreviewPatch: previewPatch,
-                            activeComponentDefinition:
-                                activeComponentDefinition,
-                            placingComponent: placingComponent,
-                            onOpen: () => showModalBottomSheet<void>(
-                              context: context,
-                              isScrollControlled: true,
-                              builder: (_) => SafeArea(
-                                child: SizedBox(
-                                  height: math.min(
-                                    MediaQuery.sizeOf(context).height * 0.72,
-                                    560,
-                                  ),
-                                  child: inspector,
-                                ),
-                              ),
+                child:
+                    wide
+                        ? Row(
+                          children: [
+                            Expanded(child: editor),
+                            SizedBox(
+                              width:
+                                  powerInspectorVisible &&
+                                          widget.powerWorkspace != null
+                                      ? 360
+                                      : 320,
+                              child: inspector,
                             ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        )
+                        : Column(
+                          children: [
+                            Expanded(child: editor),
+                            _CompactContextBar(
+                              engineeringPreview: engineeringChoice != null,
+                              tool: tool,
+                              selection: selection,
+                              measurement: measurement,
+                              measurementStart: measurementStart,
+                              navigationCandidate: navigationCandidate,
+                              adjacentPreviewPatch: previewPatch,
+                              activeComponentDefinition:
+                                  activeComponentDefinition,
+                              placingComponent: placingComponent,
+                              onOpen:
+                                  () => showModalBottomSheet<void>(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    builder:
+                                        (_) => SafeArea(
+                                          child: SizedBox(
+                                            height: math.min(
+                                              MediaQuery.sizeOf(
+                                                    context,
+                                                  ).height *
+                                                  0.72,
+                                              560,
+                                            ),
+                                            child: inspector,
+                                          ),
+                                        ),
+                                  ),
+                            ),
+                          ],
+                        ),
               ),
             ],
           );
@@ -963,12 +990,15 @@ class _EditorToolbar extends StatelessWidget {
             const SizedBox(width: 12),
             DropdownButton<Discipline>(
               value: discipline,
-              items: Discipline.values
-                  .map(
-                    (value) =>
-                        DropdownMenuItem(value: value, child: Text(value.name)),
-                  )
-                  .toList(),
+              items:
+                  Discipline.values
+                      .map(
+                        (value) => DropdownMenuItem(
+                          value: value,
+                          child: Text(value.name),
+                        ),
+                      )
+                      .toList(),
               onChanged: (value) {
                 if (value != null) onDisciplineChanged(value);
               },
@@ -977,12 +1007,16 @@ class _EditorToolbar extends StatelessWidget {
             PopupMenuButton<ArchitecturalFeatureType>(
               tooltip: 'Add opening / feature',
               onSelected: onFeatureChanged,
-              itemBuilder: (_) => ArchitecturalFeatureType.values
-                  .map(
-                    (value) =>
-                        PopupMenuItem(value: value, child: Text(value.name)),
-                  )
-                  .toList(),
+              itemBuilder:
+                  (_) =>
+                      ArchitecturalFeatureType.values
+                          .map(
+                            (value) => PopupMenuItem(
+                              value: value,
+                              child: Text(value.name),
+                            ),
+                          )
+                          .toList(),
               child: const Chip(
                 avatar: Icon(Icons.architecture, size: 18),
                 label: Text('Door / Window / Beam...'),
@@ -1099,118 +1133,127 @@ class _EditorCanvasShell extends StatelessWidget {
           Expanded(
             child: Card(
               clipBehavior: Clip.antiAlias,
-              child: patch == null
-                  ? const Center(
-                      child: Text(
-                        'Room geometry is empty.\nCreate persisted SurfacePatch data to begin.',
-                        textAlign: TextAlign.center,
-                      ),
-                    )
-                  : LayoutBuilder(
-                      builder: (context, constraints) {
-                        final transform = SurfaceViewportTransform(
-                          boundary: patch.boundary,
-                          viewportWidth: constraints.maxWidth,
-                          viewportHeight: constraints.maxHeight,
-                        );
+              child:
+                  patch == null
+                      ? const Center(
+                        child: Text(
+                          'Room geometry is empty.\nCreate persisted SurfacePatch data to begin.',
+                          textAlign: TextAlign.center,
+                        ),
+                      )
+                      : LayoutBuilder(
+                        builder: (context, constraints) {
+                          final transform = SurfaceViewportTransform(
+                            boundary: patch.boundary,
+                            viewportWidth: constraints.maxWidth,
+                            viewportHeight: constraints.maxHeight,
+                          );
 
-                        Point2Mm toLocal(Offset position) =>
-                            transform.viewportToLocal(position.dx, position.dy);
+                          Point2Mm toLocal(Offset position) => transform
+                              .viewportToLocal(position.dx, position.dy);
 
-                        return InteractiveViewer(
-                          minScale: 0.25,
-                          maxScale: 8,
-                          boundaryMargin: const EdgeInsets.all(300),
-                          child: SizedBox(
-                            width: constraints.maxWidth,
-                            height: constraints.maxHeight,
-                            child: Listener(
-                              onPointerHover: (event) => onSurfacePointer(
-                                patch,
-                                toLocal(event.localPosition),
-                              ),
-                              onPointerMove: (event) => onSurfacePointer(
-                                patch,
-                                toLocal(event.localPosition),
-                              ),
-                              child: GestureDetector(
-                                behavior: HitTestBehavior.opaque,
-                                onTapDown: (details) => onSurfaceTap(
-                                  patch,
-                                  toLocal(details.localPosition),
-                                ),
-                                child: Stack(
-                                  fit: StackFit.expand,
-                                  children: [
-                                    CustomPaint(
-                                      painter: _RoomSurfacePainter(
-                                        patch: patch,
-                                        openings: geometry.openings
-                                            .where(
-                                              (item) =>
-                                                  item.hostSurfacePatchId ==
-                                                  patch.id,
-                                            )
-                                            .toList(growable: false),
-                                        features: geometry.features
-                                            .where(
-                                              (item) =>
-                                                  item.hostSurfacePatchId ==
-                                                  patch.id,
-                                            )
-                                            .toList(growable: false),
-                                        components: components
-                                            .where(
-                                              (item) =>
-                                                  item.hostSurfacePatchId ==
-                                                  patch.id,
-                                            )
-                                            .toList(growable: false),
-                                        selection: selection,
-                                        measurement: measurement,
-                                        measurementStart: measurementStart,
-                                        navigationCandidate:
-                                            navigationCandidate,
-                                      ),
+                          return InteractiveViewer(
+                            minScale: 0.25,
+                            maxScale: 8,
+                            boundaryMargin: const EdgeInsets.all(300),
+                            child: SizedBox(
+                              width: constraints.maxWidth,
+                              height: constraints.maxHeight,
+                              child: Listener(
+                                onPointerHover:
+                                    (event) => onSurfacePointer(
+                                      patch,
+                                      toLocal(event.localPosition),
                                     ),
-                                    if (powerOverlay != null &&
-                                        powerOverlayMode !=
-                                            PowerWorkspaceOverlayMode.none)
-                                      IgnorePointer(
-                                        child: CustomPaint(
-                                          painter: PowerWorkspaceOverlayPainter(
-                                            surfacePatchId: patch.id,
-                                            boundary: patch.boundary,
-                                            components: components,
-                                            segments: powerOverlaySegments,
-                                            overlay: powerOverlay!,
-                                            mode: powerOverlayMode,
-                                            colorScheme: Theme.of(context)
-                                                .colorScheme,
-                                            selectedComponentId:
-                                                selectedPowerComponentId,
-                                          ),
+                                onPointerMove:
+                                    (event) => onSurfacePointer(
+                                      patch,
+                                      toLocal(event.localPosition),
+                                    ),
+                                child: GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTapDown:
+                                      (details) => onSurfaceTap(
+                                        patch,
+                                        toLocal(details.localPosition),
+                                      ),
+                                  child: Stack(
+                                    fit: StackFit.expand,
+                                    children: [
+                                      CustomPaint(
+                                        painter: _RoomSurfacePainter(
+                                          patch: patch,
+                                          openings: geometry.openings
+                                              .where(
+                                                (item) =>
+                                                    item.hostSurfacePatchId ==
+                                                    patch.id,
+                                              )
+                                              .toList(growable: false),
+                                          features: geometry.features
+                                              .where(
+                                                (item) =>
+                                                    item.hostSurfacePatchId ==
+                                                    patch.id,
+                                              )
+                                              .toList(growable: false),
+                                          components: components
+                                              .where(
+                                                (item) =>
+                                                    item.hostSurfacePatchId ==
+                                                    patch.id,
+                                              )
+                                              .toList(growable: false),
+                                          selection: selection,
+                                          measurement: measurement,
+                                          measurementStart: measurementStart,
+                                          navigationCandidate:
+                                              navigationCandidate,
                                         ),
                                       ),
-                                    if (candidatePoint != null &&
-                                        candidateStatus != null)
-                                      IgnorePointer(
-                                        child: CustomPaint(
-                                          painter: EngineeringCandidatePainter(
-                                            patch: patch,
-                                            point: candidatePoint!,
-                                            status: candidateStatus!,
+                                      if (powerOverlay != null &&
+                                          powerOverlayMode !=
+                                              PowerWorkspaceOverlayMode.none)
+                                        IgnorePointer(
+                                          child: CustomPaint(
+                                            painter:
+                                                PowerWorkspaceOverlayPainter(
+                                                  surfacePatchId: patch.id,
+                                                  boundary: patch.boundary,
+                                                  components: components,
+                                                  segments:
+                                                      powerOverlaySegments,
+                                                  overlay: powerOverlay!,
+                                                  mode: powerOverlayMode,
+                                                  colorScheme:
+                                                      Theme.of(
+                                                        context,
+                                                      ).colorScheme,
+                                                  selectedComponentId:
+                                                      selectedPowerComponentId,
+                                                ),
                                           ),
                                         ),
-                                      ),
-                                  ],
+                                      if (candidatePoint != null &&
+                                          candidateStatus != null)
+                                        IgnorePointer(
+                                          child: CustomPaint(
+                                            painter:
+                                                EngineeringCandidatePainter(
+                                                  patch: patch,
+                                                  point: candidatePoint!,
+                                                  status: candidateStatus!,
+                                                ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        );
-                      },
-                    ),
+                          );
+                        },
+                      ),
             ),
           ),
           if (engineeringFeedback == null)
@@ -1285,9 +1328,10 @@ class _ToolContextBar extends StatelessWidget {
         SurfaceEdgeProximity.none => 'Select · tap a surface object',
       };
     } else if (tool == EditorTool.select) {
-      text = selection == null
-          ? 'Select · tap a surface object'
-          : 'Selected · ${selection!.kind.name} · ${selection!.id}';
+      text =
+          selection == null
+              ? 'Select · tap a surface object'
+              : 'Selected · ${selection!.kind.name} · ${selection!.id}';
     } else {
       text = '${tool.name} · contextual actions will appear here';
     }
@@ -1394,9 +1438,10 @@ class _RoomSurfacePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final gridPaint = Paint()
-      ..color = Colors.blueGrey.withValues(alpha: 0.15)
-      ..strokeWidth = 1;
+    final gridPaint =
+        Paint()
+          ..color = Colors.blueGrey.withValues(alpha: 0.15)
+          ..strokeWidth = 1;
     const gridStep = 32.0;
     for (double x = 0; x <= size.width; x += gridStep) {
       canvas.drawLine(Offset(x, 0), Offset(x, size.height), gridPaint);
@@ -1431,18 +1476,20 @@ class _RoomSurfacePainter extends CustomPainter {
     final patchSelected =
         selection?.kind == EditorSelectionKind.surfacePatch &&
         selection?.id == patch.id;
-    final boundaryPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = patchSelected ? 3 : 2;
+    final boundaryPaint =
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = patchSelected ? 3 : 2;
     canvas.drawPath(polygonPath(patch.boundary), boundaryPaint);
 
     for (final opening in openings) {
       final selected =
           selection?.kind == EditorSelectionKind.opening &&
           selection?.id == opening.id;
-      final paint = Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = selected ? 3 : 1.5;
+      final paint =
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = selected ? 3 : 1.5;
       canvas.drawPath(polygonPath(opening.boundary), paint);
     }
 
@@ -1450,9 +1497,10 @@ class _RoomSurfacePainter extends CustomPainter {
       final selected =
           selection?.kind == EditorSelectionKind.spatialFeature &&
           selection?.id == feature.id;
-      final paint = Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = selected ? 3 : 1;
+      final paint =
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = selected ? 3 : 1;
       canvas.drawPath(polygonPath(feature.footprint), paint);
     }
 
@@ -1461,9 +1509,10 @@ class _RoomSurfacePainter extends CustomPainter {
       final selected =
           selection?.kind == EditorSelectionKind.component &&
           selection?.id == component.id;
-      final paint = Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = selected ? 3 : 1.5;
+      final paint =
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = selected ? 3 : 1.5;
       canvas.drawCircle(center, 8, paint);
       canvas.drawLine(
         center + const Offset(-6, 0),
@@ -1487,10 +1536,11 @@ class _RoomSurfacePainter extends CustomPainter {
       };
       if (width > 0) {
         final segment = candidate.edge.segment;
-        final paint = Paint()
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = width
-          ..strokeCap = StrokeCap.round;
+        final paint =
+            Paint()
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = width
+              ..strokeCap = StrokeCap.round;
         canvas.drawLine(mapPoint(segment.start), mapPoint(segment.end), paint);
       }
     }
@@ -1505,9 +1555,10 @@ class _RoomSurfacePainter extends CustomPainter {
     if (completed != null) {
       final start = mapPoint(completed.start);
       final end = mapPoint(completed.end);
-      final paint = Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.5;
+      final paint =
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 1.5;
       canvas.drawLine(start, end, paint);
       canvas.drawCircle(start, 4, Paint()..style = PaintingStyle.fill);
       canvas.drawCircle(end, 4, Paint()..style = PaintingStyle.fill);

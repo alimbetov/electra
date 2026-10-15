@@ -93,18 +93,16 @@ void main() {
         ),
       );
       expect(frozen, isA<ElvCommandSuccess<ProjectDesignRevision>>());
-      final before = await db
-          .select(db.designRevisionPhysicalSnapshots)
-          .getSingle();
+      final before =
+          await db.select(db.designRevisionPhysicalSnapshots).getSingle();
       expect(before.payloadSha256, isNotEmpty);
       expect(jsonDecode(before.payloadJson), {'runs': []});
       await db.close();
 
       db = AppDatabase(NativeDatabase(file));
       addTearDown(db.close);
-      final after = await db
-          .select(db.designRevisionPhysicalSnapshots)
-          .getSingle();
+      final after =
+          await db.select(db.designRevisionPhysicalSnapshots).getSingle();
       expect(after.designRevisionId, before.designRevisionId);
       expect(after.payloadJson, before.payloadJson);
       expect(after.payloadSha256, before.payloadSha256);
@@ -148,9 +146,9 @@ void main() {
     final context = await repo.context('project-1');
     expect(context.workingDesignRevisionId, 'REV-2');
     expect(context.latestFrozenRevisionId, 'REV-1');
-    final old = await (db.select(
-      db.projectDesignRevisions,
-    )..where((row) => row.id.equals('REV-1'))).getSingle();
+    final old =
+        await (db.select(db.projectDesignRevisions)
+          ..where((row) => row.id.equals('REV-1'))).getSingle();
     expect(old.state, 'FROZEN');
   });
 }

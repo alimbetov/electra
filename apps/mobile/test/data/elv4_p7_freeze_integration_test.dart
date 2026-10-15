@@ -53,15 +53,12 @@ void main() {
       );
       expect(frozen, isA<ElvCommandSuccess<ProjectDesignRevision>>());
 
-      final physical = await db
-          .select(db.designRevisionPhysicalSnapshots)
-          .getSingle();
-      final power = await db
-          .select(db.designRevisionPowerSnapshots)
-          .getSingle();
-      final manifest = await db
-          .select(db.designRevisionSnapshotManifests)
-          .getSingle();
+      final physical =
+          await db.select(db.designRevisionPhysicalSnapshots).getSingle();
+      final power =
+          await db.select(db.designRevisionPowerSnapshots).getSingle();
+      final manifest =
+          await db.select(db.designRevisionSnapshotManifests).getSingle();
       expect(power.physicalSha256, physical.payloadSha256);
       expect(manifest.physicalSha256, physical.payloadSha256);
       expect(manifest.powerSha256, power.powerSha256);

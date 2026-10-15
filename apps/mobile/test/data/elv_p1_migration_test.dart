@@ -37,16 +37,17 @@ void main() {
       await db.close();
 
       db = AppDatabase(NativeDatabase(file));
-      final project = await (db.select(
-        db.projects,
-      )..where((row) => row.id.equals('existing-project'))).getSingle();
+      final project =
+          await (db.select(db.projects)
+            ..where((row) => row.id.equals('existing-project'))).getSingle();
       expect(project.name, 'Existing project');
 
-      final tables = await db
-          .customSelect(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('elv_cables','command_execution_records') ORDER BY name",
-          )
-          .get();
+      final tables =
+          await db
+              .customSelect(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('elv_cables','command_execution_records') ORDER BY name",
+              )
+              .get();
       expect(tables.map((row) => row.read<String>('name')).toList(), [
         'command_execution_records',
         'elv_cables',

@@ -25,28 +25,33 @@ class RoomRoutingScreen extends ConsumerWidget {
       appBar: AppBar(title: Text('$roomName · Cable routing')),
       body: routing.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) =>
-            Center(child: Text('Unable to load routing: $error')),
-        data: (snapshot) => circuits.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, _) =>
-              Center(child: Text('Unable to load circuits: $error')),
-          data: (items) => CableRouteEditor(
-            snapshot: snapshot,
-            initialRunId: initialRunId,
-            circuits: {
-              for (final item in items) item.circuit.id: item.circuit.name,
-            },
-            nextId: ref.read(idGeneratorProvider).next,
-            onSave: ({required route, required run}) => ref
-                .read(cableRoutingRepositoryProvider)
-                .saveRouteWithRun(route: route, run: run),
-            onSaveJunction: ref
-                .read(cableRoutingRepositoryProvider)
-                .saveJunction,
-            onSaveChannel: ref.read(cableRoutingRepositoryProvider).saveChannel,
-          ),
-        ),
+        error:
+            (error, _) => Center(child: Text('Unable to load routing: $error')),
+        data:
+            (snapshot) => circuits.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error:
+                  (error, _) =>
+                      Center(child: Text('Unable to load circuits: $error')),
+              data:
+                  (items) => CableRouteEditor(
+                    snapshot: snapshot,
+                    initialRunId: initialRunId,
+                    circuits: {
+                      for (final item in items)
+                        item.circuit.id: item.circuit.name,
+                    },
+                    nextId: ref.read(idGeneratorProvider).next,
+                    onSave:
+                        ({required route, required run}) => ref
+                            .read(cableRoutingRepositoryProvider)
+                            .saveRouteWithRun(route: route, run: run),
+                    onSaveJunction:
+                        ref.read(cableRoutingRepositoryProvider).saveJunction,
+                    onSaveChannel:
+                        ref.read(cableRoutingRepositoryProvider).saveChannel,
+                  ),
+            ),
       ),
     );
   }
@@ -90,12 +95,12 @@ class _CableRouteEditorState extends State<CableRouteEditor> {
   @override
   void initState() {
     super.initState();
-    final run = widget.snapshot.runs
-        .where((r) => r.id == widget.initialRunId)
-        .firstOrNull;
-    final route = widget.snapshot.routes
-        .where((r) => r.id == run?.routeId)
-        .firstOrNull;
+    final run =
+        widget.snapshot.runs
+            .where((r) => r.id == widget.initialRunId)
+            .firstOrNull;
+    final route =
+        widget.snapshot.routes.where((r) => r.id == run?.routeId).firstOrNull;
     if (run != null && route != null) begin(route: route, run: run);
   }
 
@@ -112,27 +117,29 @@ class _CableRouteEditorState extends State<CableRouteEditor> {
           .where((patch) => patch.id == patchId)
           .firstOrNull ??
       widget.snapshot.geometry.patches.firstOrNull;
-  void message(Object error) =>
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('$error')));
+  void message(Object error) => ScaffoldMessenger.of(
+    context,
+  ).showSnackBar(SnackBar(content: Text('$error')));
   Future<void> openJunction([RoutingJunction? junction]) async {
     if (widget.onSaveJunction == null) return;
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => JunctionEditor(
-          snapshot: widget.snapshot,
-          id: junction?.id ?? widget.nextId(),
-          junction: junction,
-          onSave: widget.onSaveJunction!,
-          onOpenRun: (run) {
-            final route = widget.snapshot.routes
-                .where((r) => r.id == run.routeId)
-                .firstOrNull;
-            if (route == null) return;
-            Navigator.of(context).pop();
-            begin(route: route, run: run);
-          },
-        ),
+        builder:
+            (_) => JunctionEditor(
+              snapshot: widget.snapshot,
+              id: junction?.id ?? widget.nextId(),
+              junction: junction,
+              onSave: widget.onSaveJunction!,
+              onOpenRun: (run) {
+                final route =
+                    widget.snapshot.routes
+                        .where((r) => r.id == run.routeId)
+                        .firstOrNull;
+                if (route == null) return;
+                Navigator.of(context).pop();
+                begin(route: route, run: run);
+              },
+            ),
       ),
     );
   }
@@ -241,16 +248,18 @@ class _CableRouteEditorState extends State<CableRouteEditor> {
     if (saveChannel == null) return;
     await showDialog<void>(
       context: context,
-      builder: (_) => _ChannelDialog(
-        onSave: (channelName, kind) => saveChannel(
-          PhysicalChannel(
-            id: widget.nextId(),
-            roomId: widget.snapshot.geometry.roomId,
-            name: channelName,
-            kind: kind,
+      builder:
+          (_) => _ChannelDialog(
+            onSave:
+                (channelName, kind) => saveChannel(
+                  PhysicalChannel(
+                    id: widget.nextId(),
+                    roomId: widget.snapshot.geometry.roomId,
+                    name: channelName,
+                    kind: kind,
+                  ),
+                ),
           ),
-        ),
-      ),
     );
   }
 
@@ -261,24 +270,28 @@ class _CableRouteEditorState extends State<CableRouteEditor> {
     bool changeChannel = false,
   }) {
     final segment = draft!.segments[index];
-    final channel = widget.snapshot.channels
-        .where((channel) => channel.id == newChannel)
-        .firstOrNull;
+    final channel =
+        widget.snapshot.channels
+            .where((channel) => channel.id == newChannel)
+            .firstOrNull;
     setState(
-      () => draft!.segments[index] = RouteSegment(
-        id: segment.id,
-        fromNodeId: segment.fromNodeId,
-        toNodeId: segment.toNodeId,
-        surfacePatchId: segment.surfacePatchId,
-        layingMethod: channel != null
-            ? LayingMethod.values.byName(channel.kind.name)
-            : newMethod ?? segment.layingMethod,
-        physicalChannelId: changeChannel
-            ? newChannel
-            : newMethod != null
-            ? null
-            : segment.physicalChannelId,
-      ),
+      () =>
+          draft!.segments[index] = RouteSegment(
+            id: segment.id,
+            fromNodeId: segment.fromNodeId,
+            toNodeId: segment.toNodeId,
+            surfacePatchId: segment.surfacePatchId,
+            layingMethod:
+                channel != null
+                    ? LayingMethod.values.byName(channel.kind.name)
+                    : newMethod ?? segment.layingMethod,
+            physicalChannelId:
+                changeChannel
+                    ? newChannel
+                    : newMethod != null
+                    ? null
+                    : segment.physicalChannelId,
+          ),
     );
   }
 
@@ -290,330 +303,363 @@ class _CableRouteEditorState extends State<CableRouteEditor> {
         child: Text('Create room surfaces before drawing routes.'),
       );
     final preview = draft == null ? null : currentRoute();
-    final calculation = preview == null
-        ? null
-        : widget.snapshot.calculate(preview);
+    final calculation =
+        preview == null ? null : widget.snapshot.calculate(preview);
     return LayoutBuilder(
-      builder: (context, constraints) => ListView(
-        padding: const EdgeInsets.all(12),
-        children: [
-          if (widget.onSaveJunction != null) ...[
-            OutlinedButton.icon(
-              onPressed: draft == null ? () => openJunction() : null,
-              icon: const Icon(Icons.account_tree),
-              label: const Text('New junction'),
-            ),
-            for (final junction in widget.snapshot.junctions)
-              ListTile(
-                leading: const Icon(Icons.account_tree),
-                title: Text(junction.code),
-                subtitle: Text(
-                  '${junction.incoming.length} in → ${junction.outgoing.length} out · ${widget.snapshot.junctionIssues(junction).isEmpty ? "Ready" : "Review required"}',
-                ),
-                onTap: () => openJunction(junction),
-              ),
-          ],
-          Row(
+      builder:
+          (context, constraints) => ListView(
+            padding: const EdgeInsets.all(12),
             children: [
-              Expanded(
-                child: DropdownButtonFormField<String>(
-                  key: ValueKey(active.id),
-                  initialValue: active.id,
-                  isExpanded: true,
-                  decoration: const InputDecoration(labelText: 'Surface'),
-                  items: widget.snapshot.geometry.patches
-                      .map(
-                        (patch) => DropdownMenuItem(
-                          value: patch.id,
-                          child: Text(
-                            patch.surfaceId,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      )
-                      .toList(),
-                  onChanged: saving
-                      ? null
-                      : (value) => setState(() => patchId = value),
+              if (widget.onSaveJunction != null) ...[
+                OutlinedButton.icon(
+                  onPressed: draft == null ? () => openJunction() : null,
+                  icon: const Icon(Icons.account_tree),
+                  label: const Text('New junction'),
                 ),
-              ),
-              const SizedBox(width: 8),
-              if (draft == null)
-                FilledButton.icon(
-                  onPressed: saving ? null : () => begin(),
-                  icon: const Icon(Icons.add),
-                  label: const Text('New route'),
-                )
-              else
-                IconButton(
-                  tooltip: 'Undo route point',
-                  icon: const Icon(Icons.undo),
-                  onPressed: saving || draft!.nodes.isEmpty
-                      ? null
-                      : () => setState(() {
-                          draft!.removeLast();
-                          patchId = draft!.activePatchId ?? patchId;
-                        }),
-                ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          SizedBox(
-            height: (constraints.maxHeight * 0.45)
-                .clamp(220.0, 420.0)
-                .toDouble(),
-            child: _RoutingCanvas(
-              patch: active,
-              snapshot: widget.snapshot,
-              preview: preview,
-              enabled: draft != null && !saving,
-              onTap: tapPoint,
-              onJunction: openJunction,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Text(
-              draft == null ? 'Choose New route to draw on the surfaces.' : 'Tap to add points. Tap within 120 mm of a highlighted fold to cross to its adjacent surface.',
-            ),
-          ),
-          if (draft != null) ...[
-            if (draft!.activePatchId != null &&
-                draft!.activePatchId != active.id)
-              TextButton(
-                onPressed: () => setState(() => patchId = draft!.activePatchId),
-                child: const Text('Return to current route surface'),
-              ),
-            Text(
-              'Nodes: ${draft!.nodes.length} · ${calculation!.ready ? 'Geometry: ${calculation.geometricLengthMm!.toStringAsFixed(2)} mm' : 'Route needs input'}',
-            ),
-            TextField(
-              controller: name,
-              enabled: !saving,
-              decoration: const InputDecoration(
-                labelText: 'Route / CableRun name',
-              ),
-              onChanged: (_) => setState(() {}),
-            ),
-            DropdownButtonFormField<String>(
-              key: ValueKey(circuitId),
-              initialValue: widget.circuits.containsKey(circuitId)
-                  ? circuitId
-                  : null,
-              isExpanded: true,
-              decoration: const InputDecoration(labelText: 'Circuit'),
-              items: widget.circuits.entries
-                  .map(
-                    (entry) => DropdownMenuItem(
-                      value: entry.key,
-                      child: Text(entry.value, overflow: TextOverflow.ellipsis),
+                for (final junction in widget.snapshot.junctions)
+                  ListTile(
+                    leading: const Icon(Icons.account_tree),
+                    title: Text(junction.code),
+                    subtitle: Text(
+                      '${junction.incoming.length} in → ${junction.outgoing.length} out · ${widget.snapshot.junctionIssues(junction).isEmpty ? "Ready" : "Review required"}',
                     ),
-                  )
-                  .toList(),
-              onChanged: saving
-                  ? null
-                  : (value) => setState(() => circuitId = value),
-            ),
-            DropdownButtonFormField<LayingMethod>(
-              key: ValueKey(method),
-              initialValue: method,
-              isExpanded: true,
-              decoration: const InputDecoration(
-                labelText: 'New segment method',
-              ),
-              items: LayingMethod.values
-                  .map(
-                    (value) =>
-                        DropdownMenuItem(value: value, child: Text(value.name)),
-                  )
-                  .toList(),
-              onChanged: saving
-                  ? null
-                  : (value) {
-                      if (value != null)
-                        setState(() {
-                          method = value;
-                          channelId = null;
-                        });
-                    },
-            ),
-            DropdownButtonFormField<String>(
-              key: ValueKey(channelId),
-              initialValue:
-                  widget.snapshot.channels.any(
-                    (channel) => channel.id == channelId,
-                  )
-                  ? channelId
-                  : '',
-              isExpanded: true,
-              decoration: const InputDecoration(
-                labelText: 'New segment physical channel',
-              ),
-              items: [
-                const DropdownMenuItem(value: '', child: Text('None')),
-                ...widget.snapshot.channels.map(
-                  (channel) => DropdownMenuItem(
-                    value: channel.id,
-                    child: Text(channel.name, overflow: TextOverflow.ellipsis),
+                    onTap: () => openJunction(junction),
                   ),
-                ),
               ],
-              onChanged: saving
-                  ? null
-                  : (value) => setState(() {
-                      channelId = value == null || value.isEmpty ? null : value;
-                      final channel = widget.snapshot.channels
-                          .where((channel) => channel.id == channelId)
-                          .firstOrNull;
-                      if (channel != null)
-                        method = LayingMethod.values.byName(channel.kind.name);
-                    }),
-            ),
-            TextButton.icon(
-              onPressed: saving || widget.onSaveChannel == null
-                  ? null
-                  : newChannel,
-              icon: const Icon(Icons.add),
-              label: const Text('New physical channel'),
-            ),
-            TextField(
-              controller: reserve,
-              enabled: !saving,
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
+              Row(
+                children: [
+                  Expanded(
+                    child: DropdownButtonFormField<String>(
+                      key: ValueKey(active.id),
+                      initialValue: active.id,
+                      isExpanded: true,
+                      decoration: const InputDecoration(labelText: 'Surface'),
+                      items:
+                          widget.snapshot.geometry.patches
+                              .map(
+                                (patch) => DropdownMenuItem(
+                                  value: patch.id,
+                                  child: Text(
+                                    patch.surfaceId,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                      onChanged:
+                          saving
+                              ? null
+                              : (value) => setState(() => patchId = value),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  if (draft == null)
+                    FilledButton.icon(
+                      onPressed: saving ? null : () => begin(),
+                      icon: const Icon(Icons.add),
+                      label: const Text('New route'),
+                    )
+                  else
+                    IconButton(
+                      tooltip: 'Undo route point',
+                      icon: const Icon(Icons.undo),
+                      onPressed:
+                          saving || draft!.nodes.isEmpty
+                              ? null
+                              : () => setState(() {
+                                draft!.removeLast();
+                                patchId = draft!.activePatchId ?? patchId;
+                              }),
+                    ),
+                ],
               ),
-              decoration: const InputDecoration(labelText: 'Reserve (%)'),
-            ),
-            TextField(
-              controller: allowance,
-              enabled: !saving,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Termination allowance (mm)',
+              const SizedBox(height: 8),
+              SizedBox(
+                height:
+                    (constraints.maxHeight * 0.45)
+                        .clamp(220.0, 420.0)
+                        .toDouble(),
+                child: _RoutingCanvas(
+                  patch: active,
+                  snapshot: widget.snapshot,
+                  preview: preview,
+                  enabled: draft != null && !saving,
+                  onTap: tapPoint,
+                  onJunction: openJunction,
+                ),
               ),
-            ),
-            ExpansionTile(
-              title: Text('Segment details (${draft!.segments.length})'),
-              children: [
-                for (var i = 0; i < draft!.segments.length; i++)
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Segment ${i + 1} · ${draft!.segments[i].surfacePatchId}',
-                      ),
-                      DropdownButtonFormField<LayingMethod>(
-                        key: ValueKey(
-                          'method-${draft!.segments[i].id}-${draft!.segments[i].layingMethod}',
-                        ),
-                        initialValue: draft!.segments[i].layingMethod,
-                        isExpanded: true,
-                        decoration: const InputDecoration(
-                          labelText: 'Laying method',
-                        ),
-                        items: LayingMethod.values
-                            .map(
-                              (value) => DropdownMenuItem(
-                                value: value,
-                                child: Text(value.name),
-                              ),
-                            )
-                            .toList(),
-                        onChanged: saving
-                            ? null
-                            : (value) {
-                                if (value != null)
-                                  editSegment(i, newMethod: value);
-                              },
-                      ),
-                      DropdownButtonFormField<String>(
-                        key: ValueKey(
-                          'channel-${draft!.segments[i].id}-${draft!.segments[i].physicalChannelId}',
-                        ),
-                        initialValue:
-                            widget.snapshot.channels.any(
-                              (channel) =>
-                                  channel.id ==
-                                  draft!.segments[i].physicalChannelId,
-                            )
-                            ? draft!.segments[i].physicalChannelId
-                            : '',
-                        isExpanded: true,
-                        decoration: const InputDecoration(
-                          labelText: 'Physical channel',
-                        ),
-                        items: [
-                          const DropdownMenuItem(
-                            value: '',
-                            child: Text('None'),
-                          ),
-                          ...widget.snapshot.channels.map(
-                            (channel) => DropdownMenuItem(
-                              value: channel.id,
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Text(
+                  draft == null
+                      ? 'Choose New route to draw on the surfaces.'
+                      : 'Tap to add points. Tap within 120 mm of a highlighted fold to cross to its adjacent surface.',
+                ),
+              ),
+              if (draft != null) ...[
+                if (draft!.activePatchId != null &&
+                    draft!.activePatchId != active.id)
+                  TextButton(
+                    onPressed:
+                        () => setState(() => patchId = draft!.activePatchId),
+                    child: const Text('Return to current route surface'),
+                  ),
+                Text(
+                  'Nodes: ${draft!.nodes.length} · ${calculation!.ready ? 'Geometry: ${calculation.geometricLengthMm!.toStringAsFixed(2)} mm' : 'Route needs input'}',
+                ),
+                TextField(
+                  controller: name,
+                  enabled: !saving,
+                  decoration: const InputDecoration(
+                    labelText: 'Route / CableRun name',
+                  ),
+                  onChanged: (_) => setState(() {}),
+                ),
+                DropdownButtonFormField<String>(
+                  key: ValueKey(circuitId),
+                  initialValue:
+                      widget.circuits.containsKey(circuitId) ? circuitId : null,
+                  isExpanded: true,
+                  decoration: const InputDecoration(labelText: 'Circuit'),
+                  items:
+                      widget.circuits.entries
+                          .map(
+                            (entry) => DropdownMenuItem(
+                              value: entry.key,
                               child: Text(
-                                channel.name,
+                                entry.value,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
+                          )
+                          .toList(),
+                  onChanged:
+                      saving
+                          ? null
+                          : (value) => setState(() => circuitId = value),
+                ),
+                DropdownButtonFormField<LayingMethod>(
+                  key: ValueKey(method),
+                  initialValue: method,
+                  isExpanded: true,
+                  decoration: const InputDecoration(
+                    labelText: 'New segment method',
+                  ),
+                  items:
+                      LayingMethod.values
+                          .map(
+                            (value) => DropdownMenuItem(
+                              value: value,
+                              child: Text(value.name),
+                            ),
+                          )
+                          .toList(),
+                  onChanged:
+                      saving
+                          ? null
+                          : (value) {
+                            if (value != null)
+                              setState(() {
+                                method = value;
+                                channelId = null;
+                              });
+                          },
+                ),
+                DropdownButtonFormField<String>(
+                  key: ValueKey(channelId),
+                  initialValue:
+                      widget.snapshot.channels.any(
+                            (channel) => channel.id == channelId,
+                          )
+                          ? channelId
+                          : '',
+                  isExpanded: true,
+                  decoration: const InputDecoration(
+                    labelText: 'New segment physical channel',
+                  ),
+                  items: [
+                    const DropdownMenuItem(value: '', child: Text('None')),
+                    ...widget.snapshot.channels.map(
+                      (channel) => DropdownMenuItem(
+                        value: channel.id,
+                        child: Text(
+                          channel.name,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                  ],
+                  onChanged:
+                      saving
+                          ? null
+                          : (value) => setState(() {
+                            channelId =
+                                value == null || value.isEmpty ? null : value;
+                            final channel =
+                                widget.snapshot.channels
+                                    .where((channel) => channel.id == channelId)
+                                    .firstOrNull;
+                            if (channel != null)
+                              method = LayingMethod.values.byName(
+                                channel.kind.name,
+                              );
+                          }),
+                ),
+                TextButton.icon(
+                  onPressed:
+                      saving || widget.onSaveChannel == null
+                          ? null
+                          : newChannel,
+                  icon: const Icon(Icons.add),
+                  label: const Text('New physical channel'),
+                ),
+                TextField(
+                  controller: reserve,
+                  enabled: !saving,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  decoration: const InputDecoration(labelText: 'Reserve (%)'),
+                ),
+                TextField(
+                  controller: allowance,
+                  enabled: !saving,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'Termination allowance (mm)',
+                  ),
+                ),
+                ExpansionTile(
+                  title: Text('Segment details (${draft!.segments.length})'),
+                  children: [
+                    for (var i = 0; i < draft!.segments.length; i++)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Segment ${i + 1} · ${draft!.segments[i].surfacePatchId}',
+                          ),
+                          DropdownButtonFormField<LayingMethod>(
+                            key: ValueKey(
+                              'method-${draft!.segments[i].id}-${draft!.segments[i].layingMethod}',
+                            ),
+                            initialValue: draft!.segments[i].layingMethod,
+                            isExpanded: true,
+                            decoration: const InputDecoration(
+                              labelText: 'Laying method',
+                            ),
+                            items:
+                                LayingMethod.values
+                                    .map(
+                                      (value) => DropdownMenuItem(
+                                        value: value,
+                                        child: Text(value.name),
+                                      ),
+                                    )
+                                    .toList(),
+                            onChanged:
+                                saving
+                                    ? null
+                                    : (value) {
+                                      if (value != null)
+                                        editSegment(i, newMethod: value);
+                                    },
+                          ),
+                          DropdownButtonFormField<String>(
+                            key: ValueKey(
+                              'channel-${draft!.segments[i].id}-${draft!.segments[i].physicalChannelId}',
+                            ),
+                            initialValue:
+                                widget.snapshot.channels.any(
+                                      (channel) =>
+                                          channel.id ==
+                                          draft!.segments[i].physicalChannelId,
+                                    )
+                                    ? draft!.segments[i].physicalChannelId
+                                    : '',
+                            isExpanded: true,
+                            decoration: const InputDecoration(
+                              labelText: 'Physical channel',
+                            ),
+                            items: [
+                              const DropdownMenuItem(
+                                value: '',
+                                child: Text('None'),
+                              ),
+                              ...widget.snapshot.channels.map(
+                                (channel) => DropdownMenuItem(
+                                  value: channel.id,
+                                  child: Text(
+                                    channel.name,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ),
+                            ],
+                            onChanged:
+                                saving
+                                    ? null
+                                    : (value) => editSegment(
+                                      i,
+                                      newChannel:
+                                          value == null || value.isEmpty
+                                              ? null
+                                              : value,
+                                      changeChannel: true,
+                                    ),
                           ),
                         ],
-                        onChanged: saving
-                            ? null
-                            : (value) => editSegment(
-                                i,
-                                newChannel: value == null || value.isEmpty
-                                    ? null
-                                    : value,
-                                changeChannel: true,
-                              ),
                       ),
-                    ],
-                  ),
-              ],
-            ),
-            for (final issue in calculation.issues)
-              Text(
-                issue.message,
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
-              ),
-            Wrap(
-              spacing: 8,
-              children: [
-                FilledButton(
-                  onPressed: saving ? null : save,
-                  child: Text(saving ? 'Saving…' : 'Save route'),
+                  ],
                 ),
-                TextButton(
-                  onPressed: saving ? null : () => setState(() => draft = null),
-                  child: const Text('Cancel draft'),
-                ),
-              ],
-            ),
-          ],
-          const Divider(),
-          for (final run in widget.snapshot.runs)
-            Builder(
-              builder: (context) {
-                final route = widget.snapshot.routes
-                    .where((route) => route.id == run.routeId)
-                    .firstOrNull;
-                final length = widget.snapshot.cableLength(run);
-                return Card(
-                  child: ListTile(
-                    title: Text(run.name),
-                    subtitle: Text(
-                      '${widget.circuits[run.circuitId] ?? 'Circuit unavailable'} · ${length == null ? 'Route needs review' : 'Cable ${length.toStringAsFixed(2)} mm'}\nReserve ${run.reservePercent}% · allowance ${run.terminationAllowanceMm} mm',
+                for (final issue in calculation.issues)
+                  Text(
+                    issue.message,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
                     ),
-                    trailing: const Icon(Icons.edit_outlined),
-                    onTap: saving || route == null
-                        ? null
-                        : () => begin(route: route, run: run),
                   ),
-                );
-              },
-            ),
-        ],
-      ),
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    FilledButton(
+                      onPressed: saving ? null : save,
+                      child: Text(saving ? 'Saving…' : 'Save route'),
+                    ),
+                    TextButton(
+                      onPressed:
+                          saving ? null : () => setState(() => draft = null),
+                      child: const Text('Cancel draft'),
+                    ),
+                  ],
+                ),
+              ],
+              const Divider(),
+              for (final run in widget.snapshot.runs)
+                Builder(
+                  builder: (context) {
+                    final route =
+                        widget.snapshot.routes
+                            .where((route) => route.id == run.routeId)
+                            .firstOrNull;
+                    final length = widget.snapshot.cableLength(run);
+                    return Card(
+                      child: ListTile(
+                        title: Text(run.name),
+                        subtitle: Text(
+                          '${widget.circuits[run.circuitId] ?? 'Circuit unavailable'} · ${length == null ? 'Route needs review' : 'Cable ${length.toStringAsFixed(2)} mm'}\nReserve ${run.reservePercent}% · allowance ${run.terminationAllowanceMm} mm',
+                        ),
+                        trailing: const Icon(Icons.edit_outlined),
+                        onTap:
+                            saving || route == null
+                                ? null
+                                : () => begin(route: route, run: run),
+                      ),
+                    );
+                  },
+                ),
+            ],
+          ),
     );
   }
 }
@@ -751,9 +797,10 @@ class _RoutingPainter extends CustomPainter {
       canvas.drawRect(
         Rect.fromCenter(center: point, width: 16, height: 16),
         Paint()
-          ..color = snapshot.junctionIssues(junction).isEmpty
-              ? Colors.orange
-              : Colors.red,
+          ..color =
+              snapshot.junctionIssues(junction).isEmpty
+                  ? Colors.orange
+                  : Colors.red,
       );
       final label = TextPainter(
         text: TextSpan(
@@ -845,17 +892,19 @@ class _ChannelDialogState extends State<_ChannelDialog> {
         DropdownButtonFormField<PhysicalChannelKind>(
           initialValue: kind,
           isExpanded: true,
-          items: PhysicalChannelKind.values
-              .map(
-                (value) =>
-                    DropdownMenuItem(value: value, child: Text(value.name)),
-              )
-              .toList(),
-          onChanged: saving
-              ? null
-              : (value) {
-                  if (value != null) setState(() => kind = value);
-                },
+          items:
+              PhysicalChannelKind.values
+                  .map(
+                    (value) =>
+                        DropdownMenuItem(value: value, child: Text(value.name)),
+                  )
+                  .toList(),
+          onChanged:
+              saving
+                  ? null
+                  : (value) {
+                    if (value != null) setState(() => kind = value);
+                  },
         ),
         if (error != null) Text(error!),
       ],

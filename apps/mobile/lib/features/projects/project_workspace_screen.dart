@@ -36,49 +36,56 @@ class ProjectWorkspaceScreen extends ConsumerWidget {
         OutlinedButton.icon(
           icon: const Icon(Icons.hub_outlined),
           label: const Text('Engineering systems'),
-          onPressed: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => EngineeringSystemsScreen(projectId: projectId),
-            ),
-          ),
+          onPressed:
+              () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder:
+                      (_) => EngineeringSystemsScreen(projectId: projectId),
+                ),
+              ),
         ),
         OutlinedButton.icon(
           icon: const Icon(Icons.view_module_outlined),
           label: const Text('Generate panel'),
-          onPressed: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => PanelGenerationScreen(projectId: projectId),
-            ),
-          ),
+          onPressed:
+              () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => PanelGenerationScreen(projectId: projectId),
+                ),
+              ),
         ),
         OutlinedButton.icon(
           icon: const Icon(Icons.inventory_2_outlined),
           label: const Text('Manufacturer catalogs'),
-          onPressed: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => ManufacturerScreen(projectId: projectId),
-            ),
-          ),
+          onPressed:
+              () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => ManufacturerScreen(projectId: projectId),
+                ),
+              ),
         ),
 
         OutlinedButton.icon(
           icon: const Icon(Icons.shield_outlined),
           label: const Text('Protection / Normatives'),
-          onPressed: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => ProtectionScreen(projectId: projectId),
-            ),
-          ),
+          onPressed:
+              () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => ProtectionScreen(projectId: projectId),
+                ),
+              ),
         ),
 
         OutlinedButton.icon(
           icon: const Icon(Icons.calculate),
           label: const Text('Recalculate / What changed?'),
-          onPressed: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => ProjectRecalculationScreen(projectId: projectId),
-            ),
-          ),
+          onPressed:
+              () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder:
+                      (_) => ProjectRecalculationScreen(projectId: projectId),
+                ),
+              ),
         ),
       ],
       body: ElectraAdaptiveBuilder(
@@ -89,8 +96,9 @@ class ProjectWorkspaceScreen extends ConsumerWidget {
               constraints: BoxConstraints(maxWidth: width),
               child: floors.when(
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (error, _) =>
-                    Center(child: Text('Unable to load floors: $error')),
+                error:
+                    (error, _) =>
+                        Center(child: Text('Unable to load floors: $error')),
                 data: (items) {
                   if (items.isEmpty) {
                     return const Center(
@@ -113,9 +121,10 @@ class ProjectWorkspaceScreen extends ConsumerWidget {
                                 : '${floor.code} · order ${floor.sortOrder}',
                           ),
                           trailing: const Icon(Icons.chevron_right),
-                          onTap: () => context.go(
-                            '/projects/$projectId/floors/${floor.id}',
-                          ),
+                          onTap:
+                              () => context.go(
+                                '/projects/$projectId/floors/${floor.id}',
+                              ),
                         ),
                       );
                     },

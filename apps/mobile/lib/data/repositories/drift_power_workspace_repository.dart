@@ -28,15 +28,16 @@ final class DriftPowerWorkspaceRepository implements PowerWorkspaceRepository {
 
   @override
   Future<PowerWorkspaceOpenResult?> open(String projectId) async {
-    final revision = await database
-        .customSelect(
-          'SELECT id, state FROM project_design_revisions '
-          'WHERE project_id = ? AND deleted_at IS NULL '
-          "ORDER BY CASE state WHEN 'WORKING' THEN 0 WHEN 'FROZEN' THEN 1 ELSE 2 END, "
-          'sequence DESC LIMIT 1',
-          variables: [Variable.withString(projectId)],
-        )
-        .getSingleOrNull();
+    final revision =
+        await database
+            .customSelect(
+              'SELECT id, state FROM project_design_revisions '
+              'WHERE project_id = ? AND deleted_at IS NULL '
+              "ORDER BY CASE state WHEN 'WORKING' THEN 0 WHEN 'FROZEN' THEN 1 ELSE 2 END, "
+              'sequence DESC LIMIT 1',
+              variables: [Variable.withString(projectId)],
+            )
+            .getSingleOrNull();
     if (revision == null) return null;
 
     final revisionId = revision.read<String>('id');
@@ -142,19 +143,20 @@ final class DriftPowerWorkspaceRepository implements PowerWorkspaceRepository {
   Future<List<PowerWorkspaceScenarioOption>> _scenarioOptions(
     String revisionId,
   ) async {
-    final rows = await database
-        .customSelect(
-          'SELECT s.id AS scenario_id, s.role AS role, '
-          'g.segment_id AS segment_id, g.ordinal AS ordinal '
-          'FROM power_operating_scenarios s '
-          'LEFT JOIN power_scenario_segments g '
-          'ON g.design_revision_id = s.design_revision_id '
-          'AND g.scenario_id = s.id '
-          'WHERE s.design_revision_id = ? AND s.deleted_at IS NULL '
-          'ORDER BY s.id, g.ordinal, g.segment_id',
-          variables: [Variable.withString(revisionId)],
-        )
-        .get();
+    final rows =
+        await database
+            .customSelect(
+              'SELECT s.id AS scenario_id, s.role AS role, '
+              'g.segment_id AS segment_id, g.ordinal AS ordinal '
+              'FROM power_operating_scenarios s '
+              'LEFT JOIN power_scenario_segments g '
+              'ON g.design_revision_id = s.design_revision_id '
+              'AND g.scenario_id = s.id '
+              'WHERE s.design_revision_id = ? AND s.deleted_at IS NULL '
+              'ORDER BY s.id, g.ordinal, g.segment_id',
+              variables: [Variable.withString(revisionId)],
+            )
+            .get();
     final result = <PowerWorkspaceScenarioOption>[];
     for (final row in rows) {
       final scenarioId = row.read<String>('scenario_id');
@@ -177,13 +179,14 @@ final class DriftPowerWorkspaceRepository implements PowerWorkspaceRepository {
     List<PowerWorkspaceScenarioOption> configured,
   ) async {
     if (configured.isNotEmpty) return configured.first;
-    final pointer = await database
-        .customSelect(
-          'SELECT logical_node_key_json FROM power_evaluation_pointers '
-          'WHERE design_revision_id = ? ORDER BY logical_node_key_json LIMIT 1',
-          variables: [Variable.withString(revisionId)],
-        )
-        .getSingleOrNull();
+    final pointer =
+        await database
+            .customSelect(
+              'SELECT logical_node_key_json FROM power_evaluation_pointers '
+              'WHERE design_revision_id = ? ORDER BY logical_node_key_json LIMIT 1',
+              variables: [Variable.withString(revisionId)],
+            )
+            .getSingleOrNull();
     if (pointer != null) {
       final key = PowerNodeKeyV2.decode(
         pointer.read<String>('logical_node_key_json'),
@@ -204,23 +207,24 @@ final class DriftPowerWorkspaceRepository implements PowerWorkspaceRepository {
   Future<List<_WorkspaceEvidence>> _workingRecords(
     PowerWorkspaceReadContext context,
   ) async {
-    final rows = await database
-        .customSelect(
-          'SELECT p.logical_node_key_json, p.state, p.generation, '
-          'p.evaluation_id, p.evidence_sha256, r.evidence_json '
-          'FROM power_evaluation_pointers p '
-          'LEFT JOIN power_evaluation_records r '
-          'ON r.design_revision_id = p.design_revision_id '
-          'AND r.logical_node_key_sha256 = p.logical_node_key_sha256 '
-          'AND r.evaluation_id = p.evaluation_id '
-          'WHERE p.project_id = ? AND p.design_revision_id = ? '
-          'ORDER BY p.logical_node_key_json',
-          variables: [
-            Variable.withString(context.projectId),
-            Variable.withString(context.designRevisionId),
-          ],
-        )
-        .get();
+    final rows =
+        await database
+            .customSelect(
+              'SELECT p.logical_node_key_json, p.state, p.generation, '
+              'p.evaluation_id, p.evidence_sha256, r.evidence_json '
+              'FROM power_evaluation_pointers p '
+              'LEFT JOIN power_evaluation_records r '
+              'ON r.design_revision_id = p.design_revision_id '
+              'AND r.logical_node_key_sha256 = p.logical_node_key_sha256 '
+              'AND r.evaluation_id = p.evaluation_id '
+              'WHERE p.project_id = ? AND p.design_revision_id = ? '
+              'ORDER BY p.logical_node_key_json',
+              variables: [
+                Variable.withString(context.projectId),
+                Variable.withString(context.designRevisionId),
+              ],
+            )
+            .get();
     return [
       for (final row in rows)
         if (row.readNullable<String>('evaluation_id') != null &&
@@ -252,19 +256,20 @@ final class DriftPowerWorkspaceRepository implements PowerWorkspaceRepository {
       if (nodeTuple is! List || evaluationId is! String) continue;
       final nodeKeyJson = canonicalEngineeringJsonV1(nodeTuple);
       final nodeKey = PowerNodeKeyV2.decode(nodeKeyJson);
-      final row = await database
-          .customSelect(
-            'SELECT evidence_json, evidence_sha256 FROM power_evaluation_records '
-            'WHERE project_id = ? AND design_revision_id = ? '
-            'AND logical_node_key_sha256 = ? AND evaluation_id = ?',
-            variables: [
-              Variable.withString(context.projectId),
-              Variable.withString(context.designRevisionId),
-              Variable.withString(nodeKey.sha256),
-              Variable.withString(evaluationId),
-            ],
-          )
-          .getSingleOrNull();
+      final row =
+          await database
+              .customSelect(
+                'SELECT evidence_json, evidence_sha256 FROM power_evaluation_records '
+                'WHERE project_id = ? AND design_revision_id = ? '
+                'AND logical_node_key_sha256 = ? AND evaluation_id = ?',
+                variables: [
+                  Variable.withString(context.projectId),
+                  Variable.withString(context.designRevisionId),
+                  Variable.withString(nodeKey.sha256),
+                  Variable.withString(evaluationId),
+                ],
+              )
+              .getSingleOrNull();
       if (row == null) {
         throw StateError('ELV4_FROZEN_POWER_EVIDENCE_MISSING');
       }
@@ -327,17 +332,18 @@ final class DriftPowerWorkspaceRepository implements PowerWorkspaceRepository {
 
     final sourceIds = <String>{};
     if (groupIds.isNotEmpty) {
-      final rows = await database
-          .customSelect(
-            'SELECT id, owner_component_id FROM power_capacity_groups '
-            'WHERE project_id = ? AND design_revision_id = ? '
-            'AND deleted_at IS NULL',
-            variables: [
-              Variable.withString(context.projectId),
-              Variable.withString(context.designRevisionId),
-            ],
-          )
-          .get();
+      final rows =
+          await database
+              .customSelect(
+                'SELECT id, owner_component_id FROM power_capacity_groups '
+                'WHERE project_id = ? AND design_revision_id = ? '
+                'AND deleted_at IS NULL',
+                variables: [
+                  Variable.withString(context.projectId),
+                  Variable.withString(context.designRevisionId),
+                ],
+              )
+              .get();
       for (final row in rows) {
         if (groupIds.contains(row.read<String>('id'))) {
           sourceIds.add(row.read<String>('owner_component_id'));
@@ -359,17 +365,18 @@ final class DriftPowerWorkspaceRepository implements PowerWorkspaceRepository {
     required List<_WorkspaceEvidence> relevant,
     required Set<String> selectedGroupIds,
   }) async {
-    final rows = await database
-        .customSelect(
-          'SELECT id, owner_component_id, limits_json FROM power_capacity_groups '
-          'WHERE project_id = ? AND design_revision_id = ? '
-          'AND deleted_at IS NULL ORDER BY id',
-          variables: [
-            Variable.withString(context.projectId),
-            Variable.withString(context.designRevisionId),
-          ],
-        )
-        .get();
+    final rows =
+        await database
+            .customSelect(
+              'SELECT id, owner_component_id, limits_json FROM power_capacity_groups '
+              'WHERE project_id = ? AND design_revision_id = ? '
+              'AND deleted_at IS NULL ORDER BY id',
+              variables: [
+                Variable.withString(context.projectId),
+                Variable.withString(context.designRevisionId),
+              ],
+            )
+            .get();
     final selectedEvidenceGroups = <String>{
       for (final row in relevant)
         for (final dependency in row.dependencies)
@@ -418,8 +425,8 @@ final class DriftPowerWorkspaceRepository implements PowerWorkspaceRepository {
         evidence.where((row) => codes.contains(row.nodeKey.processCode));
 
     final demand = process({PowerProcessCode.pwr01}).toList();
-    final path = process({PowerProcessCode.pwr03, PowerProcessCode.pwr06})
-        .toList();
+    final path =
+        process({PowerProcessCode.pwr03, PowerProcessCode.pwr06}).toList();
     final capacity = process({PowerProcessCode.pwr02}).toList();
     final backup = process({PowerProcessCode.pwr04}).toList();
     final allFindings = [for (final row in allEvidence) ...row.findings];
@@ -460,9 +467,10 @@ final class DriftPowerWorkspaceRepository implements PowerWorkspaceRepository {
       PowerWorkspaceCardProjection(
         code: PowerWorkspaceCardCode.realization,
         title: 'Realization',
-        summary: path.isEmpty
-            ? 'No physical realization evidence for this scope.'
-            : '${_dependencyCount(path)} consumed physical dependencies',
+        summary:
+            path.isEmpty
+                ? 'No physical realization evidence for this scope.'
+                : '${_dependencyCount(path)} consumed physical dependencies',
         currentness: _currentness(path),
         metrics: _dependencyMetrics(path),
         findings: [for (final row in path) ...row.findings],
@@ -485,9 +493,10 @@ final class DriftPowerWorkspaceRepository implements PowerWorkspaceRepository {
       PowerWorkspaceCardProjection(
         code: PowerWorkspaceCardCode.findings,
         title: 'Findings / how calculated',
-        summary: allFindings.isEmpty
-            ? 'No findings in the selected scenario.'
-            : '${allFindings.length} finding(s)',
+        summary:
+            allFindings.isEmpty
+                ? 'No findings in the selected scenario.'
+                : '${allFindings.length} finding(s)',
         currentness: _currentness(allEvidence),
         metrics: const [],
         findings: allFindings,
@@ -507,9 +516,10 @@ final class DriftPowerWorkspaceRepository implements PowerWorkspaceRepository {
   }) => PowerWorkspaceCardProjection(
     code: code,
     title: title,
-    summary: rows.isEmpty
-        ? emptySummary
-        : '${rows.length} evaluation(s) · ${_currentness(rows).name.toUpperCase()}',
+    summary:
+        rows.isEmpty
+            ? emptySummary
+            : '${rows.length} evaluation(s) · ${_currentness(rows).name.toUpperCase()}',
     currentness: _currentness(rows),
     metrics: _dedupeMetrics([
       for (final row in rows)
@@ -556,13 +566,15 @@ final class _WorkspaceEvidence {
   }) {
     final envelope = _jsonMap(storedJson);
     final rawEvidence = envelope['evidence'];
-    final evidence = rawEvidence is Map
-        ? rawEvidence.cast<String, Object?>()
-        : envelope;
+    final evidence =
+        rawEvidence is Map ? rawEvidence.cast<String, Object?>() : envelope;
     final outputValue = evidence['output'];
-    final output = outputValue is Map
-        ? Map<String, Object?>.unmodifiable(outputValue.cast<String, Object?>())
-        : const <String, Object?>{};
+    final output =
+        outputValue is Map
+            ? Map<String, Object?>.unmodifiable(
+              outputValue.cast<String, Object?>(),
+            )
+            : const <String, Object?>{};
     final dependencies = <PowerDependencyKey>[];
     final dependencyValues = envelope['dependencyKeys'];
     if (dependencyValues is List) {
@@ -635,18 +647,20 @@ PowerPointerState _pointerState(String value) => switch (value) {
 
 PowerWorkspaceCurrentness _currentness(List<_WorkspaceEvidence> values) {
   if (values.isEmpty) return PowerWorkspaceCurrentness.empty;
-  final current = values
-      .where((value) => value.pointerState == PowerPointerState.current)
-      .length;
+  final current =
+      values
+          .where((value) => value.pointerState == PowerPointerState.current)
+          .length;
   if (current == values.length) return PowerWorkspaceCurrentness.current;
   if (current == 0) return PowerWorkspaceCurrentness.stale;
   return PowerWorkspaceCurrentness.mixed;
 }
 
-int _dependencyCount(List<_WorkspaceEvidence> values) => {
-  for (final value in values)
-    for (final dependency in value.dependencies) dependency.encode(),
-}.length;
+int _dependencyCount(List<_WorkspaceEvidence> values) =>
+    {
+      for (final value in values)
+        for (final dependency in value.dependencies) dependency.encode(),
+    }.length;
 
 List<PowerWorkspaceMetric> _dependencyMetrics(List<_WorkspaceEvidence> values) {
   final byKind = <PowerDependencyKind, int>{};
@@ -749,13 +763,14 @@ String _cardTitle(PowerWorkspaceCardCode code) => switch (code) {
 };
 
 String _words(String value) {
-  final spaced = value
-      .replaceAllMapped(
-        RegExp(r'([a-z0-9])([A-Z])'),
-        (match) => '${match[1]} ${match[2]}',
-      )
-      .replaceAll(RegExp(r'[_\-.]+'), ' ')
-      .trim();
+  final spaced =
+      value
+          .replaceAllMapped(
+            RegExp(r'([a-z0-9])([A-Z])'),
+            (match) => '${match[1]} ${match[2]}',
+          )
+          .replaceAll(RegExp(r'[_\-.]+'), ' ')
+          .trim();
   if (spaced.isEmpty) return value;
   return spaced[0].toUpperCase() + spaced.substring(1);
 }

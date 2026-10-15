@@ -10,8 +10,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'engineering_systems_screen_test.dart' show systemsFixture;
 
 void main() {
-  final text = File('../../docs/examples/elv2-reference-catalog.json')
-      .readAsStringSync();
+  final text =
+      File(
+        '../../docs/examples/elv2-reference-catalog.json',
+      ).readAsStringSync();
   final catalog = EngineeringReferenceCatalog.fromMap(
     jsonDecode(text) as Map<String, dynamic>,
   );
@@ -51,9 +53,11 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
       final typed = EngineeringReferenceCatalog.fromMap(
         jsonDecode(
-          File('../../docs/examples/elv2-interface-catalog.json')
-              .readAsStringSync(),
-        ) as Map<String, dynamic>,
+              File(
+                '../../docs/examples/elv2-interface-catalog.json',
+              ).readAsStringSync(),
+            )
+            as Map<String, dynamic>,
       );
       await tester.pumpWidget(
         MaterialApp(

@@ -412,14 +412,15 @@ final class DefaultElvCableCommandService implements ElvCableCommandService {
   ElvCommandFailureResult<Cable>? _validateEnvelope(
     String commandId,
     String projectId,
-  ) => commandId.trim().isEmpty || projectId.trim().isEmpty
-      ? const ElvCommandFailureResult(
-          ElvFailure(
-            code: 'ELV_COMMAND_INVALID',
-            category: ElvFailureCategory.commandEnvelope,
-          ),
-        )
-      : null;
+  ) =>
+      commandId.trim().isEmpty || projectId.trim().isEmpty
+          ? const ElvCommandFailureResult(
+            ElvFailure(
+              code: 'ELV_COMMAND_INVALID',
+              category: ElvFailureCategory.commandEnvelope,
+            ),
+          )
+          : null;
 
   Future<ElvCommandResult<Cable>?> _replayCable(
     ElvCommandLedgerStore ledger, {
