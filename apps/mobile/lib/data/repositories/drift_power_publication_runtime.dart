@@ -6,6 +6,7 @@ import 'package:engineering_core/engineering_core.dart';
 import '../database/app_database.dart';
 import '../database/drift_raw_statement.dart';
 import 'drift_power_runtime_store.dart';
+import 'drift_power_snapshot_facts.dart';
 
 enum PowerDependencyRefType { fact, evaluation }
 
@@ -432,7 +433,7 @@ final class DriftPowerPublicationRuntime {
     final snapshot =
         await database
             .customSelect(
-              'SELECT payload_json FROM design_revision_power_snapshots '
+              'SELECT payload_json, power_sha256, physical_sha256 FROM design_revision_power_snapshots '
               'WHERE project_id = ? AND design_revision_id = ?',
               variables: [
                 Variable.withString(projectId),
@@ -450,6 +451,45 @@ final class DriftPowerPublicationRuntime {
         reasonCode: 'ELV4_POWER_NOT_CAPTURED',
       );
     }
+    final payloadJson = snapshot.read<String>('payload_json');
+    if (sha256HexUtf8(payloadJson) != snapshot.read<String>('power_sha256')) {
+      throw const PowerRuntimeStorageException(
+        'ELV4_FROZEN_POWER_SNAPSHOT_HASH_MISMATCH',
+      );
+    }
+    final manifest =
+        await database
+            .customSelect(
+              'SELECT manifest_sha256, physical_sha256, power_sha256 FROM design_revision_snapshot_manifests '
+              'WHERE project_id = ? AND design_revision_id = ?',
+              variables: [
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+              ],
+            )
+            .getSingleOrNull();
+    if (manifest == null ||
+        manifest.read<String>('power_sha256') !=
+            snapshot.read<String>('power_sha256') ||
+        manifest.read<String>('physical_sha256') !=
+            snapshot.read<String>('physical_sha256') ||
+        sha256HexUtf8(
+              canonicalEngineeringJsonV1({
+                'schema': 'electra.elv4-snapshot-manifest.v1',
+                'physicalSha256': manifest.read<String>('physical_sha256'),
+                'powerSha256': manifest.read<String>('power_sha256'),
+              }),
+            ) !=
+            manifest.read<String>('manifest_sha256')) {
+      throw const PowerRuntimeStorageException(
+        'ELV4_FROZEN_MANIFEST_HASH_MISMATCH',
+      );
+    }
+    await _verifyPhysicalSection(
+      projectId,
+      designRevisionId,
+      snapshot.read<String>('physical_sha256'),
+    );
     final payload =
         (jsonDecode(snapshot.read<String>('payload_json')) as Map)
             .cast<String, Object?>();
@@ -457,7 +497,10 @@ final class DriftPowerPublicationRuntime {
     final pointers = pointerValues is List ? pointerValues : const <Object?>[];
     return PowerRevisionReadSnapshot(
       kind:
-          pointers.isEmpty
+          pointers.isEmpty &&
+                  !powerAspectTables.any(
+                    (table) => capturedPowerRows(payload, table).isNotEmpty,
+                  )
               ? PowerRevisionReadKind.capturedEmpty
               : PowerRevisionReadKind.captured,
       lifecycleState: revision.state,
@@ -485,6 +528,7 @@ final class DriftPowerPublicationRuntime {
     if (revision.revision != expectedRevisionToken) {
       throw const PowerRuntimeStorageException('ELV4_STALE_PRECONDITION');
     }
+    await _verifyPhysicalSection(projectId, designRevisionId, physicalSha256);
     final existing =
         await database
             .customSelect(
@@ -510,7 +554,10 @@ final class DriftPowerPublicationRuntime {
             )
             .get();
     final payload = <String, Object?>{
-      'schema': 'electra.elv4-power-freeze-section.v1',
+      'schema': 'electra.elv4-power-freeze-section.v2',
+      'facts': await DriftPowerSnapshotFacts(
+        database,
+      ).capture(projectId, designRevisionId),
       'revisionToken': expectedRevisionToken,
       'pointers': [
         for (final row in pointerRows)
@@ -546,7 +593,7 @@ final class DriftPowerPublicationRuntime {
       [
         Variable.withString(designRevisionId),
         Variable.withString(projectId),
-        Variable.withString('electra.elv4-power-freeze-section.v1'),
+        Variable.withString('electra.elv4-power-freeze-section.v2'),
         Variable.withString('FREEZE'),
         Variable.withString(payloadJson),
         Variable.withString(powerSha256),
@@ -574,6 +621,43 @@ final class DriftPowerPublicationRuntime {
     );
     return powerSha256;
   });
+
+  Future<void> _verifyPhysicalSection(
+    String projectId,
+    String revisionId,
+    String expectedSha,
+  ) async {
+    final row =
+        await (database.select(database.designRevisionPhysicalSnapshots)..where(
+          (r) =>
+              r.projectId.equals(projectId) &
+              r.designRevisionId.equals(revisionId),
+        )).getSingleOrNull();
+    if (row == null || row.payloadSha256 != expectedSha) {
+      throw const PowerRuntimeStorageException(
+        'ELV4_FROZEN_PHYSICAL_SNAPSHOT_HASH_MISMATCH',
+      );
+    }
+    try {
+      final payload = jsonDecode(row.payloadJson);
+      if (payload is! Map<String, dynamic> ||
+          DesignRevisionPhysicalSnapshot(
+                designRevisionId: revisionId,
+                projectId: projectId,
+                schemaVersion: row.schemaVersion,
+                payload: payload,
+              ).contentSha256 !=
+              expectedSha) {
+        throw const PowerRuntimeStorageException(
+          'ELV4_FROZEN_PHYSICAL_SNAPSHOT_HASH_MISMATCH',
+        );
+      }
+    } on FormatException {
+      throw const PowerRuntimeStorageException(
+        'ELV4_FROZEN_PHYSICAL_SNAPSHOT_HASH_MISMATCH',
+      );
+    }
+  }
 
   Future<List<PowerNodeKeyV2>> _invalidateDependencyClosure({
     required String projectId,

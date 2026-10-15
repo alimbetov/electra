@@ -3,6 +3,8 @@ import 'package:engineering_core/engineering_core.dart';
 
 import '../../application/power_workspace_overlay_geometry.dart';
 import '../database/app_database.dart';
+import 'drift_power_publication_runtime.dart';
+import 'drift_power_snapshot_facts.dart';
 
 final class DriftPowerWorkspaceOverlayGeometryRepository
     implements PowerWorkspaceOverlayGeometryRepository {
@@ -25,6 +27,33 @@ final class DriftPowerWorkspaceOverlayGeometryRepository
           ..sort();
     if (runIds.isEmpty) return const [];
 
+    final read = await DriftPowerPublicationRuntime(
+      database,
+      originDeviceId: 'read-only-overlay',
+    ).readRevision(projectId: projectId, designRevisionId: designRevisionId);
+    if (!read.mutationAllowed) {
+      final captured =
+          capturedPowerRows(
+              read.capturedPayload,
+              'overlay_geometry',
+            ).where((row) => runIds.contains(row['run_id'])).toList()
+            ..sort(
+              (a, b) => '${a['run_id']}:${a['traversal_sequence']}'.compareTo(
+                '${b['run_id']}:${b['traversal_sequence']}',
+              ),
+            );
+      final seen = <String>{};
+      return List.unmodifiable([
+        for (final row in captured)
+          if (seen.add(row['segment_id']! as String))
+            PowerWorkspaceOverlaySegment(
+              segmentId: row['segment_id']! as String,
+              surfacePatchId: row['patch_id']! as String,
+              from: Point2Mm(row['from_x']! as int, row['from_y']! as int),
+              to: Point2Mm(row['to_x']! as int, row['to_y']! as int),
+            ),
+      ]);
+    }
     final placeholders = List.filled(runIds.length, '?').join(',');
     final rows =
         await database

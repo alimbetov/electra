@@ -320,8 +320,26 @@ void main() {
     expect(legacy.reasonCode, 'ELV4_POWER_NOT_CAPTURED');
     expect(legacy.mutationAllowed, isFalse);
 
-    const physicalSha =
-        'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+    final physical = DesignRevisionPhysicalSnapshot(
+      designRevisionId: 'rev-working',
+      projectId: 'project',
+      schemaVersion: 1,
+      payload: const {'runs': []},
+    );
+    final physicalSha = physical.contentSha256;
+    await db
+        .into(db.designRevisionPhysicalSnapshots)
+        .insert(
+          DesignRevisionPhysicalSnapshotsCompanion.insert(
+            designRevisionId: 'rev-working',
+            projectId: 'project',
+            schemaVersion: 1,
+            payloadJson: canonicalEngineeringJsonV1(physical.payload),
+            payloadSha256: physicalSha,
+            createdAt: _now,
+            originDeviceId: 'test',
+          ),
+        );
     final powerSha = await runtime.captureCommittedPowerSectionForFreeze(
       projectId: 'project',
       designRevisionId: 'rev-working',

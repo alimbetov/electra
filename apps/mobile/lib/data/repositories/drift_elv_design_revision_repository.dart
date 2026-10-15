@@ -10,6 +10,7 @@ import '../../application/elv_failure_probe.dart';
 import '../database/app_database.dart';
 import 'drift_elv_runtime_support.dart';
 import 'drift_power_publication_runtime.dart';
+import 'drift_power_snapshot_facts.dart';
 
 final class DriftElvDesignRevisionRepository
     implements ElvDesignRevisionRepository {
@@ -352,12 +353,18 @@ final class DriftElvDesignRevisionRepository
           ),
         );
     await failureProbe.hit(ElvFailurePoints.p3CreateNextAfterRevisionInsert);
+    final capturedPower = await powerRuntime.readRevision(
+      projectId: command.projectId,
+      designRevisionId: base.id,
+    );
+    final physicalIds = <String, String>{};
     final payloadMap = jsonDecode(snapshot.payloadJson) as Map<String, dynamic>;
     final runs =
         (payloadMap['runs'] as List? ?? const []).cast<Map<String, dynamic>>();
     for (final source in runs) {
       final sourceRunId = source['id']! as String;
       final newRunId = '${revision.id}:run:$sourceRunId';
+      physicalIds[sourceRunId] = newRunId;
       await database
           .into(database.canonicalCableRuns)
           .insert(
@@ -384,6 +391,8 @@ final class DriftElvDesignRevisionRepository
               .cast<Map<String, dynamic>>();
       for (final traversal in traversals) {
         final sequence = (traversal['sequence'] as num).toInt();
+        if (traversal['id'] is String)
+          physicalIds[traversal['id']! as String] = '$newRunId:trv:$sequence';
         await database
             .into(database.cableRunTraversals)
             .insert(
@@ -405,6 +414,16 @@ final class DriftElvDesignRevisionRepository
               ),
             );
       }
+    }
+    if (capturedPower.capturedPayload != null) {
+      await DriftPowerSnapshotFacts(database).materialize(
+        projectId: revision.projectId,
+        revisionId: revision.id,
+        captured: capturedPower.capturedPayload!,
+        physicalIds: physicalIds,
+        now: instant,
+        originDeviceId: originDeviceId,
+      );
     }
     await recordElvRuntimeSuccess(
       database: database,

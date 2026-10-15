@@ -7,6 +7,7 @@ import '../../application/power_workspace_projection.dart';
 import '../../application/power_workspace_state.dart';
 import '../database/app_database.dart';
 import 'drift_power_publication_runtime.dart';
+import 'drift_power_snapshot_facts.dart';
 
 /// Read-only P7 adapter. It projects persisted ELV4 evidence into UI data but
 /// performs no engineering arithmetic and never mutates canonical state.
@@ -41,8 +42,19 @@ final class DriftPowerWorkspaceRepository implements PowerWorkspaceRepository {
     if (revision == null) return null;
 
     final revisionId = revision.read<String>('id');
-    final scenarios = await _scenarioOptions(revisionId);
-    final initial = await _initialScenario(revisionId, scenarios);
+    final read = await publicationRuntime.readRevision(
+      projectId: projectId,
+      designRevisionId: revisionId,
+    );
+    final scenarios = await _scenarioOptions(
+      revisionId,
+      capture: read.capturedPayload,
+    );
+    final initial = await _initialScenario(
+      revisionId,
+      scenarios,
+      capture: read.capturedPayload,
+    );
     final state = PowerWorkspaceState(
       context: PowerWorkspaceReadContext(
         projectId: projectId,
@@ -61,13 +73,19 @@ final class DriftPowerWorkspaceRepository implements PowerWorkspaceRepository {
   }
 
   @override
-  Future<PowerWorkspaceProjection> load(PowerWorkspaceState state) async {
+  Future<PowerWorkspaceProjection> load(PowerWorkspaceState state) =>
+      database.transaction(() => _load(state));
+
+  Future<PowerWorkspaceProjection> _load(PowerWorkspaceState state) async {
     final context = state.context;
     final revision = await publicationRuntime.readRevision(
       projectId: context.projectId,
       designRevisionId: context.designRevisionId,
     );
-    final scenarios = await _scenarioOptions(context.designRevisionId);
+    final scenarios = await _scenarioOptions(
+      context.designRevisionId,
+      capture: revision.capturedPayload,
+    );
 
     if (revision.kind == PowerRevisionReadKind.notCaptured) {
       return PowerWorkspaceProjection(
@@ -107,6 +125,7 @@ final class DriftPowerWorkspaceRepository implements PowerWorkspaceRepository {
       context: context,
       scope: state.scope,
       values: scenarioRecords,
+      capture: revision.capturedPayload,
     );
     final pointerStates = <String, PowerPointerState>{
       for (final row in scopeRecords) row.nodeKey.encode(): row.pointerState,
@@ -122,12 +141,14 @@ final class DriftPowerWorkspaceRepository implements PowerWorkspaceRepository {
       context: context,
       selectedComponentId: state.selectedComponentId,
       evidence: overlayEvidence,
+      capture: revision.capturedPayload,
     );
     final budgets = await _budgets(
       context: context,
       evidence: scopeRecords,
       relevant: selectedEvidence,
       selectedGroupIds: overlay.capacityGroupIds.toSet(),
+      capture: revision.capturedPayload,
     );
 
     final readKind = switch (revision.kind) {
@@ -156,22 +177,46 @@ final class DriftPowerWorkspaceRepository implements PowerWorkspaceRepository {
   }
 
   Future<List<PowerWorkspaceScenarioOption>> _scenarioOptions(
-    String revisionId,
-  ) async {
+    String revisionId, {
+    Map<String, Object?>? capture,
+  }) async {
+    final capturedScenarios = capturedPowerRows(
+      capture,
+      'power_operating_scenarios',
+    );
+    final capturedSegments = capturedPowerRows(
+      capture,
+      'power_scenario_segments',
+    );
     final rows =
-        await database
-            .customSelect(
-              'SELECT s.id AS scenario_id, s.role AS role, '
-              'g.segment_id AS segment_id, g.ordinal AS ordinal '
-              'FROM power_operating_scenarios s '
-              'LEFT JOIN power_scenario_segments g '
-              'ON g.design_revision_id = s.design_revision_id '
-              'AND g.scenario_id = s.id '
-              'WHERE s.design_revision_id = ? AND s.deleted_at IS NULL '
-              'ORDER BY s.id, g.ordinal, g.segment_id',
-              variables: [Variable.withString(revisionId)],
-            )
-            .get();
+        capture != null
+            ? <QueryRow>[
+              for (final scenario in capturedScenarios.where(
+                (r) => r['deleted_at'] == null,
+              ))
+                for (final segment in capturedSegments.where(
+                  (r) => r['scenario_id'] == scenario['id'],
+                ))
+                  QueryRow({
+                    'scenario_id': scenario['id'],
+                    'role': scenario['role'],
+                    'segment_id': segment['segment_id'],
+                    'ordinal': segment['ordinal'],
+                  }, database),
+            ]
+            : await database
+                .customSelect(
+                  'SELECT s.id AS scenario_id, s.role AS role, '
+                  'g.segment_id AS segment_id, g.ordinal AS ordinal '
+                  'FROM power_operating_scenarios s '
+                  'LEFT JOIN power_scenario_segments g '
+                  'ON g.design_revision_id = s.design_revision_id '
+                  'AND g.scenario_id = s.id '
+                  'WHERE s.design_revision_id = ? AND s.deleted_at IS NULL '
+                  'ORDER BY s.id, g.ordinal, g.segment_id',
+                  variables: [Variable.withString(revisionId)],
+                )
+                .get();
     final result = <PowerWorkspaceScenarioOption>[];
     for (final row in rows) {
       final scenarioId = row.read<String>('scenario_id');
@@ -191,9 +236,27 @@ final class DriftPowerWorkspaceRepository implements PowerWorkspaceRepository {
 
   Future<PowerWorkspaceScenarioOption> _initialScenario(
     String revisionId,
-    List<PowerWorkspaceScenarioOption> configured,
-  ) async {
+    List<PowerWorkspaceScenarioOption> configured, {
+    Map<String, Object?>? capture,
+  }) async {
     if (configured.isNotEmpty) return configured.first;
+    if (capture != null) {
+      final pointers = capture['pointers'];
+      if (pointers is List && pointers.isNotEmpty) {
+        final tuple = (pointers.first as Map)['logicalNodeKey'];
+        final key = PowerNodeKeyV2.decode(canonicalEngineeringJsonV1(tuple));
+        return PowerWorkspaceScenarioOption(
+          scenarioId: key.scenarioId,
+          segmentId: key.scopeId,
+          label: '${key.scenarioId} · ${key.scopeId}',
+        );
+      }
+      return PowerWorkspaceScenarioOption(
+        scenarioId: 'UNCONFIGURED',
+        segmentId: 'UNCONFIGURED',
+        label: 'No captured power scenario',
+      );
+    }
     final pointer =
         await database
             .customSelect(
@@ -271,24 +334,39 @@ final class DriftPowerWorkspaceRepository implements PowerWorkspaceRepository {
       if (nodeTuple is! List || evaluationId is! String) continue;
       final nodeKeyJson = canonicalEngineeringJsonV1(nodeTuple);
       final nodeKey = PowerNodeKeyV2.decode(nodeKeyJson);
-      final row =
-          await database
-              .customSelect(
-                'SELECT evidence_json, evidence_sha256 FROM power_evaluation_records '
-                'WHERE project_id = ? AND design_revision_id = ? '
-                'AND logical_node_key_sha256 = ? AND evaluation_id = ?',
-                variables: [
-                  Variable.withString(context.projectId),
-                  Variable.withString(context.designRevisionId),
-                  Variable.withString(nodeKey.sha256),
-                  Variable.withString(evaluationId),
-                ],
+      final embedded =
+          capturedPowerRows(capturedPayload, 'evaluation_records')
+              .where(
+                (r) =>
+                    r['logical_node_key_sha256'] == nodeKey.sha256 &&
+                    r['evaluation_id'] == evaluationId,
               )
-              .getSingleOrNull();
+              .firstOrNull;
+      final row =
+          embedded != null
+              ? QueryRow(embedded, database)
+              : capturedPayload?['schema'] ==
+                  'electra.elv4-power-freeze-section.v2'
+              ? null
+              : await database
+                  .customSelect(
+                    'SELECT evidence_json, evidence_sha256 FROM power_evaluation_records '
+                    'WHERE project_id = ? AND design_revision_id = ? '
+                    'AND logical_node_key_sha256 = ? AND evaluation_id = ?',
+                    variables: [
+                      Variable.withString(context.projectId),
+                      Variable.withString(context.designRevisionId),
+                      Variable.withString(nodeKey.sha256),
+                      Variable.withString(evaluationId),
+                    ],
+                  )
+                  .getSingleOrNull();
       if (row == null) {
         throw StateError('ELV4_FROZEN_POWER_EVIDENCE_MISSING');
       }
       final storedSha = row.read<String>('evidence_sha256');
+      if (sha256HexUtf8(row.read<String>('evidence_json')) != storedSha)
+        throw StateError('ELV4_FROZEN_POWER_EVIDENCE_HASH_MISMATCH');
       if (expectedSha is String && expectedSha != storedSha) {
         throw StateError('ELV4_FROZEN_POWER_EVIDENCE_HASH_MISMATCH');
       }
@@ -311,6 +389,7 @@ final class DriftPowerWorkspaceRepository implements PowerWorkspaceRepository {
     required PowerWorkspaceReadContext context,
     required PowerWorkspaceScope scope,
     required List<_WorkspaceEvidence> values,
+    Map<String, Object?>? capture,
   }) async {
     if (scope.kind == PowerWorkspaceScopeKind.building) {
       return values;
@@ -320,20 +399,29 @@ final class DriftPowerWorkspaceRepository implements PowerWorkspaceRepository {
       throw StateError('Floor scope requires floorId.');
     }
     final rows =
-        await database
-            .customSelect(
-              'SELECT ci.id FROM component_instances ci '
-              'JOIN rooms r ON r.id = ci.room_id '
-              'JOIN floors f ON f.id = r.floor_id '
-              'WHERE f.project_id = ? AND f.id = ? '
-              'AND f.deleted_at IS NULL AND r.deleted_at IS NULL '
-              'AND ci.deleted_at IS NULL ORDER BY ci.id',
-              variables: [
-                Variable.withString(context.projectId),
-                Variable.withString(floorId),
-              ],
-            )
-            .get();
+        capture != null
+            ? <QueryRow>[
+              for (final row in capturedPowerRows(
+                capture,
+                'component_locations',
+              ))
+                if (row['floor_id'] == floorId && row['deleted_at'] == null)
+                  QueryRow(row, database),
+            ]
+            : await database
+                .customSelect(
+                  'SELECT ci.id FROM component_instances ci '
+                  'JOIN rooms r ON r.id = ci.room_id '
+                  'JOIN floors f ON f.id = r.floor_id '
+                  'WHERE f.project_id = ? AND f.id = ? '
+                  'AND f.deleted_at IS NULL AND r.deleted_at IS NULL '
+                  'AND ci.deleted_at IS NULL ORDER BY ci.id',
+                  variables: [
+                    Variable.withString(context.projectId),
+                    Variable.withString(floorId),
+                  ],
+                )
+                .get();
     final componentIds = {for (final row in rows) row.read<String>('id')};
     if (componentIds.isEmpty) return const <_WorkspaceEvidence>[];
     return values
@@ -356,6 +444,7 @@ final class DriftPowerWorkspaceRepository implements PowerWorkspaceRepository {
     required PowerWorkspaceReadContext context,
     required String? selectedComponentId,
     required List<_WorkspaceEvidence> evidence,
+    Map<String, Object?>? capture,
   }) async {
     final componentIds = <String>{
       if (selectedComponentId != null) selectedComponentId,
@@ -382,17 +471,25 @@ final class DriftPowerWorkspaceRepository implements PowerWorkspaceRepository {
     final sourceIds = <String>{};
     if (groupIds.isNotEmpty) {
       final rows =
-          await database
-              .customSelect(
-                'SELECT id, owner_component_id FROM power_capacity_groups '
-                'WHERE project_id = ? AND design_revision_id = ? '
-                'AND deleted_at IS NULL',
-                variables: [
-                  Variable.withString(context.projectId),
-                  Variable.withString(context.designRevisionId),
-                ],
-              )
-              .get();
+          capture != null
+              ? <QueryRow>[
+                for (final row in capturedPowerRows(
+                  capture,
+                  'power_capacity_groups',
+                ))
+                  if (row['deleted_at'] == null) QueryRow(row, database),
+              ]
+              : await database
+                  .customSelect(
+                    'SELECT id, owner_component_id FROM power_capacity_groups '
+                    'WHERE project_id = ? AND design_revision_id = ? '
+                    'AND deleted_at IS NULL',
+                    variables: [
+                      Variable.withString(context.projectId),
+                      Variable.withString(context.designRevisionId),
+                    ],
+                  )
+                  .get();
       for (final row in rows) {
         if (groupIds.contains(row.read<String>('id'))) {
           sourceIds.add(row.read<String>('owner_component_id'));
@@ -413,19 +510,28 @@ final class DriftPowerWorkspaceRepository implements PowerWorkspaceRepository {
     required List<_WorkspaceEvidence> evidence,
     required List<_WorkspaceEvidence> relevant,
     required Set<String> selectedGroupIds,
+    Map<String, Object?>? capture,
   }) async {
     final rows =
-        await database
-            .customSelect(
-              'SELECT id, owner_component_id, limits_json FROM power_capacity_groups '
-              'WHERE project_id = ? AND design_revision_id = ? '
-              'AND deleted_at IS NULL ORDER BY id',
-              variables: [
-                Variable.withString(context.projectId),
-                Variable.withString(context.designRevisionId),
-              ],
-            )
-            .get();
+        capture != null
+            ? <QueryRow>[
+              for (final row in capturedPowerRows(
+                capture,
+                'power_capacity_groups',
+              ))
+                if (row['deleted_at'] == null) QueryRow(row, database),
+            ]
+            : await database
+                .customSelect(
+                  'SELECT id, owner_component_id, limits_json FROM power_capacity_groups '
+                  'WHERE project_id = ? AND design_revision_id = ? '
+                  'AND deleted_at IS NULL ORDER BY id',
+                  variables: [
+                    Variable.withString(context.projectId),
+                    Variable.withString(context.designRevisionId),
+                  ],
+                )
+                .get();
     final selectedEvidenceGroups = <String>{
       for (final row in relevant)
         for (final dependency in row.dependencies)
