@@ -73,21 +73,30 @@ void main() {
     expect(await _revision(db), 4);
 
     expect(
-      await db.customSelect(
-        "SELECT COUNT(*) AS c FROM power_component_bindings WHERE design_revision_id = 'rev-1'",
-      ).getSingle().then((row) => row.read<int>('c')),
+      await db
+          .customSelect(
+            "SELECT COUNT(*) AS c FROM power_component_bindings WHERE design_revision_id = 'rev-1'",
+          )
+          .getSingle()
+          .then((row) => row.read<int>('c')),
       1,
     );
     expect(
-      await db.customSelect(
-        "SELECT COUNT(*) AS c FROM power_port_bindings WHERE design_revision_id = 'rev-1'",
-      ).getSingle().then((row) => row.read<int>('c')),
+      await db
+          .customSelect(
+            "SELECT COUNT(*) AS c FROM power_port_bindings WHERE design_revision_id = 'rev-1'",
+          )
+          .getSingle()
+          .then((row) => row.read<int>('c')),
       1,
     );
     expect(
-      await db.customSelect(
-        "SELECT COUNT(*) AS c FROM power_load_bindings WHERE design_revision_id = 'rev-1'",
-      ).getSingle().then((row) => row.read<int>('c')),
+      await db
+          .customSelect(
+            "SELECT COUNT(*) AS c FROM power_load_bindings WHERE design_revision_id = 'rev-1'",
+          )
+          .getSingle()
+          .then((row) => row.read<int>('c')),
       1,
     );
 
@@ -119,138 +128,156 @@ void main() {
     expect(await _revision(db), 4);
   });
 
-  test('P2 command invalidates only exact dependency closure atomically', () async {
-    final db = AppDatabase(NativeDatabase.memory());
-    addTearDown(db.close);
-    await _seed(db);
-    final publication = DriftPowerPublicationRuntime(
-      db,
-      originDeviceId: 'test',
-      now: () => _now,
-    );
-    await publication.ensureRuntimeSchema();
+  test(
+    'P2 command invalidates only exact dependency closure atomically',
+    () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      await _seed(db);
+      final publication = DriftPowerPublicationRuntime(
+        db,
+        originDeviceId: 'test',
+        now: () => _now,
+      );
+      await publication.ensureRuntimeSchema();
 
-    final affectedNode = PowerNodeKeyV2(
-      revisionId: 'rev-1',
-      scenarioId: 'NORMAL',
-      scopeKind: PowerEvaluationScopeKind.segment,
-      scopeId: 'S1',
-      processCode: PowerProcessCode.pwr01,
-      subjectKind: 'LOAD',
-      subjectId: 'comp-load',
-    );
-    final unaffectedNode = PowerNodeKeyV2(
-      revisionId: 'rev-1',
-      scenarioId: 'NORMAL',
-      scopeKind: PowerEvaluationScopeKind.segment,
-      scopeId: 'S1',
-      processCode: PowerProcessCode.pwr01,
-      subjectKind: 'LOAD',
-      subjectId: 'comp-source',
-    );
-    await _seedPointer(db, affectedNode, _dep('PORT-LOAD'));
-    await _seedPointer(db, unaffectedNode, _dep('UNRELATED'));
+      final affectedNode = PowerNodeKeyV2(
+        revisionId: 'rev-1',
+        scenarioId: 'NORMAL',
+        scopeKind: PowerEvaluationScopeKind.segment,
+        scopeId: 'S1',
+        processCode: PowerProcessCode.pwr01,
+        subjectKind: 'LOAD',
+        subjectId: 'comp-load',
+      );
+      final unaffectedNode = PowerNodeKeyV2(
+        revisionId: 'rev-1',
+        scenarioId: 'NORMAL',
+        scopeKind: PowerEvaluationScopeKind.segment,
+        scopeId: 'S1',
+        processCode: PowerProcessCode.pwr01,
+        subjectKind: 'LOAD',
+        subjectId: 'comp-source',
+      );
+      await _seedPointer(db, affectedNode, _dep('PORT-LOAD'));
+      await _seedPointer(db, unaffectedNode, _dep('UNRELATED'));
 
-    final service = DriftPowerCommandService(
-      db,
-      originDeviceId: 'test',
-      now: () => _now,
-    );
-    final receipt = await service.execute(
-      BindPowerPortCommand(
-        operationId: 'bind-port-invalidate',
-        projectId: 'project',
-        designRevisionId: 'rev-1',
-        expectedRevision: 1,
-        changedDependencies: [_dep('PORT-LOAD')],
-        bindingId: 'port-binding',
-        binding: _portBinding('p-load'),
-      ),
-    );
-    expect(receipt.invalidatedNodeKeys, [affectedNode]);
-
-    final affected = await _pointerState(db, affectedNode);
-    final unaffected = await _pointerState(db, unaffectedNode);
-    expect(affected.$1, 'STALE');
-    expect(affected.$2, 2);
-    expect(unaffected.$1, 'CURRENT');
-    expect(unaffected.$2, 1);
-    expect(
-      await db.customSelect(
-        'SELECT COUNT(*) AS c FROM power_dependency_index_records '
-        'WHERE logical_node_key_sha256 = ?',
-        variables: [Variable.withString(affectedNode.sha256)],
-      ).getSingle().then((row) => row.read<int>('c')),
-      0,
-    );
-    expect(
-      await db.customSelect(
-        'SELECT COUNT(*) AS c FROM power_dependency_index_records '
-        'WHERE logical_node_key_sha256 = ?',
-        variables: [Variable.withString(unaffectedNode.sha256)],
-      ).getSingle().then((row) => row.read<int>('c')),
-      1,
-    );
-  });
-
-  test('P2 failed command rolls back aspect rows, token and operation ledger', () async {
-    final db = AppDatabase(NativeDatabase.memory());
-    addTearDown(db.close);
-    await _seed(db);
-    final service = DriftPowerCommandService(
-      db,
-      originDeviceId: 'test',
-      now: () => _now,
-    );
-
-    final scenario = PowerOperatingScenario(
-      scenarioId: 'NORMAL',
-      role: PowerScenarioRole.normal,
-      rowRevision: 1,
-      segments: [
-        PowerScenarioSegment(
-          segmentId: 'S1',
-          ordinal: 1,
-          componentStates: const {
-            'missing-component': PowerDeviceState.normal,
-          },
-        ),
-      ],
-    );
-    await expectLater(
-      service.execute(
-        ReplacePowerScenarioCommand(
-          operationId: 'bad-scenario',
+      final service = DriftPowerCommandService(
+        db,
+        originDeviceId: 'test',
+        now: () => _now,
+      );
+      final receipt = await service.execute(
+        BindPowerPortCommand(
+          operationId: 'bind-port-invalidate',
           projectId: 'project',
           designRevisionId: 'rev-1',
           expectedRevision: 1,
-          changedDependencies: [_dep('SCENARIO-NORMAL')],
-          scenario: scenario,
+          changedDependencies: [_dep('PORT-LOAD')],
+          bindingId: 'port-binding',
+          binding: _portBinding('p-load'),
         ),
-      ),
-      throwsA(
-        isA<PowerRuntimeStorageException>().having(
-          (error) => error.code,
-          'code',
-          'ELV4_COMPONENT_SCOPE_MISMATCH',
-        ),
-      ),
-    );
+      );
+      expect(receipt.invalidatedNodeKeys, [affectedNode]);
 
-    expect(await _revision(db), 1);
-    expect(
-      await db.customSelect(
-        "SELECT COUNT(*) AS c FROM power_operating_scenarios WHERE design_revision_id = 'rev-1'",
-      ).getSingle().then((row) => row.read<int>('c')),
-      0,
-    );
-    expect(
-      await db.customSelect(
-        "SELECT COUNT(*) AS c FROM power_operation_records WHERE operation_id = 'bad-scenario'",
-      ).getSingle().then((row) => row.read<int>('c')),
-      0,
-    );
-  });
+      final affected = await _pointerState(db, affectedNode);
+      final unaffected = await _pointerState(db, unaffectedNode);
+      expect(affected.$1, 'STALE');
+      expect(affected.$2, 2);
+      expect(unaffected.$1, 'CURRENT');
+      expect(unaffected.$2, 1);
+      expect(
+        await db
+            .customSelect(
+              'SELECT COUNT(*) AS c FROM power_dependency_index_records '
+              'WHERE logical_node_key_sha256 = ?',
+              variables: [Variable.withString(affectedNode.sha256)],
+            )
+            .getSingle()
+            .then((row) => row.read<int>('c')),
+        0,
+      );
+      expect(
+        await db
+            .customSelect(
+              'SELECT COUNT(*) AS c FROM power_dependency_index_records '
+              'WHERE logical_node_key_sha256 = ?',
+              variables: [Variable.withString(unaffectedNode.sha256)],
+            )
+            .getSingle()
+            .then((row) => row.read<int>('c')),
+        1,
+      );
+    },
+  );
+
+  test(
+    'P2 failed command rolls back aspect rows, token and operation ledger',
+    () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      await _seed(db);
+      final service = DriftPowerCommandService(
+        db,
+        originDeviceId: 'test',
+        now: () => _now,
+      );
+
+      final scenario = PowerOperatingScenario(
+        scenarioId: 'NORMAL',
+        role: PowerScenarioRole.normal,
+        rowRevision: 1,
+        segments: [
+          PowerScenarioSegment(
+            segmentId: 'S1',
+            ordinal: 1,
+            componentStates: const {
+              'missing-component': PowerDeviceState.normal,
+            },
+          ),
+        ],
+      );
+      await expectLater(
+        service.execute(
+          ReplacePowerScenarioCommand(
+            operationId: 'bad-scenario',
+            projectId: 'project',
+            designRevisionId: 'rev-1',
+            expectedRevision: 1,
+            changedDependencies: [_dep('SCENARIO-NORMAL')],
+            scenario: scenario,
+          ),
+        ),
+        throwsA(
+          isA<PowerRuntimeStorageException>().having(
+            (error) => error.code,
+            'code',
+            'ELV4_COMPONENT_SCOPE_MISMATCH',
+          ),
+        ),
+      );
+
+      expect(await _revision(db), 1);
+      expect(
+        await db
+            .customSelect(
+              "SELECT COUNT(*) AS c FROM power_operating_scenarios WHERE design_revision_id = 'rev-1'",
+            )
+            .getSingle()
+            .then((row) => row.read<int>('c')),
+        0,
+      );
+      expect(
+        await db
+            .customSelect(
+              "SELECT COUNT(*) AS c FROM power_operation_records WHERE operation_id = 'bad-scenario'",
+            )
+            .getSingle()
+            .then((row) => row.read<int>('c')),
+        0,
+      );
+    },
+  );
 }
 
 PowerPortBinding _portBinding(String portId) => PowerPortBinding(
@@ -287,7 +314,8 @@ PowerDefinitionRef _ref(PowerDefinitionKind kind, String code) =>
       definitionCode: code,
       definitionVersion: '1',
       definitionSchema: 'test.v1',
-      contentSha256: 'a' * 64,
+      contentSha256:
+          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
       sourceRef: 'test',
     );
 
@@ -299,21 +327,24 @@ PowerDependencyKey _dep(String id) => PowerDependencyKey(
   purpose: 'INPUT',
 );
 
-Future<int> _revision(AppDatabase db) => db.customSelect(
-  "SELECT revision FROM project_design_revisions WHERE id = 'rev-1'",
-).getSingle().then((row) => row.read<int>('revision'));
+Future<int> _revision(AppDatabase db) => db
+    .customSelect(
+      "SELECT revision FROM project_design_revisions WHERE id = 'rev-1'",
+    )
+    .getSingle()
+    .then((row) => row.read<int>('revision'));
 
-Future<(String, int)> _pointerState(
-  AppDatabase db,
-  PowerNodeKeyV2 node,
-) => db.customSelect(
-  'SELECT state, generation FROM power_evaluation_pointers '
-  'WHERE design_revision_id = ? AND logical_node_key_sha256 = ?',
-  variables: [
-    Variable.withString('rev-1'),
-    Variable.withString(node.sha256),
-  ],
-).getSingle().then((row) => (row.read<String>('state'), row.read<int>('generation')));
+Future<(String, int)> _pointerState(AppDatabase db, PowerNodeKeyV2 node) => db
+    .customSelect(
+      'SELECT state, generation FROM power_evaluation_pointers '
+      'WHERE design_revision_id = ? AND logical_node_key_sha256 = ?',
+      variables: [
+        Variable.withString('rev-1'),
+        Variable.withString(node.sha256),
+      ],
+    )
+    .getSingle()
+    .then((row) => (row.read<String>('state'), row.read<int>('generation')));
 
 Future<void> _seedPointer(
   AppDatabase db,
@@ -330,7 +361,9 @@ Future<void> _seedPointer(
       Variable.withString(node.encode()),
       Variable.withString(node.sha256),
       Variable.withString('eval-${node.subjectId}'),
-      Variable.withString('b' * 64),
+      Variable.withString(
+        'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+      ),
       Variable<DateTime>(_now),
     ],
   );
@@ -384,7 +417,13 @@ Future<void> _seed(AppDatabase db) async {
     "0,0,0,1,0,0,0,1,0,'WALL','[]',1,?,?,NULL,'test')",
     [Variable<DateTime>(_now), Variable<DateTime>(_now)],
   );
-  for (final id in ['comp-load', 'comp-source', 'comp-bank', 'comp-ups', 'comp-charger']) {
+  for (final id in [
+    'comp-load',
+    'comp-source',
+    'comp-bank',
+    'comp-ups',
+    'comp-charger',
+  ]) {
     await runRawStatement(
       db,
       'INSERT INTO component_instances '
@@ -399,12 +438,13 @@ Future<void> _seed(AppDatabase db) async {
       ],
     );
   }
-  for (final entry in const {
-    'p-load': 'comp-load',
-    'p-source': 'comp-source',
-    'p-out': 'comp-source',
-    'p-bank': 'comp-bank',
-  }.entries) {
+  for (final entry
+      in const {
+        'p-load': 'comp-load',
+        'p-source': 'comp-source',
+        'p-out': 'comp-source',
+        'p-bank': 'comp-bank',
+      }.entries) {
     await runRawStatement(
       db,
       'INSERT INTO engineering_port_instances '

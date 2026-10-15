@@ -38,8 +38,9 @@ final class PowerMutationReceipt {
     'previousRevision': previousRevision,
     'currentRevision': currentRevision,
     'affectedIds': affectedIds,
-    'invalidatedNodeKeys':
-        invalidatedNodeKeys.map((value) => value.encode()).toList(growable: false),
+    'invalidatedNodeKeys': invalidatedNodeKeys
+        .map((value) => value.encode())
+        .toList(growable: false),
   };
 
   factory PowerMutationReceipt.fromMap(
@@ -52,11 +53,10 @@ final class PowerMutationReceipt {
     previousRevision: map['previousRevision']! as int,
     currentRevision: map['currentRevision']! as int,
     affectedIds: (map['affectedIds'] as List<Object?>).cast<String>(),
-    invalidatedNodeKeys:
-        (map['invalidatedNodeKeys'] as List<Object?>)
-            .cast<String>()
-            .map(PowerNodeKeyV2.decode)
-            .toList(growable: false),
+    invalidatedNodeKeys: (map['invalidatedNodeKeys'] as List<Object?>)
+        .cast<String>()
+        .map(PowerNodeKeyV2.decode)
+        .toList(growable: false),
     replayed: replayed,
   );
 }
@@ -238,6 +238,9 @@ final class DriftPowerCommandService {
     BindPoeDeliveryCommand value => _bindPoe(value),
     ConfigureBackupAssemblyCommand value => _configureBackup(value),
     ReplaceBatteryBankCommand value => _replaceBatteryBank(value),
+    _ => Future<void>.error(
+      const PowerRuntimeStorageException('ELV4_UNSUPPORTED_MUTATION_COMMAND'),
+    ),
   };
 
   Future<void> _bindPort(BindPowerPortCommand command) async {
@@ -291,7 +294,8 @@ final class DriftPowerCommandService {
 
   Future<void> _bindComponent(BindPowerComponentCommand command) async {
     await _requireComponent(command.projectId, command.binding.componentId);
-    final refs = command.binding.definitionRefs.map((value) => value.toMap()).toList();
+    final refs =
+        command.binding.definitionRefs.map((value) => value.toMap()).toList();
     final refsJson = canonicalEngineeringJsonV1(refs);
     await runRawStatement(
       database,
@@ -312,7 +316,13 @@ final class DriftPowerCommandService {
         Variable<DateTime>(now().toUtc()),
         Variable.withString(originDeviceId),
         Variable.withString(command.binding.componentId),
-        Variable.withString(canonicalEngineeringJsonV1(command.binding.capabilities.map((v) => v.name.toUpperCase()).toList())),
+        Variable.withString(
+          canonicalEngineeringJsonV1(
+            command.binding.capabilities
+                .map((v) => v.name.toUpperCase())
+                .toList(),
+          ),
+        ),
         Variable.withString(refsJson),
         Variable.withString(sha256HexUtf8(refsJson)),
       ],
@@ -321,7 +331,9 @@ final class DriftPowerCommandService {
 
   Future<void> _setLoad(SetPowerLoadCommand command) async {
     await _requirePort(command.projectId, command.contribution.inputPortId);
-    final demandJson = canonicalEngineeringJsonV1(command.contribution.demand.toMap());
+    final demandJson = canonicalEngineeringJsonV1(
+      command.contribution.demand.toMap(),
+    );
     await runRawStatement(
       database,
       'INSERT INTO power_load_bindings '
@@ -342,7 +354,9 @@ final class DriftPowerCommandService {
         Variable.withString(originDeviceId),
         Variable.withString(command.contribution.inputPortId),
         Variable.withString(command.contribution.stateCode),
-        Variable.withString(command.contribution.accountingKind.name.toUpperCase()),
+        Variable.withString(
+          command.contribution.accountingKind.name.toUpperCase(),
+        ),
         Variable.withString(command.contribution.id),
         Variable.withString(demandJson),
       ],
@@ -383,7 +397,9 @@ final class DriftPowerCommandService {
         Variable.withString(transfer.componentId),
         Variable.withString(transfer.inputPortIds.single),
         Variable.withString(transfer.kind.name.toUpperCase()),
-        Variable.withString(canonicalEngineeringJsonV1(transfer.definitionRef.toMap())),
+        Variable.withString(
+          canonicalEngineeringJsonV1(transfer.definitionRef.toMap()),
+        ),
         Variable.withString(payloadJson),
       ],
     );
@@ -438,11 +454,17 @@ final class DriftPowerCommandService {
         Variable<DateTime>(now().toUtc()),
         Variable.withString(originDeviceId),
         Variable.withString(group.ownerComponentId),
-        Variable.withString(canonicalEngineeringJsonV1(group.limits.map((v) => v.toMap()).toList())),
-        Variable.withString(canonicalEngineeringJsonV1({
-          'stateCodes': group.applicabilityStateCodes,
-          'deratingFactor': group.deratingFactor.toWireDecimal(),
-        })),
+        Variable.withString(
+          canonicalEngineeringJsonV1(
+            group.limits.map((v) => v.toMap()).toList(),
+          ),
+        ),
+        Variable.withString(
+          canonicalEngineeringJsonV1({
+            'stateCodes': group.applicabilityStateCodes,
+            'deratingFactor': group.deratingFactor.toWireDecimal(),
+          }),
+        ),
       ],
     );
     await database.customUpdate(
@@ -520,7 +542,9 @@ final class DriftPowerCommandService {
           Variable.withString(command.designRevisionId),
           Variable.withString(requirement.id),
           Variable.withString(requirement.inputPortIds[i]),
-          Variable.withString(canonicalEngineeringJsonV1(requirement.candidateSourceIds)),
+          Variable.withString(
+            canonicalEngineeringJsonV1(requirement.candidateSourceIds),
+          ),
           Variable.withInt(i + 1),
         ],
       );
@@ -547,7 +571,11 @@ final class DriftPowerCommandService {
         Variable<DateTime>(now().toUtc()),
         Variable.withString(originDeviceId),
         Variable.withString(scenario.role.name.toUpperCase()),
-        Variable.withString(canonicalEngineeringJsonV1(scenario.policyRefs.map((v) => v.toMap()).toList())),
+        Variable.withString(
+          canonicalEngineeringJsonV1(
+            scenario.policyRefs.map((v) => v.toMap()).toList(),
+          ),
+        ),
       ],
     );
     for (final table in [
@@ -577,9 +605,11 @@ final class DriftPowerCommandService {
           Variable.withString(scenario.scenarioId),
           Variable.withString(segment.segmentId),
           Variable.withInt(segment.ordinal),
-          Variable<String?>(segment.durationSeconds == null
+          segment.durationSeconds == null
               ? null
-              : canonicalEngineeringJsonV1({'seconds': segment.durationSeconds!.toWireDecimal()})),
+              : canonicalEngineeringJsonV1({
+                'seconds': segment.durationSeconds!.toWireDecimal(),
+              }),
         ],
       );
       final states = <String, String>{
@@ -682,8 +712,12 @@ final class DriftPowerCommandService {
         Variable.withString(command.psePortId),
         Variable.withString(command.pdPortId),
         Variable.withString(command.accountingMode),
-        Variable.withString(canonicalEngineeringJsonV1(command.definition.definitionRef.toMap())),
-        Variable.withString(canonicalEngineeringJsonV1(command.definition.toMap())),
+        Variable.withString(
+          canonicalEngineeringJsonV1(command.definition.definitionRef.toMap()),
+        ),
+        Variable.withString(
+          canonicalEngineeringJsonV1(command.definition.toMap()),
+        ),
       ],
     );
     await database.customUpdate(
@@ -712,17 +746,15 @@ final class DriftPowerCommandService {
           Variable.withString(command.designRevisionId),
           Variable.withString(command.deliveryId),
           Variable.withInt(i + 1),
-          Variable<String?>(member.connectionId),
-          Variable<String?>(member.allocationId),
+          member.connectionId,
+          member.allocationId,
           Variable.withString(canonicalEngineeringJsonV1(member.evidence)),
         ],
       );
     }
   }
 
-  Future<void> _configureBackup(
-    ConfigureBackupAssemblyCommand command,
-  ) async {
+  Future<void> _configureBackup(ConfigureBackupAssemblyCommand command) async {
     for (final componentId in [
       command.upsComponentId,
       command.chargerComponentId,
@@ -753,9 +785,9 @@ final class DriftPowerCommandService {
         Variable<DateTime>(now().toUtc()),
         Variable<DateTime>(now().toUtc()),
         Variable.withString(originDeviceId),
-        Variable<String?>(command.upsComponentId),
-        Variable<String?>(command.chargerComponentId),
-        Variable<String?>(command.bankComponentId),
+        command.upsComponentId,
+        command.chargerComponentId,
+        command.bankComponentId,
         Variable.withString(canonicalEngineeringJsonV1(command.policy)),
       ],
     );
@@ -804,7 +836,11 @@ final class DriftPowerCommandService {
         Variable<DateTime>(now().toUtc()),
         Variable.withString(originDeviceId),
         Variable.withString(binding.componentId),
-        Variable.withString(canonicalEngineeringJsonV1(binding.unitDefinition.definitionRef.toMap())),
+        Variable.withString(
+          canonicalEngineeringJsonV1(
+            binding.unitDefinition.definitionRef.toMap(),
+          ),
+        ),
         Variable.withInt(binding.seriesCount),
         Variable.withInt(binding.parallelCount),
         Variable.withString(canonicalEngineeringJsonV1(binding.toMap())),
@@ -835,7 +871,9 @@ final class DriftPowerCommandService {
               )
               .get();
       for (final row in rows) {
-        final key = PowerNodeKeyV2.decode(row.read<String>('logical_node_key_json'));
+        final key = PowerNodeKeyV2.decode(
+          row.read<String>('logical_node_key_json'),
+        );
         if (affected.putIfAbsent(key.encode(), () => key) == key) {
           if (!queue.contains(key)) queue.add(key);
         }
@@ -880,29 +918,30 @@ final class DriftPowerCommandService {
     return List.unmodifiable(invalidated);
   }
 
-  Future<void> _requirePort(String projectId, String portId) =>
-      _requireExists(
-        'SELECT 1 FROM engineering_port_instances '
+  Future<void> _requirePort(String projectId, String portId) => _requireExists(
+    'SELECT 1 FROM engineering_port_instances '
         'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
-        [Variable.withString(projectId), Variable.withString(portId)],
-        'ELV4_PORT_SCOPE_MISMATCH',
-      );
+    [Variable.withString(projectId), Variable.withString(portId)],
+    'ELV4_PORT_SCOPE_MISMATCH',
+  );
 
-  Future<void> _requireComponent(String projectId, String componentId) =>
-      _requireExists(
-        'SELECT 1 FROM component_instances c '
+  Future<void> _requireComponent(
+    String projectId,
+    String componentId,
+  ) => _requireExists(
+    'SELECT 1 FROM component_instances c '
         'JOIN rooms r ON r.id = c.room_id '
         'JOIN floors f ON f.id = r.floor_id '
         'WHERE f.project_id = ? AND c.id = ? '
         'AND c.deleted_at IS NULL AND r.deleted_at IS NULL AND f.deleted_at IS NULL',
-        [Variable.withString(projectId), Variable.withString(componentId)],
-        'ELV4_COMPONENT_SCOPE_MISMATCH',
-      );
+    [Variable.withString(projectId), Variable.withString(componentId)],
+    'ELV4_COMPONENT_SCOPE_MISMATCH',
+  );
 
   Future<void> _requireConnection(String projectId, String connectionId) =>
       _requireExists(
         'SELECT 1 FROM engineering_port_connections '
-        'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
+            'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
         [Variable.withString(projectId), Variable.withString(connectionId)],
         'ELV4_CONNECTION_SCOPE_MISMATCH',
       );
@@ -910,7 +949,7 @@ final class DriftPowerCommandService {
   Future<void> _requireAllocation(String projectId, String allocationId) =>
       _requireExists(
         'SELECT 1 FROM cable_allocations '
-        'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
+            'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
         [Variable.withString(projectId), Variable.withString(allocationId)],
         'ELV4_ALLOCATION_SCOPE_MISMATCH',
       );
@@ -920,14 +959,20 @@ final class DriftPowerCommandService {
     List<Variable<Object>> variables,
     String code,
   ) async {
-    final row = await database.customSelect(sql, variables: variables).getSingleOrNull();
+    final row =
+        await database
+            .customSelect(sql, variables: variables)
+            .getSingleOrNull();
     if (row == null) throw PowerRuntimeStorageException(code);
   }
 
   List<String> _affectedIds(PowerMutationCommand command) => switch (command) {
     BindPowerPortCommand value => [value.bindingId, value.binding.portId],
     ReleasePowerPortCommand value => [value.bindingId],
-    BindPowerComponentCommand value => [value.bindingId, value.binding.componentId],
+    BindPowerComponentCommand value => [
+      value.bindingId,
+      value.binding.componentId,
+    ],
     SetPowerLoadCommand value => [value.contribution.id],
     ReplacePowerTransferCommand value => [value.transfer.id],
     ReplacePowerCapacityGroupCommand value => [value.group.id],
@@ -937,5 +982,9 @@ final class DriftPowerCommandService {
     BindPoeDeliveryCommand value => [value.deliveryId],
     ConfigureBackupAssemblyCommand value => [value.assemblyId],
     ReplaceBatteryBankCommand value => [value.bindingId],
+    _ =>
+      throw const PowerRuntimeStorageException(
+        'ELV4_UNSUPPORTED_MUTATION_COMMAND',
+      ),
   };
 }
