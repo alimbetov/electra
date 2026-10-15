@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../application/power_workspace_projection.dart';
 import 'power_workspace_editor_binding.dart';
 import 'power_workspace_panel.dart';
 
@@ -7,9 +8,11 @@ final class PowerWorkspacePanelHost extends StatefulWidget {
   const PowerWorkspacePanelHost({
     super.key,
     required this.binding,
+    this.onFindingSelected,
   });
 
   final PowerWorkspaceEditorBinding binding;
+  final ValueChanged<PowerWorkspaceFindingProjection>? onFindingSelected;
 
   @override
   State<PowerWorkspacePanelHost> createState() =>
@@ -72,7 +75,7 @@ final class _PowerWorkspacePanelHostState extends State<PowerWorkspacePanelHost>
       onOverlayChanged: (value) => _run(() => binding.setOverlay(value)),
       onPreviousCard: () => _run(binding.previousCard),
       onNextCard: () => _run(binding.nextCard),
-      onFindingSelected: binding.onFindingSelected,
+      onFindingSelected: widget.onFindingSelected,
       onApplyReviewedRoute: binding.onApplyReviewedRoute == null
           ? null
           : () => _run(binding.onApplyReviewedRoute!),
