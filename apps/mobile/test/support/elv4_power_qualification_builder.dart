@@ -20,7 +20,10 @@ final class Elv4QualificationBuilder {
     DateTime? instant,
   }) : instant = instant ?? DateTime.utc(2026, 10, 15, 21),
        hierarchy = DriftProjectHierarchyRepository(database),
-       geometry = DriftGeometryRepository(database, originDeviceId: 'qualification'),
+       geometry = DriftGeometryRepository(
+         database,
+         originDeviceId: 'qualification',
+       ),
        components = DriftComponentInstanceRepository(
          database,
          originDeviceId: 'qualification',
@@ -206,13 +209,19 @@ final class Elv4QualificationBuilder {
     role: role,
     voltageEnvelope: PowerVoltageEnvelope(
       currentKind: currentKind,
-      minV: PowerRational.integer(currentKind == PowerCurrentKind.ac ? 180 : 10),
-      nominalV:
-          PowerRational.integer(currentKind == PowerCurrentKind.ac ? 230 : 48),
-      maxV: PowerRational.integer(currentKind == PowerCurrentKind.ac ? 260 : 60),
-      frequencyHz: currentKind == PowerCurrentKind.ac
-          ? PowerRational.integer(50)
-          : null,
+      minV: PowerRational.integer(
+        currentKind == PowerCurrentKind.ac ? 180 : 10,
+      ),
+      nominalV: PowerRational.integer(
+        currentKind == PowerCurrentKind.ac ? 230 : 48,
+      ),
+      maxV: PowerRational.integer(
+        currentKind == PowerCurrentKind.ac ? 260 : 60,
+      ),
+      frequencyMinHz:
+          currentKind == PowerCurrentKind.ac ? PowerRational.integer(50) : null,
+      frequencyMaxHz:
+          currentKind == PowerCurrentKind.ac ? PowerRational.integer(50) : null,
     ),
     terminalRoles: const ['POWER'],
     ownership: PowerProjectionOwnership([
@@ -232,7 +241,7 @@ final class Elv4QualificationBuilder {
   );
 
   PowerLossDefinition get efficientLoss => PowerLossDefinition(
-    efficiency: PowerRational.fromFraction(9, 10),
+    efficiency: PowerRational(BigInt.from(9), BigInt.from(10)),
     idleW: PowerRational.zero,
     idleAccounting: PowerIdleAccounting.includesIdle,
   );
@@ -262,7 +271,9 @@ final class Elv4QualificationBuilder {
       binding: PowerComponentBinding(
         componentId: componentId,
         capabilities: capabilities,
-        definitionRefs: [definition(PowerDefinitionKind.component, componentId)],
+        definitionRefs: [
+          definition(PowerDefinitionKind.component, componentId),
+        ],
         ownLoadContributionIds: ownLoadContributionIds,
       ),
     ),

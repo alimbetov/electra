@@ -35,6 +35,31 @@ extension Elv4QualificationTopology on Elv4QualificationBuilder {
     required String toPortId,
   }) async {
     final systemId = await ensureSystem(familyCode);
+    final systems = DriftEngineeringSystemRepository(
+      database,
+      originDeviceId: 'qualification',
+    );
+    final snapshot = await topology.load(projectId);
+    final fromPort = snapshot.ports.singleWhere(
+      (port) => port.id == fromPortId,
+    );
+    final toPort = snapshot.ports.singleWhere((port) => port.id == toPortId);
+    await systems.assign(
+      projectId,
+      ComponentSystemMembership(
+        systemId: systemId,
+        componentId: fromPort.componentId,
+        role: 'DEVICE',
+      ),
+    );
+    await systems.assign(
+      projectId,
+      ComponentSystemMembership(
+        systemId: systemId,
+        componentId: toPort.componentId,
+        role: 'DEVICE',
+      ),
+    );
     final profileId = '$projectId-profile-${familyCode.toLowerCase()}';
     await topology.saveConnectionProfile(
       ConnectionCompatibilityProfile(
