@@ -38,7 +38,8 @@ void main() {
       );
     });
 
-    test('reordered path enumeration keeps fingerprint and evidence stable', () {
+    test('reordered path enumeration keeps fingerprint and evidence stable',
+        () {
       final context = _context();
       final demandEvidence = _demandEvidence(context);
       final firstInput = _input(
@@ -71,7 +72,8 @@ void main() {
       expect(reopened.diff(first).requiresRecalculation, isFalse);
     });
 
-    test('group membership edit invalidates the group membership fact only', () {
+    test('group membership edit invalidates the group membership fact only',
+        () {
       final context = _context();
       final demandEvidence = _demandEvidence(context);
       final firstInput = _input(
@@ -223,8 +225,7 @@ PoeEvaluationInput _input({
       reservedPseW: _r('18'),
       portAllocationLimitW: _r('20'),
       sharedGroupBudgetW: _r('40'),
-      existingGroupReservations:
-          existing ?? [_reservation('delivery-a', '12')],
+      existingGroupReservations: existing ?? [_reservation('delivery-a', '12')],
       pathStages: pathStages ?? [_stage('copper')],
       pseRoleConfirmed: true,
       pdRoleConfirmed: true,

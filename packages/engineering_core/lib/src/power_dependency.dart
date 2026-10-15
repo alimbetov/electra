@@ -35,7 +35,8 @@ final class PowerDependencyKey implements Comparable<PowerDependencyKey> {
         revisionId = _text(revisionId, 'revisionId'),
         entityId = _text(entityId, 'entityId'),
         purpose = _code(purpose, 'purpose'),
-        scenarioId = scenarioId == null ? null : _text(scenarioId, 'scenarioId'),
+        scenarioId =
+            scenarioId == null ? null : _text(scenarioId, 'scenarioId'),
         segmentId = segmentId == null ? null : _text(segmentId, 'segmentId') {
     if (this.segmentId != null && this.scenarioId == null) {
       throw ArgumentError('Segment dependency requires a scenario identity.');
@@ -106,8 +107,7 @@ final class PowerConsumedFact {
     required this.presence,
     required String canonicalValueJson,
   })  : valueSchema = _text(valueSchema, 'valueSchema'),
-        canonicalValueJson =
-            _text(canonicalValueJson, 'canonicalValueJson');
+        canonicalValueJson = _text(canonicalValueJson, 'canonicalValueJson');
 
   factory PowerConsumedFact.present({
     required PowerDependencyKey key,
@@ -202,7 +202,8 @@ final class PowerConsumedInput {
     Iterable<PowerConsumedEvaluationRef> evaluations = const [],
   })  : algorithmVersion = _text(algorithmVersion, 'algorithmVersion'),
         inputSchemaVersion = _text(inputSchemaVersion, 'inputSchemaVersion'),
-        numericPolicyVersion = _text(numericPolicyVersion, 'numericPolicyVersion'),
+        numericPolicyVersion =
+            _text(numericPolicyVersion, 'numericPolicyVersion'),
         facts = List.unmodifiable(_sortedFacts(facts)),
         evaluations = List.unmodifiable(_sortedEvaluations(evaluations));
 
@@ -220,7 +221,8 @@ final class PowerConsumedInput {
         'inputSchemaVersion': inputSchemaVersion,
         'numericPolicyVersion': numericPolicyVersion,
         'dependencyKeys': dependencyKeys,
-        'consumedFacts': facts.map((fact) => fact.toMap()).toList(growable: false),
+        'consumedFacts':
+            facts.map((fact) => fact.toMap()).toList(growable: false),
         'consumedEvaluations':
             evaluations.map((value) => value.toMap()).toList(growable: false),
       };
@@ -233,7 +235,8 @@ final class PowerConsumedInput {
     final previousFacts = {
       for (final fact in previous.facts) fact.key.encode(): fact,
     };
-    final factKeys = {...currentFacts.keys, ...previousFacts.keys}.toList()..sort();
+    final factKeys = {...currentFacts.keys, ...previousFacts.keys}.toList()
+      ..sort();
     final changedFacts = <String>[];
     for (final key in factKeys) {
       if (canonicalEngineeringJsonV1(currentFacts[key]?.toMap()) !=
@@ -315,7 +318,8 @@ List<PowerConsumedEvaluationRef> _sortedEvaluations(
   final result = values.toList()..sort();
   final keys = result.map((value) => value.logicalNodeKey).toList();
   if (keys.toSet().length != keys.length) {
-    throw ArgumentError('Consumed evaluation logical node keys must be unique.');
+    throw ArgumentError(
+        'Consumed evaluation logical node keys must be unique.');
   }
   return result;
 }

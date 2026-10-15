@@ -36,7 +36,8 @@ void main() {
   });
 
   group('RM13 consumed input projection', () {
-    test('enumeration order does not change dependency list or fingerprint', () {
+    test('enumeration order does not change dependency list or fingerprint',
+        () {
       final a = _fact('a', '1');
       final b = _fact('b', '2');
       final evalA = _evaluation('node-a', 'eval-a', 'a');
@@ -61,7 +62,8 @@ void main() {
       expect(first.inputFingerprint, second.inputFingerprint);
     });
 
-    test('present to missing transition invalidates only the exact dependency', () {
+    test('present to missing transition invalidates only the exact dependency',
+        () {
       final present = PowerConsumedInput(
         algorithmVersion: 'algo-v1',
         inputSchemaVersion: 'input-v1',
