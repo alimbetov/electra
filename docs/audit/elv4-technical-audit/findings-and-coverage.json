@@ -1,0 +1,2177 @@
+{
+  "schema": "electra.elv4-technical-audit.v1",
+  "auditDate": "2026-10-15",
+  "auditedHead": "4404c02bba777515f70e58150dd8a25bff0a1573",
+  "remoteHeadAtInspection": "29e0ad06c72d10b38b620d56215ee12f5179c7b8",
+  "verdict": "NOT_READY_FOR_IMPLEMENTATION",
+  "scope": "Design and source integration audit; no Flutter/Dart runtime execution",
+  "severityCounts": {
+    "BLOCKER": 1,
+    "HIGH": 10,
+    "MEDIUM": 4
+  },
+  "findings": [
+    {
+      "id": "ELV4-AUD-01",
+      "severity": "BLOCKER",
+      "kind": "INTEGRATION_CONFLICT",
+      "title": "Общее хранилище результатов не изолировано от устаревшего пересчёта",
+      "requirements": [
+        "ELV4-P0-003",
+        "ELV4-P0-004",
+        "ELV4-P2-005",
+        "ELV4-P7-001",
+        "ELV4-P7-002",
+        "ELV4-P8-008",
+        "ELV4-P9-002",
+        "ELV4-P9-004"
+      ],
+      "references": [
+        {
+          "path": "docs/product/elv4-coordinated-p0-p9-contract.md",
+          "line": 150,
+          "excerpt": "- Each immutable evaluation uses another nodeKey tuple `(elv4-evaluation, logicalNodeKey, evaluationId)`. Its inputsJson contains the complete resolved input snapshot or immutable content-addressed refs; dependenciesJson is populated, sorted and unique. No update/upsert overwrites this evaluation."
+        },
+        {
+          "path": "docs/product/elv4-implementation/p2-persistence-commands.md",
+          "line": 71,
+          "excerpt": "`dependenciesJson` contains full sorted typed keys including absent dependencies. Existing ELV3 rows remain decodable. Do not route evaluation rows through existing blanket `invalidate` logic. Frozen snapshots embed selected pointer/evaluation content or immutable verifiable references captured in the same transaction. References must remain resolvable after archive and cleanup; no GC of referenced frozen/replay evidence."
+        },
+        {
+          "path": "apps/mobile/lib/data/repositories/drift_dependency_recalculation_repository.dart",
+          "line": 36,
+          "excerpt": "state: EngineeringDerivedState.values.byName(r.state),"
+        },
+        {
+          "path": "apps/mobile/lib/data/repositories/drift_dependency_recalculation_repository.dart",
+          "line": 72,
+          "excerpt": "final cache = rows.where((r) => r.deletedAt == null).map(decode).toList();"
+        },
+        {
+          "path": "packages/engineering_core/lib/src/dependency_recalculation.dart",
+          "line": 143,
+          "excerpt": "cache.keys.where((key) => !nodes.containsKey(key)).toSet();"
+        },
+        {
+          "path": "apps/mobile/lib/data/repositories/drift_dependency_recalculation_repository.dart",
+          "line": 760,
+          "excerpt": "for (final key in snapshot.session.removedKeys) {"
+        }
+      ],
+      "scenario": "В ProjectDerivedResults добавлены pointer и immutable evaluation ELV4. Пользователь запускает существующий общий recalculate(projectId). Его load читает все строки проекта без фильтра владельца; неизвестные ключи попадают в removedKeys и получают deletedAt. Если SQL state записан буквально CURRENT/STALE, decode дополнительно несовместим с lower-case enum старого клиента.",
+      "impact": "Нарушается неизменяемость истории либо ломается общий экран пересчёта. Изменить только ELV4 adapter недостаточно. Это подтверждённый риск наследуемого consumer; работающий ELV4-код ещё не существует.",
+      "requiredChange": "Утвердить owner/domain и recordKind для всех строк: legacy node, ELV3 node, ELV4 pointer, ELV4 evaluation. Ограничить SELECT/decode/recalculate/removedKeys/manual/retirement каждого consumer своей областью; определить SQL-кодеки состояний. Зафиксировать это как обязательную совместную доработку P2/P7 и регрессию P8.",
+      "acceptance": "Создать mixed project с legacy/ELV3/ELV4 строками, выполнить существующий общий load/recalculate/manual-flow, закрыть и открыть БД. Ни одна чужая immutable строка не изменена/помечена удалённой; чужой кодек не вызывается; старый пересчёт работает.",
+      "status": "OPEN"
+    },
+    {
+      "id": "ELV4-AUD-02",
+      "severity": "HIGH",
+      "kind": "CONFIRMED_CONTRACT_CONFLICT",
+      "title": "Допустимый ноль ELV4 несовместим с валидацией канонического порта",
+      "requirements": [
+        "ELV4-P1-001",
+        "ELV4-P1-002",
+        "ELV4-P1-007",
+        "ELV4-P2-002",
+        "ELV4-P2-008",
+        "ELV4-P8-008"
+      ],
+      "references": [
+        {
+          "path": "docs/product/elv4-implementation/p1-domain-catalog.md",
+          "line": 11,
+          "excerpt": "| ELV4-P1-001 | Implement typed validated quantities, edition refs and immutable value objects with explicit absent/zero semantics | P1-T01 domain boundaries |"
+        },
+        {
+          "path": "docs/product/elv4-implementation/p1-domain-catalog.md",
+          "line": 12,
+          "excerpt": "| ELV4-P1-002 | Bind power roles to canonical port/component IDs with one owner per projected field | P1-T02 ownership conflict |"
+        },
+        {
+          "path": "packages/engineering_core/lib/src/engineering_topology.dart",
+          "line": 139,
+          "excerpt": "if (v != null && (!v.isFinite || v <= 0))"
+        },
+        {
+          "path": "packages/engineering_core/lib/src/engineering_topology_graph.dart",
+          "line": 95,
+          "excerpt": "for (final message in p.validate())"
+        }
+      ],
+      "scenario": "Сценарий STANDBY/OFF задаёт известную нагрузку 0W. При прямой проекции в EngineeringPort.powerDemandW=0 существующий validate возвращает INVALID_PORT; connectionFindings включает этот результат.",
+      "impact": "Сохранение/соединение валидного отключённого потребителя отвергается либо ноль ошибочно заменяется null и становится неизвестной нагрузкой.",
+      "requiredChange": "Явно определить, какие статические поля канонического порта допускают ноль, а какие остаются положительными; либо полностью хранить state-demand в power aspects и определить совместимую статическую проекцию. Обновление общего validator должно быть отдельным согласованным изменением с legacy-тестами.",
+      "acceptance": "Через публичные команды сохранить OFF=0 и неизвестный demand=null, соединить/переоткрыть; два состояния различаются и не нарушают существующие положительные паспортные ограничения.",
+      "status": "OPEN"
+    },
+    {
+      "id": "ELV4-AUD-03",
+      "severity": "HIGH",
+      "kind": "MISSING_PROJECTION_POLICY",
+      "title": "Не определена проекция нескольких состояний и сценариев в один канонический порт",
+      "requirements": [
+        "ELV4-P1-002",
+        "ELV4-P1-004",
+        "ELV4-P1-007",
+        "ELV4-P2-003",
+        "ELV4-P2-008",
+        "ELV4-P3-002",
+        "ELV4-P3-005",
+        "ELV4-P7-004"
+      ],
+      "references": [
+        {
+          "path": "docs/product/elv4-implementation/p1-domain-catalog.md",
+          "line": 12,
+          "excerpt": "| ELV4-P1-002 | Bind power roles to canonical port/component IDs with one owner per projected field | P1-T02 ownership conflict |"
+        },
+        {
+          "path": "docs/product/elv4-implementation/p2-persistence-commands.md",
+          "line": 12,
+          "excerpt": "| ELV4-P2-002 | Implement transaction-bound power stores and integrate canonical port writers without independent commits | P2-T02 rollback all writes |"
+        },
+        {
+          "path": "packages/engineering_core/lib/src/engineering_topology.dart",
+          "line": 127,
+          "excerpt": "final double? powerLimitW, powerDemandW;"
+        },
+        {
+          "path": "apps/mobile/lib/data/repositories/drift_engineering_topology_repository.dart",
+          "line": 313,
+          "excerpt": "'Profile-instantiated ports are frozen. Release the binding before changing their characteristics.',"
+        },
+        {
+          "path": "apps/mobile/lib/data/repositories/drift_engineering_topology_repository.dart",
+          "line": 326,
+          "excerpt": "'Resolve external/internal links and group attachments before changing a port.',"
+        },
+        {
+          "path": "packages/engineering_core/lib/src/engineering_topology_graph.dart",
+          "line": 215,
+          "excerpt": "b.powerDemandW! > a.powerLimitW!)"
+        }
+      ],
+      "scenario": "У одного входа demand STANDBY=2W, ALARM=10W; разные сценарии выбирают разные активные transfer. Каноническая запись имеет ровно одно powerDemandW/voltage/powerDirection. ТЗ назначает владельца полей, но не функцию проекции, момент обновления и правила проверки существующих соединений. Обычный savePort также запрещает редактирование bound/connected портов.",
+      "impact": "Разработчик может менять глобальный порт при переключении UI-сценария, перезаписывать ELV2 provenance или получать противоречивые connection guards. Модель сценария перестаёт быть чистым чтением.",
+      "requiredChange": "Зафиксировать static nameplate projection против scenario-resolved facts. Переключение сценария не пишет канонические строки. Определить отдельный transaction-bound writer для reviewed adoption существующих connected/bound портов, повторную проверку затронутых связей и политику shared ownership.",
+      "acceptance": "Один порт с двумя состояниями и двумя сценариями: переключение только меняет read context; row revision/payload/provenance порта не меняются; проверка потребления берёт выбранный state, а паспортная совместимость остаётся стабильной. Adoption не обходит чужие инварианты.",
+      "status": "OPEN"
+    },
+    {
+      "id": "ELV4-AUD-04",
+      "severity": "HIGH",
+      "kind": "IDENTITY_AMBIGUITY",
+      "title": "У результатов по сегментам отсутствует обязательная сегментная идентичность",
+      "requirements": [
+        "ELV4-P1-008",
+        "ELV4-P2-005",
+        "ELV4-P4-007",
+        "ELV4-P6-005",
+        "ELV4-P7-001",
+        "ELV4-P7-003",
+        "ELV4-P8-004",
+        "ELV4-P8-007"
+      ],
+      "references": [
+        {
+          "path": "docs/product/elv4-coordinated-p0-p9-contract.md",
+          "line": 149,
+          "excerpt": "- A logical node key is canonical encoded tuple `(elv4, revisionId, scenarioId, processCode, subjectKind, subjectId)` within project scope. Use a versioned tuple encoder, not delimiter concatenation of unrestricted IDs."
+        },
+        {
+          "path": "docs/product/elv4-implementation/shared-contracts.md",
+          "line": 34,
+          "excerpt": "Query context: projectId, designRevisionId, scenarioId, optional segmentId/subject, trace direction. Frozen query chooses its immutable reader before resolving any canonical row. WORKING read captures a consistent view. Display filtering by system is a presentation constraint, not a different calculation scope."
+        },
+        {
+          "path": "docs/product/elv4-implementation/shared-contracts.md",
+          "line": 42,
+          "excerpt": "`PowerProcessEvaluation` contains processCode, subject, scenario/segment, algorithmVersion, inputSchemaVersion, outputSchemaVersion, numericPolicyVersion, inputFingerprint, quantities, contribution records, assumptions, findings and dependency keys. Each quantity records unit and boundary. Every contribution has a unique origin `(port/load/transfer ID, segmentId, accountingKind)`."
+        },
+        {
+          "path": "docs/product/elv4-implementation/p4-load-conversion.md",
+          "line": 28,
+          "excerpt": "Each records algorithm/input/output/numeric versions and the exact scenario segment. No storage read inside core. Application orchestrator builds physical-domain subproblems, gets PoE/DC boundary demand and evaluates parent conversions in reverse topological order."
+        }
+      ],
+      "scenario": "PWR-01 для source X в BACKUP/STANDBY и BACKUP/ALARM имеет один logical key (revision,scenario,process,subject), поскольку segmentId отсутствует. ТЗ одновременно допускает segment-specific запросы и segment-specific evaluations.",
+      "impact": "Публикация ALARM может заменить pointer STANDBY; непонятно, что именно читает PWR-04 и что замораживается.",
+      "requiredChange": "Выбрать один обязательный контракт: segmentId/SEGMENT_SET в logical key либо одна scenario evaluation с полным ordered segment result set. Определить отдельный ключ sequence-процесса PWR-04, правила batch publication и зависимости между ними.",
+      "acceptance": "Рассчитать два сегмента одного scenario/subject, опубликовать в разном порядке, переоткрыть и заморозить. Оба значения адресуются однозначно; сумма энергии использует полную согласованную последовательность.",
+      "status": "OPEN"
+    },
+    {
+      "id": "ELV4-AUD-05",
+      "severity": "HIGH",
+      "kind": "INCOMPLETE_CANONICAL_BRIDGE",
+      "title": "Generic PSU/UPS definitions не имеют завершённого пути в каноническую совместимость",
+      "requirements": [
+        "ELV4-P0-005",
+        "ELV4-P0-006",
+        "ELV4-P1-005",
+        "ELV4-P2-002",
+        "ELV4-P2-003",
+        "ELV4-P3-001",
+        "ELV4-P3-003",
+        "ELV4-P5-007",
+        "ELV4-P8-001"
+      ],
+      "references": [
+        {
+          "path": "docs/product/elv4-implementation/p1-domain-catalog.md",
+          "line": 42,
+          "excerpt": "A generic power component definition contains template ports and local transfers without a ReferenceDiscipline or CanonicalComponentClass requirement. Instantiation creates canonical ELV1 ports through a transaction-bound existing port writer. Existing ports require explicit template-to-port mapping, or an explicitly reviewed creation of missing ports; never match by label alone."
+        },
+        {
+          "path": "docs/product/elv4-implementation/p1-domain-catalog.md",
+          "line": 26,
+          "excerpt": "| PowerPortDefinition | port template code, powerRole SOURCE/CONSUMER/BIDIRECTIONAL/PASSIVE, envelope, continuous limits and optional peak envelope |"
+        },
+        {
+          "path": "packages/engineering_core/lib/src/engineering_topology_graph.dart",
+          "line": 148,
+          "excerpt": "issue('MEMBERSHIP_REQUIRED',"
+        },
+        {
+          "path": "packages/engineering_core/lib/src/engineering_topology_graph.dart",
+          "line": 160,
+          "excerpt": "issue('FAMILY_PROFILE',"
+        },
+        {
+          "path": "packages/engineering_core/lib/src/engineering_topology_graph.dart",
+          "line": 171,
+          "excerpt": "issue('COMPATIBILITY_UNRESOLVED',"
+        },
+        {
+          "path": "packages/engineering_core/lib/src/engineering_reference_catalog.dart",
+          "line": 435,
+          "excerpt": "if (profiles.isEmpty && cableDefinitions.isEmpty)"
+        }
+      ],
+      "scenario": "Импортируется каталог только с power component/port definitions, без fake discipline class. Для нового PSU создаются порты. Existing connection validator требует connector, exact protocol, owning system membership обоих компонентов и compatibility profile с разрешённой family edition. Полный набор этих данных и membership/compatibility materialization для generic source не задан; текущий root validator также не признаёт power-only каталог непустым.",
+      "impact": "Профиль можно описать, но публичная последовательность создания соединения и shared-source vertical остаётся недоопределённой.",
+      "requiredChange": "Описать обязательную структуру generic port template, ссылки на vocabulary/interface/protocol, генерацию exact compatibility definitions, публикационную проверку power-only catalog и явное membership решение для источника, используемого несколькими системами. Транзакционные writers не должны обходить existing graph guards.",
+      "acceptance": "Один минимальный новый power-only каталог через import → placed generic PSU → ports → memberships → canonical connection → calculate/reopen. Никаких fake camera/controller/cable filler definitions и raw SQL.",
+      "status": "OPEN"
+    },
+    {
+      "id": "ELV4-AUD-06",
+      "severity": "HIGH",
+      "kind": "SUPPORTED_SCOPE_CONFLICT",
+      "title": "Обязательные backup/converter цепочки не согласованы с запретом constant-power DC",
+      "requirements": [
+        "ELV4-P0-005",
+        "ELV4-P4-008",
+        "ELV4-P6-003",
+        "ELV4-P6-005",
+        "ELV4-P6-006",
+        "ELV4-P6-007",
+        "ELV4-P8-001",
+        "ELV4-P9-006"
+      ],
+      "references": [
+        {
+          "path": "docs/product/elv4-implementation/p6-dc-backup.md",
+          "line": 50,
+          "excerpt": "First runtime implementation supports radial constant-current DC only. DC constant-power or voltage-dependent loads, shared-return meshes and parallel source networks return ELV4_UNSUPPORTED_ELECTRICAL_MODEL. A converter input behaving as constant power cannot be silently retyped as constant current."
+        },
+        {
+          "path": "docs/product/elv4-implementation/p6-dc-backup.md",
+          "line": 50,
+          "excerpt": "First runtime implementation supports radial constant-current DC only. DC constant-power or voltage-dependent loads, shared-return meshes and parallel source networks return ELV4_UNSUPPORTED_ELECTRICAL_MODEL. A converter input behaving as constant power cannot be silently retyped as constant current."
+        },
+        {
+          "path": "docs/product/elv4-implementation/p8-acceptance.md",
+          "line": 43,
+          "excerpt": "| CCTV | AC boundary → UPS → PSE → camera(s); PD/PSE loss and own-load boundary | Same canonical combined cable allocation; input PF explicit; upstream/backup dependencies |"
+        },
+        {
+          "path": "docs/product/elv4-implementation/p8-acceptance.md",
+          "line": 46,
+          "excerpt": "| Fire | PSU/charger/bank → panel and declared loads; standby/alarm sequence | Explicit hours/model, no implicit fire policy; loop signal topology does not create power loop |"
+        },
+        {
+          "path": "docs/product/elv4-power-topology-design-specification.md",
+          "line": 15,
+          "excerpt": "First release supports explicit radial AC/DC supply chains, converters, transformers, distribution/fused outputs, PSE/PD PoE, UPS, chargers and battery banks. A declared transfer device may select alternative supplies per operating scenario. Arbitrary parallel sources, load-sharing, backfeed and circulating-current networks remain unresolved and cannot receive a successful calculation. Closed fire signal loops are not automatically cyclic power networks."
+        }
+      ],
+      "scenario": "UPS/inverter/DC-DC при фиксированной выходной W-нагрузке задаёт DC inputW по модели efficiency. Это constant-power нагрузка на батарейной линии; P6 явно запрещает её переобозначать постоянным током. Тем не менее battery/UPS/converter backup входит в обязательные положительные verticals. Нулевое сопротивление или заданная boundary estimate может быть отдельным случаем, но исключение и его гарантии не определены.",
+      "impact": "ТЗ не гарантирует существование полного положительного backup vertical в заявленном первом scope; риск реализации только частичной оценки под видом закрытого ELV4.",
+      "requiredChange": "Либо включить ограниченный проверенный radial constant-power solver, либо определить точный допустимый boundary/ideal-transfer режим, что он доказывает и какие физические размерности остаются unresolved. Согласовать один обязательный полный положительный сценарий каждого заявленного типа до реализации.",
+      "acceptance": "Указать реализуемую bank → converter → protected load модель с необходимыми паспортами/физикой и ожидаемыми verdict по каждой размерности. Отдельно показать BLOCKED для физически неподдерживаемой DC линии; номинальный W/V не заменяет solver.",
+      "status": "OPEN"
+    },
+    {
+      "id": "ELV4-AUD-07",
+      "severity": "HIGH",
+      "kind": "MATERIALIZATION_GAP",
+      "title": "Create-next не задаёт remapping revision-specific run/traversal references",
+      "requirements": [
+        "ELV4-P0-007",
+        "ELV4-P2-006",
+        "ELV4-P5-008",
+        "ELV4-P6-008",
+        "ELV4-P7-007",
+        "ELV4-P8-004",
+        "ELV4-P8-007"
+      ],
+      "references": [
+        {
+          "path": "docs/product/elv4-implementation/p2-persistence-commands.md",
+          "line": 77,
+          "excerpt": "Create-next requires no existing active WORKING under current lifecycle rules. Materialize scoped aspects and children with stable logical IDs/new scoped PKs; preserve canonical component/port IDs and exact edition references. R1 pointers are not editable in R2. Inherited evidence remains provenance, with new current pointers STALE/absent until validated under R2 input. Pre-power source revision creates an explicitly audited empty draft only when selected by command; no silent inferred power model."
+        },
+        {
+          "path": "docs/product/elv4-implementation/p6-dc-backup.md",
+          "line": 32,
+          "excerpt": "Section fields: sectionId, canonical connection/allocation/run/traversal refs, parent/child terminal IDs, lengthBasis, installedLengthM, resistanceModel tag, temperature evidence, forward/return/contact resistance, current rating and source/consumer applicability."
+        },
+        {
+          "path": "apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart",
+          "line": 304,
+          "excerpt": "final newRunId = '${revision.id}:run:$sourceRunId';"
+        },
+        {
+          "path": "apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart",
+          "line": 335,
+          "excerpt": "id: '$newRunId:trv:$sequence',"
+        }
+      ],
+      "scenario": "R1 power physical evidence/dependencies ссылаются на run/traversal R1. Existing createNext создаёт новые run/traversal IDs. ТЗ говорит сохранить logical aspect IDs и скопировать children, но не задаёт mapping старых физических identity → новых и не запрещает ссылки R2 на R1 run.",
+      "impact": "R2 может брать длины/termination/path history из R1 или отвергать собственные FK/scope checks; R1/R2 dependency invalidation смешиваются.",
+      "requiredChange": "Задать материализатор с полной таблицей identity classes: project-stable, revision-scoped logical, ELV3 newly generated physical IDs, historical provenance-only. Перепривязать все текущие physical refs; provenance refs сохранить отдельно. Проверять отсутствие operational R1 refs в R2.",
+      "acceptance": "Freeze R1 с несколькими кабелями, create R2, проверить mapping run/traversal/aspect/keys; изменить только R2 route, переоткрыть. R2 использует R2 физику, R1 неизменен.",
+      "status": "OPEN"
+    },
+    {
+      "id": "ELV4-AUD-08",
+      "severity": "HIGH",
+      "kind": "DURABLE_REDO_GAP",
+      "title": "Hash прямой команды не позволяет восстановить redo после перезапуска",
+      "requirements": [
+        "ELV4-P2-007",
+        "ELV4-P7-006",
+        "ELV4-P8-004",
+        "ELV4-P8-006",
+        "ELV4-P9-002"
+      ],
+      "references": [
+        {
+          "path": "docs/product/elv4-implementation/p2-persistence-commands.md",
+          "line": 83,
+          "excerpt": "Undo/redo stores command schema, before/after hashes, affected identities, expected cursor and inverse payload. New ordinary edit invalidates the redo suffix according to existing history policy. Irreversible freeze/archive/adoption follows reviewed existing policy; never pretend an edition adoption can be undone by replacing catalog bytes."
+        },
+        {
+          "path": "apps/mobile/lib/application/elv_command_history_repository.dart",
+          "line": 27,
+          "excerpt": "final String? inverseCommandType;"
+        },
+        {
+          "path": "apps/mobile/lib/application/elv_command_history_repository.dart",
+          "line": 11,
+          "excerpt": "required this.forwardPayloadSha256,"
+        },
+        {
+          "path": "apps/mobile/lib/data/database/app_database.dart",
+          "line": 785,
+          "excerpt": "class CommandExecutionRecords extends Table {"
+        }
+      ],
+      "scenario": "SetPowerLoad меняет 2W на 10W. Сохранены forward schema/hash и inverse payload (2W), ledger содержит normalizedPayloadSha256 и logical response. После undo и перезапуска нельзя восстановить прямой payload 10W только из hash/receipt. Immutable before/after snapshots могли бы помочь, но их полное хранение для history не задано.",
+      "impact": "Persisted redo не реализуется однозначно; in-memory forward command не выполняет требование restart.",
+      "requiredChange": "Задать durable history schema с canonical forwardPayloadJson и inversePayloadJson либо полными immutable before/after aggregate snapshots плюс гарантированным восстановлением команды. Привязать историю к designRevision и определить cursor/branch/versioning/GC правила.",
+      "acceptance": "Обычный edit → close/reopen → undo → close/reopen → redo. Новый commandId для reauthorized redo, исходный payload восстановлен точно, original replay не используется как действие redo; frozen history не изменяется.",
+      "status": "OPEN"
+    },
+    {
+      "id": "ELV4-AUD-09",
+      "severity": "HIGH",
+      "kind": "NUMERICAL_COUNTEREXAMPLE",
+      "title": "Строгое сравнение double даёт ложное превышение на точной границе",
+      "requirements": [
+        "ELV4-P1-001",
+        "ELV4-P1-008",
+        "ELV4-P4-004",
+        "ELV4-P5-005",
+        "ELV4-P6-002",
+        "ELV4-P8-008"
+      ],
+      "references": [
+        {
+          "path": "docs/product/elv4-implementation/shared-contracts.md",
+          "line": 52,
+          "excerpt": "Validation consistency and solver residual comparisons use `abs(a-b) <= max(1e-9, 1e-9 * max(abs(a),abs(b)))` in the quantity's canonical unit. This tolerance is not permission to exceed a rating. Capacity pass uses the unrounded computed demand <= declared available capacity; near-boundary uncertainty is exposed as a finding when input precision requires it. UI rounding never changes verdict. Source min/max range checks use unrounded bounds."
+        },
+        {
+          "path": "docs/product/elv4-implementation/p4-load-conversion.md",
+          "line": 42,
+          "excerpt": "Reserve policy v1 chooses a multiplier >=1 at an explicit selection boundary. `required = demand * multiplier`; `available = nameplate * derating`, derating in `(0,1]`. Signed margin = available-required; utilization = required/available where available >0. If declared zero available capacity, utilization is undefined with a zero-capacity finding, not division by zero."
+        }
+      ],
+      "scenario": "Для limit=0.3 double sum(0.1,0.2)=0.30000000000000004, verdict FAIL. Для тех же десятичных 0.3, разложенных 0.15+0.15, sum=0.3, verdict PASS. Stable enumeration order не устраняет ошибку. Probes повторяют требуемую IEEE-754 модель; Dart runtime не запускался.",
+      "impact": "Ложные перегрузки, отрицательные margins около нуля и зависимость verdict от декомпозиции эквивалентной нагрузки.",
+      "requiredChange": "Разделить representational error и инженерный допуск. Утвердить decimal/fixed-point либо проверяемую ULP/interval error policy с BOUNDARY/UNRESOLVED для неопределённости; не вводить произвольный engineering epsilon, разрешающий реальное превышение.",
+      "acceptance": "Пограничные decimal-equivalent суммы и конвертации дают согласованный verdict. Реальное превышение вне вычислительной погрешности остаётся FAIL. Fingerprint и версии политики фиксируются.",
+      "status": "OPEN"
+    },
+    {
+      "id": "ELV4-AUD-10",
+      "severity": "HIGH",
+      "kind": "REVISION_LINEAGE_GAP",
+      "title": "Выбор старой frozen базы не согласован с уникальной sequence",
+      "requirements": [
+        "ELV4-P0-007",
+        "ELV4-P2-006",
+        "ELV4-P8-006",
+        "ELV4-P9-004"
+      ],
+      "references": [
+        {
+          "path": "docs/product/elv4-power-topology-design-specification.md",
+          "line": 152,
+          "excerpt": "Extend the existing coordinated freeze operation with a versioned power section stored as a companion snapshot and manifest under the same designRevisionId. Keep the existing snapshotHash as the physical hash; a separately versioned manifest binds physicalHash and powerHash. Freeze all records in one transaction, as detailed in the coordinated contract. Capture component/port profiles, connection layers, transfers, scenarios, capacity groups, bank data, exact cable/resource/termination/length facts and all current power evidence needed for replay. Retain old snapshot hashes. Historical pre-ELV4 snapshots return POWER_NOT_CAPTURED; never backfill from current tables. New WORKING revision may explicitly initialize power from a complete selected frozen section or an audited empty draft."
+        },
+        {
+          "path": "docs/product/elv4-implementation/p2-persistence-commands.md",
+          "line": 77,
+          "excerpt": "Create-next requires no existing active WORKING under current lifecycle rules. Materialize scoped aspects and children with stable logical IDs/new scoped PKs; preserve canonical component/port IDs and exact edition references. R1 pointers are not editable in R2. Inherited evidence remains provenance, with new current pointers STALE/absent until validated under R2 input. Pre-power source revision creates an explicitly audited empty draft only when selected by command; no silent inferred power model."
+        },
+        {
+          "path": "apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart",
+          "line": 278,
+          "excerpt": "sequence: base.sequence + 1,"
+        },
+        {
+          "path": "apps/mobile/lib/data/database/app_database.dart",
+          "line": 822,
+          "excerpt": "{projectId, sequence},"
+        }
+      ],
+      "scenario": "В проекте уже есть frozen R1(sequence1) и R2(sequence2), active WORKING отсутствует. Create-next выбирает R1. Existing code вычисляет sequence2 и попадает в UNIQUE(projectId,sequence). ТЗ не ограничивает выбор latest frozen и не задаёт отдельный глобальный sequence allocation/branching contract.",
+      "impact": "Разрешённый по описанным предусловиям запрос завершается конфликтом хранения; восстановление модели от старой ревизии недоопределено.",
+      "requiredChange": "Определить latest-only с явным domain error либо монотонную project-wide sequence независимо от basedOnRevisionId; формально описать branching/materialization и CAS allocator. Это отдельная baseline reconciliation задача, не доказательство уже реализованного ELV4 дефекта.",
+      "acceptance": "R1 → R2, оба frozen; create from R1 проверяется явным ожидаемым domain result либо создаёт новую уникальную sequence с корректной provenance; два клиента не создают две WORKING ревизии.",
+      "status": "OPEN"
+    },
+    {
+      "id": "ELV4-AUD-11",
+      "severity": "MEDIUM",
+      "kind": "WIRE_SCHEMA_GAP",
+      "title": "Версионированные wire payloads ещё не имеют проверяемой полной схемы",
+      "requirements": [
+        "ELV4-P1-005",
+        "ELV4-P1-006",
+        "ELV4-P1-008",
+        "ELV4-P2-001",
+        "ELV4-P2-003",
+        "ELV4-P8-003"
+      ],
+      "references": [
+        {
+          "path": "docs/product/elv4-implementation/p1-domain-catalog.md",
+          "line": 40,
+          "excerpt": "New catalog payloads declare a new explicit catalog schema understood by the new decoder. Proposed `power` section contains `schema: electra.elv4-power-definitions.v1`, arrays `portDefinitions`, `componentDefinitions`, `transferDefinitions`, `poeDefinitions`, `batteryDefinitions` and `policyDefinitions`. Every definition has a unique normalized code, version, sourceRef and typed body. References resolve within the exact root edition; no latest-version lookup."
+        },
+        {
+          "path": "docs/product/elv4-implementation/p1-domain-catalog.md",
+          "line": 40,
+          "excerpt": "New catalog payloads declare a new explicit catalog schema understood by the new decoder. Proposed `power` section contains `schema: electra.elv4-power-definitions.v1`, arrays `portDefinitions`, `componentDefinitions`, `transferDefinitions`, `poeDefinitions`, `batteryDefinitions` and `policyDefinitions`. Every definition has a unique normalized code, version, sourceRef and typed body. References resolve within the exact root edition; no latest-version lookup."
+        },
+        {
+          "path": "docs/product/elv4-implementation/p2-persistence-commands.md",
+          "line": 47,
+          "excerpt": "Proposed command schema names: `electra.command.elv4.<operation>.v1`; operation is a fixed registered name, not arbitrary user text. Families are bind/adopt/release-power-profile, set-power-load-profile, replace-power-transfers, replace-power-capacity-group, replace-power-supply-requirement, create/replace/archive-power-scenario, bind/replace-poe-delivery, configure-backup-assembly, replace-battery-bank and calculate-power-process. Existing revision command schemas require explicit compatible extension or versioned replacement; old replay decoding must remain available."
+        },
+        {
+          "path": "apps/mobile/lib/data/repositories/drift_elv_runtime_support.dart",
+          "line": 73,
+          "excerpt": "payloadSchemaVersion: 1,"
+        }
+      ],
+      "scenario": "Зафиксированы имена разделов и варианты объектов, но отсутствуют полные wire fields/nullability/union tags/version-dispatch для реального минимального каталога и каждой command/result/history схемы. Fixtures специально не являются import payloads. Existing success helper всегда пишет payloadSchemaVersion=1, тогда как freeze/create-next требуют нового versioned payload.",
+      "impact": "Два разработчика могут независимо создать несовместимые JSON и replay decoders; заявленный codec gate пока нельзя выполнить по единому oracle.",
+      "requiredChange": "Добавить строгие JSON Schema либо эквивалентные типизированные codec specifications, минимальные valid/invalid wire примеры, dispatch по версии и явное расширение ledger helper без потери старых replay.",
+      "acceptance": "Полный новый import/reimport/replay round-trip, старый payload byte/hash invariant, неизвестный mandatory version rejection, optional metadata policy и реальная запись schema version.",
+      "status": "OPEN"
+    },
+    {
+      "id": "ELV4-AUD-12",
+      "severity": "MEDIUM",
+      "kind": "TEMPORAL_MODEL_GAP",
+      "title": "Пусковые нагрузки и diversity не имеют полного временного aggregation контракта",
+      "requirements": [
+        "ELV4-P1-003",
+        "ELV4-P1-004",
+        "ELV4-P4-006",
+        "ELV4-P6-006",
+        "ELV4-P8-008"
+      ],
+      "references": [
+        {
+          "path": "docs/product/elv4-implementation/p4-load-conversion.md",
+          "line": 58,
+          "excerpt": "Peak record contains pulse W/A/VA, durationSeconds, simultaneous group and recurrence/applicability when required. Compare against a declared source peak envelope at the same duration. Unsupported duration/interpolation yields UNRESOLVED; do not average into steady watts. Safety-critical diversity requires explicit applicable policy."
+        },
+        {
+          "path": "docs/product/elv4-implementation/p4-load-conversion.md",
+          "line": 58,
+          "excerpt": "Peak record contains pulse W/A/VA, durationSeconds, simultaneous group and recurrence/applicability when required. Compare against a declared source peak envelope at the same duration. Unsupported duration/interpolation yields UNRESOLVED; do not average into steady watts. Safety-critical diversity requires explicit applicable policy."
+        },
+        {
+          "path": "docs/product/elv4-coordinated-p0-p9-contract.md",
+          "line": 109,
+          "excerpt": "Diversity is allowed only for a declared mutually exclusive/group policy. It cannot reduce a per-port guaranteed requirement or a safety-critical load without explicit applicable policy. Report demand, applied factor, reserve and capacity as distinct quantities."
+        }
+      ],
+      "scenario": "Два импульса с разными duration и возможным пересечением, собственный steady load и recharge demand. ТЗ требует simultaneity/recurrence, но не задаёт интервалы/корреляции/события и поддерживаемую функцию построения source envelope.",
+      "impact": "Нельзя однозначно воспроизвести требуемый peak. Возможны ошибочное усреднение или применение коэффициента к гарантированному per-port требованию.",
+      "requiredChange": "Ограничить первую версию ALL_SIMULTANEOUS с консервативной проверкой поддерживаемых durations либо задать точную event/interval модель, наложение pulses, steady baseline и интерполяцию рейтинга. Неизвестная корреляция не уменьшает worst case.",
+      "acceptance": "Разные durations, overlap/non-overlap, steady+peak и recharge+load имеют точные golden outputs; неизвестный envelope даёт UNRESOLVED, не PASS.",
+      "status": "OPEN"
+    },
+    {
+      "id": "ELV4-AUD-13",
+      "severity": "MEDIUM",
+      "kind": "INPUT_PROJECTION_GAP",
+      "title": "Область input fingerprint не связана формально с consumed dependencies",
+      "requirements": [
+        "ELV4-P4-007",
+        "ELV4-P7-001",
+        "ELV4-P7-002",
+        "ELV4-P7-003",
+        "ELV4-P8-002",
+        "ELV4-P8-008"
+      ],
+      "references": [
+        {
+          "path": "docs/product/elv4-implementation/shared-contracts.md",
+          "line": 40,
+          "excerpt": "`PowerInputSnapshot` contains scope, designToken, scenario/segment payloads, exact port/component/connection/internal mapping data, aspect sets, installed physical evidence, exact definition contents/hashes, policy refs and algorithm/numeric versions. Missing required inputs are represented by typed unresolved entries with dependency identities, not dropped rows."
+        },
+        {
+          "path": "docs/product/elv4-implementation/shared-contracts.md",
+          "line": 56,
+          "excerpt": "Input fingerprint includes scope IDs, resolved technical input, missing-input markers, exact editions, selected scenario/policy, algorithm/input/output/numeric versions. It excludes calculatedAt, commandId, evaluationId, display labels and UI selection. A design token guards publication but is excluded from the technical fingerprint: unrelated edits can advance it without changing input. Revalidation may then recapture/retry safely."
+        },
+        {
+          "path": "docs/product/elv4-implementation/p7-dependencies-workspace.md",
+          "line": 37,
+          "excerpt": "Changed source voltage affects downstream compatibility/DC terminal results and loss-sensitive upstream/backup basis. Changed bank usable model affects protected energy capacity and explicit charging dependencies; unrelated normal demand stays current. Changed unrelated room label is a required negative control. A broad revision token is a concurrency guard, not permission to mark all numerical results stale."
+        },
+        {
+          "path": "docs/product/elv4-implementation/p8-acceptance.md",
+          "line": 83,
+          "excerpt": "Permutation of input iteration order preserves fingerprints/quantities/findings; adding an unrelated isolated source leaves existing logical results unchanged; adding one distinct load increases matching group demand once; a duplicate system membership does not add physical demand. Loop resistance input and explicit forward+return equivalent produce equal simple DC result. Series bank increases V, parallel count increases Ah; capacity factors apply once."
+        }
+      ],
+      "scenario": "PowerInputSnapshot описан как полный захват графа/аспектов, а fingerprint как resolved technical input. Одновременно требуется не менять результат от независимого источника. Не задана функция subject/process input projection и равенство hash inputs фактически прочитанным dependency keys.",
+      "impact": "Глобальное хеширование делает независимые результаты stale; слишком узкое хеширование допускает late publication по устаревшим фактам.",
+      "requiredChange": "Для каждого process описать canonical consumed-input projection и missing/set-membership dependencies. Хешировать именно этот технический срез; designToken использовать отдельно как CAS guard. Проверять полноту зависимостей instrumented source reads либо эквивалентным контрактом.",
+      "acceptance": "Независимый source/label не меняет technical fingerprint; новая ветвь shared source меняет; заполнение missing profile меняет; поздняя публикация не проходит с изменившимся consumed input.",
+      "status": "OPEN"
+    },
+    {
+      "id": "ELV4-AUD-14",
+      "severity": "MEDIUM",
+      "kind": "LIFECYCLE_CONTRADICTION",
+      "title": "Freeze/RUNNING не согласован с моделью execution и протоколом публикации",
+      "requirements": [
+        "ELV4-P2-006",
+        "ELV4-P7-003",
+        "ELV4-P7-007",
+        "ELV4-P8-006",
+        "ELV4-P9-008"
+      ],
+      "references": [
+        {
+          "path": "docs/product/elv4-power-topology-design-specification.md",
+          "line": 189,
+          "excerpt": "Voltage-drop/load feedback is solved inside a bounded process contract, not by introducing dependency cycles. Freeze rejects RUNNING evidence; incomplete designs may freeze with explicit BLOCKED/NOT_CALCULATED findings, but cannot claim successful engineering acceptance."
+        },
+        {
+          "path": "docs/product/elv4-implementation/shared-contracts.md",
+          "line": 46,
+          "excerpt": "Freshness lives on the current pointer: CURRENT or STALE. Evaluation completion: COMPLETE, PARTIAL or BLOCKED; assessment: PASS, FAIL or UNRESOLVED. Execution: SUCCEEDED or FAILED. Structural/input-domain failures prevent a result from asserting PASS. A proved violated limit can report FAIL even when other dimensions are unresolved; per-dimension status remains available. Overall PASS requires every required dimension complete and passing."
+        },
+        {
+          "path": "docs/product/elv4-implementation/p7-dependencies-workspace.md",
+          "line": 41,
+          "excerpt": "Create request contains scope, process/subject set, command ID and expected input context. Capture under one consistent read transaction; build a dependency-complete immutable input. Run pure evaluator outside write transaction. Reopen short publish transaction and check ledger, WORKING lifecycle, token, recaptured technical fingerprint and prior pointer generation."
+        },
+        {
+          "path": "docs/product/elv4-implementation/p8-acceptance.md",
+          "line": 75,
+          "excerpt": "| Freeze versus calculate publish | After capture before publish | Publisher blocked after freeze; captured pointers coherent |"
+        }
+      ],
+      "scenario": "Основная спецификация требует reject freeze при RUNNING evidence. Shared contract не содержит RUNNING state или durable job/lease registry; вычисление идёт вне write transaction, P8 допускает freeze с последующим отклонением publisher. Для одного и того же interleaving возможны два разных обязательных результата.",
+      "impact": "Расходятся реализация freeze, UI и race tests; непонятно, где лежит статус незавершённой работы после restart.",
+      "requiredChange": "Выбрать nonblocking freeze текущих committed фактов с token invalidation для in-flight calculation либо persisted run registry/lease с явным запретом. Согласовать одинаковое правило в governing spec/shared/P7/P8, отдельно хранить неизменяемый evaluation и transient operation state.",
+      "acceptance": "Barrier capture → start compute → freeze → publish даёт один заранее определённый результат; restart не оставляет вечный RUNNING; старый evaluation не превращается в successful fresh result.",
+      "status": "OPEN"
+    },
+    {
+      "id": "ELV4-AUD-15",
+      "severity": "HIGH",
+      "kind": "ACCEPTANCE_GATE_GAP",
+      "title": "Не закреплены обязательные COMPLETE/PASS размерности положительных verticals",
+      "requirements": [
+        "ELV4-P0-006",
+        "ELV4-P8-001",
+        "ELV4-P8-008",
+        "ELV4-P9-001",
+        "ELV4-P9-003",
+        "ELV4-P9-006",
+        "ELV4-P9-007",
+        "ELV4-P9-008"
+      ],
+      "references": [
+        {
+          "path": "docs/product/elv4-implementation/p8-acceptance.md",
+          "line": 50,
+          "excerpt": "V1/V3/V4/V6 numerical cases are boundary arithmetic oracles. Full vertical builders must provide explicit remaining compatible profiles, ratings, source bounds and physical evidence; the oracle alone cannot assert whole-design PASS. In particular, a constant-W energy sequence does not prove a supported nonlinear DC terminal solution. Use supported constant-current radial loads for terminal-voltage acceptance, or keep that dimension explicitly unresolved."
+        },
+        {
+          "path": "docs/product/elv4-implementation/p9-closure.md",
+          "line": 56,
+          "excerpt": "Zero open BLOCKER/HIGH at runtime closure. Lower findings require explicit decision, owner and target scope. Unsupported general meshes/parallel sources, initial nonlinear DC, unimplemented explicit-loss PoE, detailed battery curves and guaranteed recharge-time predictions are declared scope limits, not silently passing capabilities. A required vertical that depends on an unsupported model blocks acceptance; it cannot be waived by calling the model a limitation after implementation."
+        },
+        {
+          "path": "docs/product/elv4-implementation/p8-acceptance.md",
+          "line": 33,
+          "excerpt": "6. Evaluate supported processes; assert topology, realization, quantities, contribution origins, statuses and dependencies."
+        },
+        {
+          "path": "docs/examples/elv4-power-design-fixtures.json",
+          "line": 9,
+          "excerpt": "\"scope\": \"CCTV_PoE_boundary\","
+        }
+      ],
+      "scenario": "P8 допускает оставить физическую размерность unresolved, P9 запрещает принимать required vertical на неподдерживаемой модели. Нет scenario×process×dimension gate: какие checks обязаны быть COMPLETE/PASS для каждого положительного кейса. V1 не задаёт конкретные guaranteedPdW/path profiles, V4 не задаёт complete end-of-discharge/voltage model — это честно названо boundary oracles, но не заменяет полный acceptance dataset.",
+      "impact": "Все тесты могут формально пройти с BLOCKED/UNRESOLVED в существенной части функциональности; либо P8 и P9 будут требовать несовместимое закрытие.",
+      "requiredChange": "Составить versioned qualification manifest: для каждого vertical перечень обязательных процессов, required dimensions, expected statuses, полный input/provenance dataset и отдельные allowed limitation cases. Negative/unsupported tests не засчитываются как положительная вертикаль.",
+      "acceptance": "Автоматический validator отвергает closure, если положительный кейс имеет required dimension UNRESOLVED/BLOCKED/NOT_CALCULATED. Каждый допустимый partial estimate явно находится вне qualification PASS; P9 читает тот же manifest.",
+      "status": "OPEN"
+    }
+  ],
+  "requirementReviews": [
+    {
+      "requirementId": "ELV4-P0-001",
+      "package": "P0",
+      "summary": "Inventory merged source, schema and supported migration origins at an exact commit; distinguish document claims from code and executed tests",
+      "plannedAcceptanceIds": [
+        "P0-T01"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p0-baseline.md",
+        "line": 11,
+        "excerpt": "| ELV4-P0-001 | Inventory merged source, schema and supported migration origins at an exact commit; distinguish document claims from code and executed tests | P0-T01 source/schema inventory |"
+      },
+      "assessment": "BASELINE_GATE_OPEN",
+      "findings": [],
+      "note": "Признанный открытый baseline gate; отсутствие evidence не выдаётся за новый runtime defect.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P0-002",
+      "package": "P0",
+      "summary": "Map each ELV3 RC0–RC9 gate to source, public entry point and exact-head evidence or an explicit unresolved gap",
+      "plannedAcceptanceIds": [
+        "P0-T02"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p0-baseline.md",
+        "line": 12,
+        "excerpt": "| ELV4-P0-002 | Map each ELV3 RC0–RC9 gate to source, public entry point and exact-head evidence or an explicit unresolved gap | P0-T02 baseline evidence reconciliation |"
+      },
+      "assessment": "BASELINE_GATE_OPEN",
+      "findings": [],
+      "note": "Признанный открытый baseline gate; отсутствие evidence не выдаётся за новый runtime defect.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P0-003",
+      "package": "P0",
+      "summary": "Identify every mutable port/profile/connection/mapping/load/route fact consumed by power and its current command owner",
+      "plannedAcceptanceIds": [
+        "P0-T03"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p0-baseline.md",
+        "line": 13,
+        "excerpt": "| ELV4-P0-003 | Identify every mutable port/profile/connection/mapping/load/route fact consumed by power and its current command owner | P0-T03 mutation-owner coverage |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-01"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P0-004",
+      "package": "P0",
+      "summary": "Record exact existing error codes and transaction/replay/result interfaces reused by ELV4",
+      "plannedAcceptanceIds": [
+        "P0-T04"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p0-baseline.md",
+        "line": 14,
+        "excerpt": "| ELV4-P0-004 | Record exact existing error codes and transaction/replay/result interfaces reused by ELV4 | P0-T04 reuse map |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-01"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P0-005",
+      "package": "P0",
+      "summary": "Freeze supported/deferred electrical model boundary and generic power catalog binding strategy",
+      "plannedAcceptanceIds": [
+        "P0-T05"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p0-baseline.md",
+        "line": 15,
+        "excerpt": "| ELV4-P0-005 | Freeze supported/deferred electrical model boundary and generic power catalog binding strategy | P0-T05 scope walkthrough |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-05",
+        "ELV4-AUD-06"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P0-006",
+      "package": "P0",
+      "summary": "Design deterministic FK-valid fixture builders for four disciplines, shared budgets, historical/legacy and negative cases",
+      "plannedAcceptanceIds": [
+        "P0-T06"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p0-baseline.md",
+        "line": 16,
+        "excerpt": "| ELV4-P0-006 | Design deterministic FK-valid fixture builders for four disciplines, shared budgets, historical/legacy and negative cases | P0-T06 fixture design review |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-05",
+        "ELV4-AUD-15"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P0-007",
+      "package": "P0",
+      "summary": "Identify snapshot freeze/create-next/delete/adopt integration and all operations requiring revision-token advancement",
+      "plannedAcceptanceIds": [
+        "P0-T07"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p0-baseline.md",
+        "line": 17,
+        "excerpt": "| ELV4-P0-007 | Identify snapshot freeze/create-next/delete/adopt integration and all operations requiring revision-token advancement | P0-T07 race-boundary map |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-07",
+        "ELV4-AUD-10"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P0-008",
+      "package": "P0",
+      "summary": "Record entry outcome with no fabricated runtime closure or implicit resolution of BASE-01…04",
+      "plannedAcceptanceIds": [
+        "P0-T08"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p0-baseline.md",
+        "line": 18,
+        "excerpt": "| ELV4-P0-008 | Record entry outcome with no fabricated runtime closure or implicit resolution of BASE-01…04 | P0-T08 gate decision |"
+      },
+      "assessment": "BASELINE_GATE_OPEN",
+      "findings": [],
+      "note": "Признанный открытый baseline gate; отсутствие evidence не выдаётся за новый runtime defect.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P1-001",
+      "package": "P1",
+      "summary": "Implement typed validated quantities, edition refs and immutable value objects with explicit absent/zero semantics",
+      "plannedAcceptanceIds": [
+        "P1-T01"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p1-domain-catalog.md",
+        "line": 11,
+        "excerpt": "| ELV4-P1-001 | Implement typed validated quantities, edition refs and immutable value objects with explicit absent/zero semantics | P1-T01 domain boundaries |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-02",
+        "ELV4-AUD-09"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P1-002",
+      "package": "P1",
+      "summary": "Bind power roles to canonical port/component IDs with one owner per projected field",
+      "plannedAcceptanceIds": [
+        "P1-T02"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p1-domain-catalog.md",
+        "line": 12,
+        "excerpt": "| ELV4-P1-002 | Bind power roles to canonical port/component IDs with one owner per projected field | P1-T02 ownership conflict |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-02",
+        "ELV4-AUD-03"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P1-003",
+      "package": "P1",
+      "summary": "Define local transfers, efficiency accounting, capacity groups and unique own-load contribution identity",
+      "plannedAcceptanceIds": [
+        "P1-T03"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p1-domain-catalog.md",
+        "line": 13,
+        "excerpt": "| ELV4-P1-003 | Define local transfers, efficiency accounting, capacity groups and unique own-load contribution identity | P1-T03 transfer/double-count validation |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-12"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P1-004",
+      "package": "P1",
+      "summary": "Implement scenario segments, state/source selection, durations and charge/discharge interlock",
+      "plannedAcceptanceIds": [
+        "P1-T04"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p1-domain-catalog.md",
+        "line": 14,
+        "excerpt": "| ELV4-P1-004 | Implement scenario segments, state/source selection, durations and charge/discharge interlock | P1-T04 scenario resolution |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-03",
+        "ELV4-AUD-12"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P1-005",
+      "package": "P1",
+      "summary": "Add versioned root-catalog power extension and generic equipment template support without changing old discipline codecs",
+      "plannedAcceptanceIds": [
+        "P1-T05"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p1-domain-catalog.md",
+        "line": 15,
+        "excerpt": "| ELV4-P1-005 | Add versioned root-catalog power extension and generic equipment template support without changing old discipline codecs | P1-T05 legacy/new codec round-trip |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-05",
+        "ELV4-AUD-11"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P1-006",
+      "package": "P1",
+      "summary": "Model PoE delivery and bank/charger definitions with exact provenance and model applicability",
+      "plannedAcceptanceIds": [
+        "P1-T06"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p1-domain-catalog.md",
+        "line": 16,
+        "excerpt": "| ELV4-P1-006 | Model PoE delivery and bank/charger definitions with exact provenance and model applicability | P1-T06 PoE/bank definition checks |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-11"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P1-007",
+      "package": "P1",
+      "summary": "Provide explicit legacy mapping/adoption preview; missing typed facts stay unresolved",
+      "plannedAcceptanceIds": [
+        "P1-T07"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p1-domain-catalog.md",
+        "line": 17,
+        "excerpt": "| ELV4-P1-007 | Provide explicit legacy mapping/adoption preview; missing typed facts stay unresolved | P1-T07 legacy mapping |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-02",
+        "ELV4-AUD-03"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P1-008",
+      "package": "P1",
+      "summary": "Freeze process input/output/numeric schemas and exact canonical serialization behavior",
+      "plannedAcceptanceIds": [
+        "P1-T08"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p1-domain-catalog.md",
+        "line": 18,
+        "excerpt": "| ELV4-P1-008 | Freeze process input/output/numeric schemas and exact canonical serialization behavior | P1-T08 deterministic fingerprints |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-04",
+        "ELV4-AUD-09",
+        "ELV4-AUD-11"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P2-001",
+      "package": "P2",
+      "summary": "Add scoped aspect/child tables, uniqueness, checks, foreign keys and indexes with additive migration",
+      "plannedAcceptanceIds": [
+        "P2-T01"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p2-persistence-commands.md",
+        "line": 11,
+        "excerpt": "| ELV4-P2-001 | Add scoped aspect/child tables, uniqueness, checks, foreign keys and indexes with additive migration | P2-T01 migration/scope constraints |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-11"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P2-002",
+      "package": "P2",
+      "summary": "Implement transaction-bound power stores and integrate canonical port writers without independent commits",
+      "plannedAcceptanceIds": [
+        "P2-T02"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p2-persistence-commands.md",
+        "line": 12,
+        "excerpt": "| ELV4-P2-002 | Implement transaction-bound power stores and integrate canonical port writers without independent commits | P2-T02 rollback all writes |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-02",
+        "ELV4-AUD-05"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P2-003",
+      "package": "P2",
+      "summary": "Implement every mutation family with replay-first ledger, aggregate CAS and complete receipts",
+      "plannedAcceptanceIds": [
+        "P2-T03"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p2-persistence-commands.md",
+        "line": 13,
+        "excerpt": "| ELV4-P2-003 | Implement every mutation family with replay-first ledger, aggregate CAS and complete receipts | P2-T03 replay/conflict/restart |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-03",
+        "ELV4-AUD-05",
+        "ELV4-AUD-11"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P2-004",
+      "package": "P2",
+      "summary": "Advance coordinated design token and invalidate old/new dependency closures atomically",
+      "plannedAcceptanceIds": [
+        "P2-T04"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p2-persistence-commands.md",
+        "line": 14,
+        "excerpt": "| ELV4-P2-004 | Advance coordinated design token and invalidate old/new dependency closures atomically | P2-T04 edit/freeze and invalidation |"
+      },
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "note": "Локальных противоречий в формулировке не найдено; это не runtime PASS и не отменяет связанных package/integration gates.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P2-005",
+      "package": "P2",
+      "summary": "Extend ProjectDerivedResults with immutable evaluation rows and guarded mutable pointers",
+      "plannedAcceptanceIds": [
+        "P2-T05"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p2-persistence-commands.md",
+        "line": 15,
+        "excerpt": "| ELV4-P2-005 | Extend ProjectDerivedResults with immutable evaluation rows and guarded mutable pointers | P2-T05 evaluation immutability/publication |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-01",
+        "ELV4-AUD-04"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P2-006",
+      "package": "P2",
+      "summary": "Add coordinated power companion snapshot and manifest; preserve old physical hashes",
+      "plannedAcceptanceIds": [
+        "P2-T06"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p2-persistence-commands.md",
+        "line": 16,
+        "excerpt": "| ELV4-P2-006 | Add coordinated power companion snapshot and manifest; preserve old physical hashes | P2-T06 freeze/history/create-next |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-07",
+        "ELV4-AUD-10",
+        "ELV4-AUD-14"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P2-007",
+      "package": "P2",
+      "summary": "Persist reversible history and validate ordinary inverse/forward commands atomically",
+      "plannedAcceptanceIds": [
+        "P2-T07"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p2-persistence-commands.md",
+        "line": 17,
+        "excerpt": "| ELV4-P2-007 | Persist reversible history and validate ordinary inverse/forward commands atomically | P2-T07 undo/intervening edit |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-08"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P2-008",
+      "package": "P2",
+      "summary": "Integrate adoption/deletion/membership guards and stable storage/error translation",
+      "plannedAcceptanceIds": [
+        "P2-T08"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p2-persistence-commands.md",
+        "line": 18,
+        "excerpt": "| ELV4-P2-008 | Integrate adoption/deletion/membership guards and stable storage/error translation | P2-T08 canonical guard coverage |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-02",
+        "ELV4-AUD-03"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P3-001",
+      "package": "P3",
+      "summary": "Build one deterministic derived graph per captured revision/scenario/segment from canonical identities",
+      "plannedAcceptanceIds": [
+        "P3-T01"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p3-topology-trace.md",
+        "line": 11,
+        "excerpt": "| ELV4-P3-001 | Build one deterministic derived graph per captured revision/scenario/segment from canonical identities | P3-T01 graph projection |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-05"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P3-002",
+      "package": "P3",
+      "summary": "Resolve availability, alternative-feed selection and transfer direction before connectivity checks",
+      "plannedAcceptanceIds": [
+        "P3-T02"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p3-topology-trace.md",
+        "line": 12,
+        "excerpt": "| ELV4-P3-002 | Resolve availability, alternative-feed selection and transfer direction before connectivity checks | P3-T02 selected backup |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-03"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P3-003",
+      "package": "P3",
+      "summary": "Preserve passive continuity and independently validate power/data direction and domain",
+      "plannedAcceptanceIds": [
+        "P3-T03"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p3-topology-trace.md",
+        "line": 13,
+        "excerpt": "| ELV4-P3-003 | Preserve passive continuity and independently validate power/data direction and domain | P3-T03 mixed-layer/relay |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-05"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P3-004",
+      "package": "P3",
+      "summary": "Detect active cycles, reconvergent supply paths, ambiguous direction and unsupported returns",
+      "plannedAcceptanceIds": [
+        "P3-T04"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p3-topology-trace.md",
+        "line": 14,
+        "excerpt": "| ELV4-P3-004 | Detect active cycles, reconvergent supply paths, ambiguous direction and unsupported returns | P3-T04 adversarial graphs |"
+      },
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "note": "Локальных противоречий в формулировке не найдено; это не runtime PASS и не отменяет связанных package/integration gates.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P3-005",
+      "package": "P3",
+      "summary": "Check voltage guarantees, AC frequency, DC polarity and supported transfer envelopes",
+      "plannedAcceptanceIds": [
+        "P3-T05"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p3-topology-trace.md",
+        "line": 15,
+        "excerpt": "| ELV4-P3-005 | Check voltage guarantees, AC frequency, DC polarity and supported transfer envelopes | P3-T05 compatibility bounds |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-03"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P3-006",
+      "package": "P3",
+      "summary": "Trace ordered provenance to explicit source boundaries with unresolved frontiers",
+      "plannedAcceptanceIds": [
+        "P3-T06"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p3-topology-trace.md",
+        "line": 16,
+        "excerpt": "| ELV4-P3-006 | Trace ordered provenance to explicit source boundaries with unresolved frontiers | P3-T06 trace completeness |"
+      },
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "note": "Локальных противоречий в формулировке не найдено; это не runtime PASS и не отменяет связанных package/integration gates.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P3-007",
+      "package": "P3",
+      "summary": "Separate topology, realization, capacity and backup dimensions; retain missing-input dependencies",
+      "plannedAcceptanceIds": [
+        "P3-T07"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p3-topology-trace.md",
+        "line": 17,
+        "excerpt": "| ELV4-P3-007 | Separate topology, realization, capacity and backup dimensions; retain missing-input dependencies | P3-T07 incomplete physical draft |"
+      },
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "note": "Локальных противоречий в формулировке не найдено; это не runtime PASS и не отменяет связанных package/integration gates.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P3-008",
+      "package": "P3",
+      "summary": "Read frozen trace entirely from verified captured evidence",
+      "plannedAcceptanceIds": [
+        "P3-T08"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p3-topology-trace.md",
+        "line": 18,
+        "excerpt": "| ELV4-P3-008 | Read frozen trace entirely from verified captured evidence | P3-T08 R1 trace isolation |"
+      },
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "note": "Локальных противоречий в формулировке не найдено; это не runtime PASS и не отменяет связанных package/integration gates.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P4-001",
+      "package": "P4",
+      "summary": "Resolve leaf state demands into typed contribution records without missing-to-zero coercion",
+      "plannedAcceptanceIds": [
+        "P4-T01"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p4-load-conversion.md",
+        "line": 11,
+        "excerpt": "| ELV4-P4-001 | Resolve leaf state demands into typed contribution records without missing-to-zero coercion | P4-T01 leaf/missing demand |"
+      },
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "note": "Локальных противоречий в формулировке не найдено; это не runtime PASS и не отменяет связанных package/integration gates.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P4-002",
+      "package": "P4",
+      "summary": "Aggregate distinct contributions per output/group/source across all system memberships",
+      "plannedAcceptanceIds": [
+        "P4-T02"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p4-load-conversion.md",
+        "line": 12,
+        "excerpt": "| ELV4-P4-002 | Aggregate distinct contributions per output/group/source across all system memberships | P4-T02 shared/deduplicated accounting |"
+      },
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "note": "Локальных противоречий в формулировке не найдено; это не runtime PASS и не отменяет связанных package/integration gates.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P4-003",
+      "package": "P4",
+      "summary": "Apply transfer efficiency and own loss at one declared boundary",
+      "plannedAcceptanceIds": [
+        "P4-T03"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p4-load-conversion.md",
+        "line": 13,
+        "excerpt": "| ELV4-P4-003 | Apply transfer efficiency and own loss at one declared boundary | P4-T03 conversion/idle golden |"
+      },
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "note": "Локальных противоречий в формулировке не найдено; это не runtime PASS и не отменяет связанных package/integration gates.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P4-004",
+      "package": "P4",
+      "summary": "Compute PSU required/available margins with independent reserve and derating policy",
+      "plannedAcceptanceIds": [
+        "P4-T04"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p4-load-conversion.md",
+        "line": 14,
+        "excerpt": "| ELV4-P4-004 | Compute PSU required/available margins with independent reserve and derating policy | P4-T04 reserve/derating |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-09"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P4-005",
+      "package": "P4",
+      "summary": "Assess UPS W and VA independently using explicit input PF/VA basis",
+      "plannedAcceptanceIds": [
+        "P4-T05"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p4-load-conversion.md",
+        "line": 15,
+        "excerpt": "| ELV4-P4-005 | Assess UPS W and VA independently using explicit input PF/VA basis | P4-T05 W-pass/VA-fail |"
+      },
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "note": "Локальных противоречий в формулировке не найдено; это не runtime PASS и не отменяет связанных package/integration gates.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P4-006",
+      "package": "P4",
+      "summary": "Assess peak duration/simultaneity separately from continuous demand",
+      "plannedAcceptanceIds": [
+        "P4-T06"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p4-load-conversion.md",
+        "line": 16,
+        "excerpt": "| ELV4-P4-006 | Assess peak duration/simultaneity separately from continuous demand | P4-T06 peak envelope |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-12"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P4-007",
+      "package": "P4",
+      "summary": "Emit deterministic arithmetic trace, applicability and per-dimension result",
+      "plannedAcceptanceIds": [
+        "P4-T07"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p4-load-conversion.md",
+        "line": 17,
+        "excerpt": "| ELV4-P4-007 | Emit deterministic arithmetic trace, applicability and per-dimension result | P4-T07 reproducible evaluation |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-04",
+        "ELV4-AUD-13"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P4-008",
+      "package": "P4",
+      "summary": "Integrate P5/P6 through one bottom-up evaluator, with no process dependency cycle",
+      "plannedAcceptanceIds": [
+        "P4-T08"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p4-load-conversion.md",
+        "line": 18,
+        "excerpt": "| ELV4-P4-008 | Integrate P5/P6 through one bottom-up evaluator, with no process dependency cycle | P4-T08 mixed-domain pipeline |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-06"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P5-001",
+      "package": "P5",
+      "summary": "Resolve exact PSE/PD roles and supported declared delivery, never RJ45/Ethernet inference",
+      "plannedAcceptanceIds": [
+        "P5-T01"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p5-poe.md",
+        "line": 11,
+        "excerpt": "| ELV4-P5-001 | Resolve exact PSE/PD roles and supported declared delivery, never RJ45/Ethernet inference | P5-T01 profile resolution |"
+      },
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "note": "Локальных противоречий в формулировке не найдено; это не runtime PASS и не отменяет связанных package/integration gates.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P5-002",
+      "package": "P5",
+      "summary": "Validate full combined path, power-pass mappings and conducting resource evidence without new cable claims",
+      "plannedAcceptanceIds": [
+        "P5-T02"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p5-poe.md",
+        "line": 12,
+        "excerpt": "| ELV4-P5-002 | Validate full combined path, power-pass mappings and conducting resource evidence without new cable claims | P5-T02 patch/fiber/resource |"
+      },
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "note": "Локальных противоречий в формулировке не найдено; это не runtime PASS и не отменяет связанных package/integration gates.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P5-003",
+      "package": "P5",
+      "summary": "Implement GUARANTEED_PD allocation/guarantee accounting with loss allowance applied once",
+      "plannedAcceptanceIds": [
+        "P5-T03"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p5-poe.md",
+        "line": 13,
+        "excerpt": "| ELV4-P5-003 | Implement GUARANTEED_PD allocation/guarantee accounting with loss allowance applied once | P5-T03 reserved budget golden |"
+      },
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "note": "Локальных противоречий в формулировке не найдено; это не runtime PASS и не отменяет связанных package/integration gates.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P5-004",
+      "package": "P5",
+      "summary": "Return BLOCKED for EXPLICIT_PATH_LOSS unless its exact pair/electrical model is implemented and verified",
+      "plannedAcceptanceIds": [
+        "P5-T04"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p5-poe.md",
+        "line": 14,
+        "excerpt": "| ELV4-P5-004 | Return BLOCKED for EXPLICIT_PATH_LOSS unless its exact pair/electrical model is implemented and verified | P5-T04 model boundary |"
+      },
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "note": "Локальных противоречий в формулировке не найдено; это не runtime PASS и не отменяет связанных package/integration gates.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P5-005",
+      "package": "P5",
+      "summary": "Check PD guarantee, per-port allocation and shared group budget independently",
+      "plannedAcceptanceIds": [
+        "P5-T05"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p5-poe.md",
+        "line": 15,
+        "excerpt": "| ELV4-P5-005 | Check PD guarantee, per-port allocation and shared group budget independently | P5-T05 port/group overload |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-09"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P5-006",
+      "package": "P5",
+      "summary": "Map PSE output demand to upstream input with own consumption/conversion exactly once",
+      "plannedAcceptanceIds": [
+        "P5-T06"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p5-poe.md",
+        "line": 16,
+        "excerpt": "| ELV4-P5-006 | Map PSE output demand to upstream input with own consumption/conversion exactly once | P5-T06 upstream accounting |"
+      },
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "note": "Локальных противоречий в формулировке не найдено; это не runtime PASS и не отменяет связанных package/integration gates.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P5-007",
+      "package": "P5",
+      "summary": "Model midspan/injector supply and data/power boundaries explicitly",
+      "plannedAcceptanceIds": [
+        "P5-T07"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p5-poe.md",
+        "line": 17,
+        "excerpt": "| ELV4-P5-007 | Model midspan/injector supply and data/power boundaries explicitly | P5-T07 injector path |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-05"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P5-008",
+      "package": "P5",
+      "summary": "Include complete/missing path/group/scenario dependencies and restart-stable result evidence",
+      "plannedAcceptanceIds": [
+        "P5-T08"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p5-poe.md",
+        "line": 18,
+        "excerpt": "| ELV4-P5-008 | Include complete/missing path/group/scenario dependencies and restart-stable result evidence | P5-T08 invalidation/reopen |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-07"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P6-001",
+      "package": "P6",
+      "summary": "Build typed radial section resistance/current model from exact installed resources and terminations",
+      "plannedAcceptanceIds": [
+        "P6-T01"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p6-dc-backup.md",
+        "line": 11,
+        "excerpt": "| ELV4-P6-001 | Build typed radial section resistance/current model from exact installed resources and terminations | P6-T01 resistance convention |"
+      },
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "note": "Локальных противоречий в формулировке не найдено; это не runtime PASS и не отменяет связанных package/integration gates.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P6-002",
+      "package": "P6",
+      "summary": "Solve constant-current trunks/branches and report every terminal/current limit at source bounds",
+      "plannedAcceptanceIds": [
+        "P6-T02"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p6-dc-backup.md",
+        "line": 12,
+        "excerpt": "| ELV4-P6-002 | Solve constant-current trunks/branches and report every terminal/current limit at source bounds | P6-T02 radial golden |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-09"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P6-003",
+      "package": "P6",
+      "summary": "Block nonlinear/mesh/shared-return models outside the supported first slice",
+      "plannedAcceptanceIds": [
+        "P6-T03"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p6-dc-backup.md",
+        "line": 13,
+        "excerpt": "| ELV4-P6-003 | Block nonlinear/mesh/shared-return models outside the supported first slice | P6-T03 unsupported model |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-06"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P6-004",
+      "package": "P6",
+      "summary": "Validate bank series/parallel compatibility, voltage, rating conditions and usable-capacity model",
+      "plannedAcceptanceIds": [
+        "P6-T04"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p6-dc-backup.md",
+        "line": 14,
+        "excerpt": "| ELV4-P6-004 | Validate bank series/parallel compatibility, voltage, rating conditions and usable-capacity model | P6-T04 bank arrangement |"
+      },
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "note": "Локальных противоречий в формулировке не найдено; это не runtime PASS и не отменяет связанных package/integration gates.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P6-005",
+      "package": "P6",
+      "summary": "Compute piecewise protected energy and sequence margin with explicit duration/model/loss boundaries",
+      "plannedAcceptanceIds": [
+        "P6-T05"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p6-dc-backup.md",
+        "line": 15,
+        "excerpt": "| ELV4-P6-005 | Compute piecewise protected energy and sequence margin with explicit duration/model/loss boundaries | P6-T05 standby/alarm energy |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-04",
+        "ELV4-AUD-06"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P6-006",
+      "package": "P6",
+      "summary": "Validate charge/discharge selection and charger operating plus recharge load",
+      "plannedAcceptanceIds": [
+        "P6-T06"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p6-dc-backup.md",
+        "line": 16,
+        "excerpt": "| ELV4-P6-006 | Validate charge/discharge selection and charger operating plus recharge load | P6-T06 charger/interlock |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-06",
+        "ELV4-AUD-12"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P6-007",
+      "package": "P6",
+      "summary": "Distinguish required capacity, available capacity and supported autonomy estimate",
+      "plannedAcceptanceIds": [
+        "P6-T07"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p6-dc-backup.md",
+        "line": 17,
+        "excerpt": "| ELV4-P6-007 | Distinguish required capacity, available capacity and supported autonomy estimate | P6-T07 autonomy applicability |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-06"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P6-008",
+      "package": "P6",
+      "summary": "Persist complete arithmetic/model assumptions and target only affected dependencies",
+      "plannedAcceptanceIds": [
+        "P6-T08"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p6-dc-backup.md",
+        "line": 18,
+        "excerpt": "| ELV4-P6-008 | Persist complete arithmetic/model assumptions and target only affected dependencies | P6-T08 dependency/history |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-07"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P7-001",
+      "package": "P7",
+      "summary": "Encode typed dependency keys and persist present/missing exact inputs for every process",
+      "plannedAcceptanceIds": [
+        "P7-T01"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p7-dependencies-workspace.md",
+        "line": 11,
+        "excerpt": "| ELV4-P7-001 | Encode typed dependency keys and persist present/missing exact inputs for every process | P7-T01 key/absent dependency |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-01",
+        "ELV4-AUD-04",
+        "ELV4-AUD-13"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P7-002",
+      "package": "P7",
+      "summary": "Invalidate old/new graph closure across shared systems and disconnected paths atomically",
+      "plannedAcceptanceIds": [
+        "P7-T02"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p7-dependencies-workspace.md",
+        "line": 12,
+        "excerpt": "| ELV4-P7-002 | Invalidate old/new graph closure across shared systems and disconnected paths atomically | P7-T02 affected/unaffected matrix |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-01",
+        "ELV4-AUD-13"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P7-003",
+      "package": "P7",
+      "summary": "Capture/calculate/publish with token/fingerprint/pointer CAS and stale-race rejection",
+      "plannedAcceptanceIds": [
+        "P7-T03"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p7-dependencies-workspace.md",
+        "line": 13,
+        "excerpt": "| ELV4-P7-003 | Capture/calculate/publish with token/fingerprint/pointer CAS and stale-race rejection | P7-T03 late publish race |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-04",
+        "ELV4-AUD-13",
+        "ELV4-AUD-14"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P7-004",
+      "package": "P7",
+      "summary": "Implement revision/scenario-aware power overlay and shared-source budget view",
+      "plannedAcceptanceIds": [
+        "P7-T04"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p7-dependencies-workspace.md",
+        "line": 14,
+        "excerpt": "| ELV4-P7-004 | Implement revision/scenario-aware power overlay and shared-source budget view | P7-T04 filter/global budget |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-03"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P7-005",
+      "package": "P7",
+      "summary": "Implement one progressive side card with back/forward selection retention and explanation",
+      "plannedAcceptanceIds": [
+        "P7-T05"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p7-dependencies-workspace.md",
+        "line": 15,
+        "excerpt": "| ELV4-P7-005 | Implement one progressive side card with back/forward selection retention and explanation | P7-T05 navigation/density |"
+      },
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "note": "Локальных противоречий в формулировке не найдено; это не runtime PASS и не отменяет связанных package/integration gates.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P7-006",
+      "package": "P7",
+      "summary": "Route preview, commit, failed draft, undo/redo through public application commands",
+      "plannedAcceptanceIds": [
+        "P7-T06"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p7-dependencies-workspace.md",
+        "line": 16,
+        "excerpt": "| ELV4-P7-006 | Route preview, commit, failed draft, undo/redo through public application commands | P7-T06 stale preview/write failure |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-08"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P7-007",
+      "package": "P7",
+      "summary": "Implement frozen read-only, NOT_CAPTURED and captured-empty states distinctly",
+      "plannedAcceptanceIds": [
+        "P7-T07"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p7-dependencies-workspace.md",
+        "line": 17,
+        "excerpt": "| ELV4-P7-007 | Implement frozen read-only, NOT_CAPTURED and captured-empty states distinctly | P7-T07 historical workspace |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-07",
+        "ELV4-AUD-14"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P7-008",
+      "package": "P7",
+      "summary": "Cover compact width, keyboard/focus/back handling and findings remediation navigation",
+      "plannedAcceptanceIds": [
+        "P7-T08"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p7-dependencies-workspace.md",
+        "line": 18,
+        "excerpt": "| ELV4-P7-008 | Cover compact width, keyboard/focus/back handling and findings remediation navigation | P7-T08 compact/accessibility |"
+      },
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "note": "Локальных противоречий в формулировке не найдено; это не runtime PASS и не отменяет связанных package/integration gates.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P8-001",
+      "package": "P8",
+      "summary": "Implement deterministic FK-valid public-command builders and all four discipline verticals",
+      "plannedAcceptanceIds": [
+        "P8-T01"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p8-acceptance.md",
+        "line": 11,
+        "excerpt": "| ELV4-P8-001 | Implement deterministic FK-valid public-command builders and all four discipline verticals | P8-T01 four verticals |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-05",
+        "ELV4-AUD-06",
+        "ELV4-AUD-15"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P8-002",
+      "package": "P8",
+      "summary": "Verify shared sources and exact affected/unaffected dependency sets",
+      "plannedAcceptanceIds": [
+        "P8-T02"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p8-acceptance.md",
+        "line": 12,
+        "excerpt": "| ELV4-P8-002 | Verify shared sources and exact affected/unaffected dependency sets | P8-T02 shared-source graph |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-13"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P8-003",
+      "package": "P8",
+      "summary": "Verify fresh and every supported historical migration origin without synthetic power backfill",
+      "plannedAcceptanceIds": [
+        "P8-T03"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p8-acceptance.md",
+        "line": 13,
+        "excerpt": "| ELV4-P8-003 | Verify fresh and every supported historical migration origin without synthetic power backfill | P8-T03 migration matrix |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-11"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P8-004",
+      "package": "P8",
+      "summary": "Close/reopen file SQLite and prove exact revision/profile/resource/result identity",
+      "plannedAcceptanceIds": [
+        "P8-T04"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p8-acceptance.md",
+        "line": 14,
+        "excerpt": "| ELV4-P8-004 | Close/reopen file SQLite and prove exact revision/profile/resource/result identity | P8-T04 restart identity |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-04",
+        "ELV4-AUD-07",
+        "ELV4-AUD-08"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P8-005",
+      "package": "P8",
+      "summary": "Inject every owned durable failure checkpoint and inspect atomic rollback",
+      "plannedAcceptanceIds": [
+        "P8-T05"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p8-acceptance.md",
+        "line": 15,
+        "excerpt": "| ELV4-P8-005 | Inject every owned durable failure checkpoint and inspect atomic rollback | P8-T05 failure matrix |"
+      },
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "note": "Локальных противоречий в формулировке не найдено; это не runtime PASS и не отменяет связанных package/integration gates.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P8-006",
+      "package": "P8",
+      "summary": "Verify lost-response replay, payload conflict and concurrent mutation/publication boundaries",
+      "plannedAcceptanceIds": [
+        "P8-T06"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p8-acceptance.md",
+        "line": 16,
+        "excerpt": "| ELV4-P8-006 | Verify lost-response replay, payload conflict and concurrent mutation/publication boundaries | P8-T06 replay/races |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-08",
+        "ELV4-AUD-10",
+        "ELV4-AUD-14"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P8-007",
+      "package": "P8",
+      "summary": "Prove frozen R1 independence from R2/current catalog/archive changes",
+      "plannedAcceptanceIds": [
+        "P8-T07"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p8-acceptance.md",
+        "line": 17,
+        "excerpt": "| ELV4-P8-007 | Prove frozen R1 independence from R2/current catalog/archive changes | P8-T07 historical invariance |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-04",
+        "ELV4-AUD-07"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P8-008",
+      "package": "P8",
+      "summary": "Exercise malformed, missing, unsupported, overload and numerical/property cases with explicit negative controls",
+      "plannedAcceptanceIds": [
+        "P8-T08"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p8-acceptance.md",
+        "line": 18,
+        "excerpt": "| ELV4-P8-008 | Exercise malformed, missing, unsupported, overload and numerical/property cases with explicit negative controls | P8-T08 adversarial matrix |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-01",
+        "ELV4-AUD-02",
+        "ELV4-AUD-09",
+        "ELV4-AUD-12",
+        "ELV4-AUD-13",
+        "ELV4-AUD-15"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P9-001",
+      "package": "P9",
+      "summary": "Resolve every requirement to actual source/test/evidence and review design deviations explicitly",
+      "plannedAcceptanceIds": [
+        "P9-T01"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p9-closure.md",
+        "line": 11,
+        "excerpt": "| ELV4-P9-001 | Resolve every requirement to actual source/test/evidence and review design deviations explicitly | P9-T01 requirement coverage |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-15"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P9-002",
+      "package": "P9",
+      "summary": "Audit every public command for scope, CAS, replay, rollback, invalidation and lifecycle",
+      "plannedAcceptanceIds": [
+        "P9-T02"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p9-closure.md",
+        "line": 12,
+        "excerpt": "| ELV4-P9-002 | Audit every public command for scope, CAS, replay, rollback, invalidation and lifecycle | P9-T02 command coverage |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-01",
+        "ELV4-AUD-08"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P9-003",
+      "package": "P9",
+      "summary": "Reconcile all six process boundaries, typed results and no-double-count invariants",
+      "plannedAcceptanceIds": [
+        "P9-T03"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p9-closure.md",
+        "line": 13,
+        "excerpt": "| ELV4-P9-003 | Reconcile all six process boundaries, typed results and no-double-count invariants | P9-T03 process accounting audit |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-15"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P9-004",
+      "package": "P9",
+      "summary": "Reconcile baseline closure, migration, history and frozen hash guarantees",
+      "plannedAcceptanceIds": [
+        "P9-T04"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p9-closure.md",
+        "line": 14,
+        "excerpt": "| ELV4-P9-004 | Reconcile baseline closure, migration, history and frozen hash guarantees | P9-T04 baseline/history audit |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-01",
+        "ELV4-AUD-10"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P9-005",
+      "package": "P9",
+      "summary": "Run required generation/format/analyze/core/mobile/P8 checks at one exact source SHA",
+      "plannedAcceptanceIds": [
+        "P9-T05"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p9-closure.md",
+        "line": 15,
+        "excerpt": "| ELV4-P9-005 | Run required generation/format/analyze/core/mobile/P8 checks at one exact source SHA | P9-T05 exact-head gate |"
+      },
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "note": "Локальных противоречий в формулировке не найдено; это не runtime PASS и не отменяет связанных package/integration gates.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P9-006",
+      "package": "P9",
+      "summary": "Disposition defects and unsupported models without hiding blocked engineering",
+      "plannedAcceptanceIds": [
+        "P9-T06"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p9-closure.md",
+        "line": 16,
+        "excerpt": "| ELV4-P9-006 | Disposition defects and unsupported models without hiding blocked engineering | P9-T06 issue/limitation audit |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-06",
+        "ELV4-AUD-15"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P9-007",
+      "package": "P9",
+      "summary": "Update authoritative stage status and publish explicit ELV5–ELV8 handoff",
+      "plannedAcceptanceIds": [
+        "P9-T07"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p9-closure.md",
+        "line": 17,
+        "excerpt": "| ELV4-P9-007 | Update authoritative stage status and publish explicit ELV5–ELV8 handoff | P9-T07 stage reconciliation |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-15"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV4-P9-008",
+      "package": "P9",
+      "summary": "Separate design approval, runtime acceptance, merge and CLOSED events with immutable evidence refs",
+      "plannedAcceptanceIds": [
+        "P9-T08"
+      ],
+      "designReference": {
+        "path": "docs/product/elv4-implementation/p9-closure.md",
+        "line": 18,
+        "excerpt": "| ELV4-P9-008 | Separate design approval, runtime acceptance, merge and CLOSED events with immutable evidence refs | P9-T08 closure event audit |"
+      },
+      "assessment": "FINDING",
+      "findings": [
+        "ELV4-AUD-14",
+        "ELV4-AUD-15"
+      ],
+      "note": "Требование просмотрено; конкретные замечания приведены в связанных findings.",
+      "runtimeStatus": "NOT_STARTED"
+    }
+  ]
+}

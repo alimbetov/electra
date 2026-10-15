@@ -1,0 +1,96 @@
+{
+  "schema": "electra.elv4-technical-audit-probes.v1",
+  "auditedHead": "4404c02bba777515f70e58150dd8a25bff0a1573",
+  "method": "Python IEEE-754/Decimal and isolated SQLite contract probes plus source-predicate modelling; not Flutter/Dart app execution",
+  "checks": {
+    "numericBoundary": {
+      "loadsA": [
+        0.1,
+        0.2
+      ],
+      "computedA": 0.30000000000000004,
+      "loadsB": [
+        0.15,
+        0.15
+      ],
+      "computedB": 0.3,
+      "capacity": 0.3,
+      "assessmentA": "FAIL",
+      "assessmentB": "PASS",
+      "decimalReference": "0.3"
+    },
+    "legacyCacheOwnership": {
+      "proposedElv4State": "CURRENT",
+      "legacyEnumNames": [
+        "current",
+        "error",
+        "recalculating",
+        "reviewRequired",
+        "stale",
+        "validated"
+      ],
+      "wouldDecodeByName": false,
+      "unknownCacheKeysWouldBeRemoved": [
+        "[\"elv4\",\"R1\",\"S1\",\"ELV-PWR-01\",\"source\",\"P1\"]",
+        "[\"elv4-evaluation\",\"logical\",\"eval1\"]"
+      ]
+    },
+    "segmentLogicalKey": {
+      "scenarioId": "backup",
+      "segments": [
+        "standby",
+        "alarm"
+      ],
+      "keyForStandby": [
+        "elv4",
+        "R1",
+        "backup",
+        "ELV-PWR-01",
+        "source",
+        "P1"
+      ],
+      "keyForAlarm": [
+        "elv4",
+        "R1",
+        "backup",
+        "ELV-PWR-01",
+        "source",
+        "P1"
+      ],
+      "collision": true
+    },
+    "olderBaseSequence": {
+      "existingSequences": [
+        1,
+        2
+      ],
+      "selectedBaseSequence": 1,
+      "baselineNextFormula": "base.sequence + 1",
+      "attemptedSequence": 2,
+      "sqliteUniqueConstraintResult": "UNIQUE constraint failed: revisions.project_id, revisions.sequence"
+    },
+    "canonicalZeroDemand": {
+      "elv4DeclaredZeroAllowed": true,
+      "baselineRejectCondition": "v != null && (!v.isFinite || v <= 0)",
+      "zeroRejectedByPredicate": true
+    },
+    "fixtureArithmetic": {
+      "poeUpstreamW": 38.333333333333336,
+      "dcTerminalV": [
+        "23.54",
+        "23.45"
+      ],
+      "dcSourceW": "19.200",
+      "dcLoadW": "18.787",
+      "dcLossW": "0.413",
+      "fireBankRequiredWh": "75",
+      "bankAvailableWh": "134.4",
+      "upsVa": 47.916666666666664
+    },
+    "coverageStructure": {
+      "requirementCount": 80,
+      "uniqueRequirementCount": 80,
+      "allRuntimeNotStarted": true
+    }
+  }
+}
