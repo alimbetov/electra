@@ -2,7 +2,7 @@ import 'package:engineering_core/engineering_core.dart';
 
 import '../../application/geometry_repository.dart';
 
-enum EditorSelectionKind { surfacePatch, opening, spatialFeature }
+enum EditorSelectionKind { surfacePatch, opening, spatialFeature, component }
 
 final class EditorSelection {
   const EditorSelection({
@@ -30,7 +30,38 @@ EditorSelection? hitTestSurface({
   required RoomGeometrySnapshot geometry,
   required SurfacePatch patch,
   required Point2Mm localPoint,
+  Iterable<ComponentInstance> components = const [],
+  int componentHitToleranceMm = 125,
 }) {
+  if (componentHitToleranceMm <= 0) {
+    throw ArgumentError.value(
+      componentHitToleranceMm,
+      'componentHitToleranceMm',
+      'Must be positive.',
+    );
+  }
+
+  ComponentInstance? nearestComponent;
+  var nearestDistanceSquared = componentHitToleranceMm * componentHitToleranceMm + 1;
+  for (final component in components) {
+    if (component.hostSurfacePatchId != patch.id) continue;
+    final dx = component.localPosition.xMm - localPoint.xMm;
+    final dy = component.localPosition.yMm - localPoint.yMm;
+    final distanceSquared = dx * dx + dy * dy;
+    if (distanceSquared < nearestDistanceSquared) {
+      nearestComponent = component;
+      nearestDistanceSquared = distanceSquared;
+    }
+  }
+  if (nearestComponent != null &&
+      nearestDistanceSquared <= componentHitToleranceMm * componentHitToleranceMm) {
+    return EditorSelection(
+      kind: EditorSelectionKind.component,
+      id: nearestComponent.id,
+      hostPatchId: patch.id,
+    );
+  }
+
   for (final opening in geometry.openings.reversed) {
     if (opening.hostSurfacePatchId == patch.id &&
         opening.boundary.containsPointInclusive(localPoint)) {
