@@ -63,3 +63,8 @@ export 'src/elv_physical_evidence.dart';
 export 'src/power_numeric.dart';
 export 'src/power_profiles.dart';
 export 'src/power_definition_ref.dart';
+export 'src/power_bindings.dart';
+export 'src/power_scenarios.dart';
+export 'src/power_assets.dart';
+export 'src/power_legacy_adoption.dart';
+export 'src/power_catalog.dart';
