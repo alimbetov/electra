@@ -19,6 +19,8 @@ on:
       - apps/mobile/lib/features/editor/power_workspace_editor_binding.dart
       - apps/mobile/lib/features/editor/power_workspace_panel_host.dart
       - apps/mobile/test/application/power_workspace_controller_test.dart
+      - apps/mobile/test/application/elv_reviewed_reroute_command_test.dart
+      - apps/mobile/test/data/elv4_p7_t06_history_test.dart
 
 permissions:
   contents: write
@@ -62,17 +64,21 @@ jobs:
             apps/mobile/lib/features/editor/power_workspace_panel_host.dart \
             apps/mobile/lib/features/editor/persisted_room_editor_screen.dart \
             apps/mobile/lib/app/providers.dart \
-            apps/mobile/test/application/power_workspace_controller_test.dart
+            apps/mobile/test/application/power_workspace_controller_test.dart \
+            apps/mobile/test/application/elv_reviewed_reroute_command_test.dart \
+            apps/mobile/test/data/elv4_p7_t06_history_test.dart
       - name: Analyze mobile app
         run: flutter analyze
       - name: Test P7 T06 application and UI regressions
         run: |
           flutter test \
             test/application/power_workspace_controller_test.dart \
+            test/application/elv_reviewed_reroute_command_test.dart \
             test/features/editor/power_workspace_panel_test.dart \
             test/features/editor/room_editor_screen_test.dart \
             test/features/editor/editor_interaction_test.dart \
-            test/data/elv4_p7_runtime_test.dart
+            test/data/elv4_p7_runtime_test.dart \
+            test/data/elv4_p7_t06_history_test.dart
       - name: Commit P7 T06 schema and wiring
         working-directory: .
         run: |
@@ -88,7 +94,9 @@ jobs:
             apps/mobile/lib/features/editor/power_workspace_panel_host.dart \
             apps/mobile/lib/features/editor/persisted_room_editor_screen.dart \
             apps/mobile/lib/app/providers.dart \
-            apps/mobile/test/application/power_workspace_controller_test.dart; then
+            apps/mobile/test/application/power_workspace_controller_test.dart \
+            apps/mobile/test/application/elv_reviewed_reroute_command_test.dart \
+            apps/mobile/test/data/elv4_p7_t06_history_test.dart; then
             exit 0
           fi
           git config user.name github-actions[bot]
@@ -105,7 +113,9 @@ jobs:
             apps/mobile/lib/features/editor/power_workspace_panel_host.dart \
             apps/mobile/lib/features/editor/persisted_room_editor_screen.dart \
             apps/mobile/lib/app/providers.dart \
-            apps/mobile/test/application/power_workspace_controller_test.dart
+            apps/mobile/test/application/power_workspace_controller_test.dart \
+            apps/mobile/test/application/elv_reviewed_reroute_command_test.dart \
+            apps/mobile/test/data/elv4_p7_t06_history_test.dart
           git commit -m "feat(elv4): persist P7 revision-scoped route history"
           git fetch origin "${GITHUB_REF_NAME}"
           git rebase "origin/${GITHUB_REF_NAME}"
