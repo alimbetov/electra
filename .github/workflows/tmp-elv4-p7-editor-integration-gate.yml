@@ -8,6 +8,7 @@ on:
       - .github/workflows/tmp-elv4-p7-editor-integration-gate.yml
       - scripts/ci/apply-elv4-p7-editor-integration.py
       - scripts/ci/apply-elv4-p7-ui-contract-normalization.py
+      - scripts/ci/apply-elv4-p7-t08-hardening.py
       - apps/mobile/lib/features/editor/room_editor_screen.dart
       - apps/mobile/lib/features/editor/persisted_room_editor_screen.dart
       - apps/mobile/lib/features/editor/power_workspace_panel.dart
@@ -16,6 +17,7 @@ on:
       - apps/mobile/lib/features/editor/power_workspace_editor_binding.dart
       - apps/mobile/lib/application/power_workspace_overlay_geometry.dart
       - apps/mobile/test/features/editor/room_editor_screen_test.dart
+      - apps/mobile/test/features/editor/power_workspace_panel_test.dart
 
 permissions:
   contents: write
@@ -42,6 +44,9 @@ jobs:
       - name: Normalize compact P7 controls
         working-directory: .
         run: python scripts/ci/apply-elv4-p7-ui-contract-normalization.py
+      - name: Apply P7 T08 back and focus hardening
+        working-directory: .
+        run: python scripts/ci/apply-elv4-p7-t08-hardening.py
       - name: Format P7 editor integration
         working-directory: .
         run: |
@@ -52,7 +57,9 @@ jobs:
             apps/mobile/lib/features/editor/power_workspace_panel_host.dart \
             apps/mobile/lib/features/editor/power_workspace_overlay_painter.dart \
             apps/mobile/lib/features/editor/power_workspace_editor_binding.dart \
-            apps/mobile/lib/application/power_workspace_overlay_geometry.dart
+            apps/mobile/lib/application/power_workspace_overlay_geometry.dart \
+            apps/mobile/test/features/editor/room_editor_screen_test.dart \
+            apps/mobile/test/features/editor/power_workspace_panel_test.dart
       - name: Analyze mobile app
         run: flutter analyze
       - name: Test P7 editor integration regressions
@@ -72,7 +79,9 @@ jobs:
             apps/mobile/lib/features/editor/power_workspace_panel_host.dart \
             apps/mobile/lib/features/editor/power_workspace_overlay_painter.dart \
             apps/mobile/lib/features/editor/power_workspace_editor_binding.dart \
-            apps/mobile/lib/application/power_workspace_overlay_geometry.dart; then
+            apps/mobile/lib/application/power_workspace_overlay_geometry.dart \
+            apps/mobile/test/features/editor/room_editor_screen_test.dart \
+            apps/mobile/test/features/editor/power_workspace_panel_test.dart; then
             exit 0
           fi
           git config user.name github-actions[bot]
@@ -84,8 +93,11 @@ jobs:
             apps/mobile/lib/features/editor/power_workspace_panel_host.dart \
             apps/mobile/lib/features/editor/power_workspace_overlay_painter.dart \
             apps/mobile/lib/features/editor/power_workspace_editor_binding.dart \
-            apps/mobile/lib/application/power_workspace_overlay_geometry.dart
-          git commit -m "feat(elv4): integrate P7 power workspace with room editor"
+            apps/mobile/lib/application/power_workspace_overlay_geometry.dart \
+            apps/mobile/test/features/editor/room_editor_screen_test.dart \
+            apps/mobile/test/features/editor/power_workspace_panel_test.dart
+          git commit -m "test(elv4): close P7 T08 editor interaction gaps"
+          git reset --hard HEAD
           git fetch origin "${GITHUB_REF_NAME}"
           git rebase "origin/${GITHUB_REF_NAME}"
           git push origin "HEAD:${GITHUB_REF_NAME}"
