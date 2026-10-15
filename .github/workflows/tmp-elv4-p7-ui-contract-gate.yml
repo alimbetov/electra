@@ -6,11 +6,16 @@ on:
       - feat/flutter-elv4-power-topology-design
     paths:
       - .github/workflows/tmp-elv4-p7-ui-contract-gate.yml
+      - apps/mobile/lib/app/providers.dart
       - apps/mobile/lib/application/power_workspace_projection.dart
       - apps/mobile/lib/application/power_workspace_controller.dart
+      - apps/mobile/lib/application/power_workspace_overlay_geometry.dart
       - apps/mobile/lib/data/repositories/drift_power_workspace_repository.dart
+      - apps/mobile/lib/data/repositories/drift_power_workspace_overlay_geometry_repository.dart
       - apps/mobile/lib/features/editor/power_workspace_panel.dart
+      - apps/mobile/lib/features/editor/power_workspace_panel_host.dart
       - apps/mobile/lib/features/editor/power_workspace_editor_binding.dart
+      - apps/mobile/lib/features/editor/power_workspace_overlay_painter.dart
       - apps/mobile/lib/features/editor/editor_interaction.dart
       - apps/mobile/test/application/power_workspace_controller_test.dart
       - apps/mobile/test/features/editor/power_workspace_panel_test.dart
@@ -35,15 +40,127 @@ jobs:
         run: flutter pub get --enforce-lockfile
       - name: Generate Drift code
         run: dart run build_runner build
+      - name: Normalize compact P7 header controls
+        working-directory: .
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('apps/mobile/lib/features/editor/power_workspace_panel.dart')
+          text = path.read_text()
+          old_scenario = """              FocusTraversalOrder(
+                order: const NumericFocusOrder(1),
+                child: DropdownButton<PowerWorkspaceScenarioOption>(
+                  key: const ValueKey('power-scenario-selector'),
+                  value: scenario,
+                  hint: const Text('Scenario'),
+                  items: [
+                    for (final option in projection.scenarios)
+                      DropdownMenuItem(
+                        value: option,
+                        child: Text(option.label),
+                      ),
+                  ],
+                  onChanged: (value) {
+                    if (value != null) onScenarioChanged(value);
+                  },
+                ),
+              ),
+"""
+          new_scenario = """              SizedBox(
+                width: 280,
+                child: FocusTraversalOrder(
+                  order: const NumericFocusOrder(1),
+                  child: DropdownButton<PowerWorkspaceScenarioOption>(
+                    key: const ValueKey('power-scenario-selector'),
+                    value: scenario,
+                    isExpanded: true,
+                    hint: const Text('Scenario'),
+                    items: [
+                      for (final option in projection.scenarios)
+                        DropdownMenuItem(
+                          value: option,
+                          child: Text(
+                            option.label,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                    ],
+                    onChanged: (value) {
+                      if (value != null) onScenarioChanged(value);
+                    },
+                  ),
+                ),
+              ),
+"""
+          old_overlay = """              FocusTraversalOrder(
+                order: const NumericFocusOrder(2),
+                child: DropdownButton<PowerWorkspaceOverlayMode>(
+                  key: const ValueKey('power-overlay-selector'),
+                  value: state.overlayMode,
+                  items: [
+                    for (final mode in PowerWorkspaceOverlayMode.values)
+                      DropdownMenuItem(
+                        value: mode,
+                        child: Text(_overlayLabel(mode)),
+                      ),
+                  ],
+                  onChanged: (value) {
+                    if (value != null) onOverlayChanged(value);
+                  },
+                ),
+              ),
+"""
+          new_overlay = """              SizedBox(
+                width: 280,
+                child: FocusTraversalOrder(
+                  order: const NumericFocusOrder(2),
+                  child: DropdownButton<PowerWorkspaceOverlayMode>(
+                    key: const ValueKey('power-overlay-selector'),
+                    value: state.overlayMode,
+                    isExpanded: true,
+                    items: [
+                      for (final mode in PowerWorkspaceOverlayMode.values)
+                        DropdownMenuItem(
+                          value: mode,
+                          child: Text(
+                            _overlayLabel(mode),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                    ],
+                    onChanged: (value) {
+                      if (value != null) onOverlayChanged(value);
+                    },
+                  ),
+                ),
+              ),
+"""
+          if old_scenario in text:
+              text = text.replace(old_scenario, new_scenario, 1)
+          elif 'width: 280' not in text:
+              raise SystemExit('scenario header normalization anchor missing')
+          if old_overlay in text:
+              text = text.replace(old_overlay, new_overlay, 1)
+          elif text.count('width: 280') < 2:
+              raise SystemExit('overlay header normalization anchor missing')
+          path.write_text(text)
+          PY
       - name: Format P7 UI contract slice
         working-directory: .
         run: |
           dart format \
+            apps/mobile/lib/app/providers.dart \
             apps/mobile/lib/application/power_workspace_projection.dart \
             apps/mobile/lib/application/power_workspace_controller.dart \
+            apps/mobile/lib/application/power_workspace_overlay_geometry.dart \
             apps/mobile/lib/data/repositories/drift_power_workspace_repository.dart \
+            apps/mobile/lib/data/repositories/drift_power_workspace_overlay_geometry_repository.dart \
             apps/mobile/lib/features/editor/power_workspace_panel.dart \
+            apps/mobile/lib/features/editor/power_workspace_panel_host.dart \
             apps/mobile/lib/features/editor/power_workspace_editor_binding.dart \
+            apps/mobile/lib/features/editor/power_workspace_overlay_painter.dart \
             apps/mobile/lib/features/editor/editor_interaction.dart \
             apps/mobile/test/application/power_workspace_controller_test.dart \
             apps/mobile/test/features/editor/power_workspace_panel_test.dart \
@@ -62,11 +179,16 @@ jobs:
         working-directory: .
         run: |
           if git diff --quiet -- \
+            apps/mobile/lib/app/providers.dart \
             apps/mobile/lib/application/power_workspace_projection.dart \
             apps/mobile/lib/application/power_workspace_controller.dart \
+            apps/mobile/lib/application/power_workspace_overlay_geometry.dart \
             apps/mobile/lib/data/repositories/drift_power_workspace_repository.dart \
+            apps/mobile/lib/data/repositories/drift_power_workspace_overlay_geometry_repository.dart \
             apps/mobile/lib/features/editor/power_workspace_panel.dart \
+            apps/mobile/lib/features/editor/power_workspace_panel_host.dart \
             apps/mobile/lib/features/editor/power_workspace_editor_binding.dart \
+            apps/mobile/lib/features/editor/power_workspace_overlay_painter.dart \
             apps/mobile/lib/features/editor/editor_interaction.dart \
             apps/mobile/test/application/power_workspace_controller_test.dart \
             apps/mobile/test/features/editor/power_workspace_panel_test.dart \
@@ -76,14 +198,19 @@ jobs:
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add \
+            apps/mobile/lib/app/providers.dart \
             apps/mobile/lib/application/power_workspace_projection.dart \
             apps/mobile/lib/application/power_workspace_controller.dart \
+            apps/mobile/lib/application/power_workspace_overlay_geometry.dart \
             apps/mobile/lib/data/repositories/drift_power_workspace_repository.dart \
+            apps/mobile/lib/data/repositories/drift_power_workspace_overlay_geometry_repository.dart \
             apps/mobile/lib/features/editor/power_workspace_panel.dart \
+            apps/mobile/lib/features/editor/power_workspace_panel_host.dart \
             apps/mobile/lib/features/editor/power_workspace_editor_binding.dart \
+            apps/mobile/lib/features/editor/power_workspace_overlay_painter.dart \
             apps/mobile/lib/features/editor/editor_interaction.dart \
             apps/mobile/test/application/power_workspace_controller_test.dart \
             apps/mobile/test/features/editor/power_workspace_panel_test.dart \
             apps/mobile/test/features/editor/editor_interaction_test.dart
-          git commit -m "style(elv4): format P7 UI contract slice"
+          git commit -m "fix(elv4): harden P7 power workspace UI contracts"
           git push origin HEAD:${{ github.ref_name }}
