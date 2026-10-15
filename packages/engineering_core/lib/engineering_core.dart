@@ -71,3 +71,4 @@ export 'src/power_catalog.dart';
 export 'src/power_evaluation.dart';
 export 'src/power_graph.dart';
 export 'src/power_load_evaluation.dart';
+export 'src/poe_evaluation.dart';
