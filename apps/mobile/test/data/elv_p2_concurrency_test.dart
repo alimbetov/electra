@@ -51,13 +51,16 @@ EngineeringReferenceCatalog _catalog() => EngineeringReferenceCatalog(
   cableDefinitions: [_definition()],
 );
 
-QueryExecutor _native(File file) => NativeDatabase.createInBackground(
-  file,
-  setup: (raw) {
-    raw.execute('PRAGMA journal_mode=WAL');
-    raw.execute('PRAGMA busy_timeout=30000');
-  },
-);
+QueryExecutor _native(File file, {bool configureWal = false}) =>
+    NativeDatabase.createInBackground(
+      file,
+      setup: (raw) {
+        if (configureWal) {
+          raw.execute('PRAGMA journal_mode=WAL');
+        }
+        raw.execute('PRAGMA busy_timeout=30000');
+      },
+    );
 
 Future<void> _seed(AppDatabase db) async {
   final now = DateTime.utc(2026, 10, 14, 9);
@@ -275,7 +278,7 @@ DefaultElvCableAllocationService _service(AppDatabase db, String device) =>
     );
 
 Future<void> _prepareDrafts(File file) async {
-  final seedDb = AppDatabase(_native(file));
+  final seedDb = AppDatabase(_native(file, configureWal: true));
   try {
     await _seed(seedDb);
     final seedService = _service(seedDb, 'seed');

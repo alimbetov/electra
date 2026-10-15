@@ -41,7 +41,7 @@ void main() {
   test('schema 21 exposes P4 pathway/carrier persistence roots', () async {
     final db = AppDatabase(NativeDatabase.memory());
     addTearDown(db.close);
-    expect(db.schemaVersion, 21);
+    expect(db.schemaVersion, 23);
     final names =
         (await db
                 .customSelect(

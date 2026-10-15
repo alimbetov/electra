@@ -456,7 +456,7 @@ void main() {
       );
       snapshot = await repository.load(project.id);
       expect(snapshot.session.cache, isEmpty);
-      expect(database.schemaVersion, 21);
+      expect(database.schemaVersion, 23);
       expect(
         (await DriftElectricalCircuitRepository(
           database,

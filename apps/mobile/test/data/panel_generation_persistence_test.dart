@@ -511,7 +511,7 @@ void main() {
         (await database.select(database.electricalCircuits).get()).single.id,
         'circuit-1',
       );
-      expect(database.schemaVersion, 21);
+      expect(database.schemaVersion, 23);
       await panels.save(config());
       await panels.archive(project.id, 'generated-panel');
       data = await panels.load(project.id);

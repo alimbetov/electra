@@ -576,7 +576,7 @@ void main() {
       expect(data.catalogs, isEmpty);
       expect(data.selections, isEmpty);
       expect(data.protection.rulesets.length, 1);
-      expect(database.schemaVersion, 21);
+      expect(database.schemaVersion, 23);
       await database.close();
       await directory.delete(recursive: true);
     },
