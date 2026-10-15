@@ -8,9 +8,11 @@ on:
       - .github/workflows/tmp-elv4-p7-closure-gate.yml
       - apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart
       - apps/mobile/lib/data/repositories/drift_power_batch_publication_runtime.dart
+      - apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart
       - apps/mobile/lib/application/power_workspace_state.dart
       - apps/mobile/test/data/elv4_p7_runtime_test.dart
       - apps/mobile/test/data/elv4_p7_batch_runtime_test.dart
+      - apps/mobile/test/data/elv4_p7_freeze_integration_test.dart
       - apps/mobile/test/application/power_workspace_state_test.dart
       - apps/mobile/test/data/elv4_p2_persistence_test.dart
 
@@ -35,7 +37,7 @@ jobs:
         run: flutter pub get --enforce-lockfile
       - name: Generate Drift code
         run: dart run build_runner build
-      - name: Apply mechanical analyzer corrections
+      - name: Apply P7 source normalizations and freeze hook
         working-directory: .
         run: |
           python - <<'PY'
@@ -50,6 +52,26 @@ jobs:
           text = test.read_text()
           text = text.replace("expect(captured.reasonCode, isNull);", "expect(captured.reasonCode, null);")
           test.write_text(text)
+
+          repo = Path('apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart')
+          text = repo.read_text()
+          import_anchor = "import 'drift_elv_runtime_support.dart';\n"
+          power_import = "import 'drift_power_publication_runtime.dart';\n"
+          if power_import not in text:
+              text = text.replace(import_anchor, import_anchor + power_import)
+
+          old_ctor = """    ElvFailureProbe? failureProbe,\n    DateTime Function()? now,\n  }) : failureProbe = failureProbe ?? const NoopElvFailureProbe(),\n       _now = now ?? (() => DateTime.now().toUtc());\n\n  final AppDatabase database;\n  final String originDeviceId;\n  final ElvFailureProbe failureProbe;\n  final DateTime Function() _now;\n"""
+          new_ctor = """    ElvFailureProbe? failureProbe,\n    DateTime Function()? now,\n    DriftPowerPublicationRuntime? powerRuntime,\n  }) : failureProbe = failureProbe ?? const NoopElvFailureProbe(),\n       _now = now ?? (() => DateTime.now().toUtc()),\n       powerRuntime =\n           powerRuntime ??\n           DriftPowerPublicationRuntime(\n             database,\n             originDeviceId: originDeviceId,\n             now: now,\n           );\n\n  final AppDatabase database;\n  final String originDeviceId;\n  final ElvFailureProbe failureProbe;\n  final DateTime Function() _now;\n  final DriftPowerPublicationRuntime powerRuntime;\n"""
+          if old_ctor in text:
+              text = text.replace(old_ctor, new_ctor)
+
+          freeze_anchor = """        );\n    await failureProbe.hit(ElvFailurePoints.p3FreezeAfterSnapshotInsert);\n"""
+          freeze_replacement = """        );\n    await powerRuntime.captureCommittedPowerSectionForFreeze(\n      projectId: row.projectId,\n      designRevisionId: row.id,\n      expectedRevisionToken: row.revision,\n      physicalSha256: snapshot.contentSha256,\n    );\n    await failureProbe.hit(ElvFailurePoints.p3FreezeAfterSnapshotInsert);\n"""
+          if 'captureCommittedPowerSectionForFreeze(' not in text:
+              if freeze_anchor not in text:
+                  raise SystemExit('freeze insertion anchor not found')
+              text = text.replace(freeze_anchor, freeze_replacement, 1)
+          repo.write_text(text)
           PY
       - name: Format P7 closure slice
         working-directory: .
@@ -57,28 +79,34 @@ jobs:
           dart format \
             apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart \
             apps/mobile/lib/data/repositories/drift_power_batch_publication_runtime.dart \
+            apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart \
             apps/mobile/lib/application/power_workspace_state.dart \
             apps/mobile/test/data/elv4_p7_runtime_test.dart \
             apps/mobile/test/data/elv4_p7_batch_runtime_test.dart \
+            apps/mobile/test/data/elv4_p7_freeze_integration_test.dart \
             apps/mobile/test/application/power_workspace_state_test.dart
       - name: Analyze mobile app
         run: flutter analyze
-      - name: Test P7 closure and P2 persistence regression
+      - name: Test P7 closure and P2/P3 persistence regression
         run: |
           flutter test \
             test/data/elv4_p7_runtime_test.dart \
             test/data/elv4_p7_batch_runtime_test.dart \
+            test/data/elv4_p7_freeze_integration_test.dart \
             test/application/power_workspace_state_test.dart \
-            test/data/elv4_p2_persistence_test.dart
+            test/data/elv4_p2_persistence_test.dart \
+            test/data/elv_p3_runtime_closure_test.dart
       - name: Commit normalized P7 closure slice
         working-directory: .
         run: |
           if git diff --quiet -- \
             apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart \
             apps/mobile/lib/data/repositories/drift_power_batch_publication_runtime.dart \
+            apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart \
             apps/mobile/lib/application/power_workspace_state.dart \
             apps/mobile/test/data/elv4_p7_runtime_test.dart \
             apps/mobile/test/data/elv4_p7_batch_runtime_test.dart \
+            apps/mobile/test/data/elv4_p7_freeze_integration_test.dart \
             apps/mobile/test/application/power_workspace_state_test.dart; then
             exit 0
           fi
@@ -87,9 +115,11 @@ jobs:
           git add \
             apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart \
             apps/mobile/lib/data/repositories/drift_power_batch_publication_runtime.dart \
+            apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart \
             apps/mobile/lib/application/power_workspace_state.dart \
             apps/mobile/test/data/elv4_p7_runtime_test.dart \
             apps/mobile/test/data/elv4_p7_batch_runtime_test.dart \
+            apps/mobile/test/data/elv4_p7_freeze_integration_test.dart \
             apps/mobile/test/application/power_workspace_state_test.dart
-          git commit -m "fix(elv4): normalize P7 closure slice"
+          git commit -m "fix(elv4): close P7 publication lifecycle"
           git push origin HEAD:${{ github.ref_name }}
