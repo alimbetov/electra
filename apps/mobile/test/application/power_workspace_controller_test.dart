@@ -4,6 +4,8 @@ import 'package:electra_mobile/application/elv_command_result.dart';
 import 'package:electra_mobile/application/elv_physical_routing_workspace_service.dart';
 import 'package:electra_mobile/application/elv_physical_routing_workspace_state.dart';
 import 'package:electra_mobile/application/elv_physical_trace_service.dart';
+import 'package:electra_mobile/application/elv_reviewed_workspace_command.dart';
+import 'package:electra_mobile/application/elv_revision_command_history_service.dart';
 import 'package:electra_mobile/application/power_workspace_controller.dart';
 import 'package:electra_mobile/application/power_workspace_projection.dart';
 import 'package:electra_mobile/application/power_workspace_state.dart';
@@ -31,7 +33,12 @@ void main() {
     );
 
     final result = await controller.commitReviewedRoute(
-      const _Command(commandId: 'cmd-1', projectId: 'project'),
+      _Command(
+        commandId: 'cmd-1',
+        projectId: 'project',
+        designRevisionId: 'rev-1',
+        reviewedFingerprint: _hash('a'),
+      ),
     );
 
     expect(result, isA<ElvCommandFailureResult<Object?>>());
@@ -58,7 +65,12 @@ void main() {
     );
 
     final result = await controller.commitReviewedRoute(
-      const _Command(commandId: 'cmd-1', projectId: 'project'),
+      _Command(
+        commandId: 'cmd-1',
+        projectId: 'project',
+        designRevisionId: 'rev-1',
+        reviewedFingerprint: _hash('b'),
+      ),
     );
 
     expect(result, isA<ElvCommandSuccess<Object?>>());
@@ -66,6 +78,64 @@ void main() {
     expect(controller.state.previewFingerprint, isNull);
     expect(controller.state.operationState, PowerWorkspaceOperationState.idle);
     expect(repository.loads, 1);
+  });
+
+  test('P7 controller rejects a reviewed command for another revision', () async {
+    final routing = _RoutingService(
+      result: const ElvCommandSuccess<Object?>('unexpected'),
+    );
+    final controller = PowerWorkspaceController(
+      repository: _Repository(),
+      routingService: routing,
+    );
+    await controller.open('project');
+    controller.stageReviewedDraft(
+      draft: const {'routeId': 'run-1'},
+      previewFingerprint: _hash('c'),
+    );
+
+    final result = await controller.commitReviewedRoute(
+      _Command(
+        commandId: 'cmd-stale-revision',
+        projectId: 'project',
+        designRevisionId: 'rev-stale',
+        reviewedFingerprint: _hash('c'),
+      ),
+    );
+
+    final failure = result as ElvCommandFailureResult<Object?>;
+    expect(failure.failure.code, 'ELV4_ROUTE_REVISION_MISMATCH');
+    expect(routing.calls, 0);
+    expect(controller.state.hasDraft, isTrue);
+  });
+
+  test('P7 controller rejects a command not produced by reviewed preview', () async {
+    final routing = _RoutingService(
+      result: const ElvCommandSuccess<Object?>('unexpected'),
+    );
+    final controller = PowerWorkspaceController(
+      repository: _Repository(),
+      routingService: routing,
+    );
+    await controller.open('project');
+    controller.stageReviewedDraft(
+      draft: const {'routeId': 'run-1'},
+      previewFingerprint: _hash('d'),
+    );
+
+    final result = await controller.commitReviewedRoute(
+      _Command(
+        commandId: 'cmd-stale-review',
+        projectId: 'project',
+        designRevisionId: 'rev-1',
+        reviewedFingerprint: _hash('e'),
+      ),
+    );
+
+    final failure = result as ElvCommandFailureResult<Object?>;
+    expect(failure.failure.code, 'ELV4_ROUTE_REVIEW_MISMATCH');
+    expect(routing.calls, 0);
+    expect(controller.state.hasDraft, isTrue);
   });
 
   test('P7 controller blocks mutation in frozen workspace', () async {
@@ -80,7 +150,12 @@ void main() {
     await controller.open('project');
 
     final result = await controller.commitReviewedRoute(
-      const _Command(commandId: 'cmd-1', projectId: 'project'),
+      _Command(
+        commandId: 'cmd-1',
+        projectId: 'project',
+        designRevisionId: 'rev-1',
+        reviewedFingerprint: _hash('f'),
+      ),
     );
 
     final failure = result as ElvCommandFailureResult<Object?>;
@@ -88,7 +163,7 @@ void main() {
     expect(routing.calls, 0);
   });
 
-  test('P7 controller routes undo and redo through durable history boundary', () async {
+  test('P7 controller routes undo and redo through revision history', () async {
     final history = _HistoryService();
     final controller = PowerWorkspaceController(
       repository: _Repository(),
@@ -102,6 +177,25 @@ void main() {
     expect(await controller.redo(), isA<ElvCommandSuccess<Object?>>());
     expect(history.undoCalls, 1);
     expect(history.redoCalls, 1);
+    expect(history.scopes, everyElement(('project', 'rev-1')));
+  });
+
+  test('P7 frozen workspace does not expose history mutations', () async {
+    final history = _HistoryService();
+    final controller = PowerWorkspaceController(
+      repository: _Repository(lifecycleState: 'FROZEN'),
+      historyService: history,
+    );
+    await controller.open('project');
+
+    expect(await controller.canUndo(), isFalse);
+    expect(await controller.canRedo(), isFalse);
+    final result = await controller.undo();
+    expect(
+      (result as ElvCommandFailureResult<Object?>).failure.code,
+      'ELV4_POWER_WORKSPACE_READ_ONLY',
+    );
+    expect(history.undoCalls, 0);
   });
 
   test('P7 controller discards projection returned for obsolete generation', () async {
@@ -233,36 +327,66 @@ final class _RoutingService implements ElvPhysicalRoutingWorkspaceService {
       const Stream.empty();
 }
 
-final class _HistoryService implements ElvCommandHistoryService {
+final class _HistoryService implements ElvRevisionCommandHistoryService {
   int undoCalls = 0;
   int redoCalls = 0;
+  final scopes = <(String, String)>[];
 
   @override
-  Future<bool> canRedo(String projectId) async => true;
+  Future<bool> canRedo({
+    required String projectId,
+    required String designRevisionId,
+  }) async {
+    scopes.add((projectId, designRevisionId));
+    return true;
+  }
 
   @override
-  Future<bool> canUndo(String projectId) async => true;
+  Future<bool> canUndo({
+    required String projectId,
+    required String designRevisionId,
+  }) async {
+    scopes.add((projectId, designRevisionId));
+    return true;
+  }
 
   @override
-  Future<ElvCommandResult<Object?>> redo(String projectId) async {
+  Future<ElvCommandResult<Object?>> redo({
+    required String projectId,
+    required String designRevisionId,
+  }) async {
+    scopes.add((projectId, designRevisionId));
     redoCalls += 1;
     return const ElvCommandSuccess<Object?>('redo');
   }
 
   @override
-  Future<ElvCommandResult<Object?>> undo(String projectId) async {
+  Future<ElvCommandResult<Object?>> undo({
+    required String projectId,
+    required String designRevisionId,
+  }) async {
+    scopes.add((projectId, designRevisionId));
     undoCalls += 1;
     return const ElvCommandSuccess<Object?>('undo');
   }
 }
 
-final class _Command implements ElvWorkspaceCommand {
-  const _Command({required this.commandId, required this.projectId});
+final class _Command implements ElvReviewedWorkspaceCommand {
+  const _Command({
+    required this.commandId,
+    required this.projectId,
+    required this.designRevisionId,
+    required this.reviewedFingerprint,
+  });
 
   @override
   final String commandId;
   @override
   final String projectId;
+  @override
+  final String designRevisionId;
+  @override
+  final String reviewedFingerprint;
 }
 
 PowerWorkspaceState _state({String lifecycleState = 'WORKING'}) =>
