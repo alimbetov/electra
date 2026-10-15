@@ -29,8 +29,8 @@ void main() {
 
   tearDown(() => database.close());
 
-  test('schema 17 exposes mandatory placement operation ledger', () async {
-    expect(database.schemaVersion, 17);
+  test('current schema exposes mandatory placement operation ledger', () async {
+    expect(database.schemaVersion, 21);
 
     final rows =
         await database

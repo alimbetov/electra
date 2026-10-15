@@ -308,7 +308,7 @@ final class _DriftElvAllocationWriteStore implements ElvAllocationWriteStore {
     final now = DateTime.now().toUtc();
     final inserted = await database
         .into(database.cableAllocations)
-        .insert(
+        .insertReturningOrNull(
           CableAllocationsCompanion.insert(
             id: allocation.id,
             projectId: allocation.projectId,
@@ -323,7 +323,7 @@ final class _DriftElvAllocationWriteStore implements ElvAllocationWriteStore {
           ),
           mode: InsertMode.insertOrIgnore,
         );
-    return inserted > 0;
+    return inserted != null;
   }
 
   @override
@@ -334,7 +334,7 @@ final class _DriftElvAllocationWriteStore implements ElvAllocationWriteStore {
   }) async {
     final evidenceInserted = await database
         .into(database.cableAllocationResourceSelections)
-        .insert(
+        .insertReturningOrNull(
           CableAllocationResourceSelectionsCompanion.insert(
             allocationId: allocation.id,
             cableDefinitionRefJson: jsonEncode(
@@ -348,7 +348,7 @@ final class _DriftElvAllocationWriteStore implements ElvAllocationWriteStore {
           ),
           mode: InsertMode.insertOrIgnore,
         );
-    if (evidenceInserted == 0) {
+    if (evidenceInserted == null) {
       return ElvAllocationMutationOutcome.immutableEvidenceConflict;
     }
 
@@ -356,7 +356,7 @@ final class _DriftElvAllocationWriteStore implements ElvAllocationWriteStore {
     for (final atom in evidence.resolvedAtoms) {
       final inserted = await database
           .into(database.cableResourceClaims)
-          .insert(
+          .insertReturningOrNull(
             CableResourceClaimsCompanion.insert(
               allocationId: allocation.id,
               cableId: allocation.cableId,
@@ -366,7 +366,7 @@ final class _DriftElvAllocationWriteStore implements ElvAllocationWriteStore {
             ),
             mode: InsertMode.insertOrIgnore,
           );
-      if (inserted == 0) {
+      if (inserted == null) {
         await (database.delete(database.cableResourceClaims)
           ..where((row) => row.allocationId.equals(allocation.id))).go();
         await (database.delete(database.cableAllocationResourceSelections)

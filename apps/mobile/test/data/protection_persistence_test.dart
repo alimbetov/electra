@@ -420,7 +420,7 @@ void main() {
       expect(snapshot.documents.length, 3);
       expect(snapshot.rulesets, isEmpty);
       expect(snapshot.circuits.single.settings.rulesetId, isNull);
-      expect(database.schemaVersion, 17);
+      expect(database.schemaVersion, 21);
       await database.close();
       await directory.delete(recursive: true);
     },

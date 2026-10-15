@@ -114,8 +114,9 @@ void main() {
       await _seed(seed);
       await seed.close();
 
-      final a = AppDatabase(NativeDatabase(file));
-      final b = AppDatabase(NativeDatabase(file));
+      // Each SQLite busy wait must leave the other connection free to commit.
+      final a = AppDatabase(NativeDatabase.createInBackground(file));
+      final b = AppDatabase(NativeDatabase.createInBackground(file));
       await a.customStatement('PRAGMA busy_timeout = 5000');
       await b.customStatement('PRAGMA busy_timeout = 5000');
 

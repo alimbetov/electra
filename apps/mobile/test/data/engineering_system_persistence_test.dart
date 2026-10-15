@@ -352,7 +352,7 @@ void main() {
         originDeviceId: 'elv-migration',
       );
       data = await systems.load(project.id);
-      expect(database.schemaVersion, 17);
+      expect(database.schemaVersion, 21);
       expect(data.systems, isEmpty);
       expect(data.components.single.id, instance.id);
       expect(data.families.length, 16);
