@@ -1,0 +1,315 @@
+name: Temporary ELV4 P2 Drift Sync
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/tmp-elv4-p2-drift-sync.yml
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  regenerate:
+    if: github.head_ref == 'feat/flutter-elv4-power-topology-design'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Patch ELV4 P2 schema source
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('apps/mobile/lib/data/database/app_database.dart')
+          text = path.read_text()
+
+          old = "part 'app_database.g.dart';\n"
+          new = "part 'app_database.g.dart';\npart 'power_database_tables.dart';\n"
+          assert old in text and "part 'power_database_tables.dart';" not in text
+          text = text.replace(old, new, 1)
+
+          anchor = "    TraversalCarrierAssignments,\n  ],\n)"
+          tables = """    TraversalCarrierAssignments,
+    PowerPortBindings,
+    PowerComponentBindings,
+    PowerTransferBindings,
+    PowerTransferOutputs,
+    PowerLoadBindings,
+    PowerCapacityGroups,
+    PowerCapacityGroupMembers,
+    PowerSupplyRequirements,
+    PowerSupplyRequirementInputs,
+    PowerOperatingScenarios,
+    PowerScenarioSegments,
+    PowerScenarioStates,
+    PowerScenarioSourceSelections,
+    PowerScenarioUnavailableSources,
+    PoeDeliveryBindings,
+    PoeDeliveryPathMembers,
+    BackupAssemblies,
+    BackupProtectedOutputs,
+    BatteryBankBindings,
+    DesignRevisionPowerSnapshots,
+    DesignRevisionSnapshotManifests,
+    PowerEvaluationRecords,
+    PowerEvaluationPointers,
+    PowerOperationRecords,
+  ],
+)"""
+          assert anchor in text
+          text = text.replace(anchor, tables, 1)
+
+          assert "int get schemaVersion => 21;" in text
+          text = text.replace("int get schemaVersion => 21;", "int get schemaVersion => 22;", 1)
+
+          migration_anchor = """        if (from < 21) {
+          await migrator.createTable(pathwayContexts);
+          await migrator.createTable(physicalCarriers);
+          await migrator.createTable(physicalCarrierCompartments);
+          await migrator.createTable(traversalCarrierAssignments);
+        }
+"""
+          migration = migration_anchor + """        if (from < 22) {
+          await migrator.createTable(powerPortBindings);
+          await migrator.createTable(powerComponentBindings);
+          await migrator.createTable(powerTransferBindings);
+          await migrator.createTable(powerTransferOutputs);
+          await migrator.createTable(powerLoadBindings);
+          await migrator.createTable(powerCapacityGroups);
+          await migrator.createTable(powerCapacityGroupMembers);
+          await migrator.createTable(powerSupplyRequirements);
+          await migrator.createTable(powerSupplyRequirementInputs);
+          await migrator.createTable(powerOperatingScenarios);
+          await migrator.createTable(powerScenarioSegments);
+          await migrator.createTable(powerScenarioStates);
+          await migrator.createTable(powerScenarioSourceSelections);
+          await migrator.createTable(powerScenarioUnavailableSources);
+          await migrator.createTable(poeDeliveryBindings);
+          await migrator.createTable(poeDeliveryPathMembers);
+          await migrator.createTable(backupAssemblies);
+          await migrator.createTable(backupProtectedOutputs);
+          await migrator.createTable(batteryBankBindings);
+          await migrator.createTable(designRevisionPowerSnapshots);
+          await migrator.createTable(designRevisionSnapshotManifests);
+          await migrator.createTable(powerEvaluationRecords);
+          await migrator.createTable(powerEvaluationPointers);
+          await migrator.createTable(powerOperationRecords);
+        }
+"""
+          assert migration_anchor in text
+          text = text.replace(migration_anchor, migration, 1)
+
+          indexes_anchor = "  Future<void> _createIndexes() async {\n"
+          indexes = indexes_anchor + """    await customStatement(
+      'CREATE UNIQUE INDEX IF NOT EXISTS uq_power_port_binding_active '
+      'ON power_port_bindings(design_revision_id, port_id) WHERE deleted_at IS NULL',
+    );
+    await customStatement(
+      'CREATE UNIQUE INDEX IF NOT EXISTS uq_power_component_binding_active '
+      'ON power_component_bindings(design_revision_id, component_id) WHERE deleted_at IS NULL',
+    );
+    await customStatement(
+      'CREATE UNIQUE INDEX IF NOT EXISTS uq_power_load_origin_active '
+      'ON power_load_bindings(design_revision_id, input_port_id, state_code, origin_id) '
+      'WHERE deleted_at IS NULL',
+    );
+    await customStatement(
+      'CREATE UNIQUE INDEX IF NOT EXISTS uq_power_transfer_output_order '
+      'ON power_transfer_outputs(design_revision_id, transfer_id, ordinal)',
+    );
+    await customStatement(
+      'CREATE UNIQUE INDEX IF NOT EXISTS uq_power_capacity_member_order '
+      'ON power_capacity_group_members(design_revision_id, group_id, ordinal)',
+    );
+    await customStatement(
+      'CREATE UNIQUE INDEX IF NOT EXISTS uq_power_requirement_input_order '
+      'ON power_supply_requirement_inputs(design_revision_id, requirement_id, ordinal)',
+    );
+    await customStatement(
+      'CREATE UNIQUE INDEX IF NOT EXISTS uq_power_scenario_segment_order '
+      'ON power_scenario_segments(design_revision_id, scenario_id, ordinal)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_power_evaluation_node '
+      'ON power_evaluation_records(design_revision_id, logical_node_key_sha256, created_at)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_power_operation_status '
+      'ON power_operation_records(project_id, design_revision_id, status)',
+    );
+
+    const revisionScopedTables = <String>[
+      'power_port_bindings',
+      'power_component_bindings',
+      'power_transfer_bindings',
+      'power_transfer_outputs',
+      'power_load_bindings',
+      'power_capacity_groups',
+      'power_capacity_group_members',
+      'power_supply_requirements',
+      'power_supply_requirement_inputs',
+      'power_operating_scenarios',
+      'power_scenario_segments',
+      'power_scenario_states',
+      'power_scenario_source_selections',
+      'power_scenario_unavailable_sources',
+      'poe_delivery_bindings',
+      'poe_delivery_path_members',
+      'backup_assemblies',
+      'backup_protected_outputs',
+      'battery_bank_bindings',
+      'design_revision_power_snapshots',
+      'design_revision_snapshot_manifests',
+      'power_evaluation_records',
+      'power_evaluation_pointers',
+      'power_operation_records',
+    ];
+    for (final table in revisionScopedTables) {
+      await customStatement(
+        'CREATE TRIGGER IF NOT EXISTS trg_${table}_revision_scope_insert '
+        'BEFORE INSERT ON $table '
+        'WHEN NOT EXISTS ('
+        'SELECT 1 FROM project_design_revisions r '
+        'WHERE r.id = NEW.design_revision_id AND r.project_id = NEW.project_id'
+        ') BEGIN SELECT RAISE(ABORT, \'ELV4 revision/project scope mismatch\'); END',
+      );
+      await customStatement(
+        'CREATE TRIGGER IF NOT EXISTS trg_${table}_revision_scope_update '
+        'BEFORE UPDATE ON $table '
+        'WHEN NOT EXISTS ('
+        'SELECT 1 FROM project_design_revisions r '
+        'WHERE r.id = NEW.design_revision_id AND r.project_id = NEW.project_id'
+        ') BEGIN SELECT RAISE(ABORT, \'ELV4 revision/project scope mismatch\'); END',
+      );
+    }
+
+    const childRoots = <(String, String, String)>[
+      ('power_transfer_outputs', 'transfer_id', 'power_transfer_bindings'),
+      ('power_capacity_group_members', 'group_id', 'power_capacity_groups'),
+      ('power_supply_requirement_inputs', 'requirement_id', 'power_supply_requirements'),
+      ('power_scenario_segments', 'scenario_id', 'power_operating_scenarios'),
+      ('power_scenario_states', 'scenario_id', 'power_operating_scenarios'),
+      ('power_scenario_source_selections', 'scenario_id', 'power_operating_scenarios'),
+      ('power_scenario_unavailable_sources', 'scenario_id', 'power_operating_scenarios'),
+      ('poe_delivery_path_members', 'delivery_id', 'poe_delivery_bindings'),
+      ('backup_protected_outputs', 'assembly_id', 'backup_assemblies'),
+    ];
+    for (final relation in childRoots) {
+      final (child, foreignColumn, root) = relation;
+      await customStatement(
+        'CREATE TRIGGER IF NOT EXISTS trg_${child}_root_scope_insert '
+        'BEFORE INSERT ON $child '
+        'WHEN NOT EXISTS ('
+        'SELECT 1 FROM $root p WHERE p.design_revision_id = NEW.design_revision_id '
+        'AND p.id = NEW.$foreignColumn AND p.deleted_at IS NULL'
+        ') BEGIN SELECT RAISE(ABORT, \'ELV4 child/root scope mismatch\'); END',
+      );
+      await customStatement(
+        'CREATE TRIGGER IF NOT EXISTS trg_${child}_root_scope_update '
+        'BEFORE UPDATE ON $child '
+        'WHEN NOT EXISTS ('
+        'SELECT 1 FROM $root p WHERE p.design_revision_id = NEW.design_revision_id '
+        'AND p.id = NEW.$foreignColumn AND p.deleted_at IS NULL'
+        ') BEGIN SELECT RAISE(ABORT, \'ELV4 child/root scope mismatch\'); END',
+      );
+    }
+
+    await customStatement(
+      'CREATE TRIGGER IF NOT EXISTS trg_power_evaluation_records_no_update '
+      'BEFORE UPDATE ON power_evaluation_records '
+      "BEGIN SELECT RAISE(ABORT, 'ELV4 evaluations are immutable'); END",
+    );
+    await customStatement(
+      'CREATE TRIGGER IF NOT EXISTS trg_power_evaluation_records_no_delete '
+      'BEFORE DELETE ON power_evaluation_records '
+      "BEGIN SELECT RAISE(ABORT, 'ELV4 evaluations are immutable'); END",
+    );
+    await customStatement(
+      'CREATE TRIGGER IF NOT EXISTS trg_power_snapshot_no_update '
+      'BEFORE UPDATE ON design_revision_power_snapshots '
+      "BEGIN SELECT RAISE(ABORT, 'ELV4 power snapshots are immutable'); END",
+    );
+    await customStatement(
+      'CREATE TRIGGER IF NOT EXISTS trg_power_snapshot_no_delete '
+      'BEFORE DELETE ON design_revision_power_snapshots '
+      "BEGIN SELECT RAISE(ABORT, 'ELV4 power snapshots are immutable'); END",
+    );
+    await customStatement(
+      'CREATE TRIGGER IF NOT EXISTS trg_power_manifest_no_update '
+      'BEFORE UPDATE ON design_revision_snapshot_manifests '
+      "BEGIN SELECT RAISE(ABORT, 'ELV4 snapshot manifests are immutable'); END",
+    );
+    await customStatement(
+      'CREATE TRIGGER IF NOT EXISTS trg_power_manifest_no_delete '
+      'BEFORE DELETE ON design_revision_snapshot_manifests '
+      "BEGIN SELECT RAISE(ABORT, 'ELV4 snapshot manifests are immutable'); END",
+    );
+    await customStatement(
+      'CREATE TRIGGER IF NOT EXISTS trg_power_pointer_current_requires_evaluation_insert '
+      'BEFORE INSERT ON power_evaluation_pointers WHEN NEW.state = \'CURRENT\' '
+      'AND NOT EXISTS (SELECT 1 FROM power_evaluation_records e '
+      'WHERE e.design_revision_id = NEW.design_revision_id '
+      'AND e.logical_node_key_sha256 = NEW.logical_node_key_sha256 '
+      'AND e.evaluation_id = NEW.evaluation_id '
+      'AND e.evidence_sha256 = NEW.evidence_sha256) '
+      "BEGIN SELECT RAISE(ABORT, 'CURRENT pointer requires exact evaluation'); END",
+    );
+    await customStatement(
+      'CREATE TRIGGER IF NOT EXISTS trg_power_pointer_current_requires_evaluation_update '
+      'BEFORE UPDATE ON power_evaluation_pointers WHEN NEW.state = \'CURRENT\' '
+      'AND NOT EXISTS (SELECT 1 FROM power_evaluation_records e '
+      'WHERE e.design_revision_id = NEW.design_revision_id '
+      'AND e.logical_node_key_sha256 = NEW.logical_node_key_sha256 '
+      'AND e.evaluation_id = NEW.evaluation_id '
+      'AND e.evidence_sha256 = NEW.evidence_sha256) '
+      "BEGIN SELECT RAISE(ABORT, 'CURRENT pointer requires exact evaluation'); END",
+    );
+"""
+          assert indexes_anchor in text
+          text = text.replace(indexes_anchor, indexes, 1)
+          path.write_text(text)
+          PY
+      - name: Install mobile dependencies
+        working-directory: apps/mobile
+        run: flutter pub get --enforce-lockfile
+      - name: Format ELV4 P2 source
+        working-directory: apps/mobile
+        run: >-
+          dart format
+          lib/data/database/app_database.dart
+          lib/data/database/power_database_tables.dart
+          lib/data/repositories/drift_power_runtime_store.dart
+          test/data/elv4_p2_persistence_test.dart
+      - name: Regenerate Drift
+        working-directory: apps/mobile
+        run: dart run build_runner build
+      - name: Analyze mobile
+        working-directory: apps/mobile
+        run: flutter analyze
+      - name: Test ELV4 P2 persistence
+        working-directory: apps/mobile
+        run: flutter test test/data/elv4_p2_persistence_test.dart
+      - name: Commit synchronized schema
+        run: |
+          git add \
+            apps/mobile/lib/data/database/app_database.dart \
+            apps/mobile/lib/data/database/app_database.g.dart \
+            apps/mobile/lib/data/database/power_database_tables.dart \
+            apps/mobile/lib/data/repositories/drift_power_runtime_store.dart \
+            apps/mobile/test/data/elv4_p2_persistence_test.dart
+          if git diff --cached --quiet; then
+            echo "No synchronized schema changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "feat(elv4): implement P2 revision-scoped persistence"
+          git push origin "HEAD:${GITHUB_HEAD_REF}"
