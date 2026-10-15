@@ -593,6 +593,8 @@ Required vertical scenarios:
 
 # ELV5 — Discipline-specific engineering calculations
 
+Design branch: `feat/flutter-elv5-power-topology-design`, based on ELV4 `4c35840`. Enter through the [ELV5 authoritative index](elv5-authoritative-spec-index.md), [design specification](elv5-discipline-calculations-design-specification.md) and [P0–P9 detailed plan](elv5-p0-p9-delivery-plan.md). Status: DESIGN DRAFT; parent runtime prerequisites remain open.
+
 ## 26. Objective
 
 Introduce the first complete calculation layer on top of ELV1–ELV4.

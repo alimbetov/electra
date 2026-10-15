@@ -4,6 +4,8 @@ Status: Draft 0.1
 Branch: `docs/elv-engineering-systems-spec`  
 Scope: canonical calculation pipeline for low-voltage engineering systems
 
+Current ELV5 implementation authority: [ELV5 design index](../product/elv5-authoritative-spec-index.md). This older overview is background; its mixed status list and duration examples are not wire/runtime contracts. ELV5 separates freshness/completion/assessment/execution, integrates the unique recording horizon once, and delegates physical power to ELV4 with exact evidence/policy scope. Later-stage compliance/layout claims stay outside ELV5.
+
 ## 1. Purpose
 
 Electra must provide dedicated calculation processes for ELV disciplines. Shared infrastructure such as dependency tracking, execution orchestration, result storage, diagnostics and reporting may be generic, but the actual engineering calculations must be discipline-specific and explicitly named.
