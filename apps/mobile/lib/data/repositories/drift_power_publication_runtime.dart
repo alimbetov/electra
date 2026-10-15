@@ -320,6 +320,7 @@ final class DriftPowerPublicationRuntime {
         storedEvidenceSha256: envelopeSha256,
         replayed: false,
       );
+      final instant = now().toUtc();
       await database.customStatement(
         'INSERT INTO power_operation_records '
         '(project_id, design_revision_id, operation_id, command_type, '
@@ -333,8 +334,8 @@ final class DriftPowerPublicationRuntime {
           Variable.withString(_text(operationId, 'operationId')),
           Variable.withString(normalizedCommandFingerprint),
           Variable.withString(canonicalEngineeringJsonV1(receipt.toMap())),
-          Variable<DateTime>(now().toUtc()),
-          Variable<DateTime>(now().toUtc()),
+          Variable<DateTime>(instant),
+          Variable<DateTime>(instant),
           Variable.withString(originDeviceId),
         ],
       );
@@ -513,6 +514,15 @@ final class DriftPowerPublicationRuntime {
         };
         final payloadJson = canonicalEngineeringJsonV1(payload);
         final powerSha256 = sha256HexUtf8(payloadJson);
+        final normalizedPhysicalSha256 =
+            _sha256(physicalSha256, 'physicalSha256');
+        final manifestPayload = <String, Object?>{
+          'schema': 'electra.elv4-snapshot-manifest.v1',
+          'physicalSha256': normalizedPhysicalSha256,
+          'powerSha256': powerSha256,
+        };
+        final manifestSha256 =
+            sha256HexUtf8(canonicalEngineeringJsonV1(manifestPayload));
         final instant = now().toUtc();
         await database.customStatement(
           'INSERT INTO design_revision_power_snapshots '
@@ -526,7 +536,23 @@ final class DriftPowerPublicationRuntime {
             Variable.withString('FREEZE'),
             Variable.withString(payloadJson),
             Variable.withString(powerSha256),
-            Variable.withString(_sha256(physicalSha256, 'physicalSha256')),
+            Variable.withString(normalizedPhysicalSha256),
+            Variable<DateTime>(instant),
+            Variable.withString(originDeviceId),
+          ],
+        );
+        await database.customStatement(
+          'INSERT INTO design_revision_snapshot_manifests '
+          '(design_revision_id, project_id, manifest_schema, manifest_sha256, '
+          'physical_sha256, power_sha256, created_at, origin_device_id) '
+          'VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+          [
+            Variable.withString(designRevisionId),
+            Variable.withString(projectId),
+            Variable.withString('electra.elv4-snapshot-manifest.v1'),
+            Variable.withString(manifestSha256),
+            Variable.withString(normalizedPhysicalSha256),
+            Variable.withString(powerSha256),
             Variable<DateTime>(instant),
             Variable.withString(originDeviceId),
           ],
@@ -558,7 +584,9 @@ final class DriftPowerPublicationRuntime {
         final key = PowerNodeKeyV2.decode(
           row.read<String>('logical_node_key_json'),
         );
-        if (affected.putIfAbsent(key.encode(), () => key) == null) {
+        final encoded = key.encode();
+        if (!affected.containsKey(encoded)) {
+          affected[encoded] = key;
           queue.add(key);
         }
       }
@@ -566,7 +594,10 @@ final class DriftPowerPublicationRuntime {
 
     for (final encoded in changedFactRefs.toSet()) {
       await discover(
-        PowerDependencyRef(type: PowerDependencyRefType.fact, encodedRef: encoded),
+        PowerDependencyRef(
+          type: PowerDependencyRefType.fact,
+          encodedRef: encoded,
+        ),
       );
     }
     var index = 0;
@@ -588,13 +619,14 @@ final class DriftPowerPublicationRuntime {
         "SET state = 'STALE', generation = generation + 1, updated_at = ?, "
         'origin_device_id = ? '
         'WHERE project_id = ? AND design_revision_id = ? '
-        'AND logical_node_key_sha256 = ? AND state = \'CURRENT\'',
+        'AND logical_node_key_sha256 = ? AND state = ?',
         variables: [
           Variable<DateTime>(now().toUtc()),
           Variable.withString(originDeviceId),
           Variable.withString(projectId),
           Variable.withString(designRevisionId),
           Variable.withString(key.sha256),
+          Variable.withString('CURRENT'),
         ],
       );
       if (updated == 1) actuallyInvalidated.add(key);
