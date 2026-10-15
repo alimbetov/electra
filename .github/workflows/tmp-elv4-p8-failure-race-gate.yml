@@ -1,0 +1,48 @@
+name: ELV4 P8 Failure Race Gate
+
+on:
+  push:
+    branches:
+      - feat/flutter-elv4-power-topology-design
+    paths:
+      - .github/workflows/tmp-elv4-p8-failure-race-gate.yml
+      - apps/mobile/test/data/elv4_p8_failure_race_acceptance_test.dart
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/flutter-elv4-power-topology-design
+          fetch-depth: 0
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Install mobile dependencies
+        working-directory: apps/mobile
+        run: flutter pub get
+      - name: Format P8 failure race acceptance
+        working-directory: apps/mobile
+        run: dart format test/data/elv4_p8_failure_race_acceptance_test.dart
+      - name: Analyze mobile
+        working-directory: apps/mobile
+        run: flutter analyze
+      - name: Run P8 failure race acceptance
+        working-directory: apps/mobile
+        run: flutter test test/data/elv4_p8_failure_race_acceptance_test.dart test/data/elv4_p8_freeze_historical_invariance_test.dart
+      - name: Commit verified formatting
+        run: |
+          if git diff --quiet -- apps/mobile/test/data/elv4_p8_failure_race_acceptance_test.dart; then
+            echo 'P8 failure/race test already formatted.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add apps/mobile/test/data/elv4_p8_failure_race_acceptance_test.dart
+          git commit -m 'test(elv4): normalize P8 failure race acceptance'
+          git push origin HEAD:feat/flutter-elv4-power-topology-design
