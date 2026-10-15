@@ -101,7 +101,7 @@ abstract final class CableResourceResolver {
     late final Set<String> atoms;
     switch (selection) {
       case WholeCableSelection():
-        atoms = _wholeCableClaims(definition);
+        atoms = _wholeCableClaims(byId);
       case ResourceSetSelection(:final resourceIdentities):
         if (resourceIdentities.isEmpty) {
           throw const CableResourceResolutionException(
@@ -124,7 +124,7 @@ abstract final class CableResourceResolver {
             );
           }
           if (resource.kind == CableResourceKind.wholeCable) {
-            atoms.addAll(_wholeCableClaims(definition));
+            atoms.addAll(_wholeCableClaims(byId));
           } else {
             atoms.addAll(_resolveAtomicDescendants(resource, byId));
           }
@@ -177,8 +177,18 @@ abstract final class CableResourceResolver {
     );
   }
 
-  static Set<String> _wholeCableClaims(CableDefinition definition) =>
-      const {'__WHOLE_CABLE__'};
+  static Set<String> _wholeCableClaims(
+    Map<String, CableResourceDefinition> byId,
+  ) {
+    final wholeCable = byId['__WHOLE_CABLE__'];
+    if (wholeCable == null) {
+      throw const CableResourceResolutionException(
+        'ELV_ALLOC_DEFINITION_INVALID',
+        {'errors': ['Cable definition is missing __WHOLE_CABLE__.']},
+      );
+    }
+    return _resolveAtomicDescendants(wholeCable, byId);
+  }
 
   static Set<String> _resolveAtomicDescendants(
     CableResourceDefinition resource,
