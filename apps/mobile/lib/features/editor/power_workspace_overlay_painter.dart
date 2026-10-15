@@ -39,20 +39,17 @@ final class PowerWorkspaceOverlayPainter extends CustomPainter {
     if (mode == PowerWorkspaceOverlayMode.paths ||
         mode == PowerWorkspaceOverlayMode.findings ||
         mode == PowerWorkspaceOverlayMode.backup) {
-      final pathPaint = Paint()
-        ..color = colorScheme.primary
-        ..strokeWidth = 4
-        ..style = PaintingStyle.stroke
-        ..strokeCap = StrokeCap.round;
+      final pathPaint =
+          Paint()
+            ..color = colorScheme.primary
+            ..strokeWidth = 4
+            ..style = PaintingStyle.stroke
+            ..strokeCap = StrokeCap.round;
       for (final segment in segments) {
         if (segment.surfacePatchId != surfacePatchId) continue;
         final from = transform.localToViewport(segment.from);
         final to = transform.localToViewport(segment.to);
-        canvas.drawLine(
-          Offset(from.x, from.y),
-          Offset(to.x, to.y),
-          pathPaint,
-        );
+        canvas.drawLine(Offset(from.x, from.y), Offset(to.x, to.y), pathPaint);
       }
     }
 
@@ -63,24 +60,24 @@ final class PowerWorkspaceOverlayPainter extends CustomPainter {
         mode == PowerWorkspaceOverlayMode.backup) {
       for (final component in components) {
         if (component.hostSurfacePatchId != surfacePatchId) continue;
-        final highlighted = overlay.highlightedComponentIds.contains(component.id);
+        final highlighted = overlay.highlightedComponentIds.contains(
+          component.id,
+        );
         final source = overlay.sourceComponentIds.contains(component.id);
         final selected = selectedComponentId == component.id;
         if (!highlighted && !source && !selected) continue;
         final point = transform.localToViewport(component.localPosition);
-        final fill = Paint()
-          ..color = source ? colorScheme.tertiary : colorScheme.primary
-          ..style = PaintingStyle.fill;
-        final ring = Paint()
-          ..color = colorScheme.onSurface
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = selected ? 4 : 2;
+        final fill =
+            Paint()
+              ..color = source ? colorScheme.tertiary : colorScheme.primary
+              ..style = PaintingStyle.fill;
+        final ring =
+            Paint()
+              ..color = colorScheme.onSurface
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = selected ? 4 : 2;
         canvas.drawCircle(Offset(point.x, point.y), source ? 10 : 8, fill);
-        canvas.drawCircle(
-          Offset(point.x, point.y),
-          selected ? 14 : 11,
-          ring,
-        );
+        canvas.drawCircle(Offset(point.x, point.y), selected ? 14 : 11, ring);
       }
     }
   }

@@ -70,7 +70,9 @@ class _PersistedRoomEditorScreenState
       powerSession = null;
       powerOverlaySegments = const [];
       powerWorkspaceError = null;
-      WidgetsBinding.instance.addPostFrameCallback((_) => _openPowerWorkspace());
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => _openPowerWorkspace(),
+      );
     }
   }
 

@@ -61,42 +61,47 @@ final class PowerWorkspacePanel extends StatelessWidget {
                 title: 'Power evidence not captured',
                 detail: projection.reasonCode ?? 'ELV4_POWER_NOT_CAPTURED',
               )
-            else if (projection.readKind == PowerWorkspaceReadKind.capturedEmpty)
+            else if (projection.readKind ==
+                PowerWorkspaceReadKind.capturedEmpty)
               const _StatusBanner(
                 icon: Icons.inventory_2_outlined,
                 title: 'Captured power section is empty',
-                detail: 'The frozen revision contains a valid empty power capture.',
+                detail:
+                    'The frozen revision contains a valid empty power capture.',
               )
             else if (projection.historical)
               const _StatusBanner(
                 icon: Icons.lock_outline,
                 title: 'Historical power evidence',
-                detail: 'Read-only values are resolved from the frozen capture.',
+                detail:
+                    'Read-only values are resolved from the frozen capture.',
               ),
             if (state.unsavedDraftWarning)
               const _StatusBanner(
                 icon: Icons.edit_note,
                 title: 'Unsaved reviewed draft',
-                detail: 'Scenario/revision context changed; review the draft again before applying.',
+                detail:
+                    'Scenario/revision context changed; review the draft again before applying.',
               ),
             Expanded(
-              child: card == null
-                  ? const Center(child: Text('No power card data.'))
-                  : _CardBody(
-                      card: card,
-                      budgets: state.currentCard ==
-                              PowerWorkspaceCardCode.sourceCapacity
-                          ? projection.budgets
-                          : const [],
-                      onFindingSelected: onFindingSelected,
-                    ),
+              child:
+                  card == null
+                      ? const Center(child: Text('No power card data.'))
+                      : _CardBody(
+                        card: card,
+                        budgets:
+                            state.currentCard ==
+                                    PowerWorkspaceCardCode.sourceCapacity
+                                ? projection.budgets
+                                : const [],
+                        onFindingSelected: onFindingSelected,
+                      ),
             ),
             if (state.hasDraft)
               _ReviewedDraftBar(
                 state: state,
-                onApply: projection.mutationAllowed
-                    ? onApplyReviewedRoute
-                    : null,
+                onApply:
+                    projection.mutationAllowed ? onApplyReviewedRoute : null,
                 onDiscard: onDiscardDraft,
               ),
             _NavigationBar(
@@ -169,6 +174,7 @@ final class _Header extends StatelessWidget {
                 child: DropdownButton<PowerWorkspaceScenarioOption>(
                   key: const ValueKey('power-scenario-selector'),
                   value: scenario,
+                  isExpanded: true,
                   hint: const Text('Scenario'),
                   items: [
                     for (final option in projection.scenarios)
@@ -187,6 +193,7 @@ final class _Header extends StatelessWidget {
                 child: DropdownButton<PowerWorkspaceOverlayMode>(
                   key: const ValueKey('power-overlay-selector'),
                   value: state.overlayMode,
+                  isExpanded: true,
                   items: [
                     for (final mode in PowerWorkspaceOverlayMode.values)
                       DropdownMenuItem(
@@ -234,60 +241,54 @@ final class _CardBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ListView(
-        key: ValueKey('power-card-${card.code.name}'),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+    key: ValueKey('power-card-${card.code.name}'),
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+    children: [
+      Row(
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  card.title,
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
-              ),
-              _CurrentnessChip(currentness: card.currentness),
-            ],
+          Expanded(
+            child: Text(
+              card.title,
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
           ),
-          const SizedBox(height: 6),
-          Text(card.summary),
-          if (card.metrics.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            for (final metric in card.metrics) _MetricRow(metric: metric),
-          ],
-          if (budgets.isNotEmpty) ...[
-            const SizedBox(height: 16),
-            Text(
-              'Shared-source / project budget',
-              style: Theme.of(context).textTheme.titleSmall,
-            ),
-            const SizedBox(height: 6),
-            for (final budget in budgets) _BudgetCard(budget: budget),
-          ],
-          if (card.explanation.isNotEmpty) ...[
-            const SizedBox(height: 16),
-            Text(
-              'How calculated',
-              style: Theme.of(context).textTheme.titleSmall,
-            ),
-            const SizedBox(height: 6),
-            for (final line in card.explanation)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 6),
-                child: Text(line),
-              ),
-          ],
-          if (card.findings.isNotEmpty) ...[
-            const SizedBox(height: 16),
-            Text('Findings', style: Theme.of(context).textTheme.titleSmall),
-            for (var index = 0; index < card.findings.length; index++)
-              _FindingTile(
-                key: ValueKey('power-finding-$index'),
-                value: card.findings[index],
-                onTap: onFindingSelected,
-              ),
-          ],
+          _CurrentnessChip(currentness: card.currentness),
         ],
-      );
+      ),
+      const SizedBox(height: 6),
+      Text(card.summary),
+      if (card.metrics.isNotEmpty) ...[
+        const SizedBox(height: 12),
+        for (final metric in card.metrics) _MetricRow(metric: metric),
+      ],
+      if (budgets.isNotEmpty) ...[
+        const SizedBox(height: 16),
+        Text(
+          'Shared-source / project budget',
+          style: Theme.of(context).textTheme.titleSmall,
+        ),
+        const SizedBox(height: 6),
+        for (final budget in budgets) _BudgetCard(budget: budget),
+      ],
+      if (card.explanation.isNotEmpty) ...[
+        const SizedBox(height: 16),
+        Text('How calculated', style: Theme.of(context).textTheme.titleSmall),
+        const SizedBox(height: 6),
+        for (final line in card.explanation)
+          Padding(padding: const EdgeInsets.only(bottom: 6), child: Text(line)),
+      ],
+      if (card.findings.isNotEmpty) ...[
+        const SizedBox(height: 16),
+        Text('Findings', style: Theme.of(context).textTheme.titleSmall),
+        for (var index = 0; index < card.findings.length; index++)
+          _FindingTile(
+            key: ValueKey('power-finding-$index'),
+            value: card.findings[index],
+            onTap: onFindingSelected,
+          ),
+      ],
+    ],
+  );
 }
 
 final class _MetricRow extends StatelessWidget {
@@ -296,23 +297,23 @@ final class _MetricRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(bottom: 4),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(child: Text(metric.label)),
-            const SizedBox(width: 12),
-            Flexible(
-              child: Text(
-                metric.unit == null
-                    ? metric.value
-                    : '${metric.value} ${metric.unit}',
-                textAlign: TextAlign.end,
-              ),
-            ),
-          ],
+    padding: const EdgeInsets.only(bottom: 4),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(child: Text(metric.label)),
+        const SizedBox(width: 12),
+        Flexible(
+          child: Text(
+            metric.unit == null
+                ? metric.value
+                : '${metric.value} ${metric.unit}',
+            textAlign: TextAlign.end,
+          ),
         ),
-      );
+      ],
+    ),
+  );
 }
 
 final class _BudgetCard extends StatelessWidget {
@@ -321,54 +322,51 @@ final class _BudgetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Card.outlined(
-        key: ValueKey('power-budget-${budget.groupId}'),
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    key: ValueKey('power-budget-${budget.groupId}'),
+    child: Padding(
+      padding: const EdgeInsets.all(10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              Row(
-                children: [
-                  if (budget.selectedContribution)
-                    const Padding(
-                      padding: EdgeInsets.only(right: 6),
-                      child: Icon(Icons.my_location, size: 16),
-                    ),
-                  Expanded(child: Text(budget.groupId)),
-                  _CurrentnessChip(currentness: budget.currentness),
-                ],
-              ),
-              if (budget.ownerComponentId != null)
-                Text('Owner: ${budget.ownerComponentId}'),
-              const SizedBox(height: 6),
-              for (final metric in budget.metrics) _MetricRow(metric: metric),
+              if (budget.selectedContribution)
+                const Padding(
+                  padding: EdgeInsets.only(right: 6),
+                  child: Icon(Icons.my_location, size: 16),
+                ),
+              Expanded(child: Text(budget.groupId)),
+              _CurrentnessChip(currentness: budget.currentness),
             ],
           ),
-        ),
-      );
+          if (budget.ownerComponentId != null)
+            Text('Owner: ${budget.ownerComponentId}'),
+          const SizedBox(height: 6),
+          for (final metric in budget.metrics) _MetricRow(metric: metric),
+        ],
+      ),
+    ),
+  );
 }
 
 final class _FindingTile extends StatelessWidget {
-  const _FindingTile({
-    super.key,
-    required this.value,
-    required this.onTap,
-  });
+  const _FindingTile({super.key, required this.value, required this.onTap});
 
   final PowerWorkspaceFindingProjection value;
   final ValueChanged<PowerWorkspaceFindingProjection>? onTap;
 
   @override
   Widget build(BuildContext context) => ListTile(
-        contentPadding: EdgeInsets.zero,
-        leading: const Icon(Icons.report_outlined),
-        title: Text('${value.finding.code} · ${value.finding.severity}'),
-        subtitle: Text(value.finding.message),
-        trailing: value.entityRef == null
+    contentPadding: EdgeInsets.zero,
+    leading: const Icon(Icons.report_outlined),
+    title: Text('${value.finding.code} · ${value.finding.severity}'),
+    subtitle: Text(value.finding.message),
+    trailing:
+        value.entityRef == null
             ? null
             : const Icon(Icons.open_in_new, size: 18),
-        onTap: onTap == null ? null : () => onTap!(value),
-      );
+    onTap: onTap == null ? null : () => onTap!(value),
+  );
 }
 
 final class _ReviewedDraftBar extends StatelessWidget {
@@ -384,42 +382,42 @@ final class _ReviewedDraftBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-        elevation: 1,
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+    elevation: 1,
+    child: Padding(
+      padding: const EdgeInsets.all(10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            'Reviewed route draft',
+            style: Theme.of(context).textTheme.labelLarge,
+          ),
+          if (state.previewFingerprint != null)
+            Text(
+              'Fingerprint: ${state.previewFingerprint!.substring(0, 12)}…',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          const SizedBox(height: 6),
+          Wrap(
+            spacing: 8,
             children: [
-              Text(
-                'Reviewed route draft',
-                style: Theme.of(context).textTheme.labelLarge,
+              FilledButton(
+                key: const ValueKey('power-route-apply'),
+                onPressed: onApply,
+                child: const Text('Apply reviewed route'),
               ),
-              if (state.previewFingerprint != null)
-                Text(
-                  'Fingerprint: ${state.previewFingerprint!.substring(0, 12)}…',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              const SizedBox(height: 6),
-              Wrap(
-                spacing: 8,
-                children: [
-                  FilledButton(
-                    key: const ValueKey('power-route-apply'),
-                    onPressed: onApply,
-                    child: const Text('Apply reviewed route'),
-                  ),
-                  TextButton(
-                    key: const ValueKey('power-route-discard'),
-                    onPressed: onDiscard,
-                    child: const Text('Discard'),
-                  ),
-                ],
+              TextButton(
+                key: const ValueKey('power-route-discard'),
+                onPressed: onDiscard,
+                child: const Text('Discard'),
               ),
             ],
           ),
-        ),
-      );
+        ],
+      ),
+    ),
+  );
 }
 
 final class _NavigationBar extends StatelessWidget {
@@ -435,39 +433,39 @@ final class _NavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-        elevation: 2,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-          child: Row(
-            children: [
-              FocusTraversalOrder(
-                order: const NumericFocusOrder(20),
-                child: IconButton(
-                  key: const ValueKey('power-card-previous'),
-                  tooltip: 'Previous power card',
-                  onPressed: onPrevious,
-                  icon: const Icon(Icons.chevron_left),
-                ),
-              ),
-              Expanded(
-                child: Text(
-                  '${state.cardIndex + 1}/${state.cards.length} · ${_cardLabel(state.currentCard)}',
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              FocusTraversalOrder(
-                order: const NumericFocusOrder(21),
-                child: IconButton(
-                  key: const ValueKey('power-card-next'),
-                  tooltip: 'Next power card',
-                  onPressed: onNext,
-                  icon: const Icon(Icons.chevron_right),
-                ),
-              ),
-            ],
+    elevation: 2,
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      child: Row(
+        children: [
+          FocusTraversalOrder(
+            order: const NumericFocusOrder(20),
+            child: IconButton(
+              key: const ValueKey('power-card-previous'),
+              tooltip: 'Previous power card',
+              onPressed: onPrevious,
+              icon: const Icon(Icons.chevron_left),
+            ),
           ),
-        ),
-      );
+          Expanded(
+            child: Text(
+              '${state.cardIndex + 1}/${state.cards.length} · ${_cardLabel(state.currentCard)}',
+              textAlign: TextAlign.center,
+            ),
+          ),
+          FocusTraversalOrder(
+            order: const NumericFocusOrder(21),
+            child: IconButton(
+              key: const ValueKey('power-card-next'),
+              tooltip: 'Next power card',
+              onPressed: onNext,
+              icon: const Icon(Icons.chevron_right),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 final class _CurrentnessChip extends StatelessWidget {
@@ -476,10 +474,10 @@ final class _CurrentnessChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Chip(
-        key: ValueKey('power-currentness-${currentness.name}'),
-        label: Text(currentness.name.toUpperCase()),
-        visualDensity: VisualDensity.compact,
-      );
+    key: ValueKey('power-currentness-${currentness.name}'),
+    label: Text(currentness.name.toUpperCase()),
+    visualDensity: VisualDensity.compact,
+  );
 }
 
 final class _StatusBanner extends StatelessWidget {
@@ -495,15 +493,15 @@ final class _StatusBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-        child: Card.outlined(
-          child: ListTile(
-            leading: Icon(icon),
-            title: Text(title),
-            subtitle: Text(detail),
-          ),
-        ),
-      );
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+    child: Card.outlined(
+      child: ListTile(
+        leading: Icon(icon),
+        title: Text(title),
+        subtitle: Text(detail),
+      ),
+    ),
+  );
 }
 
 Future<void> showPowerWorkspaceSheet({
@@ -515,9 +513,10 @@ Future<void> showPowerWorkspaceSheet({
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
-    builder: (context) => SafeArea(
-      child: FractionallySizedBox(heightFactor: 0.82, child: child),
-    ),
+    builder:
+        (context) => SafeArea(
+          child: FractionallySizedBox(heightFactor: 0.82, child: child),
+        ),
   );
   if (restoreFocusTo.canRequestFocus) restoreFocusTo.requestFocus();
 }

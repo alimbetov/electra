@@ -19,7 +19,8 @@ final class PowerWorkspacePanelHost extends StatefulWidget {
       _PowerWorkspacePanelHostState();
 }
 
-final class _PowerWorkspacePanelHostState extends State<PowerWorkspacePanelHost> {
+final class _PowerWorkspacePanelHostState
+    extends State<PowerWorkspacePanelHost> {
   bool canUndo = false;
   bool canRedo = false;
   bool historyLoading = false;
@@ -76,9 +77,10 @@ final class _PowerWorkspacePanelHostState extends State<PowerWorkspacePanelHost>
       onPreviousCard: () => _run(binding.previousCard),
       onNextCard: () => _run(binding.nextCard),
       onFindingSelected: widget.onFindingSelected,
-      onApplyReviewedRoute: binding.onApplyReviewedRoute == null
-          ? null
-          : () => _run(binding.onApplyReviewedRoute!),
+      onApplyReviewedRoute:
+          binding.onApplyReviewedRoute == null
+              ? null
+              : () => _run(binding.onApplyReviewedRoute!),
       onDiscardDraft: binding.onDiscardDraft,
       canUndo: canUndo,
       canRedo: canRedo,
