@@ -392,17 +392,19 @@ UpsLoadingResult evaluateUpsLoading({
   required PowerRational ratedOutputW,
   required PowerRational ratedOutputVa,
   required PowerLossDefinition transferLoss,
-  PowerRational reserveMultiplier = PowerRational.one,
-  PowerRational deratingFactor = PowerRational.one,
+  PowerRational? reserveMultiplier,
+  PowerRational? deratingFactor,
   PowerRational? inputPowerFactor,
 }) {
+  final effectiveReserveMultiplier = reserveMultiplier ?? PowerRational.one;
+  final effectiveDeratingFactor = deratingFactor ?? PowerRational.one;
   final watt = evaluateSupplyCapability(
     PowerCapabilityDimension(
       dimension: PowerQuantityDimension.watt,
       demand: protectedOutputW,
       nameplate: ratedOutputW,
-      reserveMultiplier: reserveMultiplier,
-      deratingFactor: deratingFactor,
+      reserveMultiplier: effectiveReserveMultiplier,
+      deratingFactor: effectiveDeratingFactor,
     ),
   );
   final va = evaluateSupplyCapability(
@@ -410,8 +412,8 @@ UpsLoadingResult evaluateUpsLoading({
       dimension: PowerQuantityDimension.voltAmpere,
       demand: protectedOutputVa,
       nameplate: ratedOutputVa,
-      reserveMultiplier: reserveMultiplier,
-      deratingFactor: deratingFactor,
+      reserveMultiplier: effectiveReserveMultiplier,
+      deratingFactor: effectiveDeratingFactor,
     ),
   );
   final transfer = evaluateTransferInputDemand(
