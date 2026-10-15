@@ -181,7 +181,7 @@ class ConsumptionGroups extends Table with GeometryAuditColumns {
 @DataClassName('EquipmentElectricalLoadRow')
 class EquipmentElectricalLoads extends Table with GeometryAuditColumns {
   TextColumn get componentInstanceId =>
-      text().references(ComponentInstances, #componentInstanceId)();
+      text().references(ComponentInstances, #id)();
   TextColumn get consumptionGroupId =>
       text().nullable().references(ConsumptionGroups, #id)();
   RealColumn get nominalVoltageV => real()();

@@ -8041,6 +8041,9 @@ class $EquipmentElectricalLoadsTable extends EquipmentElectricalLoads
         false,
         type: DriftSqlType.string,
         requiredDuringInsert: true,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES component_instances (id)',
+        ),
       );
   static const VerificationMeta _consumptionGroupIdMeta =
       const VerificationMeta('consumptionGroupId');
@@ -54708,6 +54711,35 @@ final class $$ComponentInstancesTableReferences
   }
 
   static MultiTypedResultKey<
+    $EquipmentElectricalLoadsTable,
+    List<EquipmentElectricalLoadRow>
+  >
+  _equipmentElectricalLoadsRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.equipmentElectricalLoads,
+    aliasName:
+        'component_instances__id__equipment_electrical_loads__component_instance_id',
+  );
+
+  $$EquipmentElectricalLoadsTableProcessedTableManager
+  get equipmentElectricalLoadsRefs {
+    final manager = $$EquipmentElectricalLoadsTableTableManager(
+      $_db,
+      $_db.equipmentElectricalLoads,
+    ).filter(
+      (f) => f.componentInstanceId.id.sqlEquals($_itemColumn<String>('id')!),
+    );
+
+    final cache = $_typedResult.readTableOrNull(
+      _equipmentElectricalLoadsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
     $ComponentEngineeringMembershipsTable,
     List<ComponentEngineeringMembershipRow>
   >
@@ -54960,6 +54992,33 @@ class $$ComponentInstancesTableFilterComposer
           ),
     );
     return composer;
+  }
+
+  Expression<bool> equipmentElectricalLoadsRefs(
+    Expression<bool> Function($$EquipmentElectricalLoadsTableFilterComposer f)
+    f,
+  ) {
+    final $$EquipmentElectricalLoadsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.equipmentElectricalLoads,
+          getReferencedColumn: (t) => t.componentInstanceId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EquipmentElectricalLoadsTableFilterComposer(
+                $db: $db,
+                $table: $db.equipmentElectricalLoads,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
   }
 
   Expression<bool> componentEngineeringMembershipsRefs(
@@ -55331,6 +55390,33 @@ class $$ComponentInstancesTableAnnotationComposer
     return composer;
   }
 
+  Expression<T> equipmentElectricalLoadsRefs<T extends Object>(
+    Expression<T> Function($$EquipmentElectricalLoadsTableAnnotationComposer a)
+    f,
+  ) {
+    final $$EquipmentElectricalLoadsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.equipmentElectricalLoads,
+          getReferencedColumn: (t) => t.componentInstanceId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$EquipmentElectricalLoadsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.equipmentElectricalLoads,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
   Expression<T> componentEngineeringMembershipsRefs<T extends Object>(
     Expression<T> Function(
       $$ComponentEngineeringMembershipsTableAnnotationComposer a,
@@ -55491,6 +55577,7 @@ class $$ComponentInstancesTableTableManager
           PrefetchHooks Function({
             bool roomId,
             bool hostSurfacePatchId,
+            bool equipmentElectricalLoadsRefs,
             bool componentEngineeringMembershipsRefs,
             bool componentReferenceBindingsRefs,
             bool engineeringPortInstancesRefs,
@@ -55608,6 +55695,7 @@ class $$ComponentInstancesTableTableManager
           prefetchHooksCallback: ({
             roomId = false,
             hostSurfacePatchId = false,
+            equipmentElectricalLoadsRefs = false,
             componentEngineeringMembershipsRefs = false,
             componentReferenceBindingsRefs = false,
             engineeringPortInstancesRefs = false,
@@ -55617,6 +55705,7 @@ class $$ComponentInstancesTableTableManager
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [
+                if (equipmentElectricalLoadsRefs) db.equipmentElectricalLoads,
                 if (componentEngineeringMembershipsRefs)
                   db.componentEngineeringMemberships,
                 if (componentReferenceBindingsRefs)
@@ -55675,6 +55764,28 @@ class $$ComponentInstancesTableTableManager
               },
               getPrefetchedDataCallback: (items) async {
                 return [
+                  if (equipmentElectricalLoadsRefs)
+                    await $_getPrefetchedData<
+                      ComponentInstanceRow,
+                      $ComponentInstancesTable,
+                      EquipmentElectricalLoadRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$ComponentInstancesTableReferences
+                          ._equipmentElectricalLoadsRefsTable(db),
+                      managerFromTypedResult:
+                          (p0) =>
+                              $$ComponentInstancesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).equipmentElectricalLoadsRefs,
+                      referencedItemsForCurrentItem:
+                          (item, referencedItems) => referencedItems.where(
+                            (e) => e.componentInstanceId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
                   if (componentEngineeringMembershipsRefs)
                     await $_getPrefetchedData<
                       ComponentInstanceRow,
@@ -55808,6 +55919,7 @@ typedef $$ComponentInstancesTableProcessedTableManager =
       PrefetchHooks Function({
         bool roomId,
         bool hostSurfacePatchId,
+        bool equipmentElectricalLoadsRefs,
         bool componentEngineeringMembershipsRefs,
         bool componentReferenceBindingsRefs,
         bool engineeringPortInstancesRefs,
@@ -56700,6 +56812,26 @@ final class $$EquipmentElectricalLoadsTableReferences
     super.$_typedResult,
   );
 
+  static $ComponentInstancesTable _componentInstanceIdTable(
+    _$AppDatabase db,
+  ) => db.componentInstances.createAlias(
+    'equipment_electrical_loads__component_instance_id__component_instances__id',
+  );
+
+  $$ComponentInstancesTableProcessedTableManager get componentInstanceId {
+    final $_column = $_itemColumn<String>('component_instance_id')!;
+
+    final manager = $$ComponentInstancesTableTableManager(
+      $_db,
+      $_db.componentInstances,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_componentInstanceIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
   static $ConsumptionGroupsTable _consumptionGroupIdTable(
     _$AppDatabase db,
   ) => db.consumptionGroups.createAlias(
@@ -56717,37 +56849,6 @@ final class $$EquipmentElectricalLoadsTableReferences
     if (item == null) return manager;
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-
-  static MultiTypedResultKey<
-    $CircuitLoadAssignmentsTable,
-    List<CircuitLoadAssignmentRow>
-  >
-  _circuitLoadAssignmentsRefsTable(
-    _$AppDatabase db,
-  ) => MultiTypedResultKey.fromTable(
-    db.circuitLoadAssignments,
-    aliasName:
-        'equipment_electrical_loads__component_instance_id__circuit_load_assignments__component_instance_id',
-  );
-
-  $$CircuitLoadAssignmentsTableProcessedTableManager
-  get circuitLoadAssignmentsRefs {
-    final manager = $$CircuitLoadAssignmentsTableTableManager(
-      $_db,
-      $_db.circuitLoadAssignments,
-    ).filter(
-      (f) => f.componentInstanceId.componentInstanceId.sqlEquals(
-        $_itemColumn<String>('component_instance_id')!,
-      ),
-    );
-
-    final cache = $_typedResult.readTableOrNull(
-      _circuitLoadAssignmentsRefsTable($_db),
-    );
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
     );
   }
 }
@@ -56783,11 +56884,6 @@ class $$EquipmentElectricalLoadsTableFilterComposer
 
   ColumnFilters<String> get originDeviceId => $composableBuilder(
     column: $table.originDeviceId,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get componentInstanceId => $composableBuilder(
-    column: $table.componentInstanceId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -56871,6 +56967,29 @@ class $$EquipmentElectricalLoadsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  $$ComponentInstancesTableFilterComposer get componentInstanceId {
+    final $$ComponentInstancesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.componentInstanceId,
+      referencedTable: $db.componentInstances,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ComponentInstancesTableFilterComposer(
+            $db: $db,
+            $table: $db.componentInstances,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
   $$ConsumptionGroupsTableFilterComposer get consumptionGroupId {
     final $$ConsumptionGroupsTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -56892,32 +57011,6 @@ class $$EquipmentElectricalLoadsTableFilterComposer
           ),
     );
     return composer;
-  }
-
-  Expression<bool> circuitLoadAssignmentsRefs(
-    Expression<bool> Function($$CircuitLoadAssignmentsTableFilterComposer f) f,
-  ) {
-    final $$CircuitLoadAssignmentsTableFilterComposer composer =
-        $composerBuilder(
-          composer: this,
-          getCurrentColumn: (t) => t.componentInstanceId,
-          referencedTable: $db.circuitLoadAssignments,
-          getReferencedColumn: (t) => t.componentInstanceId,
-          builder:
-              (
-                joinBuilder, {
-                $addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer,
-              }) => $$CircuitLoadAssignmentsTableFilterComposer(
-                $db: $db,
-                $table: $db.circuitLoadAssignments,
-                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-                joinBuilder: joinBuilder,
-                $removeJoinBuilderFromRootComposer:
-                    $removeJoinBuilderFromRootComposer,
-              ),
-        );
-    return f(composer);
   }
 }
 
@@ -56952,11 +57045,6 @@ class $$EquipmentElectricalLoadsTableOrderingComposer
 
   ColumnOrderings<String> get originDeviceId => $composableBuilder(
     column: $table.originDeviceId,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get componentInstanceId => $composableBuilder(
-    column: $table.componentInstanceId,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -57040,6 +57128,29 @@ class $$EquipmentElectricalLoadsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  $$ComponentInstancesTableOrderingComposer get componentInstanceId {
+    final $$ComponentInstancesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.componentInstanceId,
+      referencedTable: $db.componentInstances,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ComponentInstancesTableOrderingComposer(
+            $db: $db,
+            $table: $db.componentInstances,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
   $$ConsumptionGroupsTableOrderingComposer get consumptionGroupId {
     final $$ConsumptionGroupsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -57087,11 +57198,6 @@ class $$EquipmentElectricalLoadsTableAnnotationComposer
 
   GeneratedColumn<String> get originDeviceId => $composableBuilder(
     column: $table.originDeviceId,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get componentInstanceId => $composableBuilder(
-    column: $table.componentInstanceId,
     builder: (column) => column,
   );
 
@@ -57171,6 +57277,30 @@ class $$EquipmentElectricalLoadsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  $$ComponentInstancesTableAnnotationComposer get componentInstanceId {
+    final $$ComponentInstancesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.componentInstanceId,
+          referencedTable: $db.componentInstances,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$ComponentInstancesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.componentInstances,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
   $$ConsumptionGroupsTableAnnotationComposer get consumptionGroupId {
     final $$ConsumptionGroupsTableAnnotationComposer composer =
         $composerBuilder(
@@ -57194,32 +57324,6 @@ class $$EquipmentElectricalLoadsTableAnnotationComposer
         );
     return composer;
   }
-
-  Expression<T> circuitLoadAssignmentsRefs<T extends Object>(
-    Expression<T> Function($$CircuitLoadAssignmentsTableAnnotationComposer a) f,
-  ) {
-    final $$CircuitLoadAssignmentsTableAnnotationComposer composer =
-        $composerBuilder(
-          composer: this,
-          getCurrentColumn: (t) => t.componentInstanceId,
-          referencedTable: $db.circuitLoadAssignments,
-          getReferencedColumn: (t) => t.componentInstanceId,
-          builder:
-              (
-                joinBuilder, {
-                $addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer,
-              }) => $$CircuitLoadAssignmentsTableAnnotationComposer(
-                $db: $db,
-                $table: $db.circuitLoadAssignments,
-                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-                joinBuilder: joinBuilder,
-                $removeJoinBuilderFromRootComposer:
-                    $removeJoinBuilderFromRootComposer,
-              ),
-        );
-    return f(composer);
-  }
 }
 
 class $$EquipmentElectricalLoadsTableTableManager
@@ -57239,8 +57343,8 @@ class $$EquipmentElectricalLoadsTableTableManager
           ),
           EquipmentElectricalLoadRow,
           PrefetchHooks Function({
+            bool componentInstanceId,
             bool consumptionGroupId,
-            bool circuitLoadAssignmentsRefs,
           })
         > {
   $$EquipmentElectricalLoadsTableTableManager(
@@ -57387,14 +57491,12 @@ class $$EquipmentElectricalLoadsTableTableManager
                       )
                       .toList(),
           prefetchHooksCallback: ({
+            componentInstanceId = false,
             consumptionGroupId = false,
-            circuitLoadAssignmentsRefs = false,
           }) {
             return PrefetchHooks(
               db: db,
-              explicitlyWatchedTables: [
-                if (circuitLoadAssignmentsRefs) db.circuitLoadAssignments,
-              ],
+              explicitlyWatchedTables: [],
               addJoins: <
                 T extends TableManagerState<
                   dynamic,
@@ -57410,6 +57512,21 @@ class $$EquipmentElectricalLoadsTableTableManager
                   dynamic
                 >
               >(state) {
+                if (componentInstanceId) {
+                  state =
+                      state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.componentInstanceId,
+                            referencedTable:
+                                $$EquipmentElectricalLoadsTableReferences
+                                    ._componentInstanceIdTable(db),
+                            referencedColumn:
+                                $$EquipmentElectricalLoadsTableReferences
+                                    ._componentInstanceIdTable(db)
+                                    .id,
+                          )
+                          as T;
+                }
                 if (consumptionGroupId) {
                   state =
                       state.withJoin(
@@ -57429,32 +57546,7 @@ class $$EquipmentElectricalLoadsTableTableManager
                 return state;
               },
               getPrefetchedDataCallback: (items) async {
-                return [
-                  if (circuitLoadAssignmentsRefs)
-                    await $_getPrefetchedData<
-                      EquipmentElectricalLoadRow,
-                      $EquipmentElectricalLoadsTable,
-                      CircuitLoadAssignmentRow
-                    >(
-                      currentTable: table,
-                      referencedTable: $$EquipmentElectricalLoadsTableReferences
-                          ._circuitLoadAssignmentsRefsTable(db),
-                      managerFromTypedResult:
-                          (p0) =>
-                              $$EquipmentElectricalLoadsTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).circuitLoadAssignmentsRefs,
-                      referencedItemsForCurrentItem:
-                          (item, referencedItems) => referencedItems.where(
-                            (e) =>
-                                e.componentInstanceId ==
-                                item.componentInstanceId,
-                          ),
-                      typedResults: items,
-                    ),
-                ];
+                return [];
               },
             );
           },
@@ -57475,8 +57567,8 @@ typedef $$EquipmentElectricalLoadsTableProcessedTableManager =
       (EquipmentElectricalLoadRow, $$EquipmentElectricalLoadsTableReferences),
       EquipmentElectricalLoadRow,
       PrefetchHooks Function({
+        bool componentInstanceId,
         bool consumptionGroupId,
-        bool circuitLoadAssignmentsRefs,
       })
     >;
 typedef $$ElectricalCircuitsTableCreateCompanionBuilder =
@@ -58640,26 +58732,6 @@ final class $$CircuitLoadAssignmentsTableReferences
     super.$_typedResult,
   );
 
-  static $EquipmentElectricalLoadsTable _componentInstanceIdTable(
-    _$AppDatabase db,
-  ) => db.equipmentElectricalLoads.createAlias(
-    'circuit_load_assignments__component_instance_id__equipment_electrical_loads__component_instance_id',
-  );
-
-  $$EquipmentElectricalLoadsTableProcessedTableManager get componentInstanceId {
-    final $_column = $_itemColumn<String>('component_instance_id')!;
-
-    final manager = $$EquipmentElectricalLoadsTableTableManager(
-      $_db,
-      $_db.equipmentElectricalLoads,
-    ).filter((f) => f.componentInstanceId.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_componentInstanceIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-
   static $ElectricalCircuitsTable _circuitIdTable(_$AppDatabase db) =>
       db.electricalCircuits.createAlias(
         'circuit_load_assignments__circuit_id__electrical_circuits__id',
@@ -58689,30 +58761,6 @@ class $$CircuitLoadAssignmentsTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  $$EquipmentElectricalLoadsTableFilterComposer get componentInstanceId {
-    final $$EquipmentElectricalLoadsTableFilterComposer composer =
-        $composerBuilder(
-          composer: this,
-          getCurrentColumn: (t) => t.componentInstanceId,
-          referencedTable: $db.equipmentElectricalLoads,
-          getReferencedColumn: (t) => t.componentInstanceId,
-          builder:
-              (
-                joinBuilder, {
-                $addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer,
-              }) => $$EquipmentElectricalLoadsTableFilterComposer(
-                $db: $db,
-                $table: $db.equipmentElectricalLoads,
-                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-                joinBuilder: joinBuilder,
-                $removeJoinBuilderFromRootComposer:
-                    $removeJoinBuilderFromRootComposer,
-              ),
-        );
-    return composer;
-  }
-
   $$ElectricalCircuitsTableFilterComposer get circuitId {
     final $$ElectricalCircuitsTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -58746,30 +58794,6 @@ class $$CircuitLoadAssignmentsTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  $$EquipmentElectricalLoadsTableOrderingComposer get componentInstanceId {
-    final $$EquipmentElectricalLoadsTableOrderingComposer composer =
-        $composerBuilder(
-          composer: this,
-          getCurrentColumn: (t) => t.componentInstanceId,
-          referencedTable: $db.equipmentElectricalLoads,
-          getReferencedColumn: (t) => t.componentInstanceId,
-          builder:
-              (
-                joinBuilder, {
-                $addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer,
-              }) => $$EquipmentElectricalLoadsTableOrderingComposer(
-                $db: $db,
-                $table: $db.equipmentElectricalLoads,
-                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-                joinBuilder: joinBuilder,
-                $removeJoinBuilderFromRootComposer:
-                    $removeJoinBuilderFromRootComposer,
-              ),
-        );
-    return composer;
-  }
-
   $$ElectricalCircuitsTableOrderingComposer get circuitId {
     final $$ElectricalCircuitsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -58803,30 +58827,6 @@ class $$CircuitLoadAssignmentsTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  $$EquipmentElectricalLoadsTableAnnotationComposer get componentInstanceId {
-    final $$EquipmentElectricalLoadsTableAnnotationComposer composer =
-        $composerBuilder(
-          composer: this,
-          getCurrentColumn: (t) => t.componentInstanceId,
-          referencedTable: $db.equipmentElectricalLoads,
-          getReferencedColumn: (t) => t.componentInstanceId,
-          builder:
-              (
-                joinBuilder, {
-                $addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer,
-              }) => $$EquipmentElectricalLoadsTableAnnotationComposer(
-                $db: $db,
-                $table: $db.equipmentElectricalLoads,
-                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-                joinBuilder: joinBuilder,
-                $removeJoinBuilderFromRootComposer:
-                    $removeJoinBuilderFromRootComposer,
-              ),
-        );
-    return composer;
-  }
-
   $$ElectricalCircuitsTableAnnotationComposer get circuitId {
     final $$ElectricalCircuitsTableAnnotationComposer composer =
         $composerBuilder(
@@ -58865,7 +58865,7 @@ class $$CircuitLoadAssignmentsTableTableManager
           $$CircuitLoadAssignmentsTableUpdateCompanionBuilder,
           (CircuitLoadAssignmentRow, $$CircuitLoadAssignmentsTableReferences),
           CircuitLoadAssignmentRow,
-          PrefetchHooks Function({bool componentInstanceId, bool circuitId})
+          PrefetchHooks Function({bool circuitId})
         > {
   $$CircuitLoadAssignmentsTableTableManager(
     _$AppDatabase db,
@@ -58922,10 +58922,7 @@ class $$CircuitLoadAssignmentsTableTableManager
                         ),
                       )
                       .toList(),
-          prefetchHooksCallback: ({
-            componentInstanceId = false,
-            circuitId = false,
-          }) {
+          prefetchHooksCallback: ({circuitId = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [],
@@ -58944,21 +58941,6 @@ class $$CircuitLoadAssignmentsTableTableManager
                   dynamic
                 >
               >(state) {
-                if (componentInstanceId) {
-                  state =
-                      state.withJoin(
-                            currentTable: table,
-                            currentColumn: table.componentInstanceId,
-                            referencedTable:
-                                $$CircuitLoadAssignmentsTableReferences
-                                    ._componentInstanceIdTable(db),
-                            referencedColumn:
-                                $$CircuitLoadAssignmentsTableReferences
-                                    ._componentInstanceIdTable(db)
-                                    .componentInstanceId,
-                          )
-                          as T;
-                }
                 if (circuitId) {
                   state =
                       state.withJoin(
@@ -58998,7 +58980,7 @@ typedef $$CircuitLoadAssignmentsTableProcessedTableManager =
       $$CircuitLoadAssignmentsTableUpdateCompanionBuilder,
       (CircuitLoadAssignmentRow, $$CircuitLoadAssignmentsTableReferences),
       CircuitLoadAssignmentRow,
-      PrefetchHooks Function({bool componentInstanceId, bool circuitId})
+      PrefetchHooks Function({bool circuitId})
     >;
 typedef $$PhysicalChannelsTableCreateCompanionBuilder =
     PhysicalChannelsCompanion Function({
