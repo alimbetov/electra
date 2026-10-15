@@ -1,5 +1,7 @@
 import 'elv_command_result.dart';
 import 'elv_physical_routing_workspace_service.dart';
+import 'elv_reviewed_workspace_command.dart';
+import 'elv_revision_command_history_service.dart';
 import 'power_workspace_projection.dart';
 import 'power_workspace_state.dart';
 
@@ -16,9 +18,9 @@ final class PowerWorkspaceSessionSnapshot {
 /// Application coordinator for the P7 power workspace.
 ///
 /// Widgets never call persistence repositories directly. Queries come through
-/// [PowerWorkspaceRepository], physical-route mutations through
-/// [ElvPhysicalRoutingWorkspaceService], and undo/redo through the durable ELV
-/// command-history boundary.
+/// [PowerWorkspaceRepository], reviewed physical-route mutations through
+/// [ElvPhysicalRoutingWorkspaceService], and undo/redo through the explicit
+/// revision-scoped durable history boundary.
 final class PowerWorkspaceController {
   PowerWorkspaceController({
     required this.repository,
@@ -28,7 +30,7 @@ final class PowerWorkspaceController {
 
   final PowerWorkspaceRepository repository;
   final ElvPhysicalRoutingWorkspaceService? routingService;
-  final ElvCommandHistoryService? historyService;
+  final ElvRevisionCommandHistoryService? historyService;
 
   PowerWorkspaceState? _state;
   PowerWorkspaceProjection? _projection;
@@ -108,11 +110,17 @@ final class PowerWorkspaceController {
     return snapshot;
   }
 
-  /// Commits the exact reviewed physical-routing command through the public
-  /// ELV workspace service. A command failure deliberately retains the draft
-  /// and reviewed fingerprint so the engineer can correct and retry it.
+  /// Commits only the exact reviewed physical-routing command through the
+  /// public ELV workspace service.
+  ///
+  /// Project, design revision and reviewed fingerprint are checked before the
+  /// command reaches the mutating service. A command failure deliberately
+  /// retains the draft and fingerprint so the engineer can correct/review and
+  /// retry. The persistence-side executor must still CAS the command's own row
+  /// revisions/preconditions; these checks prevent UI context drift, not DB
+  /// concurrency races.
   Future<ElvCommandResult<Object?>> commitReviewedRoute(
-    ElvWorkspaceCommand command,
+    ElvReviewedWorkspaceCommand command,
   ) async {
     final service = routingService;
     if (service == null) {
@@ -131,7 +139,8 @@ final class PowerWorkspaceController {
         ),
       );
     }
-    if (!state.hasDraft || state.previewFingerprint == null) {
+    final reviewedFingerprint = state.previewFingerprint;
+    if (!state.hasDraft || reviewedFingerprint == null) {
       return const ElvCommandFailureResult<Object?>(
         ElvFailure(
           code: 'ELV4_ROUTE_PREVIEW_REQUIRED',
@@ -144,6 +153,23 @@ final class PowerWorkspaceController {
         ElvFailure(
           code: 'ELV4_ROUTE_PROJECT_MISMATCH',
           category: ElvFailureCategory.projectIsolation,
+        ),
+      );
+    }
+    if (command.designRevisionId != state.context.designRevisionId) {
+      return const ElvCommandFailureResult<Object?>(
+        ElvFailure(
+          code: 'ELV4_ROUTE_REVISION_MISMATCH',
+          category: ElvFailureCategory.revisionConflict,
+        ),
+      );
+    }
+    if (command.reviewedFingerprint.toLowerCase() !=
+        reviewedFingerprint.toLowerCase()) {
+      return const ElvCommandFailureResult<Object?>(
+        ElvFailure(
+          code: 'ELV4_ROUTE_REVIEW_MISMATCH',
+          category: ElvFailureCategory.revisionConflict,
         ),
       );
     }
@@ -160,11 +186,23 @@ final class PowerWorkspaceController {
     return result;
   }
 
-  Future<bool> canUndo() async =>
-      await historyService?.canUndo(state.context.projectId) ?? false;
+  Future<bool> canUndo() async {
+    if (!state.mutationAllowed) return false;
+    return await historyService?.canUndo(
+          projectId: state.context.projectId,
+          designRevisionId: state.context.designRevisionId,
+        ) ??
+        false;
+  }
 
-  Future<bool> canRedo() async =>
-      await historyService?.canRedo(state.context.projectId) ?? false;
+  Future<bool> canRedo() async {
+    if (!state.mutationAllowed) return false;
+    return await historyService?.canRedo(
+          projectId: state.context.projectId,
+          designRevisionId: state.context.designRevisionId,
+        ) ??
+        false;
+  }
 
   Future<ElvCommandResult<Object?>> undo() => _historyMutation(undo: true);
 
@@ -189,10 +227,16 @@ final class PowerWorkspaceController {
       );
     }
     _state = state.startOperation();
-    final result =
-        undo
-            ? await history.undo(state.context.projectId)
-            : await history.redo(state.context.projectId);
+    final context = state.context;
+    final result = undo
+        ? await history.undo(
+            projectId: context.projectId,
+            designRevisionId: context.designRevisionId,
+          )
+        : await history.redo(
+            projectId: context.projectId,
+            designRevisionId: context.designRevisionId,
+          );
     switch (result) {
       case ElvCommandSuccess<Object?>():
         _state = state.finishOperation();
