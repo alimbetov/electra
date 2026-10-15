@@ -37,7 +37,8 @@ class PowerComponentBindings extends Table with PowerRevisionAuditColumns {
 @DataClassName('PowerTransferBindingRow')
 class PowerTransferBindings extends Table with PowerRevisionAuditColumns {
   TextColumn get componentId => text().references(ComponentInstances, #id)();
-  TextColumn get inputPortId => text().references(EngineeringPortInstances, #id)();
+  TextColumn get inputPortId =>
+      text().references(EngineeringPortInstances, #id)();
   TextColumn get transferKind => text()();
   TextColumn get modelRefJson => text()();
   TextColumn get payloadJson => text()();
@@ -52,7 +53,8 @@ class PowerTransferOutputs extends Table {
   TextColumn get designRevisionId =>
       text().references(ProjectDesignRevisions, #id)();
   TextColumn get transferId => text()();
-  TextColumn get outputPortId => text().references(EngineeringPortInstances, #id)();
+  TextColumn get outputPortId =>
+      text().references(EngineeringPortInstances, #id)();
   IntColumn get ordinal => integer()();
 
   @override
@@ -65,7 +67,8 @@ class PowerTransferOutputs extends Table {
 
 @DataClassName('PowerLoadBindingRow')
 class PowerLoadBindings extends Table with PowerRevisionAuditColumns {
-  TextColumn get inputPortId => text().references(EngineeringPortInstances, #id)();
+  TextColumn get inputPortId =>
+      text().references(EngineeringPortInstances, #id)();
   TextColumn get stateCode => text()();
   TextColumn get accountingKind => text()();
   TextColumn get originId => text()();
@@ -77,7 +80,8 @@ class PowerLoadBindings extends Table with PowerRevisionAuditColumns {
 
 @DataClassName('PowerCapacityGroupRow')
 class PowerCapacityGroups extends Table with PowerRevisionAuditColumns {
-  TextColumn get ownerComponentId => text().references(ComponentInstances, #id)();
+  TextColumn get ownerComponentId =>
+      text().references(ComponentInstances, #id)();
   TextColumn get limitsJson => text()();
   TextColumn get applicabilityJson => text()();
 
@@ -91,7 +95,8 @@ class PowerCapacityGroupMembers extends Table {
   TextColumn get designRevisionId =>
       text().references(ProjectDesignRevisions, #id)();
   TextColumn get groupId => text()();
-  TextColumn get outputPortId => text().references(EngineeringPortInstances, #id)();
+  TextColumn get outputPortId =>
+      text().references(EngineeringPortInstances, #id)();
   IntColumn get ordinal => integer()();
 
   @override
@@ -104,7 +109,8 @@ class PowerCapacityGroupMembers extends Table {
 
 @DataClassName('PowerSupplyRequirementRow')
 class PowerSupplyRequirements extends Table with PowerRevisionAuditColumns {
-  TextColumn get consumerComponentId => text().references(ComponentInstances, #id)();
+  TextColumn get consumerComponentId =>
+      text().references(ComponentInstances, #id)();
   TextColumn get selectionMode => text()();
   TextColumn get payloadJson => text()();
 
@@ -118,7 +124,8 @@ class PowerSupplyRequirementInputs extends Table {
   TextColumn get designRevisionId =>
       text().references(ProjectDesignRevisions, #id)();
   TextColumn get requirementId => text()();
-  TextColumn get inputPortId => text().references(EngineeringPortInstances, #id)();
+  TextColumn get inputPortId =>
+      text().references(EngineeringPortInstances, #id)();
   TextColumn get allowedSourcesJson => text()();
   IntColumn get ordinal => integer()();
 
@@ -215,7 +222,8 @@ class PowerScenarioUnavailableSources extends Table {
 
 @DataClassName('PoeDeliveryBindingRow')
 class PoeDeliveryBindings extends Table with PowerRevisionAuditColumns {
-  TextColumn get psePortId => text().references(EngineeringPortInstances, #id)();
+  TextColumn get psePortId =>
+      text().references(EngineeringPortInstances, #id)();
   TextColumn get pdPortId => text().references(EngineeringPortInstances, #id)();
   TextColumn get accountingMode => text()();
   TextColumn get definitionRefJson => text()();
@@ -239,11 +247,7 @@ class PoeDeliveryPathMembers extends Table {
   TextColumn get evidenceJson => text()();
 
   @override
-  Set<Column<Object>> get primaryKey => {
-    designRevisionId,
-    deliveryId,
-    ordinal,
-  };
+  Set<Column<Object>> get primaryKey => {designRevisionId, deliveryId, ordinal};
 }
 
 @DataClassName('BackupAssemblyRow')
@@ -266,7 +270,8 @@ class BackupProtectedOutputs extends Table {
   TextColumn get designRevisionId =>
       text().references(ProjectDesignRevisions, #id)();
   TextColumn get assemblyId => text()();
-  TextColumn get outputPortId => text().references(EngineeringPortInstances, #id)();
+  TextColumn get outputPortId =>
+      text().references(EngineeringPortInstances, #id)();
 
   @override
   Set<Column<Object>> get primaryKey => {
@@ -278,7 +283,8 @@ class BackupProtectedOutputs extends Table {
 
 @DataClassName('BatteryBankBindingRow')
 class BatteryBankBindings extends Table with PowerRevisionAuditColumns {
-  TextColumn get bankComponentId => text().references(ComponentInstances, #id)();
+  TextColumn get bankComponentId =>
+      text().references(ComponentInstances, #id)();
   TextColumn get unitRefJson => text()();
   IntColumn get seriesCount => integer()();
   IntColumn get parallelCount => integer()();
