@@ -55,7 +55,7 @@ QueryExecutor _native(File file) => NativeDatabase.createInBackground(
   file,
   setup: (raw) {
     raw.execute('PRAGMA journal_mode=WAL');
-    raw.execute('PRAGMA busy_timeout=5000');
+    raw.execute('PRAGMA busy_timeout=30000');
   },
 );
 
