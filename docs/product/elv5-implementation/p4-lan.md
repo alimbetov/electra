@@ -28,3 +28,7 @@ Rack basis reports required RU/weight/depth and available-limit comparison only 
 ## Exit
 
 P4 runtime acceptance requires its numbered assertions at the same accepted source SHA and its prerequisite gates. This document is a design contract, not proof of source implementation.
+
+## Audit refinements
+
+LAN-05 keeps physical lossMin/lossMax free of engineering reserve: sensitivity margin is required separately against TxMin-lossMax; overload always checks TxMax-lossMin without fictitious attenuation. LAN-06 tags GROSS_WITH_EXCLUSIONS versus NET_USABLE and subtracts known reservations once. Neither basis proves layout/fit.

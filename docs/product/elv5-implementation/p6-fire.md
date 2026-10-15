@@ -28,3 +28,7 @@ FA-08 required ELV5 dimensions are exact project-policy match, route/cable evide
 ## Exit
 
 P6 runtime acceptance requires its numbered assertions at the same accepted source SHA and its prerequisite gates. This document is a design contract, not proof of source implementation.
+
+## Audit refinements
+
+FA-01 stores/expands every occupied address in its explicit domain, validates cardinality against profile consumption and detects overlaps on the full set. FA-07 consumes that set; distinct base addresses do not prove nonoverlapping multichannel resources.

@@ -76,3 +76,9 @@ ELV6 owns actual rack/cabinet layout/fit; LAN-06 provides a demand/capacity basi
 All 27 codes have a planned positive technical oracle and a negative/unsupported case. Core qualification covers four disciplines in one FK-valid public-command project with shared source, change isolation, migration/restart, frozen R1/R2, replay, rollback and publication/freeze races. Required dimensions are declared per process; unsupported future dimensions cannot be passed silently. Explicit basis-only processes display that scope and do not claim later-stage completeness.
 
 P0 requires evidenced ELV4 capabilities (RM01–RM15, six PWR kernels, exact numeric/physical models, scoped snapshots and accepted qualified verticals). The inherited branch contains designs and specification probes, not that runtime evidence. No merge or SPEC_RESOLVED label closes this gate.
+
+## 8. Technical audit refinements
+
+The [initial technical audit and remediation](../audit/elv5-technical-audit.md) resolved eight design findings. Pool-level integer byte ceilings, explicit estimate/guarantee retention basis, declared recorder channel accounting key, full address sets, physical-versus-reserve optical separation, gross/net RU basis and typed upstream scope/subject bindings are mandatory refinements to the above process contracts. Runtime and baseline gates remain open.
+
+CCTV-01 qualification requires both bounded FOV angles and footprint/model applicability; process-contracts.md fixes the bounded rational pinhole-angle backend. An unavailable backend produces a partial/blocked result, not complete coverage PASS.

@@ -2,7 +2,7 @@
 
 Status: DESIGN DRAFT / RUNTIME NOT IMPLEMENTED. Parent: [design](../elv5-discipline-calculations-design-specification.md).
 
-All thresholds/numbers below are fictional test data. Code names are stable; algorithm/schema versions are design targets, not registered runtime. Each required dimension must have explicit status. Numeric units are canonical SI/bytes; signed dBm and coordinate inputs extend decimal validation by quantity type, never relax nonnegative capacity/demand constraints.
+All thresholds/numbers are fictional test data. Typed upstream edges and code-owned scope/subject binders are normative in process-registry.json; dependencyNotes are display text only. Numeric units are canonical SI/bytes, signed dBm/coordinates where applicable. Every required dimension has explicit status; no later-stage compliance/layout claim follows from technical basis PASS.
 
 ## CCTV-01 — Camera coverage geometry
 
@@ -10,11 +10,13 @@ Scope: `DESIGN`; mode: `GEOMETRY`.
 
 **Required inputs:** camera captured position/frame and rotation matrix; rectilinear sensor width/height and focal length; target plane/zone and supported-obstruction declaration.
 
-**Algorithm/boundary:** Cast sensor corner rays through captured calibrated pinhole frame; intersect t=(planeOffset-dot(normal,origin))/dot(normal,direction), require positive finite intersection and supported model. Clip ordered footprint to zone. FOV=2*atan(sensorDimension/(2*focalLength)) uses separately versioned bounded backend; exact rational footprint may qualify independently of an unavailable angle display. Parallel/horizon/uncertain intersections remain unresolved. No DORI or occlusion success inferred.
+**Algorithm/boundary:** Cast sensor corner rays through captured calibrated pinhole frame; intersect t=(planeOffset-dot(normal,origin))/dot(normal,direction), require positive finite intersection and supported model. Clip ordered footprint to zone. FOV=2*atan(sensorDimension/(2*focalLength)) uses separately versioned bounded backend; horizontal/vertical FOV bounds are mandatory technical dimensions; a footprint-only result cannot qualify the complete process. Parallel/horizon/uncertain intersections remain unresolved. No DORI or occlusion success inferred.
 
-**Required technical dimensions:** footprint-bounds, zone-intersection, model-applicability.
+**Required technical dimensions:** footprint-bounds, zone-intersection, model-applicability, horizontal-FOV-bound, vertical-FOV-bound.
 
-**Consumed dependencies:** camera pose, intrinsics edition, target geometry/frame.
+**Upstream processes:** None; registered typed input facts only..
+
+**Dependency explanation:** camera pose, intrinsics edition, target geometry/frame.
 
 **Positive oracle:** Fictional normal incidence: height=3m,sensor=6x4mm,focal=6mm,target parallel plane -> footprint 3x2m, area 6m2; unobstructed geometry basis only.
 
@@ -32,7 +34,9 @@ Scope: `DESIGN`; mode: `SCALAR`.
 
 **Required technical dimensions:** edge-expected-bitrate, edge-peak-bitrate, recorder-ingress.
 
-**Consumed dependencies:** stream profiles, flow membership sets, network path.
+**Upstream processes:** None; registered typed input facts only..
+
+**Dependency explanation:** stream profiles, flow membership sets, network path.
 
 **Positive oracle:** One 4,000,000bit/s stream, two unicast receivers on common edge -> 8,000,000bit/s edge load; one recorded subscription -> 4,000,000bit/s recording ingress.
 
@@ -44,17 +48,19 @@ Scope: `DESIGN`; mode: `SCALAR`.
 
 Scope: `DESIGN`; mode: `SCALAR`.
 
-**Required inputs:** recording assignment per encoded stream; expected recording bitrate basis; union of half-open recorded UTC intervals over explicit horizon; reserve multiplier and optional redundancy profile.
+**Required inputs:** recording assignment per encoded stream; expected recording bitrate basis; union of half-open recorded UTC intervals over explicit horizon; reserve multiplier and optional redundancy profile; sizingBasis EXPECTED_ESTIMATE or GUARANTEED_UPPER_BOUND; explicit storage pool/copy identity and integer-byte rounding policy.
 
-**Algorithm/boundary:** For each unique recording assignment integrate bitrateBitsPerSecond * uniqueRecordedSeconds / 8; sum and apply declared reserve once. Daily recurrence is expanded with pinned timezone/rules, then overlaps are unioned; do not multiply total horizon seconds by retentionDays again. Raw estimate=usableRequired/redundancyUsableFraction only if explicit model applies; no product selection.
+**Algorithm/boundary:** For each unique recording assignment integrate bitrateBitsPerSecond * uniqueRecordedSeconds / 8; sum and apply declared reserve once. Daily recurrence is expanded with pinned timezone/rules, then overlaps are unioned; do not multiply total horizon seconds by retentionDays again. Raw estimate=usableRequired/redundancyUsableFraction only if explicit model applies; no product selection. Сначала суммировать точные rational bytes всех уникальных recording assignments в одном storage pool/horizon, затем применить reserve один раз и ceil до целого usable byte. Raw basis=ceil(rounded usable/redundancy fraction). UI rounding не меняет ни один verdict. Явный sizingBasis EXPECTED_ESTIMATE либо GUARANTEED_UPPER_BOUND. Для guarantee интегрировать подтверждённый upper-bound bitrate/schedule model; missing bound ->UNRESOLVED. Estimate может пройти только estimate-capacity и всегда retentionGuarantee=NOT_ASSESSED. Recording identity=(streamId,poolId,copyRole); duplicate identity rejected; two deliberate pools/copies counted explicitly.
 
-**Required technical dimensions:** recorded-time, usable-bytes, reserve-accounting.
+**Required technical dimensions:** recorded-time, usable-bytes, reserve-accounting, integer-byte-capacity, sizing-claim-scope.
 
-**Consumed dependencies:** CCTV-02 recorded stream basis, schedule/horizon, storage policy.
+**Upstream processes:** CCTV-02 / DESIGN / RECORDED_STREAM_SET / ALWAYS.
+
+**Dependency explanation:** CCTV-02 recorded stream basis, schedule/horizon, storage policy.
 
 **Positive oracle:** 8,000,000bit/s continuous 30*86400s -> 2,592,000,000,000B; reserve1.1 -> 2,851,200,000,000B. Explicit mirror usable fraction .5 -> raw basis5,702,400,000,000B.
 
-**Negative/unsupported case:** Overlapping intervals counted once; absent event duty or schedule/timezone policy blocks affected estimate, never assume 24h or a motion factor.
+**Negative/unsupported case:** Overlapping intervals counted once; absent event duty or schedule/timezone policy blocks affected estimate, never assume 24h or a motion factor. Expected estimate never qualifies guaranteed retention; one-bit recording tests byte rounding.
 
 **Planned acceptance:** CCTV-03-POS, CCTV-03-NEG. Runtime: NOT_STARTED.
 
@@ -68,7 +74,9 @@ Scope: `SEGMENT`; mode: `POWER_WRAPPER`.
 
 **Required technical dimensions:** global-budget, CCTV-contribution, physical-evidence.
 
-**Consumed dependencies:** ELV-PWR-06, shared PSE membership, CCTV policy.
+**Upstream processes:** ELV-PWR-06 / SAME_SEGMENT / GLOBAL_PSE_CONTEXT / ALWAYS.
+
+**Dependency explanation:** ELV-PWR-06, shared PSE membership, CCTV policy.
 
 **Positive oracle:** Global shared reservation30W, budget35W, selected CCTV contribution12W -> global margin5W, contribution12W; exactly one physical budget evidence.
 
@@ -80,13 +88,15 @@ Scope: `SEGMENT`; mode: `POWER_WRAPPER`.
 
 Scope: `DESIGN`; mode: `SCALAR`.
 
-**Required inputs:** recorded stream/channel assignments; recorder exact codec/resolution/ingress/usable capacity; CCTV-02/03 evidence.
+**Required inputs:** recorded stream/channel assignments; recorder exact codec/resolution/ingress/usable capacity; CCTV-02/03 evidence; channel/license accounting basis and exact grouping key; storage sizing claim required by selected policy.
 
-**Algorithm/boundary:** Check distinct recorded channel count, peak ingress, declared stream compatibility and required usable storage independently. Selected usable capacity is not raw disk sum. Capacity failure is a completed FAIL, not an execution error.
+**Algorithm/boundary:** Check distinct recorded channel count, peak ingress, declared stream compatibility and required usable storage independently. Selected usable capacity is not raw disk sum. Capacity failure is a completed FAIL, not an execution error. Recorder profile explicitly selects accounting basis DEVICE, ENCODED_STREAM or LICENSE_CHANNEL with exact assignments. Enforce each declared channel/license capacity separately. Sum actual ingress and recordings independently of channel grouping. Missing accounting basis ->BLOCKED. Явный sizingBasis EXPECTED_ESTIMATE либо GUARANTEED_UPPER_BOUND. Для guarantee интегрировать подтверждённый upper-bound bitrate/schedule model; missing bound ->UNRESOLVED. Estimate может пройти только estimate-capacity и всегда retentionGuarantee=NOT_ASSESSED. Recording identity=(streamId,poolId,copyRole); duplicate identity rejected; two deliberate pools/copies counted explicitly.
 
-**Required technical dimensions:** channels, ingress, codec-profile, usable-storage.
+**Required technical dimensions:** channels, ingress, codec-profile, usable-storage, channel-accounting-basis, storage-claim-scope.
 
-**Consumed dependencies:** CCTV-02, CCTV-03, recorder definition.
+**Upstream processes:** CCTV-02 / DESIGN / RECORDER_INGRESS / ALWAYS; CCTV-03 / DESIGN / RECORDER_POOL / ALWAYS.
+
+**Dependency explanation:** CCTV-02, CCTV-03, recorder definition.
 
 **Positive oracle:** 2 assigned channels, declared4-channel limit, ingress8Mbps<=20Mbps and required2,851,200,000,000B<=3,000,000,000,000 usable B -> PASS.
 
@@ -104,7 +114,9 @@ Scope: `DESIGN`; mode: `BASIS`.
 
 **Required technical dimensions:** link-composition, policy-match, physical-path.
 
-**Consumed dependencies:** ELV3 installed path, LAN length/compatibility kernel where applicable, PWR-06 when powered.
+**Upstream processes:** ELV-ROUTE-01 / DESIGN / REALIZED_LINK_SECTIONS / ALWAYS; ELV-PWR-06 / REQUIRED_APPLICABILITY_SEGMENTS / GLOBAL_PSE_CONTEXT / POWERED.
+
+**Dependency explanation:** ELV3 installed path, LAN length/compatibility kernel where applicable, PWR-06 when powered.
 
 **Positive oracle:** Fictional copper policy maximum30m, realized28m+2m patches=30m -> length basis PASS with exact profile provenance.
 
@@ -122,7 +134,9 @@ Scope: `DESIGN`; mode: `SCALAR`.
 
 **Required technical dimensions:** permanent-length, channel-length, allowance-accounting.
 
-**Consumed dependencies:** ELV3 installed lengths, link section membership, cabling policy.
+**Upstream processes:** ELV-ROUTE-01 / DESIGN / REALIZED_LINK_SECTIONS / ALWAYS.
+
+**Dependency explanation:** ELV3 installed lengths, link section membership, cabling policy.
 
 **Positive oracle:** Permanent28m + explicit patches2m = channel30m; policy permanent<=28/channel<=30 -> PASS, no second service-loop addition.
 
@@ -140,7 +154,9 @@ Scope: `DESIGN`; mode: `SCALAR`.
 
 **Required technical dimensions:** physical-count, media-speed, spare-capacity.
 
-**Consumed dependencies:** port inventory, assignment set, spare policy.
+**Upstream processes:** None; registered typed input facts only..
+
+**Dependency explanation:** port inventory, assignment set, spare policy.
 
 **Positive oracle:** 6 occupied,8 available,ratio .25 -> ceil1.5=2 spare,required8,margin0 -> PASS.
 
@@ -158,7 +174,9 @@ Scope: `SEGMENT`; mode: `POWER_WRAPPER`.
 
 **Required technical dimensions:** global-budget, LAN-contribution, physical-evidence.
 
-**Consumed dependencies:** ELV-PWR-06, PSE membership, LAN policy.
+**Upstream processes:** ELV-PWR-06 / SAME_SEGMENT / GLOBAL_PSE_CONTEXT / ALWAYS.
+
+**Dependency explanation:** ELV-PWR-06, PSE membership, LAN policy.
 
 **Positive oracle:** Global30W, selected LAN18W,35W budget -> margin5W with same physical evidence as CCTV-04.
 
@@ -176,7 +194,9 @@ Scope: `DESIGN`; mode: `BASIS`.
 
 **Required technical dimensions:** ordered-interface-match, path-capability, policy-provenance.
 
-**Consumed dependencies:** canonical interfaces, cable editions, LAN-01, compatibility matrix.
+**Upstream processes:** LAN-01 / DESIGN / SAME_LINK_POLICY_CONTEXT / ALWAYS.
+
+**Dependency explanation:** canonical interfaces, cable editions, LAN-01, compatibility matrix.
 
 **Positive oracle:** Every section explicitly supports selected1Gb/s fixture profile and length policy -> technical policy-match PASS.
 
@@ -188,13 +208,15 @@ Scope: `DESIGN`; mode: `BASIS`.
 
 Scope: `DESIGN`; mode: `SCALAR`.
 
-**Required inputs:** exact wavelength/fiber attenuation and installed lengths; mated connector pairs and splice events; Tx min/max dBm, receiver sensitivity/overload dBm; loss min/max and explicit reserve.
+**Required inputs:** exact wavelength/fiber attenuation and installed lengths; mated connector pairs and splice events; Tx min/max dBm, receiver sensitivity/overload dBm; loss min/max and explicit reserve; requiredSensitivityMargin separate from physical attenuation interval.
 
-**Algorithm/boundary:** For each optical direction compute loss interval=sum(alpha_dB_per_km*length_m/1000 + matedPairLoss + spliceLoss + declared loss terms). RxMin=TxMin-lossMax must meet sensitivity; RxMax=TxMax-lossMin must not exceed overload. Signed dBm is allowed; dB losses nonnegative. Evaluate both directions with their exact optics.
+**Algorithm/boundary:** For each optical direction compute loss interval=sum(alpha_dB_per_km*length_m/1000 + matedPairLoss + spliceLoss + declared loss terms). RxMin=TxMin-lossMax must meet sensitivity; RxMax=TxMax-lossMin must not exceed overload. Signed dBm is allowed; dB losses nonnegative. Evaluate both directions with their exact optics. Physical loss interval excludes reserve. Sensitivity check: TxMin-lossMax >= sensitivity+requiredSensitivityMargin. Overload: TxMax-lossMin <= receiverMax; no reserve is added to lossMin. Both directions pin separate optics/wavelength/path facts.
 
 **Required technical dimensions:** sensitivity-margin, overload-margin, both-directions.
 
-**Consumed dependencies:** fiber paths, termination/splice sets, optical editions/wavelength.
+**Upstream processes:** ELV-ROUTE-01 / DESIGN / REALIZED_LINK_SECTIONS / ALWAYS.
+
+**Dependency explanation:** fiber paths, termination/splice sets, optical editions/wavelength.
 
 **Positive oracle:** Tx=-3dBm,loss=2.5dB -> Rx=-5.5dBm; sensitivity=-15/overload=-1 -> margins9.5dB/4.5dB, both PASS for symmetric declared optics.
 
@@ -206,13 +228,15 @@ Scope: `DESIGN`; mode: `SCALAR`.
 
 Scope: `DESIGN`; mode: `BASIS`.
 
-**Required inputs:** declared equipment RU/weight/depth; non-owning rack membership; spare policy and available capacity if explicitly supplied.
+**Required inputs:** declared equipment RU/weight/depth; non-owning rack membership; spare policy and available capacity if explicitly supplied; capacityBasis and explicit already-excluded reservation provenance.
 
-**Algorithm/boundary:** Sum demand from distinct equipment; report RU/weight/depth requirements and comparison only for explicit available limits. No slot placement, clearance, thermal-layout or cabinet-fit certification; those belong to ELV6.
+**Algorithm/boundary:** Sum demand from distinct equipment; report RU/weight/depth requirements and comparison only for explicit available limits. No slot placement, clearance, thermal-layout or cabinet-fit certification; those belong to ELV6. Capacity basis is GROSS_WITH_EXCLUSIONS or NET_USABLE. Gross subtracts explicit unavailable/reserved set once; net never subtracts those again and records their provenance. Equipment demand is distinct from excluded reserve. Actual slot/depth/thermal fit stays NOT_ASSESSED until ELV6.
 
 **Required technical dimensions:** RU-demand, membership-accounting, basis-scope.
 
-**Consumed dependencies:** equipment dimensions, rack membership, reserve policy.
+**Upstream processes:** None; registered typed input facts only..
+
+**Dependency explanation:** equipment dimensions, rack membership, reserve policy.
 
 **Positive oracle:** Devices2RU+1RU and explicit1RU reserved -> demand4RU; declared6RU basis leaves2RU; layout status NOT_ASSESSED.
 
@@ -230,7 +254,9 @@ Scope: `DESIGN`; mode: `SCALAR`.
 
 **Required technical dimensions:** port-count, reserve, mapping-completeness.
 
-**Consumed dependencies:** panel ports, termination/patch membership, spare policy.
+**Upstream processes:** None; registered typed input facts only..
+
+**Dependency explanation:** panel ports, termination/patch membership, spare policy.
 
 **Positive oracle:** 8 ports,5 occupied,2 required spare ->3 free,1 free-after-reserve; complete declared mapping -> PASS.
 
@@ -248,7 +274,9 @@ Scope: `DESIGN`; mode: `TOPOLOGY`.
 
 **Required technical dimensions:** required-roles, role-multiplicity, scope-ownership.
 
-**Consumed dependencies:** door assembly, door profile, role membership set.
+**Upstream processes:** None; registered typed input facts only..
+
+**Dependency explanation:** door assembly, door profile, role membership set.
 
 **Positive oracle:** Profile reader+lock+(exitReader OR exitButton); exactly reader,lock,exitButton assigned -> PASS.
 
@@ -266,7 +294,9 @@ Scope: `DESIGN`; mode: `SCALAR`.
 
 **Required technical dimensions:** reader-channels, relay-channels, input-channels.
 
-**Consumed dependencies:** controller ports/resources, door assignments, capacity policy.
+**Upstream processes:** None; registered typed input facts only..
+
+**Dependency explanation:** controller ports/resources, door assignments, capacity policy.
 
 **Positive oracle:** Controller4 reader channels,3 used ->1 free;2 relay channels,2 used ->0 free; explicit zero spare -> PASS.
 
@@ -284,7 +314,9 @@ Scope: `SEGMENT`; mode: `POWER_WRAPPER`.
 
 **Required technical dimensions:** lock-state-demand, terminal-voltage, shared-trunk-current.
 
-**Consumed dependencies:** ELV-PWR-01, ELV-PWR-03, lock policy, control/feed separation.
+**Upstream processes:** ELV-PWR-01 / SAME_SEGMENT / GLOBAL_SUPPLY_CONTEXT / ALWAYS; ELV-PWR-03 / SAME_SEGMENT / SUPPLY_DC_DOMAIN / ALWAYS.
+
+**Dependency explanation:** ELV-PWR-01, ELV-PWR-03, lock policy, control/feed separation.
 
 **Positive oracle:** Shared trunk .3+.5A,24V,.5ohm and lock branch .3ohm -> lock23.45V; shared trunk .8A retained.
 
@@ -302,7 +334,9 @@ Scope: `SEGMENT`; mode: `POWER_WRAPPER`.
 
 **Required technical dimensions:** global-source-demand, policy-requirement, available-margin.
 
-**Consumed dependencies:** ELV-PWR-01, ELV-PWR-02, source policy set.
+**Upstream processes:** ELV-PWR-01 / SAME_SEGMENT / GLOBAL_SUPPLY_CONTEXT / ALWAYS; ELV-PWR-02 / SAME_SEGMENT / SOURCE_REQUIREMENT_CONTEXT / ALWAYS.
+
+**Dependency explanation:** ELV-PWR-01, ELV-PWR-02, source policy set.
 
 **Positive oracle:** Demand30W,reserve1.2,50W rating,derating.8 ->required36,available40,margin4; actual output demand remains30W.
 
@@ -320,7 +354,9 @@ Scope: `SEQUENCE`; mode: `POWER_WRAPPER`.
 
 **Required technical dimensions:** sequence-energy, bank-model, global-capacity-margin.
 
-**Consumed dependencies:** ELV-PWR-04, protected membership, ACS policy.
+**Upstream processes:** ELV-PWR-04 / SAME_SEQUENCE / GLOBAL_PROTECTED_BANK / ALWAYS.
+
+**Dependency explanation:** ELV-PWR-04, protected membership, ACS policy.
 
 **Positive oracle:** Shared constant-current source19.2W for3600s ->19.2Wh; usable134.4Wh ->115.2Wh margin for that explicit sequence.
 
@@ -338,7 +374,9 @@ Scope: `DESIGN`; mode: `TOPOLOGY`.
 
 **Required technical dimensions:** control-path, required-feed, release-policy.
 
-**Consumed dependencies:** canonical graph, door roles/profile, controller assignments.
+**Upstream processes:** None; registered typed input facts only..
+
+**Dependency explanation:** canonical graph, door roles/profile, controller assignments.
 
 **Positive oracle:** Explicit reader-controller link,controller relay control,independent lock supply and required exit/release path -> topology basis PASS.
 
@@ -350,13 +388,15 @@ Scope: `DESIGN`; mode: `TOPOLOGY`.
 
 Scope: `DESIGN`; mode: `SCALAR`.
 
-**Required inputs:** panel/module/loop inventory; device assignments and exact address/resource consumption; spare policy.
+**Required inputs:** panel/module/loop inventory; device assignments and exact address/resource consumption; spare policy; full expanded domain/address assignment sets including reserved resources.
 
-**Algorithm/boundary:** Count physical devices and consumed addresses separately, including modules occupying multiple addresses. Enforce declared uniqueness and scoped address domain. Compare independent device/address/panel limits.
+**Algorithm/boundary:** Count physical devices and consumed addresses separately, including modules occupying multiple addresses. Enforce declared uniqueness and scoped address domain. Compare independent device/address/panel limits. Assignments store explicit address set or versioned deterministic expansion with loop/panel address domain; expanded cardinality must equal profile consumption. Uniqueness is checked on full(domain,address) set including reserved resources, not just start address. Noncontiguous sets allowed only by selected profile.
 
 **Required technical dimensions:** device-count, address-count, address-uniqueness.
 
-**Consumed dependencies:** loop membership, device editions, panel policy.
+**Upstream processes:** None; registered typed input facts only..
+
+**Dependency explanation:** loop membership, device editions, panel policy.
 
 **Positive oracle:** 3 devices with address consumption1,1,2 ->4 addresses; declared5-address limit ->margin1.
 
@@ -374,7 +414,9 @@ Scope: `SEGMENT`; mode: `SCALAR`.
 
 **Required technical dimensions:** state-current, own-load-accounting, membership-completeness.
 
-**Consumed dependencies:** device profiles, state selection, loop/auxiliary membership.
+**Upstream processes:** None; registered typed input facts only..
+
+**Dependency explanation:** device profiles, state selection, loop/auxiliary membership.
 
 **Positive oracle:** 2 detectors at .01A standby + module .02A ->.04A; alarm .03+.03+.02 ->.08A for declared simultaneous state.
 
@@ -392,7 +434,9 @@ Scope: `SEGMENT`; mode: `POWER_WRAPPER`.
 
 **Required technical dimensions:** supported-electrical-model, terminal-voltage, declared-limit-match.
 
-**Consumed dependencies:** ELV-PWR-03, physical path, fire electrical policy.
+**Upstream processes:** ELV-PWR-03 / SAME_SEGMENT / SUPPLY_DC_DOMAIN / ALWAYS.
+
+**Dependency explanation:** ELV-PWR-03, physical path, fire electrical policy.
 
 **Positive oracle:** Explicit radial notification/panel feeder24V,.5A,.2ohm ->23.9V, within declared22..26V ->physical basis PASS.
 
@@ -410,7 +454,9 @@ Scope: `SEGMENT`; mode: `POWER_WRAPPER`.
 
 **Required technical dimensions:** global-load-coverage, required-capability, available-margin.
 
-**Consumed dependencies:** FA-02 where relevant, ELV-PWR-01, ELV-PWR-02, fire policy.
+**Upstream processes:** FA-02 / SAME_SEGMENT / FIRE_STATE_ORIGINS / ALWAYS; ELV-PWR-01 / SAME_SEGMENT / GLOBAL_SUPPLY_CONTEXT / ALWAYS; ELV-PWR-02 / SAME_SEGMENT / SOURCE_REQUIREMENT_CONTEXT / ALWAYS.
+
+**Dependency explanation:** FA-02 where relevant, ELV-PWR-01, ELV-PWR-02, fire policy.
 
 **Positive oracle:** Explicit total24W,reserve1.25,40W available ->required30W,margin10W; no second conversion/idle addition.
 
@@ -428,7 +474,9 @@ Scope: `SEQUENCE`; mode: `POWER_WRAPPER`.
 
 **Required technical dimensions:** required-duration-coverage, sequence-energy, bank-voltage-current, capacity-margin.
 
-**Consumed dependencies:** FA-02, ELV-PWR-04, fire autonomy policy.
+**Upstream processes:** FA-02 / COMPOSED_SEGMENTS / FIRE_STATE_ORIGINS / ALWAYS; ELV-PWR-04 / SAME_SEQUENCE / GLOBAL_PROTECTED_BANK / ALWAYS.
+
+**Dependency explanation:** FA-02, ELV-PWR-04, fire autonomy policy.
 
 **Positive oracle:** Explicit source12W standby7200s +24W alarm1800s ->36Wh; usable134.4Wh ->98.4Wh margin. No default mandated hours.
 
@@ -446,7 +494,9 @@ Scope: `SEGMENT`; mode: `POWER_WRAPPER`.
 
 **Required technical dimensions:** device-count, output-current, terminal-voltage.
 
-**Consumed dependencies:** notification membership, ELV-PWR-01/03, output profile.
+**Upstream processes:** ELV-PWR-01 / SAME_SEGMENT / NOTIFICATION_OUTPUT_CONTEXT / ALWAYS; ELV-PWR-03 / SAME_SEGMENT / NOTIFICATION_DC_DOMAIN / ALWAYS.
+
+**Dependency explanation:** notification membership, ELV-PWR-01/03, output profile.
 
 **Positive oracle:** 3 devices at .1A ->.3A <=declared .5A output, all terminals within provided voltage bounds ->basis PASS.
 
@@ -460,11 +510,13 @@ Scope: `DESIGN`; mode: `TOPOLOGY`.
 
 **Required inputs:** signal graph and loop source/return ports; exact closure/branch/isolation/address policy; device membership.
 
-**Algorithm/boundary:** Validate the selected directed/loop topology, required return closure, illegal branches and declared isolator placement policy on the signal layer. Isolator behavior/short-circuit survivability needs an explicit supported model; mere component presence is not proof.
+**Algorithm/boundary:** Validate the selected directed/loop topology, required return closure, illegal branches and declared isolator placement policy on the signal layer. Isolator behavior/short-circuit survivability needs an explicit supported model; mere component presence is not proof. Consume full expanded FA-01 address sets; topological placement does not hide overlaps.
 
 **Required technical dimensions:** signal-closure, branch-policy, address-topology-match.
 
-**Consumed dependencies:** canonical signal graph, loop policy, FA-01 address facts.
+**Upstream processes:** FA-01 / DESIGN / SAME_FIRE_LOOP / ALWAYS.
+
+**Dependency explanation:** canonical signal graph, loop policy, FA-01 address facts.
 
 **Positive oracle:** Declared source->D1->D2->return path closed with no forbidden branch and unique addresses ->signal basis PASS.
 
@@ -482,7 +534,9 @@ Scope: `DESIGN`; mode: `BASIS`.
 
 **Required technical dimensions:** cable-policy-match, route-evidence, claim-scope.
 
-**Consumed dependencies:** cable editions, route environment, fire cable policy.
+**Upstream processes:** None; registered typed input facts only..
+
+**Dependency explanation:** cable editions, route environment, fire cable policy.
 
 **Positive oracle:** Fictional policy requires TEST_CLASS_A, cable explicitly TEST_CLASS_A and applicable environment evidence ->policy-match PASS; verified compliance UNRESOLVED/not claimed.
 
@@ -490,3 +544,6 @@ Scope: `DESIGN`; mode: `BASIS`.
 
 **Planned acceptance:** FA-08-POS, FA-08-NEG. Runtime: NOT_STARTED.
 
+## Bounded FOV backend contract
+
+`pinhole-angle-bounds.v1` consumes nonnegative exact sensor/(2*focal) ratios, all lengths positive. For x>1 use atan(x)=pi/2-atan(1/x); on [0,1] use atan(x)=2*atan(x/(1+sqrt(1+x*x))) so the series argument is <=sqrt(2)-1. Bound sqrt with rational bisection; bound atan(z) by adjacent partial sums of its alternating series sum((-1)^k*z^(2k+1)/(2k+1)). Bound pi using the same series in pi=16*atan(1/5)-4*atan(1/239). All operations propagate conservative rational intervals. Limit 128 bisection steps,64 series terms and require final FOV width<=1e-9rad; otherwise BLOCKED, no midpoint-only PASS. Output radians plus optional derived degree display. This is a deterministic numeric contract, not claimed Dart implementation. Required positive example must include both FOV bounds and footprint.

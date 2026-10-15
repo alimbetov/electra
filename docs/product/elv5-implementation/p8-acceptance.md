@@ -28,3 +28,7 @@ Race barriers cover policy adoption versus reviewed preview, stream/route edits 
 ## Exit
 
 P8 runtime acceptance requires its numbered assertions at the same accepted source SHA and its prerequisite gates. This document is a design contract, not proof of source implementation.
+
+## Audit refinements
+
+Audit regression oracles include sub-byte aggregate ceiling, expected-versus-guaranteed retention, two streams/one-camera recorder licence, optical overload with design reserve, overlapping module address sets, gross/net RU equivalence, unknown upstream process/scope and registry cycle. All are required design-to-runtime tests; no structural validator substitutes for executed public-command qualification.

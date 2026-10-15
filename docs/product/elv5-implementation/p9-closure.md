@@ -28,3 +28,7 @@ ELV6 receives demand/assignment/enclosure inputs; ELV7 receives versioned policy
 ## Exit
 
 P9 runtime acceptance requires its numbered assertions at the same accepted source SHA and its prerequisite gates. This document is a design contract, not proof of source implementation.
+
+## Audit refinements
+
+The initial technical audit found eight design defects, now SPEC_RESOLVED with explicit contracts and regression oracles. Keep that resolution distinct from runtime evidence. Close only with all corresponding implemented tests; signed optical loss/retention/channel/address/basis scope cannot be waived by a passing unrelated subtotal.

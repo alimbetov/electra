@@ -22,3 +22,5 @@ ELV5 registers 27 discipline processes and consumes shared ELV3/ELV4 facts. It d
 [Process contracts](process-contracts.md) and [process registry](process-registry.json) cover CCTV6/LAN7/ACS6/Fire8. [Requirement ledger](requirements.json) contains 80 stable package requirements. Every runtime evidence field is intentionally empty.
 
 ELV4 RM01–RM15 are inherited design obligations, not an already implemented platform. Complete ELV5 wire schemas, DB migrations and executable qualification inputs must be reviewed in P1/P2/P8 before their runtime gates. This first ELV5 branch establishes the detailed package/process contracts without claiming the same audit/remediation maturity as the parent.
+
+Initial [technical audit/remediation](../../audit/elv5-technical-audit.md) covers all package requirements/processes. Eight findings are resolved in design; strict runtime codecs, full qualification input data and inherited prerequisite implementation still require their recorded gates.

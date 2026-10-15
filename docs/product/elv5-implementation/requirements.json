@@ -15,7 +15,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P0-002",
@@ -29,7 +30,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P0-003",
@@ -43,7 +45,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P0-004",
@@ -57,7 +60,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P0-005",
@@ -71,7 +75,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P0-006",
@@ -85,7 +90,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P0-007",
@@ -99,7 +105,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P0-008",
@@ -113,7 +120,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P1-001",
@@ -127,7 +135,10 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-06"
+      ]
     },
     {
       "requirementId": "ELV5-P1-002",
@@ -141,7 +152,11 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-02",
+        "ELV5-AUD-03"
+      ]
     },
     {
       "requirementId": "ELV5-P1-003",
@@ -155,7 +170,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P1-004",
@@ -169,7 +185,13 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-02",
+        "ELV5-AUD-04",
+        "ELV5-AUD-05",
+        "ELV5-AUD-07"
+      ]
     },
     {
       "requirementId": "ELV5-P1-005",
@@ -183,7 +205,11 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-01",
+        "ELV5-AUD-08"
+      ]
     },
     {
       "requirementId": "ELV5-P1-006",
@@ -197,7 +223,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P1-007",
@@ -211,7 +238,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P1-008",
@@ -225,7 +253,10 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-06"
+      ]
     },
     {
       "requirementId": "ELV5-P2-001",
@@ -239,7 +270,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P2-002",
@@ -253,7 +285,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P2-003",
@@ -267,7 +300,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P2-004",
@@ -281,7 +315,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P2-005",
@@ -295,7 +330,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P2-006",
@@ -309,7 +345,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P2-007",
@@ -323,7 +360,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P2-008",
@@ -337,7 +375,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P3-001",
@@ -351,7 +390,10 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-08"
+      ]
     },
     {
       "requirementId": "ELV5-P3-002",
@@ -365,7 +407,10 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-05"
+      ]
     },
     {
       "requirementId": "ELV5-P3-003",
@@ -379,7 +424,11 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-01",
+        "ELV5-AUD-02"
+      ]
     },
     {
       "requirementId": "ELV5-P3-004",
@@ -393,7 +442,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P3-005",
@@ -407,7 +457,11 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-02",
+        "ELV5-AUD-05"
+      ]
     },
     {
       "requirementId": "ELV5-P3-006",
@@ -421,7 +475,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P3-007",
@@ -435,7 +490,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P3-008",
@@ -449,7 +505,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P4-001",
@@ -463,7 +520,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P4-002",
@@ -477,7 +535,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P4-003",
@@ -491,7 +550,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P4-004",
@@ -505,7 +565,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P4-005",
@@ -519,7 +580,10 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-03"
+      ]
     },
     {
       "requirementId": "ELV5-P4-006",
@@ -533,7 +597,10 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-07"
+      ]
     },
     {
       "requirementId": "ELV5-P4-007",
@@ -547,7 +614,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P4-008",
@@ -561,7 +629,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P5-001",
@@ -575,7 +644,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P5-002",
@@ -589,7 +659,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P5-003",
@@ -603,7 +674,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P5-004",
@@ -617,7 +689,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P5-005",
@@ -631,7 +704,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P5-006",
@@ -645,7 +719,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P5-007",
@@ -659,7 +734,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P5-008",
@@ -673,7 +749,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P6-001",
@@ -687,7 +764,10 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-04"
+      ]
     },
     {
       "requirementId": "ELV5-P6-002",
@@ -701,7 +781,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P6-003",
@@ -715,7 +796,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P6-004",
@@ -729,7 +811,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P6-005",
@@ -743,7 +826,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P6-006",
@@ -757,7 +841,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P6-007",
@@ -771,7 +856,10 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-04"
+      ]
     },
     {
       "requirementId": "ELV5-P6-008",
@@ -785,7 +873,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P7-001",
@@ -799,7 +888,10 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-06"
+      ]
     },
     {
       "requirementId": "ELV5-P7-002",
@@ -813,7 +905,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P7-003",
@@ -827,7 +920,10 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-06"
+      ]
     },
     {
       "requirementId": "ELV5-P7-004",
@@ -841,7 +937,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P7-005",
@@ -855,7 +952,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P7-006",
@@ -869,7 +967,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P7-007",
@@ -883,7 +982,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P7-008",
@@ -897,7 +997,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P8-001",
@@ -911,7 +1012,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P8-002",
@@ -925,7 +1027,16 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-01",
+        "ELV5-AUD-02",
+        "ELV5-AUD-03",
+        "ELV5-AUD-04",
+        "ELV5-AUD-05",
+        "ELV5-AUD-07",
+        "ELV5-AUD-08"
+      ]
     },
     {
       "requirementId": "ELV5-P8-003",
@@ -939,7 +1050,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P8-004",
@@ -953,7 +1065,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P8-005",
@@ -967,7 +1080,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P8-006",
@@ -981,7 +1095,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P8-007",
@@ -995,7 +1110,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P8-008",
@@ -1009,7 +1125,14 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-01",
+        "ELV5-AUD-03",
+        "ELV5-AUD-04",
+        "ELV5-AUD-06",
+        "ELV5-AUD-08"
+      ]
     },
     {
       "requirementId": "ELV5-P9-001",
@@ -1023,7 +1146,10 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-06"
+      ]
     },
     {
       "requirementId": "ELV5-P9-002",
@@ -1037,7 +1163,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P9-003",
@@ -1051,7 +1178,12 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-01",
+        "ELV5-AUD-03",
+        "ELV5-AUD-05"
+      ]
     },
     {
       "requirementId": "ELV5-P9-004",
@@ -1065,7 +1197,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P9-005",
@@ -1079,7 +1212,8 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     },
     {
       "requirementId": "ELV5-P9-006",
@@ -1093,7 +1227,11 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-02",
+        "ELV5-AUD-08"
+      ]
     },
     {
       "requirementId": "ELV5-P9-007",
@@ -1107,7 +1245,10 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-07"
+      ]
     },
     {
       "requirementId": "ELV5-P9-008",
@@ -1121,7 +1262,9 @@
       "sourcePaths": [],
       "testPaths": [],
       "testedSha": null,
-      "evidence": []
+      "evidence": [],
+      "specificationResolutions": []
     }
-  ]
+  ],
+  "specificationAuditStatus": "8_FINDINGS_RESOLVED_IN_SPEC_ONLY"
 }

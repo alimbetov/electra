@@ -28,3 +28,7 @@ Card sequence: process summary → selected inputs/policy → affected equipment
 ## Exit
 
 P7 runtime acceptance requires its numbered assertions at the same accepted source SHA and its prerequisite gates. This document is a design contract, not proof of source implementation.
+
+## Audit refinements
+
+Execution graph consumes structured upstreamProcesses only. Registered scope/subject binders resolve exact compatible physical/policy contexts, including complete segment sets for DESIGN consumers. Unknown process/binder, invalid scope or cycle rejects registry publication. Dependency notes are explanatory text and cannot be parsed as code.

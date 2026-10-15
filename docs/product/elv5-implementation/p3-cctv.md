@@ -26,3 +26,9 @@ Streams, network replicas and recordings have separate IDs. Schedule intervals u
 ## Exit
 
 P3 runtime acceptance requires its numbered assertions at the same accepted source SHA and its prerequisite gates. This document is a design contract, not proof of source implementation.
+
+## Audit refinements
+
+CCTV-03 sums exact rational bytes per unique (stream,pool,copyRole) horizon before a single pool-level reserve/ceil to usable byte; raw estimate ceilings once after declared redundancy. Explicit EXPECTED_ESTIMATE versus GUARANTEED_UPPER_BOUND controls retention claims. CCTV-05 channel basis DEVICE/ENCODED_STREAM/LICENSE_CHANNEL is required independently of ingress/storage. Two streams of one camera are one channel only if the exact profile declares DEVICE accounting.
+
+CCTV-01 additionally requires horizontal/vertical FOV interval dimensions through pinhole-angle-bounds.v1; missing angle backend cannot be waived as an optional display. Its bounded algorithm and termination are specified in process-contracts.md; footprint-only remains a partial result.

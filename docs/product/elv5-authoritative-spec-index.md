@@ -22,3 +22,7 @@ Existing ELV1–ELV4 identities, ownership, reference editions, physical routing
 Within ELV5 the design governs boundaries; process registry governs each algorithm's inputs/outputs; package contracts govern writes and proof. Semantic changes require synchronized updates, not package-local overrides. The older architecture overview remains background: its mixed state list and ambiguous recording-duration formula are refined here, not copied into runtime codecs.
 
 All P0–P9 runtime packages are NOT_STARTED. ELV4 design findings were SPEC_RESOLVED, not implemented or runtime accepted. ELV5 design may proceed; runtime acceptance depends on evidenced ELV4 prerequisite capability gates and unresolved ELV1–ELV3 baseline reconciliation. Missing evidence is not a newly proven source defect.
+
+## Initial technical audit
+
+The [all-package/process audit](../audit/elv5-technical-audit.md) reviewed 80 requirements and 27 process contracts, identified 6 HIGH/2 MEDIUM design findings and resolved all eight in specification. Runtime acceptance remains unproven. See the [structured coverage/probes](../audit/elv5-technical-audit.json).

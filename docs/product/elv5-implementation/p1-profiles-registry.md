@@ -28,3 +28,7 @@ DESIGN consumers of power evidence, such as CCTV-06, declare the complete requir
 ## Exit
 
 P1 runtime acceptance requires its numbered assertions at the same accepted source SHA and its prerequisite gates. This document is a design contract, not proof of source implementation.
+
+## Audit refinements
+
+Audit resolutions require: exact pool/copy/sizing/channel basis types; integer-capacity rounding separate from UI formatting; signed optical physical-loss interval separate from design reserve; full expanded fire address sets; gross/net rack capacity tag. Registry upstream edges use registered code/scope/subject/condition fields and are validated for unknown nodes/cycles; free-text dependency notes never drive execution.
