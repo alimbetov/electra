@@ -82,7 +82,9 @@ final class _PowerWorkspacePanelHostState
               ? () => _run(binding.applyReviewedRoute)
               : null,
       onDiscardDraft:
-          binding.state.hasDraft ? () => _run(binding.discardReviewedRoute) : null,
+          binding.state.hasDraft
+              ? () => _run(binding.discardReviewedRoute)
+              : null,
       canUndo: canUndo,
       canRedo: canRedo,
       onUndo: canUndo ? () => _run(binding.undo) : null,

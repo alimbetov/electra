@@ -61,8 +61,14 @@ void main() {
       ],
     );
 
-    expect(staleRevision.reviewedFingerprint, isNot(baseline.reviewedFingerprint));
-    expect(changedRoute.reviewedFingerprint, isNot(baseline.reviewedFingerprint));
+    expect(
+      staleRevision.reviewedFingerprint,
+      isNot(baseline.reviewedFingerprint),
+    );
+    expect(
+      changedRoute.reviewedFingerprint,
+      isNot(baseline.reviewedFingerprint),
+    );
   });
 }
 

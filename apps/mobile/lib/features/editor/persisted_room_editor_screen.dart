@@ -53,9 +53,14 @@ class _PersistedRoomEditorScreenState
     WidgetsBinding.instance.addPostFrameCallback((_) => _openPowerWorkspace());
   }
 
-  PowerWorkspaceController _newPowerController() => PowerWorkspaceController(
-    repository: ref.read(powerWorkspaceRepositoryProvider),
-  );
+  PowerWorkspaceController _newPowerController() {
+    final routingRuntime = ref.read(elvReviewedRoutingRuntimeProvider);
+    return PowerWorkspaceController(
+      repository: ref.read(powerWorkspaceRepositoryProvider),
+      routingService: routingRuntime,
+      historyService: routingRuntime,
+    );
+  }
 
   @override
   void didUpdateWidget(covariant PersistedRoomEditorScreen oldWidget) {

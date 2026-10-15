@@ -19,7 +19,7 @@ import 'drift_elv_cable_run_repository.dart';
 /// transaction. [DriftElvCableRunRepository] remains the canonical mutator and
 /// continues to own command-ledger replay plus row-level revision validation.
 final class DriftElvReviewedRoutingRuntime
-    implements ElvWorkspaceCommandExecutor, ElvRevisionCommandHistoryService {
+    implements ElvWorkspaceCommandService, ElvRevisionCommandHistoryService {
   DriftElvReviewedRoutingRuntime(
     this.database, {
     required this.originDeviceId,
@@ -107,7 +107,9 @@ final class DriftElvReviewedRoutingRuntime
       cableRunId: command.cableRunId,
     );
     if (after == null) {
-      throw StateError('Committed reroute aggregate disappeared before history capture.');
+      throw StateError(
+        'Committed reroute aggregate disappeared before history capture.',
+      );
     }
 
     await _appendRerouteHistory(command: command, before: before, after: after);
@@ -138,7 +140,11 @@ final class DriftElvReviewedRoutingRuntime
     if (!await _isWorking(projectId, designRevisionId)) return false;
     final cursor = await _cursor(projectId, designRevisionId);
     if (cursor == null) return false;
-    return await _redoCandidate(projectId, designRevisionId, cursor.headSequence) !=
+    return await _redoCandidate(
+          projectId,
+          designRevisionId,
+          cursor.headSequence,
+        ) !=
         null;
   }
 
@@ -168,7 +174,9 @@ final class DriftElvReviewedRoutingRuntime
       return _historyFailure('ELV4_HISTORY_COMMAND_UNSUPPORTED');
     }
 
-    final inversePayload = _decodePayload(operation.inverseCanonicalPayloadJson);
+    final inversePayload = _decodePayload(
+      operation.inverseCanonicalPayloadJson,
+    );
     final cableRunId = _requiredString(inversePayload, 'cableRunId');
     final current = await _captureAggregate(
       projectId: projectId,
@@ -199,7 +207,9 @@ final class DriftElvReviewedRoutingRuntime
       cableRunId: cableRunId,
     );
     if (restored == null || restored.sha256 != operation.beforeAggregateHash) {
-      throw StateError('Undo postcondition does not match durable before evidence.');
+      throw StateError(
+        'Undo postcondition does not match durable before evidence.',
+      );
     }
 
     final previousHead = await _previousAppliedSequence(
@@ -255,7 +265,8 @@ final class DriftElvReviewedRoutingRuntime
     );
     if (lifecycleFailure != null) return lifecycleFailure;
     final cursor = await _cursor(projectId, designRevisionId);
-    if (cursor == null) return _historyFailure('ELV4_HISTORY_REDO_NOT_AVAILABLE');
+    if (cursor == null)
+      return _historyFailure('ELV4_HISTORY_REDO_NOT_AVAILABLE');
     final operation = await _redoCandidate(
       projectId,
       designRevisionId,
@@ -268,7 +279,9 @@ final class DriftElvReviewedRoutingRuntime
       return _historyFailure('ELV4_HISTORY_COMMAND_UNSUPPORTED');
     }
 
-    final forwardPayload = _decodePayload(operation.forwardCanonicalPayloadJson);
+    final forwardPayload = _decodePayload(
+      operation.forwardCanonicalPayloadJson,
+    );
     final cableRunId = _requiredString(forwardPayload, 'cableRunId');
     final current = await _captureAggregate(
       projectId: projectId,
@@ -299,7 +312,9 @@ final class DriftElvReviewedRoutingRuntime
       cableRunId: cableRunId,
     );
     if (restored == null || restored.sha256 != operation.afterAggregateHash) {
-      throw StateError('Redo postcondition does not match durable after evidence.');
+      throw StateError(
+        'Redo postcondition does not match durable after evidence.',
+      );
     }
 
     final nextGeneration = cursor.generation + 1;
@@ -393,32 +408,36 @@ final class DriftElvReviewedRoutingRuntime
       traversals: before.traversals,
     );
     final now = _now();
-    await database.into(database.elvRevisionCommandHistoryOperations).insert(
-      ElvRevisionCommandHistoryOperationsCompanion.insert(
-        projectId: command.projectId,
-        designRevisionId: command.designRevisionId,
-        sequence: sequence,
-        originalCommandId: command.commandId,
-        state: 'APPLIED',
-        forwardCommandType: 'REROUTE_CABLE_RUN',
-        forwardCommandSchema: ReviewedRerouteCableRunWorkspaceCommand.payloadSchema,
-        forwardCanonicalPayloadJson: forward.json,
-        forwardPayloadSha256: forward.sha256,
-        inverseCommandType: 'REROUTE_CABLE_RUN',
-        inverseCommandSchema: ReviewedRerouteCableRunWorkspaceCommand.payloadSchema,
-        inverseCanonicalPayloadJson: inverse.json,
-        inversePayloadSha256: inverse.sha256,
-        beforeAggregateEvidenceRef: beforeRef,
-        beforeAggregateHash: before.sha256,
-        afterAggregateEvidenceRef: afterRef,
-        afterAggregateHash: after.sha256,
-        cursorGeneration: nextGeneration,
-        affectedIdsJson: jsonEncode([command.cableRunId]),
-        createdAt: now,
-        updatedAt: now,
-        originDeviceId: originDeviceId,
-      ),
-    );
+    await database
+        .into(database.elvRevisionCommandHistoryOperations)
+        .insert(
+          ElvRevisionCommandHistoryOperationsCompanion.insert(
+            projectId: command.projectId,
+            designRevisionId: command.designRevisionId,
+            sequence: sequence,
+            originalCommandId: command.commandId,
+            state: 'APPLIED',
+            forwardCommandType: 'REROUTE_CABLE_RUN',
+            forwardCommandSchema:
+                ReviewedRerouteCableRunWorkspaceCommand.payloadSchema,
+            forwardCanonicalPayloadJson: forward.json,
+            forwardPayloadSha256: forward.sha256,
+            inverseCommandType: 'REROUTE_CABLE_RUN',
+            inverseCommandSchema:
+                ReviewedRerouteCableRunWorkspaceCommand.payloadSchema,
+            inverseCanonicalPayloadJson: inverse.json,
+            inversePayloadSha256: inverse.sha256,
+            beforeAggregateEvidenceRef: beforeRef,
+            beforeAggregateHash: before.sha256,
+            afterAggregateEvidenceRef: afterRef,
+            afterAggregateHash: after.sha256,
+            cursorGeneration: nextGeneration,
+            affectedIdsJson: jsonEncode([command.cableRunId]),
+            createdAt: now,
+            updatedAt: now,
+            originDeviceId: originDeviceId,
+          ),
+        );
     await _insertExecution(
       projectId: command.projectId,
       designRevisionId: command.designRevisionId,
@@ -428,18 +447,20 @@ final class DriftElvReviewedRoutingRuntime
     );
 
     if (cursor == null) {
-      await database.into(database.elvRevisionCommandHistoryCursors).insert(
-        ElvRevisionCommandHistoryCursorsCompanion.insert(
-          projectId: command.projectId,
-          designRevisionId: command.designRevisionId,
-          generation: nextGeneration,
-          headSequence: sequence,
-          branchId: branchId,
-          createdAt: now,
-          updatedAt: now,
-          originDeviceId: originDeviceId,
-        ),
-      );
+      await database
+          .into(database.elvRevisionCommandHistoryCursors)
+          .insert(
+            ElvRevisionCommandHistoryCursorsCompanion.insert(
+              projectId: command.projectId,
+              designRevisionId: command.designRevisionId,
+              generation: nextGeneration,
+              headSequence: sequence,
+              branchId: branchId,
+              createdAt: now,
+              updatedAt: now,
+              originDeviceId: originDeviceId,
+            ),
+          );
     } else {
       await _moveCursor(
         cursor,
@@ -480,19 +501,21 @@ final class DriftElvReviewedRoutingRuntime
   }
 
   Future<void> _insertEvidence(String evidenceRef, _RunAggregate value) async {
-    await database.into(database.elvRevisionAggregateEvidenceRecords).insert(
-      ElvRevisionAggregateEvidenceRecordsCompanion.insert(
-        evidenceRef: evidenceRef,
-        projectId: value.run.projectId,
-        designRevisionId: value.run.designRevisionId,
-        aggregateKind: 'CABLE_RUN',
-        aggregateId: value.run.id,
-        canonicalPayloadJson: value.canonicalJson,
-        payloadSha256: value.sha256,
-        createdAt: _now(),
-        originDeviceId: originDeviceId,
-      ),
-    );
+    await database
+        .into(database.elvRevisionAggregateEvidenceRecords)
+        .insert(
+          ElvRevisionAggregateEvidenceRecordsCompanion.insert(
+            evidenceRef: evidenceRef,
+            projectId: value.run.projectId,
+            designRevisionId: value.run.designRevisionId,
+            aggregateKind: 'CABLE_RUN',
+            aggregateId: value.run.id,
+            canonicalPayloadJson: value.canonicalJson,
+            payloadSha256: value.sha256,
+            createdAt: _now(),
+            originDeviceId: originDeviceId,
+          ),
+        );
   }
 
   Future<void> _insertExecution({
@@ -502,17 +525,19 @@ final class DriftElvReviewedRoutingRuntime
     required String commandId,
     required String kind,
   }) async {
-    await database.into(database.elvRevisionCommandHistoryExecutions).insert(
-      ElvRevisionCommandHistoryExecutionsCompanion.insert(
-        projectId: projectId,
-        designRevisionId: designRevisionId,
-        historySequence: historySequence,
-        executionCommandId: commandId,
-        executionKind: kind,
-        createdAt: _now(),
-        originDeviceId: originDeviceId,
-      ),
-    );
+    await database
+        .into(database.elvRevisionCommandHistoryExecutions)
+        .insert(
+          ElvRevisionCommandHistoryExecutionsCompanion.insert(
+            projectId: projectId,
+            designRevisionId: designRevisionId,
+            historySequence: historySequence,
+            executionCommandId: commandId,
+            executionKind: kind,
+            createdAt: _now(),
+            originDeviceId: originDeviceId,
+          ),
+        );
   }
 
   Future<void> _moveCursor(
@@ -541,13 +566,14 @@ final class DriftElvReviewedRoutingRuntime
   }
 
   Future<bool> _isWorking(String projectId, String designRevisionId) async {
-    final row = await (database.select(database.projectDesignRevisions)..where(
-      (candidate) =>
-          candidate.projectId.equals(projectId) &
-          candidate.id.equals(designRevisionId) &
-          candidate.state.equals('WORKING') &
-          candidate.deletedAt.isNull(),
-    )).getSingleOrNull();
+    final row =
+        await (database.select(database.projectDesignRevisions)..where(
+          (candidate) =>
+              candidate.projectId.equals(projectId) &
+              candidate.id.equals(designRevisionId) &
+              candidate.state.equals('WORKING') &
+              candidate.deletedAt.isNull(),
+        )).getSingleOrNull();
     return row != null;
   }
 
@@ -562,63 +588,70 @@ final class DriftElvReviewedRoutingRuntime
   Future<ElvRevisionCommandHistoryCursorRow?> _cursor(
     String projectId,
     String designRevisionId,
-  ) => (database.select(database.elvRevisionCommandHistoryCursors)..where(
-    (row) =>
-        row.projectId.equals(projectId) &
-        row.designRevisionId.equals(designRevisionId),
-  )).getSingleOrNull();
+  ) =>
+      (database.select(database.elvRevisionCommandHistoryCursors)..where(
+        (row) =>
+            row.projectId.equals(projectId) &
+            row.designRevisionId.equals(designRevisionId),
+      )).getSingleOrNull();
 
   Future<ElvRevisionCommandHistoryOperationRow?> _operation(
     String projectId,
     String designRevisionId,
     int sequence,
-  ) => (database.select(database.elvRevisionCommandHistoryOperations)..where(
-    (row) =>
-        row.projectId.equals(projectId) &
-        row.designRevisionId.equals(designRevisionId) &
-        row.sequence.equals(sequence),
-  )).getSingleOrNull();
+  ) =>
+      (database.select(database.elvRevisionCommandHistoryOperations)..where(
+        (row) =>
+            row.projectId.equals(projectId) &
+            row.designRevisionId.equals(designRevisionId) &
+            row.sequence.equals(sequence),
+      )).getSingleOrNull();
 
   Future<ElvRevisionCommandHistoryOperationRow?> _historyByOriginalCommand(
     String projectId,
     String designRevisionId,
     String commandId,
-  ) => (database.select(database.elvRevisionCommandHistoryOperations)
-        ..where(
-          (row) =>
-              row.projectId.equals(projectId) &
-              row.designRevisionId.equals(designRevisionId) &
-              row.originalCommandId.equals(commandId),
-        )
-        ..limit(1))
-      .getSingleOrNull();
+  ) =>
+      (database.select(database.elvRevisionCommandHistoryOperations)
+            ..where(
+              (row) =>
+                  row.projectId.equals(projectId) &
+                  row.designRevisionId.equals(designRevisionId) &
+                  row.originalCommandId.equals(commandId),
+            )
+            ..limit(1))
+          .getSingleOrNull();
 
   Future<ElvRevisionCommandHistoryOperationRow?> _redoCandidate(
     String projectId,
     String designRevisionId,
     int headSequence,
-  ) => (database.select(database.elvRevisionCommandHistoryOperations)
-        ..where(
-          (row) =>
-              row.projectId.equals(projectId) &
-              row.designRevisionId.equals(designRevisionId) &
-              row.sequence.isBiggerThanValue(headSequence) &
-              row.state.equals('UNDONE'),
-        )
-        ..orderBy([(row) => OrderingTerm.asc(row.sequence)])
-        ..limit(1))
-      .getSingleOrNull();
+  ) =>
+      (database.select(database.elvRevisionCommandHistoryOperations)
+            ..where(
+              (row) =>
+                  row.projectId.equals(projectId) &
+                  row.designRevisionId.equals(designRevisionId) &
+                  row.sequence.isBiggerThanValue(headSequence) &
+                  row.state.equals('UNDONE'),
+            )
+            ..orderBy([(row) => OrderingTerm.asc(row.sequence)])
+            ..limit(1))
+          .getSingleOrNull();
 
   Future<int> _maxSequence(String projectId, String designRevisionId) async {
-    final row = await database.customSelect(
-      'SELECT MAX(sequence) AS value FROM elv_revision_command_history_operations '
-      'WHERE project_id = ? AND design_revision_id = ?',
-      variables: [
-        Variable.withString(projectId),
-        Variable.withString(designRevisionId),
-      ],
-      readsFrom: {database.elvRevisionCommandHistoryOperations},
-    ).getSingle();
+    final row =
+        await database
+            .customSelect(
+              'SELECT MAX(sequence) AS value FROM elv_revision_command_history_operations '
+              'WHERE project_id = ? AND design_revision_id = ?',
+              variables: [
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+              ],
+              readsFrom: {database.elvRevisionCommandHistoryOperations},
+            )
+            .getSingle();
     return row.readNullable<int>('value') ?? 0;
   }
 
@@ -627,16 +660,19 @@ final class DriftElvReviewedRoutingRuntime
     String designRevisionId,
     int beforeSequence,
   ) async {
-    final row = await database.customSelect(
-      'SELECT MAX(sequence) AS value FROM elv_revision_command_history_operations '
-      "WHERE project_id = ? AND design_revision_id = ? AND sequence < ? AND state = 'APPLIED'",
-      variables: [
-        Variable.withString(projectId),
-        Variable.withString(designRevisionId),
-        Variable.withInt(beforeSequence),
-      ],
-      readsFrom: {database.elvRevisionCommandHistoryOperations},
-    ).getSingle();
+    final row =
+        await database
+            .customSelect(
+              'SELECT MAX(sequence) AS value FROM elv_revision_command_history_operations '
+              "WHERE project_id = ? AND design_revision_id = ? AND sequence < ? AND state = 'APPLIED'",
+              variables: [
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                Variable.withInt(beforeSequence),
+              ],
+              readsFrom: {database.elvRevisionCommandHistoryOperations},
+            )
+            .getSingle();
     return row.readNullable<int>('value') ?? 0;
   }
 }
@@ -694,15 +730,16 @@ _StoredPayload _storedReroutePayload({
   return _StoredPayload(canonical, sha256HexUtf8(canonical));
 }
 
-Map<String, Object?> _traversalMap(CableRunTraversal value) => <String, Object?>{
-  'id': value.id,
-  'cableRunId': value.cableRunId,
-  'sequence': value.sequence,
-  'routeSegmentId': value.routeSegmentId,
-  'direction': value.direction.name.toUpperCase(),
-  'physicalCarrierId': value.physicalCarrierId,
-  'carrierCompartmentId': value.carrierCompartmentId,
-};
+Map<String, Object?> _traversalMap(CableRunTraversal value) =>
+    <String, Object?>{
+      'id': value.id,
+      'cableRunId': value.cableRunId,
+      'sequence': value.sequence,
+      'routeSegmentId': value.routeSegmentId,
+      'direction': value.direction.name.toUpperCase(),
+      'physicalCarrierId': value.physicalCarrierId,
+      'carrierCompartmentId': value.carrierCompartmentId,
+    };
 
 Map<String, Object?> _decodePayload(String canonicalJson) =>
     (jsonDecode(canonicalJson) as Map).cast<String, Object?>();

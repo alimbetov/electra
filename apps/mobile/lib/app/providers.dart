@@ -28,6 +28,7 @@ import '../application/power_workspace_overlay_geometry.dart';
 import '../application/power_workspace_projection.dart';
 import '../data/repositories/drift_power_workspace_overlay_geometry_repository.dart';
 import '../data/repositories/drift_power_workspace_repository.dart';
+import '../data/repositories/drift_elv_reviewed_routing_runtime.dart';
 
 import 'package:engineering_core/engineering_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -210,6 +211,15 @@ final roomRoutingProvider = StreamProvider.family<RoomRoutingSnapshot, String>(
   (ref, roomId) =>
       ref.watch(cableRoutingRepositoryProvider).watchRoomRouting(roomId),
 );
+
+final elvReviewedRoutingRuntimeProvider =
+    Provider<DriftElvReviewedRoutingRuntime>((ref) {
+      return DriftElvReviewedRoutingRuntime(
+        ref.watch(databaseProvider),
+        originDeviceId: 'local-device',
+        idGenerator: ref.watch(idGeneratorProvider),
+      );
+    });
 
 final powerWorkspaceRepositoryProvider = Provider<PowerWorkspaceRepository>(
   (ref) => DriftPowerWorkspaceRepository(

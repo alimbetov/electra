@@ -35,109 +35,127 @@ void main() {
     expect(controller.state.hasDraft, isTrue);
     expect(controller.hasReviewedRouteCommand, isTrue);
     expect(controller.state.previewFingerprint, command.reviewedFingerprint);
-    expect(controller.state.operationState, PowerWorkspaceOperationState.failed);
+    expect(
+      controller.state.operationState,
+      PowerWorkspaceOperationState.failed,
+    );
     expect(controller.state.operationErrorCode, 'ELV_ROUTE_CONFLICT');
     expect(routing.calls, 1);
   });
 
-  test('P7 controller clears exact draft only after public command success', () async {
-    final repository = _Repository();
-    final routing = _RoutingService(
-      result: const ElvCommandSuccess<Object?>('ok'),
-    );
-    final controller = PowerWorkspaceController(
-      repository: repository,
-      routingService: routing,
-    );
-    await controller.open('project');
-    _stage(controller, 'b');
+  test(
+    'P7 controller clears exact draft only after public command success',
+    () async {
+      final repository = _Repository();
+      final routing = _RoutingService(
+        result: const ElvCommandSuccess<Object?>('ok'),
+      );
+      final controller = PowerWorkspaceController(
+        repository: repository,
+        routingService: routing,
+      );
+      await controller.open('project');
+      _stage(controller, 'b');
 
-    final result = await controller.commitStagedReviewedRoute();
+      final result = await controller.commitStagedReviewedRoute();
 
-    expect(result, isA<ElvCommandSuccess<Object?>>());
-    expect(controller.state.hasDraft, isFalse);
-    expect(controller.hasReviewedRouteCommand, isFalse);
-    expect(controller.state.previewFingerprint, isNull);
-    expect(controller.state.operationState, PowerWorkspaceOperationState.idle);
-    expect(repository.loads, 1);
-  });
+      expect(result, isA<ElvCommandSuccess<Object?>>());
+      expect(controller.state.hasDraft, isFalse);
+      expect(controller.hasReviewedRouteCommand, isFalse);
+      expect(controller.state.previewFingerprint, isNull);
+      expect(
+        controller.state.operationState,
+        PowerWorkspaceOperationState.idle,
+      );
+      expect(repository.loads, 1);
+    },
+  );
 
-  test('P7 controller rejects a reviewed command for another revision', () async {
-    final routing = _RoutingService(
-      result: const ElvCommandSuccess<Object?>('unexpected'),
-    );
-    final controller = PowerWorkspaceController(
-      repository: _Repository(),
-      routingService: routing,
-    );
-    await controller.open('project');
-    _stage(controller, 'c');
+  test(
+    'P7 controller rejects a reviewed command for another revision',
+    () async {
+      final routing = _RoutingService(
+        result: const ElvCommandSuccess<Object?>('unexpected'),
+      );
+      final controller = PowerWorkspaceController(
+        repository: _Repository(),
+        routingService: routing,
+      );
+      await controller.open('project');
+      _stage(controller, 'c');
 
-    final result = await controller.commitReviewedRoute(
-      _Command(
-        commandId: 'cmd-stale-revision',
-        projectId: 'project',
-        designRevisionId: 'rev-stale',
-        reviewedFingerprint: _hash('c'),
-      ),
-    );
+      final result = await controller.commitReviewedRoute(
+        _Command(
+          commandId: 'cmd-stale-revision',
+          projectId: 'project',
+          designRevisionId: 'rev-stale',
+          reviewedFingerprint: _hash('c'),
+        ),
+      );
 
-    final failure = result as ElvCommandFailureResult<Object?>;
-    expect(failure.failure.code, 'ELV4_ROUTE_REVISION_MISMATCH');
-    expect(routing.calls, 0);
-    expect(controller.state.hasDraft, isTrue);
-  });
+      final failure = result as ElvCommandFailureResult<Object?>;
+      expect(failure.failure.code, 'ELV4_ROUTE_REVISION_MISMATCH');
+      expect(routing.calls, 0);
+      expect(controller.state.hasDraft, isTrue);
+    },
+  );
 
-  test('P7 controller rejects a command not produced by reviewed preview', () async {
-    final routing = _RoutingService(
-      result: const ElvCommandSuccess<Object?>('unexpected'),
-    );
-    final controller = PowerWorkspaceController(
-      repository: _Repository(),
-      routingService: routing,
-    );
-    await controller.open('project');
-    _stage(controller, 'd');
+  test(
+    'P7 controller rejects a command not produced by reviewed preview',
+    () async {
+      final routing = _RoutingService(
+        result: const ElvCommandSuccess<Object?>('unexpected'),
+      );
+      final controller = PowerWorkspaceController(
+        repository: _Repository(),
+        routingService: routing,
+      );
+      await controller.open('project');
+      _stage(controller, 'd');
 
-    final result = await controller.commitReviewedRoute(
-      _Command(
-        commandId: 'cmd-stale-review',
-        projectId: 'project',
-        designRevisionId: 'rev-1',
-        reviewedFingerprint: _hash('e'),
-      ),
-    );
+      final result = await controller.commitReviewedRoute(
+        _Command(
+          commandId: 'cmd-stale-review',
+          projectId: 'project',
+          designRevisionId: 'rev-1',
+          reviewedFingerprint: _hash('e'),
+        ),
+      );
 
-    final failure = result as ElvCommandFailureResult<Object?>;
-    expect(failure.failure.code, 'ELV4_ROUTE_REVIEW_MISMATCH');
-    expect(routing.calls, 0);
-    expect(controller.state.hasDraft, isTrue);
-  });
+      final failure = result as ElvCommandFailureResult<Object?>;
+      expect(failure.failure.code, 'ELV4_ROUTE_REVIEW_MISMATCH');
+      expect(routing.calls, 0);
+      expect(controller.state.hasDraft, isTrue);
+    },
+  );
 
-  test('P7 controller rejects substituted command with same fingerprint', () async {
-    final routing = _RoutingService(
-      result: const ElvCommandSuccess<Object?>('unexpected'),
-    );
-    final controller = PowerWorkspaceController(
-      repository: _Repository(),
-      routingService: routing,
-    );
-    await controller.open('project');
-    _stage(controller, 'f');
+  test(
+    'P7 controller rejects substituted command with same fingerprint',
+    () async {
+      final routing = _RoutingService(
+        result: const ElvCommandSuccess<Object?>('unexpected'),
+      );
+      final controller = PowerWorkspaceController(
+        repository: _Repository(),
+        routingService: routing,
+      );
+      await controller.open('project');
+      _stage(controller, 'f');
 
-    final result = await controller.commitReviewedRoute(
-      _Command(
-        commandId: 'cmd-substitute',
-        projectId: 'project',
-        designRevisionId: 'rev-1',
-        reviewedFingerprint: _hash('f'),
-      ),
-    );
+      final result = await controller.commitReviewedRoute(
+        _Command(
+          commandId: 'cmd-substitute',
+          projectId: 'project',
+          designRevisionId: 'rev-1',
+          reviewedFingerprint: _hash('f'),
+        ),
+      );
 
-    final failure = result as ElvCommandFailureResult<Object?>;
-    expect(failure.failure.code, 'ELV4_ROUTE_REVIEW_COMMAND_CHANGED');
-    expect(routing.calls, 0);
-  });
+      final failure = result as ElvCommandFailureResult<Object?>;
+      expect(failure.failure.code, 'ELV4_ROUTE_REVIEW_COMMAND_CHANGED');
+      expect(routing.calls, 0);
+    },
+  );
 
   test('P7 controller blocks mutation in frozen workspace', () async {
     final repository = _Repository(lifecycleState: 'FROZEN');
@@ -199,47 +217,50 @@ void main() {
     expect(history.undoCalls, 0);
   });
 
-  test('P7 controller discards projection returned for obsolete generation', () async {
-    final repository = _DeferredRepository();
-    final controller = PowerWorkspaceController(repository: repository);
-    await controller.open('project');
+  test(
+    'P7 controller discards projection returned for obsolete generation',
+    () async {
+      final repository = _DeferredRepository();
+      final controller = PowerWorkspaceController(repository: repository);
+      await controller.open('project');
 
-    final first = controller.switchScenario(
-      scenarioId: 'BACKUP',
-      segmentId: 'SEG-2',
-    );
-    await Future<void>.delayed(Duration.zero);
-    final second = controller.switchScenario(
-      scenarioId: 'ALARM',
-      segmentId: 'SEG-3',
-    );
-    await Future<void>.delayed(Duration.zero);
-
-    repository.complete(
-      2,
-      _projection(
-        generation: 2,
-        lifecycleState: 'WORKING',
+      final first = controller.switchScenario(
         scenarioId: 'BACKUP',
         segmentId: 'SEG-2',
-      ),
-    );
-    await first;
-    expect(controller.state.context.scenarioId, 'ALARM');
-
-    repository.complete(
-      3,
-      _projection(
-        generation: 3,
-        lifecycleState: 'WORKING',
+      );
+      await Future<void>.delayed(Duration.zero);
+      final second = controller.switchScenario(
         scenarioId: 'ALARM',
         segmentId: 'SEG-3',
-      ),
-    );
-    await second;
-    expect(controller.projection.contextGeneration, 3);
-    expect(controller.state.context.scenarioId, 'ALARM');
-  });
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      repository.complete(
+        2,
+        _projection(
+          generation: 2,
+          lifecycleState: 'WORKING',
+          scenarioId: 'BACKUP',
+          segmentId: 'SEG-2',
+        ),
+      );
+      await first;
+      expect(controller.state.context.scenarioId, 'ALARM');
+
+      repository.complete(
+        3,
+        _projection(
+          generation: 3,
+          lifecycleState: 'WORKING',
+          scenarioId: 'ALARM',
+          segmentId: 'SEG-3',
+        ),
+      );
+      await second;
+      expect(controller.projection.contextGeneration, 3);
+      expect(controller.state.context.scenarioId, 'ALARM');
+    },
+  );
 }
 
 _Command _stage(PowerWorkspaceController controller, String hashChar) {
@@ -267,10 +288,7 @@ final class _Repository implements PowerWorkspaceRepository {
     final state = _state(lifecycleState: lifecycleState);
     return PowerWorkspaceOpenResult(
       state: state,
-      projection: _projection(
-        generation: 1,
-        lifecycleState: lifecycleState,
-      ),
+      projection: _projection(generation: 1, lifecycleState: lifecycleState),
     );
   }
 
@@ -424,9 +442,10 @@ PowerWorkspaceProjection _projection({
   String segmentId = 'SEG-1',
 }) => PowerWorkspaceProjection(
   contextGeneration: generation,
-  readKind: lifecycleState == 'WORKING'
-      ? PowerWorkspaceReadKind.working
-      : PowerWorkspaceReadKind.capturedEmpty,
+  readKind:
+      lifecycleState == 'WORKING'
+          ? PowerWorkspaceReadKind.working
+          : PowerWorkspaceReadKind.capturedEmpty,
   lifecycleState: lifecycleState,
   currentness: PowerWorkspaceCurrentness.empty,
   scenarios: [

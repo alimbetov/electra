@@ -33,7 +33,9 @@ final class ReviewedRerouteCableRunWorkspaceCommand
     final errors = validateTraversalChain(this.traversals);
     if (errors.isNotEmpty) throw ArgumentError(errors.join(' '));
     if (this.traversals.any((item) => item.cableRunId != this.cableRunId)) {
-      throw ArgumentError('Every traversal must reference the reviewed cable run.');
+      throw ArgumentError(
+        'Every traversal must reference the reviewed cable run.',
+      );
     }
   }
 
@@ -71,15 +73,16 @@ final class ReviewedRerouteCableRunWorkspaceCommand
   };
 }
 
-Map<String, Object?> _traversalMap(CableRunTraversal value) => <String, Object?>{
-  'id': value.id,
-  'cableRunId': value.cableRunId,
-  'sequence': value.sequence,
-  'routeSegmentId': value.routeSegmentId,
-  'direction': value.direction.name.toUpperCase(),
-  'physicalCarrierId': value.physicalCarrierId,
-  'carrierCompartmentId': value.carrierCompartmentId,
-};
+Map<String, Object?> _traversalMap(CableRunTraversal value) =>
+    <String, Object?>{
+      'id': value.id,
+      'cableRunId': value.cableRunId,
+      'sequence': value.sequence,
+      'routeSegmentId': value.routeSegmentId,
+      'direction': value.direction.name.toUpperCase(),
+      'physicalCarrierId': value.physicalCarrierId,
+      'carrierCompartmentId': value.carrierCompartmentId,
+    };
 
 String _text(String value, String field) {
   final normalized = value.trim();

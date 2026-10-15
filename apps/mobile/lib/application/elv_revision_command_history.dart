@@ -18,7 +18,10 @@ final class ElvRevisionAggregateEvidence {
        designRevisionId = _text(designRevisionId, 'designRevisionId'),
        aggregateKind = _text(aggregateKind, 'aggregateKind').toUpperCase(),
        aggregateId = _text(aggregateId, 'aggregateId'),
-       canonicalPayloadJson = _text(canonicalPayloadJson, 'canonicalPayloadJson'),
+       canonicalPayloadJson = _text(
+         canonicalPayloadJson,
+         'canonicalPayloadJson',
+       ),
        payloadSha256 = _sha256(payloadSha256, 'payloadSha256');
 
   final String evidenceRef;
@@ -57,10 +60,8 @@ final class ElvRevisionCommandHistoryOperation {
   }) : projectId = _text(projectId, 'projectId'),
        designRevisionId = _text(designRevisionId, 'designRevisionId'),
        originalCommandId = _text(originalCommandId, 'originalCommandId'),
-       forwardCommandType = _text(
-         forwardCommandType,
-         'forwardCommandType',
-       ).toUpperCase(),
+       forwardCommandType =
+           _text(forwardCommandType, 'forwardCommandType').toUpperCase(),
        forwardCommandSchema = _text(
          forwardCommandSchema,
          'forwardCommandSchema',
@@ -73,10 +74,8 @@ final class ElvRevisionCommandHistoryOperation {
          forwardPayloadSha256,
          'forwardPayloadSha256',
        ),
-       inverseCommandType = _text(
-         inverseCommandType,
-         'inverseCommandType',
-       ).toUpperCase(),
+       inverseCommandType =
+           _text(inverseCommandType, 'inverseCommandType').toUpperCase(),
        inverseCommandSchema = _text(
          inverseCommandSchema,
          'inverseCommandSchema',
@@ -101,10 +100,7 @@ final class ElvRevisionCommandHistoryOperation {
          afterAggregateEvidenceRef,
          'afterAggregateEvidenceRef',
        ),
-       afterAggregateHash = _sha256(
-         afterAggregateHash,
-         'afterAggregateHash',
-       ),
+       afterAggregateHash = _sha256(afterAggregateHash, 'afterAggregateHash'),
        affectedIds = List.unmodifiable(
          affectedIds.map((value) => _text(value, 'affectedId')).toSet().toList()
            ..sort(),

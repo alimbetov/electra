@@ -19,7 +19,7 @@ final class PowerWorkspaceSessionSnapshot {
 ///
 /// Widgets never call persistence repositories directly. Queries come through
 /// [PowerWorkspaceRepository], reviewed physical-route mutations through
-/// [ElvPhysicalRoutingWorkspaceService], and undo/redo through the explicit
+/// [ElvWorkspaceCommandService], and undo/redo through the explicit
 /// revision-scoped durable history boundary.
 final class PowerWorkspaceController {
   PowerWorkspaceController({
@@ -29,7 +29,7 @@ final class PowerWorkspaceController {
   });
 
   final PowerWorkspaceRepository repository;
-  final ElvPhysicalRoutingWorkspaceService? routingService;
+  final ElvWorkspaceCommandService? routingService;
   final ElvRevisionCommandHistoryService? historyService;
 
   PowerWorkspaceState? _state;
@@ -43,10 +43,8 @@ final class PowerWorkspaceController {
   bool get isOpen => _state != null && _projection != null;
   bool get hasReviewedRouteCommand => _reviewedRouteCommand != null;
 
-  PowerWorkspaceSessionSnapshot get snapshot => PowerWorkspaceSessionSnapshot(
-    state: state,
-    projection: projection,
-  );
+  PowerWorkspaceSessionSnapshot get snapshot =>
+      PowerWorkspaceSessionSnapshot(state: state, projection: projection);
 
   Future<PowerWorkspaceSessionSnapshot?> open(String projectId) async {
     final result = await repository.open(projectId);
@@ -252,7 +250,9 @@ final class PowerWorkspaceController {
 
   Future<ElvCommandResult<Object?>> redo() => _historyMutation(undo: false);
 
-  Future<ElvCommandResult<Object?>> _historyMutation({required bool undo}) async {
+  Future<ElvCommandResult<Object?>> _historyMutation({
+    required bool undo,
+  }) async {
     final history = historyService;
     if (history == null) {
       return const ElvCommandFailureResult<Object?>(
@@ -272,15 +272,16 @@ final class PowerWorkspaceController {
     }
     _state = state.startOperation();
     final context = state.context;
-    final result = undo
-        ? await history.undo(
-            projectId: context.projectId,
-            designRevisionId: context.designRevisionId,
-          )
-        : await history.redo(
-            projectId: context.projectId,
-            designRevisionId: context.designRevisionId,
-          );
+    final result =
+        undo
+            ? await history.undo(
+              projectId: context.projectId,
+              designRevisionId: context.designRevisionId,
+            )
+            : await history.redo(
+              projectId: context.projectId,
+              designRevisionId: context.designRevisionId,
+            );
     switch (result) {
       case ElvCommandSuccess<Object?>():
         _state = state.finishOperation();

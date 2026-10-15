@@ -6,6 +6,7 @@ import 'package:drift_flutter/drift_flutter.dart';
 
 part 'app_database.g.dart';
 part 'power_database_tables.dart';
+part 'elv_history_database_tables.dart';
 
 class Projects extends Table {
   TextColumn get id => text()();
@@ -1076,6 +1077,10 @@ class TraversalCarrierAssignments extends Table with GeometryAuditColumns {
     PowerEvaluationRecords,
     PowerEvaluationPointers,
     PowerOperationRecords,
+    ElvRevisionAggregateEvidenceRecords,
+    ElvRevisionCommandHistoryOperations,
+    ElvRevisionCommandHistoryCursors,
+    ElvRevisionCommandHistoryExecutions,
   ],
 )
 final class AppDatabase extends _$AppDatabase {
@@ -1083,7 +1088,7 @@ final class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'electra'));
 
   @override
-  int get schemaVersion => 22;
+  int get schemaVersion => 23;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -1217,6 +1222,12 @@ final class AppDatabase extends _$AppDatabase {
           await migrator.createTable(powerEvaluationRecords);
           await migrator.createTable(powerEvaluationPointers);
           await migrator.createTable(powerOperationRecords);
+        }
+        if (from < 23) {
+          await migrator.createTable(elvRevisionAggregateEvidenceRecords);
+          await migrator.createTable(elvRevisionCommandHistoryOperations);
+          await migrator.createTable(elvRevisionCommandHistoryCursors);
+          await migrator.createTable(elvRevisionCommandHistoryExecutions);
         }
       }
       await _createIndexes();
@@ -1451,6 +1462,18 @@ final class AppDatabase extends _$AppDatabase {
     await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_power_pointer_scope ON power_evaluation_pointers(project_id, design_revision_id, logical_node_key_sha256)',
     );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_elv_revision_history_state ON elv_revision_command_history_operations(project_id, design_revision_id, state, sequence)',
+    );
+    await customStatement(
+      'CREATE UNIQUE INDEX IF NOT EXISTS ux_elv_revision_history_original_command ON elv_revision_command_history_operations(project_id, design_revision_id, original_command_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_elv_revision_history_evidence ON elv_revision_aggregate_evidence_records(project_id, design_revision_id, aggregate_kind, aggregate_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_elv_revision_history_execution ON elv_revision_command_history_executions(project_id, design_revision_id, history_sequence)',
+    );
   }
 
   Future<void> _createPowerIntegrityGuards() async {
@@ -1479,6 +1502,10 @@ final class AppDatabase extends _$AppDatabase {
       'power_evaluation_records',
       'power_evaluation_pointers',
       'power_operation_records',
+      'elv_revision_aggregate_evidence_records',
+      'elv_revision_command_history_operations',
+      'elv_revision_command_history_cursors',
+      'elv_revision_command_history_executions',
     ];
     for (final table in scopedTables) {
       await customStatement(
@@ -1507,6 +1534,8 @@ final class AppDatabase extends _$AppDatabase {
       'design_revision_power_snapshots',
       'design_revision_snapshot_manifests',
       'power_evaluation_records',
+      'elv_revision_aggregate_evidence_records',
+      'elv_revision_command_history_executions',
     ];
     for (final table in immutableTables) {
       await customStatement(
@@ -1520,5 +1549,38 @@ final class AppDatabase extends _$AppDatabase {
         "BEGIN SELECT RAISE(ABORT, 'ELV4_IMMUTABLE_EVIDENCE'); END",
       );
     }
+    await customStatement(
+      "CREATE TRIGGER IF NOT EXISTS trg_elv_revision_history_operation_payload_immutable "
+      "BEFORE UPDATE ON elv_revision_command_history_operations FOR EACH ROW "
+      "WHEN OLD.original_command_id != NEW.original_command_id "
+      "OR OLD.forward_command_type != NEW.forward_command_type "
+      "OR OLD.forward_command_schema != NEW.forward_command_schema "
+      "OR OLD.forward_canonical_payload_json != NEW.forward_canonical_payload_json "
+      "OR OLD.forward_payload_sha256 != NEW.forward_payload_sha256 "
+      "OR OLD.inverse_command_type != NEW.inverse_command_type "
+      "OR OLD.inverse_command_schema != NEW.inverse_command_schema "
+      "OR OLD.inverse_canonical_payload_json != NEW.inverse_canonical_payload_json "
+      "OR OLD.inverse_payload_sha256 != NEW.inverse_payload_sha256 "
+      "OR OLD.before_aggregate_evidence_ref != NEW.before_aggregate_evidence_ref "
+      "OR OLD.before_aggregate_hash != NEW.before_aggregate_hash "
+      "OR OLD.after_aggregate_evidence_ref != NEW.after_aggregate_evidence_ref "
+      "OR OLD.after_aggregate_hash != NEW.after_aggregate_hash "
+      "OR OLD.affected_ids_json != NEW.affected_ids_json "
+      "BEGIN SELECT RAISE(ABORT, 'ELV4_HISTORY_IMMUTABLE_OPERATION_PAYLOAD'); END",
+    );
+    await customStatement(
+      "CREATE TRIGGER IF NOT EXISTS trg_elv_revision_history_cursor_monotonic "
+      "BEFORE UPDATE ON elv_revision_command_history_cursors FOR EACH ROW "
+      "WHEN NEW.generation <= OLD.generation "
+      "BEGIN SELECT RAISE(ABORT, 'ELV4_HISTORY_CURSOR_GENERATION_CONFLICT'); END",
+    );
+    await customStatement(
+      "CREATE TRIGGER IF NOT EXISTS trg_elv_revision_history_execution_operation "
+      "BEFORE INSERT ON elv_revision_command_history_executions FOR EACH ROW "
+      "WHEN NOT EXISTS (SELECT 1 FROM elv_revision_command_history_operations h "
+      "WHERE h.project_id = NEW.project_id AND h.design_revision_id = NEW.design_revision_id "
+      "AND h.sequence = NEW.history_sequence) "
+      "BEGIN SELECT RAISE(ABORT, 'ELV4_HISTORY_OPERATION_NOT_FOUND'); END",
+    );
   }
 }
