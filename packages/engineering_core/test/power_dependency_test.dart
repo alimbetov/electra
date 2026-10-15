@@ -136,5 +136,5 @@ PowerConsumedEvaluationRef _evaluation(
     PowerConsumedEvaluationRef(
       logicalNodeKey: node,
       evaluationId: evaluation,
-      inputFingerprint: hex * 64,
+      inputFingerprint: List.filled(64, hex).join(),
     );
