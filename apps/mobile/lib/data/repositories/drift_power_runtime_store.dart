@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:engineering_core/engineering_core.dart';
 
 import '../database/app_database.dart';
+import '../database/drift_raw_statement.dart';
 
 final class PowerRuntimeStorageException implements Exception {
   const PowerRuntimeStorageException(this.code, [this.details = const {}]);
@@ -95,7 +96,8 @@ final class DriftPowerRuntimeStore {
     }
 
     final timestamp = now().toUtc();
-    await database.customStatement(
+    await runRawStatement(
+      database,
       'INSERT INTO power_operation_records '
       '(project_id, design_revision_id, operation_id, command_type, '
       'payload_schema, command_fingerprint, status, result_json, created_at, '
@@ -173,7 +175,8 @@ final class DriftPowerRuntimeStore {
         'evaluationId': evidence.evaluationId,
       });
     }
-    await database.customStatement(
+    await runRawStatement(
+      database,
       'INSERT INTO power_evaluation_records '
       '(project_id, design_revision_id, logical_node_key_json, '
       'logical_node_key_sha256, evaluation_id, scope_kind, scope_id, '
@@ -217,7 +220,8 @@ final class DriftPowerRuntimeStore {
       designRevisionId: designRevisionId,
       evidence: evidence,
     );
-    await database.customStatement(
+    await runRawStatement(
+      database,
       'INSERT OR IGNORE INTO power_evaluation_pointers '
       '(project_id, design_revision_id, logical_node_key_json, '
       'logical_node_key_sha256, state, generation, evaluation_id, '

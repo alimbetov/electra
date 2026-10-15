@@ -29,11 +29,11 @@ final class PowerWorkspaceReadContext {
     required String scenarioId,
     required String segmentId,
     required this.generation,
-  })  : projectId = _text(projectId, 'projectId'),
-        designRevisionId = _text(designRevisionId, 'designRevisionId'),
-        lifecycleState = _text(lifecycleState, 'lifecycleState').toUpperCase(),
-        scenarioId = _text(scenarioId, 'scenarioId'),
-        segmentId = _text(segmentId, 'segmentId') {
+  }) : projectId = _text(projectId, 'projectId'),
+       designRevisionId = _text(designRevisionId, 'designRevisionId'),
+       lifecycleState = _text(lifecycleState, 'lifecycleState').toUpperCase(),
+       scenarioId = _text(scenarioId, 'scenarioId'),
+       segmentId = _text(segmentId, 'segmentId') {
     if (generation < 1) {
       throw ArgumentError.value(generation, 'generation', 'Must be positive.');
     }
@@ -53,15 +53,14 @@ final class PowerWorkspaceReadContext {
     String? lifecycleState,
     String? scenarioId,
     String? segmentId,
-  }) =>
-      PowerWorkspaceReadContext(
-        projectId: projectId,
-        designRevisionId: designRevisionId ?? this.designRevisionId,
-        lifecycleState: lifecycleState ?? this.lifecycleState,
-        scenarioId: scenarioId ?? this.scenarioId,
-        segmentId: segmentId ?? this.segmentId,
-        generation: generation + 1,
-      );
+  }) => PowerWorkspaceReadContext(
+    projectId: projectId,
+    designRevisionId: designRevisionId ?? this.designRevisionId,
+    lifecycleState: lifecycleState ?? this.lifecycleState,
+    scenarioId: scenarioId ?? this.scenarioId,
+    segmentId: segmentId ?? this.segmentId,
+    generation: generation + 1,
+  );
 }
 
 final class PowerWorkspaceQuerySnapshot {
@@ -98,10 +97,10 @@ final class PowerWorkspaceState {
     Iterable<PowerEvaluationFinding> findings = const [],
     Map<String, PowerPointerState> pointerStates = const {},
     this.unsavedDraftWarning = false,
-  })  : cards = List.unmodifiable(cards),
-        draft = Map.unmodifiable(draft ?? const <String, Object?>{}),
-        findings = List.unmodifiable(findings),
-        pointerStates = Map.unmodifiable(pointerStates) {
+  }) : cards = List.unmodifiable(cards),
+       draft = Map.unmodifiable(draft ?? const <String, Object?>{}),
+       findings = List.unmodifiable(findings),
+       pointerStates = Map.unmodifiable(pointerStates) {
     if (this.cards.isEmpty) {
       throw ArgumentError('Power workspace requires at least one card.');
     }
@@ -135,10 +134,7 @@ final class PowerWorkspaceState {
   bool get mutationAllowed => context.mutationAllowed;
   bool get hasDraft => draft.isNotEmpty;
 
-  PowerWorkspaceState select({
-    String? componentId,
-    String? portId,
-  }) {
+  PowerWorkspaceState select({String? componentId, String? portId}) {
     final normalizedComponent = _nullableText(componentId, 'componentId');
     final normalizedPort = _nullableText(portId, 'portId');
     if (normalizedPort != null && normalizedComponent == null) {
@@ -149,6 +145,7 @@ final class PowerWorkspaceState {
       selectedComponentId: normalizedComponent,
       selectedPortId: normalizedPort,
       clearSelection: normalizedComponent == null,
+      clearPortSelection: normalizedComponent != null && normalizedPort == null,
       clearQuerySnapshot: true,
     );
   }
@@ -156,40 +153,38 @@ final class PowerWorkspaceState {
   PowerWorkspaceState switchScenario({
     required String scenarioId,
     required String segmentId,
-  }) =>
-      _copy(
-        context: context.nextGeneration(
-          scenarioId: _text(scenarioId, 'scenarioId'),
-          segmentId: _text(segmentId, 'segmentId'),
-        ),
-        clearQuerySnapshot: true,
-        unsavedDraftWarning: hasDraft,
-      );
+  }) => _copy(
+    context: context.nextGeneration(
+      scenarioId: _text(scenarioId, 'scenarioId'),
+      segmentId: _text(segmentId, 'segmentId'),
+    ),
+    clearQuerySnapshot: true,
+    unsavedDraftWarning: hasDraft,
+  );
 
   PowerWorkspaceState switchRevision({
     required String designRevisionId,
     required String lifecycleState,
     required String scenarioId,
     required String segmentId,
-  }) =>
-      PowerWorkspaceState(
-        context: context.nextGeneration(
-          designRevisionId: _text(designRevisionId, 'designRevisionId'),
-          lifecycleState: _text(lifecycleState, 'lifecycleState'),
-          scenarioId: _text(scenarioId, 'scenarioId'),
-          segmentId: _text(segmentId, 'segmentId'),
-        ),
-        cards: cards,
-        cardIndex: cardIndex,
-        selectedComponentId: selectedComponentId,
-        selectedPortId: selectedPortId,
-        overlayMode: overlayMode,
-        draft: const {},
-        operationState: PowerWorkspaceOperationState.idle,
-        findings: const [],
-        pointerStates: const {},
-        unsavedDraftWarning: hasDraft,
-      );
+  }) => PowerWorkspaceState(
+    context: context.nextGeneration(
+      designRevisionId: _text(designRevisionId, 'designRevisionId'),
+      lifecycleState: _text(lifecycleState, 'lifecycleState'),
+      scenarioId: _text(scenarioId, 'scenarioId'),
+      segmentId: _text(segmentId, 'segmentId'),
+    ),
+    cards: cards,
+    cardIndex: cardIndex,
+    selectedComponentId: selectedComponentId,
+    selectedPortId: selectedPortId,
+    overlayMode: overlayMode,
+    draft: const {},
+    operationState: PowerWorkspaceOperationState.idle,
+    findings: const [],
+    pointerStates: const {},
+    unsavedDraftWarning: hasDraft,
+  );
 
   PowerWorkspaceState nextCard() =>
       _copy(cardIndex: (cardIndex + 1) % cards.length);
@@ -222,10 +217,10 @@ final class PowerWorkspaceState {
   }
 
   PowerWorkspaceState clearDraft() => _copy(
-        draft: const {},
-        clearPreviewFingerprint: true,
-        unsavedDraftWarning: false,
-      );
+    draft: const {},
+    clearPreviewFingerprint: true,
+    unsavedDraftWarning: false,
+  );
 
   /// Applies only responses captured for the current read context. Obsolete
   /// async responses are deliberately discarded without changing selection,
@@ -253,19 +248,19 @@ final class PowerWorkspaceState {
   }
 
   PowerWorkspaceState finishOperation() => _copy(
-        operationState: PowerWorkspaceOperationState.idle,
-        clearOperationErrorCode: true,
-      );
+    operationState: PowerWorkspaceOperationState.idle,
+    clearOperationErrorCode: true,
+  );
 
   PowerWorkspaceState cancelOperation() => _copy(
-        operationState: PowerWorkspaceOperationState.cancelled,
-        clearOperationErrorCode: true,
-      );
+    operationState: PowerWorkspaceOperationState.cancelled,
+    clearOperationErrorCode: true,
+  );
 
   PowerWorkspaceState failOperation(String code) => _copy(
-        operationState: PowerWorkspaceOperationState.failed,
-        operationErrorCode: _text(code, 'operationErrorCode').toUpperCase(),
-      );
+    operationState: PowerWorkspaceOperationState.failed,
+    operationErrorCode: _text(code, 'operationErrorCode').toUpperCase(),
+  );
 
   void _requireMutationAllowed() {
     if (!mutationAllowed) {
@@ -279,6 +274,7 @@ final class PowerWorkspaceState {
     String? selectedComponentId,
     String? selectedPortId,
     bool clearSelection = false,
+    bool clearPortSelection = false,
     PowerWorkspaceOverlayMode? overlayMode,
     PowerWorkspaceQuerySnapshot? querySnapshot,
     bool clearQuerySnapshot = false,
@@ -291,31 +287,33 @@ final class PowerWorkspaceState {
     Iterable<PowerEvaluationFinding>? findings,
     Map<String, PowerPointerState>? pointerStates,
     bool? unsavedDraftWarning,
-  }) =>
-      PowerWorkspaceState(
-        context: context ?? this.context,
-        cards: cards,
-        cardIndex: cardIndex ?? this.cardIndex,
-        selectedComponentId:
-            clearSelection ? null : selectedComponentId ?? this.selectedComponentId,
-        selectedPortId:
-            clearSelection ? null : selectedPortId ?? this.selectedPortId,
-        overlayMode: overlayMode ?? this.overlayMode,
-        querySnapshot:
-            clearQuerySnapshot ? null : querySnapshot ?? this.querySnapshot,
-        draft: draft ?? this.draft,
-        previewFingerprint: clearPreviewFingerprint
+  }) => PowerWorkspaceState(
+    context: context ?? this.context,
+    cards: cards,
+    cardIndex: cardIndex ?? this.cardIndex,
+    selectedComponentId:
+        clearSelection ? null : selectedComponentId ?? this.selectedComponentId,
+    selectedPortId:
+        clearSelection || clearPortSelection
+            ? null
+            : selectedPortId ?? this.selectedPortId,
+    overlayMode: overlayMode ?? this.overlayMode,
+    querySnapshot:
+        clearQuerySnapshot ? null : querySnapshot ?? this.querySnapshot,
+    draft: draft ?? this.draft,
+    previewFingerprint:
+        clearPreviewFingerprint
             ? null
             : previewFingerprint ?? this.previewFingerprint,
-        operationState: operationState ?? this.operationState,
-        operationErrorCode: clearOperationErrorCode
+    operationState: operationState ?? this.operationState,
+    operationErrorCode:
+        clearOperationErrorCode
             ? null
             : operationErrorCode ?? this.operationErrorCode,
-        findings: findings ?? this.findings,
-        pointerStates: pointerStates ?? this.pointerStates,
-        unsavedDraftWarning:
-            unsavedDraftWarning ?? this.unsavedDraftWarning,
-      );
+    findings: findings ?? this.findings,
+    pointerStates: pointerStates ?? this.pointerStates,
+    unsavedDraftWarning: unsavedDraftWarning ?? this.unsavedDraftWarning,
+  );
 }
 
 String _text(String value, String field) {

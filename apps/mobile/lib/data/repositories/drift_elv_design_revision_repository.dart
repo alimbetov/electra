@@ -9,6 +9,7 @@ import '../../application/elv_design_revision_repository.dart';
 import '../../application/elv_failure_probe.dart';
 import '../database/app_database.dart';
 import 'drift_elv_runtime_support.dart';
+import 'drift_power_publication_runtime.dart';
 
 final class DriftElvDesignRevisionRepository
     implements ElvDesignRevisionRepository {
@@ -17,13 +18,22 @@ final class DriftElvDesignRevisionRepository
     required this.originDeviceId,
     ElvFailureProbe? failureProbe,
     DateTime Function()? now,
+    DriftPowerPublicationRuntime? powerRuntime,
   }) : failureProbe = failureProbe ?? const NoopElvFailureProbe(),
-       _now = now ?? (() => DateTime.now().toUtc());
+       _now = now ?? (() => DateTime.now().toUtc()),
+       powerRuntime =
+           powerRuntime ??
+           DriftPowerPublicationRuntime(
+             database,
+             originDeviceId: originDeviceId,
+             now: now,
+           );
 
   final AppDatabase database;
   final String originDeviceId;
   final ElvFailureProbe failureProbe;
   final DateTime Function() _now;
+  final DriftPowerPublicationRuntime powerRuntime;
 
   @override
   Future<PhysicalDesignContext> context(String projectId) async {
@@ -186,6 +196,12 @@ final class DriftElvDesignRevisionRepository
             originDeviceId: originDeviceId,
           ),
         );
+    await powerRuntime.captureCommittedPowerSectionForFreeze(
+      projectId: row.projectId,
+      designRevisionId: row.id,
+      expectedRevisionToken: row.revision,
+      physicalSha256: snapshot.contentSha256,
+    );
     await failureProbe.hit(ElvFailurePoints.p3FreezeAfterSnapshotInsert);
     await (database.update(database.projectDesignRevisions)..where(
       (candidate) =>

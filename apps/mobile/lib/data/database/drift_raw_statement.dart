@@ -11,16 +11,16 @@ Future<void> runRawStatement(
   DatabaseConnectionUser database,
   String statement, [
   List<Variable<Object>> variables = const [],
-]) =>
-    database.customStatement(
-      statement,
-      variables.map(_sqliteValue).toList(growable: false),
-    );
+]) => database.customStatement(
+  statement,
+  variables.map(_sqliteValue).toList(growable: false),
+);
 
 Object? _sqliteValue(Variable<Object> variable) {
   final value = variable.value;
   if (value is DateTime) {
-    return value.toUtc().millisecondsSinceEpoch ~/ Duration.millisecondsPerSecond;
+    return value.toUtc().millisecondsSinceEpoch ~/
+        Duration.millisecondsPerSecond;
   }
   return value;
 }

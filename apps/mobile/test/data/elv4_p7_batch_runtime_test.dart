@@ -46,10 +46,7 @@ void main() {
     );
     final receipt = await batch.publishBatchGuarded(
       capture: capture,
-      evaluations: [
-        _evidence(leafPlan),
-        _evidence(capabilityPlan),
-      ],
+      evaluations: [_evidence(leafPlan), _evidence(capabilityPlan)],
       operationId: 'op-batch-1',
       commandFingerprint: sha256HexUtf8('op-batch-1'),
       recapturePlans: () async => [capabilityPlan, leafPlan],
@@ -63,183 +60,196 @@ void main() {
     expect(await _count(db, 'power_evaluation_records'), 2);
     expect(await _count(db, 'power_operation_records'), 1);
 
-    final dependencyEdge = await db.customSelect(
-      'SELECT COUNT(*) AS c FROM power_dependency_index_records '
-      "WHERE dependency_ref_type = 'EVALUATION' "
-      'AND dependency_ref_sha256 = ? AND logical_node_key_sha256 = ?',
-      variables: [
-        Variable.withString(sha256HexUtf8(leafNode.encode())),
-        Variable.withString(capabilityNode.sha256),
-      ],
-    ).getSingle();
+    final dependencyEdge =
+        await db
+            .customSelect(
+              'SELECT COUNT(*) AS c FROM power_dependency_index_records '
+              "WHERE dependency_ref_type = 'EVALUATION' "
+              'AND dependency_ref_sha256 = ? AND logical_node_key_sha256 = ?',
+              variables: [
+                Variable.withString(sha256HexUtf8(leafNode.encode())),
+                Variable.withString(capabilityNode.sha256),
+              ],
+            )
+            .getSingle();
     expect(dependencyEdge.read<int>('c'), 1);
   });
 
-  test('P7 batch CAS failure rolls back every evaluation and pointer publish',
-      () async {
-    final db = AppDatabase(NativeDatabase.memory());
-    addTearDown(db.close);
-    await _seed(db);
-    final batch = _batchRuntime(db);
-    final single = DriftPowerPublicationRuntime(
-      db,
-      originDeviceId: 'device-p7',
-      now: () => _now,
-    );
+  test(
+    'P7 batch CAS failure rolls back every evaluation and pointer publish',
+    () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      await _seed(db);
+      final batch = _batchRuntime(db);
+      final single = DriftPowerPublicationRuntime(
+        db,
+        originDeviceId: 'device-p7',
+        now: () => _now,
+      );
 
-    final leafNode = _node(PowerProcessCode.pwr01, 'LOAD-1');
-    final capabilityNode = _node(PowerProcessCode.pwr02, 'SOURCE-1');
-    final sourceFact = _factKey('SOURCE-1', 'DEMAND');
-    final firstPlans = _plans(
-      leafNode: leafNode,
-      capabilityNode: capabilityNode,
-      sourceFact: sourceFact,
-      suffix: '1',
-    );
-    final firstCapture = await batch.captureBatch(
-      projectId: 'project',
-      designRevisionId: 'rev-working',
-      capturePlans: () async => firstPlans,
-    );
-    await batch.publishBatchGuarded(
-      capture: firstCapture,
-      evaluations: firstPlans.map(_evidence),
-      operationId: 'op-first',
-      commandFingerprint: sha256HexUtf8('op-first'),
-      recapturePlans: () async => firstPlans,
-    );
+      final leafNode = _node(PowerProcessCode.pwr01, 'LOAD-1');
+      final capabilityNode = _node(PowerProcessCode.pwr02, 'SOURCE-1');
+      final sourceFact = _factKey('SOURCE-1', 'DEMAND');
+      final firstPlans = _plans(
+        leafNode: leafNode,
+        capabilityNode: capabilityNode,
+        sourceFact: sourceFact,
+        suffix: '1',
+      );
+      final firstCapture = await batch.captureBatch(
+        projectId: 'project',
+        designRevisionId: 'rev-working',
+        capturePlans: () async => firstPlans,
+      );
+      await batch.publishBatchGuarded(
+        capture: firstCapture,
+        evaluations: firstPlans.map(_evidence),
+        operationId: 'op-first',
+        commandFingerprint: sha256HexUtf8('op-first'),
+        recapturePlans: () async => firstPlans,
+      );
 
-    await single.mutateAndInvalidate(
-      projectId: 'project',
-      designRevisionId: 'rev-working',
-      oldClosure: [sourceFact],
-      applyMutation: () => db.customUpdate(
-        'UPDATE project_design_revisions SET revision = revision + 1 '
-        'WHERE id = ?',
-        variables: [Variable.withString('rev-working')],
-      ),
-      captureNewClosure: () async => [sourceFact],
-    );
-    expect(await _pointerState(db, leafNode), 'STALE');
-    expect(await _pointerState(db, capabilityNode), 'STALE');
+      await single.mutateAndInvalidate(
+        projectId: 'project',
+        designRevisionId: 'rev-working',
+        oldClosure: [sourceFact],
+        applyMutation:
+            () => db.customUpdate(
+              'UPDATE project_design_revisions SET revision = revision + 1 '
+              'WHERE id = ?',
+              variables: [Variable.withString('rev-working')],
+            ),
+        captureNewClosure: () async => [sourceFact],
+      );
+      expect(await _pointerState(db, leafNode), 'STALE');
+      expect(await _pointerState(db, capabilityNode), 'STALE');
 
-    final secondPlans = _plans(
-      leafNode: leafNode,
-      capabilityNode: capabilityNode,
-      sourceFact: sourceFact,
-      suffix: '2',
-    );
-    final secondCapture = await batch.captureBatch(
-      projectId: 'project',
-      designRevisionId: 'rev-working',
-      capturePlans: () async => secondPlans,
-    );
+      final secondPlans = _plans(
+        leafNode: leafNode,
+        capabilityNode: capabilityNode,
+        sourceFact: sourceFact,
+        suffix: '2',
+      );
+      final secondCapture = await batch.captureBatch(
+        projectId: 'project',
+        designRevisionId: 'rev-working',
+        capturePlans: () async => secondPlans,
+      );
 
-    await db.customUpdate(
-      'UPDATE power_evaluation_pointers SET generation = generation + 1 '
-      'WHERE logical_node_key_sha256 = ?',
-      variables: [Variable.withString(capabilityNode.sha256)],
-    );
+      await db.customUpdate(
+        'UPDATE power_evaluation_pointers SET generation = generation + 1 '
+        'WHERE logical_node_key_sha256 = ?',
+        variables: [Variable.withString(capabilityNode.sha256)],
+      );
 
-    await expectLater(
-      batch.publishBatchGuarded(
-        capture: secondCapture,
-        evaluations: secondPlans.map(_evidence),
-        operationId: 'op-second',
-        commandFingerprint: sha256HexUtf8('op-second'),
-        recapturePlans: () async => secondPlans,
-      ),
-      throwsA(
-        isA<PowerRuntimeStorageException>().having(
-          (error) => error.code,
-          'code',
-          'ELV4_RESULT_INPUT_CHANGED',
+      await expectLater(
+        batch.publishBatchGuarded(
+          capture: secondCapture,
+          evaluations: secondPlans.map(_evidence),
+          operationId: 'op-second',
+          commandFingerprint: sha256HexUtf8('op-second'),
+          recapturePlans: () async => secondPlans,
         ),
-      ),
-    );
-
-    expect(await _pointerState(db, leafNode), 'STALE');
-    expect(await _pointerState(db, capabilityNode), 'STALE');
-    final newEvaluations = await db.customSelect(
-      "SELECT COUNT(*) AS c FROM power_evaluation_records "
-      "WHERE evaluation_id IN ('eval-leaf-2','eval-capability-2')",
-    ).getSingle();
-    expect(newEvaluations.read<int>('c'), 0);
-    final secondLedger = await db.customSelect(
-      "SELECT COUNT(*) AS c FROM power_operation_records "
-      "WHERE operation_id = 'op-second'",
-    ).getSingle();
-    expect(secondLedger.read<int>('c'), 0);
-  });
-
-  test('P7 batch rejects an internal evaluation dependency cycle at capture',
-      () async {
-    final db = AppDatabase(NativeDatabase.memory());
-    addTearDown(db.close);
-    await _seed(db);
-    final batch = _batchRuntime(db);
-    final a = _node(PowerProcessCode.pwr01, 'A');
-    final b = _node(PowerProcessCode.pwr02, 'B');
-    final aBase = _input([_factKey('A', 'FACT')]);
-    final bBase = _input([_factKey('B', 'FACT')]);
-    final aInput = _input(
-      [_factKey('A', 'FACT')],
-      evaluations: [
-        PowerConsumedEvaluationRef(
-          logicalNodeKey: b.encode(),
-          evaluationId: 'eval-b',
-          inputFingerprint: bBase.inputFingerprint,
+        throwsA(
+          isA<PowerRuntimeStorageException>().having(
+            (error) => error.code,
+            'code',
+            'ELV4_RESULT_INPUT_CHANGED',
+          ),
         ),
-      ],
-    );
-    final bInput = _input(
-      [_factKey('B', 'FACT')],
-      evaluations: [
-        PowerConsumedEvaluationRef(
-          logicalNodeKey: a.encode(),
-          evaluationId: 'eval-a',
-          inputFingerprint: aInput.inputFingerprint,
-        ),
-      ],
-    );
-    final aPlan = PowerBatchTargetPlan(
-      nodeKey: a,
-      evaluationId: 'eval-a',
-      consumedInput: PowerConsumedInput(
-        algorithmVersion: aInput.algorithmVersion,
-        inputSchemaVersion: aInput.inputSchemaVersion,
-        numericPolicyVersion: aInput.numericPolicyVersion,
-        facts: aInput.facts,
+      );
+
+      expect(await _pointerState(db, leafNode), 'STALE');
+      expect(await _pointerState(db, capabilityNode), 'STALE');
+      final newEvaluations =
+          await db
+              .customSelect(
+                "SELECT COUNT(*) AS c FROM power_evaluation_records "
+                "WHERE evaluation_id IN ('eval-leaf-2','eval-capability-2')",
+              )
+              .getSingle();
+      expect(newEvaluations.read<int>('c'), 0);
+      final secondLedger =
+          await db
+              .customSelect(
+                "SELECT COUNT(*) AS c FROM power_operation_records "
+                "WHERE operation_id = 'op-second'",
+              )
+              .getSingle();
+      expect(secondLedger.read<int>('c'), 0);
+    },
+  );
+
+  test(
+    'P7 batch rejects an internal evaluation dependency cycle at capture',
+    () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      await _seed(db);
+      final batch = _batchRuntime(db);
+      final a = _node(PowerProcessCode.pwr01, 'A');
+      final b = _node(PowerProcessCode.pwr02, 'B');
+      final bBase = _input([_factKey('B', 'FACT')]);
+      final aInput = _input(
+        [_factKey('A', 'FACT')],
         evaluations: [
           PowerConsumedEvaluationRef(
             logicalNodeKey: b.encode(),
             evaluationId: 'eval-b',
-            inputFingerprint: bInput.inputFingerprint,
+            inputFingerprint: bBase.inputFingerprint,
           ),
         ],
-      ),
-    );
-    final bPlan = PowerBatchTargetPlan(
-      nodeKey: b,
-      evaluationId: 'eval-b',
-      consumedInput: bInput,
-    );
-
-    await expectLater(
-      batch.captureBatch(
-        projectId: 'project',
-        designRevisionId: 'rev-working',
-        capturePlans: () async => [aPlan, bPlan],
-      ),
-      throwsA(
-        isA<PowerRuntimeStorageException>().having(
-          (error) => error.code,
-          'code',
-          'ELV4_DEPENDENCY_CYCLE',
+      );
+      final bInput = _input(
+        [_factKey('B', 'FACT')],
+        evaluations: [
+          PowerConsumedEvaluationRef(
+            logicalNodeKey: a.encode(),
+            evaluationId: 'eval-a',
+            inputFingerprint: aInput.inputFingerprint,
+          ),
+        ],
+      );
+      final aPlan = PowerBatchTargetPlan(
+        nodeKey: a,
+        evaluationId: 'eval-a',
+        consumedInput: PowerConsumedInput(
+          algorithmVersion: aInput.algorithmVersion,
+          inputSchemaVersion: aInput.inputSchemaVersion,
+          numericPolicyVersion: aInput.numericPolicyVersion,
+          facts: aInput.facts,
+          evaluations: [
+            PowerConsumedEvaluationRef(
+              logicalNodeKey: b.encode(),
+              evaluationId: 'eval-b',
+              inputFingerprint: bInput.inputFingerprint,
+            ),
+          ],
         ),
-      ),
-    );
-  });
+      );
+      final bPlan = PowerBatchTargetPlan(
+        nodeKey: b,
+        evaluationId: 'eval-b',
+        consumedInput: bInput,
+      );
+
+      await expectLater(
+        batch.captureBatch(
+          projectId: 'project',
+          designRevisionId: 'rev-working',
+          capturePlans: () async => [aPlan, bPlan],
+        ),
+        throwsA(
+          isA<PowerRuntimeStorageException>().having(
+            (error) => error.code,
+            'code',
+            'ELV4_DEPENDENCY_CYCLE',
+          ),
+        ),
+      );
+    },
+  );
 }
 
 List<PowerBatchTargetPlan> _plans({
@@ -296,21 +306,20 @@ PowerEvaluationEvidence _evidence(PowerBatchTargetPlan plan) =>
 PowerConsumedInput _input(
   Iterable<PowerDependencyKey> factKeys, {
   Iterable<PowerConsumedEvaluationRef> evaluations = const [],
-}) =>
-    PowerConsumedInput(
-      algorithmVersion: 'elv4-p7-batch-fixture-v1',
-      inputSchemaVersion: 'electra.elv4-p7-batch-input.v1',
-      numericPolicyVersion: powerNumericPolicyVersion,
-      facts: [
-        for (final key in factKeys)
-          PowerConsumedFact.present(
-            key: key,
-            valueSchema: 'electra.elv4-p7-batch-fact.v1',
-            value: {'entityId': key.entityId, 'purpose': key.purpose},
-          ),
-      ],
-      evaluations: evaluations,
-    );
+}) => PowerConsumedInput(
+  algorithmVersion: 'elv4-p7-batch-fixture-v1',
+  inputSchemaVersion: 'electra.elv4-p7-batch-input.v1',
+  numericPolicyVersion: powerNumericPolicyVersion,
+  facts: [
+    for (final key in factKeys)
+      PowerConsumedFact.present(
+        key: key,
+        valueSchema: 'electra.elv4-p7-batch-fact.v1',
+        value: {'entityId': key.entityId, 'purpose': key.purpose},
+      ),
+  ],
+  evaluations: evaluations,
+);
 
 PowerDependencyKey _factKey(String entityId, String purpose) =>
     PowerDependencyKey(
@@ -340,20 +349,26 @@ DriftPowerBatchPublicationRuntime _batchRuntime(AppDatabase db) =>
     );
 
 Future<String?> _pointerState(AppDatabase db, PowerNodeKeyV2 node) async {
-  final row = await db.customSelect(
-    'SELECT state FROM power_evaluation_pointers '
-    'WHERE logical_node_key_sha256 = ?',
-    variables: [Variable.withString(node.sha256)],
-  ).getSingleOrNull();
+  final row =
+      await db
+          .customSelect(
+            'SELECT state FROM power_evaluation_pointers '
+            'WHERE logical_node_key_sha256 = ?',
+            variables: [Variable.withString(node.sha256)],
+          )
+          .getSingleOrNull();
   return row?.read<String>('state');
 }
 
 Future<int?> _pointerGeneration(AppDatabase db, PowerNodeKeyV2 node) async {
-  final row = await db.customSelect(
-    'SELECT generation FROM power_evaluation_pointers '
-    'WHERE logical_node_key_sha256 = ?',
-    variables: [Variable.withString(node.sha256)],
-  ).getSingleOrNull();
+  final row =
+      await db
+          .customSelect(
+            'SELECT generation FROM power_evaluation_pointers '
+            'WHERE logical_node_key_sha256 = ?',
+            variables: [Variable.withString(node.sha256)],
+          )
+          .getSingleOrNull();
   return row?.read<int>('generation');
 }
 
@@ -365,7 +380,9 @@ Future<int> _count(AppDatabase db, String table) => db
 final _now = DateTime.utc(2026, 10, 15, 13);
 
 Future<void> _seed(AppDatabase db) async {
-  await db.into(db.projects).insert(
+  await db
+      .into(db.projects)
+      .insert(
         ProjectsCompanion.insert(
           id: 'project',
           name: 'ELV4 P7 batch',
@@ -377,7 +394,9 @@ Future<void> _seed(AppDatabase db) async {
           originDeviceId: 'test',
         ),
       );
-  await db.into(db.projectDesignRevisions).insert(
+  await db
+      .into(db.projectDesignRevisions)
+      .insert(
         ProjectDesignRevisionsCompanion.insert(
           id: 'rev-working',
           projectId: 'project',
