@@ -19,9 +19,10 @@
       "testPaths": [
         "apps/mobile/test/data/elv4_p2_persistence_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
@@ -47,9 +48,10 @@
         "apps/mobile/test/data/elv_p3_runtime_closure_test.dart",
         "apps/mobile/test/data/elv_p4_runtime_closure_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
@@ -76,9 +78,10 @@
       "testPaths": [
         "apps/mobile/test/data/elv4_p2_power_command_service_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-01"
@@ -109,9 +112,10 @@
       "testPaths": [
         "apps/mobile/test/data/elv4_p8_command_outcome_durability_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-01"
@@ -141,9 +145,10 @@
         "packages/engineering_core/test/power_dc_backup_test.dart",
         "packages/engineering_core/test/poe_evaluation_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-05",
@@ -173,9 +178,10 @@
       "testPaths": [
         "apps/mobile/test/data/elv4_p8_public_vertical_acceptance_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-05",
@@ -208,9 +214,10 @@
       "testPaths": [
         "apps/mobile/test/data/elv4_p7_freeze_integration_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-07",
@@ -242,9 +249,10 @@
       "testPaths": [
         "scripts/ci/check-elv4-closure.py"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
@@ -270,9 +278,10 @@
         "packages/engineering_core/test/power_numeric_test.dart",
         "packages/engineering_core/test/power_profiles_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-02",
@@ -304,9 +313,10 @@
         "packages/engineering_core/test/power_domain_contracts_test.dart",
         "apps/mobile/test/data/elv4_p2_power_command_service_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-02",
@@ -340,9 +350,10 @@
         "packages/engineering_core/test/power_domain_contracts_test.dart",
         "packages/engineering_core/test/power_profiles_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-12"
@@ -372,9 +383,10 @@
         "packages/engineering_core/test/power_domain_contracts_test.dart",
         "apps/mobile/test/data/elv4_p2_power_command_service_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-03",
@@ -406,9 +418,10 @@
         "packages/engineering_core/test/power_catalog_test.dart",
         "apps/mobile/test/data/engineering_reference_vocabulary_persistence_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-05",
@@ -441,9 +454,10 @@
         "packages/engineering_core/test/power_domain_contracts_test.dart",
         "packages/engineering_core/test/power_dc_backup_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-11"
@@ -473,9 +487,10 @@
         "packages/engineering_core/test/power_domain_contracts_test.dart",
         "apps/mobile/test/data/engineering_reference_adoption_safety_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-02",
@@ -508,9 +523,10 @@
       "testPaths": [
         "packages/engineering_core/test/power_evaluation_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-04",
@@ -545,9 +561,10 @@
       "testPaths": [
         "apps/mobile/test/data/elv4_p2_persistence_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-11"
@@ -578,9 +595,10 @@
       "testPaths": [
         "apps/mobile/test/data/elv4_p2_power_command_service_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-02",
@@ -613,9 +631,10 @@
       "testPaths": [
         "apps/mobile/test/data/elv4_p2_power_command_service_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-03",
@@ -651,9 +670,10 @@
         "apps/mobile/test/data/elv4_p2_power_command_service_test.dart",
         "apps/mobile/test/data/elv4_p7_runtime_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
@@ -680,9 +700,10 @@
       "testPaths": [
         "apps/mobile/test/data/elv4_p2_persistence_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-01",
@@ -714,9 +735,10 @@
         "apps/mobile/test/data/elv4_p7_freeze_integration_test.dart",
         "apps/mobile/test/data/elv4_p8_freeze_historical_invariance_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-07",
@@ -751,9 +773,10 @@
       "testPaths": [
         "apps/mobile/test/data/elv4_p7_t06_history_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-08"
@@ -782,9 +805,10 @@
       "testPaths": [
         "apps/mobile/test/data/elv4_p2_power_command_service_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-02",
@@ -816,9 +840,10 @@
       "testPaths": [
         "packages/engineering_core/test/power_graph_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-05"
@@ -849,9 +874,10 @@
       "testPaths": [
         "packages/engineering_core/test/power_graph_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-03"
@@ -879,9 +905,10 @@
       "testPaths": [
         "packages/engineering_core/test/power_graph_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-05"
@@ -909,9 +936,10 @@
       "testPaths": [
         "packages/engineering_core/test/power_graph_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
@@ -935,9 +963,10 @@
       "testPaths": [
         "packages/engineering_core/test/power_graph_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-03"
@@ -965,9 +994,10 @@
       "testPaths": [
         "packages/engineering_core/test/power_trace_evidence_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
@@ -991,9 +1021,10 @@
       "testPaths": [
         "packages/engineering_core/test/power_graph_readiness_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
@@ -1019,9 +1050,10 @@
         "packages/engineering_core/test/power_trace_evidence_test.dart",
         "apps/mobile/test/data/elv4_p8_freeze_historical_invariance_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
@@ -1047,9 +1079,10 @@
       "testPaths": [
         "packages/engineering_core/test/power_load_evaluation_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
@@ -1075,9 +1108,10 @@
         "packages/engineering_core/test/power_load_evaluation_test.dart",
         "packages/engineering_core/test/power_bottom_up_evaluation_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
@@ -1101,9 +1135,10 @@
       "testPaths": [
         "packages/engineering_core/test/power_load_evaluation_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
@@ -1127,9 +1162,10 @@
       "testPaths": [
         "packages/engineering_core/test/power_load_evaluation_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-09"
@@ -1157,9 +1193,10 @@
       "testPaths": [
         "packages/engineering_core/test/power_load_evaluation_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
@@ -1183,9 +1220,10 @@
       "testPaths": [
         "packages/engineering_core/test/power_load_evaluation_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-12"
@@ -1213,9 +1251,10 @@
       "testPaths": [
         "packages/engineering_core/test/power_load_evidence_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-04",
@@ -1248,9 +1287,10 @@
         "packages/engineering_core/test/power_bottom_up_evaluation_test.dart",
         "packages/engineering_core/test/p6_closure_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-06"
@@ -1278,9 +1318,10 @@
       "testPaths": [
         "packages/engineering_core/test/poe_evaluation_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
@@ -1305,9 +1346,10 @@
         "packages/engineering_core/test/poe_evaluation_test.dart",
         "apps/mobile/test/data/elv4_p8_public_vertical_acceptance_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
@@ -1333,9 +1375,10 @@
       "testPaths": [
         "packages/engineering_core/test/poe_evaluation_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
@@ -1359,9 +1402,10 @@
       "testPaths": [
         "packages/engineering_core/test/poe_evaluation_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
@@ -1385,9 +1429,10 @@
       "testPaths": [
         "packages/engineering_core/test/poe_evaluation_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-09"
@@ -1415,9 +1460,10 @@
       "testPaths": [
         "packages/engineering_core/test/poe_orchestration_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
@@ -1441,9 +1487,10 @@
       "testPaths": [
         "packages/engineering_core/test/poe_evaluation_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-05"
@@ -1473,9 +1520,10 @@
         "packages/engineering_core/test/poe_evidence_test.dart",
         "apps/mobile/test/data/elv4_p7_runtime_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-07"
@@ -1505,9 +1553,10 @@
       "testPaths": [
         "packages/engineering_core/test/power_dc_backup_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
@@ -1533,9 +1582,10 @@
       "testPaths": [
         "packages/engineering_core/test/power_dc_backup_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-09"
@@ -1563,9 +1613,10 @@
       "testPaths": [
         "packages/engineering_core/test/power_dc_backup_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-06"
@@ -1595,9 +1646,10 @@
         "packages/engineering_core/test/power_domain_contracts_test.dart",
         "packages/engineering_core/test/p6_closure_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
@@ -1621,9 +1673,10 @@
       "testPaths": [
         "packages/engineering_core/test/p6_closure_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-04",
@@ -1655,9 +1708,10 @@
         "packages/engineering_core/test/power_dc_backup_test.dart",
         "packages/engineering_core/test/p6_closure_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-06",
@@ -1687,9 +1741,10 @@
       "testPaths": [
         "packages/engineering_core/test/power_dc_backup_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-06"
@@ -1719,9 +1774,10 @@
         "packages/engineering_core/test/p6_closure_test.dart",
         "apps/mobile/test/data/elv4_p7_runtime_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-07"
@@ -1753,9 +1809,10 @@
         "packages/engineering_core/test/power_dependency_test.dart",
         "apps/mobile/test/data/elv4_p7_runtime_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-01",
@@ -1791,9 +1848,10 @@
         "apps/mobile/test/data/elv4_p7_runtime_test.dart",
         "apps/mobile/test/data/elv4_p2_power_command_service_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-01",
@@ -1827,9 +1885,10 @@
         "apps/mobile/test/data/elv4_p7_runtime_test.dart",
         "apps/mobile/test/data/elv4_p7_batch_runtime_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-04",
@@ -1862,9 +1921,10 @@
       "testPaths": [
         "apps/mobile/test/features/editor/power_workspace_panel_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-03"
@@ -1896,9 +1956,10 @@
         "apps/mobile/test/features/editor/power_workspace_panel_test.dart",
         "apps/mobile/test/application/power_workspace_controller_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
@@ -1924,9 +1985,10 @@
         "apps/mobile/test/data/elv4_p7_t06_history_test.dart",
         "apps/mobile/test/features/editor/power_workspace_panel_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-08"
@@ -1956,9 +2018,10 @@
         "apps/mobile/test/data/elv4_p7_runtime_test.dart",
         "apps/mobile/test/data/elv4_p8_freeze_historical_invariance_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-07",
@@ -1990,9 +2053,10 @@
       "testPaths": [
         "apps/mobile/test/features/editor/power_workspace_panel_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
@@ -2016,9 +2080,10 @@
       "testPaths": [
         "apps/mobile/test/data/elv4_p8_public_vertical_acceptance_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-05",
@@ -2054,9 +2119,10 @@
         "apps/mobile/test/data/elv4_p2_power_command_service_test.dart",
         "apps/mobile/test/data/elv4_p8_public_vertical_acceptance_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-13"
@@ -2088,9 +2154,10 @@
         "apps/mobile/test/data/elv_p2_migration_test.dart",
         "apps/mobile/test/data/elv4_p2_persistence_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-11"
@@ -2122,9 +2189,10 @@
         "apps/mobile/test/data/elv4_p8_public_vertical_acceptance_test.dart",
         "apps/mobile/test/data/elv4_p8_freeze_historical_invariance_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-04",
@@ -2159,9 +2227,10 @@
       "testPaths": [
         "apps/mobile/test/data/elv4_p8_failure_race_acceptance_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
@@ -2189,9 +2258,10 @@
         "apps/mobile/test/data/elv4_p8_idempotency_race_acceptance_test.dart",
         "apps/mobile/test/data/elv4_p8_rejection_concurrency_acceptance_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-08",
@@ -2224,9 +2294,10 @@
       "testPaths": [
         "apps/mobile/test/data/elv4_p8_freeze_historical_invariance_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-04",
@@ -2260,9 +2331,10 @@
         "packages/engineering_core/test/power_numeric_test.dart",
         "packages/engineering_core/test/power_dc_backup_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-01",
@@ -2301,9 +2373,10 @@
       "testPaths": [
         "scripts/ci/check-elv4-closure.py"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-15"
@@ -2332,9 +2405,10 @@
       "testPaths": [
         "apps/mobile/test/data/elv4_p2_power_command_service_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-01",
@@ -2370,9 +2444,10 @@
         "packages/engineering_core/test/poe_orchestration_test.dart",
         "packages/engineering_core/test/p6_closure_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-15"
@@ -2402,9 +2477,10 @@
         "apps/mobile/test/data/elv_p3_runtime_closure_test.dart",
         "apps/mobile/test/data/elv4_p8_freeze_historical_invariance_test.dart"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-01",
@@ -2429,7 +2505,7 @@
       "plannedAcceptanceIds": [
         "P9-T05"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         ".github/workflows/elv4-exact-head.yml",
         "scripts/ci/run-elv4-exact-head.sh"
@@ -2437,16 +2513,15 @@
       "testPaths": [
         "scripts/ci/check-elv4-closure.py"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
       "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C06"
-      ],
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
     },
@@ -2466,9 +2541,10 @@
       "testPaths": [
         "scripts/ci/check-elv4-closure.py"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-06",
@@ -2499,9 +2575,10 @@
       "testPaths": [
         "scripts/ci/check-elv4-closure.py"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-15"
@@ -2529,9 +2606,10 @@
       "testPaths": [
         "scripts/ci/check-elv4-closure.py"
       ],
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
-        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths."
+        "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
       ],
       "specificationResolutions": [
         "ELV4-AUD-14",
@@ -2554,5 +2632,21 @@
     "IMPLEMENTED": "Source and regression exist in the stated scope; no runtime acceptance inferred.",
     "BLOCKED": "Concrete integration or evidence gap recorded in closure.json.",
     "ACCEPTED": "Requires exact-head execution and an explicit RUNTIME_ACCEPTED event."
-  }
+  },
+  "technicalEvidence": [
+    {
+      "sourceSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
+      "workflowRunId": 38784483402,
+      "technicalJobId": 116592838704,
+      "artifactId": 11997121749,
+      "artifactDigest": "sha256:3af0ee825058d16fde0ab5a079776faf0576fb6dbda63d4f80e52a2535f0bb1a",
+      "url": "https://github.com/alimbetov/electra/actions/runs/38784483402",
+      "technicalResult": "PASS",
+      "mobileTests": 278,
+      "coreTests": 307,
+      "p7P8AlignmentSubsetTests": 71,
+      "runtimeAcceptanceVerified": false,
+      "scope": "Executed technical regression files; not full requirement or seven-case qualification acceptance."
+    }
+  ]
 }

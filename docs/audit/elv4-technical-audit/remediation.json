@@ -56,14 +56,15 @@
         "packages/engineering_core/test/power_numeric_test.dart"
       ],
       "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "openFindingIds": [
         "C01",
         "C02",
         "C03"
       ],
       "evidence": [
-        "docs/audit/elv4-p9-reconciliation.md"
+        "docs/audit/elv4-p9-reconciliation.md",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402 (technical regressions only, no full RM acceptance)"
       ],
       "acceptanceStatus": "PENDING"
     },
@@ -108,12 +109,13 @@
         "packages/engineering_core/test/power_profiles_test.dart"
       ],
       "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "openFindingIds": [
         "C02"
       ],
       "evidence": [
-        "docs/audit/elv4-p9-reconciliation.md"
+        "docs/audit/elv4-p9-reconciliation.md",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402 (technical regressions only, no full RM acceptance)"
       ],
       "acceptanceStatus": "PENDING"
     },
@@ -161,13 +163,14 @@
         "packages/engineering_core/test/power_graph_test.dart"
       ],
       "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "openFindingIds": [
         "C02",
         "C03"
       ],
       "evidence": [
-        "docs/audit/elv4-p9-reconciliation.md"
+        "docs/audit/elv4-p9-reconciliation.md",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402 (technical regressions only, no full RM acceptance)"
       ],
       "acceptanceStatus": "PENDING"
     },
@@ -223,14 +226,15 @@
         "packages/engineering_core/test/power_load_evidence_test.dart"
       ],
       "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "openFindingIds": [
         "C01",
         "C03",
         "C05"
       ],
       "evidence": [
-        "docs/audit/elv4-p9-reconciliation.md"
+        "docs/audit/elv4-p9-reconciliation.md",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402 (technical regressions only, no full RM acceptance)"
       ],
       "acceptanceStatus": "PENDING"
     },
@@ -283,13 +287,14 @@
         "packages/engineering_core/test/power_graph_test.dart"
       ],
       "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "openFindingIds": [
         "C01",
         "C02"
       ],
       "evidence": [
-        "docs/audit/elv4-p9-reconciliation.md"
+        "docs/audit/elv4-p9-reconciliation.md",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402 (technical regressions only, no full RM acceptance)"
       ],
       "acceptanceStatus": "PENDING"
     },
@@ -339,12 +344,13 @@
         "scripts/ci/check-elv4-closure.py"
       ],
       "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "openFindingIds": [
         "C01"
       ],
       "evidence": [
-        "docs/audit/elv4-p9-reconciliation.md"
+        "docs/audit/elv4-p9-reconciliation.md",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402 (technical regressions only, no full RM acceptance)"
       ],
       "acceptanceStatus": "PENDING"
     },
@@ -390,13 +396,14 @@
         "packages/engineering_core/test/poe_evidence_test.dart"
       ],
       "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "openFindingIds": [
         "C01",
         "C03"
       ],
       "evidence": [
-        "docs/audit/elv4-p9-reconciliation.md"
+        "docs/audit/elv4-p9-reconciliation.md",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402 (technical regressions only, no full RM acceptance)"
       ],
       "acceptanceStatus": "PENDING"
     },
@@ -441,13 +448,14 @@
         "apps/mobile/test/features/editor/power_workspace_panel_test.dart"
       ],
       "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "openFindingIds": [
         "C02",
         "C03"
       ],
       "evidence": [
-        "docs/audit/elv4-p9-reconciliation.md"
+        "docs/audit/elv4-p9-reconciliation.md",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402 (technical regressions only, no full RM acceptance)"
       ],
       "acceptanceStatus": "PENDING"
     },
@@ -493,12 +501,13 @@
         "packages/engineering_core/test/power_profiles_test.dart"
       ],
       "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "openFindingIds": [
         "C05"
       ],
       "evidence": [
-        "docs/audit/elv4-p9-reconciliation.md"
+        "docs/audit/elv4-p9-reconciliation.md",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402 (technical regressions only, no full RM acceptance)"
       ],
       "acceptanceStatus": "PENDING"
     },
@@ -536,12 +545,13 @@
         "apps/mobile/test/data/elv_p3_runtime_closure_test.dart"
       ],
       "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "openFindingIds": [
         "C03"
       ],
       "evidence": [
-        "docs/audit/elv4-p9-reconciliation.md"
+        "docs/audit/elv4-p9-reconciliation.md",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402 (technical regressions only, no full RM acceptance)"
       ],
       "acceptanceStatus": "PENDING"
     },
@@ -590,14 +600,15 @@
         "packages/engineering_core/test/power_evaluation_test.dart"
       ],
       "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "openFindingIds": [
         "C02",
         "C04",
         "C05"
       ],
       "evidence": [
-        "docs/audit/elv4-p9-reconciliation.md"
+        "docs/audit/elv4-p9-reconciliation.md",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402 (technical regressions only, no full RM acceptance)"
       ],
       "acceptanceStatus": "PENDING"
     },
@@ -643,10 +654,11 @@
         "packages/engineering_core/test/power_profiles_test.dart"
       ],
       "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "openFindingIds": [],
       "evidence": [
-        "docs/audit/elv4-p9-reconciliation.md"
+        "docs/audit/elv4-p9-reconciliation.md",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402 (technical regressions only, no full RM acceptance)"
       ],
       "acceptanceStatus": "PENDING"
     },
@@ -692,13 +704,14 @@
         "packages/engineering_core/test/power_numeric_test.dart"
       ],
       "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "openFindingIds": [
         "C01",
         "C02"
       ],
       "evidence": [
-        "docs/audit/elv4-p9-reconciliation.md"
+        "docs/audit/elv4-p9-reconciliation.md",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402 (technical regressions only, no full RM acceptance)"
       ],
       "acceptanceStatus": "PENDING"
     },
@@ -741,12 +754,13 @@
         "scripts/ci/check-elv4-closure.py"
       ],
       "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "openFindingIds": [
         "C03"
       ],
       "evidence": [
-        "docs/audit/elv4-p9-reconciliation.md"
+        "docs/audit/elv4-p9-reconciliation.md",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402 (technical regressions only, no full RM acceptance)"
       ],
       "acceptanceStatus": "PENDING"
     },
@@ -797,14 +811,31 @@
         "scripts/ci/check-elv4-closure.py"
       ],
       "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "testedSha": null,
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "openFindingIds": [
         "C01"
       ],
       "evidence": [
-        "docs/audit/elv4-p9-reconciliation.md"
+        "docs/audit/elv4-p9-reconciliation.md",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402 (technical regressions only, no full RM acceptance)"
       ],
       "acceptanceStatus": "PENDING"
+    }
+  ],
+  "technicalEvidence": [
+    {
+      "sourceSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
+      "workflowRunId": 38784483402,
+      "technicalJobId": 116592838704,
+      "artifactId": 11997121749,
+      "artifactDigest": "sha256:3af0ee825058d16fde0ab5a079776faf0576fb6dbda63d4f80e52a2535f0bb1a",
+      "url": "https://github.com/alimbetov/electra/actions/runs/38784483402",
+      "technicalResult": "PASS",
+      "mobileTests": 278,
+      "coreTests": 307,
+      "p7P8AlignmentSubsetTests": 71,
+      "runtimeAcceptanceVerified": false,
+      "scope": "Executed technical regression files; not full requirement or seven-case qualification acceptance."
     }
   ]
 }

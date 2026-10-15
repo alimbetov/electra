@@ -70,13 +70,16 @@
     {
       "id": "C06",
       "severity": "GATE",
-      "status": "PENDING",
+      "status": "RESOLVED",
       "owner": "P9",
-      "summary": "Final immutable-source technical gate has not yet been recorded for the reconciliation head.",
+      "summary": "Exact-head technical gate passed at ca281015; artifact and logs are retained. Every subsequent HEAD is checked independently.",
       "evidence": [
-        ".github/workflows/elv4-exact-head.yml"
+        ".github/workflows/elv4-exact-head.yml",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402/job/116592838704"
       ],
-      "requiredResolution": "Run generation, format, both analyzers, full mobile/core and explicit P7/P8 tests on one clean SHA; preserve report and logs with run metadata."
+      "requiredResolution": "Run generation, format, both analyzers, full mobile/core and explicit P7/P8 tests on one clean SHA; preserve report and logs with run metadata.",
+      "resolution": "GitHub technical job PASS, full source SHA and artifact digest recorded in technicalEvidence. Separate runtime-acceptance job rejects the five remaining HIGH findings."
     }
   ],
   "repairedInThisReview": [
@@ -92,6 +95,22 @@
       "area": "RM01 result ownership",
       "implemented": "Dedicated power_evaluation_records/pointers plus reverse index, isolated from legacy ProjectDerivedResults.",
       "disposition": "Recorded deviation from planned shared ProjectDerivedResults owner/kind extension; no assumption of shared invalidation. C02 remains blocking."
+    }
+  ],
+  "technicalEvidence": [
+    {
+      "sourceSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
+      "workflowRunId": 38784483402,
+      "technicalJobId": 116592838704,
+      "artifactId": 11997121749,
+      "artifactDigest": "sha256:3af0ee825058d16fde0ab5a079776faf0576fb6dbda63d4f80e52a2535f0bb1a",
+      "url": "https://github.com/alimbetov/electra/actions/runs/38784483402",
+      "technicalResult": "PASS",
+      "mobileTests": 278,
+      "coreTests": 307,
+      "p7P8AlignmentSubsetTests": 71,
+      "runtimeAcceptanceVerified": false,
+      "scope": "Executed technical regression files; not full requirement or seven-case qualification acceptance."
     }
   ]
 }

@@ -24,7 +24,7 @@ Local review bootstrap uses Flutter 3.47.7, framework `abaf9c5237`, Dart 3.13.5.
 | C03 | HIGH | Freeze captures power pointer identities, not the full aspect/scenario/physical-input snapshot. `createNext` copies runs/traversals but no power bindings or scenarios. Workspace `_scenarioOptions`, `_scopeRecords`, `_budgets` and overlay helpers read operational state. Existing R1/R2 test uses captured-empty power. | Versioned captured facts and remapped R2 aspects, immutable historical reads with nonempty R1 and changed R2/catalog/membership. Keep old physical hashes valid. |
 | C04 | HIGH | Current-schema P2 construction is not execution of upgrades from actual historical v21/v22. ELV1/P2 historical tests do not establish the complete new power/history migration matrix. | Upgrade supported real historical schemas, assert identity/hash/legacy result invariance, FK/integrity checks and no invented power defaults. |
 | C05 | HIGH | Application mutation objects and evaluation envelopes do not demonstrate round-trip/version dispatch against the documented public wire schema. JSON specification examples alone are not application decoder evidence. | Reconcile the real envelope/decoder with the schema and prove malformed/unknown-version rejection through the public boundary. |
-| C06 | Gate | Final source has not yet been certified by the new immutable-head technical gate. | Full generation/format/analyzer/mobile/core/P7/P8 execution and report. Even PASS cannot waive C01–C05. |
+| C06 | RESOLVED gate | Exact-head technical job passed at `ca281015`; full logs and artifact are retained. | Every subsequent source HEAD is verified independently; PASS does not waive C01–C05. |
 
 ## Repairs in this review
 
@@ -58,3 +58,20 @@ Run `bash scripts/ci/run-elv4-exact-head.sh` from a clean committed checkout wit
 ## Handoff boundary
 
 ELV5 receives typed physical demand/capability and explicit assumptions, not an invented policy or a fully accepted ELV4 baseline. ELV6 owns cabinet/battery fit; ELV7 owns verified jurisdictional rules; ELV8 owns product selection/BOM. Do not expand ELV4 into those stages to compensate for the integration gaps above.
+
+## Executed exact-head evidence
+
+At `ca281015876829b7d95c23dee0854bbb255f11b2`, both local and GitHub technical
+validation passed: generation, format, both analyzers, **278 mobile**, **307 core**,
+**71 explicit P7/P8/alignment subset tests**, and clean source. The subset is
+already contained in the full mobile count and must not be added to it.
+
+- [Exact-head run 38784483402](https://github.com/alimbetov/electra/actions/runs/38784483402): technical job `116592838704` PASS.
+- Evidence artifact `11997121749`, digest `sha256:3af0ee825058d16fde0ab5a079776faf0576fb6dbda63d4f80e52a2535f0bb1a`.
+- [Foundation run 38784483658](https://github.com/alimbetov/electra/actions/runs/38784483658) PASS at the same SHA.
+- Runtime-acceptance job `116594846639` failed specifically on unresolved HIGH
+  findings, after successfully downloading and verifying the technical artifact.
+
+This evidence-only update references the executed source above; it does not claim
+that its own commit has already run. Every new HEAD is independently checked by
+the permanent workflow. No RUNTIME_ACCEPTED/MERGED/CLOSED event is recorded.
