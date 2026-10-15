@@ -78,8 +78,8 @@ PowerEvaluationEvidence buildPowerIntervalCapabilityEvidence({
   required PowerIntervalCapabilityAssessment assessment,
   Iterable<PowerNodeKeyV2> dependencies = const [],
 }) {
-  if (input.demandW.toMap().toString() !=
-      assessment.physicalDemandW.toMap().toString()) {
+  if (input.demandW.lower != assessment.physicalDemandW.lower ||
+      input.demandW.upper != assessment.physicalDemandW.upper) {
     throw ArgumentError('Interval capability evidence input/result mismatch.');
   }
   final inputs = <String, Object?>{
@@ -115,7 +115,10 @@ PowerEvaluationEvidence buildPowerIntervalCapabilityEvidence({
     },
     dependencies: dependencies,
     quantities: [
-      {'code': 'PHYSICAL_DEMAND_W_INTERVAL', 'value': assessment.physicalDemandW.toMap()},
+      {
+        'code': 'PHYSICAL_DEMAND_W_INTERVAL',
+        'value': assessment.physicalDemandW.toMap(),
+      },
       {'code': 'REQUIRED_W_INTERVAL', 'value': assessment.requiredW.toMap()},
       {'code': 'AVAILABLE_W_INTERVAL', 'value': assessment.availableW.toMap()},
       {'code': 'MARGIN_W_INTERVAL', 'value': assessment.marginW.toMap()},
@@ -131,7 +134,8 @@ PowerEvaluationEvidence buildPowerIntervalCapabilityEvidence({
         PowerEvaluationFinding(
           code: 'ELV4_NUMERIC_BOUNDARY_UNCERTAIN',
           severity: 'UNRESOLVED',
-          message: 'Demand and available capability intervals overlap at the decision boundary.',
+          message:
+              'Demand and available capability intervals overlap at the decision boundary.',
         ),
     ],
     assumptions: const ['INTERVAL_DECISION_USES_CONSERVATIVE_BOUNDS'],
