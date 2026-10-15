@@ -12,7 +12,7 @@ import 'package:electra_mobile/application/power_workspace_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('P7 controller keeps reviewed draft on command failure', () async {
+  test('P7 controller keeps exact reviewed draft on command failure', () async {
     final repository = _Repository();
     final routing = _RoutingService(
       result: const ElvCommandFailureResult<Object?>(
@@ -27,29 +27,20 @@ void main() {
       routingService: routing,
     );
     await controller.open('project');
-    controller.stageReviewedDraft(
-      draft: const {'routeId': 'run-1'},
-      previewFingerprint: _hash('a'),
-    );
+    final command = _stage(controller, 'a');
 
-    final result = await controller.commitReviewedRoute(
-      _Command(
-        commandId: 'cmd-1',
-        projectId: 'project',
-        designRevisionId: 'rev-1',
-        reviewedFingerprint: _hash('a'),
-      ),
-    );
+    final result = await controller.commitStagedReviewedRoute();
 
     expect(result, isA<ElvCommandFailureResult<Object?>>());
     expect(controller.state.hasDraft, isTrue);
-    expect(controller.state.previewFingerprint, _hash('a'));
+    expect(controller.hasReviewedRouteCommand, isTrue);
+    expect(controller.state.previewFingerprint, command.reviewedFingerprint);
     expect(controller.state.operationState, PowerWorkspaceOperationState.failed);
     expect(controller.state.operationErrorCode, 'ELV_ROUTE_CONFLICT');
     expect(routing.calls, 1);
   });
 
-  test('P7 controller clears draft only after public command success', () async {
+  test('P7 controller clears exact draft only after public command success', () async {
     final repository = _Repository();
     final routing = _RoutingService(
       result: const ElvCommandSuccess<Object?>('ok'),
@@ -59,22 +50,13 @@ void main() {
       routingService: routing,
     );
     await controller.open('project');
-    controller.stageReviewedDraft(
-      draft: const {'routeId': 'run-1'},
-      previewFingerprint: _hash('b'),
-    );
+    _stage(controller, 'b');
 
-    final result = await controller.commitReviewedRoute(
-      _Command(
-        commandId: 'cmd-1',
-        projectId: 'project',
-        designRevisionId: 'rev-1',
-        reviewedFingerprint: _hash('b'),
-      ),
-    );
+    final result = await controller.commitStagedReviewedRoute();
 
     expect(result, isA<ElvCommandSuccess<Object?>>());
     expect(controller.state.hasDraft, isFalse);
+    expect(controller.hasReviewedRouteCommand, isFalse);
     expect(controller.state.previewFingerprint, isNull);
     expect(controller.state.operationState, PowerWorkspaceOperationState.idle);
     expect(repository.loads, 1);
@@ -89,10 +71,7 @@ void main() {
       routingService: routing,
     );
     await controller.open('project');
-    controller.stageReviewedDraft(
-      draft: const {'routeId': 'run-1'},
-      previewFingerprint: _hash('c'),
-    );
+    _stage(controller, 'c');
 
     final result = await controller.commitReviewedRoute(
       _Command(
@@ -118,10 +97,7 @@ void main() {
       routingService: routing,
     );
     await controller.open('project');
-    controller.stageReviewedDraft(
-      draft: const {'routeId': 'run-1'},
-      previewFingerprint: _hash('d'),
-    );
+    _stage(controller, 'd');
 
     final result = await controller.commitReviewedRoute(
       _Command(
@@ -136,6 +112,31 @@ void main() {
     expect(failure.failure.code, 'ELV4_ROUTE_REVIEW_MISMATCH');
     expect(routing.calls, 0);
     expect(controller.state.hasDraft, isTrue);
+  });
+
+  test('P7 controller rejects substituted command with same fingerprint', () async {
+    final routing = _RoutingService(
+      result: const ElvCommandSuccess<Object?>('unexpected'),
+    );
+    final controller = PowerWorkspaceController(
+      repository: _Repository(),
+      routingService: routing,
+    );
+    await controller.open('project');
+    _stage(controller, 'f');
+
+    final result = await controller.commitReviewedRoute(
+      _Command(
+        commandId: 'cmd-substitute',
+        projectId: 'project',
+        designRevisionId: 'rev-1',
+        reviewedFingerprint: _hash('f'),
+      ),
+    );
+
+    final failure = result as ElvCommandFailureResult<Object?>;
+    expect(failure.failure.code, 'ELV4_ROUTE_REVIEW_COMMAND_CHANGED');
+    expect(routing.calls, 0);
   });
 
   test('P7 controller blocks mutation in frozen workspace', () async {
@@ -154,7 +155,7 @@ void main() {
         commandId: 'cmd-1',
         projectId: 'project',
         designRevisionId: 'rev-1',
-        reviewedFingerprint: _hash('f'),
+        reviewedFingerprint: _hash('0'),
       ),
     );
 
@@ -239,6 +240,20 @@ void main() {
     expect(controller.projection.contextGeneration, 3);
     expect(controller.state.context.scenarioId, 'ALARM');
   });
+}
+
+_Command _stage(PowerWorkspaceController controller, String hashChar) {
+  final command = _Command(
+    commandId: 'cmd-$hashChar',
+    projectId: 'project',
+    designRevisionId: 'rev-1',
+    reviewedFingerprint: _hash(hashChar),
+  );
+  controller.stageReviewedRoute(
+    command: command,
+    draft: const {'routeId': 'run-1'},
+  );
+  return command;
 }
 
 final class _Repository implements PowerWorkspaceRepository {
