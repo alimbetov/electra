@@ -1,0 +1,46 @@
+name: ELV4 Closure Inventory
+
+on:
+  push:
+    branches:
+      - feat/flutter-elv4-power-topology-design
+    paths:
+      - .github/workflows/tmp-elv4-closure-inventory.yml
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/flutter-elv4-power-topology-design
+          fetch-depth: 0
+      - name: Inventory ELV4 closure state
+        run: |
+          echo '=== ELV4 specification statuses ==='
+          grep -R '^Status:' docs/product/elv4-implementation/*.md || true
+          echo
+          echo '=== requirements runtimeStatus by package ==='
+          python3 - <<'PY'
+          import json, collections
+          p='docs/product/elv4-implementation/requirements.json'
+          data=json.load(open(p))
+          print('root', data.get('designStatus'), data.get('runtimeStatus'))
+          by=collections.defaultdict(collections.Counter)
+          for r in data['requirements']:
+              by[r['package']][r['runtimeStatus']]+=1
+          for pkg in sorted(by, key=lambda x:int(x[1:])):
+              print(pkg, dict(by[pkg]))
+          PY
+          echo
+          echo '=== ELV4 implementation files/tests ==='
+          find apps/mobile/lib packages/engineering_core/lib apps/mobile/test packages/engineering_core/test -type f \( -iname '*power*' -o -iname '*elv4*' \) | sort
+          echo
+          echo '=== tracked ELV4 temporary/application scripts ==='
+          find scripts/ci .github/workflows -maxdepth 2 -type f -iname '*elv4*' | sort
+          echo
+          echo '=== TODO/FIXME in ELV4/power runtime and UI ==='
+          grep -RInE 'TODO|FIXME|XXX|NOT_IMPLEMENTED|NotImplemented' apps/mobile/lib/application apps/mobile/lib/data/repositories apps/mobile/lib/features/editor packages/engineering_core/lib/src | grep -Ei 'power|elv4|poe|backup|battery|workspace|topology' || true
+          echo
+          echo '=== ELV4 specification checker ==='
+          python3 scripts/ci/check-elv4-specification.py
