@@ -1,0 +1,58 @@
+name: Temporary ELV4 P7 UI Contract Gate
+
+on:
+  push:
+    branches:
+      - feat/flutter-elv4-power-topology-design
+    paths:
+      - .github/workflows/tmp-elv4-p7-ui-contract-gate.yml
+      - apps/mobile/lib/application/power_workspace_projection.dart
+      - apps/mobile/lib/application/power_workspace_controller.dart
+      - apps/mobile/lib/data/repositories/drift_power_workspace_repository.dart
+      - apps/mobile/lib/features/editor/power_workspace_panel.dart
+      - apps/mobile/lib/features/editor/editor_interaction.dart
+      - apps/mobile/test/application/power_workspace_controller_test.dart
+      - apps/mobile/test/features/editor/power_workspace_panel_test.dart
+      - apps/mobile/test/features/editor/editor_interaction_test.dart
+
+permissions:
+  contents: read
+
+jobs:
+  p7-ui-contract:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Install mobile dependencies
+        run: flutter pub get --enforce-lockfile
+      - name: Generate Drift code
+        run: dart run build_runner build
+      - name: Verify P7 UI contract formatting
+        working-directory: .
+        run: |
+          dart format --output=none --set-exit-if-changed \
+            apps/mobile/lib/application/power_workspace_projection.dart \
+            apps/mobile/lib/application/power_workspace_controller.dart \
+            apps/mobile/lib/data/repositories/drift_power_workspace_repository.dart \
+            apps/mobile/lib/features/editor/power_workspace_panel.dart \
+            apps/mobile/lib/features/editor/editor_interaction.dart \
+            apps/mobile/test/application/power_workspace_controller_test.dart \
+            apps/mobile/test/features/editor/power_workspace_panel_test.dart \
+            apps/mobile/test/features/editor/editor_interaction_test.dart
+      - name: Analyze mobile app
+        run: flutter analyze
+      - name: Test P7 UI contracts
+        run: |
+          flutter test \
+            test/application/power_workspace_controller_test.dart \
+            test/features/editor/power_workspace_panel_test.dart \
+            test/features/editor/editor_interaction_test.dart \
+            test/application/power_workspace_state_test.dart \
+            test/data/elv4_p7_runtime_test.dart
