@@ -33,10 +33,10 @@ final class DcSection {
     required String sectionId,
     required String parentNodeId,
     required String childNodeId,
-    required this.installedLengthM,
-    required this.forwardOhmPerM,
-    required this.returnOhmPerM,
-    required this.contactResistanceOhm,
+    required PowerRational installedLengthM,
+    required PowerRational forwardOhmPerM,
+    required PowerRational returnOhmPerM,
+    required PowerRational contactResistanceOhm,
     required this.currentRatingA,
     required String evidenceRef,
   })  : sectionId = _text(sectionId, 'sectionId'),
@@ -44,6 +44,10 @@ final class DcSection {
         childNodeId = _text(childNodeId, 'childNodeId'),
         resistanceModel = DcResistanceModel.conductorOhmPerM,
         _loopResistanceOhm = null,
+        installedLengthM = installedLengthM,
+        forwardOhmPerM = forwardOhmPerM,
+        returnOhmPerM = returnOhmPerM,
+        contactResistanceOhm = contactResistanceOhm,
         evidenceRef = _text(evidenceRef, 'evidenceRef') {
     _positive(installedLengthM, 'installedLengthM');
     _nonnegative(forwardOhmPerM, 'forwardOhmPerM');
