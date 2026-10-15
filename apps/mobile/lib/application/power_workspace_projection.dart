@@ -37,7 +37,7 @@ final class PowerWorkspaceMetric {
     required String key,
     required String label,
     required String value,
-    this.unit,
+    String? unit,
   }) : key = _text(key, 'key'),
        label = _text(label, 'label'),
        value = _text(value, 'value'),
