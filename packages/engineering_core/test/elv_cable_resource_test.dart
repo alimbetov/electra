@@ -58,7 +58,8 @@ void main() {
   });
 
   group('CableDefinition whole-cable invariant', () {
-    test('whole cable cannot stay atomic when finer allocatable resources exist',
+    test(
+        'whole cable cannot stay atomic when finer allocatable resources exist',
         () {
       final definition = CableDefinition(
         code: 'INVALID-ATOMIC-WHOLE',

@@ -184,7 +184,9 @@ abstract final class CableResourceResolver {
     if (wholeCable == null) {
       throw const CableResourceResolutionException(
         'ELV_ALLOC_DEFINITION_INVALID',
-        {'errors': ['Cable definition is missing __WHOLE_CABLE__.']},
+        {
+          'errors': ['Cable definition is missing __WHOLE_CABLE__.']
+        },
       );
     }
     return _resolveAtomicDescendants(wholeCable, byId);

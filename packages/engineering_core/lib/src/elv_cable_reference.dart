@@ -192,7 +192,8 @@ final class CableDefinition {
     if (wholeResource != null) {
       final finerAllocatable = resourceDefinitions.any(
         (resource) =>
-            resource.identity != wholeResource!.identity && resource.allocatable,
+            resource.identity != wholeResource!.identity &&
+            resource.allocatable,
       );
       if (finerAllocatable) {
         if (wholeResource.atomic) {
