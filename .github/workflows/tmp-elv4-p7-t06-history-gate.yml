@@ -10,6 +10,7 @@ on:
       - scripts/ci/apply-elv4-p7-history-replay.py
       - scripts/ci/apply-elv4-p7-history-integrity.py
       - scripts/ci/apply-elv4-p7-history-acceptance.py
+      - scripts/ci/fix-elv4-p7-history-acceptance-scope.py
       - scripts/ci/apply-elv4-p7-t06-wiring.py
       - apps/mobile/lib/data/database/elv_history_database_tables.dart
       - apps/mobile/lib/data/repositories/drift_elv_reviewed_routing_runtime.dart
@@ -54,6 +55,9 @@ jobs:
       - name: Apply P7 T06 negative acceptance
         working-directory: .
         run: python scripts/ci/apply-elv4-p7-history-acceptance.py
+      - name: Normalize P7 T06 acceptance scope
+        working-directory: .
+        run: python scripts/ci/fix-elv4-p7-history-acceptance-scope.py
       - name: Apply P7 T06 production wiring
         working-directory: .
         run: python scripts/ci/apply-elv4-p7-t06-wiring.py
