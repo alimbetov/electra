@@ -117,6 +117,7 @@ jobs:
             apps/mobile/test/application/elv_reviewed_reroute_command_test.dart \
             apps/mobile/test/data/elv4_p7_t06_history_test.dart
           git commit -m "feat(elv4): persist P7 revision-scoped route history"
+          git reset --hard HEAD
           git fetch origin "${GITHUB_REF_NAME}"
           git rebase "origin/${GITHUB_REF_NAME}"
           git push origin "HEAD:${GITHUB_REF_NAME}"
