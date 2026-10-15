@@ -113,7 +113,8 @@ if 'trg_elv_revision_history_operation_payload_immutable' not in text:
         "  }\n"
         "}\n"
     )
-    hardened_tail = immutable_tail[:-8] + (
+    method_body = immutable_tail.removesuffix("  }\n}\n")
+    hardened_tail = method_body + (
         "    await customStatement(\n"
         "      \"CREATE TRIGGER IF NOT EXISTS trg_elv_revision_history_operation_payload_immutable \"\n"
         "      \"BEFORE UPDATE ON elv_revision_command_history_operations FOR EACH ROW \"\n"
