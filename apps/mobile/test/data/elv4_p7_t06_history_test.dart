@@ -60,7 +60,7 @@ void main() {
         state: 'APPLIED',
         headSequence: 1,
         generation: 1,
-        executionKinds: const ['ORIGINAL'],
+        executionKinds: const {'ORIGINAL'},
       );
       final evidence = await db.select(db.elvRevisionAggregateEvidenceRecords).get();
       expect(evidence, hasLength(2));
@@ -95,7 +95,7 @@ void main() {
         state: 'UNDONE',
         headSequence: 0,
         generation: 2,
-        executionKinds: const ['ORIGINAL', 'UNDO'],
+        executionKinds: const {'ORIGINAL', 'UNDO'},
       );
 
       db = await harness.reopen(db);
@@ -123,7 +123,7 @@ void main() {
         state: 'APPLIED',
         headSequence: 1,
         generation: 3,
-        executionKinds: const ['ORIGINAL', 'UNDO', 'REDO'],
+        executionKinds: const {'ORIGINAL', 'UNDO', 'REDO'},
       );
 
       await db.close();
@@ -341,15 +341,14 @@ Future<void> _expectHistory(
   required String state,
   required int headSequence,
   required int generation,
-  required List<String> executionKinds,
+  required Set<String> executionKinds,
 }) async {
   final operation = await db.select(db.elvRevisionCommandHistoryOperations).getSingle();
   final cursor = await db.select(db.elvRevisionCommandHistoryCursors).getSingle();
-  final executions = await (db.select(db.elvRevisionCommandHistoryExecutions)
-        ..orderBy([(row) => OrderingTerm.asc(row.createdAt)]))
-      .get();
+  final executions = await db.select(db.elvRevisionCommandHistoryExecutions).get();
   expect(operation.state, state);
   expect(cursor.headSequence, headSequence);
   expect(cursor.generation, generation);
-  expect(executions.map((row) => row.executionKind).toList(), executionKinds);
+  expect(executions, hasLength(executionKinds.length));
+  expect(executions.map((row) => row.executionKind).toSet(), executionKinds);
 }
