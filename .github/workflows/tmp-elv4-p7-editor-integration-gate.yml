@@ -7,8 +7,10 @@ on:
     paths:
       - .github/workflows/tmp-elv4-p7-editor-integration-gate.yml
       - scripts/ci/apply-elv4-p7-editor-integration.py
+      - scripts/ci/apply-elv4-p7-ui-contract-normalization.py
       - apps/mobile/lib/features/editor/room_editor_screen.dart
       - apps/mobile/lib/features/editor/persisted_room_editor_screen.dart
+      - apps/mobile/lib/features/editor/power_workspace_panel.dart
       - apps/mobile/lib/features/editor/power_workspace_panel_host.dart
       - apps/mobile/lib/features/editor/power_workspace_overlay_painter.dart
       - apps/mobile/lib/features/editor/power_workspace_editor_binding.dart
@@ -37,12 +39,16 @@ jobs:
       - name: Apply P7 editor integration
         working-directory: .
         run: python scripts/ci/apply-elv4-p7-editor-integration.py
+      - name: Normalize compact P7 controls
+        working-directory: .
+        run: python scripts/ci/apply-elv4-p7-ui-contract-normalization.py
       - name: Format P7 editor integration
         working-directory: .
         run: |
           dart format \
             apps/mobile/lib/features/editor/room_editor_screen.dart \
             apps/mobile/lib/features/editor/persisted_room_editor_screen.dart \
+            apps/mobile/lib/features/editor/power_workspace_panel.dart \
             apps/mobile/lib/features/editor/power_workspace_panel_host.dart \
             apps/mobile/lib/features/editor/power_workspace_overlay_painter.dart \
             apps/mobile/lib/features/editor/power_workspace_editor_binding.dart \
@@ -62,6 +68,7 @@ jobs:
           if git diff --quiet -- \
             apps/mobile/lib/features/editor/room_editor_screen.dart \
             apps/mobile/lib/features/editor/persisted_room_editor_screen.dart \
+            apps/mobile/lib/features/editor/power_workspace_panel.dart \
             apps/mobile/lib/features/editor/power_workspace_panel_host.dart \
             apps/mobile/lib/features/editor/power_workspace_overlay_painter.dart \
             apps/mobile/lib/features/editor/power_workspace_editor_binding.dart \
@@ -73,6 +80,7 @@ jobs:
           git add \
             apps/mobile/lib/features/editor/room_editor_screen.dart \
             apps/mobile/lib/features/editor/persisted_room_editor_screen.dart \
+            apps/mobile/lib/features/editor/power_workspace_panel.dart \
             apps/mobile/lib/features/editor/power_workspace_panel_host.dart \
             apps/mobile/lib/features/editor/power_workspace_overlay_painter.dart \
             apps/mobile/lib/features/editor/power_workspace_editor_binding.dart \
