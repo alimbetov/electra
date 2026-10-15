@@ -11,7 +11,6 @@ final class PowerWorkspaceEditorBinding {
   PowerWorkspaceEditorBinding({
     required this.controller,
     required this.onSessionChanged,
-    required this.onFindingSelected,
     this.onApplyReviewedRoute,
     this.onDiscardDraft,
   });
@@ -19,7 +18,6 @@ final class PowerWorkspaceEditorBinding {
   final PowerWorkspaceController controller;
   final Future<void> Function(PowerWorkspaceSessionSnapshot snapshot)
   onSessionChanged;
-  final ValueChanged<PowerWorkspaceFindingProjection> onFindingSelected;
   final Future<void> Function()? onApplyReviewedRoute;
   final VoidCallback? onDiscardDraft;
 
