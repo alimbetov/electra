@@ -111,21 +111,25 @@ final class PowerWorkspaceOverlayProjection {
     Iterable<String> highlightedComponentIds = const [],
     Iterable<String> sourceComponentIds = const [],
     Iterable<String> highlightedCableRunIds = const [],
+    Iterable<String> highlightedRouteSegmentIds = const [],
     Iterable<String> capacityGroupIds = const [],
   }) : highlightedComponentIds = _sortedUnique(highlightedComponentIds),
        sourceComponentIds = _sortedUnique(sourceComponentIds),
        highlightedCableRunIds = _sortedUnique(highlightedCableRunIds),
+       highlightedRouteSegmentIds = _sortedUnique(highlightedRouteSegmentIds),
        capacityGroupIds = _sortedUnique(capacityGroupIds);
 
   final List<String> highlightedComponentIds;
   final List<String> sourceComponentIds;
   final List<String> highlightedCableRunIds;
+  final List<String> highlightedRouteSegmentIds;
   final List<String> capacityGroupIds;
 
   bool get isEmpty =>
       highlightedComponentIds.isEmpty &&
       sourceComponentIds.isEmpty &&
       highlightedCableRunIds.isEmpty &&
+      highlightedRouteSegmentIds.isEmpty &&
       capacityGroupIds.isEmpty;
 }
 
