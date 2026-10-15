@@ -1,6 +1,6 @@
 # P5 — PoE delivery, patching and shared PSE budgets
 
-Status: IMPLEMENTATION DESIGN DRAFT
+Status: CORE RUNTIME CLOSURE IMPLEMENTED (P5-T01–P5-T08); application publication, reverse-index persistence and workspace qualification continue in P7/P8.
 Consumes P1 exact profiles, P3 graph, P4 leaf demands and ELV3 physical evidence.
 Shared rules: [runtime contracts](shared-contracts.md).
 Resolved audit decisions: [RM01–RM15](remediation-contract.md).
@@ -18,9 +18,22 @@ Resolved audit decisions: [RM01–RM15](remediation-contract.md).
 | ELV4-P5-007 | Model midspan/injector supply and data/power boundaries explicitly | P5-T07 injector path |
 | ELV4-P5-008 | Include complete/missing path/group/scenario dependencies and restart-stable result evidence | P5-T08 invalidation/reopen |
 
+## Core closure evidence
+
+The pure-core implementation now closes P5-T01–P5-T08 without adding storage or Flutter dependencies:
+
+- `poe_evaluation.dart` implements role/path/model/PD/port/group/midspan checks and PSE upstream conversion accounting.
+- `power_dependency.dart` implements delimiter-safe `elv4-dep-v1` typed dependency identities, PRESENT/MISSING consumed facts, consumed-evaluation references and deterministic input diffs.
+- `poe_evidence.dart` records PWR-06 consumed profile, delivery, shared-group membership/capacity, PSE loss model, scenario segment, physical path, allocation/run presence and the exact consumed PWR-01 evaluation. Its input fingerprint is enumeration-order independent and restart-stable.
+- `power_bottom_up_evidence.dart` persists the parent-facing PWR-01 boundary result after P5 without reconstructing child losses.
+- `poe_orchestration.dart` fixes the dependency direction as `leaf PWR-01 -> PWR-06 -> parent PWR-01 -> PWR-02`. PSE efficiency/idle belongs only to PWR-06; reserve/derating belongs only to PWR-02.
+- Shared PSE demand is owned by the canonical group identity. The P4 adapter uses `POE_GROUP:<groupId>` and `P5_PSE_GROUP_TRANSFER_<groupId>`, preventing one group-wide upstream demand from being summed once per PD delivery.
+
+Targeted core gate `38725967815` passed formatter, full `dart analyze` for `engineering_core`, P5 dependency/evidence/orchestration tests and adjacent P4/P5 regression tests. The temporary gate was removed after the successful run. This is a core-runtime closure claim only; it does not claim completion of P7 publication races/reverse indexes or P8 workspace/mobile acceptance.
+
 ## Core API and profile fields
 
-Proposed `evaluatePoeDelivery(PoeEvaluationInput) -> PoeEvaluationResult` implements ELV-PWR-06. Input contains graph segment, PD demand, exact PSE/PD delivery definitions, selected accounting mode, path realization and group membership. Output contains pdDemandW, guaranteedPdW, reservedPseW, estimatedActualPseW when supported, pdMarginW, per-port/group utilization and upstream demand basis.
+`evaluatePoeDelivery(PoeEvaluationInput) -> PoeEvaluationResult` implements ELV-PWR-06. Input contains graph segment, PD demand, exact PSE/PD delivery definitions, selected accounting mode, path realization and group membership. Output contains pdDemandW, guaranteedPdW, reservedPseW, estimatedActualPseW when supported, pdMarginW, per-port/group utilization and upstream demand basis.
 
 Delivery definition identifies supported profile code/edition, pair/terminal semantics, voltage/current bounds, PSE output allocation and guaranteed PD capability at its stated boundary, allowed media/path evidence and provenance. The code is an exact catalog identifier, not parsed text from a device label.
 
