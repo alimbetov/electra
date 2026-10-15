@@ -352,6 +352,65 @@ void main() {
   );
 
   test(
+    'committed operation replays after freeze but rejects type/schema reuse',
+    () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      await _seedProjectAndRevisions(db);
+      final store = DriftPowerRuntimeStore(db, originDeviceId: 'test');
+      var executions = 0;
+      Future<PowerReplayResult> run({
+        String type = 'EDIT',
+        String schema = 'edit.v1',
+        String id = 'op',
+      }) => store.executeReplayable(
+        projectId: 'project',
+        designRevisionId: 'rev-working',
+        operationId: id,
+        commandType: type,
+        payloadSchema: schema,
+        commandFingerprint:
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        execute: () async {
+          executions++;
+          return '{"ok":true}';
+        },
+      );
+      final original = await run();
+      await db.customStatement(
+        "UPDATE project_design_revisions SET state = 'FROZEN' WHERE id = 'rev-working'",
+      );
+      final replay = await run();
+      expect(replay.replayed, isTrue);
+      expect(replay.resultJson, original.resultJson);
+      expect(executions, 1);
+      for (final args in [('OTHER', 'edit.v1'), ('EDIT', 'edit.v2')]) {
+        await expectLater(
+          run(type: args.$1, schema: args.$2),
+          throwsA(
+            isA<PowerRuntimeStorageException>().having(
+              (e) => e.code,
+              'code',
+              'ELV4_OPERATION_FINGERPRINT_CONFLICT',
+            ),
+          ),
+        );
+      }
+      await expectLater(
+        run(id: 'new'),
+        throwsA(
+          isA<PowerRuntimeStorageException>().having(
+            (e) => e.code,
+            'code',
+            'ELV4_REVISION_NOT_WORKING',
+          ),
+        ),
+      );
+      expect(executions, 1);
+    },
+  );
+
+  test(
     'revision mutation and evaluation append are rejected after freeze',
     () async {
       final db = AppDatabase(NativeDatabase.memory());

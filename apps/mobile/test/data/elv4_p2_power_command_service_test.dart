@@ -129,6 +129,44 @@ void main() {
   });
 
   test(
+    'same-project foreign port cannot be charged to another component',
+    () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      await _seed(db);
+      final service = DriftPowerCommandService(db, originDeviceId: 'test');
+      final command = SetPowerLoadCommand(
+        operationId: 'wrong-owner',
+        projectId: 'project',
+        designRevisionId: 'rev-1',
+        expectedRevision: 1,
+        changedDependencies: [_dep('LOAD')],
+        contribution: PowerOwnLoadContribution(
+          id: 'LOAD',
+          componentId: 'comp-source',
+          inputPortId: 'p-load',
+          accountingKind: PowerAccountingKind.consumerInput,
+          stateCode: 'NORMAL',
+          demand: DcConstantPowerDemand(PowerRational.integer(12)),
+        ),
+      );
+      await expectLater(
+        service.execute(command),
+        throwsA(
+          isA<PowerRuntimeStorageException>().having(
+            (e) => e.code,
+            'code',
+            'ELV4_PORT_OWNER_MISMATCH',
+          ),
+        ),
+      );
+      expect(await _revision(db), 1);
+      expect(await db.select(db.powerLoadBindings).get(), isEmpty);
+      expect(await db.select(db.powerOperationRecords).get(), isEmpty);
+    },
+  );
+
+  test(
     'P2 command invalidates only exact dependency closure atomically',
     () async {
       final db = AppDatabase(NativeDatabase.memory());

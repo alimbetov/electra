@@ -57,16 +57,11 @@ final class DriftPowerRuntimeStore {
     required String commandFingerprint,
     required Future<String> Function() execute,
   }) => database.transaction(() async {
-    await _requireRevision(
-      projectId: projectId,
-      designRevisionId: designRevisionId,
-      requireWorking: true,
-    );
     final fingerprint = _sha256(commandFingerprint, 'commandFingerprint');
     final existing =
         await database
             .customSelect(
-              'SELECT command_fingerprint, status, result_json '
+              'SELECT command_type, payload_schema, command_fingerprint, status, result_json '
               'FROM power_operation_records '
               'WHERE project_id = ? AND design_revision_id = ? AND operation_id = ?',
               variables: [
@@ -78,7 +73,9 @@ final class DriftPowerRuntimeStore {
             .getSingleOrNull();
     if (existing != null) {
       final storedFingerprint = existing.read<String>('command_fingerprint');
-      if (storedFingerprint != fingerprint) {
+      if (storedFingerprint != fingerprint ||
+          existing.read<String>('command_type') != commandType.trim() ||
+          existing.read<String>('payload_schema') != payloadSchema.trim()) {
         throw PowerRuntimeStorageException(
           'ELV4_OPERATION_FINGERPRINT_CONFLICT',
           {'operationId': operationId},
@@ -95,6 +92,12 @@ final class DriftPowerRuntimeStore {
       return PowerReplayResult(resultJson: resultJson, replayed: true);
     }
 
+    // A committed receipt survives freeze; only new work requires WORKING.
+    await _requireRevision(
+      projectId: projectId,
+      designRevisionId: designRevisionId,
+      requireWorking: true,
+    );
     final timestamp = now().toUtc();
     await runRawStatement(
       database,

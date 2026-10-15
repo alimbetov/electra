@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:drift/drift.dart';
@@ -156,7 +157,7 @@ void main() {
         throwsArgumentError,
       );
 
-      await _publishVerticalEvidence(builder, db);
+      await _publishPersistedLoadEvidence(builder, db);
       expect(
         await _countWhere(db, 'power_evaluation_pointers', "state = 'CURRENT'"),
         4,
@@ -717,7 +718,7 @@ Future<int> _countWhere(AppDatabase db, String table, String where) => db
     .getSingle()
     .then((row) => row.read<int>('c'));
 
-Future<void> _publishVerticalEvidence(
+Future<void> _publishPersistedLoadEvidence(
   Elv4QualificationBuilder builder,
   AppDatabase db,
 ) async {
@@ -726,36 +727,63 @@ Future<void> _publishVerticalEvidence(
     originDeviceId: 'qualification',
     now: () => DateTime.utc(2026, 10, 15, 21, 15),
   );
+  // This is persisted-load/publication integration, not the seven-case
+  // qualification.json process x context x dimension acceptance matrix.
   final cases = <(String, String, String, String)>[
-    ('CCTV', 'NORMAL', 'cctv-camera', 'LOAD-CCTV_CAMERA_LOAD'),
-    ('LAN', 'NORMAL', 'lan-pd', 'LOAD-LAN_PD_LOAD'),
-    ('ACS', 'ACS_BACKUP', 'acs-controller', 'SCENARIO-ACS-BACKUP'),
-    ('FIRE', 'FIRE_SEQUENCE', 'fire-panel', 'SCENARIO-FIRE-SEQUENCE'),
+    ('CCTV', 'NORMAL', 'NORMAL', 'CCTV_CAMERA_LOAD'),
+    ('LAN', 'NORMAL', 'NORMAL', 'LAN_PD_LOAD'),
+    ('ACS', 'ACS_BACKUP', 'BACKUP', 'ACS_CONTROLLER_LOAD'),
+    ('FIRE', 'FIRE_SEQUENCE', 'STANDBY', 'FIRE_STANDBY_LOAD'),
   ];
   for (final item in cases) {
-    final node = PowerNodeKeyV2(
+    Future<PowerDemandContribution> readContribution() async {
+      final row =
+          await db
+              .customSelect(
+                'SELECT l.origin_id, l.input_port_id, l.state_code, l.typed_demand_json, '
+                'p.component_id FROM power_load_bindings l '
+                'JOIN engineering_port_instances p ON p.id = l.input_port_id '
+                'AND p.project_id = l.project_id '
+                'WHERE l.project_id = ? AND l.design_revision_id = ? '
+                'AND l.id = ? AND l.deleted_at IS NULL',
+                variables: [
+                  Variable.withString(builder.projectId),
+                  Variable.withString(builder.revisionId),
+                  Variable.withString(item.$4),
+                ],
+              )
+              .getSingle();
+      return PowerDemandContribution(
+        originId: row.read<String>('origin_id'),
+        componentId: row.read<String>('component_id'),
+        inputPortId: row.read<String>('input_port_id'),
+        stateCode: row.read<String>('state_code'),
+        demand: PowerDemand.fromMap(
+          jsonDecode(row.read<String>('typed_demand_json'))
+              as Map<String, dynamic>,
+        ),
+      );
+    }
+
+    final contribution = await readContribution();
+    final calculated = buildPowerDemandEvidence(
+      evaluationId: 'P8-${item.$1}-PWR01',
       revisionId: builder.revisionId,
       scenarioId: item.$2,
-      scopeKind: PowerEvaluationScopeKind.segment,
-      scopeId: '${item.$1}-QUALIFICATION',
-      processCode: PowerProcessCode.pwr01,
+      segmentId: item.$3,
       subjectKind: 'COMPONENT',
-      subjectId: item.$3,
+      subjectId: contribution.componentId,
+      demand: aggregatePowerDemand([contribution]),
     );
-    final fact = builder.dependency(item.$4, purpose: 'QUALIFICATION_INPUT');
-    final input = PowerConsumedInput(
-      algorithmVersion: 'elv4-p8-qualification-v1',
-      inputSchemaVersion: 'electra.elv4-p8-qualification-input.v1',
-      numericPolicyVersion: powerNumericPolicyVersion,
+    Future<PowerConsumedInput> captureInput() async => PowerConsumedInput(
+      algorithmVersion: calculated.algorithmVersion,
+      inputSchemaVersion: calculated.inputSchemaVersion,
+      numericPolicyVersion: calculated.numericPolicyVersion,
       facts: [
         PowerConsumedFact.present(
-          key: fact,
-          valueSchema: 'electra.elv4-p8-qualification-fact.v1',
-          value: {
-            'discipline': item.$1,
-            'entityId': fact.entityId,
-            'purpose': fact.purpose,
-          },
+          key: builder.dependency('LOAD-${item.$4}'),
+          valueSchema: 'electra.elv4-persisted-load.v1',
+          value: (await readContribution()).toMap(),
         ),
       ],
       evaluations: const [],
@@ -763,29 +791,35 @@ Future<void> _publishVerticalEvidence(
     final capture = await runtime.captureForCalculation(
       projectId: builder.projectId,
       designRevisionId: builder.revisionId,
-      targetNodeKey: node,
-      captureInput: () async => input,
+      targetNodeKey: calculated.nodeKey,
+      captureInput: captureInput,
     );
+    final input = await captureInput();
     final evidence = PowerEvaluationEvidence(
-      evaluationId: 'P8-${item.$1}-PWR01',
-      nodeKey: node,
-      algorithmVersion: input.algorithmVersion,
-      inputSchemaVersion: input.inputSchemaVersion,
-      outputSchemaVersion: 'electra.elv4-p8-qualification-output.v1',
-      numericPolicyVersion: input.numericPolicyVersion,
+      evaluationId: calculated.evaluationId,
+      nodeKey: calculated.nodeKey,
+      algorithmVersion: calculated.algorithmVersion,
+      inputSchemaVersion: calculated.inputSchemaVersion,
+      outputSchemaVersion: calculated.outputSchemaVersion,
+      numericPolicyVersion: calculated.numericPolicyVersion,
       inputFingerprint: input.inputFingerprint,
-      status: PowerEvaluationStatus.pass,
-      applicability: PowerEvaluationApplicability.applicable,
-      inputs: {'dependencyKeys': input.dependencyKeys},
-      output: {'qualified': true, 'discipline': item.$1},
-      dependencies: const [],
+      status: calculated.status,
+      applicability: calculated.applicability,
+      inputs: calculated.inputs,
+      output: calculated.output,
+      arithmeticSteps: calculated.arithmeticSteps,
+      findings: calculated.findings,
     );
+    // W is known; A/VA stay explicitly incomplete without a solved voltage/PF.
+    expect(evidence.output['completeW'], isTrue);
+    expect(evidence.output['completeA'], isFalse);
+    expect(evidence.output.containsKey('qualified'), isFalse);
     final receipt = await runtime.publishGuarded(
       capture: capture,
       evidence: evidence,
-      operationId: 'p8-qualify-${item.$1.toLowerCase()}',
-      commandFingerprint: sha256HexUtf8('p8-qualify-${item.$1}'),
-      recaptureInput: () async => input,
+      operationId: 'p8-load-${item.$1.toLowerCase()}',
+      commandFingerprint: sha256HexUtf8('p8-load-${item.$1}'),
+      recaptureInput: captureInput,
     );
     expect(receipt.replayed, isFalse);
   }

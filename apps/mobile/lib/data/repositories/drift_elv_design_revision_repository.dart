@@ -310,18 +310,28 @@ final class DriftElvDesignRevisionRepository
         await (database.select(database.designRevisionPhysicalSnapshots)..where(
           (row) => row.designRevisionId.equals(base.id),
         )).getSingleOrNull();
-    if (snapshot == null || snapshot.payloadSha256 != base.snapshotHash) {
+    if (snapshot == null ||
+        snapshot.projectId != command.projectId ||
+        snapshot.payloadSha256 != base.snapshotHash ||
+        !_validPhysicalSnapshot(snapshot)) {
       return elvRuntimeFailure(
         'ELV_DESIGN_REVISION_SNAPSHOT_INVALID',
         ElvFailureCategory.referenceIntegrity,
       );
     }
+    // Restoring an older frozen base must not reuse a later revision's sequence.
+    final latestSequence =
+        await (database.select(database.projectDesignRevisions)
+              ..where((row) => row.projectId.equals(command.projectId))
+              ..orderBy([(row) => OrderingTerm.desc(row.sequence)])
+              ..limit(1))
+            .getSingle();
     final instant = _now();
     final revision = ProjectDesignRevision(
       id: command.newRevisionId,
       projectId: command.projectId,
       code: command.code.trim(),
-      sequence: base.sequence + 1,
+      sequence: latestSequence.sequence + 1,
       state: ProjectDesignRevisionState.working,
       basedOnRevisionId: base.id,
       revision: 1,
@@ -409,6 +419,22 @@ final class DriftElvDesignRevisionRepository
     );
     return ElvCommandSuccess(revision);
   });
+
+  bool _validPhysicalSnapshot(DesignRevisionPhysicalSnapshotRow snapshot) {
+    try {
+      final payload = jsonDecode(snapshot.payloadJson);
+      if (payload is! Map<String, dynamic>) return false;
+      return DesignRevisionPhysicalSnapshot(
+            designRevisionId: snapshot.designRevisionId,
+            projectId: snapshot.projectId,
+            schemaVersion: snapshot.schemaVersion,
+            payload: payload,
+          ).contentSha256 ==
+          snapshot.payloadSha256;
+    } on FormatException {
+      return false;
+    }
+  }
 
   @override
   Future<ElvCommandResult<ProjectDesignRevision>> supersede(

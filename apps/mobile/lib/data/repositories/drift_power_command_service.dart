@@ -330,7 +330,11 @@ final class DriftPowerCommandService {
   }
 
   Future<void> _setLoad(SetPowerLoadCommand command) async {
-    await _requirePort(command.projectId, command.contribution.inputPortId);
+    await _requireOwnedPort(
+      command.projectId,
+      command.contribution.inputPortId,
+      command.contribution.componentId,
+    );
     final demandJson = canonicalEngineeringJsonV1(
       command.contribution.demand.toMap(),
     );
@@ -371,9 +375,13 @@ final class DriftPowerCommandService {
       );
     }
     await _requireComponent(command.projectId, transfer.componentId);
-    await _requirePort(command.projectId, transfer.inputPortIds.single);
+    await _requireOwnedPort(
+      command.projectId,
+      transfer.inputPortIds.single,
+      transfer.componentId,
+    );
     for (final portId in transfer.outputPortIds) {
-      await _requirePort(command.projectId, portId);
+      await _requireOwnedPort(command.projectId, portId, transfer.componentId);
     }
     final payloadJson = canonicalEngineeringJsonV1(transfer.toMap());
     await runRawStatement(
@@ -434,7 +442,11 @@ final class DriftPowerCommandService {
     final group = command.group;
     await _requireComponent(command.projectId, group.ownerComponentId);
     for (final portId in group.memberOutputPortIds) {
-      await _requirePort(command.projectId, portId);
+      await _requireOwnedPort(
+        command.projectId,
+        portId,
+        group.ownerComponentId,
+      );
     }
     await runRawStatement(
       database,
@@ -497,7 +509,11 @@ final class DriftPowerCommandService {
     final requirement = command.requirement;
     await _requireComponent(command.projectId, requirement.consumerComponentId);
     for (final portId in requirement.inputPortIds) {
-      await _requirePort(command.projectId, portId);
+      await _requireOwnedPort(
+        command.projectId,
+        portId,
+        requirement.consumerComponentId,
+      );
     }
     final payloadJson = canonicalEngineeringJsonV1(requirement.toMap());
     await runRawStatement(
@@ -916,6 +932,25 @@ final class DriftPowerCommandService {
       );
     }
     return List.unmodifiable(invalidated);
+  }
+
+  Future<void> _requireOwnedPort(
+    String projectId,
+    String portId,
+    String componentId,
+  ) async {
+    await _requireComponent(projectId, componentId);
+    await _requireExists(
+      'SELECT 1 FROM engineering_port_instances '
+          'WHERE project_id = ? AND id = ? AND component_id = ? '
+          'AND deleted_at IS NULL',
+      [
+        Variable.withString(projectId),
+        Variable.withString(portId),
+        Variable.withString(componentId),
+      ],
+      'ELV4_PORT_OWNER_MISMATCH',
+    );
   }
 
   Future<void> _requirePort(String projectId, String portId) => _requireExists(
