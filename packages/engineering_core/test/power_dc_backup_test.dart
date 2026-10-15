@@ -85,7 +85,7 @@ void main() {
 
       expect(result.status, PowerEvaluationStatus.fail);
       expect(result.terminals.single.nominalV, _r('18'));
-      expect(result.sections.single.currentMarginA, _r('-1'));
+      expect(result.sections.single.currentMarginA, _signed('-1'));
     });
 
     test('shared-return or two-parent structure is rejected before solving', () {
@@ -176,8 +176,8 @@ void main() {
       );
 
       expect(result.requiredWh, _r('125'));
-      expect(result.availableWh, _r('172.8'));
-      expect(result.marginWh, _r('47.8'));
+      expect(result.availableWh, _r('138.24'));
+      expect(result.marginWh, _r('13.24'));
       expect(result.status, PowerEvaluationStatus.pass);
       expect(result.estimatedAutonomySeconds, isNull);
     });
@@ -283,3 +283,4 @@ PowerDefinitionRef _ref(PowerDefinitionKind kind, String code) =>
     );
 
 PowerRational _r(String value) => PowerRational.fromWireDecimal(value);
+PowerRational _signed(String value) => PowerRational.parseDecimal(value);
