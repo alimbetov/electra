@@ -82,7 +82,9 @@ if "'elv_revision_command_history_operations'," not in text:
         "      'elv_revision_command_history_executions',\n",
     )
 
-if "'elv_revision_aggregate_evidence_records'," not in text.split('const immutableTables = <String>[')[1]:
+if "'elv_revision_aggregate_evidence_records'," not in text.split(
+    'const immutableTables = <String>['
+)[1]:
     replace_once(
         "      'power_evaluation_records',\n"
         "    ];\n"
@@ -95,11 +97,23 @@ if "'elv_revision_aggregate_evidence_records'," not in text.split('const immutab
     )
 
 if 'trg_elv_revision_history_operation_payload_immutable' not in text:
-    replace_once(
+    immutable_tail = (
+        "    for (final table in immutableTables) {\n"
+        "      await customStatement(\n"
+        "        'CREATE TRIGGER IF NOT EXISTS trg_${table}_immutable_update '\n"
+        "        'BEFORE UPDATE ON $table '\n"
+        "        \"BEGIN SELECT RAISE(ABORT, 'ELV4_IMMUTABLE_EVIDENCE'); END\",\n"
+        "      );\n"
+        "      await customStatement(\n"
+        "        'CREATE TRIGGER IF NOT EXISTS trg_${table}_immutable_delete '\n"
+        "        'BEFORE DELETE ON $table '\n"
+        "        \"BEGIN SELECT RAISE(ABORT, 'ELV4_IMMUTABLE_EVIDENCE'); END\",\n"
+        "      );\n"
         "    }\n"
         "  }\n"
-        "}\n",
-        "    }\n"
+        "}\n"
+    )
+    hardened_tail = immutable_tail[:-8] + (
         "    await customStatement(\n"
         "      \"CREATE TRIGGER IF NOT EXISTS trg_elv_revision_history_operation_payload_immutable \"\n"
         "      \"BEFORE UPDATE ON elv_revision_command_history_operations FOR EACH ROW \"\n"
@@ -134,7 +148,8 @@ if 'trg_elv_revision_history_operation_payload_immutable' not in text:
         "      \"BEGIN SELECT RAISE(ABORT, 'ELV4_HISTORY_OPERATION_NOT_FOUND'); END\",\n"
         "    );\n"
         "  }\n"
-        "}\n",
+        "}\n"
     )
+    replace_once(immutable_tail, hardened_tail)
 
 DB.write_text(text)
