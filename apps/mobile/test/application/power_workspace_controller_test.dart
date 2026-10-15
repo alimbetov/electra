@@ -7,7 +7,6 @@ import 'package:electra_mobile/application/elv_physical_trace_service.dart';
 import 'package:electra_mobile/application/power_workspace_controller.dart';
 import 'package:electra_mobile/application/power_workspace_projection.dart';
 import 'package:electra_mobile/application/power_workspace_state.dart';
-import 'package:engineering_core/engineering_core.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
