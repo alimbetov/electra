@@ -1,9 +1,31 @@
 # P7 — Dependencies, safe publication and progressive workspace
 
-Status: IMPLEMENTATION DESIGN DRAFT
+Status: RUNTIME / DATA / WORKSPACE-STATE CLOSURE IMPLEMENTED; POWER-SPECIFIC UI WIRING OPEN
 Dependency integration begins in P2; complete workspace follows P3–P6.
 Shared rules: [runtime contracts](shared-contracts.md).
 Resolved audit decisions: [RM01–RM15](remediation-contract.md).
+
+## Implemented closure (2026-10-15)
+
+The durable P7 runtime boundary is implemented and acceptance-tested on the feature branch.
+
+- P7-T01: `elv4-dep-v1` typed facts, PRESENT/MISSING consumed inputs and consumed evaluation refs are persisted in the immutable evaluation envelope. Technical fingerprints contain exact consumed facts and algorithm/input/numeric-policy versions; the broad design revision token remains a CAS guard rather than a fingerprint input.
+- P7-T02: a scoped additive `power_dependency_index_records` reverse index tracks only CURRENT logical pointers. It indexes both FACT and EVALUATION refs, computes transitive dependency closure, unions old/new fact closures around the canonical mutation, marks only affected WORKING pointers STALE and removes only their current-index rows in the same transaction. Immutable evaluations remain untouched.
+- P7-T03: single-node and atomic multi-node publication use capture → pure calculation → guarded publish. Publish rechecks WORKING lifecycle, design revision token, recaptured technical fingerprint, target pointer baseline and consumed pointer generations. Calculate ledger, immutable evaluations, CURRENT pointers and reverse-index rows commit atomically. Late publishers and CAS losers return `ELV4_RESULT_INPUT_CHANGED` without partial publication. Operation replay is idempotent, and internal batch dependency cycles are rejected before publication.
+- P7-T07: freeze now captures the committed power pointer section after the physical snapshot and before the existing WORKING → FROZEN CAS, inside the existing freeze transaction. Power snapshot and combined physical/power manifest hashes are persisted together. Frozen reads are mutation-disabled and distinguish `ELV4_POWER_NOT_CAPTURED` from a valid captured-empty power section.
+- Workspace-state portions of P7-T04/P7-T05/P7-T08 are implemented: revision/scenario/segment context generation, selected component/port, progressive card order/index, overlay mode, immutable query snapshot, draft/preview state, transient operation state, findings/currentness and stale async-response suppression. Scenario switches retain compatible selection and drafts with warning; revision switches clear draft state; frozen/historical contexts reject mutation.
+- The P7 work also exposed and fixed a pre-existing P2 Drift defect: parameterized `customStatement` calls passed `Variable<T>` directly to sqlite3. `drift_raw_statement.dart` now converts typed Drift variables to legal raw SQLite values (including DateTime → Unix seconds), and the P2 persistence regression is included in the P7 gate.
+
+Final read-only targeted validation run `38733525610` passed clean checkout, Drift generation, format verification, full `flutter analyze`, P7 single publication/invalidation/race tests, atomic batch tests, freeze integration, workspace-state acceptance, P2 persistence regression and P3 runtime-closure regression. The temporary P7 workflow was removed after success.
+
+Still intentionally open before claiming full visual P7 closure:
+
+- P7-T04 actual editor rendering of the revision/scenario-aware power overlay and shared-source/global budget view;
+- P7-T05 the concrete progressive power side-card widget and explanation presentation in the editor;
+- P7-T06 route preview/review/commit/failure/undo-redo wiring from the power workspace into the existing public ELV physical-routing command service;
+- P7-T08 compact-width widget acceptance, keyboard traversal, focus restoration, back handling and concrete finding-remediation navigation.
+
+The existing editor already provides wide/compact responsive shells and the existing `DefaultElvPhysicalRoutingWorkspaceService` provides the public command/trace boundary. The remaining UI slice must reuse those contracts and must not introduce widget-owned persistence or power arithmetic.
 
 ## Required work and acceptance
 
