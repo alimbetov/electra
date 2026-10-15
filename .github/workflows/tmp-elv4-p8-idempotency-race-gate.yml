@@ -26,6 +26,19 @@ jobs:
       - name: Install mobile dependencies
         working-directory: apps/mobile
         run: flutter pub get
+      - name: Normalize Drift predicates
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('apps/mobile/test/data/elv4_p8_idempotency_race_acceptance_test.dart')
+          text = path.read_text()
+          old = """..where(\n            (row) =>\n                row.projectId.equals(_projectId) &\n                row.commandId.equals(_freezeCommandId),\n          ))"""
+          new = """..where((row) => row.projectId.equals(_projectId))\n          ..where((row) => row.commandId.equals(_freezeCommandId)))"""
+          count = text.count(old)
+          if count != 5:
+              raise SystemExit(f'expected 5 compound predicates, found {count}')
+          path.write_text(text.replace(old, new))
+          PY
       - name: Format P8 idempotency acceptance
         working-directory: apps/mobile
         run: dart format test/data/elv4_p8_idempotency_race_acceptance_test.dart
@@ -35,10 +48,10 @@ jobs:
       - name: Run P8 idempotency acceptance
         working-directory: apps/mobile
         run: flutter test test/data/elv4_p8_idempotency_race_acceptance_test.dart test/data/elv4_p8_failure_race_acceptance_test.dart test/data/elv4_p8_freeze_historical_invariance_test.dart
-      - name: Commit verified formatting
+      - name: Commit verified acceptance
         run: |
           if git diff --quiet -- apps/mobile/test/data/elv4_p8_idempotency_race_acceptance_test.dart; then
-            echo 'P8 idempotency test already formatted.'
+            echo 'P8 idempotency test already normalized.'
             exit 0
           fi
           git config user.name 'github-actions[bot]'
