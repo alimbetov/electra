@@ -3,7 +3,9 @@ import 'package:test/test.dart';
 
 void main() {
   group('P4 deterministic evaluation evidence', () {
-    test('PWR-01 fingerprint and evidence ignore contribution enumeration order', () {
+    test(
+        'PWR-01 fingerprint and evidence ignore contribution enumeration order',
+        () {
       final a = PowerDemandContribution(
         originId: 'camera-a:normal',
         componentId: 'camera-a',
@@ -45,7 +47,8 @@ void main() {
       expect(first.arithmeticSteps, hasLength(3));
     });
 
-    test('PWR-01 unresolved contribution is explicit instead of zero-filled', () {
+    test('PWR-01 unresolved contribution is explicit instead of zero-filled',
+        () {
       final evidence = buildPowerDemandEvidence(
         evaluationId: 'eval-unresolved',
         revisionId: 'revision-1',

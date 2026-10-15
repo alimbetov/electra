@@ -2,7 +2,11 @@ import 'power_bindings.dart';
 import 'power_evaluation.dart';
 import 'power_profiles.dart';
 
-enum PowerGraphEdgeKind { externalConnection, passiveContinuity, activeTransfer }
+enum PowerGraphEdgeKind {
+  externalConnection,
+  passiveContinuity,
+  activeTransfer
+}
 
 enum PowerGraphLayer { power, dataPower }
 
@@ -111,7 +115,8 @@ final class PowerGraphEdgeSpec {
           ),
         ) {
     if (this.supplySetId != null && this.sourceBoundaryPortId == null) {
-      throw ArgumentError('Selected supply edge requires a source boundary id.');
+      throw ArgumentError(
+          'Selected supply edge requires a source boundary id.');
     }
   }
 
@@ -313,7 +318,8 @@ PowerGraphBuildResult buildPowerGraph(PowerGraphInput input) {
     );
   }
 
-  if (findings.any((finding) => finding.status == PowerEvaluationStatus.blocked)) {
+  if (findings
+      .any((finding) => finding.status == PowerEvaluationStatus.blocked)) {
     return PowerGraphBuildResult(
       graph: null,
       findings: List.unmodifiable(findings),
@@ -434,7 +440,8 @@ final class PowerTraceResult {
   final List<PowerGraphFinding> findings;
 }
 
-PowerTraceResult tracePower(PowerGraphSnapshot graph, PowerTraceRequest request) {
+PowerTraceResult tracePower(
+    PowerGraphSnapshot graph, PowerTraceRequest request) {
   if (!graph.portsById.containsKey(request.portId)) {
     throw ArgumentError('Trace subject port is not present in the graph.');
   }
@@ -518,7 +525,8 @@ PowerGraphFinding? _validatePortCompatibility(
   }
   if (source.envelope.currentKind == PowerCurrentKind.ac &&
       (source.envelope.frequencyMinHz! < consumer.envelope.frequencyMinHz! ||
-          source.envelope.frequencyMaxHz! > consumer.envelope.frequencyMaxHz!)) {
+          source.envelope.frequencyMaxHz! >
+              consumer.envelope.frequencyMaxHz!)) {
     return PowerGraphFinding(
       code: 'ELV4_POWER_FREQUENCY_GUARANTEE_MISMATCH',
       status: PowerEvaluationStatus.blocked,
@@ -618,7 +626,7 @@ List<String> _cycleWitness(PowerGraphSnapshot graph) {
       final next = edge.spec.toPortId;
       if (state[next] == 1) {
         final start = stack.indexOf(next);
-        witness = [...stack.sublist(start), next];
+        witness = stack.sublist(start);
         return true;
       }
       if (state[next] != 2 && visit(next)) return true;

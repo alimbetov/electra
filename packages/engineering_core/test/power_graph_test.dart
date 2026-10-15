@@ -3,7 +3,8 @@ import 'package:test/test.dart';
 
 void main() {
   group('P3 radial graph and trace', () {
-    test('one source powers one consumer and upstream trace reaches boundary', () {
+    test('one source powers one consumer and upstream trace reaches boundary',
+        () {
       final result = buildPowerGraph(
         _input(
           ports: [
@@ -64,10 +65,12 @@ void main() {
       expect(result.graph!.activeEdges.map((edge) => edge.spec.edgeId), [
         'backup-feed',
       ]);
-      expect(validatePowerGraph(result.graph!).status, PowerEvaluationStatus.pass);
+      expect(
+          validatePowerGraph(result.graph!).status, PowerEvaluationStatus.pass);
     });
 
-    test('missing direction stays unresolved instead of disappearing as valid', () {
+    test('missing direction stays unresolved instead of disappearing as valid',
+        () {
       final result = buildPowerGraph(
         _input(
           ports: [
@@ -200,7 +203,9 @@ void main() {
       );
 
       expect(
-        validatePowerGraph(result.graph!).findings.map((finding) => finding.code),
+        validatePowerGraph(result.graph!)
+            .findings
+            .map((finding) => finding.code),
         contains('ELV4_POWER_DC_TERMINAL_MISMATCH'),
       );
     });
@@ -220,6 +225,14 @@ void main() {
       expect(
         validation.findings.map((finding) => finding.code),
         contains('ELV4_POWER_GRAPH_ACTIVE_CYCLE'),
+      );
+      expect(
+        validation.findings
+            .singleWhere(
+              (finding) => finding.code == 'ELV4_POWER_GRAPH_ACTIVE_CYCLE',
+            )
+            .witnesses,
+        ['source'],
       );
     });
 

@@ -26,7 +26,8 @@ final class PowerPolicyRef {
   PowerPolicyRef({required this.definitionRef, required String purpose})
       : purpose = _code(purpose, 'purpose') {
     if (definitionRef.definitionKind != PowerDefinitionKind.policy) {
-      throw ArgumentError('Power policy reference requires a policy definition.');
+      throw ArgumentError(
+          'Power policy reference requires a policy definition.');
     }
   }
 
@@ -157,8 +158,8 @@ final class PowerScenarioSegment {
       'chargingBankIds',
       'dischargingBankIds',
     });
-    final rawStates =
-        (map['componentStates'] as Map<Object?, Object?>).cast<String, String>();
+    final rawStates = (map['componentStates'] as Map<Object?, Object?>)
+        .cast<String, String>();
     return PowerScenarioSegment(
       segmentId: map['segmentId'] as String,
       ordinal: map['ordinal'] as int,
@@ -176,8 +177,7 @@ final class PowerScenarioSegment {
               .cast<String, String>(),
       unavailableSourceIds:
           (map['unavailableSourceIds'] as List<Object?>).cast<String>(),
-      chargingBankIds:
-          (map['chargingBankIds'] as List<Object?>).cast<String>(),
+      chargingBankIds: (map['chargingBankIds'] as List<Object?>).cast<String>(),
       dischargingBankIds:
           (map['dischargingBankIds'] as List<Object?>).cast<String>(),
     );
@@ -195,7 +195,8 @@ final class PowerOperatingScenario {
         segments = List.unmodifiable(segments),
         policyRefs = List.unmodifiable(_sortedPolicies(policyRefs)) {
     if (rowRevision < 1) {
-      throw ArgumentError.value(rowRevision, 'rowRevision', 'Must be positive.');
+      throw ArgumentError.value(
+          rowRevision, 'rowRevision', 'Must be positive.');
     }
     if (this.segments.isEmpty) {
       throw ArgumentError('Power scenario requires at least one segment.');
@@ -205,11 +206,13 @@ final class PowerOperatingScenario {
       throw ArgumentError('Scenario segment identities must be unique.');
     }
     final ordinals = this.segments.map((segment) => segment.ordinal).toList();
-    final expected = List<int>.generate(this.segments.length, (index) => index + 1);
+    final expected =
+        List<int>.generate(this.segments.length, (index) => index + 1);
     if (!_sameInts(ordinals, expected)) {
       throw ArgumentError('Scenario ordinals must be gap-free and ordered.');
     }
-    final policyPurposes = this.policyRefs.map((policy) => policy.purpose).toList();
+    final policyPurposes =
+        this.policyRefs.map((policy) => policy.purpose).toList();
     if (policyPurposes.toSet().length != policyPurposes.length) {
       throw ArgumentError('Scenario policy purposes must be unique.');
     }
@@ -312,8 +315,7 @@ List<String> _sortedUniqueTexts(
 }
 
 List<PowerPolicyRef> _sortedPolicies(Iterable<PowerPolicyRef> input) {
-  final result = input.toList()
-    ..sort((a, b) => a.purpose.compareTo(b.purpose));
+  final result = input.toList()..sort((a, b) => a.purpose.compareTo(b.purpose));
   return result;
 }
 

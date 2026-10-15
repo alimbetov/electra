@@ -74,7 +74,8 @@ final class BatteryBankBinding {
     }
     if (unitDefinition.arrangementCodes.isNotEmpty &&
         !unitDefinition.arrangementCodes.contains(this.arrangementCode)) {
-      throw ArgumentError('Battery arrangement is not compatible with the unit.');
+      throw ArgumentError(
+          'Battery arrangement is not compatible with the unit.');
     }
     _factorInclusiveZero(socMin, 'socMin');
     _factorInclusiveZero(socMax, 'socMax');
@@ -83,7 +84,8 @@ final class BatteryBankBinding {
     }
     _positive(endOfDischargeVoltagePerUnit, 'endOfDischargeVoltagePerUnit');
     if (endOfDischargeVoltagePerUnit > unitDefinition.nominalV) {
-      throw ArgumentError('End-of-discharge voltage cannot exceed nominal voltage.');
+      throw ArgumentError(
+          'End-of-discharge voltage cannot exceed nominal voltage.');
     }
   }
 

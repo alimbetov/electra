@@ -24,7 +24,8 @@ final class PowerGraphReadiness {
 
   final List<PowerGraphDimensionResult> dimensions;
 
-  PowerGraphDimensionResult operator [](PowerGraphReadinessDimension dimension) =>
+  PowerGraphDimensionResult operator [](
+          PowerGraphReadinessDimension dimension) =>
       dimensions.singleWhere((value) => value.dimension == dimension);
 
   bool get topologyUsable =>
@@ -78,7 +79,8 @@ PowerGraphReadiness assessPowerGraphReadiness({
 List<PowerGraphDimensionResult> _canonicalDimensions(
   Iterable<PowerGraphDimensionResult> input,
 ) {
-  final byDimension = <PowerGraphReadinessDimension, PowerGraphDimensionResult>{};
+  final byDimension =
+      <PowerGraphReadinessDimension, PowerGraphDimensionResult>{};
   for (final value in input) {
     if (byDimension.containsKey(value.dimension)) {
       throw ArgumentError('Power graph readiness dimensions must be unique.');
@@ -97,13 +99,17 @@ List<PowerGraphDimensionResult> _canonicalDimensions(
 }
 
 List<String> _sortedUnique(Iterable<String> values) {
-  final result = values.map((value) {
-    final normalized = value.trim();
-    if (normalized.isEmpty) {
-      throw ArgumentError('Power graph dependency/finding identity is required.');
-    }
-    return normalized;
-  }).toSet().toList()
+  final result = values
+      .map((value) {
+        final normalized = value.trim();
+        if (normalized.isEmpty) {
+          throw ArgumentError(
+              'Power graph dependency/finding identity is required.');
+        }
+        return normalized;
+      })
+      .toSet()
+      .toList()
     ..sort();
   return result;
 }

@@ -21,7 +21,8 @@ void main() {
       );
     });
 
-    test('port binding round-trips exact canonical ownership and terminals', () {
+    test('port binding round-trips exact canonical ownership and terminals',
+        () {
       final binding = PowerPortBinding(
         portId: 'port-1',
         profileRef: _ref(PowerDefinitionKind.port, 'DC_INPUT'),
@@ -39,7 +40,8 @@ void main() {
       expect(decoded.terminalRoles, ['MINUS', 'PLUS']);
     });
 
-    test('active transfer requires loss and unique idle contribution identity', () {
+    test('active transfer requires loss and unique idle contribution identity',
+        () {
       expect(
         () => PowerTransferBinding(
           id: 'psu-main',
@@ -137,7 +139,8 @@ void main() {
   });
 
   group('P1 explicit operating scenarios', () {
-    test('selection cannot use unavailable source and bank directions interlock',
+    test(
+        'selection cannot use unavailable source and bank directions interlock',
         () {
       expect(
         () => PowerScenarioSegment(
@@ -224,7 +227,8 @@ void main() {
   });
 
   group('P1 PoE and battery definitions', () {
-    test('series raises voltage while Ah capacity scales only with parallel', () {
+    test('series raises voltage while Ah capacity scales only with parallel',
+        () {
       final unit = BatteryUnitDefinition(
         definitionRef: _ref(PowerDefinitionKind.battery, 'BAT_12V'),
         technology: 'vrla',
@@ -290,7 +294,8 @@ void main() {
   });
 
   group('P1 reviewed legacy adoption', () {
-    test('missing typed fact stays unresolved and exact mismatch conflicts', () {
+    test('missing typed fact stays unresolved and exact mismatch conflicts',
+        () {
       final preview = PowerLegacyAdoptionPreview.compare(
         subjectId: 'port-1',
         legacy: {
@@ -313,15 +318,19 @@ void main() {
       expect(preview.canCommit, isFalse);
       expect(preview.hasUnresolved, isTrue);
       expect(
-        preview.fields.singleWhere(
-          (field) => field.field == LegacyPowerField.nominalVoltage,
-        ).disposition,
+        preview.fields
+            .singleWhere(
+              (field) => field.field == LegacyPowerField.nominalVoltage,
+            )
+            .disposition,
         LegacyAdoptionDisposition.unresolved,
       );
       expect(
-        preview.fields.singleWhere(
-          (field) => field.field == LegacyPowerField.demand,
-        ).disposition,
+        preview.fields
+            .singleWhere(
+              (field) => field.field == LegacyPowerField.demand,
+            )
+            .disposition,
         LegacyAdoptionDisposition.conflict,
       );
     });

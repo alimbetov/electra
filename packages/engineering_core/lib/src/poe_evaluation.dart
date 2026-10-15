@@ -24,7 +24,8 @@ final class PoePathStage {
         resourceKind = _code(resourceKind, 'resourceKind'),
         allocationId =
             allocationId == null ? null : _text(allocationId, 'allocationId'),
-        cableRunId = cableRunId == null ? null : _text(cableRunId, 'cableRunId');
+        cableRunId =
+            cableRunId == null ? null : _text(cableRunId, 'cableRunId');
 
   final String stageId;
   final PoePathStageKind kind;
@@ -66,7 +67,8 @@ final class PoeMidspanContext {
         supplyInputPortId = _text(supplyInputPortId, 'supplyInputPortId') {
     if (this.dataInputPortId == this.supplyInputPortId ||
         this.combinedOutputPortId == this.supplyInputPortId) {
-      throw ArgumentError('Midspan data and supply boundaries must be explicit.');
+      throw ArgumentError(
+          'Midspan data and supply boundaries must be explicit.');
     }
   }
 
@@ -216,7 +218,8 @@ PoeEvaluationResult evaluatePoeDelivery(PoeEvaluationInput input) {
         'Path stage ${stage.stageId} has unresolved pair/terminal mapping.',
       ));
     }
-    if (!input.definition.compatibleResourceKinds.contains(stage.resourceKind)) {
+    if (!input.definition.compatibleResourceKinds
+        .contains(stage.resourceKind)) {
       findings.add(_finding(
         'ELV4_POE_RESOURCE_UNSUPPORTED',
         'BLOCKED',
@@ -233,10 +236,10 @@ PoeEvaluationResult evaluatePoeDelivery(PoeEvaluationInput input) {
       'PD demand exceeds the guaranteed delivered power.',
     ));
   }
-  final effectivePortLimit = input.portAllocationLimitW <
-          input.definition.psePortLimitW
-      ? input.portAllocationLimitW
-      : input.definition.psePortLimitW;
+  final effectivePortLimit =
+      input.portAllocationLimitW < input.definition.psePortLimitW
+          ? input.portAllocationLimitW
+          : input.definition.psePortLimitW;
   final portMargin = effectivePortLimit - input.reservedPseW;
   if (portMargin.isNegative) {
     findings.add(_finding(

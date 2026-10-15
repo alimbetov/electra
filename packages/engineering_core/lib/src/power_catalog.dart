@@ -7,7 +7,9 @@ const powerRootCatalogSchemaV1 = 'electra.elv4-power-catalog.v1';
 const powerDefinitionsSchemaV1 = 'electra.elv4-power-definitions.v1';
 
 enum PowerCatalogPortKind { power, dataPower }
+
 enum PowerCatalogDirection { input, output, bidirectional }
+
 enum PowerCatalogCapability {
   source,
   consumer,
@@ -18,7 +20,9 @@ enum PowerCatalogCapability {
   pse,
   pd,
 }
+
 enum PowerSupplyOrigin { externalDeclared, localTransfer, notSource }
+
 enum PowerCatalogTransferKind {
   acDc,
   dcDc,
@@ -29,10 +33,15 @@ enum PowerCatalogTransferKind {
   poePse,
   selector,
 }
+
 enum BatteryCapacityModel { explicitFlatVoltageWh, constantCurrentAh }
+
 enum PowerPolicyPurpose { supplyReserve, backupSequence, peak }
+
 enum PowerExtensionPolicy { none, continueLast, repeatSequence }
+
 enum PowerCompatibilityLayer { power, dataPower }
+
 enum PowerCompatibilityFlow { directed, bidirectional }
 
 final class PowerConnectorDefinition {
@@ -70,7 +79,8 @@ final class PowerProtocolDefinition {
   })  : code = _code(code),
         portKinds = List.unmodifiable(_uniqueEnums(portKinds, 'portKinds')),
         sourceRef = _text(sourceRef, 'sourceRef') {
-    if (this.portKinds.isEmpty) throw ArgumentError('Protocol needs port kinds.');
+    if (this.portKinds.isEmpty)
+      throw ArgumentError('Protocol needs port kinds.');
   }
   final String code;
   final List<PowerCatalogPortKind> portKinds;
@@ -223,8 +233,10 @@ final class PowerComponentDefinition {
   })  : code = _code(code),
         sourceRef = _text(sourceRef, 'sourceRef'),
         portCodes = List.unmodifiable(_codes(portCodes, 'portCodes')),
-        transferCodes = List.unmodifiable(_codes(transferCodes, 'transferCodes')),
-        capabilities = List.unmodifiable(_uniqueEnums(capabilities, 'capabilities')) {
+        transferCodes =
+            List.unmodifiable(_codes(transferCodes, 'transferCodes')),
+        capabilities =
+            List.unmodifiable(_uniqueEnums(capabilities, 'capabilities')) {
     if (this.portCodes.isEmpty || this.capabilities.isEmpty) {
       throw ArgumentError('Power component requires ports and capabilities.');
     }
@@ -240,7 +252,8 @@ final class PowerComponentDefinition {
         'sourceRef': sourceRef,
         'portCodes': portCodes,
         'transferCodes': transferCodes,
-        'capabilities': capabilities.map(_capabilityWire).toList(growable: false),
+        'capabilities':
+            capabilities.map(_capabilityWire).toList(growable: false),
         'supplyOrigin': _supplyOriginWire(supplyOrigin),
       };
   factory PowerComponentDefinition.fromMap(Map<String, Object?> map) {
@@ -277,7 +290,8 @@ final class PowerCatalogTransferDefinition {
   })  : code = _code(code),
         sourceRef = _text(sourceRef, 'sourceRef'),
         inputPortCode = _code(inputPortCode),
-        outputPortCodes = List.unmodifiable(_codes(outputPortCodes, 'outputPortCodes')),
+        outputPortCodes =
+            List.unmodifiable(_codes(outputPortCodes, 'outputPortCodes')),
         activeStates = List.unmodifiable(_codes(activeStates, 'activeStates')) {
     if (this.outputPortCodes.isEmpty || this.activeStates.isEmpty) {
       throw ArgumentError('Transfer requires outputs and active states.');
@@ -346,7 +360,8 @@ final class PoeCatalogDefinition {
     _positive(reservedPseW, 'reservedPseW');
     _positive(maximumPathM, 'maximumPathM');
     if (reservedPseW < guaranteedPdW) {
-      throw ArgumentError('Reserved PSE power cannot be below guaranteed PD power.');
+      throw ArgumentError(
+          'Reserved PSE power cannot be below guaranteed PD power.');
     }
     if (maximumPatchStages < 0) {
       throw ArgumentError('maximumPatchStages cannot be negative.');
@@ -431,7 +446,8 @@ final class BatteryCatalogDefinition {
         ratingConditions = _text(ratingConditions, 'ratingConditions') {
     _positive(unitV, 'unitV');
     _positive(unitAh, 'unitAh');
-    if (this.allowedSeriesCounts.isEmpty || this.allowedParallelCounts.isEmpty) {
+    if (this.allowedSeriesCounts.isEmpty ||
+        this.allowedParallelCounts.isEmpty) {
       throw ArgumentError('Battery arrangement sets cannot be empty.');
     }
   }
@@ -598,7 +614,8 @@ final class PowerCompatibilityDefinition {
     });
     final media = (map['media'] as List<Object?>).cast<String>();
     if (media.length != 1 || media.single != 'wired') {
-      throw const FormatException('Power catalog v1 supports wired media only.');
+      throw const FormatException(
+          'Power catalog v1 supports wired media only.');
     }
     return PowerCompatibilityDefinition(
       code: map['code'] as String,
@@ -628,16 +645,26 @@ final class PowerCatalogExtension {
     Iterable<BatteryCatalogDefinition> batteryDefinitions = const [],
     Iterable<PowerPolicyDefinition> policyDefinitions = const [],
     required Iterable<PowerCompatibilityDefinition> compatibilityDefinitions,
-  })  : connectors = List.unmodifiable(_sortByCode(connectors, (value) => value.code)),
-        protocols = List.unmodifiable(_sortByCode(protocols, (value) => value.code)),
-        interfaces = List.unmodifiable(_sortByCode(interfaces, (value) => value.code)),
-        portDefinitions = List.unmodifiable(_sortByCode(portDefinitions, (value) => value.code)),
-        componentDefinitions = List.unmodifiable(_sortByCode(componentDefinitions, (value) => value.code)),
-        transferDefinitions = List.unmodifiable(_sortByCode(transferDefinitions, (value) => value.code)),
-        poeDefinitions = List.unmodifiable(_sortByCode(poeDefinitions, (value) => value.code)),
-        batteryDefinitions = List.unmodifiable(_sortByCode(batteryDefinitions, (value) => value.code)),
-        policyDefinitions = List.unmodifiable(_sortByCode(policyDefinitions, (value) => value.code)),
-        compatibilityDefinitions = List.unmodifiable(_sortByCode(compatibilityDefinitions, (value) => value.code)) {
+  })  : connectors =
+            List.unmodifiable(_sortByCode(connectors, (value) => value.code)),
+        protocols =
+            List.unmodifiable(_sortByCode(protocols, (value) => value.code)),
+        interfaces =
+            List.unmodifiable(_sortByCode(interfaces, (value) => value.code)),
+        portDefinitions = List.unmodifiable(
+            _sortByCode(portDefinitions, (value) => value.code)),
+        componentDefinitions = List.unmodifiable(
+            _sortByCode(componentDefinitions, (value) => value.code)),
+        transferDefinitions = List.unmodifiable(
+            _sortByCode(transferDefinitions, (value) => value.code)),
+        poeDefinitions = List.unmodifiable(
+            _sortByCode(poeDefinitions, (value) => value.code)),
+        batteryDefinitions = List.unmodifiable(
+            _sortByCode(batteryDefinitions, (value) => value.code)),
+        policyDefinitions = List.unmodifiable(
+            _sortByCode(policyDefinitions, (value) => value.code)),
+        compatibilityDefinitions = List.unmodifiable(
+            _sortByCode(compatibilityDefinitions, (value) => value.code)) {
     _validate();
   }
 
@@ -659,7 +686,8 @@ final class PowerCatalogExtension {
         portDefinitions.isEmpty ||
         componentDefinitions.isEmpty ||
         compatibilityDefinitions.isEmpty) {
-      throw ArgumentError('Power extension requires complete v1 core sections.');
+      throw ArgumentError(
+          'Power extension requires complete v1 core sections.');
     }
     _uniqueCodes(connectors.map((value) => value.code), 'connectors');
     _uniqueCodes(protocols.map((value) => value.code), 'protocols');
@@ -670,41 +698,49 @@ final class PowerCatalogExtension {
     _uniqueCodes(poeDefinitions.map((value) => value.code), 'poe');
     _uniqueCodes(batteryDefinitions.map((value) => value.code), 'batteries');
     _uniqueCodes(policyDefinitions.map((value) => value.code), 'policies');
-    _uniqueCodes(compatibilityDefinitions.map((value) => value.code), 'compatibility');
+    _uniqueCodes(
+        compatibilityDefinitions.map((value) => value.code), 'compatibility');
 
     final connectorCodes = connectors.map((value) => value.code).toSet();
     final protocolByCode = {for (final value in protocols) value.code: value};
     final interfaceByCode = {for (final value in interfaces) value.code: value};
     final portByCode = {for (final value in portDefinitions) value.code: value};
-    final transferCodes = transferDefinitions.map((value) => value.code).toSet();
+    final transferCodes =
+        transferDefinitions.map((value) => value.code).toSet();
 
     for (final interface in interfaces) {
       if (!portByCode.containsKey(interface.portCode)) {
-        throw ArgumentError('Interface ${interface.code} references unknown port.');
+        throw ArgumentError(
+            'Interface ${interface.code} references unknown port.');
       }
     }
     for (final port in portDefinitions) {
       if (!connectorCodes.contains(port.connectorCode) ||
           !protocolByCode.containsKey(port.protocolCode) ||
           !interfaceByCode.containsKey(port.interfaceCode)) {
-        throw ArgumentError('Port ${port.code} has unresolved vocabulary refs.');
+        throw ArgumentError(
+            'Port ${port.code} has unresolved vocabulary refs.');
       }
       if (!protocolByCode[port.protocolCode]!.portKinds.contains(port.kind)) {
-        throw ArgumentError('Port ${port.code} kind is not supported by protocol.');
+        throw ArgumentError(
+            'Port ${port.code} kind is not supported by protocol.');
       }
       if (interfaceByCode[port.interfaceCode]!.portCode != port.code) {
-        throw ArgumentError('Port ${port.code} interface points to another port.');
+        throw ArgumentError(
+            'Port ${port.code} interface points to another port.');
       }
     }
     for (final component in componentDefinitions) {
       if (component.portCodes.any((code) => !portByCode.containsKey(code)) ||
-          component.transferCodes.any((code) => !transferCodes.contains(code))) {
+          component.transferCodes
+              .any((code) => !transferCodes.contains(code))) {
         throw ArgumentError('Component ${component.code} has unresolved refs.');
       }
     }
     for (final transfer in transferDefinitions) {
       if (!portByCode.containsKey(transfer.inputPortCode) ||
-          transfer.outputPortCodes.any((code) => !portByCode.containsKey(code))) {
+          transfer.outputPortCodes
+              .any((code) => !portByCode.containsKey(code))) {
         throw ArgumentError('Transfer ${transfer.code} has unresolved ports.');
       }
     }
@@ -730,16 +766,33 @@ final class PowerCatalogExtension {
 
   Map<String, Object?> toMap() => {
         'schema': powerDefinitionsSchemaV1,
-        'connectors': connectors.map((value) => value.toMap()).toList(growable: false),
-        'protocols': protocols.map((value) => value.toMap()).toList(growable: false),
-        'interfaces': interfaces.map((value) => value.toMap()).toList(growable: false),
-        'portDefinitions': portDefinitions.map((value) => value.toMap()).toList(growable: false),
-        'componentDefinitions': componentDefinitions.map((value) => value.toMap()).toList(growable: false),
-        'transferDefinitions': transferDefinitions.map((value) => value.toMap()).toList(growable: false),
-        'poeDefinitions': poeDefinitions.map((value) => value.toMap()).toList(growable: false),
-        'batteryDefinitions': batteryDefinitions.map((value) => value.toMap()).toList(growable: false),
-        'policyDefinitions': policyDefinitions.map((value) => value.toMap()).toList(growable: false),
-        'compatibilityDefinitions': compatibilityDefinitions.map((value) => value.toMap()).toList(growable: false),
+        'connectors':
+            connectors.map((value) => value.toMap()).toList(growable: false),
+        'protocols':
+            protocols.map((value) => value.toMap()).toList(growable: false),
+        'interfaces':
+            interfaces.map((value) => value.toMap()).toList(growable: false),
+        'portDefinitions': portDefinitions
+            .map((value) => value.toMap())
+            .toList(growable: false),
+        'componentDefinitions': componentDefinitions
+            .map((value) => value.toMap())
+            .toList(growable: false),
+        'transferDefinitions': transferDefinitions
+            .map((value) => value.toMap())
+            .toList(growable: false),
+        'poeDefinitions': poeDefinitions
+            .map((value) => value.toMap())
+            .toList(growable: false),
+        'batteryDefinitions': batteryDefinitions
+            .map((value) => value.toMap())
+            .toList(growable: false),
+        'policyDefinitions': policyDefinitions
+            .map((value) => value.toMap())
+            .toList(growable: false),
+        'compatibilityDefinitions': compatibilityDefinitions
+            .map((value) => value.toMap())
+            .toList(growable: false),
       };
 
   factory PowerCatalogExtension.fromMap(Map<String, Object?> map) {
@@ -772,15 +825,16 @@ final class PowerCatalogExtension {
           .map((value) => decode(value, PowerPortDefinition.fromMap)),
       componentDefinitions: (map['componentDefinitions'] as List<Object?>)
           .map((value) => decode(value, PowerComponentDefinition.fromMap)),
-      transferDefinitions: (map['transferDefinitions'] as List<Object?>)
-          .map((value) => decode(value, PowerCatalogTransferDefinition.fromMap)),
+      transferDefinitions: (map['transferDefinitions'] as List<Object?>).map(
+          (value) => decode(value, PowerCatalogTransferDefinition.fromMap)),
       poeDefinitions: (map['poeDefinitions'] as List<Object?>)
           .map((value) => decode(value, PoeCatalogDefinition.fromMap)),
       batteryDefinitions: (map['batteryDefinitions'] as List<Object?>)
           .map((value) => decode(value, BatteryCatalogDefinition.fromMap)),
       policyDefinitions: (map['policyDefinitions'] as List<Object?>)
           .map((value) => decode(value, PowerPolicyDefinition.fromMap)),
-      compatibilityDefinitions: (map['compatibilityDefinitions'] as List<Object?>)
+      compatibilityDefinitions: (map['compatibilityDefinitions']
+              as List<Object?>)
           .map((value) => decode(value, PowerCompatibilityDefinition.fromMap)),
     );
   }
@@ -793,8 +847,9 @@ final class PowerCatalogExtension {
   }) {
     final normalized = _code(code);
     final Map<String, Object?> definition = switch (kind) {
-      PowerDefinitionKind.port =>
-        portDefinitions.singleWhere((value) => value.code == normalized).toMap(),
+      PowerDefinitionKind.port => portDefinitions
+          .singleWhere((value) => value.code == normalized)
+          .toMap(),
       PowerDefinitionKind.component => componentDefinitions
           .singleWhere((value) => value.code == normalized)
           .toMap(),
@@ -869,12 +924,15 @@ final class PowerRootCatalog {
         'metadata': metadata,
       };
 
-  String get contentSha256 => sha256HexUtf8(canonicalEngineeringJsonV1(toMap()));
+  String get contentSha256 =>
+      sha256HexUtf8(canonicalEngineeringJsonV1(toMap()));
 
   factory PowerRootCatalog.fromMap(Map<String, Object?> map) {
-    _keys(map, {'schema', 'id', 'code', 'version', 'source', 'power', 'metadata'});
+    _keys(map,
+        {'schema', 'id', 'code', 'version', 'source', 'power', 'metadata'});
     if (map['schema'] != powerRootCatalogSchemaV1) {
-      throw const FormatException('Unsupported ELV4 power root catalog schema.');
+      throw const FormatException(
+          'Unsupported ELV4 power root catalog schema.');
     }
     return PowerRootCatalog(
       id: map['id'] as String,
@@ -913,7 +971,8 @@ List<String> _codes(Iterable<String> input, String field) {
 
 List<int> _positiveInts(Iterable<int> input, String field) {
   final result = input.toList()..sort();
-  if (result.any((value) => value < 1) || result.toSet().length != result.length) {
+  if (result.any((value) => value < 1) ||
+      result.toSet().length != result.length) {
     throw ArgumentError('$field must contain unique positive integers.');
   }
   return result;
@@ -974,7 +1033,8 @@ PowerCatalogPortKind _portKindFromWire(String value) => switch (value) {
 String _directionWire(PowerCatalogDirection value) => value.name;
 PowerCatalogDirection _directionFromWire(String value) =>
     PowerCatalogDirection.values.byName(value);
-String _capabilityWire(PowerCatalogCapability value) => value.name.toUpperCase();
+String _capabilityWire(PowerCatalogCapability value) =>
+    value.name.toUpperCase();
 PowerCatalogCapability _capabilityFromWire(String value) => switch (value) {
       'SOURCE' => PowerCatalogCapability.source,
       'CONSUMER' => PowerCatalogCapability.consumer,

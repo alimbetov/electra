@@ -3,7 +3,9 @@ import 'package:test/test.dart';
 
 void main() {
   group('P3 ordered trace evidence', () {
-    test('upstream trace retains ordered canonical provenance and physical refs', () {
+    test(
+        'upstream trace retains ordered canonical provenance and physical refs',
+        () {
       final graph = buildPowerGraph(
         PowerGraphInput(
           revisionId: 'revision-r1',
@@ -63,7 +65,8 @@ void main() {
       expect(first.activeReason, 'SCENARIO_SELECTED');
     });
 
-    test('both-direction trace is deterministic and never duplicates an edge', () {
+    test('both-direction trace is deterministic and never duplicates an edge',
+        () {
       final graph = buildPowerGraph(
         PowerGraphInput(
           revisionId: 'revision-r1',

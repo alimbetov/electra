@@ -18,7 +18,8 @@ void main() {
       );
     });
 
-    test('missing realization is unresolved while known fiber blocks power', () {
+    test('missing realization is unresolved while known fiber blocks power',
+        () {
       final missing = evaluatePoeDelivery(
         _input(
           pathStages: [
@@ -142,7 +143,8 @@ void main() {
       expect(groupFail.portMarginW, _r('2'));
     });
 
-    test('same reservation origin is counted once across shared memberships', () {
+    test('same reservation origin is counted once across shared memberships',
+        () {
       final result = evaluatePoeDelivery(
         _input(
           deliveryId: 'delivery-a',

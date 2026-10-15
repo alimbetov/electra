@@ -200,12 +200,14 @@ final class PowerComponentBinding {
       throw ArgumentError('Power component binding requires capabilities.');
     }
     if (this.definitionRefs.isEmpty) {
-      throw ArgumentError('Power component binding requires exact definitions.');
+      throw ArgumentError(
+          'Power component binding requires exact definitions.');
     }
     if (this.definitionRefs.any(
           (ref) => ref.definitionKind != PowerDefinitionKind.component,
         )) {
-      throw ArgumentError('Power component binding accepts component refs only.');
+      throw ArgumentError(
+          'Power component binding accepts component refs only.');
     }
   }
 
@@ -307,8 +309,13 @@ final class PowerTransferBinding {
     if (this.inputPortIds.isEmpty || this.outputPortIds.isEmpty) {
       throw ArgumentError('Power transfer requires input and output ports.');
     }
-    if (this.inputPortIds.toSet().intersection(this.outputPortIds.toSet()).isNotEmpty) {
-      throw ArgumentError('Transfer input/output port ownership must be distinct.');
+    if (this
+        .inputPortIds
+        .toSet()
+        .intersection(this.outputPortIds.toSet())
+        .isNotEmpty) {
+      throw ArgumentError(
+          'Transfer input/output port ownership must be distinct.');
     }
     if (this.enabledStateCodes.isEmpty) {
       throw ArgumentError('Power transfer requires explicit enabled states.');
@@ -320,10 +327,12 @@ final class PowerTransferBinding {
       PowerTransferKind.psu ||
       PowerTransferKind.ups ||
       PowerTransferKind.charger ||
-      PowerTransferKind.pse => true,
+      PowerTransferKind.pse =>
+        true,
       PowerTransferKind.distributor ||
       PowerTransferKind.fuse ||
-      PowerTransferKind.passive => false,
+      PowerTransferKind.passive =>
+        false,
     };
     if (activeLossRequired && lossDefinition == null) {
       throw ArgumentError('Active conversion transfer requires a loss model.');
@@ -462,11 +471,13 @@ final class PowerSupplyRequirement {
           field: 'requiredStateCodes',
         )) {
     if (this.inputPortIds.isEmpty || this.requiredStateCodes.isEmpty) {
-      throw ArgumentError('Supply requirement needs inputs and required states.');
+      throw ArgumentError(
+          'Supply requirement needs inputs and required states.');
     }
     if (selectionMode == PowerSupplySelectionMode.single &&
         this.candidateSourceIds.length != 1) {
-      throw ArgumentError('Single-source requirement needs exactly one source.');
+      throw ArgumentError(
+          'Single-source requirement needs exactly one source.');
     }
     if (selectionMode == PowerSupplySelectionMode.alternative &&
         this.candidateSourceIds.length < 2) {

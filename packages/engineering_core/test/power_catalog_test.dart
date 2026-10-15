@@ -3,7 +3,8 @@ import 'package:test/test.dart';
 
 void main() {
   group('P1 strict power catalog codec', () {
-    test('generic power-only catalog round-trips without discipline identity', () {
+    test('generic power-only catalog round-trips without discipline identity',
+        () {
       final catalog = _catalog();
       final decoded = PowerRootCatalog.fromMap(catalog.toMap());
 

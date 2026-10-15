@@ -104,7 +104,8 @@ final class PowerEvaluationKeyV2 {
     }
     final nodeTuple = decoded[1];
     if (nodeTuple is! List) {
-      throw const FormatException('Evaluation key must embed a logical node tuple.');
+      throw const FormatException(
+          'Evaluation key must embed a logical node tuple.');
     }
     return PowerEvaluationKeyV2(
       nodeKey: PowerNodeKeyV2.decode(canonicalEngineeringJsonV1(nodeTuple)),
@@ -162,7 +163,8 @@ final class PowerEvaluationEvidence {
         algorithmVersion = _text(algorithmVersion, 'algorithmVersion'),
         inputSchemaVersion = _text(inputSchemaVersion, 'inputSchemaVersion'),
         outputSchemaVersion = _text(outputSchemaVersion, 'outputSchemaVersion'),
-        numericPolicyVersion = _text(numericPolicyVersion, 'numericPolicyVersion'),
+        numericPolicyVersion =
+            _text(numericPolicyVersion, 'numericPolicyVersion'),
         inputFingerprint = _sha256(inputFingerprint, 'inputFingerprint'),
         inputs = Map.unmodifiable(inputs),
         output = Map.unmodifiable(output),
@@ -272,7 +274,8 @@ final class PowerEvaluationPointer {
     );
   }
 
-  static PowerEvaluationPointer firstPublication(PowerEvaluationEvidence evidence) =>
+  static PowerEvaluationPointer firstPublication(
+          PowerEvaluationEvidence evidence) =>
       PowerEvaluationPointer(
         nodeKey: evidence.nodeKey,
         state: PowerPointerState.current,

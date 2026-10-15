@@ -3,7 +3,8 @@ import 'package:test/test.dart';
 
 void main() {
   group('P3 graph readiness dimensions', () {
-    test('valid topology stays usable while physical realization is unresolved', () {
+    test('valid topology stays usable while physical realization is unresolved',
+        () {
       final readiness = assessPowerGraphReadiness(
         topology: const PowerTopologyValidation(
           status: PowerEvaluationStatus.pass,
@@ -41,7 +42,9 @@ void main() {
       );
     });
 
-    test('topology failure does not erase independent capacity and backup state', () {
+    test(
+        'topology failure does not erase independent capacity and backup state',
+        () {
       final readiness = assessPowerGraphReadiness(
         topology: PowerTopologyValidation(
           status: PowerEvaluationStatus.blocked,

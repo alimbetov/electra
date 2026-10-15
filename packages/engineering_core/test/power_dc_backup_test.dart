@@ -88,7 +88,8 @@ void main() {
       expect(result.sections.single.currentMarginA, _signed('-1'));
     });
 
-    test('shared-return or two-parent structure is rejected before solving', () {
+    test('shared-return or two-parent structure is rejected before solving',
+        () {
       expect(
         () => solveDcConstantCurrentTree(
           DcTreeInput(
@@ -136,7 +137,8 @@ void main() {
       expect(result.lossW!.upper > PowerRational.zero, isTrue);
     });
 
-    test('infeasible constant-power feeder fails instead of inventing a current',
+    test(
+        'infeasible constant-power feeder fails instead of inventing a current',
         () {
       final result = solveSingleConstantPowerFeeder(
         sourceVoltageV: _r('24'),

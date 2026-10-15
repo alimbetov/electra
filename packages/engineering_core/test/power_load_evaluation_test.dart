@@ -3,7 +3,8 @@ import 'package:test/test.dart';
 
 void main() {
   group('P4 leaf demand and distinct-origin aggregation', () {
-    test('missing demand stays unresolved while explicit zero remains known', () {
+    test('missing demand stays unresolved while explicit zero remains known',
+        () {
       final missing = resolvePowerContribution(
         PowerDemandContribution(
           originId: 'missing',
@@ -31,7 +32,8 @@ void main() {
       expect(zero.watt, PowerRational.zero);
     });
 
-    test('DC constant current never invents terminal voltage from nameplate', () {
+    test('DC constant current never invents terminal voltage from nameplate',
+        () {
       final unresolved = resolvePowerContribution(
         PowerDemandContribution(
           originId: 'lock-current',
@@ -57,7 +59,8 @@ void main() {
       expect(solved.watt, _r('11.5'));
     });
 
-    test('shared membership contributes once by origin and distinct loads twice',
+    test(
+        'shared membership contributes once by origin and distinct loads twice',
         () {
       final camera = PowerDemandContribution(
         originId: 'camera-1:normal',
