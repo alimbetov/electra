@@ -6,20 +6,16 @@ import '../../application/power_workspace_state.dart';
 
 /// Presentation adapter between the persisted editor shell and the P7 power
 /// application controller. Widgets can issue intents through this boundary but
-/// cannot reach persistence repositories or engineering evaluators directly.
+/// cannot reach persistence repositories, routing executors or evaluators.
 final class PowerWorkspaceEditorBinding {
   PowerWorkspaceEditorBinding({
     required this.controller,
     required this.onSessionChanged,
-    this.onApplyReviewedRoute,
-    this.onDiscardDraft,
   });
 
   final PowerWorkspaceController controller;
   final Future<void> Function(PowerWorkspaceSessionSnapshot snapshot)
   onSessionChanged;
-  final Future<void> Function()? onApplyReviewedRoute;
-  final VoidCallback? onDiscardDraft;
 
   PowerWorkspaceState get state => controller.state;
   PowerWorkspaceProjection get projection => controller.projection;
@@ -54,6 +50,16 @@ final class PowerWorkspaceEditorBinding {
 
   Future<void> showCard(PowerWorkspaceCardCode card) async {
     final snapshot = controller.showCard(card);
+    await onSessionChanged(snapshot);
+  }
+
+  Future<void> applyReviewedRoute() async {
+    await controller.commitStagedReviewedRoute();
+    await onSessionChanged(controller.snapshot);
+  }
+
+  Future<void> discardReviewedRoute() async {
+    final snapshot = controller.discardReviewedRoute();
     await onSessionChanged(snapshot);
   }
 
