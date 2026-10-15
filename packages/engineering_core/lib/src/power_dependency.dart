@@ -54,7 +54,7 @@ final class PowerDependencyKey implements Comparable<PowerDependencyKey> {
         'elv4-dep-v1',
         projectId,
         revisionId,
-        kind.name.toUpperCase(),
+        _kindWire(kind),
         entityId,
         purpose,
         if (scenarioId != null) scenarioId,
@@ -80,12 +80,7 @@ final class PowerDependencyKey implements Comparable<PowerDependencyKey> {
     return PowerDependencyKey(
       projectId: values[1]! as String,
       revisionId: values[2]! as String,
-      kind: PowerDependencyKind.values.singleWhere(
-        (value) => value.name.toUpperCase() == values[3],
-        orElse: () => throw const FormatException(
-          'Unknown ELV4 dependency kind.',
-        ),
-      ),
+      kind: _kindFromWire(values[3]! as String),
       entityId: values[4]! as String,
       purpose: values[5]! as String,
       scenarioId: values.length >= 7 ? values[6]! as String : null,
@@ -275,6 +270,35 @@ final class PowerConsumedInput {
     );
   }
 }
+
+String _kindWire(PowerDependencyKind kind) => switch (kind) {
+      PowerDependencyKind.definition => 'DEFINITION',
+      PowerDependencyKind.poeDelivery => 'POE_DELIVERY',
+      PowerDependencyKind.pathStage => 'PATH_STAGE',
+      PowerDependencyKind.allocation => 'ALLOCATION',
+      PowerDependencyKind.cableRun => 'CABLE_RUN',
+      PowerDependencyKind.capacityGroup => 'CAPACITY_GROUP',
+      PowerDependencyKind.groupMembership => 'GROUP_MEMBERSHIP',
+      PowerDependencyKind.scenario => 'SCENARIO',
+      PowerDependencyKind.segment => 'SEGMENT',
+      PowerDependencyKind.transferLoss => 'TRANSFER_LOSS',
+      PowerDependencyKind.missingInput => 'MISSING_INPUT',
+    };
+
+PowerDependencyKind _kindFromWire(String value) => switch (value) {
+      'DEFINITION' => PowerDependencyKind.definition,
+      'POE_DELIVERY' => PowerDependencyKind.poeDelivery,
+      'PATH_STAGE' => PowerDependencyKind.pathStage,
+      'ALLOCATION' => PowerDependencyKind.allocation,
+      'CABLE_RUN' => PowerDependencyKind.cableRun,
+      'CAPACITY_GROUP' => PowerDependencyKind.capacityGroup,
+      'GROUP_MEMBERSHIP' => PowerDependencyKind.groupMembership,
+      'SCENARIO' => PowerDependencyKind.scenario,
+      'SEGMENT' => PowerDependencyKind.segment,
+      'TRANSFER_LOSS' => PowerDependencyKind.transferLoss,
+      'MISSING_INPUT' => PowerDependencyKind.missingInput,
+      _ => throw const FormatException('Unknown ELV4 dependency kind.'),
+    };
 
 List<PowerConsumedFact> _sortedFacts(Iterable<PowerConsumedFact> values) {
   final result = values.toList()..sort((a, b) => a.key.compareTo(b.key));
