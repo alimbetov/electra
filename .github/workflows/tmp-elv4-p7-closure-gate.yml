@@ -6,6 +6,8 @@ on:
       - feat/flutter-elv4-power-topology-design
     paths:
       - .github/workflows/tmp-elv4-p7-closure-gate.yml
+      - apps/mobile/lib/data/database/drift_raw_statement.dart
+      - apps/mobile/lib/data/repositories/drift_power_runtime_store.dart
       - apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart
       - apps/mobile/lib/data/repositories/drift_power_batch_publication_runtime.dart
       - apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart
@@ -43,15 +45,34 @@ jobs:
           python - <<'PY'
           from pathlib import Path
 
-          runtime = Path('apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart')
-          text = runtime.read_text()
-          text = text.replace("generation: row!.read<int>('generation'),", "generation: row.read<int>('generation'),")
-          runtime.write_text(text)
+          raw_import = "import '../database/drift_raw_statement.dart';\n"
 
-          batch_runtime = Path('apps/mobile/lib/data/repositories/drift_power_batch_publication_runtime.dart')
-          text = batch_runtime.read_text()
-          text = text.replace("generation: row!.read<int>('generation'),", "generation: row.read<int>('generation'),")
-          batch_runtime.write_text(text)
+          for relative in [
+              'apps/mobile/lib/data/repositories/drift_power_runtime_store.dart',
+              'apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart',
+              'apps/mobile/lib/data/repositories/drift_power_batch_publication_runtime.dart',
+          ]:
+              path = Path(relative)
+              text = path.read_text()
+              anchor = "import '../database/app_database.dart';\n"
+              if raw_import not in text:
+                  if anchor not in text:
+                      raise SystemExit(f'app_database import anchor missing: {relative}')
+                  text = text.replace(anchor, anchor + raw_import, 1)
+              text = text.replace('database.customStatement(', 'runRawStatement(database, ')
+              text = text.replace("generation: row!.read<int>('generation'),", "generation: row.read<int>('generation'),")
+              path.write_text(text)
+
+          p2_test = Path('apps/mobile/test/data/elv4_p2_persistence_test.dart')
+          text = p2_test.read_text()
+          package_import = "import 'package:electra_mobile/data/database/drift_raw_statement.dart';\n"
+          package_anchor = "import 'package:electra_mobile/data/database/app_database.dart';\n"
+          if package_import not in text:
+              if package_anchor not in text:
+                  raise SystemExit('P2 app_database import anchor missing')
+              text = text.replace(package_anchor, package_anchor + package_import, 1)
+          text = text.replace('db.customStatement(', 'runRawStatement(db, ')
+          p2_test.write_text(text)
 
           test = Path('apps/mobile/test/data/elv4_p7_runtime_test.dart')
           text = test.read_text()
@@ -115,10 +136,13 @@ jobs:
         working-directory: .
         run: |
           dart format \
+            apps/mobile/lib/data/database/drift_raw_statement.dart \
+            apps/mobile/lib/data/repositories/drift_power_runtime_store.dart \
             apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart \
             apps/mobile/lib/data/repositories/drift_power_batch_publication_runtime.dart \
             apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart \
             apps/mobile/lib/application/power_workspace_state.dart \
+            apps/mobile/test/data/elv4_p2_persistence_test.dart \
             apps/mobile/test/data/elv4_p7_runtime_test.dart \
             apps/mobile/test/data/elv4_p7_batch_runtime_test.dart \
             apps/mobile/test/data/elv4_p7_freeze_integration_test.dart \
@@ -138,10 +162,13 @@ jobs:
         working-directory: .
         run: |
           if git diff --quiet -- \
+            apps/mobile/lib/data/database/drift_raw_statement.dart \
+            apps/mobile/lib/data/repositories/drift_power_runtime_store.dart \
             apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart \
             apps/mobile/lib/data/repositories/drift_power_batch_publication_runtime.dart \
             apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart \
             apps/mobile/lib/application/power_workspace_state.dart \
+            apps/mobile/test/data/elv4_p2_persistence_test.dart \
             apps/mobile/test/data/elv4_p7_runtime_test.dart \
             apps/mobile/test/data/elv4_p7_batch_runtime_test.dart \
             apps/mobile/test/data/elv4_p7_freeze_integration_test.dart \
@@ -151,10 +178,13 @@ jobs:
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add \
+            apps/mobile/lib/data/database/drift_raw_statement.dart \
+            apps/mobile/lib/data/repositories/drift_power_runtime_store.dart \
             apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart \
             apps/mobile/lib/data/repositories/drift_power_batch_publication_runtime.dart \
             apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart \
             apps/mobile/lib/application/power_workspace_state.dart \
+            apps/mobile/test/data/elv4_p2_persistence_test.dart \
             apps/mobile/test/data/elv4_p7_runtime_test.dart \
             apps/mobile/test/data/elv4_p7_batch_runtime_test.dart \
             apps/mobile/test/data/elv4_p7_freeze_integration_test.dart \
