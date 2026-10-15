@@ -26,16 +26,25 @@ jobs:
       - name: Install mobile dependencies
         working-directory: apps/mobile
         run: flutter pub get
+      - name: Narrow Drift import
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('apps/mobile/test/data/elv4_p8_freeze_historical_invariance_test.dart')
+          text = path.read_text()
+          text = text.replace("import 'package:drift/drift.dart';", "import 'package:drift/drift.dart' show Value;")
+          path.write_text(text)
+          PY
       - name: Format P8 history acceptance
         working-directory: apps/mobile
         run: dart format test/data/elv4_p8_freeze_historical_invariance_test.dart
       - name: Run P8 historical acceptance
         working-directory: apps/mobile
         run: flutter test test/data/elv4_p8_freeze_historical_invariance_test.dart
-      - name: Commit verified formatting
+      - name: Commit verified test
         run: |
           if git diff --quiet -- apps/mobile/test/data/elv4_p8_freeze_historical_invariance_test.dart; then
-            echo 'P8 history test already formatted.'
+            echo 'P8 history test already normalized.'
             exit 0
           fi
           git config user.name 'github-actions[bot]'
