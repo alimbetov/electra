@@ -271,7 +271,7 @@ final class Acs03Output { final List<AcsLockOperatingCaseResult> cases; final St
 ```
 
 ### 21. Positive reference vector
-Shared trunk currents 0.3 A + 0.5 A =0.8 A at 24 V; trunk resistance 0.5 Ω, lock branch current 0.3 A, branch resistance 0.3 Ω. Accepted ELV4 evidence gives lock terminal 23.45 V. Requirement minimum 22 V => +1.45 V margin; shared 0.8 A retained.
+Shared trunk currents 0.3 A + 0.5 A = 0.8 A at 24 V; trunk resistance 0.5 Ω gives 0.40 V drop and 23.60 V branch origin; lock branch current 0.3 A through 0.3 Ω gives 0.09 V branch drop. Accepted ELV4 evidence therefore gives lock terminal **23.51 V**. Requirement minimum 22.00 V => **+1.51 V** margin; shared 0.8 A retained.
 
 ### 22. Boundary vector
 Startup event terminal lower bound exactly equals 22.0 V minimum => 0 V margin inclusive PASS. Holding event has larger margin; startup remains governing.
