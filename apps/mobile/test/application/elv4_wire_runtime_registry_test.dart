@@ -7,57 +7,63 @@ void main() {
   const fingerprint =
       'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
 
-  test('production semantic registry routes every registered operation', () async {
-    final backend = _RecordingBackend();
-    final adapter = Elv4WireSemanticAdapter<String>(
-      codecs: createElv4WireRuntimeCodecs(backend),
-      resolveImpact: (_) async => Elv4ResolvedWireImpact(
-        verifiedRows: const {},
-        changedDependencyRefs: const ['server-reviewed-dependency'],
-        reviewedImpactFingerprint: fingerprint,
-      ),
-    );
-
-    for (final entry in _payloads.entries) {
-      final revision = Elv4WireCommandEnvelope.revisionV2Operations.contains(
-        entry.key,
+  test(
+    'production semantic registry routes every registered operation',
+    () async {
+      final backend = _RecordingBackend();
+      final adapter = Elv4WireSemanticAdapter<String>(
+        codecs: createElv4WireRuntimeCodecs(backend),
+        resolveImpact:
+            (_) async => Elv4ResolvedWireImpact(
+              verifiedRows: const {},
+              changedDependencyRefs: const ['server-reviewed-dependency'],
+              reviewedImpactFingerprint: fingerprint,
+            ),
       );
-      final actual = await adapter.dispatchMap({
-        'schema': revision
-            ? Elv4WireCommandEnvelope.revisionCommandSchema
-            : Elv4WireCommandEnvelope.powerCommandSchema,
-        'operation': entry.key,
-        'payloadSchemaVersion': revision ? 2 : 1,
-        'projectId': 'project-1',
-        'designRevisionId': 'revision-1',
-        'commandId': 'cmd-${entry.key}',
-        'expectedDesignRowRevision': 7,
-        'expectedRows': <String, Object?>{},
-        'reviewedImpactFingerprint': fingerprint,
-        'payload': entry.value,
-      });
-      expect(actual, entry.key);
-      expect(backend.lastOperation, entry.key);
-    }
 
-    expect(
-      backend.calls,
-      hasLength(
-        Elv4WireCommandEnvelope.powerV1Operations.length +
-            Elv4WireCommandEnvelope.revisionV2Operations.length,
-      ),
-    );
-  });
+      for (final entry in _payloads.entries) {
+        final revision = Elv4WireCommandEnvelope.revisionV2Operations.contains(
+          entry.key,
+        );
+        final actual = await adapter.dispatchMap({
+          'schema':
+              revision
+                  ? Elv4WireCommandEnvelope.revisionCommandSchema
+                  : Elv4WireCommandEnvelope.powerCommandSchema,
+          'operation': entry.key,
+          'payloadSchemaVersion': revision ? 2 : 1,
+          'projectId': 'project-1',
+          'designRevisionId': 'revision-1',
+          'commandId': 'cmd-${entry.key}',
+          'expectedDesignRowRevision': 7,
+          'expectedRows': <String, Object?>{},
+          'reviewedImpactFingerprint': fingerprint,
+          'payload': entry.value,
+        });
+        expect(actual, entry.key);
+        expect(backend.lastOperation, entry.key);
+      }
+
+      expect(
+        backend.calls,
+        hasLength(
+          Elv4WireCommandEnvelope.powerV1Operations.length +
+              Elv4WireCommandEnvelope.revisionV2Operations.length,
+        ),
+      );
+    },
+  );
 
   test('operation-specific payload shape rejects before backend', () async {
     final backend = _RecordingBackend();
     final adapter = Elv4WireSemanticAdapter<String>(
       codecs: createElv4WireRuntimeCodecs(backend),
-      resolveImpact: (_) async => Elv4ResolvedWireImpact(
-        verifiedRows: const {},
-        changedDependencyRefs: const [],
-        reviewedImpactFingerprint: fingerprint,
-      ),
+      resolveImpact:
+          (_) async => Elv4ResolvedWireImpact(
+            verifiedRows: const {},
+            changedDependencyRefs: const [],
+            reviewedImpactFingerprint: fingerprint,
+          ),
     );
 
     await expectLater(
@@ -114,7 +120,9 @@ final Map<String, Map<String, Object?>> _payloads = {
     'groupId': 'group-1',
     'componentId': 'component-1',
     'outputPortIds': <Object?>['port-1'],
-    'limits': <Object?>[<String, Object?>{'dimension': 'WATT', 'limit': '10'}],
+    'limits': <Object?>[
+      <String, Object?>{'dimension': 'WATT', 'limit': '10'},
+    ],
     'derating': '1',
     'reserveMultiplier': '1',
     'policyRef': _ref,
@@ -130,14 +138,18 @@ final Map<String, Map<String, Object?>> _payloads = {
   'CREATE_POWER_SCENARIO': <String, Object?>{
     'scenarioId': 'scenario-1',
     'role': 'NORMAL',
-    'segments': <Object?>[<String, Object?>{'id': 'segment-1'}],
+    'segments': <Object?>[
+      <String, Object?>{'id': 'segment-1'},
+    ],
     'peakModel': 'ALL_SIMULTANEOUS',
     'policyRefs': <Object?>[],
   },
   'REPLACE_POWER_SCENARIO': <String, Object?>{
     'scenarioId': 'scenario-1',
     'role': 'NORMAL',
-    'segments': <Object?>[<String, Object?>{'id': 'segment-1'}],
+    'segments': <Object?>[
+      <String, Object?>{'id': 'segment-1'},
+    ],
     'peakModel': 'ALL_SIMULTANEOUS',
     'policyRefs': <Object?>[],
   },
@@ -149,7 +161,9 @@ final Map<String, Map<String, Object?>> _payloads = {
     'definitionRef': _ref,
     'accountingMode': 'GUARANTEED_PD',
     'upstreamBasis': 'CONSERVATIVE_RESERVED',
-    'path': <Object?>[<String, Object?>{'connectionId': 'connection-1'}],
+    'path': <Object?>[
+      <String, Object?>{'connectionId': 'connection-1'},
+    ],
   },
   'REPLACE_POE_DELIVERY': <String, Object?>{
     'deliveryId': 'delivery-1',
@@ -158,7 +172,9 @@ final Map<String, Map<String, Object?>> _payloads = {
     'definitionRef': _ref,
     'accountingMode': 'GUARANTEED_PD',
     'upstreamBasis': 'CONSERVATIVE_RESERVED',
-    'path': <Object?>[<String, Object?>{'connectionId': 'connection-1'}],
+    'path': <Object?>[
+      <String, Object?>{'connectionId': 'connection-1'},
+    ],
   },
   'CONFIGURE_BACKUP_ASSEMBLY': <String, Object?>{
     'assemblyId': 'assembly-1',
