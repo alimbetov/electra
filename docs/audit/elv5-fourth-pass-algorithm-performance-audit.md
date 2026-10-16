@@ -12,31 +12,31 @@ This pass reviewed ELV5 from two production perspectives simultaneously:
 
 The prior hardening already established 27 process identities, exact engineering primitives, persistence, authority, execution status semantics and a common calculation engine. The fourth pass asks a stricter question: **can a developer now implement every process and the high-performance runtime without inventing mathematics, worst-case rules, scheduling semantics or UI performance behavior?**
 
-The answer before this pass was “not fully”. Eighteen specification gaps were identified and resolved in design. Runtime remains not started.
+The answer before this pass was “not fully”. Nineteen specification gaps, including one arithmetic reference-oracle defect found during independent vector cross-checking, were identified and resolved in design. Runtime remains not started.
 
 ## Findings summary
 
 | Severity | Count |
 |---|---:|
-| HIGH | 14 |
+| HIGH | 15 |
 | MEDIUM | 4 |
-| Total | 18 |
+| Total | 19 |
 
-All 18 are `SPEC_RESOLVED`. None is a runtime fix.
+All 19 are `SPEC_RESOLVED`. None is a runtime fix.
 
 ## HIGH findings
 
 ### ELV5-AUD4-01 — PROCESS_DOSSIER_UNIFORMITY
 
-**Problem.** Process contracts described the engineering intent well, but did not force one implementation-complete shape across all 27 processes. A developer could still find different levels of detail in CCTV, LAN, ACS and Fire.
+**Problem.** Process contracts described the engineering intent well, but did not force one implementation-complete shape across all 27 processes.
 
-**Resolution.** `process-code-level-specification.md` now requires exactly 25 sections for every process, and four discipline dossier files provide those sections for all 27 codes.
+**Resolution.** `process-code-level-specification.md` requires exactly 25 sections for every process; four discipline dossier files provide those sections for all 27 codes.
 
 ### ELV5-AUD4-02 — EQUATION_AND_BOUNDARY_SEMANTICS
 
 **Problem.** Shared comparison algebra existed, but equation boundaries, interval endpoints, rounding points and inclusive/exclusive limits were not frozen per process.
 
-**Resolution.** Every dossier now states mathematical model, equations, exact/bounded arithmetic and comparison equations. Examples such as CCTV storage pool-level `ceil`, LAN optical overload, ACS terminal-voltage ranges and Fire address expansion are explicit.
+**Resolution.** Every dossier states mathematical model, equations, exact/bounded arithmetic and comparison equations. Examples such as CCTV storage pool-level `ceil`, LAN optical overload, ACS terminal-voltage ranges and Fire address expansion are explicit.
 
 ### ELV5-AUD4-03 — GOVERNING_AND_LIMITING_SELECTION
 
@@ -54,7 +54,7 @@ All 18 are `SPEC_RESOLVED`. None is a runtime fix.
 
 **Problem.** Scale fixtures existed globally, but algorithmic complexity and anti-quadratic expectations were not explicit per process.
 
-**Resolution.** Every process dossier states complexity/resource bounds; `flutter-performance-contract.md` also freezes a 27-process complexity matrix.
+**Resolution.** Every process dossier states complexity/resource bounds; `flutter-performance-contract.md` freezes a 27-process complexity matrix.
 
 ### ELV5-AUD4-06 — MAIN_ISOLATE_ENGINEERING_WORK
 
@@ -64,7 +64,7 @@ All 18 are `SPEC_RESOLVED`. None is a runtime fix.
 
 ### ELV5-AUD4-07 — WEB_COMPUTE_FALSE_PARALLELISM
 
-**Problem.** Using Flutter `compute()` as a generic performance answer would be unsafe because on web it executes on the current event loop rather than providing the same native isolate semantics.
+**Problem.** Using Flutter `compute()` as a generic performance answer would be unsafe because on web it executes on the current event loop rather than providing native isolate semantics.
 
 **Resolution.** Web receives a separate executor policy with bounded chunks/yields and separate qualification. A future real worker backend may replace it without changing pure kernel APIs.
 
@@ -72,7 +72,7 @@ All 18 are `SPEC_RESOLVED`. None is a runtime fix.
 
 **Problem.** Parallel execution could reorder results/findings/traces and therefore alter hashes if completion order leaked into aggregation.
 
-**Resolution.** Batch execution is a deterministic DAG. Node results are keyed and canonically ordered; worker count/completion timing may change wall-clock metrics only. Worker-count/order determinism is now mandatory evidence.
+**Resolution.** Batch execution is a deterministic DAG. Node results are keyed and canonically ordered; worker count/completion timing may change wall-clock metrics only. Worker-count/order determinism is mandatory evidence.
 
 ### ELV5-AUD4-09 — STALE_WORK_CANCELLATION_BACKPRESSURE
 
@@ -110,11 +110,17 @@ All 18 are `SPEC_RESOLVED`. None is a runtime fix.
 
 **Resolution.** The requested coherent batch remains all-or-nothing at publish. Workers may finish independent nodes for diagnostics/cache, but no partial pointer advance is permitted.
 
+### ELV5-AUD4-19 — REFERENCE_ORACLE_ARITHMETIC_INTEGRITY
+
+**Problem.** Independent recomputation found an arithmetic inconsistency in the inherited ACS-03 positive reference vector. For a 24 V source, 0.8 A shared-trunk current over 0.5 Ω and a 0.3 A lock branch over 0.3 Ω, the old oracle stated 23.45 V.
+
+**Resolution.** [calculation-oracle-errata-v1.md](../product/elv5-implementation/calculation-oracle-errata-v1.md) is normative: trunk drop is `0.8×0.5=0.4 V`, branch drop is `0.3×0.3=0.09 V`, therefore terminal voltage is **23.51 V** and headroom over a 22.00 V minimum is **+1.51 V**. Executable ACS-03 vectors must use the corrected arithmetic. This is an oracle correction, not permission for ELV5 to duplicate the ELV4 PWR-03 solver.
+
 ## MEDIUM findings
 
 ### ELV5-AUD4-15 — EQUATION_TRACE_CODES
 
-Each process now defines stable equation-code families so trace/evidence can be tested structurally instead of comparing localized prose.
+Each process defines stable equation-code families so trace/evidence can be tested structurally instead of comparing localized prose.
 
 ### ELV5-AUD4-16 — CROSS_STAGE_VECTOR_PROOF
 
@@ -129,8 +135,6 @@ What-if calculations reuse pure kernels/cache but are bounded, cancellable and n
 Deterministic performance architecture gates run on every PR; timing/memory regression gates require a controlled runner/profile setup to avoid treating noisy CI measurements as engineering truth.
 
 ## Engineering decisions strengthened by this pass
-
-The following are now explicit project invariants:
 
 ```text
 expected != guaranteed
@@ -148,11 +152,10 @@ contribution != global physical total
 parallel completion order != canonical result order
 worker completion != publication authority
 what-if result != CURRENT
+reference oracle != trusted until independently recomputed
 ```
 
 ## Priority computational core
-
-The implementation order requested for the deepest mathematical core remains appropriate:
 
 ```text
 1  CCTV-02  directed bandwidth/flow accounting
@@ -168,11 +171,11 @@ The implementation order requested for the deepest mathematical core remains app
 11 FA-06    notification circuit capacity
 ```
 
-These processes exercise the highest-value primitives: exact arithmetic, intervals, time integration, path accounting, shared-source evidence, transient cases and worst-case selection. Implementing them first will expose weaknesses in P1/P2 foundations early.
+These processes exercise exact arithmetic, intervals, time integration, path accounting, shared-source evidence, transient cases and worst-case selection first.
 
 ## Flutter performance architecture verdict
 
-The proposed runtime is deliberately split into three phases:
+The runtime is deliberately split into:
 
 ```text
 short consistent capture
@@ -182,30 +185,29 @@ pure deterministic calculation outside write transaction
 short guarded atomic publication
 ```
 
-On native Flutter, medium/large workloads use long-lived worker isolate(s); on web, the runtime must not mistake `compute()` for native-style parallelism. Incremental dependency closure and input-fingerprint reuse are more important than simply adding more workers.
+On native Flutter, medium/large workloads use long-lived worker isolate(s); on web, the runtime must not mistake `compute()` for native-style parallelism. Incremental dependency closure and semantic input-fingerprint reuse are more important than simply adding workers.
 
-UI performance is treated separately from compute throughput: virtualized collections, targeted immutable projections and cheap `build()` paths are mandatory because isolate offloading alone cannot prevent rebuild/raster jank.
+UI performance is separate from compute throughput: virtualized collections, targeted immutable projections and cheap `build()` paths remain mandatory.
 
 ## Closure impact
 
-This pass does **not** change the fixed public inventory:
+Fixed public inventory remains:
 
 - processes: 27;
 - public ELV5 commands: 16;
 - primary process verticals: 54;
 - target Drift schema: 24.
 
-It strengthens how those inventories must be implemented and qualified.
-
-The authority chain should include:
+The authority chain includes:
 
 - `process-code-level-specification.md`;
 - all four discipline dossier files;
 - `flutter-performance-contract.md`;
-- this fourth-pass audit and machine-readable audit registry.
+- `calculation-oracle-errata-v1.md`;
+- this audit and machine-readable audit registry.
 
 ## Final audit verdict
 
-After this pass, ELV5 is substantially closer to a mechanically implementable specification: formulas, comparison boundaries, worst-case behavior, trace shape, complexity, pseudocode and typed APIs are no longer left to local developer interpretation for any of the 27 processes.
+After this pass, formulas, comparison boundaries, worst-case behavior, trace shape, complexity, pseudocode and typed APIs are no longer left to local developer interpretation for any of the 27 processes. Reference vectors themselves are now explicitly subject to arithmetic-integrity validation and authority-controlled errata.
 
-The remaining risk is no longer specification ambiguity. It is implementation fidelity: P1/P2 primitives, executor/scheduler, schema-24 repositories and the first 11 computational kernels must now prove that the runtime matches this contract under exact-head CI, scale fixtures and profile-mode performance evidence.
+The remaining risk is implementation fidelity: P1/P2 primitives, executor/scheduler, schema-24 repositories and the first 11 computational kernels must prove runtime agreement under exact-head CI, 135 process vectors, scale fixtures and profile-mode performance evidence.
