@@ -1,7 +1,9 @@
 {
   "schema": "electra.elv5-command-design-registry.v1",
-  "status": "DESIGN_DRAFT",
+  "status": "DESIGN_FROZEN",
   "runtimeStatus": "NOT_STARTED",
+  "developmentReadiness": "READY_FOR_DEVELOPMENT",
+  "developmentReadinessRegistrySha256": "3822c6c6bf51398ef51070db549494036dd7eee89c7f69ac8228eec4f5236d04",
   "wireSchema": "electra.elv5-discipline-command.v1",
   "payloadSchemaVersion": 1,
   "topLevelKeys": [
@@ -25,112 +27,117 @@
     "rule": "ELV5 extends the accepted revision transaction/snapshot/remapping service; it does not register competing public revision commands."
   },
   "commands": [
-    {
-      "operation": "BIND_DISCIPLINE_POLICY",
-      "payloadKeys": ["bindingId", "subject", "processCodes", "definitionRef", "applicability"],
-      "owner": "ELV5",
-      "mutationKind": "POLICY_BINDING"
-    },
-    {
-      "operation": "ADOPT_DISCIPLINE_POLICY",
-      "payloadKeys": ["bindingId", "newDefinitionRef", "applicability"],
-      "owner": "ELV5",
-      "mutationKind": "POLICY_BINDING"
-    },
-    {
-      "operation": "RELEASE_DISCIPLINE_POLICY",
-      "payloadKeys": ["bindingId", "releasePolicy"],
-      "owner": "ELV5",
-      "mutationKind": "POLICY_BINDING"
-    },
-    {
-      "operation": "REPLACE_CAMERA_STREAMS",
-      "payloadKeys": ["cameraId", "streams", "subscriptions", "transportOverheadModelRef"],
-      "owner": "ELV5",
-      "mutationKind": "ASSIGNMENT_REPLACEMENT"
-    },
-    {
-      "operation": "REPLACE_RECORDING_ASSIGNMENTS",
-      "payloadKeys": ["poolId", "horizon", "temporalPolicy", "assignments", "scheduleSegments", "sizingBasis", "reserveMultiplier", "redundancyModel", "policyRef"],
-      "owner": "ELV5",
-      "mutationKind": "ASSIGNMENT_REPLACEMENT"
-    },
-    {
-      "operation": "REPLACE_RECORDER_ASSIGNMENTS",
-      "payloadKeys": ["recorderId", "accountingBasis", "assignments"],
-      "owner": "ELV5",
-      "mutationKind": "ASSIGNMENT_REPLACEMENT"
-    },
-    {
-      "operation": "REPLACE_LINK_COMPOSITION",
-      "payloadKeys": ["linkId", "orderedSections", "policyBindingId"],
-      "owner": "ELV5",
-      "mutationKind": "ASSIGNMENT_REPLACEMENT"
-    },
-    {
-      "operation": "REPLACE_PORT_CAPACITY_ASSIGNMENTS",
-      "payloadKeys": ["switchId", "assignments", "sparePolicyRef"],
-      "owner": "ELV5",
-      "mutationKind": "ASSIGNMENT_REPLACEMENT"
-    },
-    {
-      "operation": "REPLACE_OPTICAL_LINK_ASSIGNMENTS",
-      "payloadKeys": ["linkId", "forwardOptics", "reverseOptics", "connectorEvents", "spliceEvents"],
-      "owner": "ELV5",
-      "mutationKind": "ASSIGNMENT_REPLACEMENT"
-    },
-    {
-      "operation": "REPLACE_RACK_CAPACITY_BASIS",
-      "payloadKeys": ["rackId", "capacityBasis", "equipmentIds", "excludedCapacity", "policyRef"],
-      "owner": "ELV5",
-      "mutationKind": "ASSIGNMENT_REPLACEMENT"
-    },
-    {
-      "operation": "REPLACE_PATCH_PANEL_ASSIGNMENTS",
-      "payloadKeys": ["panelId", "assignments", "sparePolicyRef"],
-      "owner": "ELV5",
-      "mutationKind": "ASSIGNMENT_REPLACEMENT"
-    },
-    {
-      "operation": "REPLACE_DOOR_ROLE_ASSIGNMENTS",
-      "payloadKeys": ["doorAssemblyId", "topologyProfileRef", "safetyMode", "roleAssignments", "releaseTruthTable"],
-      "owner": "ELV5",
-      "mutationKind": "ASSIGNMENT_REPLACEMENT"
-    },
-    {
-      "operation": "REPLACE_CONTROLLER_RESOURCE_ASSIGNMENTS",
-      "payloadKeys": ["controllerId", "resourceAssignments", "reservePolicyRef"],
-      "owner": "ELV5",
-      "mutationKind": "ASSIGNMENT_REPLACEMENT"
-    },
-    {
-      "operation": "REPLACE_FIRE_LOOP_ASSIGNMENTS",
-      "payloadKeys": ["loopId", "deviceAssignments", "addressDomain", "topologyProfileRef"],
-      "owner": "ELV5",
-      "mutationKind": "ASSIGNMENT_REPLACEMENT"
-    },
-    {
-      "operation": "REPLACE_NOTIFICATION_CIRCUIT_ASSIGNMENTS",
-      "payloadKeys": ["circuitId", "deviceAssignments", "outputRef", "policyRef"],
-      "owner": "ELV5",
-      "mutationKind": "ASSIGNMENT_REPLACEMENT"
-    },
-    {
-      "operation": "CALCULATE_DISCIPLINE_PROCESS",
-      "payloadKeys": ["scope", "processCodes", "subjects", "expectedPointerGenerations"],
-      "owner": "ELV5",
-      "mutationKind": "EVALUATION_PUBLICATION"
-    }
+    {"operation":"BIND_DISCIPLINE_POLICY","payloadKeys":["bindingId","subject","processCodes","definitionRef","applicability"],"owner":"ELV5","mutationKind":"POLICY_BINDING"},
+    {"operation":"ADOPT_DISCIPLINE_POLICY","payloadKeys":["bindingId","newDefinitionRef","applicability"],"owner":"ELV5","mutationKind":"POLICY_BINDING"},
+    {"operation":"RELEASE_DISCIPLINE_POLICY","payloadKeys":["bindingId","releasePolicy"],"owner":"ELV5","mutationKind":"POLICY_BINDING"},
+    {"operation":"REPLACE_CAMERA_STREAMS","payloadKeys":["cameraId","streams","subscriptions","transportOverheadModelRef"],"owner":"ELV5","mutationKind":"ASSIGNMENT_REPLACEMENT"},
+    {"operation":"REPLACE_RECORDING_ASSIGNMENTS","payloadKeys":["poolId","horizon","temporalPolicy","assignments","scheduleSegments","sizingBasis","reserveMultiplier","redundancyModel","policyRef"],"owner":"ELV5","mutationKind":"ASSIGNMENT_REPLACEMENT"},
+    {"operation":"REPLACE_RECORDER_ASSIGNMENTS","payloadKeys":["recorderId","accountingBasis","assignments"],"owner":"ELV5","mutationKind":"ASSIGNMENT_REPLACEMENT"},
+    {"operation":"REPLACE_LINK_COMPOSITION","payloadKeys":["linkId","orderedSections","policyBindingId"],"owner":"ELV5","mutationKind":"ASSIGNMENT_REPLACEMENT"},
+    {"operation":"REPLACE_PORT_CAPACITY_ASSIGNMENTS","payloadKeys":["switchId","assignments","sparePolicyRef"],"owner":"ELV5","mutationKind":"ASSIGNMENT_REPLACEMENT"},
+    {"operation":"REPLACE_OPTICAL_LINK_ASSIGNMENTS","payloadKeys":["linkId","forwardOptics","reverseOptics","connectorEvents","spliceEvents"],"owner":"ELV5","mutationKind":"ASSIGNMENT_REPLACEMENT"},
+    {"operation":"REPLACE_RACK_CAPACITY_BASIS","payloadKeys":["rackId","capacityBasis","equipmentIds","excludedCapacity","policyRef"],"owner":"ELV5","mutationKind":"ASSIGNMENT_REPLACEMENT"},
+    {"operation":"REPLACE_PATCH_PANEL_ASSIGNMENTS","payloadKeys":["panelId","assignments","sparePolicyRef"],"owner":"ELV5","mutationKind":"ASSIGNMENT_REPLACEMENT"},
+    {"operation":"REPLACE_DOOR_ROLE_ASSIGNMENTS","payloadKeys":["doorAssemblyId","topologyProfileRef","safetyMode","roleAssignments","releaseTruthTable"],"owner":"ELV5","mutationKind":"ASSIGNMENT_REPLACEMENT"},
+    {"operation":"REPLACE_CONTROLLER_RESOURCE_ASSIGNMENTS","payloadKeys":["controllerId","resourceAssignments","reservePolicyRef"],"owner":"ELV5","mutationKind":"ASSIGNMENT_REPLACEMENT"},
+    {"operation":"REPLACE_FIRE_LOOP_ASSIGNMENTS","payloadKeys":["loopId","deviceAssignments","addressDomain","topologyProfileRef"],"owner":"ELV5","mutationKind":"ASSIGNMENT_REPLACEMENT"},
+    {"operation":"REPLACE_NOTIFICATION_CIRCUIT_ASSIGNMENTS","payloadKeys":["circuitId","deviceAssignments","outputRef","policyRef"],"owner":"ELV5","mutationKind":"ASSIGNMENT_REPLACEMENT"},
+    {"operation":"CALCULATE_DISCIPLINE_PROCESS","payloadKeys":["scope","processCodes","subjects","expectedPointerGenerations"],"owner":"ELV5","mutationKind":"EVALUATION_PUBLICATION"}
   ],
+  "nestedSchemaRegistryVersion": "electra.elv5-command-nested-schema.v1",
+  "nestedSchemas": {
+    "subject.v1": {"keys":["kind","id"],"types":{"kind":"string","id":"string"}},
+    "policy-ref.v1": {"keys":["policyCode","editionId","contentHash"],"types":{"policyCode":"string","editionId":"string","contentHash":"sha256"}},
+    "definition-ref.v1": {"keys":["policyCode","editionId","contentHash"],"types":{"policyCode":"string","editionId":"string","contentHash":"sha256"}},
+    "applicability.v1": {"keys":["scopeKinds","scenarioIds"],"types":{"scopeKinds":"string_array","scenarioIds":"string_array"}},
+    "evidence-ref.v1": {"keys":["sourceKind","sourceId","contentHash"],"types":{"sourceKind":"string","sourceId":"string","contentHash":"sha256"}},
+    "rate-evidence.v1": {
+      "keys":["kind","averagingWindowMs","rateBoundary","evidenceRef","applicabilityHash"],
+      "types":{"kind":"string","averagingWindowMs":"nullable_integer","rateBoundary":"string","evidenceRef":"object:evidence-ref.v1","applicabilityHash":"sha256"},
+      "nullableKeys":["averagingWindowMs"],
+      "enumValues":{"kind":["EXPECTED_ESTIMATE","CONFIGURED_TARGET","MEASURED_WINDOW","GUARANTEED_WINDOW_UPPER_BOUND","GUARANTEED_POINTWISE_UPPER_BOUND"],"rateBoundary":["PAYLOAD","WIRE"]}
+    },
+    "cctv-stream.v1": {
+      "keys":["encodedStreamId","codecProfileRef","expectedBitrateBps","peakBitrateBps","expectedRateEvidence","peakRateEvidence"],
+      "types":{"encodedStreamId":"string","codecProfileRef":"string","expectedBitrateBps":"decimal_string","peakBitrateBps":"nullable_decimal_string","expectedRateEvidence":"object:rate-evidence.v1","peakRateEvidence":"nullable_object:rate-evidence.v1"},
+      "nullableKeys":["peakBitrateBps","peakRateEvidence"]
+    },
+    "cctv-multicast-tree.v1": {"keys":["treeId","edgeIds"],"types":{"treeId":"string","edgeIds":"string_array"},"constraints":["edgeIds_non_empty","edgeIds_unique"]},
+    "cctv-subscription.v1": {
+      "keys":["subscriptionId","encodedStreamId","receiverId","deliveryMode","orderedNetworkEdgeIds","multicastGroupId","multicastTree"],
+      "types":{"subscriptionId":"string","encodedStreamId":"string","receiverId":"string","deliveryMode":"string","orderedNetworkEdgeIds":"string_array","multicastGroupId":"nullable_string","multicastTree":"nullable_object:cctv-multicast-tree.v1"},
+      "nullableKeys":["multicastGroupId","multicastTree"],
+      "enumValues":{"deliveryMode":["UNICAST","MULTICAST"]},
+      "constraints":["UNICAST=>multicastGroupId:null,multicastTree:null","MULTICAST=>multicastGroupId:string,multicastTree:object","same_stream_group=>same_multicast_tree_hash"]
+    },
+    "transport-overhead-ref.v1": {"keys":["modelCode","editionId","contentHash"],"types":{"modelCode":"string","editionId":"string","contentHash":"sha256"}},
+    "utc-window.v1": {"keys":["startUtc","endUtc"],"types":{"startUtc":"utc_string","endUtc":"utc_string"},"constraints":["start_before_end"]},
+    "temporal-policy.v1": {"keys":["timeZoneId","tzdbVersion","gapRule","overlapRule"],"types":{"timeZoneId":"string","tzdbVersion":"string","gapRule":"string","overlapRule":"string"}},
+    "recording-assignment.v1": {
+      "keys":["encodedStreamId","copyRole","scheduleProfileId","expectedBitrateBps","upperBoundBitrateBps","evidenceBasis"],
+      "types":{"encodedStreamId":"string","copyRole":"string","scheduleProfileId":"string","expectedBitrateBps":"decimal_string","upperBoundBitrateBps":"nullable_decimal_string","evidenceBasis":"string"},
+      "nullableKeys":["upperBoundBitrateBps"]
+    },
+    "recurrence.v1": {"keys":["rule","timeZoneLocal"],"types":{"rule":"string","timeZoneLocal":"boolean"}},
+    "recording-schedule-segment.v1": {
+      "keys":["scheduleProfileId","segmentId","absoluteWindow","recurrence"],
+      "types":{"scheduleProfileId":"string","segmentId":"string","absoluteWindow":"nullable_object:utc-window.v1","recurrence":"nullable_object:recurrence.v1"},
+      "nullableKeys":["absoluteWindow","recurrence"],
+      "constraints":["exactly_one_of:absoluteWindow,recurrence"]
+    },
+    "redundancy-model.v1": {"keys":["modelCode","usableFraction","contentHash"],"types":{"modelCode":"string","usableFraction":"decimal_string","contentHash":"sha256"}},
+    "recorder-assignment.v1": {"keys":["assignmentId","cameraId","encodedStreamId","licenseChannelId","storagePoolId"],"types":{"assignmentId":"string","cameraId":"string","encodedStreamId":"string","licenseChannelId":"string","storagePoolId":"string"}},
+    "link-section.v1": {"keys":["ordinal","realizedSectionId","classification"],"types":{"ordinal":"integer","realizedSectionId":"string","classification":"string"}},
+    "port-assignment.v1": {"keys":["portId","endpointId","media","speedBps"],"types":{"portId":"string","endpointId":"string","media":"string","speedBps":"decimal_string"}},
+    "optics.v1": {"keys":["txPortId","rxPortId","wavelengthNm","txMinDbm","txMaxDbm","receiverSensitivityDbm","receiverOverloadDbm","requiredSensitivityMarginDb"],"types":{"txPortId":"string","rxPortId":"string","wavelengthNm":"decimal_string","txMinDbm":"decimal_string","txMaxDbm":"decimal_string","receiverSensitivityDbm":"decimal_string","receiverOverloadDbm":"decimal_string","requiredSensitivityMarginDb":"decimal_string"}},
+    "optical-loss-event.v1": {"keys":["eventId","lossMinDb","lossMaxDb"],"types":{"eventId":"string","lossMinDb":"decimal_string","lossMaxDb":"decimal_string"}},
+    "excluded-capacity.v1": {"keys":["reservedRu","unavailableRu","provenance"],"types":{"reservedRu":"decimal_string","unavailableRu":"decimal_string","provenance":"string"}},
+    "patch-assignment.v1": {"keys":["panelPortId","terminationId","linkId"],"types":{"panelPortId":"string","terminationId":"string","linkId":"string"}},
+    "topology-profile-ref.v1": {"keys":["profileCode","editionId","contentHash"],"types":{"profileCode":"string","editionId":"string","contentHash":"sha256"}},
+    "door-role-assignment.v1": {"keys":["roleCode","slot","componentId"],"types":{"roleCode":"string","slot":"integer","componentId":"string"}},
+    "release-truth-row.v1": {"keys":["causeCode","expectedOutcomeCode","requiredEvidenceRoles"],"types":{"causeCode":"string","expectedOutcomeCode":"string","requiredEvidenceRoles":"string_array"}},
+    "controller-resource-assignment.v1": {"keys":["resourceId","resourceKind","assignmentRole","subjectId"],"types":{"resourceId":"string","resourceKind":"string","assignmentRole":"string","subjectId":"string"}},
+    "fire-device-assignment.v1": {"keys":["deviceId","profileRef","expandedAddresses"],"types":{"deviceId":"string","profileRef":"string","expandedAddresses":"integer_array"}},
+    "address-domain.v1": {"keys":["panelId","loopId","minAddress","maxAddress","reservedAddresses"],"types":{"panelId":"string","loopId":"string","minAddress":"integer","maxAddress":"integer","reservedAddresses":"integer_array"}},
+    "notification-device-assignment.v1": {"keys":["deviceId","stateCurrentMa"],"types":{"deviceId":"string","stateCurrentMa":"string_map_decimal_string"}},
+    "output-ref.v1": {"keys":["componentId","portId"],"types":{"componentId":"string","portId":"string"}},
+    "scope.v1": {"keys":["kind","scopeId","scenarioKey"],"types":{"kind":"string","scopeId":"string","scenarioKey":"string"}}
+  },
+  "commandNestedBindings": {
+    "BIND_DISCIPLINE_POLICY":[{"path":"subject","schema":"subject.v1"},{"path":"definitionRef","schema":"definition-ref.v1"},{"path":"applicability","schema":"applicability.v1"}],
+    "ADOPT_DISCIPLINE_POLICY":[{"path":"newDefinitionRef","schema":"definition-ref.v1"},{"path":"applicability","schema":"applicability.v1"}],
+    "RELEASE_DISCIPLINE_POLICY":[],
+    "REPLACE_CAMERA_STREAMS":[{"path":"streams[]","schema":"cctv-stream.v1"},{"path":"subscriptions[]","schema":"cctv-subscription.v1"},{"path":"transportOverheadModelRef","schema":"transport-overhead-ref.v1"}],
+    "REPLACE_RECORDING_ASSIGNMENTS":[{"path":"horizon","schema":"utc-window.v1"},{"path":"temporalPolicy","schema":"temporal-policy.v1"},{"path":"assignments[]","schema":"recording-assignment.v1"},{"path":"scheduleSegments[]","schema":"recording-schedule-segment.v1"},{"path":"redundancyModel","schema":"redundancy-model.v1"},{"path":"policyRef","schema":"policy-ref.v1"}],
+    "REPLACE_RECORDER_ASSIGNMENTS":[{"path":"assignments[]","schema":"recorder-assignment.v1"}],
+    "REPLACE_LINK_COMPOSITION":[{"path":"orderedSections[]","schema":"link-section.v1"}],
+    "REPLACE_PORT_CAPACITY_ASSIGNMENTS":[{"path":"assignments[]","schema":"port-assignment.v1"},{"path":"sparePolicyRef","schema":"policy-ref.v1"}],
+    "REPLACE_OPTICAL_LINK_ASSIGNMENTS":[{"path":"forwardOptics","schema":"optics.v1"},{"path":"reverseOptics","schema":"optics.v1"},{"path":"connectorEvents[]","schema":"optical-loss-event.v1"},{"path":"spliceEvents[]","schema":"optical-loss-event.v1"}],
+    "REPLACE_RACK_CAPACITY_BASIS":[{"path":"excludedCapacity","schema":"excluded-capacity.v1"},{"path":"policyRef","schema":"policy-ref.v1"}],
+    "REPLACE_PATCH_PANEL_ASSIGNMENTS":[{"path":"assignments[]","schema":"patch-assignment.v1"},{"path":"sparePolicyRef","schema":"policy-ref.v1"}],
+    "REPLACE_DOOR_ROLE_ASSIGNMENTS":[{"path":"topologyProfileRef","schema":"topology-profile-ref.v1"},{"path":"roleAssignments[]","schema":"door-role-assignment.v1"},{"path":"releaseTruthTable[]","schema":"release-truth-row.v1"}],
+    "REPLACE_CONTROLLER_RESOURCE_ASSIGNMENTS":[{"path":"resourceAssignments[]","schema":"controller-resource-assignment.v1"},{"path":"reservePolicyRef","schema":"policy-ref.v1"}],
+    "REPLACE_FIRE_LOOP_ASSIGNMENTS":[{"path":"deviceAssignments[]","schema":"fire-device-assignment.v1"},{"path":"addressDomain","schema":"address-domain.v1"},{"path":"topologyProfileRef","schema":"topology-profile-ref.v1"}],
+    "REPLACE_NOTIFICATION_CIRCUIT_ASSIGNMENTS":[{"path":"deviceAssignments[]","schema":"notification-device-assignment.v1"},{"path":"outputRef","schema":"output-ref.v1"},{"path":"policyRef","schema":"policy-ref.v1"}],
+    "CALCULATE_DISCIPLINE_PROCESS":[{"path":"scope","schema":"scope.v1"},{"path":"subjects[]","schema":"subject.v1"}]
+  },
+  "semanticConstraints": {
+    "REPLACE_CAMERA_STREAMS":["subscriptionId is unique within camera replacement set","UNICAST has null multicastGroupId and multicastTree","MULTICAST requires multicastGroupId and multicastTree","same encodedStreamId+multicastGroupId carries identical canonical multicastTree hash","multicast dedup identity is encodedStreamId+multicastGroupId+edgeId"],
+    "REPLACE_RECORDING_ASSIGNMENTS":["reserveMultiplier >= 1","every assignment scheduleProfileId resolves to at least one schedule segment","schedule union is per scheduleProfileId; there is no implicit pool-wide schedule"],
+    "REPLACE_RECORDER_ASSIGNMENTS":["storagePoolId is mandatory for every assignment and selects exact CCTV-03 storage evidence"]
+  },
+  "readinessClosure": {"reviewPass":"EIGHTH_IMPLEMENTATION_READINESS","high":7,"medium":3,"total":10,"resolved":10,"open":0},
   "invariants": [
     "Exactly 16 unique ELV5 discipline operations are registered.",
     "Every payload uses an exact key set; unknown or missing fields fail closed.",
+    "Every registered nested object/array item uses the machine-frozen nested schema registry; unknown or missing nested fields fail closed.",
     "Every durable command requires reviewedImpactFingerprint and server-side impact resolution.",
     "Replay by projectId+commandId+requestHash precedes mutable preconditions.",
     "Same commandId with different requestHash is a payload conflict.",
     "Replacement mutations invalidate union(oldClosure,newClosure).",
-    "Recording replacement captures deterministic temporal policy, reserve/redundancy basis and exact policy provenance together with its member sets.",
-    "Camera stream replacement captures explicit directed subscriptions; payload bitrate is not silently promoted to wire-rate capacity without an exact transport overhead model reference.",
+    "Recording replacement captures deterministic temporal policy, schedule-profile ownership, reserve/redundancy basis and exact policy provenance together with its member sets.",
+    "Camera stream replacement captures explicit directed subscriptions and explicit multicast group/tree semantics; payload bitrate is not silently promoted to wire-rate capacity without an exact transport overhead model reference.",
+    "Recorder assignment carries exact storagePoolId for CCTV-03 evidence selection.",
     "Door-role replacement captures the selected lock safety mode and technical release truth table; these do not create an ELV7 compliance claim.",
     "ELV5 commands never become canonical owners of ELV3 cable/port/component identities or ELV4 power source/battery identities.",
     "ELV4 revision command schema and operation identities remain unchanged."
