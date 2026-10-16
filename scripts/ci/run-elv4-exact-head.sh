@@ -61,6 +61,10 @@ phase p7-p8-acceptance flutter test --reporter expanded \
   test/data/elv4_p9_canonical_port_guard_test.dart \
   test/data/elv4_p9_membership_guard_test.dart \
   test/data/elv_p3_runtime_closure_test.dart
+phase runtime-qualification env \
+  ELV4_SOURCE_SHA="$source_sha" \
+  ELV4_QUALIFICATION_REPORT="$report_dir/qualification-report.json" \
+  flutter test --reporter expanded test/data/elv4_p9_runtime_qualification_test.dart
 cd "$root"
 phase clean-tree bash -c 'git diff --exit-code HEAD -- . && test -z "$(git ls-files --others --exclude-standard)"'
 python3 - "$report_dir" "$source_sha" <<'PY'
@@ -73,7 +77,7 @@ report={'schema':'electra.elv4-exact-head-technical.v1','sourceSha':sys.argv[2],
         'technicalResult':'PASS' if all(v=='PASS' for v in phases.values()) else 'FAIL',
         'phases':phases,'toolchain':json.loads((out/'flutter-version.json').read_text()),
         'runtimeAcceptanceVerified':False,
-        'scope':'Full regression, real v21/v22 migration matrix and existing P7/P8 integration tests; not the missing seven-case qualification matrix.'}
+        'scope':'Full regression, real v21/v22 migration matrix, P7/P8 integration and persisted seven-case ELV4 qualification matrix.'}
 (out/'technical-report.json').write_text(json.dumps(report,indent=2)+'\n')
 print(json.dumps(report,indent=2))
 PY
