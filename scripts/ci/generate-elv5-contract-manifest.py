@@ -32,6 +32,9 @@ AUTHORITY_PATHS = [
     "docs/product/elv5-implementation/README.md",
     "docs/product/elv5-implementation/requirements.json",
     "docs/product/elv5-implementation/normative-requirements-registry.json",
+    "docs/product/elv5-implementation/market-simulation-requirements.json",
+    "docs/product/elv5-implementation/market-simulation-catalog.json",
+    "docs/product/elv5-implementation/market-simulation-450-plan.md",
     "docs/product/elv5-implementation/process-contracts.md",
     "docs/product/elv5-implementation/process-registry.json",
     "docs/product/elv5-implementation/algorithm-registry.json",
@@ -126,6 +129,8 @@ def main() -> None:
     command_registry_path = IMPL / "command-registry.json"
     requirements_path = IMPL / "requirements.json"
     normative_requirements_path = IMPL / "normative-requirements-registry.json"
+    market_requirements_path = IMPL / "market-simulation-requirements.json"
+    market_catalog_path = IMPL / "market-simulation-catalog.json"
     oracle_errata_path = IMPL / "calculation-oracle-errata-v1.md"
 
     process_registry = load_json(process_registry_path)
@@ -133,12 +138,15 @@ def main() -> None:
     command_registry = load_json(command_registry_path)
     requirements = load_json(requirements_path)
     normative_requirements = load_json(normative_requirements_path)
+    market_requirements = load_json(market_requirements_path)
+    market_catalog = load_json(market_catalog_path)
 
     processes = process_registry.get("processes", [])
     algorithms = algorithm_registry.get("processes", [])
     commands = command_registry.get("commands", [])
     requirement_rows = rows_from_requirements(requirements)
     obligations = normative_requirements.get("obligations", [])
+    market_requirement_rows = market_requirements.get("requirements", [])
     fixed = normative_requirements.get("fixedInventories", {})
 
     if len(processes) != 27:
@@ -153,6 +161,13 @@ def main() -> None:
         raise SystemExit(f"expected 80 requirements, found {len(requirement_rows)}")
     if len(obligations) != 42 or len({row.get('id') for row in obligations}) != 42:
         raise SystemExit("expected 42 unique normative obligations")
+    if len(market_requirement_rows) != 12 or len({row.get('id') for row in market_requirement_rows}) != 12:
+        raise SystemExit("expected 12 unique market-simulation requirements")
+    if market_requirements.get("scenarioMatrixTarget") != 450:
+        raise SystemExit("market-simulation requirements must target exactly 450 scenarios")
+    market_counts = market_catalog.get("processScenarioCounts", {})
+    if len(market_counts) != 27 or sum(market_counts.values()) != 450:
+        raise SystemExit("market-simulation catalog must allocate exactly 450 scenarios across 27 processes")
     if fixed.get("designFindingsResolved") != 56 or fixed.get("minimumProcessVectorCount") != 135:
         raise SystemExit("unexpected normative fixed inventory")
     if command_registry.get("wireSchema") != "electra.elv5-discipline-command.v1":
@@ -167,6 +182,8 @@ def main() -> None:
         raise SystemExit("every ELV5 process must have requiredDimensions")
     if set(normative_requirements.get("processCodes", [])) != set(process_codes):
         raise SystemExit("normative requirements process inventory differs from process registry")
+    if set(market_counts) != set(process_codes):
+        raise SystemExit("market-simulation process inventory differs from process registry")
 
     command_ops = [row.get("operation") for row in commands]
     if len(command_ops) != len(set(command_ops)):
@@ -204,6 +221,10 @@ def main() -> None:
         {"id": row["id"], "severity": row["severity"], "title": row["title"], "acceptance": row["acceptance"]}
         for row in sorted(obligations, key=lambda item: item["id"])
     ]
+    market_requirement_inventory = [
+        {"id": row["id"], "severity": row["severity"], "title": row["title"]}
+        for row in sorted(market_requirement_rows, key=lambda item: item["id"])
+    ]
 
     artifacts = []
     for relative in AUTHORITY_PATHS:
@@ -226,11 +247,13 @@ def main() -> None:
         "processDossierSectionCount": 25,
         "processVectorClassCount": 5,
         "minimumProcessVectorCount": 135,
+        "marketSimulationScenarioCount": 450,
         "fourthPassFindingCount": 19,
         "designFindingsResolved": 56,
         "commandCount": 16,
         "requirementCount": 80,
         "normativeObligationCount": 42,
+        "marketSimulationRequirementCount": 12,
         "primaryProcessOracleCount": 54,
         "authorityArtifactCount": len(AUTHORITY_PATHS),
         "processRegistrySha256": sha256_file(process_registry_path),
@@ -243,6 +266,10 @@ def main() -> None:
         "requirementsSha256": sha256_file(requirements_path),
         "normativeRequirementsSha256": sha256_file(normative_requirements_path),
         "normativeObligationInventorySha256": sha256_bytes(deterministic_json_bytes(obligation_inventory)),
+        "marketSimulationRequirementsSha256": sha256_file(market_requirements_path),
+        "marketSimulationRequirementInventorySha256": sha256_bytes(deterministic_json_bytes(market_requirement_inventory)),
+        "marketSimulationCatalogSha256": sha256_file(market_catalog_path),
+        "marketSimulationScenarioDistributionSha256": sha256_bytes(deterministic_json_bytes(market_counts)),
         "commandRegistrySha256": sha256_file(command_registry_path),
         "requiredDimensionInventorySha256": sha256_bytes(deterministic_json_bytes(required_dimension_inventory)),
         "algorithmInventorySha256": sha256_bytes(deterministic_json_bytes(algorithm_inventory)),
@@ -257,7 +284,8 @@ def main() -> None:
         "sourceSha": source_sha(),
         "runtimeStatus": "NOT_STARTED",
         "qualificationStatus": "NOT_EXECUTED",
-        "note": "Authority fingerprint/design-entry evidence only. It does not constitute ELV5 runtime implementation or engineering acceptance.",
+        "marketSimulationStatus": "DESIGN_SIMULATION_ONLY",
+        "note": "Authority fingerprint/design-entry evidence only. It does not constitute ELV5 runtime implementation, engineering acceptance, ELV7 compliance or ELV8 procurement acceptance.",
     }
 
     output = Path(args.output)
@@ -268,8 +296,8 @@ def main() -> None:
     print(f"sourceSha={manifest['sourceSha']}")
     print(f"authorityFingerprintSha256={authority_fingerprint}")
     print(
-        "processes=27 algorithms=27 dossiers=27 sections=25 vectors=135 commands=16 "
-        "requirements=80 obligations=42 primaryOracles=54 fourthPassFindings=19 "
+        "processes=27 algorithms=27 dossiers=27 sections=25 vectors=135 marketSimulation=450 commands=16 "
+        "requirements=80 obligations=42 marketRequirements=12 primaryOracles=54 fourthPassFindings=19 "
         f"designFindingsResolved=56 schema=24 authorityArtifacts={len(AUTHORITY_PATHS)}"
     )
 
