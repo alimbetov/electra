@@ -6,18 +6,20 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   Elv4QualificationMatrixContract loadContract() {
-    final file = File('../../docs/product/elv4-implementation/qualification.json');
+    final file = File(
+      '../../docs/product/elv4-implementation/qualification.json',
+    );
     expect(file.existsSync(), isTrue);
     final manifest =
         (jsonDecode(file.readAsStringSync()) as Map).cast<String, Object?>();
     return Elv4QualificationMatrixContract.fromManifest(manifest);
   }
 
-  test('qualification manifest expands all seven cases into exact obligations', () {
-    final contract = loadContract();
-    expect(
-      contract.requiredCaseIds,
-      const [
+  test(
+    'qualification manifest expands all seven cases into exact obligations',
+    () {
+      final contract = loadContract();
+      expect(contract.requiredCaseIds, const [
         'Q-CCTV',
         'Q-LAN',
         'Q-ACS',
@@ -25,41 +27,25 @@ void main() {
         'Q-SHARED',
         'Q-GENERIC',
         'Q-CHARGE',
-      ],
-    );
-    expect(contract.expectedRows, isNotEmpty);
-    expect(
-      contract.expectedRows.map((row) => row.caseId).toSet(),
-      contract.requiredCaseIds.toSet(),
-    );
-    expect(
-      contract.expectedRows.map((row) => row.key).toSet(),
-      hasLength(contract.expectedRows.length),
-    );
-  });
+      ]);
+      expect(contract.expectedRows, isNotEmpty);
+      expect(
+        contract.expectedRows.map((row) => row.caseId).toSet(),
+        contract.requiredCaseIds.toSet(),
+      );
+      expect(
+        contract.expectedRows.map((row) => row.key).toSet(),
+        hasLength(contract.expectedRows.length),
+      );
+    },
+  );
 
-  test('complete persisted evidence shape satisfies exact Cartesian matrix', () {
-    final contract = loadContract();
-    contract.validateEvidence(
-      contract.expectedRows.map(
-        (row) => Elv4QualificationEvidenceRow(
-          caseId: row.caseId,
-          processCode: row.processCode,
-          context: row.context,
-          dimension: row.dimension,
-          completion: row.completion,
-          assessment: row.assessment,
-          execution: row.execution,
-          evaluationId: 'evaluation:${row.key}',
-        ),
-      ),
-    );
-  });
-
-  test('missing, duplicate, extra and failed evidence are rejected', () {
-    final contract = loadContract();
-    final complete = contract.expectedRows
-        .map(
+  test(
+    'complete persisted evidence shape satisfies exact Cartesian matrix',
+    () {
+      final contract = loadContract();
+      contract.validateEvidence(
+        contract.expectedRows.map(
           (row) => Elv4QualificationEvidenceRow(
             caseId: row.caseId,
             processCode: row.processCode,
@@ -70,8 +56,28 @@ void main() {
             execution: row.execution,
             evaluationId: 'evaluation:${row.key}',
           ),
-        )
-        .toList();
+        ),
+      );
+    },
+  );
+
+  test('missing, duplicate, extra and failed evidence are rejected', () {
+    final contract = loadContract();
+    final complete =
+        contract.expectedRows
+            .map(
+              (row) => Elv4QualificationEvidenceRow(
+                caseId: row.caseId,
+                processCode: row.processCode,
+                context: row.context,
+                dimension: row.dimension,
+                completion: row.completion,
+                assessment: row.assessment,
+                execution: row.execution,
+                evaluationId: 'evaluation:${row.key}',
+              ),
+            )
+            .toList();
 
     expect(
       () => contract.validateEvidence(complete.sublist(1)),
