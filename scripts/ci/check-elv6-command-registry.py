@@ -19,8 +19,8 @@ EXPECTED = {
     'REPLACE_MOUNTING_SURFACES': {'hostRef', 'surfaces'},
     'REPLACE_LAYOUT_ZONES': {'hostRef', 'zones'},
     'REPLACE_CABLE_ENTRIES': {'hostRef', 'entries'},
-    'PLACE_LAYOUT_SUBJECT': {'placementId', 'logicalId', 'hostRef', 'subjectRef', 'installationRole', 'mountingSurfaceId', 'pose', 'occupiedEnvelope', 'rackSpan', 'dinSpan', 'sourceProposalId'},
-    'MOVE_LAYOUT_SUBJECT': {'placementId', 'hostRef', 'mountingSurfaceId', 'pose', 'occupiedEnvelope', 'rackSpan', 'dinSpan', 'sourceProposalId'},
+    'PLACE_LAYOUT_SUBJECT': {'placementId', 'logicalId', 'hostRef', 'subjectRef', 'installationRole', 'placementSpec'},
+    'MOVE_LAYOUT_SUBJECT': {'placementId', 'hostRef', 'placementSpec'},
     'REMOVE_LAYOUT_SUBJECT': {'placementId', 'hostRef', 'removalReason'},
     'LOCK_LAYOUT_PLACEMENT': {'placementId', 'hostRef', 'lockReason'},
     'UNLOCK_LAYOUT_PLACEMENT': {'placementId', 'hostRef', 'unlockReason'},
@@ -33,6 +33,9 @@ EXPECTED = {
     'CALCULATE_LAYOUT_PROCESS': {'hostRef', 'processCodes', 'subjects', 'expectedPointerGenerations'},
     'REPLACE_LAYOUT_TECHNICAL_PROFILE': {'bindingId', 'hostRef', 'profileRole', 'definitionRef', 'applicability'},
     'RELEASE_LAYOUT_TECHNICAL_PROFILE': {'bindingId', 'hostRef', 'releasePolicy'},
+}
+FORBIDDEN_PLACEMENT_WIRE_FIELDS = {
+    'occupiedEnvelope', 'rackSpan', 'dinSpan', 'sourceProposalId',
 }
 
 
@@ -56,6 +59,15 @@ def validate(registry):
         assert len(row['payloadKeys']) == len(set(row['payloadKeys']))
         assert set(row['payloadKeys']) == expected_keys, ('payload key mismatch', operation)
 
+    for operation in ('PLACE_LAYOUT_SUBJECT', 'MOVE_LAYOUT_SUBJECT'):
+        fields = set(by_op[operation]['payloadKeys'])
+        assert 'placementSpec' in fields
+        assert not fields & FORBIDDEN_PLACEMENT_WIRE_FIELDS, (
+            'client-derived placement/provenance field leaked to wire',
+            operation,
+            sorted(fields & FORBIDDEN_PLACEMENT_WIRE_FIELDS),
+        )
+
     revision = registry['externalRevisionBoundary']
     assert revision['schema'] == 'electra.elv4-revision-command.v2'
     assert revision['operations'] == ['FREEZE_DESIGN_REVISION', 'CREATE_NEXT_WORKING_DESIGN_REVISION']
@@ -68,6 +80,10 @@ def validate(registry):
     assert registry['wireSchema'] in contract
     for operation in EXPECTED:
         assert operation in contract, ('command absent from code contract', operation)
+
+    safety = (BASE / 'mutation-safety-contract.md').read_text()
+    for token in ['placementSpec', 'SERVER_DERIVED_GEOMETRY', 'REFERENCED_MEMBER_REMOVAL']:
+        assert token in safety, ('missing mutation safety contract token', token)
 
     panel = by_op['REPLACE_PANEL_LAYOUT_ROOT']
     assert panel['ownerTarget'] == 'PANEL_ASSEMBLY'
@@ -98,11 +114,15 @@ def main():
     client_impact['commands'][7]['payloadKeys'].append('dependencyClosure')
     must_reject(client_impact)
 
+    client_geometry = copy.deepcopy(registry)
+    client_geometry['commands'][7]['payloadKeys'].append('occupiedEnvelope')
+    must_reject(client_geometry)
+
     wrong_version = copy.deepcopy(registry)
     wrong_version['payloadSchemaVersion'] = 2
     must_reject(wrong_version)
 
-    print('PASS: ELV6 exact wire schema, 21 commands, payload keys and ELV4 revision boundary')
+    print('PASS: ELV6 exact 21-command wire registry; placement intent is client-authored, derived geometry/provenance is server-owned')
 
 
 if __name__ == '__main__':
