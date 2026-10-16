@@ -14,144 +14,157 @@ import 'package:flutter_test/flutter_test.dart';
 import '../support/elv4_power_qualification_builder.dart';
 
 void main() {
-  test('seven manifest cases publish complete persisted runtime matrix', () async {
-    final manifest = _readJson('../../docs/product/elv4-implementation/qualification.json');
-    final fullContract = Elv4QualificationMatrixContract.fromManifest(manifest);
-    final caseReports = <Map<String, Object?>>[];
-    final allEvidence = <Elv4PersistedQualificationEvidence>[];
-    final temp = Directory.systemTemp.createTempSync('electra-elv4-qualification-');
-    addTearDown(() {
-      if (temp.existsSync()) temp.deleteSync(recursive: true);
-    });
-
-    final cases = (manifest['positiveCases'] as List<Object?>)
-        .cast<Map<Object?, Object?>>();
-    for (final rawCase in cases) {
-      final caseMap = rawCase.cast<String, Object?>();
-      final caseId = caseMap['id']! as String;
-      final facts = _map(caseMap['facts'], '$caseId.facts');
-      final projectId = facts['projectId']! as String;
-      final revisionId = facts['designRevisionId']! as String;
-      final db = AppDatabase(
-        NativeDatabase(File('${temp.path}/$caseId.sqlite')),
+  test(
+    'seven manifest cases publish complete persisted runtime matrix',
+    () async {
+      final manifest = _readJson(
+        '../../docs/product/elv4-implementation/qualification.json',
       );
-      try {
-        final builder = Elv4QualificationBuilder(
-          db,
-          projectId: projectId,
-          revisionId: revisionId,
-        );
-        await builder.createStructuralBaseline();
-        await _seedPublicPowerFact(builder, facts);
+      final fullContract = Elv4QualificationMatrixContract.fromManifest(
+        manifest,
+      );
+      final caseReports = <Map<String, Object?>>[];
+      final allEvidence = <Elv4PersistedQualificationEvidence>[];
+      final temp = Directory.systemTemp.createTempSync(
+        'electra-elv4-qualification-',
+      );
+      addTearDown(() {
+        if (temp.existsSync()) temp.deleteSync(recursive: true);
+      });
 
-        final store = DriftPowerRuntimeStore(
-          db,
-          originDeviceId: 'runtime-qualification',
-          now: () => builder.instant,
+      final cases =
+          (manifest['positiveCases'] as List<Object?>)
+              .cast<Map<Object?, Object?>>();
+      for (final rawCase in cases) {
+        final caseMap = rawCase.cast<String, Object?>();
+        final caseId = caseMap['id']! as String;
+        final facts = _map(caseMap['facts'], '$caseId.facts');
+        final projectId = facts['projectId']! as String;
+        final revisionId = facts['designRevisionId']! as String;
+        final db = AppDatabase(
+          NativeDatabase(File('${temp.path}/$caseId.sqlite')),
         );
-        final requiredContexts = _map(
-          caseMap['requiredContexts'],
-          '$caseId.requiredContexts',
-        );
-        for (final entry in requiredContexts.entries) {
-          final processCode = entry.key;
-          for (final context in (entry.value as List<Object?>).cast<String>()) {
-            final evidence = _evaluateRequiredContext(
-              caseId: caseId,
-              processCode: processCode,
-              context: context,
-              facts: facts,
-              revisionId: revisionId,
-            );
-            expect(
-              evidence.status,
-              PowerEvaluationStatus.pass,
-              reason: '$caseId $processCode $context did not PASS',
-            );
-            await store.appendEvaluation(
-              projectId: projectId,
-              designRevisionId: revisionId,
-              evidence: evidence,
-            );
-            await store.publishFirstCurrent(
-              projectId: projectId,
-              designRevisionId: revisionId,
-              evidence: evidence,
-            );
+        try {
+          final builder = Elv4QualificationBuilder(
+            db,
+            projectId: projectId,
+            revisionId: revisionId,
+          );
+          await builder.createStructuralBaseline();
+          await _seedPublicPowerFact(builder, facts);
+
+          final store = DriftPowerRuntimeStore(
+            db,
+            originDeviceId: 'runtime-qualification',
+            now: () => builder.instant,
+          );
+          final requiredContexts = _map(
+            caseMap['requiredContexts'],
+            '$caseId.requiredContexts',
+          );
+          for (final entry in requiredContexts.entries) {
+            final processCode = entry.key;
+            for (final context
+                in (entry.value as List<Object?>).cast<String>()) {
+              final evidence = _evaluateRequiredContext(
+                caseId: caseId,
+                processCode: processCode,
+                context: context,
+                facts: facts,
+                revisionId: revisionId,
+              );
+              expect(
+                evidence.status,
+                PowerEvaluationStatus.pass,
+                reason: '$caseId $processCode $context did not PASS',
+              );
+              await store.appendEvaluation(
+                projectId: projectId,
+                designRevisionId: revisionId,
+                evidence: evidence,
+              );
+              await store.publishFirstCurrent(
+                projectId: projectId,
+                designRevisionId: revisionId,
+                evidence: evidence,
+              );
+            }
           }
+
+          final oneCaseManifest = <String, Object?>{
+            'schema': manifest['schema'],
+            'requiredPositiveCaseIds': [caseId],
+            'positiveCases': [caseMap],
+          };
+          final contract = Elv4QualificationMatrixContract.fromManifest(
+            oneCaseManifest,
+          );
+          final reader = DriftElv4QualificationEvidenceReader(db);
+          final persisted = await reader.collect(
+            contract: contract,
+            caseScopes:
+                DriftElv4QualificationEvidenceReader.caseScopesFromManifest(
+                  oneCaseManifest,
+                ),
+          );
+          allEvidence.addAll(persisted);
+          final fkViolations =
+              await db.customSelect('PRAGMA foreign_key_check').get();
+          expect(fkViolations, isEmpty, reason: '$caseId has FK violations');
+          caseReports.add({
+            'id': caseId,
+            'fixtureKind': 'PUBLIC_COMMAND_FILE_SQLITE',
+            'foreignKeyViolations': fkViolations.length,
+            'results': persisted.map((value) => value.toReportMap()).toList(),
+          });
+        } finally {
+          await db.close();
         }
-
-        final oneCaseManifest = <String, Object?>{
-          'schema': manifest['schema'],
-          'requiredPositiveCaseIds': [caseId],
-          'positiveCases': [caseMap],
-        };
-        final contract = Elv4QualificationMatrixContract.fromManifest(
-          oneCaseManifest,
-        );
-        final reader = DriftElv4QualificationEvidenceReader(db);
-        final persisted = await reader.collect(
-          contract: contract,
-          caseScopes:
-              DriftElv4QualificationEvidenceReader.caseScopesFromManifest(
-                oneCaseManifest,
-              ),
-        );
-        allEvidence.addAll(persisted);
-        final fkViolations = await db.customSelect('PRAGMA foreign_key_check').get();
-        expect(fkViolations, isEmpty, reason: '$caseId has FK violations');
-        caseReports.add({
-          'id': caseId,
-          'fixtureKind': 'PUBLIC_COMMAND_FILE_SQLITE',
-          'foreignKeyViolations': fkViolations.length,
-          'results': persisted.map((value) => value.toReportMap()).toList(),
-        });
-      } finally {
-        await db.close();
       }
-    }
 
-    fullContract.validateEvidence(allEvidence.map((value) => value.row));
-    expect(
-      allEvidence.map((value) => value.row.caseId).toSet(),
-      fullContract.requiredCaseIds.toSet(),
-    );
+      fullContract.validateEvidence(allEvidence.map((value) => value.row));
+      expect(
+        allEvidence.map((value) => value.row.caseId).toSet(),
+        fullContract.requiredCaseIds.toSet(),
+      );
 
-    final outputPath = Platform.environment['ELV4_QUALIFICATION_REPORT'];
-    if (outputPath != null && outputPath.trim().isNotEmpty) {
-      final sourceSha = Platform.environment['ELV4_SOURCE_SHA'];
-      expect(sourceSha, isNotNull);
-      expect(RegExp(r'^[a-f0-9]{40}$').hasMatch(sourceSha!), isTrue);
-      final requirements = _readJson(
-        '../../docs/product/elv4-implementation/requirements.json',
-      );
-      final requirementResults = (requirements['requirements'] as List<Object?>)
-          .cast<Map<Object?, Object?>>()
-          .map((raw) {
-            final requirementId = raw['requirementId']! as String;
-            return <String, Object?>{
-              'requirementId': requirementId,
-              'status': 'PASS',
-              'evidenceRefs': [
-                'exact-head:full-regression:$sourceSha',
-                'qualification:seven-case-matrix:$sourceSha',
-              ],
-            };
-          })
-          .toList(growable: false);
-      final report = <String, Object?>{
-        'schema': 'electra.elv4-runtime-qualification-report.v1',
-        'sourceSha': sourceSha,
-        'cases': caseReports,
-        'requirementResults': requirementResults,
-      };
-      final file = File(outputPath);
-      file.parent.createSync(recursive: true);
-      file.writeAsStringSync(
-        '${const JsonEncoder.withIndent('  ').convert(report)}\n',
-      );
-    }
-  });
+      final outputPath = Platform.environment['ELV4_QUALIFICATION_REPORT'];
+      if (outputPath != null && outputPath.trim().isNotEmpty) {
+        final sourceSha = Platform.environment['ELV4_SOURCE_SHA'];
+        expect(sourceSha, isNotNull);
+        expect(RegExp(r'^[a-f0-9]{40}$').hasMatch(sourceSha!), isTrue);
+        final requirements = _readJson(
+          '../../docs/product/elv4-implementation/requirements.json',
+        );
+        final requirementResults = (requirements['requirements']
+                as List<Object?>)
+            .cast<Map<Object?, Object?>>()
+            .map((raw) {
+              final requirementId = raw['requirementId']! as String;
+              return <String, Object?>{
+                'requirementId': requirementId,
+                'status': 'PASS',
+                'evidenceRefs': [
+                  'exact-head:full-regression:$sourceSha',
+                  'qualification:seven-case-matrix:$sourceSha',
+                ],
+              };
+            })
+            .toList(growable: false);
+        final report = <String, Object?>{
+          'schema': 'electra.elv4-runtime-qualification-report.v1',
+          'sourceSha': sourceSha,
+          'cases': caseReports,
+          'requirementResults': requirementResults,
+        };
+        final file = File(outputPath);
+        file.parent.createSync(recursive: true);
+        file.writeAsStringSync(
+          '${const JsonEncoder.withIndent('  ').convert(report)}\n',
+        );
+      }
+    },
+  );
 }
 
 Future<void> _seedPublicPowerFact(
@@ -179,11 +192,7 @@ Future<void> _seedPublicPowerFact(
     powerDirection: PortDirection.input,
   );
   await builder.addComponent(componentId, ports: [port]);
-  await builder.bindPort(
-    portId,
-    PowerPortRole.consumer,
-    expectedRevision: 1,
-  );
+  await builder.bindPort(portId, PowerPortRole.consumer, expectedRevision: 1);
   final receipt = await builder.power.execute(
     SetPowerLoadCommand(
       operationId: '${builder.projectId}-qualification-seed',
@@ -220,9 +229,7 @@ _SeedDemand _seedDemand(Map<String, Object?> facts) {
   }
   final pse = _map(facts['pse'], 'pse');
   final paths = _maps(facts['paths']);
-  final powered = paths.firstWhere(
-    (path) => path['domain'] == 'GUARANTEED_PD',
-  );
+  final powered = paths.firstWhere((path) => path['domain'] == 'GUARANTEED_PD');
   final target = powered['to']! as String;
   return _SeedDemand(
     componentId: target.split('.').first,
@@ -246,46 +253,41 @@ PowerEvaluationEvidence _evaluateRequiredContext({
   final evaluationId = '$caseId-$processCode-$scenarioId-$segmentId';
   return switch (processCode) {
     'ELV-PWR-01' => _pwr01(
-        evaluationId,
-        revisionId,
-        scenarioId,
-        segmentId,
-        facts,
-      ),
+      evaluationId,
+      revisionId,
+      scenarioId,
+      segmentId,
+      facts,
+    ),
     'ELV-PWR-02' => _pwr02(
-        evaluationId,
-        revisionId,
-        scenarioId,
-        segmentId,
-        facts,
-      ),
+      evaluationId,
+      revisionId,
+      scenarioId,
+      segmentId,
+      facts,
+    ),
     'ELV-PWR-03' => _pwr03(
-        evaluationId,
-        revisionId,
-        scenarioId,
-        segmentId,
-        facts,
-      ),
-    'ELV-PWR-04' => _pwr04(
-        evaluationId,
-        revisionId,
-        scenarioId,
-        facts,
-      ),
+      evaluationId,
+      revisionId,
+      scenarioId,
+      segmentId,
+      facts,
+    ),
+    'ELV-PWR-04' => _pwr04(evaluationId, revisionId, scenarioId, facts),
     'ELV-PWR-05' => _pwr05(
-        evaluationId,
-        revisionId,
-        scenarioId,
-        segmentId,
-        facts,
-      ),
+      evaluationId,
+      revisionId,
+      scenarioId,
+      segmentId,
+      facts,
+    ),
     'ELV-PWR-06' => _pwr06(
-        evaluationId,
-        revisionId,
-        scenarioId,
-        segmentId,
-        facts,
-      ),
+      evaluationId,
+      revisionId,
+      scenarioId,
+      segmentId,
+      facts,
+    ),
     _ => throw StateError('Unsupported qualification process $processCode'),
   };
 }
@@ -406,8 +408,8 @@ PowerEvaluationEvidence _pwr04(
   var currentWithinLimit = true;
   for (final segment in _maps(scenario['segments'])) {
     final segmentId = segment['id']! as String;
-    final sourceW = _evaluateDc(facts, scenarioId, segmentId)
-        .sourceDemandUpperBoundW;
+    final sourceW =
+        _evaluateDc(facts, scenarioId, segmentId).sourceDemandUpperBoundW;
     if (sourceW == null) {
       throw StateError('PWR-04 segment lacks resolved source demand.');
     }
@@ -425,7 +427,8 @@ PowerEvaluationEvidence _pwr04(
   }
   final availability = BatteryWhAvailabilityModel(
     modelVoltageV: _r(bank['modelVoltageV']),
-    bankAh: _r(bank['unitAh']) *
+    bankAh:
+        _r(bank['unitAh']) *
         PowerRational.integer(bank['parallelCount']! as int),
     initialSocFraction: _r(bank['initialSoc']),
     minimumSocFraction: _r(bank['minimumSoc']),
@@ -441,23 +444,25 @@ PowerEvaluationEvidence _pwr04(
   final bankVoltageMatches =
       _r(bank['unitV']) * PowerRational.integer(bank['seriesCount']! as int) ==
       _r(bank['modelVoltageV']);
-  final status = result.status == PowerEvaluationStatus.pass &&
-          bankVoltageMatches &&
-          currentWithinLimit
-      ? PowerEvaluationStatus.pass
-      : PowerEvaluationStatus.fail;
+  final status =
+      result.status == PowerEvaluationStatus.pass &&
+              bankVoltageMatches &&
+              currentWithinLimit
+          ? PowerEvaluationStatus.pass
+          : PowerEvaluationStatus.fail;
   final inputs = <String, Object?>{
     'schema': 'electra.elv4-qualification-pwr04-input.v1',
     'bank': bank,
-    'segments': segments
-        .map(
-          (value) => {
-            'segmentId': value.segmentId,
-            'durationSeconds': value.durationSeconds.toMap(),
-            'bankInputW': value.bankInputW.toMap(),
-          },
-        )
-        .toList(),
+    'segments':
+        segments
+            .map(
+              (value) => {
+                'segmentId': value.segmentId,
+                'durationSeconds': value.durationSeconds.toMap(),
+                'bankInputW': value.bankInputW.toMap(),
+              },
+            )
+            .toList(),
   };
   return PowerEvaluationEvidence(
     evaluationId: evaluationId,
@@ -530,10 +535,8 @@ PowerEvaluationEvidence _pwr06(
 ) {
   final pse = _map(facts['pse'], 'pse');
   final demand = (pse['pdDemandW']! as List<Object?>).map(_r).toList();
-  final guaranteed =
-      (pse['guaranteedPdW']! as List<Object?>).map(_r).toList();
-  final reserved =
-      (pse['reservedPseW']! as List<Object?>).map(_r).toList();
+  final guaranteed = (pse['guaranteedPdW']! as List<Object?>).map(_r).toList();
+  final reserved = (pse['reservedPseW']! as List<Object?>).map(_r).toList();
   final limits = (pse['perPortLimitW']! as List<Object?>).map(_r).toList();
   final pathStages = <PoePathStage>[
     for (final path in _maps(facts['paths']))
@@ -561,9 +564,10 @@ PowerEvaluationEvidence _pwr06(
   final transferLoss = PowerLossDefinition(
     efficiency: _r(pse['conversionEfficiency']),
     idleW: _r(pse['idleW']),
-    idleAccounting: pse['idleAccounting'] == 'EXCLUDES_SEPARATE_IDLE'
-        ? PowerIdleAccounting.excludesSeparateIdle
-        : PowerIdleAccounting.includesIdle,
+    idleAccounting:
+        pse['idleAccounting'] == 'EXCLUDES_SEPARATE_IDLE'
+            ? PowerIdleAccounting.excludesSeparateIdle
+            : PowerIdleAccounting.includesIdle,
   );
   final existing = <PoeReservedAllocation>[];
   final results = <Map<String, Object?>>[];
@@ -623,20 +627,21 @@ PowerEvaluationEvidence _pwr06(
   final inputs = <String, Object?>{
     'schema': 'electra.elv4-qualification-pwr06-input.v1',
     'pse': pse,
-    'pathStages': pathStages
-        .map(
-          (value) => {
-            'stageId': value.stageId,
-            'kind': value.kind.name,
-            'resourceKind': value.resourceKind,
-            'physicalRealized': value.physicalRealized,
-            'powerPass': value.powerPass,
-            'pairMappingResolved': value.pairMappingResolved,
-            'allocationId': value.allocationId,
-            'cableRunId': value.cableRunId,
-          },
-        )
-        .toList(),
+    'pathStages':
+        pathStages
+            .map(
+              (value) => {
+                'stageId': value.stageId,
+                'kind': value.kind.name,
+                'resourceKind': value.resourceKind,
+                'physicalRealized': value.physicalRealized,
+                'powerPass': value.powerPass,
+                'pairMappingResolved': value.pairMappingResolved,
+                'allocationId': value.allocationId,
+                'cableRunId': value.cableRunId,
+              },
+            )
+            .toList(),
   };
   return PowerEvaluationEvidence(
     evaluationId: evaluationId,
@@ -671,15 +676,16 @@ DcDomainEvaluationResult _evaluateDc(
     final bank = _map(facts['bank'], 'bank');
     final ups = _map(facts['ups'], 'ups');
     final outputW = _pseInputW(facts);
-    final batteryDemand = evaluateTransferInputDemand(
-      transferId: 'UPS-BACKUP',
-      deliveredOutputW: outputW,
-      loss: PowerLossDefinition(
-        efficiency: _r(ups['backupEfficiency']),
-        idleW: _r(ups['idleW']),
-        idleAccounting: PowerIdleAccounting.includesIdle,
-      ),
-    ).inputW;
+    final batteryDemand =
+        evaluateTransferInputDemand(
+          transferId: 'UPS-BACKUP',
+          deliveredOutputW: outputW,
+          loss: PowerLossDefinition(
+            efficiency: _r(ups['backupEfficiency']),
+            idleW: _r(ups['idleW']),
+            idleAccounting: PowerIdleAccounting.includesIdle,
+          ),
+        ).inputW;
     return evaluateDcDomain(
       DcSingleConstantPowerDomainInput(
         domainId: 'qualification-cp-domain',
@@ -693,9 +699,12 @@ DcDomainEvaluationResult _evaluateDc(
   }
 
   final source = _map(facts['source'], 'source');
-  final selected = _demandContributions(facts, scenarioId, segmentId)
-      .where((value) => value.demand is DcConstantCurrentDemand)
-      .toList();
+  final selected =
+      _demandContributions(
+        facts,
+        scenarioId,
+        segmentId,
+      ).where((value) => value.demand is DcConstantCurrentDemand).toList();
   var totalCurrent = PowerRational.zero;
   for (final contribution in selected) {
     totalCurrent += (contribution.demand! as DcConstantCurrentDemand).currentA;
@@ -843,42 +852,37 @@ PowerRational _pseInputW(Map<String, Object?> facts) {
     loss: PowerLossDefinition(
       efficiency: _r(pse['conversionEfficiency']),
       idleW: _r(pse['idleW']),
-      idleAccounting: pse['idleAccounting'] == 'EXCLUDES_SEPARATE_IDLE'
-          ? PowerIdleAccounting.excludesSeparateIdle
-          : PowerIdleAccounting.includesIdle,
+      idleAccounting:
+          pse['idleAccounting'] == 'EXCLUDES_SEPARATE_IDLE'
+              ? PowerIdleAccounting.excludesSeparateIdle
+              : PowerIdleAccounting.includesIdle,
     ),
   ).inputW;
 }
 
-Map<String, Object?> _scenario(
-  Map<String, Object?> facts,
-  String scenarioId,
-) => _maps(facts['scenarios']).singleWhere(
-  (value) => value['id'] == scenarioId,
-);
+Map<String, Object?> _scenario(Map<String, Object?> facts, String scenarioId) =>
+    _maps(facts['scenarios']).singleWhere((value) => value['id'] == scenarioId);
 
 Map<String, Object?> _segment(
   Map<String, Object?> facts,
   String scenarioId,
   String segmentId,
-) => _maps(_scenario(facts, scenarioId)['segments']).singleWhere(
-  (value) => value['id'] == segmentId,
-);
+) => _maps(
+  _scenario(facts, scenarioId)['segments'],
+).singleWhere((value) => value['id'] == segmentId);
 
-PowerDefinitionRef _definitionRef(
-  PowerDefinitionKind kind,
-  String code,
-) => PowerDefinitionRef(
-  catalogId: 'qualification',
-  catalogVersion: '1',
-  definitionKind: kind,
-  definitionCode: code,
-  definitionVersion: '1',
-  definitionSchema: 'electra.elv4-qualification.v1',
-  contentSha256:
-      'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-  sourceRef: 'FICTIONAL_PRODUCT_NEUTRAL',
-);
+PowerDefinitionRef _definitionRef(PowerDefinitionKind kind, String code) =>
+    PowerDefinitionRef(
+      catalogId: 'qualification',
+      catalogVersion: '1',
+      definitionKind: kind,
+      definitionCode: code,
+      definitionVersion: '1',
+      definitionSchema: 'electra.elv4-qualification.v1',
+      contentSha256:
+          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+      sourceRef: 'FICTIONAL_PRODUCT_NEUTRAL',
+    );
 
 Map<String, Object?> _readJson(String path) =>
     (jsonDecode(File(path).readAsStringSync()) as Map<Object?, Object?>)
@@ -892,12 +896,13 @@ Map<String, Object?> _map(Object? value, String field) {
 Map<String, Object?> _mapOrEmpty(Object? value) =>
     value is Map ? value.cast<String, Object?>() : <String, Object?>{};
 
-List<Map<String, Object?>> _maps(Object? value) => value is List
-    ? value
-          .cast<Map<Object?, Object?>>()
-          .map((item) => item.cast<String, Object?>())
-          .toList(growable: false)
-    : const <Map<String, Object?>>[];
+List<Map<String, Object?>> _maps(Object? value) =>
+    value is List
+        ? value
+            .cast<Map<Object?, Object?>>()
+            .map((item) => item.cast<String, Object?>())
+            .toList(growable: false)
+        : const <Map<String, Object?>>[];
 
 PowerRational _r(Object? value) => PowerRational.fromWireDecimal(value);
 
