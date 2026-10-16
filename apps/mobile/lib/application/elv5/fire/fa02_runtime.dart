@@ -4,6 +4,7 @@ import 'package:engineering_core/engineering_core.dart'
     show PowerDeviceState, PowerRational, PowerScenarioRole;
 import 'package:engineering_core/engineering_core_elv5.dart';
 
+import '../calculation/elv5_blocked_capture.dart';
 import '../calculation/elv5_calculation_runtime.dart';
 import '../calculation/elv5_kernel_executor.dart';
 import '../persistence/elv5_runtime_persistence.dart';
@@ -53,7 +54,10 @@ final class Fa02PersistedInputResolver
 
     final addressDomain = _map(loop.payload['addressDomain'], 'addressDomain');
     final memberIds = <String>{_text(addressDomain, 'panelId')};
-    for (final assignment in _objects(loop.payload['deviceAssignments'], 'deviceAssignments')) {
+    for (final assignment in _objects(
+      loop.payload['deviceAssignments'],
+      'deviceAssignments',
+    )) {
       memberIds.add(_text(assignment, 'deviceId'));
     }
 
@@ -72,85 +76,6 @@ final class Fa02PersistedInputResolver
       },
     );
 
-    final stateByCase = <Fa02OperatingCase, Map<String, PowerDeviceState>>{};
-    for (final entry in const <(Fa02OperatingCase, PowerScenarioRole)>[
-      (Fa02OperatingCase.standby, PowerScenarioRole.standby),
-      (Fa02OperatingCase.alarm, PowerScenarioRole.alarm),
-      (Fa02OperatingCase.startupInrush, PowerScenarioRole.startup),
-    ]) {
-      final matching = scenarios.where((segment) => segment.role == entry.$2).toList();
-      if (matching.isEmpty) continue;
-      Map<String, PowerDeviceState>? canonical;
-      for (final segment in matching) {
-        final selected = <String, PowerDeviceState>{};
-        for (final componentId in memberIds) {
-          final state = segment.componentStates[componentId];
-          if (state == null) {
-            throw StateError(
-              'FA02_SCENARIO_COMPONENT_STATE_MISSING:'
-              '${segment.scenarioId}:${segment.segmentId}:$componentId',
-            );
-          }
-          selected[componentId] = state;
-        }
-        if (canonical == null) {
-          canonical = selected;
-        } else if (!_sameStates(canonical, selected)) {
-          throw StateError('FA02_SIMULTANEITY_POLICY_AMBIGUOUS:${entry.$2.name}');
-        }
-      }
-      stateByCase[entry.$1] = canonical!;
-    }
-    if (!stateByCase.containsKey(Fa02OperatingCase.standby) ||
-        !stateByCase.containsKey(Fa02OperatingCase.alarm)) {
-      throw StateError('FA02_REQUIRED_STANDBY_ALARM_SCENARIOS_MISSING');
-    }
-
-    final factsByComponent = <String, List<Elv4ExactDcLoadFact>>{};
-    for (final fact in loadFacts) {
-      (factsByComponent[fact.componentId] ??= <Elv4ExactDcLoadFact>[]).add(fact);
-    }
-
-    final origins = <Fa02LoadOrigin>[];
-    final selectedByCase = <Fa02OperatingCase, Set<String>>{
-      for (final operatingCase in stateByCase.keys) operatingCase: <String>{},
-    };
-    for (final componentId in memberIds.toList()..sort()) {
-      final componentFacts = factsByComponent[componentId] ?? const <Elv4ExactDcLoadFact>[];
-      final originIds = componentFacts.map((value) => value.originId).toSet();
-      if (originIds.isEmpty) {
-        final missingId = 'MISSING_POWER_LOAD:$componentId';
-        origins.add(Fa02LoadOrigin(originId: missingId, currents: const {}));
-        for (final selected in selectedByCase.values) selected.add(missingId);
-        continue;
-      }
-      for (final originId in originIds.toList()..sort()) {
-        final originFacts = componentFacts.where((value) => value.originId == originId).toList();
-        final currents = <Fa02OperatingCase, Elv5Interval<CurrentDim>>{};
-        for (final entry in stateByCase.entries) {
-          final state = entry.value[componentId]!;
-          final stateCode = state.name.toUpperCase();
-          final matching = originFacts.where((fact) => fact.stateCode == stateCode).toList();
-          if (matching.length > 1) {
-            throw StateError('FA02_DUPLICATE_ORIGIN_STATE:$originId:$stateCode');
-          }
-          selectedByCase[entry.key]!.add(originId);
-          if (matching.isEmpty) continue;
-          final current = _current(matching.single.currentA);
-          currents[entry.key] = Elv5Interval<CurrentDim>(current, current);
-        }
-        origins.add(Fa02LoadOrigin(originId: originId, currents: currents));
-      }
-    }
-
-    final cases = <Fa02CasePolicy>[
-      for (final operatingCase in Fa02OperatingCase.values)
-        if (selectedByCase.containsKey(operatingCase))
-          Fa02CasePolicy(
-            operatingCase: operatingCase,
-            selectedOriginIds: Set.unmodifiable(selectedByCase[operatingCase]!),
-          ),
-    ];
     final dependencies = <Elv5DependencyMarker>[
       _dependency(request, 'SET', 'FIRE_LOOP', loopId),
       for (final componentId in memberIds.toList()..sort())
@@ -164,7 +89,6 @@ final class Fa02PersistedInputResolver
           memberId: '${segment.scenarioRevision}:${segment.segmentId}',
         ),
     ];
-
     final inputBasis = <String, Object?>{
       'schema': 'electra.elv5-fa02-captured-input.v1',
       'loopAggregateId': loop.aggregateId,
@@ -195,16 +119,134 @@ final class Fa02PersistedInputResolver
           },
       ],
     };
+    final inputFingerprint = _encoder.sha256(inputBasis);
+    final policyFingerprint = _encoder.sha256(<String, Object?>{
+      'schema': 'electra.elv5-fa02-policy-basis.v1',
+      'selectionSource': 'ELV4_OPERATING_SCENARIO_COMPONENT_STATES',
+      'capacityLimit': null,
+    });
+
+    Never blocked(
+      String reasonCode, {
+      String? scenarioId,
+      String? segmentId,
+      String? componentId,
+      String? role,
+    }) {
+      throw Elv5CaptureBlockedException(
+        request: request,
+        reasonCode: reasonCode,
+        inputFingerprint: inputFingerprint,
+        policyFingerprint: policyFingerprint,
+        dependencies: dependencies,
+        evidence: <String, Object?>{
+          'source': 'ELV5_FIRE_MEMBERSHIP_PLUS_ELV4_EXACT_DC_LOADS',
+          'loopAggregateId': loop.aggregateId,
+          'loopRevision': loop.revision,
+          if (scenarioId != null) 'scenarioId': scenarioId,
+          if (segmentId != null) 'segmentId': segmentId,
+          if (componentId != null) 'componentId': componentId,
+          if (role != null) 'scenarioRole': role,
+        },
+      );
+    }
+
+    final stateByCase = <Fa02OperatingCase, Map<String, PowerDeviceState>>{};
+    for (final entry in const <(Fa02OperatingCase, PowerScenarioRole)>[
+      (Fa02OperatingCase.standby, PowerScenarioRole.standby),
+      (Fa02OperatingCase.alarm, PowerScenarioRole.alarm),
+      (Fa02OperatingCase.startupInrush, PowerScenarioRole.startup),
+    ]) {
+      final matching = scenarios.where((segment) => segment.role == entry.$2).toList();
+      if (matching.isEmpty) continue;
+      Map<String, PowerDeviceState>? canonical;
+      for (final segment in matching) {
+        final selected = <String, PowerDeviceState>{};
+        for (final componentId in memberIds) {
+          final state = segment.componentStates[componentId];
+          if (state == null) {
+            blocked(
+              'FA02_SCENARIO_COMPONENT_STATE_MISSING',
+              scenarioId: segment.scenarioId,
+              segmentId: segment.segmentId,
+              componentId: componentId,
+              role: entry.$2.name,
+            );
+          }
+          selected[componentId] = state;
+        }
+        if (canonical == null) {
+          canonical = selected;
+        } else if (!_sameStates(canonical, selected)) {
+          blocked(
+            'FA02_SIMULTANEITY_POLICY_AMBIGUOUS',
+            scenarioId: segment.scenarioId,
+            segmentId: segment.segmentId,
+            role: entry.$2.name,
+          );
+        }
+      }
+      stateByCase[entry.$1] = canonical!;
+    }
+    if (!stateByCase.containsKey(Fa02OperatingCase.standby) ||
+        !stateByCase.containsKey(Fa02OperatingCase.alarm)) {
+      blocked('FA02_REQUIRED_STANDBY_ALARM_SCENARIOS_MISSING');
+    }
+
+    final factsByComponent = <String, List<Elv4ExactDcLoadFact>>{};
+    for (final fact in loadFacts) {
+      (factsByComponent[fact.componentId] ??= <Elv4ExactDcLoadFact>[]).add(fact);
+    }
+
+    final origins = <Fa02LoadOrigin>[];
+    final selectedByCase = <Fa02OperatingCase, Set<String>>{
+      for (final operatingCase in stateByCase.keys) operatingCase: <String>{},
+    };
+    for (final componentId in memberIds.toList()..sort()) {
+      final componentFacts =
+          factsByComponent[componentId] ?? const <Elv4ExactDcLoadFact>[];
+      final originIds = componentFacts.map((value) => value.originId).toSet();
+      if (originIds.isEmpty) {
+        final missingId = 'MISSING_POWER_LOAD:$componentId';
+        origins.add(Fa02LoadOrigin(originId: missingId, currents: const {}));
+        for (final selected in selectedByCase.values) selected.add(missingId);
+        continue;
+      }
+      for (final originId in originIds.toList()..sort()) {
+        final originFacts =
+            componentFacts.where((value) => value.originId == originId).toList();
+        final currents = <Fa02OperatingCase, Elv5Interval<CurrentDim>>{};
+        for (final entry in stateByCase.entries) {
+          final state = entry.value[componentId]!;
+          final stateCode = state.name.toUpperCase();
+          final matching =
+              originFacts.where((fact) => fact.stateCode == stateCode).toList();
+          if (matching.length > 1) {
+            throw StateError('FA02_DUPLICATE_ORIGIN_STATE:$originId:$stateCode');
+          }
+          selectedByCase[entry.key]!.add(originId);
+          if (matching.isEmpty) continue;
+          final current = _current(matching.single.currentA);
+          currents[entry.key] = Elv5Interval<CurrentDim>(current, current);
+        }
+        origins.add(Fa02LoadOrigin(originId: originId, currents: currents));
+      }
+    }
+
+    final cases = <Fa02CasePolicy>[
+      for (final operatingCase in Fa02OperatingCase.values)
+        if (selectedByCase.containsKey(operatingCase))
+          Fa02CasePolicy(
+            operatingCase: operatingCase,
+            selectedOriginIds: Set.unmodifiable(selectedByCase[operatingCase]!),
+          ),
+    ];
 
     return Elv5CapturedInput<Fa02Input>(
       request: request,
       value: Fa02Input(segmentId: loopId, origins: origins, cases: cases),
-      inputFingerprint: _encoder.sha256(inputBasis),
-      policyFingerprint: _encoder.sha256(<String, Object?>{
-        'schema': 'electra.elv5-fa02-policy-basis.v1',
-        'selectionSource': 'ELV4_OPERATING_SCENARIO_COMPONENT_STATES',
-        'capacityLimit': null,
-      }),
+      inputFingerprint: inputFingerprint,
+      policyFingerprint: policyFingerprint,
       dependencies: dependencies,
       upstreamPointerGenerations: const <String, int>{},
       captureRevision: loop.revision,
