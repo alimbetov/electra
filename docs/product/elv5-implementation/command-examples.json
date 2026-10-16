@@ -51,24 +51,33 @@
         "streams": [
           {"encodedStreamId": "camera-01-main", "codecProfileRef": "h265-main-v1", "expectedBitrateBps": "4000000", "peakBitrateBps": "6000000"},
           {"encodedStreamId": "camera-01-sub", "codecProfileRef": "h265-sub-v1", "expectedBitrateBps": "1000000", "peakBitrateBps": "1500000"}
-        ]
+        ],
+        "subscriptions": [
+          {"subscriptionId": "sub-nvr-main", "encodedStreamId": "camera-01-main", "receiverId": "nvr-01", "deliveryMode": "UNICAST", "orderedNetworkEdgeIds": ["edge-access-01", "edge-core-01"]},
+          {"subscriptionId": "sub-vms-main", "encodedStreamId": "camera-01-main", "receiverId": "vms-01", "deliveryMode": "UNICAST", "orderedNetworkEdgeIds": ["edge-access-01", "edge-core-01"]}
+        ],
+        "transportOverheadModelRef": {"modelCode": "ETHERNET-IP-RTP-OVERHEAD-FIXTURE", "editionId": "transport-overhead-v1", "contentHash": "5555555555555555555555555555555555555555555555555555555555555555"}
       },
-      "rejection": {"mutation": "REMOVE_FIELD", "field": "streams", "expectedCode": "ELV5_PAYLOAD_FIELDS_MISMATCH"}
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "subscriptions", "expectedCode": "ELV5_PAYLOAD_FIELDS_MISMATCH"}
     },
     {
       "operation": "REPLACE_RECORDING_ASSIGNMENTS",
       "validPayload": {
         "poolId": "storage-pool-01",
-        "horizon": {"startUtc": "2026-10-01T00:00:00Z", "endUtc": "2026-10-31T00:00:00Z", "timezone": "Asia/Almaty"},
+        "horizon": {"startUtc": "2026-10-01T00:00:00Z", "endUtc": "2026-10-31T00:00:00Z"},
+        "temporalPolicy": {"timeZoneId": "Asia/Almaty", "tzdbVersion": "fixture-tzdb-2026a", "gapRule": "REJECT", "overlapRule": "REJECT"},
         "assignments": [
-          {"encodedStreamId": "camera-01-main", "copyRole": "PRIMARY", "expectedBitrateBps": "4000000", "upperBoundBitrateBps": "6000000"}
+          {"encodedStreamId": "camera-01-main", "copyRole": "PRIMARY", "expectedBitrateBps": "4000000", "upperBoundBitrateBps": "6000000", "evidenceBasis": "MANUFACTURER_GUARANTEED"}
         ],
         "scheduleSegments": [
           {"segmentId": "recording-24x7", "startUtc": "2026-10-01T00:00:00Z", "endUtc": "2026-10-31T00:00:00Z"}
         ],
-        "sizingBasis": "GUARANTEED_UPPER_BOUND"
+        "sizingBasis": "GUARANTEED_UPPER_BOUND",
+        "reserveMultiplier": "1.10",
+        "redundancyModel": {"modelCode": "MIRROR-FIXTURE", "usableFraction": "0.5", "contentHash": "6666666666666666666666666666666666666666666666666666666666666666"},
+        "policyRef": {"policyCode": "CCTV-STORAGE", "editionId": "cctv-storage-v1", "contentHash": "7777777777777777777777777777777777777777777777777777777777777777"}
       },
-      "rejection": {"mutation": "REMOVE_FIELD", "field": "sizingBasis", "expectedCode": "ELV5_PAYLOAD_FIELDS_MISMATCH"}
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "temporalPolicy", "expectedCode": "ELV5_PAYLOAD_FIELDS_MISMATCH"}
     },
     {
       "operation": "REPLACE_RECORDER_ASSIGNMENTS",
@@ -140,13 +149,22 @@
       "validPayload": {
         "doorAssemblyId": "door-01",
         "topologyProfileRef": {"profileCode": "ACS-DOOR-SINGLE", "editionId": "acs-door-single-v1", "contentHash": "1111111111111111111111111111111111111111111111111111111111111111"},
+        "safetyMode": "FAIL_SAFE",
         "roleAssignments": [
           {"roleCode": "READER_ENTRY", "slot": 0, "componentId": "reader-01"},
           {"roleCode": "LOCK", "slot": 0, "componentId": "lock-01"},
-          {"roleCode": "DOOR_CONTACT", "slot": 0, "componentId": "contact-01"}
+          {"roleCode": "DOOR_CONTACT", "slot": 0, "componentId": "contact-01"},
+          {"roleCode": "EMERGENCY_RELEASE", "slot": 0, "componentId": "release-01"}
+        ],
+        "releaseTruthTable": [
+          {"causeCode": "NORMAL_ACCESS", "expectedOutcomeCode": "UNLOCKED", "requiredEvidenceRoles": ["READER_ENTRY", "LOCK"]},
+          {"causeCode": "REQUEST_TO_EXIT", "expectedOutcomeCode": "UNLOCKED", "requiredEvidenceRoles": ["REQUEST_TO_EXIT", "LOCK"]},
+          {"causeCode": "FIRE_RELEASE", "expectedOutcomeCode": "UNLOCKED", "requiredEvidenceRoles": ["FIRE_RELEASE_INPUT", "LOCK"]},
+          {"causeCode": "EMERGENCY_BREAK_GLASS", "expectedOutcomeCode": "UNLOCKED", "requiredEvidenceRoles": ["EMERGENCY_RELEASE", "LOCK"]},
+          {"causeCode": "POWER_FAILURE", "expectedOutcomeCode": "UNLOCKED", "requiredEvidenceRoles": ["LOCK"]}
         ]
       },
-      "rejection": {"mutation": "REMOVE_FIELD", "field": "topologyProfileRef", "expectedCode": "ELV5_PAYLOAD_FIELDS_MISMATCH"}
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "releaseTruthTable", "expectedCode": "ELV5_PAYLOAD_FIELDS_MISMATCH"}
     },
     {
       "operation": "REPLACE_CONTROLLER_RESOURCE_ASSIGNMENTS",
