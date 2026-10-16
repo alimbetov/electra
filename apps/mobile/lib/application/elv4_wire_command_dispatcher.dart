@@ -126,9 +126,7 @@ final class Elv4WireCommandEnvelope {
     if (decoded is! Map) {
       throw const FormatException('ELV4 command root must be an object.');
     }
-    return Elv4WireCommandEnvelope.fromMap(
-      decoded.cast<String, Object?>(),
-    );
+    return Elv4WireCommandEnvelope.fromMap(decoded.cast<String, Object?>());
   }
 
   factory Elv4WireCommandEnvelope.fromMap(Map<String, Object?> map) {
@@ -243,13 +241,11 @@ final class Elv4WireCommandDispatcher<T> {
 
   final Map<Elv4WireCommandKey, Elv4WireOperationHandler<T>> _handlers;
 
-  Future<T> dispatchJson(String source) => dispatch(
-    Elv4WireCommandEnvelope.fromJson(source),
-  );
+  Future<T> dispatchJson(String source) =>
+      dispatch(Elv4WireCommandEnvelope.fromJson(source));
 
-  Future<T> dispatchMap(Map<String, Object?> map) => dispatch(
-    Elv4WireCommandEnvelope.fromMap(map),
-  );
+  Future<T> dispatchMap(Map<String, Object?> map) =>
+      dispatch(Elv4WireCommandEnvelope.fromMap(map));
 
   Future<T> dispatch(Elv4WireCommandEnvelope envelope) {
     final handler = _handlers[envelope.dispatchKey];
