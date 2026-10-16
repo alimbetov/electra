@@ -124,6 +124,31 @@ class DriftEngineeringTopologyRepository
       old.readNullable<DateTime>('deleted_at') == null &&
       canonicalEngineeringJson(_payload(old)) ==
           canonicalEngineeringJson(payload);
+
+  Future<void> _guardMutableConnectionAgainstPowerOwnership(
+    String projectId,
+    String connectionId,
+  ) async {
+    final owned =
+        await database
+            .customSelect(
+              'SELECT 1 FROM poe_delivery_path_members '
+              'WHERE project_id = ? AND connection_id = ? LIMIT 1',
+              variables: [
+                Variable.withString(projectId),
+                Variable.withString(connectionId),
+              ],
+              readsFrom: database.allTables.toSet(),
+            )
+            .getSingleOrNull();
+    if (owned != null) {
+      throw StateError(
+        'ELV4_POWER_CONNECTION_OWNED: Replace the revision-scoped PoE '
+        'delivery path before editing or retiring this engineering connection.',
+      );
+    }
+  }
+
   Future<void> _uniqueCode(
     String table,
     String scopeColumn,
@@ -369,6 +394,7 @@ class DriftEngineeringTopologyRepository
         if (c.groupId != null)
           _check(graph.groupFindings(graph.groups[c.groupId]!), draft: true);
         if (_same(old, c.toMap())) return;
+        await _guardMutableConnectionAgainstPowerOwnership(projectId, c.id);
         final now = DateTime.now().toUtc();
         await database
             .into(database.engineeringPortConnections)
@@ -541,6 +567,9 @@ class DriftEngineeringTopologyRepository
         projectId,
         id,
       );
+    }
+    if (kind == TopologyObjectKind.connection) {
+      await _guardMutableConnectionAgainstPowerOwnership(projectId, id);
     }
     if (kind == TopologyObjectKind.port &&
         (s.connections.any((c) => c.fromPortId == id || c.toPortId == id) ||
