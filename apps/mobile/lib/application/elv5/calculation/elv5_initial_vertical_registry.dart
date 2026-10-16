@@ -1,3 +1,5 @@
+import '../acs/acs03_runtime.dart';
+import '../acs/elv5_acs_persistence.dart';
 import '../cctv/cctv02_runtime.dart';
 import '../cctv/cctv03_runtime.dart';
 import '../cctv/elv5_cctv_persistence.dart';
@@ -20,6 +22,7 @@ import 'elv5_capture_guard.dart';
 Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
   required Elv5CctvMutationStore cctvStore,
   required Elv5LanMutationStore lanStore,
+  required Elv5AcsMutationStore acsStore,
   required Elv5FireMutationStore fireStore,
   required Elv3RealizedLinkFactSource elv3LinkFacts,
   required Lan05OpticalSectionEvidenceSource opticalSectionEvidence,
@@ -69,6 +72,13 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
         ),
       ),
       executor: buildLan05Executor(nowUtc: nowUtc),
+      nowUtc: nowUtc,
+    ),
+    Elv5BlockedAwareTypedProcessCalculationAdapter(
+      resolver: guarded(
+        Acs03PersistedInputResolver(acsStore: acsStore, nowUtc: nowUtc),
+      ),
+      executor: buildAcs03Executor(nowUtc: nowUtc),
       nowUtc: nowUtc,
     ),
     Elv5BlockedAwareTypedProcessCalculationAdapter(
