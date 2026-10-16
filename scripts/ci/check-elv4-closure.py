@@ -17,8 +17,9 @@ ROOT = Path(__file__).resolve().parents[2]
 BASE = ROOT / 'docs/product/elv4-implementation'
 SHA = re.compile(r'^[0-9a-f]{40}$')
 PHASES = {'baseline-guards', 'specification', 'reconciliation', 'drift',
-          'mobile-deps', 'core-deps', 'mobile-format', 'mobile-analyze', 'mobile-tests', 'core-format',
-          'core-analyze', 'core-tests', 'p7-p8-acceptance', 'clean-tree'}
+          'mobile-deps', 'core-deps', 'mobile-format', 'mobile-analyze', 'mobile-tests',
+          'historical-migrations', 'core-format', 'core-analyze', 'core-tests',
+          'p7-p8-acceptance', 'runtime-qualification', 'clean-tree'}
 
 
 def require(ok, message):
