@@ -4,10 +4,10 @@
   "branch": "feat/flutter-elv5-power-topology-design",
   "scope": "27 process implementation mathematics and ultra-performance Flutter runtime architecture",
   "counts": {
-    "high": 14,
+    "high": 15,
     "medium": 4,
-    "total": 18,
-    "specResolved": 18,
+    "total": 19,
+    "specResolved": 19,
     "runtimeImplemented": 0
   },
   "findings": [
@@ -28,6 +28,7 @@
     {"id":"ELV5-AUD4-15","severity":"MEDIUM","code":"EQUATION_TRACE_CODES","status":"SPEC_RESOLVED","resolution":"Each process dossier defines stable equation-code families and deterministic trace expectations."},
     {"id":"ELV5-AUD4-16","severity":"MEDIUM","code":"CROSS_STAGE_VECTOR_PROOF","status":"SPEC_RESOLVED","resolution":"Each process includes a cross-discipline/stage vector proving ELV3/4 reuse and ELV6/7/8 claim boundaries."},
     {"id":"ELV5-AUD4-17","severity":"MEDIUM","code":"WHAT_IF_RESOURCE_ISOLATION","status":"SPEC_RESOLVED","resolution":"What-if calculations use the same pure kernels but are cancellable, bounded, lower-priority and non-publishable as CURRENT."},
-    {"id":"ELV5-AUD4-18","severity":"MEDIUM","code":"MEASURED_REGRESSION_POLICY","status":"SPEC_RESOLVED","resolution":"Deterministic structural performance gates are separated from controlled-runner timing regression evidence."}
+    {"id":"ELV5-AUD4-18","severity":"MEDIUM","code":"MEASURED_REGRESSION_POLICY","status":"SPEC_RESOLVED","resolution":"Deterministic structural performance gates are separated from controlled-runner timing regression evidence."},
+    {"id":"ELV5-AUD4-19","severity":"HIGH","code":"REFERENCE_ORACLE_ARITHMETIC_INTEGRITY","status":"SPEC_RESOLVED","resolution":"ACS-03 reference-vector arithmetic was independently recomputed; the canonical 24 V / 0.8 A / 0.5 ohm trunk plus 0.3 A / 0.3 ohm branch terminal value is corrected to 23.51 V in normative calculation-oracle errata, and executable vectors must use the corrected value."}
   ]
 }
