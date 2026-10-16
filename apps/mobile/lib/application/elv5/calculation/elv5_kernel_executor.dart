@@ -68,7 +68,7 @@ final class Elv5PureKernelExecutor<I, O> implements Elv5PureProcessExecutor<I> {
       inputSchemaVersion: descriptor.versions.inputSchemaVersion,
       outputSchemaVersion: descriptor.versions.outputSchemaVersion,
       numericBackendVersion: descriptor.versions.numericBackendVersion,
-      canonicalEncoderVersion: Elv5CanonicalJsonV1.version,
+      canonicalEncoderVersion: const Elv5CanonicalJsonV1().version,
       inputFingerprint: input.inputFingerprint,
       policyFingerprint: input.policyFingerprint,
       execution: executionOf(output),
