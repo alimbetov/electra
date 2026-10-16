@@ -183,37 +183,37 @@ final class Fa08CablePolicyKernel {
         for (final fact in section.numericFacts) fact.propertyCode: fact,
       };
       for (final req in requirements) {
-        Fa08AssessmentStatus status;
+        late Fa08AssessmentStatus status;
         Elv5Rational? margin;
-        switch (req.kind) {
-          case Fa08RequirementKind.cableClassEquals:
-            status = section.cableClass == null
-                ? Fa08AssessmentStatus.blocked
-                : (section.cableClass == req.expectedToken
-                    ? Fa08AssessmentStatus.pass
-                    : Fa08AssessmentStatus.fail);
-          case Fa08RequirementKind.environmentTagPresent:
-            status = !section.environmentEvidenceComplete
-                ? Fa08AssessmentStatus.blocked
-                : (section.environmentTags.contains(req.expectedToken)
-                    ? Fa08AssessmentStatus.pass
-                    : Fa08AssessmentStatus.fail);
-          case Fa08RequirementKind.numericMinimum:
-          case Fa08RequirementKind.numericMaximum:
-            final fact = facts[req.propertyCode];
-            if (!section.environmentEvidenceComplete || fact == null || fact.unitCode != req.unitCode) {
-              status = Fa08AssessmentStatus.blocked;
-            } else if (req.kind == Fa08RequirementKind.numericMinimum) {
-              margin = fact.value - req.threshold!;
-              status = margin >= Elv5Rational.zero
+        if (req.kind == Fa08RequirementKind.cableClassEquals) {
+          status = section.cableClass == null
+              ? Fa08AssessmentStatus.blocked
+              : (section.cableClass == req.expectedToken
                   ? Fa08AssessmentStatus.pass
-                  : Fa08AssessmentStatus.fail;
-            } else {
-              margin = req.threshold! - fact.value;
-              status = margin >= Elv5Rational.zero
+                  : Fa08AssessmentStatus.fail);
+        } else if (req.kind == Fa08RequirementKind.environmentTagPresent) {
+          status = !section.environmentEvidenceComplete
+              ? Fa08AssessmentStatus.blocked
+              : (section.environmentTags.contains(req.expectedToken)
                   ? Fa08AssessmentStatus.pass
-                  : Fa08AssessmentStatus.fail;
-            }
+                  : Fa08AssessmentStatus.fail);
+        } else {
+          final fact = facts[req.propertyCode];
+          if (!section.environmentEvidenceComplete || fact == null || fact.unitCode != req.unitCode) {
+            status = Fa08AssessmentStatus.blocked;
+          } else if (req.kind == Fa08RequirementKind.numericMinimum) {
+            margin = fact.value - req.threshold!;
+            status = margin >= Elv5Rational.zero
+                ? Fa08AssessmentStatus.pass
+                : Fa08AssessmentStatus.fail;
+          } else if (req.kind == Fa08RequirementKind.numericMaximum) {
+            margin = req.threshold! - fact.value;
+            status = margin >= Elv5Rational.zero
+                ? Fa08AssessmentStatus.pass
+                : Fa08AssessmentStatus.fail;
+          } else {
+            throw StateError('FA08 unreachable requirement kind.');
+          }
         }
         if (limitingSection == null && status != Fa08AssessmentStatus.pass) {
           limitingSection = section.sectionId;
