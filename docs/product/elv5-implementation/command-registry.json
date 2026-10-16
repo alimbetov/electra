@@ -1,0 +1,135 @@
+{
+  "schema": "electra.elv5-command-design-registry.v1",
+  "status": "DESIGN_DRAFT",
+  "runtimeStatus": "NOT_STARTED",
+  "wireSchema": "electra.elv5-discipline-command.v1",
+  "payloadSchemaVersion": 1,
+  "topLevelKeys": [
+    "schema",
+    "operation",
+    "payloadSchemaVersion",
+    "projectId",
+    "designRevisionId",
+    "commandId",
+    "expectedDesignRowRevision",
+    "expectedRows",
+    "reviewedImpactFingerprint",
+    "payload"
+  ],
+  "externalRevisionBoundary": {
+    "schema": "electra.elv4-revision-command.v2",
+    "operations": [
+      "FREEZE_DESIGN_REVISION",
+      "CREATE_NEXT_WORKING_DESIGN_REVISION"
+    ],
+    "rule": "ELV5 extends the accepted revision transaction/snapshot/remapping service; it does not register competing public revision commands."
+  },
+  "commands": [
+    {
+      "operation": "BIND_DISCIPLINE_POLICY",
+      "payloadKeys": ["bindingId", "subject", "processCodes", "definitionRef", "applicability"],
+      "owner": "ELV5",
+      "mutationKind": "POLICY_BINDING"
+    },
+    {
+      "operation": "ADOPT_DISCIPLINE_POLICY",
+      "payloadKeys": ["bindingId", "newDefinitionRef", "applicability"],
+      "owner": "ELV5",
+      "mutationKind": "POLICY_BINDING"
+    },
+    {
+      "operation": "RELEASE_DISCIPLINE_POLICY",
+      "payloadKeys": ["bindingId", "releasePolicy"],
+      "owner": "ELV5",
+      "mutationKind": "POLICY_BINDING"
+    },
+    {
+      "operation": "REPLACE_CAMERA_STREAMS",
+      "payloadKeys": ["cameraId", "streams"],
+      "owner": "ELV5",
+      "mutationKind": "ASSIGNMENT_REPLACEMENT"
+    },
+    {
+      "operation": "REPLACE_RECORDING_ASSIGNMENTS",
+      "payloadKeys": ["poolId", "horizon", "assignments", "scheduleSegments", "sizingBasis"],
+      "owner": "ELV5",
+      "mutationKind": "ASSIGNMENT_REPLACEMENT"
+    },
+    {
+      "operation": "REPLACE_RECORDER_ASSIGNMENTS",
+      "payloadKeys": ["recorderId", "accountingBasis", "assignments"],
+      "owner": "ELV5",
+      "mutationKind": "ASSIGNMENT_REPLACEMENT"
+    },
+    {
+      "operation": "REPLACE_LINK_COMPOSITION",
+      "payloadKeys": ["linkId", "orderedSections", "policyBindingId"],
+      "owner": "ELV5",
+      "mutationKind": "ASSIGNMENT_REPLACEMENT"
+    },
+    {
+      "operation": "REPLACE_PORT_CAPACITY_ASSIGNMENTS",
+      "payloadKeys": ["switchId", "assignments", "sparePolicyRef"],
+      "owner": "ELV5",
+      "mutationKind": "ASSIGNMENT_REPLACEMENT"
+    },
+    {
+      "operation": "REPLACE_OPTICAL_LINK_ASSIGNMENTS",
+      "payloadKeys": ["linkId", "forwardOptics", "reverseOptics", "connectorEvents", "spliceEvents"],
+      "owner": "ELV5",
+      "mutationKind": "ASSIGNMENT_REPLACEMENT"
+    },
+    {
+      "operation": "REPLACE_RACK_CAPACITY_BASIS",
+      "payloadKeys": ["rackId", "capacityBasis", "equipmentIds", "excludedCapacity", "policyRef"],
+      "owner": "ELV5",
+      "mutationKind": "ASSIGNMENT_REPLACEMENT"
+    },
+    {
+      "operation": "REPLACE_PATCH_PANEL_ASSIGNMENTS",
+      "payloadKeys": ["panelId", "assignments", "sparePolicyRef"],
+      "owner": "ELV5",
+      "mutationKind": "ASSIGNMENT_REPLACEMENT"
+    },
+    {
+      "operation": "REPLACE_DOOR_ROLE_ASSIGNMENTS",
+      "payloadKeys": ["doorAssemblyId", "topologyProfileRef", "roleAssignments"],
+      "owner": "ELV5",
+      "mutationKind": "ASSIGNMENT_REPLACEMENT"
+    },
+    {
+      "operation": "REPLACE_CONTROLLER_RESOURCE_ASSIGNMENTS",
+      "payloadKeys": ["controllerId", "resourceAssignments", "reservePolicyRef"],
+      "owner": "ELV5",
+      "mutationKind": "ASSIGNMENT_REPLACEMENT"
+    },
+    {
+      "operation": "REPLACE_FIRE_LOOP_ASSIGNMENTS",
+      "payloadKeys": ["loopId", "deviceAssignments", "addressDomain", "topologyProfileRef"],
+      "owner": "ELV5",
+      "mutationKind": "ASSIGNMENT_REPLACEMENT"
+    },
+    {
+      "operation": "REPLACE_NOTIFICATION_CIRCUIT_ASSIGNMENTS",
+      "payloadKeys": ["circuitId", "deviceAssignments", "outputRef", "policyRef"],
+      "owner": "ELV5",
+      "mutationKind": "ASSIGNMENT_REPLACEMENT"
+    },
+    {
+      "operation": "CALCULATE_DISCIPLINE_PROCESS",
+      "payloadKeys": ["scope", "processCodes", "subjects", "expectedPointerGenerations"],
+      "owner": "ELV5",
+      "mutationKind": "EVALUATION_PUBLICATION"
+    }
+  ],
+  "invariants": [
+    "Exactly 16 unique ELV5 discipline operations are registered.",
+    "Every payload uses an exact key set; unknown or missing fields fail closed.",
+    "Every durable command requires reviewedImpactFingerprint and server-side impact resolution.",
+    "Replay by projectId+commandId+requestHash precedes mutable preconditions.",
+    "Same commandId with different requestHash is a payload conflict.",
+    "Replacement mutations invalidate union(oldClosure,newClosure).",
+    "ELV5 commands never become canonical owners of ELV3 cable/port/component identities or ELV4 power source/battery identities.",
+    "ELV4 revision command schema and operation identities remain unchanged."
+  ]
+}

@@ -1,0 +1,200 @@
+{
+  "schema": "electra.elv5-command-examples.v1",
+  "status": "DESIGN_DRAFT",
+  "wireSchema": "electra.elv5-discipline-command.v1",
+  "payloadSchemaVersion": 1,
+  "envelopeTemplate": {
+    "schema": "electra.elv5-discipline-command.v1",
+    "operation": "<operation>",
+    "payloadSchemaVersion": 1,
+    "projectId": "project-fixture-01",
+    "designRevisionId": "revision-r1",
+    "commandId": "<unique-command-id>",
+    "expectedDesignRowRevision": 1,
+    "expectedRows": {},
+    "reviewedImpactFingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "payload": "<operation-payload>"
+  },
+  "examples": [
+    {
+      "operation": "BIND_DISCIPLINE_POLICY",
+      "validPayload": {
+        "bindingId": "policy-binding-cctv-01",
+        "subject": {"kind": "CAMERA", "id": "camera-01"},
+        "processCodes": ["CCTV-01", "CCTV-02"],
+        "definitionRef": {"policyCode": "CCTV-DESIGN", "editionId": "cctv-design-v1", "contentHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"},
+        "applicability": {"scopeKinds": ["DESIGN"], "scenarioIds": []}
+      },
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "definitionRef", "expectedCode": "ELV5_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "ADOPT_DISCIPLINE_POLICY",
+      "validPayload": {
+        "bindingId": "policy-binding-cctv-01",
+        "newDefinitionRef": {"policyCode": "CCTV-DESIGN", "editionId": "cctv-design-v2", "contentHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+        "applicability": {"scopeKinds": ["DESIGN"], "scenarioIds": []}
+      },
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "newDefinitionRef", "expectedCode": "ELV5_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "RELEASE_DISCIPLINE_POLICY",
+      "validPayload": {
+        "bindingId": "policy-binding-cctv-01",
+        "releasePolicy": "REMOVE_ELV5_BINDING_KEEP_CANONICAL_FACTS"
+      },
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "releasePolicy", "expectedCode": "ELV5_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "REPLACE_CAMERA_STREAMS",
+      "validPayload": {
+        "cameraId": "camera-01",
+        "streams": [
+          {"encodedStreamId": "camera-01-main", "codecProfileRef": "h265-main-v1", "expectedBitrateBps": "4000000", "peakBitrateBps": "6000000"},
+          {"encodedStreamId": "camera-01-sub", "codecProfileRef": "h265-sub-v1", "expectedBitrateBps": "1000000", "peakBitrateBps": "1500000"}
+        ]
+      },
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "streams", "expectedCode": "ELV5_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "REPLACE_RECORDING_ASSIGNMENTS",
+      "validPayload": {
+        "poolId": "storage-pool-01",
+        "horizon": {"startUtc": "2026-10-01T00:00:00Z", "endUtc": "2026-10-31T00:00:00Z", "timezone": "Asia/Almaty"},
+        "assignments": [
+          {"encodedStreamId": "camera-01-main", "copyRole": "PRIMARY", "expectedBitrateBps": "4000000", "upperBoundBitrateBps": "6000000"}
+        ],
+        "scheduleSegments": [
+          {"segmentId": "recording-24x7", "startUtc": "2026-10-01T00:00:00Z", "endUtc": "2026-10-31T00:00:00Z"}
+        ],
+        "sizingBasis": "GUARANTEED_UPPER_BOUND"
+      },
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "sizingBasis", "expectedCode": "ELV5_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "REPLACE_RECORDER_ASSIGNMENTS",
+      "validPayload": {
+        "recorderId": "nvr-01",
+        "accountingBasis": "ENCODED_STREAM",
+        "assignments": [
+          {"assignmentId": "nvr-01-main", "cameraId": "camera-01", "encodedStreamId": "camera-01-main", "licenseChannelId": "channel-01", "storagePoolId": "storage-pool-01"}
+        ]
+      },
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "accountingBasis", "expectedCode": "ELV5_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "REPLACE_LINK_COMPOSITION",
+      "validPayload": {
+        "linkId": "lan-link-01",
+        "orderedSections": [
+          {"ordinal": 0, "realizedSectionId": "run-section-01", "classification": "PERMANENT"},
+          {"ordinal": 1, "realizedSectionId": "patch-section-01", "classification": "PATCH"}
+        ],
+        "policyBindingId": "policy-binding-lan-01"
+      },
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "orderedSections", "expectedCode": "ELV5_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "REPLACE_PORT_CAPACITY_ASSIGNMENTS",
+      "validPayload": {
+        "switchId": "switch-01",
+        "assignments": [
+          {"portId": "switch-01-ge01", "endpointId": "camera-01", "media": "COPPER", "speedBps": "1000000000"}
+        ],
+        "sparePolicyRef": {"policyCode": "LAN-PORT-SPARE", "editionId": "lan-port-spare-v1", "contentHash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"}
+      },
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "assignments", "expectedCode": "ELV5_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "REPLACE_OPTICAL_LINK_ASSIGNMENTS",
+      "validPayload": {
+        "linkId": "fiber-link-01",
+        "forwardOptics": {"txPortId": "sfp-a-tx", "rxPortId": "sfp-b-rx", "wavelengthNm": "1310", "txMinDbm": "-3", "txMaxDbm": "-1", "receiverSensitivityDbm": "-15", "receiverOverloadDbm": "-3", "requiredSensitivityMarginDb": "2"},
+        "reverseOptics": {"txPortId": "sfp-b-tx", "rxPortId": "sfp-a-rx", "wavelengthNm": "1310", "txMinDbm": "-3", "txMaxDbm": "-1", "receiverSensitivityDbm": "-15", "receiverOverloadDbm": "-3", "requiredSensitivityMarginDb": "2"},
+        "connectorEvents": [{"eventId": "mated-pair-01", "lossMinDb": "0.2", "lossMaxDb": "0.5"}],
+        "spliceEvents": [{"eventId": "splice-01", "lossMinDb": "0.05", "lossMaxDb": "0.15"}]
+      },
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "reverseOptics", "expectedCode": "ELV5_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "REPLACE_RACK_CAPACITY_BASIS",
+      "validPayload": {
+        "rackId": "rack-01",
+        "capacityBasis": "GROSS_WITH_EXCLUSIONS",
+        "equipmentIds": ["switch-01", "nvr-01"],
+        "excludedCapacity": {"reservedRu": "1", "unavailableRu": "0", "provenance": "project-reserve-policy"},
+        "policyRef": {"policyCode": "RACK-CAPACITY", "editionId": "rack-capacity-v1", "contentHash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"}
+      },
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "capacityBasis", "expectedCode": "ELV5_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "REPLACE_PATCH_PANEL_ASSIGNMENTS",
+      "validPayload": {
+        "panelId": "panel-01",
+        "assignments": [{"panelPortId": "panel-01-01", "terminationId": "termination-01", "linkId": "lan-link-01"}],
+        "sparePolicyRef": {"policyCode": "PATCH-SPARE", "editionId": "patch-spare-v1", "contentHash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"}
+      },
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "panelId", "expectedCode": "ELV5_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "REPLACE_DOOR_ROLE_ASSIGNMENTS",
+      "validPayload": {
+        "doorAssemblyId": "door-01",
+        "topologyProfileRef": {"profileCode": "ACS-DOOR-SINGLE", "editionId": "acs-door-single-v1", "contentHash": "1111111111111111111111111111111111111111111111111111111111111111"},
+        "roleAssignments": [
+          {"roleCode": "READER_ENTRY", "slot": 0, "componentId": "reader-01"},
+          {"roleCode": "LOCK", "slot": 0, "componentId": "lock-01"},
+          {"roleCode": "DOOR_CONTACT", "slot": 0, "componentId": "contact-01"}
+        ]
+      },
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "topologyProfileRef", "expectedCode": "ELV5_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "REPLACE_CONTROLLER_RESOURCE_ASSIGNMENTS",
+      "validPayload": {
+        "controllerId": "acs-controller-01",
+        "resourceAssignments": [
+          {"resourceId": "acs-controller-01-reader-01", "resourceKind": "READER_CHANNEL", "assignmentRole": "READER_ENTRY", "subjectId": "door-01"},
+          {"resourceId": "acs-controller-01-output-01", "resourceKind": "RELAY_OUTPUT", "assignmentRole": "LOCK", "subjectId": "door-01"}
+        ],
+        "reservePolicyRef": {"policyCode": "ACS-CONTROLLER-SPARE", "editionId": "acs-controller-spare-v1", "contentHash": "2222222222222222222222222222222222222222222222222222222222222222"}
+      },
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "resourceAssignments", "expectedCode": "ELV5_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "REPLACE_FIRE_LOOP_ASSIGNMENTS",
+      "validPayload": {
+        "loopId": "fire-loop-01",
+        "deviceAssignments": [
+          {"deviceId": "detector-01", "profileRef": "smoke-detector-v1", "expandedAddresses": [1]},
+          {"deviceId": "module-01", "profileRef": "io-module-2addr-v1", "expandedAddresses": [2, 3]}
+        ],
+        "addressDomain": {"panelId": "fasp-01", "loopId": "fire-loop-01", "minAddress": 1, "maxAddress": 250, "reservedAddresses": [250]},
+        "topologyProfileRef": {"profileCode": "FIRE-LOOP-RING-SIGNAL", "editionId": "fire-loop-ring-v1", "contentHash": "3333333333333333333333333333333333333333333333333333333333333333"}
+      },
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "addressDomain", "expectedCode": "ELV5_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "REPLACE_NOTIFICATION_CIRCUIT_ASSIGNMENTS",
+      "validPayload": {
+        "circuitId": "nac-01",
+        "deviceAssignments": [
+          {"deviceId": "sounder-01", "stateCurrentMa": {"NORMAL": "0", "ALARM": "35"}},
+          {"deviceId": "strobe-01", "stateCurrentMa": {"NORMAL": "0", "ALARM": "45"}}
+        ],
+        "outputRef": {"componentId": "fasp-01", "portId": "nac-output-01"},
+        "policyRef": {"policyCode": "FIRE-NAC", "editionId": "fire-nac-v1", "contentHash": "4444444444444444444444444444444444444444444444444444444444444444"}
+      },
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "outputRef", "expectedCode": "ELV5_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "CALCULATE_DISCIPLINE_PROCESS",
+      "validPayload": {
+        "scope": {"kind": "DESIGN", "scopeId": "design-root", "scenarioKey": "NONE"},
+        "processCodes": ["CCTV-02", "CCTV-03", "CCTV-05"],
+        "subjects": [{"kind": "CAMERA", "id": "camera-01"}, {"kind": "RECORDER", "id": "nvr-01"}],
+        "expectedPointerGenerations": {"CCTV-02/camera-01": 3, "CCTV-03/storage-pool-01": 2, "CCTV-05/nvr-01": 4}
+      },
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "expectedPointerGenerations", "expectedCode": "ELV5_PAYLOAD_FIELDS_MISMATCH"}
+    }
+  ]
+}
