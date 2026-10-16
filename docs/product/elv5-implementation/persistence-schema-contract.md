@@ -556,7 +556,57 @@ class FireAddressClaims extends Table {
 }
 ```
 
-The address claim table makes collision impossible to hide inside JSON. Migration/runtime validates expanded claim cardinality against the selected expansion profile.
+The primary key above identifies an assignment row; by itself it does **not**
+prevent two different bindings from claiming the same address. The following
+constraints are mandatory in migration 24 and take precedence over the schematic
+Drift declarations where those omit composite constraints.
+
+`FireLoopBindings` adds `UNIQUE(projectId, designRevisionId, id)` and one active
+root per canonical loop. `FireLoopDeviceAssignments` adds
+`UNIQUE(projectId, designRevisionId, bindingId, deviceId)` and a composite FK
+`(projectId, designRevisionId, bindingId)` to the root. Each claim references that
+complete device-membership key; independent project/device FKs are insufficient.
+
+Normative SQL for the claim table (snake_case is the Drift storage spelling):
+
+```sql
+-- ELV5_FIRE_CLAIM_DDL_BEGIN
+CREATE TABLE fire_address_claims (
+  project_id TEXT NOT NULL,
+  design_revision_id TEXT NOT NULL,
+  binding_id TEXT NOT NULL,
+  device_id TEXT NOT NULL,
+  address_domain TEXT NOT NULL,
+  address INTEGER NOT NULL CHECK(typeof(address) = 'integer' AND address >= 0),
+  PRIMARY KEY(design_revision_id, binding_id, address_domain, address),
+  UNIQUE(design_revision_id, address_domain, address),
+  FOREIGN KEY(project_id, design_revision_id, binding_id, device_id)
+    REFERENCES fire_loop_device_assignments
+      (project_id, design_revision_id, binding_id, device_id)
+    ON DELETE RESTRICT
+);
+-- ELV5_FIRE_CLAIM_DDL_END
+```
+
+`addressDomain` is a canonical resolver-owned identity of the physical address
+space selected by the exact panel/loop/profile definition. It cannot contain the
+ELV5 binding ID or a display label. Two bindings for the same address space must
+produce the same domain identity. Different physical domains/revisions may reuse
+the same integer address. The profile's actual minimum/maximum/reserved ranges
+and complete multiaddress cardinality remain transaction-level validations;
+the SQL nonnegative check does not invent a universal valid address range.
+
+`FireAddressClaims` contains **active claims only**, not historical ownership.
+Replacing membership or soft-deleting a root deletes its active claims in the
+same shared transaction before removing membership. Immutable history and frozen
+capture preserve the old claims. Undo/restore must reacquire every claim under
+the same UNIQUE/FK constraints: if another active binding took an address, the
+whole restore rejects and leaves roots, history cursor, ledger and claims
+unchanged. A partial unique index cannot refer to a parent's `deletedAt`.
+
+`test_elv5_fire_claim_contract.py` executes this SQL as a design-level SQLite
+constraint probe, including cross-binding collisions, foreign scope, multiaddress
+rollback and restore conflicts. It is not a schema-24 Drift migration/runtime test.
 
 ## 15. Notification circuit root and assignments
 
