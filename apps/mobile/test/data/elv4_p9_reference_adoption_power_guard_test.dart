@@ -1,4 +1,4 @@
-import 'package:drift/drift.dart';
+import 'package:drift/drift.dart' hide isNull;
 import 'package:drift/native.dart';
 import 'package:electra_mobile/application/id_generator.dart';
 import 'package:electra_mobile/data/database/app_database.dart';
