@@ -12,10 +12,18 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[2]
 IMPL = ROOT / "docs" / "product" / "elv5-implementation"
+
+DOSSIER_PATHS = [
+    "docs/product/elv5-implementation/process-specifications/cctv-processes.md",
+    "docs/product/elv5-implementation/process-specifications/lan-processes.md",
+    "docs/product/elv5-implementation/process-specifications/acs-processes.md",
+    "docs/product/elv5-implementation/process-specifications/fire-processes.md",
+]
 
 AUTHORITY_PATHS = [
     "docs/product/elv5-authoritative-spec-index.md",
@@ -30,6 +38,9 @@ AUTHORITY_PATHS = [
     "docs/product/elv5-implementation/engineering-primitives-contract.md",
     "docs/product/elv5-implementation/typed-process-api.md",
     "docs/product/elv5-implementation/calculation-engine-contract.md",
+    "docs/product/elv5-implementation/process-code-level-specification.md",
+    *DOSSIER_PATHS,
+    "docs/product/elv5-implementation/flutter-performance-contract.md",
     "docs/product/elv5-implementation/persistence-schema-contract.md",
     "docs/product/elv5-implementation/code-level-runtime-contract.md",
     "docs/product/elv5-implementation/code-level-hardening-amendments.md",
@@ -47,6 +58,8 @@ AUTHORITY_PATHS = [
     "docs/product/elv5-implementation/p8-acceptance.md",
     "docs/product/elv5-implementation/p9-closure.md",
     "docs/audit/elv5-third-pass-production-readiness-audit.json",
+    "docs/audit/elv5-fourth-pass-algorithm-performance-audit.md",
+    "docs/audit/elv5-fourth-pass-algorithm-performance-audit.json",
 ]
 
 
@@ -93,6 +106,26 @@ def rows_from_requirements(value):
     return []
 
 
+def dossier_inventory() -> list[dict[str, object]]:
+    process_re = re.compile(r"^## (CCTV-\d{2}|LAN-\d{2}|ACS-\d{2}|FA-\d{2}) — .+$", re.MULTILINE)
+    rows = []
+    codes: list[str] = []
+    for relative in DOSSIER_PATHS:
+        path = ROOT / relative
+        text = path.read_text(encoding="utf-8")
+        file_codes = process_re.findall(text)
+        codes.extend(file_codes)
+        rows.append({
+            "path": relative,
+            "sha256": sha256_file(path),
+            "byteLength": path.stat().st_size,
+            "processCodes": file_codes,
+        })
+    if len(codes) != 27 or len(set(codes)) != 27:
+        raise SystemExit(f"expected 27 unique process dossiers, found {len(codes)} / {len(set(codes))} unique")
+    return rows
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", required=True)
@@ -137,6 +170,15 @@ def main() -> None:
     command_ops = [row.get("operation") for row in commands]
     if len(command_ops) != len(set(command_ops)):
         raise SystemExit("duplicate ELV5 command operation")
+
+    dossier_rows = dossier_inventory()
+    dossier_codes = {
+        code
+        for row in dossier_rows
+        for code in row["processCodes"]
+    }
+    if dossier_codes != set(process_codes):
+        raise SystemExit("code-level dossier process inventory differs from process registry")
 
     required_dimension_inventory = [
         {
@@ -187,6 +229,10 @@ def main() -> None:
         "payloadSchemaVersion": 1,
         "processCount": 27,
         "algorithmMappingCount": 27,
+        "processCodeLevelDossierCount": 27,
+        "processDossierSectionCount": 25,
+        "processVectorClassCount": 5,
+        "fourthPassFindingCount": 18,
         "commandCount": 16,
         "requirementCount": 80,
         "primaryProcessOracleCount": 54,
@@ -194,6 +240,9 @@ def main() -> None:
         "processRegistrySha256": sha256_file(process_registry_path),
         "algorithmRegistrySha256": sha256_file(algorithm_registry_path),
         "processContractsSha256": sha256_file(IMPL / "process-contracts.md"),
+        "processCodeLevelSpecificationSha256": sha256_file(IMPL / "process-code-level-specification.md"),
+        "processDossierAggregateSha256": sha256_bytes(deterministic_json_bytes(dossier_rows)),
+        "flutterPerformanceContractSha256": sha256_file(IMPL / "flutter-performance-contract.md"),
         "commandRegistrySha256": sha256_file(command_registry_path),
         "requirementsSha256": sha256_file(requirements_path),
         "requiredDimensionInventorySha256": sha256_bytes(
@@ -232,8 +281,9 @@ def main() -> None:
     print(f"sourceSha={manifest['sourceSha']}")
     print(f"authorityFingerprintSha256={authority_fingerprint}")
     print(
-        f"processes=27 algorithms=27 commands=16 requirements=80 "
-        f"primaryOracles=54 schema=24 authorityArtifacts={len(AUTHORITY_PATHS)}"
+        f"processes=27 algorithms=27 dossiers=27 sections=25 commands=16 "
+        f"requirements=80 primaryOracles=54 fourthPassFindings=18 schema=24 "
+        f"authorityArtifacts={len(AUTHORITY_PATHS)}"
     )
 
 
