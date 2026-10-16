@@ -1,77 +1,89 @@
 # ELV4 P9 implementation and ELV1–ELV3 alignment review
 
-Date: 2026-10-15. Source reviewed: `626cb2d4500be6aba3e0230c1b4f52603dc0d38f`.
+Date: 2026-10-16. Source implementation reviewed and executed at `eeadf3fb83c209c6280953413edab6790c3dc7b8`.
 Branch: `feat/flutter-elv4-power-topology-design`. PR: [#11](https://github.com/alimbetov/electra/pull/11), still draft/unmerged.
 
 ## Decision
 
-**IMPLEMENTATION_RECONCILED / RUNTIME_ACCEPTANCE_BLOCKED.** The claim that only documentation and CI cleanup remain is not supported by source. Core arithmetic, publication, history and editor functionality exist, but several required integration guarantees are absent. Do not assign an overall percentage from test counts. `RUNTIME_ACCEPTED`, `MERGED` and `CLOSED` are distinct events; none is recorded by this review.
+**IMPLEMENTATION_RECONCILED / RUNTIME_ACCEPTANCE_BLOCKED.** Technical regression is green and C03 historical power materialization is now closed on executed evidence. Four HIGH integration findings remain: C01, C02, C04 and C05. `RUNTIME_ACCEPTED`, `MERGED` and `CLOSED` remain distinct events; none is recorded by this review.
 
-The [80-row ledger](../product/elv4-implementation/requirements.json) maps every requirement to actual source and regression paths, differentiates pure-core scope, and identifies blocking gaps. Source paths establish implementation traceability, not test execution or requirement acceptance. The [live closure register](../product/elv4-implementation/closure.json) is authoritative for current gaps; earlier audits retain their historical conclusions.
-
-## What existing runs establish
-
-Run [38777994205](https://github.com/alimbetov/electra/actions/runs/38777994205), job `116570525640`, passed mobile analysis and selected rejection/public-vertical/durability/idempotency/failure tests. Its workflow normalized and formatted a test **before execution**, then committed the result as `626cb2d`. It is therefore not a read-only final-head gate. The associated foundation run `38778190445` at `626cb2d` has `action_required` and no jobs, not a passing full suite.
-
-Local review bootstrap uses Flutter 3.47.7, framework `abaf9c5237`, Dart 3.13.5. The initial core-only review executed 307 tests and `dart analyze` successfully. Final source execution belongs to the permanent exact-head report, which includes full source SHA, toolchain, phase outcomes, run/attempt when available, and logs. This document does not fabricate a future run identifier or a self-referential tested SHA.
-
-## Confirmed integration gaps
-
-| ID | Severity | Actual source behavior | Required resolution |
-|---|---|---|---|
-| C01 | HIGH | The four-vertical test formerly constructed `status: pass` and `output: {qualified: true}`. It never consumed the seven-case qualification manifest, solved all six processes, or checked its required contexts/dimensions. The public builder does not create all manifest physical allocations, terminations and runs. | Execute Q-CCTV, Q-LAN, Q-ACS, Q-FIRE, Q-SHARED, Q-GENERIC and Q-CHARGE through persisted canonical/physical inputs. No boolean, core oracle or row count substitutes for this. |
-| C02 | HIGH | `_bindPort` writes the aspect only, without projecting static ELV1 port fields. Generic topology/reference/membership writers do not share power token/invalidation coordination. Mutation dependencies are supplied by callers. | Reviewed static projection and field ownership, exact old/new invalidation, all direct/public writers, deletion/adoption/membership and two-connection regressions. New port/owner rejection guards are partial repairs, not full resolution. |
-| C03 | HIGH | Freeze captures power pointer identities, not the full aspect/scenario/physical-input snapshot. `createNext` copies runs/traversals but no power bindings or scenarios. Workspace `_scenarioOptions`, `_scopeRecords`, `_budgets` and overlay helpers read operational state. Existing R1/R2 test uses captured-empty power. | Versioned captured facts and remapped R2 aspects, immutable historical reads with nonempty R1 and changed R2/catalog/membership. Keep old physical hashes valid. |
-| C04 | HIGH | Current-schema P2 construction is not execution of upgrades from actual historical v21/v22. ELV1/P2 historical tests do not establish the complete new power/history migration matrix. | Upgrade supported real historical schemas, assert identity/hash/legacy result invariance, FK/integrity checks and no invented power defaults. |
-| C05 | HIGH | Application mutation objects and evaluation envelopes do not demonstrate round-trip/version dispatch against the documented public wire schema. JSON specification examples alone are not application decoder evidence. | Reconcile the real envelope/decoder with the schema and prove malformed/unknown-version rejection through the public boundary. |
-| C06 | RESOLVED gate | Exact-head technical job passed at `ca281015`; full logs and artifact are retained. | Every subsequent source HEAD is verified independently; PASS does not waive C01–C05. |
-
-## Repairs in this review
-
-1. `DriftElvDesignRevisionRepository.createNext` allocates `max(project.sequence)+1`, including retired rows. Restoring R1 after R2 no longer reuses sequence 2. Replay retains its original revision identity.
-2. Before materialization it reconstructs the existing versioned `DesignRevisionPhysicalSnapshot` hash from the stored payload and scope. Altered payload is rejected before inserting R2. The original physical hash algorithm is preserved.
-3. `DriftPowerRuntimeStore.executeReplayable` resolves committed receipts before WORKING checks. A lost response can replay after freeze; new operations remain forbidden. Reusing an operation under another command type or payload schema is rejected even with the same supplied fingerprint.
-4. Load, transfer, group and supply-requirement ports must belong to the declared canonical component, not merely the same project. Rejected operations do not leave aspect/token/receipt changes.
-5. The ELV1 topology port writer rejects modification/retirement of an actively power-bound port. Exact no-op remains allowed; revision-scoped release enables ordinary editing. This is a conservative ownership guard pending the reviewed projection bridge.
-6. The public vertical test now reads persisted typed loads, runs `aggregatePowerDemand` and builds actual PWR-01 evidence. Guarded publication recaptures the actual persisted contribution. Known W and incomplete A/VA are asserted explicitly. This strengthens integration evidence but deliberately does not claim the mandatory matrix has passed.
-7. Removed eight temporary ELV4 workflows and ten one-shot source-mutating scripts. The permanent workflow has read-only permissions, checks out the exact PR head/push SHA, pins the toolchain, never commits source, and retains logs even on failure.
-8. Reconciled all P0–P9 and RM01–RM15 source/test mappings. The schema checker permits actual implementation progress instead of requiring every remediation to remain `NOT_IMPLEMENTED`. Acceptance still requires executed evidence.
-
-## ELV1–ELV3 consistency
-
-| Contract | Preserved or observed |
-|---|---|
-| Canonical identities | Power rows reference existing component/port/connection/allocation identities; no fifth discipline is introduced. New owner checks reject cross-component borrowing. |
-| Physical cable accounting | Existing allocation/run identities remain authoritative. PoE core does not create a second cable claim. C01 remains open until physical verticals prove the complete path. |
-| Revisions | Existing lifecycle and transaction/receipt APIs are reused. Sequence and snapshot integrity are repaired. Power materialization remains C03. |
-| Legacy results | Actual implementation uses dedicated power evaluation/pointer tables rather than the planned shared ProjectDerivedResults owner/kind extension. This isolates power rows from legacy retirement but is an explicit architecture deviation, not proof of shared invalidation (C02). |
-| Schema | Merged ELV3 baseline is v21; power migration is v22; revision-history migration is v23. Payload schema versions remain separate. Actual AppDatabase is v23. |
-| Accounting | Existing core tests cover single ownership of PSE conversion/idle, feeder loss, charger conversion and usable-bank factors. Reserve/derating affect capability, not physical demand. Application qualification remains C01. |
-| Historical audits | Earlier ELV1–ELV3 and ELV4 audits are not rewritten into retrospective acceptance. Current status is recorded here and in the live registers. |
-
-## Technical verification versus acceptance
-
-Run `bash scripts/ci/run-elv4-exact-head.sh` from a clean committed checkout with Flutter/Dart on PATH. It verifies guards, specification and reconciliation, locked dependencies, Drift, both formatters/analyzers, full mobile/core, explicit P7/P8/history/race/reopen tests and clean source. Set `ELV4_REPORT_DIR` outside the repository to retain JSON and logs.
-
-`python3 scripts/ci/check-elv4-closure.py` checks reconciliation integrity. It must pass with honestly documented gaps. `--require-accepted` is a separate failing gate while HIGH findings or pending evidence remain. A report must cover all manifest process/context/dimension rows at the same SHA with immutable evaluation IDs/digests; unknown/missing/unresolved/duplicate/stale rows are rejected. Validator unit-test reports are structural negative controls, never application acceptance evidence.
-
-## Handoff boundary
-
-ELV5 receives typed physical demand/capability and explicit assumptions, not an invented policy or a fully accepted ELV4 baseline. ELV6 owns cabinet/battery fit; ELV7 owns verified jurisdictional rules; ELV8 owns product selection/BOM. Do not expand ELV4 into those stages to compensate for the integration gaps above.
+The [80-row ledger](../product/elv4-implementation/requirements.json) provides implementation traceability. The [live closure register](../product/elv4-implementation/closure.json) is authoritative for current blockers. Passing technical tests do not by themselves satisfy the mandatory seven-case runtime qualification matrix.
 
 ## Executed exact-head evidence
 
-At `ca281015876829b7d95c23dee0854bbb255f11b2`, both local and GitHub technical
-validation passed: generation, format, both analyzers, **278 mobile**, **307 core**,
-**71 explicit P7/P8/alignment subset tests**, and clean source. The subset is
-already contained in the full mobile count and must not be added to it.
+At `eeadf3fb83c209c6280953413edab6790c3dc7b8` the permanent read-only exact-head workflow passed its technical job:
 
-- [Exact-head run 38784483402](https://github.com/alimbetov/electra/actions/runs/38784483402): technical job `116592838704` PASS.
-- Evidence artifact `11997121749`, digest `sha256:3af0ee825058d16fde0ab5a079776faf0576fb6dbda63d4f80e52a2535f0bb1a`.
-- [Foundation run 38784483658](https://github.com/alimbetov/electra/actions/runs/38784483658) PASS at the same SHA.
-- Runtime-acceptance job `116594846639` failed specifically on unresolved HIGH
-  findings, after successfully downloading and verifying the technical artifact.
+- [Exact-head run 38792145445](https://github.com/alimbetov/electra/actions/runs/38792145445), technical job `116619140018`: PASS.
+- Evidence artifact `12001250252`, digest `sha256:ae3055f15b1245dc5caa9bc599db657aa4b950a47d029a9d06fdb00c4e3d5763`.
+- generation, formatting and both analyzers: PASS;
+- **278 mobile tests**: PASS;
+- **307 engineering_core tests**: PASS;
+- **71 explicit P7/P8/alignment subset tests**: PASS;
+- clean source verification: PASS.
 
-This evidence-only update references the executed source above; it does not claim
-that its own commit has already run. Every new HEAD is independently checked by
-the permanent workflow. No RUNTIME_ACCEPTED/MERGED/CLOSED event is recorded.
+The executed mobile suite includes `elv4_p9_snapshot_materialization_test.dart` and its nonempty R1 -> R2 -> operational mutation/corruption -> reopen regression. `runtime-acceptance` job `116621527959` correctly failed because unresolved HIGH findings remain.
+
+## Current integration findings
+
+| ID | Severity | Status | Actual source behavior / remaining obligation |
+|---|---|---|---|
+| C01 | HIGH | OPEN | The public four-vertical coverage now publishes calculated persisted-load evidence, but it is not the mandatory Q-CCTV/Q-LAN/Q-ACS/Q-FIRE/Q-SHARED/Q-GENERIC/Q-CHARGE matrix across every required process/context/dimension. Build and execute the complete manifest from persisted canonical and physical facts. |
+| C02 | HIGH | OPEN | ELV1 port ownership protection exists, but `_bindPort` still lacks the complete reviewed field-level canonical projection bridge and generic topology/reference/membership writers do not yet coordinate exact old/new power invalidation through one transaction boundary. Implement projection/ownership plus direct-writer invalidation and concurrency regressions. |
+| C03 | HIGH | RESOLVED | Freeze now captures versioned immutable power/canonical facts, verifies power/physical/manifest hashes, create-next materializes scoped power configuration with run/traversal identity remapping, and frozen workspace reads use captured facts. The executed nonempty R1/R2/reopen test proves historical scenario/budget/workspace invariance and FK validity while CURRENT pointers are deliberately not copied into R2. |
+| C04 | HIGH | OPEN | Current-schema construction does not prove upgrades from all supported historical v21/v22 origins. Execute the migration matrix with legacy identity/hash invariance, FK/integrity checks and no invented power defaults. |
+| C05 | HIGH | OPEN | Domain mutation objects and JSON schemas still do not prove that the documented envelope is the actual application decoder/version-dispatch boundary. Add public round-trip/dispatch and malformed/unknown-version rejection evidence. |
+| C06 | GATE | RESOLVED | Exact-head technical job is green at `eeadf3fb`; every later source HEAD must be checked independently. |
+
+## C03 closure evidence
+
+The C03 repair is no longer only prospective design text:
+
+1. `DriftPowerPublicationRuntime` writes `electra.elv4-power-freeze-section.v2` with captured facts and verifies `power_sha256`, `physical_sha256` and the snapshot manifest before historical reads/materialization.
+2. `DriftPowerSnapshotFacts` captures revision-scoped power aspects plus required canonical/project facts and historical evaluation records.
+3. `DriftElvDesignRevisionRepository.createNext` reconstructs R2 physical run/traversal identities and materializes power configuration with explicit physical-ID remapping.
+4. `DriftPowerWorkspaceRepository` and overlay reads consume captured facts for frozen revisions instead of consulting mutable operational rows.
+5. `elv4_p9_snapshot_materialization_test.dart` uses nonempty load, scenario, capacity and evaluation data, mutates R2 and adversarially changes R1 operational rows, closes/reopens SQLite, then proves the captured R1 payload, workspace metrics, scenarios and budgets remain invariant and `PRAGMA foreign_key_check` remains empty.
+6. R2 receives configuration but not R1 CURRENT evaluation pointers; recalculation remains explicit under the new revision.
+
+This closes the former C03 statement that freeze captured pointer identities only and create-next omitted power aspects.
+
+## Repairs retained from the previous review
+
+- project-maximum revision sequence allocation prevents sequence reuse when restoring an older frozen base;
+- versioned physical snapshot hashes are recomputed before create-next materialization;
+- committed power-operation replay is resolved before WORKING lifecycle rejection, while command/schema fingerprint reuse is rejected;
+- load/transfer/group/supply ports are checked against their declared canonical component owner;
+- ELV1 `savePort`/archive rejects modification or retirement of an actively power-bound port, while exact no-op and explicit release remain allowed;
+- the public vertical test calculates PWR-01 evidence from persisted typed loads rather than publishing a synthetic PASS;
+- temporary source-mutating workflows/scripts were removed and the exact-head gate is read-only.
+
+## ELV1–ELV3 consistency
+
+| Contract | Current state |
+|---|---|
+| Canonical identities | Power rows continue to reference existing component/port/connection/allocation identities; no parallel ELV identity model is introduced. C02 remains open for projection/invalidation ownership, not identity duplication. |
+| Physical cable accounting | Existing allocation/run identities remain authoritative. C03 create-next now remaps captured run/traversal references explicitly. C01 must still prove every mandatory physical qualification path. |
+| Revisions/history | Existing lifecycle and receipt APIs are reused. Sequence, physical-hash verification and nonempty power materialization are implemented. |
+| Legacy results | Power uses dedicated evaluation/pointer tables rather than the originally planned shared `ProjectDerivedResults` owner/kind extension. This recorded deviation remains acceptable only with explicit invalidation isolation; C02 still blocks acceptance. |
+| Schema | Merged ELV3 baseline is v21; power migration is v22; revision-history migration is v23. C04 must prove real supported-origin upgrades. |
+| Accounting | Core regressions cover PSE conversion/idle, feeder loss, charger conversion and usable-bank factors. Application runtime qualification remains C01. |
+
+## Technical verification versus runtime acceptance
+
+`bash scripts/ci/run-elv4-exact-head.sh` remains the technical gate. `python3 scripts/ci/check-elv4-closure.py` validates reconciliation integrity; `--require-accepted` must continue to fail while any HIGH finding is OPEN or mandatory qualification evidence is absent.
+
+A future runtime acceptance report must cover every manifest process/context/dimension row at one immutable source SHA with evaluation IDs/digests. Unknown, missing, duplicate, stale or unresolved rows fail closed. Validator unit tests and row counts are negative/control evidence, not substitutes for application qualification.
+
+## Recommended closure order
+
+1. C02 — complete canonical projection plus writer/invalidation transaction coordination.
+2. C01 — execute the seven mandatory persisted qualification scenarios on the stable canonical writer contract.
+3. C04 — execute the supported historical migration matrix.
+4. C05 — close the public wire decoder/version-dispatch boundary.
+5. Reconcile ledgers at one final source SHA, run exact-head technical gate, then require `runtime-acceptance` PASS before removing draft status.
+
+## Handoff boundary
+
+ELV5 may consume typed physical demand/capability and explicit assumptions, but ELV4 is not yet a runtime-accepted baseline. ELV6 remains responsible for cabinet/battery fit, ELV7 for verified jurisdictional rules, and ELV8 for product selection/BOM. Do not move unresolved ELV4 integration guarantees into later stages.
+
+The commits that update this audit/closure register are evidence reconciliation commits after the executed `eeadf3fb` implementation. They must receive their own exact-head technical run before they can become new technical evidence. No `RUNTIME_ACCEPTED`, `MERGED` or `CLOSED` event is claimed here.
