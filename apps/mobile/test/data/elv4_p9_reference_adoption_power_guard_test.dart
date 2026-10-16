@@ -33,33 +33,37 @@ void main() {
     final ownedPortId = binding.portIds.first;
     final now = DateTime.utc(2026, 10, 16, 2);
 
-    await db.into(db.projectDesignRevisions).insert(
-      ProjectDesignRevisionsCompanion.insert(
-        id: 'revision-power-owned-camera',
-        projectId: 'project-1',
-        code: 'R-POWER',
-        sequence: 1,
-        state: 'WORKING',
-        createdAt: now,
-        updatedAt: now,
-        originDeviceId: 'elv4-p9-adoption-guard',
-      ),
-    );
-    await db.into(db.powerPortBindings).insert(
-      PowerPortBindingsCompanion.insert(
-        projectId: 'project-1',
-        designRevisionId: 'revision-power-owned-camera',
-        id: 'power-owned-camera-port',
-        createdAt: now,
-        updatedAt: now,
-        originDeviceId: 'elv4-p9-adoption-guard',
-        portId: ownedPortId,
-        resolvedProfileJson: '{}',
-        profileSchema: 'electra.power-port-binding.v1',
-        profileSha256:
-            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-      ),
-    );
+    await db
+        .into(db.projectDesignRevisions)
+        .insert(
+          ProjectDesignRevisionsCompanion.insert(
+            id: 'revision-power-owned-camera',
+            projectId: 'project-1',
+            code: 'R-POWER',
+            sequence: 1,
+            state: 'WORKING',
+            createdAt: now,
+            updatedAt: now,
+            originDeviceId: 'elv4-p9-adoption-guard',
+          ),
+        );
+    await db
+        .into(db.powerPortBindings)
+        .insert(
+          PowerPortBindingsCompanion.insert(
+            projectId: 'project-1',
+            designRevisionId: 'revision-power-owned-camera',
+            id: 'power-owned-camera-port',
+            createdAt: now,
+            updatedAt: now,
+            originDeviceId: 'elv4-p9-adoption-guard',
+            portId: ownedPortId,
+            resolvedProfileJson: '{}',
+            profileSchema: 'electra.power-port-binding.v1',
+            profileSha256:
+                'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          ),
+        );
 
     final before = await fixture.adoptionState(db, placed.componentId);
     final repository = DriftEngineeringReferenceAdoptionRepository(
