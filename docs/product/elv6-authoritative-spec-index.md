@@ -20,14 +20,16 @@ If no accepted persisted panel-layout writer exists, ELV6 promotes the existing 
 ## Entry documents
 
 1. [ELV6 design specification](elv6-enclosure-layout-design-specification.md).
-2. [ELV6 P0–P9 delivery plan](elv6-p0-p9-delivery-plan.md).
+2. [ELV6 P0–P9 delivery plan](elv6-p0-p9-delivery-plan.md) — 80 stable requirements.
 3. [Implementation design index](elv6-implementation/README.md).
 4. [Code-level runtime contract](elv6-implementation/code-level-runtime-contract.md).
 5. [24-process machine registry](elv6-implementation/process-registry.json).
 6. [21-command machine registry](elv6-implementation/command-registry.json).
-7. [Hard technical audit](../audit/elv6-hard-technical-audit.md).
-8. [ADR-019 physical panel layout](../adr/ADR-019-physical-panel-layout-editor.md) and `packages/engineering_core/lib/src/panel_assembly.dart` as semantic baseline inputs.
-9. ELV5 authoritative/code-level/command contracts at the pinned upstream SHA.
+7. [Canonical command examples](elv6-implementation/command-examples.json) — all 21 operations.
+8. [Qualification manifest](elv6-implementation/qualification-manifest.json) — 72 POS/NEG/BLOCKED process oracles.
+9. [Hard technical audit](../audit/elv6-hard-technical-audit.md) — 18 findings/remediations.
+10. [ADR-019 physical panel layout](../adr/ADR-019-physical-panel-layout-editor.md) and `packages/engineering_core/lib/src/panel_assembly.dart` as semantic baseline inputs.
+11. ELV5 authoritative/code-level/command contracts at the pinned upstream SHA.
 
 ## Authority hierarchy
 
@@ -36,9 +38,10 @@ When ELV6 artifacts disagree, use this order:
 1. accepted ELV1–ELV5 runtime ownership/revision contracts and any P0-proven existing canonical writer;
 2. this authoritative index;
 3. `elv6-implementation/code-level-runtime-contract.md`;
-4. machine process and command registries;
-5. ELV6 design specification and P0–P9 plan;
-6. ADR-019 as semantic baseline and older architecture/product notes.
+4. machine process/command registries and canonical command examples;
+5. qualification manifest for required oracle identities/statuses;
+6. ELV6 design specification and P0–P9 plan;
+7. ADR-019 as semantic baseline and older architecture/product notes.
 
 No package-local document may weaken replay/CAS, exact geometry, claim boundaries or canonical ownership.
 
@@ -90,6 +93,20 @@ ELV6 must not infer normative compliance from intrinsic fit. Required clearance,
 
 Initial runtime has exactly **24 layout processes** `LAY-01…LAY-24` and exactly **21 ELV6 public command operations**. Unknown custom executable processes/operations fail closed. Data-driven technical profiles may supply parameters/evidence, never arbitrary executable formulas/scripts.
 
+Each process has three required design-to-runtime oracle identities — POS, NEG and BLOCKED — for a total of **72 process oracles**. A NEG oracle is allowed to be `UNRESOLVED` for a basis/measurement process when absence of knowledge is the engineering truth; it must not be forced into FAIL merely to color a test red.
+
+## CI design gates
+
+Before Flutter setup, the shared workflow verifies independently:
+
+```text
+ELV6 specification/process/80-requirement guard
+ELV6 exact 21-command registry guard
+ELV6 21 canonical command examples + 72-oracle qualification guard
+```
+
+A design guard proves internal consistency only. It never marks runtime requirements implemented.
+
 ## Runtime entry gate
 
 Runtime P0 starts only after all of the following are pinned at one source baseline:
@@ -105,8 +122,6 @@ Runtime P0 starts only after all of the following are pinned at one source basel
 If ELV5 runtime is not yet accepted, ELV6 implementation remains blocked while ELV6 design may continue against the pinned ELV5 design contracts.
 
 ## Acceptance boundary
-
-Design CI may prove registry consistency, links and contract arithmetic. It never proves ELV6 runtime.
 
 Runtime closure requires public-command/file-SQLite qualification of all 24 processes and all 21 command codecs, migrations, restart, replay, rollback, concurrency races, deterministic solver output, freeze/create-next history and stable ELV7/ELV8 projections at one exact source SHA.
 
