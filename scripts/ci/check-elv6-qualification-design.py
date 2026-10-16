@@ -5,6 +5,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 BASE = ROOT / 'docs/product/elv6-implementation'
+FORBIDDEN_PLACEMENT_WIRE_FIELDS = {'occupiedEnvelope', 'rackSpan', 'dinSpan', 'sourceProposalId'}
 
 
 def load(name):
@@ -35,6 +36,18 @@ def validate_command_examples(registry, examples):
         assert rejection['mutation'] == 'REMOVE_FIELD'
         assert rejection['field'] in command['payloadKeys']
         assert rejection['expectedCode'] == 'ELV6_PAYLOAD_FIELDS_MISMATCH'
+
+    for operation in ('PLACE_LAYOUT_SUBJECT', 'MOVE_LAYOUT_SUBJECT'):
+        payload = by_op[operation]['validPayload']
+        assert 'placementSpec' in payload
+        assert not set(payload) & FORBIDDEN_PLACEMENT_WIRE_FIELDS
+        spec = payload['placementSpec']
+        assert spec['kind'] in {'FREE_3D', 'RACK_U', 'DIN', 'SURFACE_2D'}
+
+    assert set(by_op['PLACE_LAYOUT_SUBJECT']['validPayload']['placementSpec']) == {
+        'kind', 'mountingSurfaceId', 'position'
+    }
+    assert by_op['PLACE_LAYOUT_SUBJECT']['validPayload']['placementSpec']['kind'] == 'DIN'
 
 
 def validate_qualification(process_registry, manifest):
@@ -67,7 +80,7 @@ def validate_qualification(process_registry, manifest):
     assert len(oracle_ids) == len(set(oracle_ids)) == 72
 
     cross = manifest['crossCuttingQualifications']
-    assert len(cross) == len(set(cross)) >= 20
+    assert len(cross) == len(set(cross)) >= 22
     for required in [
         'MODULE_PASS_PHYSICAL_WIDTH_FAIL',
         'RACK_U_PASS_RAIL_DEPTH_FAIL',
@@ -77,6 +90,8 @@ def validate_qualification(process_registry, manifest):
         'NO_NORMATIVE_PASS_FROM_INTRINSIC_PASS',
         'SOLVER_BYTE_STABILITY',
         'FREEZE_VS_PUBLICATION_RACE',
+        'CLIENT_DERIVED_PLACEMENT_GEOMETRY_REJECTED',
+        'REFERENCED_MEMBER_REMOVAL_REJECTED',
     ]:
         assert required in cross
 
@@ -88,7 +103,7 @@ def main():
     qualification = load('qualification-manifest.json')
     validate_command_examples(command_registry, examples)
     validate_qualification(process_registry, qualification)
-    print('PASS: 21 ELV6 canonical command examples and 72 POS/NEG/BLOCKED process oracles')
+    print('PASS: 21 ELV6 canonical command examples, strict placement intent, 72 process oracles and mutation-safety qualifications')
 
 
 if __name__ == '__main__':
