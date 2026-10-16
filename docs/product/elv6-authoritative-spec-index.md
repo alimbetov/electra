@@ -23,13 +23,15 @@ If no accepted persisted panel-layout writer exists, ELV6 promotes the existing 
 2. [ELV6 P0–P9 delivery plan](elv6-p0-p9-delivery-plan.md) — 80 stable requirements.
 3. [Implementation design index](elv6-implementation/README.md).
 4. [Code-level runtime contract](elv6-implementation/code-level-runtime-contract.md).
-5. [24-process machine registry](elv6-implementation/process-registry.json).
-6. [21-command machine registry](elv6-implementation/command-registry.json).
-7. [Canonical command examples](elv6-implementation/command-examples.json) — all 21 operations.
-8. [Qualification manifest](elv6-implementation/qualification-manifest.json) — 72 POS/NEG/BLOCKED process oracles.
-9. [Hard technical audit](../audit/elv6-hard-technical-audit.md) — 18 findings/remediations.
-10. [ADR-019 physical panel layout](../adr/ADR-019-physical-panel-layout-editor.md) and `packages/engineering_core/lib/src/panel_assembly.dart` as semantic baseline inputs.
-11. ELV5 authoritative/code-level/command contracts at the pinned upstream SHA.
+5. [Placement and collection mutation safety contract](elv6-implementation/mutation-safety-contract.md).
+6. [24-process machine registry](elv6-implementation/process-registry.json).
+7. [21-command machine registry](elv6-implementation/command-registry.json).
+8. [Canonical command examples](elv6-implementation/command-examples.json) — all 21 operations.
+9. [Qualification manifest](elv6-implementation/qualification-manifest.json) — 72 POS/NEG/BLOCKED process oracles.
+10. [Hard technical audit](../audit/elv6-hard-technical-audit.md) — initial 18 findings/remediations.
+11. [Final architecture hardening](../audit/elv6-final-architecture-hardening.md) — findings 19–20.
+12. [ADR-019 physical panel layout](../adr/ADR-019-physical-panel-layout-editor.md) and `packages/engineering_core/lib/src/panel_assembly.dart` as semantic baseline inputs.
+13. ELV5 authoritative/code-level/command contracts at the pinned upstream SHA.
 
 ## Authority hierarchy
 
@@ -37,13 +39,13 @@ When ELV6 artifacts disagree, use this order:
 
 1. accepted ELV1–ELV5 runtime ownership/revision contracts and any P0-proven existing canonical writer;
 2. this authoritative index;
-3. `elv6-implementation/code-level-runtime-contract.md`;
+3. `elv6-implementation/code-level-runtime-contract.md` and `mutation-safety-contract.md`;
 4. machine process/command registries and canonical command examples;
 5. qualification manifest for required oracle identities/statuses;
 6. ELV6 design specification and P0–P9 plan;
 7. ADR-019 as semantic baseline and older architecture/product notes.
 
-No package-local document may weaken replay/CAS, exact geometry, claim boundaries or canonical ownership.
+No package-local document may weaken replay/CAS, exact geometry, mutation safety, claim boundaries or canonical ownership.
 
 ## Stage boundary
 
@@ -82,6 +84,9 @@ ELV6 must not infer normative compliance from intrinsic fit. Required clearance,
 - Auto-layout is deterministic proposal-only; hard constraints are never traded for a weighted score.
 - Locked placements do not move until explicitly unlocked.
 - Exact public mutation surface is the 21-operation `electra.elv6-layout-command.v1` registry.
+- PLACE/MOVE wire payload carries only strict `placementSpec` intent; body envelopes, rack/DIN spans, service/protrusion envelopes and proposal provenance are server-derived.
+- `sourceProposalId` is backend-owned and may be written only by actual proposal acceptance.
+- Referenced mounting surfaces/cable entries cannot be removed by replacement commands; `ELV6_REFERENCED_MEMBER_REMOVAL` fails before write and no `force` bypass exists.
 - Server resolves impact/dependencies; wire clients cannot author trusted invalidation sets.
 - Replay precedes mutable preconditions; canonical state + invalidation + history + ledger/outbox commit atomically.
 - Calculation/proposal execution follows capture → pure kernel → guarded publication.
@@ -95,13 +100,15 @@ Initial runtime has exactly **24 layout processes** `LAY-01…LAY-24` and exactl
 
 Each process has three required design-to-runtime oracle identities — POS, NEG and BLOCKED — for a total of **72 process oracles**. A NEG oracle is allowed to be `UNRESOLVED` for a basis/measurement process when absence of knowledge is the engineering truth; it must not be forced into FAIL merely to color a test red.
 
+The complete design audit contains **20 findings**: 18 initial engineering/system findings plus two final mutation-safety findings. All are specification-resolved; none is runtime evidence.
+
 ## CI design gates
 
 Before Flutter setup, the shared workflow verifies independently:
 
 ```text
-ELV6 specification/process/80-requirement guard
-ELV6 exact 21-command registry guard
+ELV6 specification/process/80-requirement/20-finding guard
+ELV6 exact 21-command registry and server-derived-placement guard
 ELV6 21 canonical command examples + 72-oracle qualification guard
 ```
 
@@ -123,6 +130,6 @@ If ELV5 runtime is not yet accepted, ELV6 implementation remains blocked while E
 
 ## Acceptance boundary
 
-Runtime closure requires public-command/file-SQLite qualification of all 24 processes and all 21 command codecs, migrations, restart, replay, rollback, concurrency races, deterministic solver output, freeze/create-next history and stable ELV7/ELV8 projections at one exact source SHA.
+Runtime closure requires public-command/file-SQLite qualification of all 24 processes and all 21 command codecs, migrations, restart, replay, rollback, concurrency races, deterministic solver output, mutation-safety cases, freeze/create-next history and stable ELV7/ELV8 projections at one exact source SHA.
 
 All ELV6 P0–P9 runtime packages remain `NOT_STARTED` until that evidence exists.
