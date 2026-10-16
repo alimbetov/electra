@@ -54,12 +54,13 @@ void main() {
     expect(
       await dispatcher.dispatchMap(
         command(
-          schema: Elv4WireCommandEnvelope.revisionCommandSchema,
-          operation: 'FREEZE_DESIGN_REVISION',
-          version: 2,
-        )..['payload'] = <String, Object?>{
-          'powerSectionIntent': 'CAPTURE_CURRENT',
-        },
+            schema: Elv4WireCommandEnvelope.revisionCommandSchema,
+            operation: 'FREEZE_DESIGN_REVISION',
+            version: 2,
+          )
+          ..['payload'] = <String, Object?>{
+            'powerSectionIntent': 'CAPTURE_CURRENT',
+          },
       ),
       'revision:command-1',
     );
@@ -91,19 +92,16 @@ void main() {
   test('missing, extra and malformed envelope fields are rejected', () {
     final missing = command()..remove('commandId');
     final extra = command()..['unexpected'] = true;
-    final badRows = command()
-      ..['expectedRows'] = <String, Object?>{'LOAD-1': -1};
-    final badFingerprint = command()
-      ..['reviewedImpactFingerprint'] = 'NOT-A-SHA';
+    final badRows =
+        command()..['expectedRows'] = <String, Object?>{'LOAD-1': -1};
+    final badFingerprint =
+        command()..['reviewedImpactFingerprint'] = 'NOT-A-SHA';
 
     expect(
       () => Elv4WireCommandEnvelope.fromMap(missing),
       throwsFormatException,
     );
-    expect(
-      () => Elv4WireCommandEnvelope.fromMap(extra),
-      throwsFormatException,
-    );
+    expect(() => Elv4WireCommandEnvelope.fromMap(extra), throwsFormatException);
     expect(
       () => Elv4WireCommandEnvelope.fromMap(badRows),
       throwsFormatException,
