@@ -1,0 +1,81 @@
+{
+  "schema": "electra.elv5-fifth-pass-specification-closure-audit.v1",
+  "status": "SPEC_RESOLVED_RUNTIME_NOT_STARTED",
+  "counts": {"high": 6, "medium": 2, "total": 8, "resolved": 8, "open": 0},
+  "historicalDesignFindingCountThroughFourthPass": 56,
+  "scope": [
+    "deterministic 1500-case generation",
+    "legal pair constraints",
+    "targeted 3-wise inventory",
+    "system-wide inventory",
+    "P8/P9 closure coherence",
+    "authority fingerprint completeness",
+    "CI exact-head artifact binding"
+  ],
+  "findings": [
+    {
+      "id": "ELV5-FIFTH-001",
+      "severity": "HIGH",
+      "code": "DECLARATION_ONLY_COMBINATORIAL_GATE",
+      "status": "SPEC_RESOLVED",
+      "finding": "The prior CI gate validated 1500/72/42/36 declarations but did not construct or prove the matrix.",
+      "resolution": "Added a deterministic generator plus frozen 42-row strength-2 template; generation now proves 1500 exact rows, 16,011/16,011 pair obligations and 330/330 targeted 3-wise obligations."
+    },
+    {
+      "id": "ELV5-FIFTH-002",
+      "severity": "HIGH",
+      "code": "LEGAL_PAIR_EXCLUSION_AUTHORITY_MISSING",
+      "status": "SPEC_RESOLVED",
+      "finding": "Pairwise acceptance allowed conceptual exclusions but had no machine authority for exclusions or reason codes.",
+      "resolution": "Added combinatorial-legal-pair-constraints.json with explicit anti-gaming policy, reason-code registry, all 27 process bindings and current strongest closure of zero exclusions."
+    },
+    {
+      "id": "ELV5-FIFTH-003",
+      "severity": "HIGH",
+      "code": "THREE_WISE_FACTOR_MODEL_CONTRADICTION",
+      "status": "SPEC_RESOLVED",
+      "finding": "The prose 3-wise examples referenced operatingCase, transientState, upstreamEvidenceState and reserve/capacity factors that were not members of the frozen eight-factor model.",
+      "resolution": "Reconciled the plan to five exact families using only declared factors and froze T3-001..T3-030 in combinatorial-targeted-three-wise.json for all 11 priority processes."
+    },
+    {
+      "id": "ELV5-FIFTH-004",
+      "severity": "MEDIUM",
+      "code": "SYSTEM_WIDE_INVENTORY_PROSE_ONLY",
+      "status": "SPEC_RESOLVED",
+      "finding": "The 36 system-wide scenarios were prose-only and could be replaced by arbitrary filler while preserving the count.",
+      "resolution": "Added combinatorial-system-wide-inventory.json with exact SYS-001..SYS-036 identities and required package ownership."
+    },
+    {
+      "id": "ELV5-FIFTH-005",
+      "severity": "HIGH",
+      "code": "AUTHORITY_FINGERPRINT_INCOMPLETE_FOR_COMBINATORIAL_PROOF",
+      "status": "SPEC_RESOLVED",
+      "finding": "The authority manifest did not fingerprint the legal-pair registry, 3-wise inventory, covering template, system-wide inventory or actual generator source.",
+      "resolution": "Authority manifest generation now fingerprints all combinatorial authorities, generator source and fifth-pass audit artifacts."
+    },
+    {
+      "id": "ELV5-FIFTH-006",
+      "severity": "HIGH",
+      "code": "P8_P9_CLOSURE_CHAIN_STALE",
+      "status": "SPEC_RESOLVED",
+      "finding": "Main P8/P9 closure language predated constructive pairwise/3-wise generation and relied on a later amendment for the 1500-case layer.",
+      "resolution": "P8/P9 are synchronized to require generated exact-head combinatorial evidence in addition to the normative amendment."
+    },
+    {
+      "id": "ELV5-FIFTH-007",
+      "severity": "HIGH",
+      "code": "COMBINATORIAL_ARTIFACT_NOT_BOUND_TO_AUTHORITY",
+      "status": "SPEC_RESOLVED",
+      "finding": "The declaration-only CI step emitted no 1500-row artifact and therefore could not bind a matrix fingerprint to the exact authority fingerprint.",
+      "resolution": "CI now generates the authority manifest first, then generates/publishes the 1500-case artifact using that exact manifest fingerprint."
+    },
+    {
+      "id": "ELV5-FIFTH-008",
+      "severity": "MEDIUM",
+      "code": "GENERATOR_ALGORITHM_NOT_PINNED",
+      "status": "SPEC_RESOLVED",
+      "finding": "A deterministic-generation claim could drift if generator source changed without participating in authority identity.",
+      "resolution": "The generator source SHA-256 is an explicit authority-manifest field; a generator change invalidates the authority fingerprint and exact-head closure."
+    }
+  ]
+}
