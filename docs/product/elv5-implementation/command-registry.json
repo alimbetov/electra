@@ -45,13 +45,13 @@
     },
     {
       "operation": "REPLACE_CAMERA_STREAMS",
-      "payloadKeys": ["cameraId", "streams"],
+      "payloadKeys": ["cameraId", "streams", "subscriptions", "transportOverheadModelRef"],
       "owner": "ELV5",
       "mutationKind": "ASSIGNMENT_REPLACEMENT"
     },
     {
       "operation": "REPLACE_RECORDING_ASSIGNMENTS",
-      "payloadKeys": ["poolId", "horizon", "assignments", "scheduleSegments", "sizingBasis"],
+      "payloadKeys": ["poolId", "horizon", "temporalPolicy", "assignments", "scheduleSegments", "sizingBasis", "reserveMultiplier", "redundancyModel", "policyRef"],
       "owner": "ELV5",
       "mutationKind": "ASSIGNMENT_REPLACEMENT"
     },
@@ -93,7 +93,7 @@
     },
     {
       "operation": "REPLACE_DOOR_ROLE_ASSIGNMENTS",
-      "payloadKeys": ["doorAssemblyId", "topologyProfileRef", "roleAssignments"],
+      "payloadKeys": ["doorAssemblyId", "topologyProfileRef", "safetyMode", "roleAssignments", "releaseTruthTable"],
       "owner": "ELV5",
       "mutationKind": "ASSIGNMENT_REPLACEMENT"
     },
@@ -129,6 +129,9 @@
     "Replay by projectId+commandId+requestHash precedes mutable preconditions.",
     "Same commandId with different requestHash is a payload conflict.",
     "Replacement mutations invalidate union(oldClosure,newClosure).",
+    "Recording replacement captures deterministic temporal policy, reserve/redundancy basis and exact policy provenance together with its member sets.",
+    "Camera stream replacement captures explicit directed subscriptions; payload bitrate is not silently promoted to wire-rate capacity without an exact transport overhead model reference.",
+    "Door-role replacement captures the selected lock safety mode and technical release truth table; these do not create an ELV7 compliance claim.",
     "ELV5 commands never become canonical owners of ELV3 cable/port/component identities or ELV4 power source/battery identities.",
     "ELV4 revision command schema and operation identities remain unchanged."
   ]
