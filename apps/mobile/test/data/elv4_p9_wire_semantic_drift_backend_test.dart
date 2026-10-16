@@ -107,7 +107,7 @@ void main() {
     expect(ledger.read<String>('command_type'), 'SET_POWER_LOAD_PROFILE');
     expect(
       ledger.read<String>('payload_schema'),
-      'electra.elv4-command.v1#v1',
+      'electra.elv4-command.v1/SET_POWER_LOAD_PROFILE@1',
     );
     expect(ledger.read<String>('status'), 'COMMITTED');
     expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
