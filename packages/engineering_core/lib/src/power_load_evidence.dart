@@ -254,13 +254,14 @@ PowerEvaluationEvidence buildUpsLoadingEvidence({
 
 Map<String, Object?> _capabilityAssessmentMap(
   PowerCapabilityAssessment value,
-) => {
-  'dimension': value.dimension.name.toUpperCase(),
-  'status': value.status.name.toUpperCase(),
-  'physicalDemand': value.physicalDemand.toMap(),
-  'required': value.required.toMap(),
-  'available': value.available.toMap(),
-  'margin': value.margin.toMap(),
-  'utilization': value.utilization?.toMap(),
-  'zeroCapacity': value.zeroCapacity,
-};
+) =>
+    {
+      'dimension': value.dimension.name.toUpperCase(),
+      'status': value.status.name.toUpperCase(),
+      'physicalDemand': value.physicalDemand.toMap(),
+      'required': value.required.toMap(),
+      'available': value.available.toMap(),
+      'margin': value.margin.toMap(),
+      'utilization': value.utilization?.toMap(),
+      'zeroCapacity': value.zeroCapacity,
+    };
