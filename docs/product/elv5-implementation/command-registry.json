@@ -3,7 +3,7 @@
   "status": "DESIGN_FROZEN",
   "runtimeStatus": "NOT_STARTED",
   "developmentReadiness": "READY_FOR_DEVELOPMENT",
-  "developmentReadinessRegistrySha256": "3822c6c6bf51398ef51070db549494036dd7eee89c7f69ac8228eec4f5236d04",
+  "developmentReadinessRegistrySha256": "0c9c6c20ec37c26c66cfacef705efdc77d9aaec4850432d3f27f01c36f83095a",
   "wireSchema": "electra.elv5-discipline-command.v1",
   "payloadSchemaVersion": 1,
   "topLevelKeys": [
