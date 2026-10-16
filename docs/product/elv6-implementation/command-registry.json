@@ -1,0 +1,151 @@
+{
+  "schema": "electra.elv6-command-design-registry.v1",
+  "status": "DESIGN_DRAFT",
+  "runtimeStatus": "NOT_STARTED",
+  "wireSchema": "electra.elv6-layout-command.v1",
+  "payloadSchemaVersion": 1,
+  "topLevelKeys": [
+    "schema",
+    "operation",
+    "payloadSchemaVersion",
+    "projectId",
+    "designRevisionId",
+    "commandId",
+    "expectedDesignRowRevision",
+    "expectedRows",
+    "reviewedImpactFingerprint",
+    "payload"
+  ],
+  "externalRevisionBoundary": {
+    "schema": "electra.elv4-revision-command.v2",
+    "operations": ["FREEZE_DESIGN_REVISION", "CREATE_NEXT_WORKING_DESIGN_REVISION"]
+  },
+  "commands": [
+    {
+      "operation": "CREATE_RACK_ENCLOSURE",
+      "mutationKind": "CANONICAL_HOST_CREATE",
+      "ownerTarget": "ELV6_RACK",
+      "payloadKeys": ["rackId", "logicalId", "kind", "geometry", "rackProfileRef", "locationRef", "technicalDefinitionRef"]
+    },
+    {
+      "operation": "UPDATE_RACK_ENCLOSURE",
+      "mutationKind": "CANONICAL_HOST_UPDATE",
+      "ownerTarget": "ELV6_RACK",
+      "payloadKeys": ["rackId", "kind", "geometry", "rackProfileRef", "locationRef", "technicalDefinitionRef"]
+    },
+    {
+      "operation": "ARCHIVE_RACK_ENCLOSURE",
+      "mutationKind": "CANONICAL_HOST_ARCHIVE",
+      "ownerTarget": "ELV6_RACK",
+      "payloadKeys": ["rackId", "archiveReason"]
+    },
+    {
+      "operation": "REPLACE_PANEL_LAYOUT_ROOT",
+      "mutationKind": "PANEL_OWNER_ADAPTER_REPLACEMENT",
+      "ownerTarget": "PANEL_ASSEMBLY",
+      "payloadKeys": ["panelId", "panelLogicalId", "panelType", "enclosureGeometry", "mountingSections", "sourceSemanticFingerprint"]
+    },
+    {
+      "operation": "REPLACE_MOUNTING_SURFACES",
+      "mutationKind": "LAYOUT_STRUCTURE_REPLACEMENT",
+      "ownerTarget": "RESOLVED_HOST_OWNER",
+      "payloadKeys": ["hostRef", "surfaces"]
+    },
+    {
+      "operation": "REPLACE_LAYOUT_ZONES",
+      "mutationKind": "LAYOUT_STRUCTURE_REPLACEMENT",
+      "ownerTarget": "RESOLVED_HOST_OWNER",
+      "payloadKeys": ["hostRef", "zones"]
+    },
+    {
+      "operation": "REPLACE_CABLE_ENTRIES",
+      "mutationKind": "LAYOUT_STRUCTURE_REPLACEMENT",
+      "ownerTarget": "RESOLVED_HOST_OWNER",
+      "payloadKeys": ["hostRef", "entries"]
+    },
+    {
+      "operation": "PLACE_LAYOUT_SUBJECT",
+      "mutationKind": "PLACEMENT_CREATE",
+      "ownerTarget": "RESOLVED_HOST_OWNER",
+      "payloadKeys": ["placementId", "logicalId", "hostRef", "subjectRef", "installationRole", "mountingSurfaceId", "pose", "occupiedEnvelope", "rackSpan", "dinSpan", "sourceProposalId"]
+    },
+    {
+      "operation": "MOVE_LAYOUT_SUBJECT",
+      "mutationKind": "PLACEMENT_UPDATE",
+      "ownerTarget": "RESOLVED_HOST_OWNER",
+      "payloadKeys": ["placementId", "hostRef", "mountingSurfaceId", "pose", "occupiedEnvelope", "rackSpan", "dinSpan", "sourceProposalId"]
+    },
+    {
+      "operation": "REMOVE_LAYOUT_SUBJECT",
+      "mutationKind": "PLACEMENT_REMOVE",
+      "ownerTarget": "RESOLVED_HOST_OWNER",
+      "payloadKeys": ["placementId", "hostRef", "removalReason"]
+    },
+    {
+      "operation": "LOCK_LAYOUT_PLACEMENT",
+      "mutationKind": "PLACEMENT_LOCK_STATE",
+      "ownerTarget": "RESOLVED_HOST_OWNER",
+      "payloadKeys": ["placementId", "hostRef", "lockReason"]
+    },
+    {
+      "operation": "UNLOCK_LAYOUT_PLACEMENT",
+      "mutationKind": "PLACEMENT_LOCK_STATE",
+      "ownerTarget": "RESOLVED_HOST_OWNER",
+      "payloadKeys": ["placementId", "hostRef", "unlockReason"]
+    },
+    {
+      "operation": "ASSIGN_CABLE_ENTRY",
+      "mutationKind": "ENTRY_ASSIGNMENT_CREATE",
+      "ownerTarget": "ELV6_ENTRY_ASSIGNMENT",
+      "payloadKeys": ["assignmentId", "hostRef", "entryId", "cableEndRef", "approachDirection", "terminationTargetRef"]
+    },
+    {
+      "operation": "RELEASE_CABLE_ENTRY",
+      "mutationKind": "ENTRY_ASSIGNMENT_REMOVE",
+      "ownerTarget": "ELV6_ENTRY_ASSIGNMENT",
+      "payloadKeys": ["assignmentId", "hostRef", "releaseReason"]
+    },
+    {
+      "operation": "REPLACE_PHYSICAL_BONDING_ASSIGNMENTS",
+      "mutationKind": "PHYSICAL_BONDING_REPLACEMENT",
+      "ownerTarget": "ELV6_BONDING_BASIS",
+      "payloadKeys": ["hostRef", "bondPoints", "bondLinks"]
+    },
+    {
+      "operation": "GENERATE_LAYOUT_PROPOSAL",
+      "mutationKind": "PROPOSAL_GENERATION",
+      "ownerTarget": "ELV6_PROPOSAL",
+      "payloadKeys": ["proposalId", "hostRef", "subjectRefs", "solverProfileRef", "expectedPointerGenerations"]
+    },
+    {
+      "operation": "ACCEPT_LAYOUT_PROPOSAL",
+      "mutationKind": "PROPOSAL_ACCEPTANCE",
+      "ownerTarget": "MULTI_OWNER_LAYOUT_UOW",
+      "payloadKeys": ["proposalId", "hostRef", "expectedProposalHash", "expectedOwnerRevisions", "expectedPointerGenerations"]
+    },
+    {
+      "operation": "REJECT_LAYOUT_PROPOSAL",
+      "mutationKind": "PROPOSAL_REJECTION",
+      "ownerTarget": "ELV6_PROPOSAL",
+      "payloadKeys": ["proposalId", "hostRef", "rejectionReason"]
+    },
+    {
+      "operation": "CALCULATE_LAYOUT_PROCESS",
+      "mutationKind": "EVALUATION_PUBLICATION",
+      "ownerTarget": "ELV6_EVALUATION",
+      "payloadKeys": ["hostRef", "processCodes", "subjects", "expectedPointerGenerations"]
+    },
+    {
+      "operation": "REPLACE_LAYOUT_TECHNICAL_PROFILE",
+      "mutationKind": "PROFILE_BINDING_REPLACEMENT",
+      "ownerTarget": "ELV6_PROFILE_BINDING",
+      "payloadKeys": ["bindingId", "hostRef", "profileRole", "definitionRef", "applicability"]
+    },
+    {
+      "operation": "RELEASE_LAYOUT_TECHNICAL_PROFILE",
+      "mutationKind": "PROFILE_BINDING_RELEASE",
+      "ownerTarget": "ELV6_PROFILE_BINDING",
+      "payloadKeys": ["bindingId", "hostRef", "releasePolicy"]
+    }
+  ]
+}
