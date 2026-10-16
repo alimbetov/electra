@@ -46,6 +46,10 @@ final class DriftElv4WireAggregateService {
     final normalizedComponentId = _text(componentId, 'componentId');
     final values = List<Elv4WireLoadEntry>.unmodifiable(loads);
     _requireUnique(values.map((value) => value.loadId), 'loadId');
+    _requireEnvelopePayload(envelope, {
+      'componentId': normalizedComponentId,
+      'loads': values.map((value) => value.toMap()).toList(growable: false),
+    });
     final dependencies = _dependencies(envelope, changedDependencyRefs);
     await publicationRuntime.ensureRuntimeSchema();
     final replay = await runtimeStore.executeReplayable(
@@ -67,8 +71,9 @@ final class DriftElv4WireAggregateService {
           },
           captureNewClosure: () async => dependencies,
         );
-        final affected = {...oldIds, ...values.map((value) => value.loadId)}.toList()
-          ..sort();
+        final affected =
+            {...oldIds, ...values.map((value) => value.loadId)}.toList()
+              ..sort();
         return canonicalEngineeringJsonV1(
           PowerMutationReceipt(
             operationId: envelope.commandId,
@@ -104,6 +109,10 @@ final class DriftElv4WireAggregateService {
         'ELV4_TRANSFER_COMPONENT_SCOPE_MISMATCH',
       );
     }
+    _requireEnvelopePayload(envelope, {
+      'componentId': normalizedComponentId,
+      'transfers': values.map((value) => value.toMap()).toList(growable: false),
+    });
     final dependencies = _dependencies(envelope, changedDependencyRefs);
     await publicationRuntime.ensureRuntimeSchema();
     final replay = await runtimeStore.executeReplayable(
@@ -114,7 +123,10 @@ final class DriftElv4WireAggregateService {
       payloadSchema: _ledgerSchema(envelope),
       commandFingerprint: _fingerprint(envelope),
       execute: () async {
-        final oldIds = await _activeTransferIds(envelope, normalizedComponentId);
+        final oldIds = await _activeTransferIds(
+          envelope,
+          normalizedComponentId,
+        );
         final invalidation = await publicationRuntime.mutateAndInvalidate(
           projectId: envelope.projectId,
           designRevisionId: envelope.designRevisionId,
@@ -125,8 +137,8 @@ final class DriftElv4WireAggregateService {
           },
           captureNewClosure: () async => dependencies,
         );
-        final affected = {...oldIds, ...values.map((value) => value.id)}.toList()
-          ..sort();
+        final affected =
+            {...oldIds, ...values.map((value) => value.id)}.toList()..sort();
         return canonicalEngineeringJsonV1(
           PowerMutationReceipt(
             operationId: envelope.commandId,
@@ -311,18 +323,21 @@ final class DriftElv4WireAggregateService {
     Elv4WireCommandEnvelope envelope,
     String componentId,
   ) async {
-    final rows = await database.customSelect(
-      'SELECT l.id FROM power_load_bindings l '
-      'JOIN engineering_port_instances p ON p.project_id = l.project_id '
-      'AND p.id = l.input_port_id '
-      'WHERE l.project_id = ? AND l.design_revision_id = ? '
-      'AND l.deleted_at IS NULL AND p.component_id = ? ORDER BY l.id',
-      variables: [
-        Variable.withString(envelope.projectId),
-        Variable.withString(envelope.designRevisionId),
-        Variable.withString(componentId),
-      ],
-    ).get();
+    final rows =
+        await database
+            .customSelect(
+              'SELECT l.id FROM power_load_bindings l '
+              'JOIN engineering_port_instances p ON p.project_id = l.project_id '
+              'AND p.id = l.input_port_id '
+              'WHERE l.project_id = ? AND l.design_revision_id = ? '
+              'AND l.deleted_at IS NULL AND p.component_id = ? ORDER BY l.id',
+              variables: [
+                Variable.withString(envelope.projectId),
+                Variable.withString(envelope.designRevisionId),
+                Variable.withString(componentId),
+              ],
+            )
+            .get();
     return rows.map((row) => row.read<String>('id')).toList(growable: false);
   }
 
@@ -330,16 +345,19 @@ final class DriftElv4WireAggregateService {
     Elv4WireCommandEnvelope envelope,
     String componentId,
   ) async {
-    final rows = await database.customSelect(
-      'SELECT id FROM power_transfer_bindings WHERE project_id = ? '
-      'AND design_revision_id = ? AND component_id = ? AND deleted_at IS NULL '
-      'ORDER BY id',
-      variables: [
-        Variable.withString(envelope.projectId),
-        Variable.withString(envelope.designRevisionId),
-        Variable.withString(componentId),
-      ],
-    ).get();
+    final rows =
+        await database
+            .customSelect(
+              'SELECT id FROM power_transfer_bindings WHERE project_id = ? '
+              'AND design_revision_id = ? AND component_id = ? AND deleted_at IS NULL '
+              'ORDER BY id',
+              variables: [
+                Variable.withString(envelope.projectId),
+                Variable.withString(envelope.designRevisionId),
+                Variable.withString(componentId),
+              ],
+            )
+            .get();
     return rows.map((row) => row.read<String>('id')).toList(growable: false);
   }
 
@@ -348,16 +366,19 @@ final class DriftElv4WireAggregateService {
     String loadId,
     String componentId,
   ) async {
-    final row = await database.customSelect(
-      'SELECT p.component_id FROM power_load_bindings l '
-      'JOIN engineering_port_instances p ON p.project_id = l.project_id '
-      'AND p.id = l.input_port_id '
-      'WHERE l.design_revision_id = ? AND l.id = ?',
-      variables: [
-        Variable.withString(envelope.designRevisionId),
-        Variable.withString(loadId),
-      ],
-    ).getSingleOrNull();
+    final row =
+        await database
+            .customSelect(
+              'SELECT p.component_id FROM power_load_bindings l '
+              'JOIN engineering_port_instances p ON p.project_id = l.project_id '
+              'AND p.id = l.input_port_id '
+              'WHERE l.design_revision_id = ? AND l.id = ?',
+              variables: [
+                Variable.withString(envelope.designRevisionId),
+                Variable.withString(loadId),
+              ],
+            )
+            .getSingleOrNull();
     if (row != null && row.read<String>('component_id') != componentId) {
       throw const PowerRuntimeStorageException('ELV4_LOAD_ID_SCOPE_CONFLICT');
     }
@@ -368,14 +389,17 @@ final class DriftElv4WireAggregateService {
     String transferId,
     String componentId,
   ) async {
-    final row = await database.customSelect(
-      'SELECT component_id FROM power_transfer_bindings '
-      'WHERE design_revision_id = ? AND id = ?',
-      variables: [
-        Variable.withString(envelope.designRevisionId),
-        Variable.withString(transferId),
-      ],
-    ).getSingleOrNull();
+    final row =
+        await database
+            .customSelect(
+              'SELECT component_id FROM power_transfer_bindings '
+              'WHERE design_revision_id = ? AND id = ?',
+              variables: [
+                Variable.withString(envelope.designRevisionId),
+                Variable.withString(transferId),
+              ],
+            )
+            .getSingleOrNull();
     if (row != null && row.read<String>('component_id') != componentId) {
       throw const PowerRuntimeStorageException(
         'ELV4_TRANSFER_ID_SCOPE_CONFLICT',
@@ -389,8 +413,8 @@ final class DriftElv4WireAggregateService {
     String componentId,
   ) => _requireExists(
     'SELECT 1 FROM power_capacity_groups WHERE project_id = ? '
-    'AND design_revision_id = ? AND id = ? AND owner_component_id = ? '
-    'AND deleted_at IS NULL',
+        'AND design_revision_id = ? AND id = ? AND owner_component_id = ? '
+        'AND deleted_at IS NULL',
     [
       Variable.withString(envelope.projectId),
       Variable.withString(envelope.designRevisionId),
@@ -428,8 +452,8 @@ final class DriftElv4WireAggregateService {
     await _requireComponent(projectId, componentId);
     await _requireExists(
       'SELECT 1 FROM engineering_port_instances '
-      'WHERE project_id = ? AND id = ? AND component_id = ? '
-      'AND deleted_at IS NULL',
+          'WHERE project_id = ? AND id = ? AND component_id = ? '
+          'AND deleted_at IS NULL',
       [
         Variable.withString(projectId),
         Variable.withString(portId),
@@ -442,10 +466,10 @@ final class DriftElv4WireAggregateService {
   Future<void> _requireComponent(String projectId, String componentId) =>
       _requireExists(
         'SELECT 1 FROM component_instances c '
-        'JOIN rooms r ON r.id = c.room_id '
-        'JOIN floors f ON f.id = r.floor_id '
-        'WHERE f.project_id = ? AND c.id = ? AND c.deleted_at IS NULL '
-        'AND r.deleted_at IS NULL AND f.deleted_at IS NULL',
+            'JOIN rooms r ON r.id = c.room_id '
+            'JOIN floors f ON f.id = r.floor_id '
+            'WHERE f.project_id = ? AND c.id = ? AND c.deleted_at IS NULL '
+            'AND r.deleted_at IS NULL AND f.deleted_at IS NULL',
         [Variable.withString(projectId), Variable.withString(componentId)],
         'ELV4_COMPONENT_SCOPE_MISMATCH',
       );
@@ -455,7 +479,10 @@ final class DriftElv4WireAggregateService {
     List<Variable<Object>> variables,
     String code,
   ) async {
-    final row = await database.customSelect(sql, variables: variables).getSingleOrNull();
+    final row =
+        await database
+            .customSelect(sql, variables: variables)
+            .getSingleOrNull();
     if (row == null) throw PowerRuntimeStorageException(code);
   }
 
@@ -481,6 +508,18 @@ final class DriftElv4WireAggregateService {
         envelope.operation != operation) {
       throw const PowerRuntimeStorageException(
         'ELV4_WIRE_OPERATION_DISPATCH_MISMATCH',
+      );
+    }
+  }
+
+  void _requireEnvelopePayload(
+    Elv4WireCommandEnvelope envelope,
+    Map<String, Object?> expected,
+  ) {
+    if (canonicalEngineeringJsonV1(envelope.payload) !=
+        canonicalEngineeringJsonV1(expected)) {
+      throw const PowerRuntimeStorageException(
+        'ELV4_WIRE_PAYLOAD_ARGUMENT_MISMATCH',
       );
     }
   }
