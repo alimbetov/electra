@@ -16,6 +16,7 @@ export 'src/elv5/processes/acs/acs06_topology.dart';
 export 'src/elv5/processes/cctv/cctv02_bandwidth.dart';
 export 'src/elv5/processes/cctv/cctv03_storage.dart';
 export 'src/elv5/processes/cctv/cctv04_pse_projection.dart';
+export 'src/elv5/processes/cctv/cctv05_recorder_capacity.dart';
 export 'src/elv5/processes/cctv/cctv06_link_basis.dart';
 export 'src/elv5/processes/fire/fa01_address_capacity.dart';
 export 'src/elv5/processes/fire/fa02_current_aggregation.dart';
