@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Generate a deterministic ELV5 authority/contract manifest.
 
-The manifest fingerprints the normative machine registries and the highest-value
-code-level contracts. It is design/implementation-entry evidence only; it does
-not claim ELV5 runtime implementation or engineering acceptance.
+The manifest fingerprints the machine registries plus the governing authority
+chain. It is design/implementation-entry evidence only; it does not claim ELV5
+runtime implementation or engineering acceptance.
 """
 from __future__ import annotations
 
@@ -18,6 +18,10 @@ ROOT = Path(__file__).resolve().parents[2]
 IMPL = ROOT / "docs" / "product" / "elv5-implementation"
 
 AUTHORITY_PATHS = [
+    "docs/product/elv5-authoritative-spec-index.md",
+    "docs/product/elv5-discipline-calculations-design-specification.md",
+    "docs/product/elv5-p0-p9-delivery-plan.md",
+    "docs/product/elv5-implementation/README.md",
     "docs/product/elv5-implementation/process-registry.json",
     "docs/product/elv5-implementation/command-registry.json",
     "docs/product/elv5-implementation/requirements.json",
@@ -28,6 +32,7 @@ AUTHORITY_PATHS = [
     "docs/product/elv5-implementation/code-level-hardening-v2.md",
     "docs/product/elv5-implementation/production-source-blueprint.md",
     "docs/product/elv5-implementation/qualification-contract.md",
+    "docs/audit/elv5-third-pass-production-readiness-audit.json",
 ]
 
 
@@ -39,7 +44,7 @@ def sha256_file(path: Path) -> str:
     return sha256_bytes(path.read_bytes())
 
 
-def canonical_json_bytes(value: object) -> bytes:
+def deterministic_json_bytes(value: object) -> bytes:
     return json.dumps(
         value,
         ensure_ascii=False,
@@ -142,8 +147,9 @@ def main() -> None:
 
     manifest_core = {
         "manifestSchema": "electra.elv5-contract-manifest.v1",
+        "manifestCanonicalization": "utf8-json-sort-keys-separators-v1",
         "hashAlgorithm": "SHA-256",
-        "canonicalJsonVersion": "electra.canonical-json.v1",
+        "engineeringCanonicalJsonVersion": "electra.canonical-json.v1",
         "databaseSchemaVersion": 24,
         "wireSchema": "electra.elv5-discipline-command.v1",
         "payloadSchemaVersion": 1,
@@ -155,14 +161,14 @@ def main() -> None:
         "commandRegistrySha256": sha256_file(command_registry_path),
         "requirementsSha256": sha256_file(requirements_path),
         "requiredDimensionInventorySha256": sha256_bytes(
-            canonical_json_bytes(required_dimension_inventory)
+            deterministic_json_bytes(required_dimension_inventory)
         ),
         "commandPayloadInventorySha256": sha256_bytes(
-            canonical_json_bytes(command_inventory)
+            deterministic_json_bytes(command_inventory)
         ),
         "authorityArtifacts": artifacts,
     }
-    authority_fingerprint = sha256_bytes(canonical_json_bytes(manifest_core))
+    authority_fingerprint = sha256_bytes(deterministic_json_bytes(manifest_core))
 
     manifest = {
         **manifest_core,
