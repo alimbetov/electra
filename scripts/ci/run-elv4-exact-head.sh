@@ -33,6 +33,8 @@ phase drift dart run build_runner build
 phase mobile-format dart format --output=none --set-exit-if-changed lib test
 phase mobile-analyze flutter analyze
 phase mobile-tests flutter test --reporter expanded
+cd "$root"
+phase historical-migrations bash scripts/ci/run-elv4-historical-migration-matrix.sh
 cd "$root/packages/engineering_core"
 phase core-deps dart pub get --enforce-lockfile
 phase core-format dart format --output=none --set-exit-if-changed lib test
@@ -40,6 +42,7 @@ phase core-analyze dart analyze
 phase core-tests dart test --reporter expanded
 cd "$root/apps/mobile"
 phase p7-p8-acceptance flutter test --reporter expanded \
+  test/application/elv4_wire_command_dispatcher_test.dart \
   test/application/power_workspace_state_test.dart \
   test/application/power_workspace_controller_test.dart \
   test/features/editor/power_workspace_panel_test.dart \
@@ -56,6 +59,7 @@ phase p7-p8-acceptance flutter test --reporter expanded \
   test/data/elv4_p8_rejection_concurrency_acceptance_test.dart \
   test/data/elv4_p8_freeze_historical_invariance_test.dart \
   test/data/elv4_p9_canonical_port_guard_test.dart \
+  test/data/elv4_p9_membership_guard_test.dart \
   test/data/elv_p3_runtime_closure_test.dart
 cd "$root"
 phase clean-tree bash -c 'git diff --exit-code HEAD -- . && test -z "$(git ls-files --others --exclude-standard)"'
@@ -69,7 +73,7 @@ report={'schema':'electra.elv4-exact-head-technical.v1','sourceSha':sys.argv[2],
         'technicalResult':'PASS' if all(v=='PASS' for v in phases.values()) else 'FAIL',
         'phases':phases,'toolchain':json.loads((out/'flutter-version.json').read_text()),
         'runtimeAcceptanceVerified':False,
-        'scope':'Full regression plus existing P7/P8 integration tests; not the missing seven-case qualification matrix.'}
+        'scope':'Full regression, real v21/v22 migration matrix and existing P7/P8 integration tests; not the missing seven-case qualification matrix.'}
 (out/'technical-report.json').write_text(json.dumps(report,indent=2)+'\n')
 print(json.dumps(report,indent=2))
 PY
