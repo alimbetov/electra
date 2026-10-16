@@ -332,6 +332,7 @@ final class _DriftElvAllocationWriteStore implements ElvAllocationWriteStore {
     required int expectedRevision,
     required CableAllocationResourceSelectionEvidence evidence,
   }) async {
+    await _guardAgainstPowerPath(allocation);
     final evidenceInserted = await database
         .into(database.cableAllocationResourceSelections)
         .insertReturningOrNull(
@@ -406,6 +407,7 @@ final class _DriftElvAllocationWriteStore implements ElvAllocationWriteStore {
     required int expectedRevision,
     required List<CableTerminationMapping> mappings,
   }) async {
+    await _guardAgainstPowerPath(allocation);
     final ids = mappings.map((mapping) => mapping.id).toSet();
     if (ids.length != mappings.length) {
       return ElvAllocationMutationOutcome.storageConflict;
@@ -464,18 +466,22 @@ final class _DriftElvAllocationWriteStore implements ElvAllocationWriteStore {
   Future<ElvAllocationMutationOutcome> activate({
     required CableAllocation allocation,
     required int expectedRevision,
-  }) => _stateUpdate(
-    allocation,
-    expectedRevision: expectedRevision,
-    fromStates: const ['RESERVED'],
-    toState: 'ACTIVE',
-  );
+  }) async {
+    await _guardAgainstPowerPath(allocation);
+    return _stateUpdate(
+      allocation,
+      expectedRevision: expectedRevision,
+      fromStates: const ['RESERVED'],
+      toState: 'ACTIVE',
+    );
+  }
 
   @override
   Future<ElvAllocationMutationOutcome> release({
     required CableAllocation allocation,
     required int expectedRevision,
   }) async {
+    await _guardAgainstPowerPath(allocation);
     final outcome = await _stateUpdate(
       allocation,
       expectedRevision: expectedRevision,
@@ -492,12 +498,39 @@ final class _DriftElvAllocationWriteStore implements ElvAllocationWriteStore {
   Future<ElvAllocationMutationOutcome> archive({
     required CableAllocation allocation,
     required int expectedRevision,
-  }) => _stateUpdate(
-    allocation,
-    expectedRevision: expectedRevision,
-    fromStates: const ['DRAFT', 'RELEASED'],
-    toState: 'ARCHIVED',
-  );
+  }) async {
+    await _guardAgainstPowerPath(allocation);
+    return _stateUpdate(
+      allocation,
+      expectedRevision: expectedRevision,
+      fromStates: const ['DRAFT', 'RELEASED'],
+      toState: 'ARCHIVED',
+    );
+  }
+
+  Future<void> _guardAgainstPowerPath(CableAllocation allocation) async {
+    final row =
+        await database
+            .customSelect(
+              'SELECT 1 FROM poe_delivery_path_members m '
+              'JOIN poe_delivery_bindings b '
+              'ON b.project_id = m.project_id '
+              'AND b.design_revision_id = m.design_revision_id '
+              'AND b.id = m.delivery_id '
+              'WHERE m.project_id = ? AND m.allocation_id = ? '
+              'AND b.deleted_at IS NULL LIMIT 1',
+              variables: [
+                Variable.withString(allocation.projectId),
+                Variable.withString(allocation.id),
+              ],
+            )
+            .getSingleOrNull();
+    if (row != null) {
+      throw StateError(
+        'ELV4_POWER_ALLOCATION_OWNED: allocation ${allocation.id} is an active PoE path member; use reviewed power detach/replacement.',
+      );
+    }
+  }
 
   Future<ElvAllocationMutationOutcome> _stateUpdate(
     CableAllocation allocation, {
