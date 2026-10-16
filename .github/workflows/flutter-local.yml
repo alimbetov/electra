@@ -62,6 +62,10 @@ jobs:
         working-directory: .
         run: python3 scripts/ci/check-elv5-calculation-engine.py
 
+      - name: Verify ELV5 process code-level dossiers
+        working-directory: .
+        run: python3 scripts/ci/check-elv5-process-code-level-specs.py
+
       - name: Generate ELV5 contract manifest
         working-directory: .
         run: >-
