@@ -17,6 +17,11 @@ PowerEvaluationEvidence buildPowerDemandEvidence({
   final contributionMaps = demand.contributions
       .map((value) => value.source.toMap())
       .toList(growable: false);
+  final unresolvedWOriginIds = demand.contributions
+      .where((value) => value.watt == null)
+      .map((value) => value.source.originId)
+      .toList(growable: false)
+    ..sort();
   final inputs = <String, Object?>{
     'schema': 'electra.elv4-pwr01-input.v1',
     'contributions': contributionMaps,
@@ -29,6 +34,7 @@ PowerEvaluationEvidence buildPowerDemandEvidence({
     'completeA': demand.completeA,
     'completeVa': demand.completeVa,
     'unresolvedOriginIds': demand.unresolvedOriginIds,
+    'unresolvedWOriginIds': unresolvedWOriginIds,
   };
 
   return PowerEvaluationEvidence(
@@ -46,7 +52,7 @@ PowerEvaluationEvidence buildPowerDemandEvidence({
     inputSchemaVersion: 'electra.elv4-pwr01-input.v1',
     outputSchemaVersion: 'electra.elv4-pwr01-output.v1',
     inputFingerprint: sha256HexUtf8(canonicalEngineeringJsonV1(inputs)),
-    status: demand.unresolvedOriginIds.isEmpty
+    status: demand.completeW
         ? PowerEvaluationStatus.pass
         : PowerEvaluationStatus.unresolved,
     applicability: PowerEvaluationApplicability.applicable,
@@ -54,12 +60,12 @@ PowerEvaluationEvidence buildPowerDemandEvidence({
     output: output,
     arithmeticSteps: demand.arithmeticSteps.map((value) => value.toMap()),
     findings: [
-      if (demand.unresolvedOriginIds.isNotEmpty)
+      if (!demand.completeW)
         PowerEvaluationFinding(
           code: 'ELV4_POWER_DEMAND_INCOMPLETE',
           severity: 'UNRESOLVED',
-          message: 'Power demand retains unresolved contribution dimensions.',
-          sourceRefs: demand.unresolvedOriginIds,
+          message: 'Power demand retains unresolved watt contributions.',
+          sourceRefs: unresolvedWOriginIds,
         ),
     ],
   );
