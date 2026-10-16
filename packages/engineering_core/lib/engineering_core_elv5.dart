@@ -9,6 +9,7 @@ export 'src/elv5/numeric/quantity.dart';
 export 'src/elv5/numeric/rational.dart';
 export 'src/elv5/processes/acs/acs03_electrical.dart';
 export 'src/elv5/processes/acs/acs04_source_requirement.dart';
+export 'src/elv5/processes/acs/acs05_autonomy.dart';
 export 'src/elv5/processes/cctv/cctv02_bandwidth.dart';
 export 'src/elv5/processes/cctv/cctv03_storage.dart';
 export 'src/elv5/processes/lan/lan01_path_length.dart';
