@@ -1,0 +1,70 @@
+name: ELV4 Exact Head
+
+on:
+  push:
+    branches: [feat/flutter-elv4-power-topology-design]
+  pull_request:
+    branches: [main]
+    paths:
+      - apps/mobile/**
+      - packages/engineering_core/**
+      - docs/product/elv4-*
+      - docs/product/elv4-implementation/**
+      - docs/audit/elv4-*
+      - scripts/ci/**
+      - .github/workflows/elv4-exact-head.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  technical:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.7'
+          channel: stable
+          cache: true
+      - name: Verify immutable source head
+        env:
+          ELV4_REPORT_DIR: ${{ runner.temp }}/elv4-exact-head
+        run: bash scripts/ci/run-elv4-exact-head.sh
+      - name: Preserve exact-head evidence and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: elv4-exact-head-${{ github.event.pull_request.head.sha || github.sha }}
+          path: ${{ runner.temp }}/elv4-exact-head
+          if-no-files-found: error
+  runtime-acceptance:
+    needs: technical
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: elv4-exact-head-${{ github.event.pull_request.head.sha || github.sha }}
+          path: ${{ runner.temp }}/elv4-exact-head
+      - name: Require actual runtime closure
+        env:
+          REPORT_DIR: ${{ runner.temp }}/elv4-exact-head
+        run: |
+          args=(--require-accepted --technical-report "$REPORT_DIR/technical-report.json" --acceptance-output "$REPORT_DIR/runtime-acceptance.json")
+          if [[ -f "$REPORT_DIR/qualification-report.json" ]]; then
+            args+=(--qualification-report "$REPORT_DIR/qualification-report.json")
+          fi
+          python3 scripts/ci/check-elv4-closure.py "${args[@]}"
+      - name: Preserve accepted event separately from source
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: elv4-runtime-accepted-${{ github.event.pull_request.head.sha || github.sha }}
+          path: ${{ runner.temp }}/elv4-exact-head/runtime-acceptance.json
+          if-no-files-found: error

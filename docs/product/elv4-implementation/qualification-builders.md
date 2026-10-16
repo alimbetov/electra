@@ -1,6 +1,6 @@
 # ELV4 — Qualification fixture construction contract
 
-Status: SPECIFICATION / RUNTIME NOT IMPLEMENTED
+Status: IMPLEMENTATION RECONCILED / RUNTIME ACCEPTANCE PENDING — see [current P9 audit](../../audit/elv4-p9-reconciliation.md).
 Data: [qualification.json](qualification.json). Closure policy: [RM15](remediation-contract.md#rm15--qualification-manifest-required-dimensions-and-closure).
 
 ## Fact materialization

@@ -1,6 +1,6 @@
 # P9 — Requirement reconciliation, exact-head gate and handoff
 
-Status: IMPLEMENTATION DESIGN DRAFT / CLOSURE OPEN
+Status: IMPLEMENTATION RECONCILED / RUNTIME ACCEPTANCE PENDING — see [current P9 audit](../../audit/elv4-p9-reconciliation.md).
 Consumes P0–P8 implementation and evidence.
 Shared rules: [runtime contracts](shared-contracts.md).
 Resolved audit decisions: [RM01–RM15](remediation-contract.md).
@@ -64,8 +64,19 @@ ELV5 receives typed physical results, required-input findings and scenario/polic
 
 Record separate events with timestamp, source SHA and evidence refs: DESIGN_REVIEWED, IMPLEMENTED, RUNTIME_ACCEPTED, MERGED and CLOSED. Merge commit and tested source may differ; identify both and any required post-merge evidence. Documentation-only status updates link back to accepted source evidence and do not masquerade as a new runtime run.
 
-Current outcome: specification prepared for all ten packages; no runtime acceptance evidence is claimed by this branch update.
+Current outcome: all 80 rows reconciled to source/tests, with concrete blocking gaps in [closure.json](closure.json). No RUNTIME_ACCEPTED, MERGED or CLOSED event has occurred. The permanent exact-head workflow verifies technical regressions; it cannot erase unresolved integration findings.
 
 ## Remediation closure interpretation
 
 A finding is SPEC_RESOLVED only when all linked governing/shared/package contracts and wire/qualification artifacts agree. It stays RUNTIME_NOT_IMPLEMENTED until source and RMxx-T evidence pass. Consume qualification.json as the sole positive process×dimension gate; required UNRESOLVED/BLOCKED/NOT_CALCULATED prevents closure. Recheck all existing result consumers for RM01 and both revision creation/port writer paths for RM03/RM07/RM10. Historical audit reports remain immutable evidence of the old design; later remediation status is recorded separately.
+
+## Exact-head evidence storage
+
+The committed ledger records implementation and earlier executed evidence. It
+cannot embed its own final Git SHA. The current run's qualification report must
+also contain `requirementResults`: exactly the 80 requirement IDs, each with
+`status: PASS` and nonempty `evidenceRefs`. The closure validator verifies these,
+the seven-case process/context/dimension matrix, the technical report's SHA and
+all blocking dispositions before emitting a timestamped `RUNTIME_ACCEPTED`
+event into a separate CI artifact. The source ledger's prior `testedSha` is not
+misrepresented as the new run. MERGED and CLOSED remain separate later events.

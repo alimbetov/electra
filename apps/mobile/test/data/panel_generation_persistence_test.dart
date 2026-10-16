@@ -4,6 +4,7 @@ import 'package:electra_mobile/data/repositories/drift_protection_repository.dar
 import 'package:electra_mobile/data/repositories/drift_panel_generation_repository.dart';
 import 'package:electra_mobile/data/repositories/drift_cable_routing_repository.dart';
 import 'package:electra_mobile/data/repositories/drift_floor_routing_repository.dart';
+
 import 'dart:async';
 
 import 'dart:io';
@@ -510,7 +511,7 @@ void main() {
         (await database.select(database.electricalCircuits).get()).single.id,
         'circuit-1',
       );
-      expect(database.schemaVersion, 17);
+      expect(database.schemaVersion, 23);
       await panels.save(config());
       await panels.archive(project.id, 'generated-panel');
       data = await panels.load(project.id);

@@ -3,9 +3,12 @@ import 'package:electra_mobile/data/repositories/drift_electrical_load_repositor
 import 'package:electra_mobile/data/repositories/drift_dependency_recalculation_repository.dart';
 import 'package:electra_mobile/data/repositories/drift_protection_repository.dart';
 import 'package:electra_mobile/data/repositories/drift_manufacturer_repository.dart';
+
 import 'dart:convert';
+
 import 'package:electra_mobile/data/repositories/drift_cable_routing_repository.dart';
 import 'package:electra_mobile/data/repositories/drift_floor_routing_repository.dart';
+
 import 'dart:async';
 
 import 'dart:io';
@@ -573,7 +576,7 @@ void main() {
       expect(data.catalogs, isEmpty);
       expect(data.selections, isEmpty);
       expect(data.protection.rulesets.length, 1);
-      expect(database.schemaVersion, 17);
+      expect(database.schemaVersion, 23);
       await database.close();
       await directory.delete(recursive: true);
     },

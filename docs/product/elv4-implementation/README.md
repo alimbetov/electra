@@ -1,8 +1,8 @@
 # ELV4 — Implementation technical specification
 
-Status: IMPLEMENTATION DESIGN DRAFT / RUNTIME NOT STARTED
+Status: IMPLEMENTATION RECONCILED / RUNTIME ACCEPTANCE PENDING — see [current P9 audit](../../audit/elv4-p9-reconciliation.md).
 Branch: `feat/flutter-elv4-power-topology-design`
-Inspected source: `7f1c701cb4ba492589321f8f9827d20464ddaefb`
+Implementation source reviewed: `626cb2d4500be6aba3e0230c1b4f52603dc0d38f` (ELV3 merged baseline remains `7f1c701`).
 Preceding design: `ce8c971`
 
 This specification decomposes all ten P0–P9 packages into implementable requirements. It refines the [governing specification](../elv4-power-topology-design-specification.md) and [coordinated contract](../elv4-coordinated-p0-p9-contract.md); it does not supersede ELV1–ELV3 ownership or certify their closure. Each file defines contracts, implementation order, failure behavior and acceptance cases. Names marked proposed describe future code, not implemented APIs.
@@ -20,7 +20,7 @@ This specification decomposes all ten P0–P9 packages into implementable requir
 | P8 | [Runtime verification](p8-acceptance.md) | Public-command verticals, migration, restart and races |
 | P9 | [Closure and handoff](p9-closure.md) | Requirement-to-evidence reconciliation at exact SHA |
 
-[Shared runtime contracts](shared-contracts.md) and [resolved RM01–RM15 decisions](remediation-contract.md) apply to every package. [Wire registry/schemas](wire-contract.md), [qualification manifest](qualification.json) and [public-builder contract](qualification-builders.md) are normative implementation inputs. [Requirement ledger](requirements.json) records design traceability; every runtime status remains NOT_STARTED. Test IDs denote planned assertions, not tests that have run.
+[Shared runtime contracts](shared-contracts.md) and [resolved RM01–RM15 decisions](remediation-contract.md) apply to every package. [Wire registry/schemas](wire-contract.md), [qualification manifest](qualification.json) and [public-builder contract](qualification-builders.md) are normative implementation inputs. [Requirement ledger](requirements.json) records concrete source/test mappings for all 80 rows, implementation scope and blocking findings. See the [current audit](../../audit/elv4-p9-reconciliation.md) for executed evidence and limitations. No package is runtime-accepted; existing test implementations and their execution are distinguished. The first implementation entry is historical.
 
 ## Implementation sequence
 

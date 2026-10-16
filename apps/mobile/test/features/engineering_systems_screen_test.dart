@@ -3,6 +3,7 @@ import 'package:electra_mobile/features/calculations/engineering_systems_screen.
 import 'package:engineering_core/engineering_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
 import 'protection_screen_test.dart' show protectionFixture;
 
 ProjectEngineeringSystemsSnapshot systemsFixture() {

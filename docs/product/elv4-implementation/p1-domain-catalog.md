@@ -1,6 +1,6 @@
 # P1 — Typed domain, catalog and operating scenarios
 
-Status: IMPLEMENTATION DESIGN DRAFT
+Status: IMPLEMENTATION RECONCILED / RUNTIME ACCEPTANCE PENDING — see [current P9 audit](../../audit/elv4-p9-reconciliation.md).
 Consumes P0 ownership map; supplies P2 schema, P3 graph and P4–P6 arithmetic.
 Shared rules: [runtime contracts](shared-contracts.md).
 Resolved audit decisions: [RM01–RM15](remediation-contract.md).

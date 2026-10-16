@@ -1,4 +1,5 @@
 import 'package:engineering_core/engineering_core.dart';
+
 import 'dependency_recalculation_repository.dart';
 
 class CircuitProtectionView {

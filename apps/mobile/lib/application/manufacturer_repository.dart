@@ -1,5 +1,7 @@
 import 'dart:convert';
+
 import 'package:engineering_core/engineering_core.dart';
+
 import 'protection_repository.dart';
 
 class ManufacturerCandidate {

@@ -1,6 +1,6 @@
 # P3 — Scenario power graph, validation and trace
 
-Status: IMPLEMENTATION DESIGN DRAFT
+Status: IMPLEMENTATION RECONCILED / RUNTIME ACCEPTANCE PENDING — see [current P9 audit](../../audit/elv4-p9-reconciliation.md).
 Consumes P1 typed inputs and P2 consistent reader. Supplies P4–P7.
 Shared rules: [runtime contracts](shared-contracts.md).
 Resolved audit decisions: [RM01–RM15](remediation-contract.md).

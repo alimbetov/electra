@@ -3,6 +3,7 @@ import 'package:electra_mobile/data/repositories/drift_electrical_load_repositor
 import 'package:electra_mobile/data/repositories/drift_dependency_recalculation_repository.dart';
 import 'package:electra_mobile/data/repositories/drift_cable_routing_repository.dart';
 import 'package:electra_mobile/data/repositories/drift_floor_routing_repository.dart';
+
 import 'dart:async';
 import 'dart:convert';
 
@@ -455,7 +456,7 @@ void main() {
       );
       snapshot = await repository.load(project.id);
       expect(snapshot.session.cache, isEmpty);
-      expect(database.schemaVersion, 17);
+      expect(database.schemaVersion, 23);
       expect(
         (await DriftElectricalCircuitRepository(
           database,

@@ -7,15 +7,23 @@ abstract interface class ElvWorkspaceCommand {
   String get projectId;
 }
 
-abstract interface class ElvPhysicalRoutingWorkspaceService {
+/// Narrow public mutation boundary shared by ELV editor workspaces.
+///
+/// The complete physical-routing workspace remains available below. Consumers
+/// that only commit already-reviewed commands do not need to depend on trace or
+/// read-model capabilities they never call.
+abstract interface class ElvWorkspaceCommandService {
+  Future<ElvCommandResult<Object?>> execute(ElvWorkspaceCommand command);
+}
+
+abstract interface class ElvPhysicalRoutingWorkspaceService
+    implements ElvWorkspaceCommandService {
   Future<PhysicalRoutingWorkspaceState> load({
     required String projectId,
     String? connectionId,
   });
 
   Stream<PhysicalRoutingWorkspaceState> watch(String projectId);
-
-  Future<ElvCommandResult<Object?>> execute(ElvWorkspaceCommand command);
 
   Future<PhysicalTraceResult> traceConnection(
     String projectId,

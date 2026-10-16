@@ -260,7 +260,7 @@ void main() {
     final names = tables.map((row) => row.read<String>('name')).toSet();
 
     expect(restoredRoom?.name, 'Workshop');
-    expect(database.schemaVersion, 17);
+    expect(database.schemaVersion, 23);
     expect(
       names,
       containsAll([

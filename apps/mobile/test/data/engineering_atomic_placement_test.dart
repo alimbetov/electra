@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:drift/native.dart';
 import 'package:electra_mobile/application/component_placement_history.dart';
@@ -14,6 +15,7 @@ import 'package:electra_mobile/data/repositories/drift_engineering_placement_rep
 import 'package:electra_mobile/data/repositories/drift_engineering_topology_repository.dart';
 import 'package:engineering_core/engineering_core.dart';
 import 'package:flutter_test/flutter_test.dart';
+
 import '../support/engineering_placement_fixture.dart';
 
 Future<void> seedAtomic(AppDatabase db) async {

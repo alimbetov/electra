@@ -1,7 +1,10 @@
 import '../elv_deletion_guards.dart';
+
 import 'dart:convert';
+
 import 'package:drift/drift.dart';
 import 'package:engineering_core/engineering_core.dart';
+
 import '../../application/engineering_system_repository.dart';
 import '../database/app_database.dart';
 import 'drift_project_hierarchy_repository.dart';
@@ -261,6 +264,13 @@ class DriftEngineeringSystemRepository implements EngineeringSystemRepository {
               )).getSingleOrNull();
         final role = membership.role.trim();
         if (old != null && old.deletedAt == null && old.role == role) return;
+        if (old != null && old.deletedAt == null && old.role != role) {
+          await guardSystemPowerOwnedMembership(
+            database,
+            membership.systemId,
+            membership.componentId,
+          );
+        }
         final now = DateTime.now().toUtc();
         await database
             .into(database.componentEngineeringMemberships)

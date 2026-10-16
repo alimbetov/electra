@@ -1,6 +1,6 @@
 # Electra — ELV4 Expanded P0–P9 Delivery Plan
 
-Status: DESIGN DRAFT / ALL PACKAGES OPEN
+Status: IMPLEMENTATION RECONCILED / RUNTIME ACCEPTANCE BLOCKED — see [current audit](../audit/elv4-p9-reconciliation.md).
 Branch: `feat/flutter-elv4-power-topology-design`
 Baseline: `7f1c701cb4ba492589321f8f9827d20464ddaefb`
 Parent: [ELV4 specification](elv4-power-topology-design-specification.md)
@@ -213,3 +213,7 @@ Each package now has eight numbered MUST requirements, planned acceptance IDs, i
 ## Technical audit remediation gates
 
 All packages include applicable RM01-T…RM15-T acceptance refinements. The [resolved contract](elv4-implementation/remediation-contract.md), strict wire schemas/examples and [qualification manifest](elv4-implementation/qualification.json) are required design inputs. All 80 original requirement IDs remain stable; their runtime states remain NOT_STARTED. A specification resolution never substitutes for P0 baseline evidence or an exact-SHA runtime gate.
+
+## Current implementation reconciliation (2026-10-15)
+
+The [P9 audit](../audit/elv4-p9-reconciliation.md), [80-row source/test ledger](elv4-implementation/requirements.json) and [closure record](elv4-implementation/closure.json) supersede historical progress statements. Core/runtime/UI code exists; integration and qualification gaps remain explicit. `RUNTIME_ACCEPTED`, `MERGED` and `CLOSED` are separate events and none is inferred from a targeted test run. Governing acceptance obligations are unchanged.

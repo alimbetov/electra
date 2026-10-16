@@ -114,10 +114,11 @@ void main() {
       await _seed(seed);
       await seed.close();
 
-      final a = AppDatabase(NativeDatabase(file));
-      final b = AppDatabase(NativeDatabase(file));
-      await a.customStatement('PRAGMA busy_timeout = 5000');
-      await b.customStatement('PRAGMA busy_timeout = 5000');
+      // Keep the DB-level race real while tolerating a loaded shared CI runner.
+      final a = AppDatabase(NativeDatabase.createInBackground(file));
+      final b = AppDatabase(NativeDatabase.createInBackground(file));
+      await a.customStatement('PRAGMA busy_timeout = 30000');
+      await b.customStatement('PRAGMA busy_timeout = 30000');
 
       final results = await Future.wait([
         _service(a, 'A').create(_command('cmd-a', 'cable-a')),

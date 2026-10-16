@@ -36,11 +36,11 @@ DriftElvDesignRevisionRepository _repository(AppDatabase db) =>
 
 void main() {
   test(
-    'schema 20 exposes canonical P3 tables and keeps legacy CableRuns',
+    'current schema exposes canonical P3 tables and keeps legacy CableRuns',
     () async {
       final db = AppDatabase(NativeDatabase.memory());
       addTearDown(db.close);
-      expect(db.schemaVersion, 20);
+      expect(db.schemaVersion, greaterThanOrEqualTo(20));
       final names =
           (await db
                   .customSelect(
@@ -151,4 +151,114 @@ void main() {
           ..where((row) => row.id.equals('REV-1'))).getSingle();
     expect(old.state, 'FROZEN');
   });
+  test(
+    'restoring older frozen base allocates project maximum sequence',
+    () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      await _seedProject(db);
+      final repo = _repository(db);
+      await repo.bootstrap(
+        const BootstrapProjectDesignRevisionCommand(
+          commandId: 'b',
+          projectId: 'project-1',
+          revisionId: 'R1',
+          code: 'R1',
+        ),
+      );
+      await repo.freeze(
+        const FreezeProjectDesignRevisionCommand(
+          commandId: 'f1',
+          projectId: 'project-1',
+          designRevisionId: 'R1',
+          expectedRevision: 1,
+        ),
+      );
+      await repo.createNext(
+        const CreateNextWorkingDesignRevisionCommand(
+          commandId: 'n2',
+          projectId: 'project-1',
+          newRevisionId: 'R2',
+          code: 'R2',
+          basedOnRevisionId: 'R1',
+        ),
+      );
+      await repo.freeze(
+        const FreezeProjectDesignRevisionCommand(
+          commandId: 'f2',
+          projectId: 'project-1',
+          designRevisionId: 'R2',
+          expectedRevision: 1,
+        ),
+      );
+      const restore = CreateNextWorkingDesignRevisionCommand(
+        commandId: 'n3',
+        projectId: 'project-1',
+        newRevisionId: 'R3',
+        code: 'R3',
+        basedOnRevisionId: 'R1',
+      );
+      final result = await repo.createNext(restore);
+      expect(result, isA<ElvCommandSuccess<ProjectDesignRevision>>());
+      expect(
+        (result as ElvCommandSuccess<ProjectDesignRevision>).value.sequence,
+        3,
+      );
+      final replay = await repo.createNext(restore);
+      expect(
+        (replay as ElvCommandSuccess<ProjectDesignRevision>).value.sequence,
+        3,
+      );
+      expect(await db.select(db.projectDesignRevisions).get(), hasLength(3));
+    },
+  );
+
+  test(
+    'create-next rejects altered snapshot payload before inserting revision',
+    () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      await _seedProject(db);
+      final repo = _repository(db);
+      await repo.bootstrap(
+        const BootstrapProjectDesignRevisionCommand(
+          commandId: 'b',
+          projectId: 'project-1',
+          revisionId: 'R1',
+          code: 'R1',
+        ),
+      );
+      await repo.freeze(
+        const FreezeProjectDesignRevisionCommand(
+          commandId: 'f1',
+          projectId: 'project-1',
+          designRevisionId: 'R1',
+          expectedRevision: 1,
+        ),
+      );
+      // Deliberately corrupt historical input while retaining both stored hashes.
+      await db.customStatement(
+        "UPDATE design_revision_physical_snapshots SET payload_json = '{\"runs\":[],\"tampered\":true}' WHERE design_revision_id = 'R1'",
+      );
+      final result = await repo.createNext(
+        const CreateNextWorkingDesignRevisionCommand(
+          commandId: 'n2',
+          projectId: 'project-1',
+          newRevisionId: 'R2',
+          code: 'R2',
+          basedOnRevisionId: 'R1',
+        ),
+      );
+      expect(
+        result,
+        isA<ElvCommandFailureResult<ProjectDesignRevision>>().having(
+          (value) => value.failure.code,
+          'code',
+          'ELV_DESIGN_REVISION_SNAPSHOT_INVALID',
+        ),
+      );
+      expect(await db.select(db.projectDesignRevisions).get(), hasLength(1));
+      expect((await repo.context('project-1')).workingDesignRevisionId, isNull);
+    },
+  );
 }

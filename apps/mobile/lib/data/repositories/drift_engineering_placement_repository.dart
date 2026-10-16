@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'drift_engineering_placement_aggregate.dart';
 
 import 'package:drift/drift.dart';

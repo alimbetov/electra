@@ -1,5 +1,6 @@
 import 'package:engineering_core/engineering_core.dart';
 import 'package:flutter/material.dart';
+
 import '../../application/engineering_profile_palette.dart';
 import 'editor_interaction.dart';
 

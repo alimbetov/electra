@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+
 import 'database/app_database.dart';
 
 Future<void> guardComponentElvPorts(
@@ -23,6 +24,68 @@ Future<void> guardComponentElvPorts(
     );
 }
 
+Future<void> guardMutableEngineeringPortAgainstPowerOwnership(
+  AppDatabase database,
+  String projectId,
+  String portId,
+) async {
+  final owned =
+      await database
+          .customSelect(
+            '''
+SELECT 1
+WHERE
+  EXISTS (
+    SELECT 1 FROM power_port_bindings b
+    WHERE b.project_id = ?1 AND b.port_id = ?2 AND b.deleted_at IS NULL
+  )
+  OR EXISTS (
+    SELECT 1 FROM power_transfer_bindings b
+    WHERE b.project_id = ?1 AND b.input_port_id = ?2 AND b.deleted_at IS NULL
+  )
+  OR EXISTS (
+    SELECT 1 FROM power_transfer_outputs b
+    WHERE b.project_id = ?1 AND b.output_port_id = ?2
+  )
+  OR EXISTS (
+    SELECT 1 FROM power_load_bindings b
+    WHERE b.project_id = ?1 AND b.input_port_id = ?2 AND b.deleted_at IS NULL
+  )
+  OR EXISTS (
+    SELECT 1 FROM power_capacity_group_members b
+    WHERE b.project_id = ?1 AND b.output_port_id = ?2
+  )
+  OR EXISTS (
+    SELECT 1 FROM power_supply_requirement_inputs b
+    WHERE b.project_id = ?1 AND b.input_port_id = ?2
+  )
+  OR EXISTS (
+    SELECT 1 FROM poe_delivery_bindings b
+    WHERE b.project_id = ?1
+      AND (b.pse_port_id = ?2 OR b.pd_port_id = ?2)
+      AND b.deleted_at IS NULL
+  )
+  OR EXISTS (
+    SELECT 1 FROM backup_protected_outputs b
+    WHERE b.project_id = ?1 AND b.output_port_id = ?2
+  )
+LIMIT 1
+''',
+            variables: [
+              Variable.withString(projectId),
+              Variable.withString(portId),
+            ],
+            readsFrom: database.allTables.toSet(),
+          )
+          .getSingleOrNull();
+  if (owned != null) {
+    throw StateError(
+      'ELV4_POWER_PORT_OWNED: Release or replace revision-scoped power '
+      'ownership before editing or retiring this engineering port.',
+    );
+  }
+}
+
 Future<void> guardSystemElvTopology(
   AppDatabase database,
   String systemId, {
@@ -37,6 +100,7 @@ Future<void> guardSystemElvTopology(
       throw StateError(
         'Release the profile binding before changing system participation.',
       );
+    await guardSystemPowerOwnedMembership(database, systemId, componentId);
   }
   final ports =
       componentId == null
@@ -67,6 +131,101 @@ Future<void> guardSystemElvTopology(
     throw StateError(
       'Resolve engineering connections and topology groups before changing system participation or ownership.',
     );
+}
+
+Future<void> guardSystemPowerOwnedMembership(
+  AppDatabase database,
+  String systemId,
+  String componentId,
+) async {
+  final row =
+      await database
+          .customSelect(
+            '''
+SELECT 1
+FROM project_engineering_systems s
+WHERE s.id = ?
+  AND s.deleted_at IS NULL
+  AND (
+    EXISTS (
+      SELECT 1 FROM power_component_bindings b
+      WHERE b.project_id = s.project_id
+        AND b.component_id = ?
+        AND b.deleted_at IS NULL
+    )
+    OR EXISTS (
+      SELECT 1 FROM power_transfer_bindings b
+      WHERE b.project_id = s.project_id
+        AND b.component_id = ?
+        AND b.deleted_at IS NULL
+    )
+    OR EXISTS (
+      SELECT 1 FROM power_capacity_groups b
+      WHERE b.project_id = s.project_id
+        AND b.owner_component_id = ?
+        AND b.deleted_at IS NULL
+    )
+    OR EXISTS (
+      SELECT 1 FROM power_supply_requirements b
+      WHERE b.project_id = s.project_id
+        AND b.consumer_component_id = ?
+        AND b.deleted_at IS NULL
+    )
+    OR EXISTS (
+      SELECT 1 FROM power_scenario_states b
+      WHERE b.project_id = s.project_id
+        AND b.component_id = ?
+    )
+    OR EXISTS (
+      SELECT 1 FROM backup_assemblies b
+      WHERE b.project_id = s.project_id
+        AND b.deleted_at IS NULL
+        AND (
+          b.ups_component_id = ?
+          OR b.charger_component_id = ?
+          OR b.bank_component_id = ?
+        )
+    )
+    OR EXISTS (
+      SELECT 1 FROM battery_bank_bindings b
+      WHERE b.project_id = s.project_id
+        AND b.bank_component_id = ?
+        AND b.deleted_at IS NULL
+    )
+    OR EXISTS (
+      SELECT 1
+      FROM power_port_bindings b
+      JOIN engineering_port_instances p ON p.id = b.port_id
+      WHERE b.project_id = s.project_id
+        AND p.component_id = ?
+        AND b.deleted_at IS NULL
+        AND p.deleted_at IS NULL
+    )
+    OR EXISTS (
+      SELECT 1
+      FROM power_load_bindings b
+      JOIN engineering_port_instances p ON p.id = b.input_port_id
+      WHERE b.project_id = s.project_id
+        AND p.component_id = ?
+        AND b.deleted_at IS NULL
+        AND p.deleted_at IS NULL
+    )
+  )
+LIMIT 1
+''',
+            variables: [
+              Variable.withString(systemId),
+              for (var i = 0; i < 11; i++) Variable.withString(componentId),
+            ],
+            readsFrom: database.allTables.toSet(),
+          )
+          .getSingleOrNull();
+  if (row != null) {
+    throw StateError(
+      'ELV4_POWER_MEMBERSHIP_OWNED: Release or replace revision-scoped power '
+      'ownership before changing engineering system participation.',
+    );
+  }
 }
 
 enum HierarchyElvScope { project, floor, room }

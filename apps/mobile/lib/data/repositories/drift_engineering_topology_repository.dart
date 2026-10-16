@@ -1,8 +1,11 @@
 import 'dart:convert';
+
 import 'package:drift/drift.dart';
 import 'package:engineering_core/engineering_core.dart';
+
 import '../../application/engineering_topology_repository.dart';
 import '../database/app_database.dart';
+import '../elv_deletion_guards.dart';
 import 'drift_engineering_system_repository.dart';
 
 class DriftEngineeringTopologyRepository
@@ -121,6 +124,31 @@ class DriftEngineeringTopologyRepository
       old.readNullable<DateTime>('deleted_at') == null &&
       canonicalEngineeringJson(_payload(old)) ==
           canonicalEngineeringJson(payload);
+
+  Future<void> _guardMutableConnectionAgainstPowerOwnership(
+    String projectId,
+    String connectionId,
+  ) async {
+    final owned =
+        await database
+            .customSelect(
+              'SELECT 1 FROM poe_delivery_path_members '
+              'WHERE project_id = ? AND connection_id = ? LIMIT 1',
+              variables: [
+                Variable.withString(projectId),
+                Variable.withString(connectionId),
+              ],
+              readsFrom: database.allTables.toSet(),
+            )
+            .getSingleOrNull();
+    if (owned != null) {
+      throw StateError(
+        'ELV4_POWER_CONNECTION_OWNED: Replace the revision-scoped PoE '
+        'delivery path before editing or retiring this engineering connection.',
+      );
+    }
+  }
+
   Future<void> _uniqueCode(
     String table,
     String scopeColumn,
@@ -301,6 +329,11 @@ class DriftEngineeringTopologyRepository
     if (old != null && _payload(old)['componentId'] != p.componentId)
       throw StateError('Port identity cannot move between components.');
     if (_same(old, p.toMap())) return;
+    await guardMutableEngineeringPortAgainstPowerOwnership(
+      database,
+      projectId,
+      p.id,
+    );
     final binding =
         await (database.select(database.componentReferenceBindings)..where(
           (r) => r.componentId.equals(p.componentId) & r.deletedAt.isNull(),
@@ -361,6 +394,7 @@ class DriftEngineeringTopologyRepository
         if (c.groupId != null)
           _check(graph.groupFindings(graph.groups[c.groupId]!), draft: true);
         if (_same(old, c.toMap())) return;
+        await _guardMutableConnectionAgainstPowerOwnership(projectId, c.id);
         final now = DateTime.now().toUtc();
         await database
             .into(database.engineeringPortConnections)
@@ -509,6 +543,7 @@ class DriftEngineeringTopologyRepository
               ),
             );
       });
+
   @override
   Future<void> archive(
     String projectId,
@@ -526,6 +561,16 @@ class DriftEngineeringTopologyRepository
     final old = await _old(table, id, projectId);
     if (old == null || old.readNullable<DateTime>('deleted_at') != null)
       throw StateError('Topology object is unavailable.');
+    if (kind == TopologyObjectKind.port) {
+      await guardMutableEngineeringPortAgainstPowerOwnership(
+        database,
+        projectId,
+        id,
+      );
+    }
+    if (kind == TopologyObjectKind.connection) {
+      await _guardMutableConnectionAgainstPowerOwnership(projectId, id);
+    }
     if (kind == TopologyObjectKind.port &&
         (s.connections.any((c) => c.fromPortId == id || c.toPortId == id) ||
             s.internalLinks.any(

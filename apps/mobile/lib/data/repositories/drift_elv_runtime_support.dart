@@ -37,12 +37,18 @@ Future<ElvCommandResult<T>?> replayElvRuntimeCommand<T>({
       ),
     );
   }
-  if (row.outcomeKind != 'SUCCESS') {
+  if (row.outcomeKind == 'REJECTED') {
     return ElvCommandFailureResult(
+      _failureFromMap(
+        jsonDecode(row.logicalResultJson) as Map<String, dynamic>,
+      ),
+    );
+  }
+  if (row.outcomeKind != 'SUCCESS') {
+    return const ElvCommandFailureResult(
       ElvFailure(
-        code: 'ELV_REPLAYED_REJECTION',
-        category: ElvFailureCategory.validation,
-        details: {'logicalResultJson': row.logicalResultJson},
+        code: 'ELV_COMMAND_LEDGER_INVALID_OUTCOME',
+        category: ElvFailureCategory.storage,
       ),
     );
   }
@@ -81,11 +87,67 @@ Future<void> recordElvRuntimeSuccess({
       );
 }
 
+Future<ElvCommandFailureResult<T>> recordElvRuntimeRejection<T>({
+  required AppDatabase database,
+  required String projectId,
+  required String commandId,
+  required String commandType,
+  required String schema,
+  required Map<String, Object?> payload,
+  required ElvFailure failure,
+  required String originDeviceId,
+  DateTime? now,
+}) async {
+  final instant = (now ?? DateTime.now()).toUtc();
+  await database
+      .into(database.commandExecutionRecords)
+      .insert(
+        CommandExecutionRecordsCompanion.insert(
+          projectId: projectId,
+          commandId: commandId,
+          commandType: commandType,
+          payloadSchemaVersion: 1,
+          normalizedPayloadSha256: elvRuntimeFingerprint(schema, payload),
+          outcomeKind: 'REJECTED',
+          logicalResultJson: canonicalEngineeringJsonV1(_failureToMap(failure)),
+          createdAt: instant,
+          committedAt: instant,
+          originDeviceId: originDeviceId,
+        ),
+      );
+  return ElvCommandFailureResult(failure);
+}
+
+Map<String, Object?> _failureToMap(ElvFailure failure) => {
+  'code': failure.code,
+  'category': failure.category.name,
+  'entityType': failure.entityType,
+  'entityId': failure.entityId,
+  'field': failure.field,
+  'expectedRevision': failure.expectedRevision,
+  'actualRevision': failure.actualRevision,
+  'details': failure.details,
+};
+
+ElvFailure _failureFromMap(Map<String, dynamic> map) => ElvFailure(
+  code: map['code']! as String,
+  category: ElvFailureCategory.values.byName(map['category']! as String),
+  entityType: map['entityType'] as String?,
+  entityId: map['entityId'] as String?,
+  field: map['field'] as String?,
+  expectedRevision: (map['expectedRevision'] as num?)?.toInt(),
+  actualRevision: (map['actualRevision'] as num?)?.toInt(),
+  details: Map<String, Object?>.from(
+    map['details'] as Map? ?? const <String, Object?>{},
+  ),
+);
+
 ElvCommandFailureResult<T> elvRuntimeFailure<T>(
   String code,
   ElvFailureCategory category, {
   String? entityType,
   String? entityId,
+  String? field,
   int? expectedRevision,
   int? actualRevision,
   Map<String, Object?> details = const {},
@@ -95,6 +157,7 @@ ElvCommandFailureResult<T> elvRuntimeFailure<T>(
     category: category,
     entityType: entityType,
     entityId: entityId,
+    field: field,
     expectedRevision: expectedRevision,
     actualRevision: actualRevision,
     details: details,

@@ -6,6 +6,7 @@ import 'package:electra_mobile/features/editor/editor_interaction.dart';
 import 'package:engineering_core/engineering_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
 import '../../support/engineering_palette_fixture.dart';
 
 Future<void> pickCandidate(

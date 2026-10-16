@@ -1,6 +1,6 @@
 # P2 — Persistence, commands, history and frozen evidence
 
-Status: IMPLEMENTATION DESIGN DRAFT
+Status: IMPLEMENTATION RECONCILED / RUNTIME ACCEPTANCE PENDING — see [current P9 audit](../../audit/elv4-p9-reconciliation.md).
 Consumes P1 types and P0 integration map. Supplies all runtime packages.
 Shared rules: [runtime contracts](shared-contracts.md).
 Resolved audit decisions: [RM01–RM15](remediation-contract.md).

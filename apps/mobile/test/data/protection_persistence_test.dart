@@ -4,6 +4,7 @@ import 'package:electra_mobile/data/repositories/drift_dependency_recalculation_
 import 'package:electra_mobile/data/repositories/drift_protection_repository.dart';
 import 'package:electra_mobile/data/repositories/drift_cable_routing_repository.dart';
 import 'package:electra_mobile/data/repositories/drift_floor_routing_repository.dart';
+
 import 'dart:async';
 
 import 'dart:io';
@@ -420,7 +421,7 @@ void main() {
       expect(snapshot.documents.length, 3);
       expect(snapshot.rulesets, isEmpty);
       expect(snapshot.circuits.single.settings.rulesetId, isNull);
-      expect(database.schemaVersion, 17);
+      expect(database.schemaVersion, 23);
       await database.close();
       await directory.delete(recursive: true);
     },

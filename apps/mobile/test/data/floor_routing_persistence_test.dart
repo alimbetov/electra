@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:async';
+
 import 'package:drift/native.dart';
 import 'package:electra_mobile/application/geometry_repository.dart';
 import 'package:electra_mobile/application/floor_routing_repository.dart';
@@ -398,7 +399,7 @@ void main() {
       snapshot = await floorRepository.load(floor.id);
       expect(snapshot.graph().runs.length, 2);
       expect(snapshot.panels, isEmpty);
-      expect(database.schemaVersion, 17);
+      expect(database.schemaVersion, 23);
       await DriftProjectHierarchyRepository(database).deleteProject(project.id);
       expect((await floorRepository.load(floor.id)).floor, isNull);
       await database.close();

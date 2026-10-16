@@ -1,6 +1,6 @@
 # ELV4 — Shared runtime contracts
 
-Status: PROPOSED IMPLEMENTATION CONTRACT
+Status: IMPLEMENTATION RECONCILED / RUNTIME ACCEPTANCE PENDING — see [current P9 audit](../../audit/elv4-p9-reconciliation.md).
 Parents: [index](README.md), [coordinated design](../elv4-coordinated-p0-p9-contract.md).
 
 ## S1. Layers and proposed files

@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:drift/drift.dart';
 import 'package:engineering_core/engineering_core.dart';
+
 import '../../application/engineering_placement_command.dart';
 import '../../application/engineering_reference_repository.dart';
 import '../../application/id_generator.dart';

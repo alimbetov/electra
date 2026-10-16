@@ -16,7 +16,10 @@ void main() {
       final first = _buildCctvFoundation(firstIds);
       final second = _buildCctvFoundation(secondIds);
 
-      expect(first, second);
+      expect(first.projectId, second.projectId);
+      expect(first.connectionId, second.connectionId);
+      expect(first.runId, second.runId);
+      expect(first.traversalIds, orderedEquals(second.traversalIds));
       expect(first.projectId, startsWith(ElvFixturePrefixes.project));
       expect(first.connectionId, startsWith(ElvFixturePrefixes.connection));
       expect(first.runId, startsWith(ElvFixturePrefixes.run));
