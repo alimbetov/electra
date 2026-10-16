@@ -112,11 +112,14 @@ void main() {
     expect(await _pointerState(db, nodeKey), 'STALE');
     expect(await _revisionToken(db), 2);
 
-    final loadRows = await db.customSelect(
-      'SELECT id, origin_id FROM power_load_bindings '
-      'WHERE design_revision_id = ? AND deleted_at IS NULL ORDER BY id',
-      variables: [Variable.withString(builder.revisionId)],
-    ).get();
+    final loadRows =
+        await db
+            .customSelect(
+              'SELECT id, origin_id FROM power_load_bindings '
+              'WHERE design_revision_id = ? AND deleted_at IS NULL ORDER BY id',
+              variables: [Variable.withString(builder.revisionId)],
+            )
+            .get();
     expect(loadRows.map((row) => row.read<String>('id')).toList(), [
       'load-1',
       'load-2',
@@ -157,11 +160,14 @@ void main() {
       loads: [replacementLoad],
     );
     expect(await _revisionToken(db), 3);
-    final activeAfterReplacement = await db.customSelect(
-      'SELECT id, origin_id FROM power_load_bindings '
-      'WHERE design_revision_id = ? AND deleted_at IS NULL ORDER BY id',
-      variables: [Variable.withString(builder.revisionId)],
-    ).get();
+    final activeAfterReplacement =
+        await db
+            .customSelect(
+              'SELECT id, origin_id FROM power_load_bindings '
+              'WHERE design_revision_id = ? AND deleted_at IS NULL ORDER BY id',
+              variables: [Variable.withString(builder.revisionId)],
+            )
+            .get();
     expect(activeAfterReplacement, hasLength(1));
     expect(activeAfterReplacement.single.read<String>('id'), 'load-2');
     expect(
@@ -215,14 +221,17 @@ void main() {
       transfers: [transfer],
     );
     expect(transferReceipt.currentRevision, 5);
-    final transferRow = await db.customSelect(
-      'SELECT transfer_kind, payload_json FROM power_transfer_bindings '
-      'WHERE design_revision_id = ? AND id = ? AND deleted_at IS NULL',
-      variables: [
-        Variable.withString(builder.revisionId),
-        Variable.withString('selector-1'),
-      ],
-    ).getSingle();
+    final transferRow =
+        await db
+            .customSelect(
+              'SELECT transfer_kind, payload_json FROM power_transfer_bindings '
+              'WHERE design_revision_id = ? AND id = ? AND deleted_at IS NULL',
+              variables: [
+                Variable.withString(builder.revisionId),
+                Variable.withString('selector-1'),
+              ],
+            )
+            .getSingle();
     expect(transferRow.read<String>('transfer_kind'), 'SELECTOR');
     final storedPayload =
         (jsonDecode(transferRow.read<String>('payload_json')) as Map)
@@ -255,17 +264,20 @@ void main() {
     expect(await _activeCount(db, 'power_transfer_outputs'), 0);
     expect(await _revisionToken(db), 6);
 
-    final ledger = await db.customSelect(
-      'SELECT command_type, payload_schema FROM power_operation_records '
-      "WHERE command_type IN ('SET_POWER_LOAD_PROFILE', 'REPLACE_POWER_TRANSFERS') "
-      'ORDER BY operation_id',
-    ).get();
+    final ledger =
+        await db
+            .customSelect(
+              'SELECT command_type, payload_schema FROM power_operation_records '
+              "WHERE command_type IN ('SET_POWER_LOAD_PROFILE', 'REPLACE_POWER_TRANSFERS') "
+              'ORDER BY operation_id',
+            )
+            .get();
     expect(ledger, hasLength(5));
     expect(
       ledger.every(
-        (row) => row.read<String>('payload_schema').startsWith(
-          'electra.elv4-command.v1/',
-        ),
+        (row) => row
+            .read<String>('payload_schema')
+            .startsWith('electra.elv4-command.v1/'),
       ),
       isTrue,
     );
@@ -337,18 +349,23 @@ Future<void> _publish(
 }
 
 Future<String> _pointerState(AppDatabase db, PowerNodeKeyV2 node) async =>
-    (await db.customSelect(
-      'SELECT state FROM power_evaluation_pointers '
-      'WHERE logical_node_key_sha256 = ?',
-      variables: [Variable.withString(node.sha256)],
-    ).getSingle()).read<String>('state');
+    (await db
+            .customSelect(
+              'SELECT state FROM power_evaluation_pointers '
+              'WHERE logical_node_key_sha256 = ?',
+              variables: [Variable.withString(node.sha256)],
+            )
+            .getSingle())
+        .read<String>('state');
 
 Future<int> _revisionToken(AppDatabase db) async =>
     (await db.select(db.projectDesignRevisions).getSingle()).revision;
 
-Future<int> _activeCount(AppDatabase db, String table) async =>
-    (await db.customSelect(
-      table == 'power_transfer_outputs'
-          ? 'SELECT COUNT(*) AS c FROM power_transfer_outputs'
-          : 'SELECT COUNT(*) AS c FROM $table WHERE deleted_at IS NULL',
-    ).getSingle()).read<int>('c');
+Future<int> _activeCount(AppDatabase db, String table) async => (await db
+        .customSelect(
+          table == 'power_transfer_outputs'
+              ? 'SELECT COUNT(*) AS c FROM power_transfer_outputs'
+              : 'SELECT COUNT(*) AS c FROM $table WHERE deleted_at IS NULL',
+        )
+        .getSingle())
+    .read<int>('c');
