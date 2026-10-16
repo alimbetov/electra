@@ -1,6 +1,8 @@
 import 'dart:async';
+
 import '../../application/engineering_placement_command.dart';
 import '../../application/id_generator.dart';
+
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -11,6 +13,9 @@ import '../../application/engineering_reference_repository.dart';
 import 'engineering_profile_palette.dart';
 import 'engineering_placement_preview.dart';
 import '../../application/catalog_preferences_repository.dart';
+import '../../application/power_workspace_overlay_geometry.dart';
+import '../../application/power_workspace_projection.dart';
+import '../../application/power_workspace_state.dart';
 import '../../domain/models.dart';
 import '../../domain/project_models.dart';
 import '../../domain/system_component_catalog.dart';
@@ -20,6 +25,10 @@ import 'component_catalog_sheet.dart';
 import 'editor_interaction.dart';
 import 'electrical_loads_screen.dart';
 import 'electrical_circuits_screen.dart';
+import 'power_workspace_editor_binding.dart';
+import 'power_workspace_overlay_painter.dart';
+import 'power_workspace_panel.dart';
+import 'power_workspace_panel_host.dart';
 import 'room_routing_screen.dart';
 
 typedef ComponentPlacementCallback =
@@ -36,6 +45,9 @@ class RoomEditorScreen extends StatefulWidget {
     required this.room,
     required this.geometry,
     this.components = const [],
+    this.powerWorkspace,
+    this.powerOverlaySegments = const [],
+    this.powerWorkspaceError,
     this.engineeringReferences,
     this.engineeringReferenceMessage,
     this.engineeringTopologyProfiles = const [],
@@ -52,6 +64,9 @@ class RoomEditorScreen extends StatefulWidget {
   final RoomRecord room;
   final RoomGeometrySnapshot geometry;
   final List<ComponentInstance> components;
+  final PowerWorkspaceEditorBinding? powerWorkspace;
+  final List<PowerWorkspaceOverlaySegment> powerOverlaySegments;
+  final Object? powerWorkspaceError;
   final ProjectEngineeringReferences? engineeringReferences;
   final String? engineeringReferenceMessage;
   final List<TopologyProfile> engineeringTopologyProfiles;
@@ -72,6 +87,11 @@ class RoomEditorScreen extends StatefulWidget {
 
 class _RoomEditorScreenState extends State<RoomEditorScreen> {
   static const _navigationResolver = SurfaceNavigationResolver();
+  static const _wideEditorBreakpoint = 900.0;
+  final FocusNode _powerWorkspaceFocusNode = FocusNode(
+    debugLabel: 'power-workspace',
+  );
+  bool powerInspectorVisible = false;
 
   EditorTool tool = EditorTool.select;
   Discipline discipline = Discipline.electrical;
@@ -136,6 +156,12 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
             widget.engineeringTopologyProfiles) {
       resetCandidate();
     }
+  }
+
+  @override
+  void dispose() {
+    _powerWorkspaceFocusNode.dispose();
+    super.dispose();
   }
 
   PlacementCompatibilityResult? get placementPreview {
@@ -517,18 +543,72 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
     }
   }
 
+  Future<void> openPowerWorkspace() async {
+    final binding = widget.powerWorkspace;
+    if (binding == null) return;
+    if (MediaQuery.sizeOf(context).width >= _wideEditorBreakpoint) {
+      setState(() => powerInspectorVisible = !powerInspectorVisible);
+      return;
+    }
+    await showPowerWorkspaceSheet(
+      context: context,
+      restoreFocusTo: _powerWorkspaceFocusNode,
+      child: PowerWorkspacePanelHost(
+        binding: binding,
+        onFindingSelected: handlePowerFinding,
+      ),
+    );
+  }
+
+  void handlePowerFinding(PowerWorkspaceFindingProjection finding) {
+    final entityId = finding.entityRef;
+    if (entityId == null) return;
+    ComponentInstance? component;
+    for (final candidate in widget.components) {
+      if (candidate.id == entityId) {
+        component = candidate;
+        break;
+      }
+    }
+    if (component == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Referenced entity: $entityId')));
+      return;
+    }
+    setState(() {
+      activePatchId = component!.hostSurfacePatchId;
+      selection = EditorSelection(
+        kind: EditorSelectionKind.component,
+        id: component.id,
+        hostPatchId: component.hostSurfacePatchId,
+      );
+      tool = EditorTool.select;
+      navigationCandidate = null;
+      currentPreviewEdgeId = null;
+    });
+    unawaited(widget.powerWorkspace?.selectComponent(component.id));
+  }
+
   void handleSurfaceTap(SurfacePatch patch, Point2Mm localPoint) {
     if (_navigateAcrossStrongEdge(patch, localPoint)) return;
 
     switch (tool) {
       case EditorTool.select:
-        setState(() {
-          selection = hitTestSurface(
-            geometry: widget.geometry,
-            patch: patch,
-            localPoint: localPoint,
-          );
-        });
+        final nextSelection = hitTestSurface(
+          geometry: widget.geometry,
+          patch: patch,
+          localPoint: localPoint,
+          components: widget.components,
+        );
+        setState(() => selection = nextSelection);
+        unawaited(
+          widget.powerWorkspace?.selectComponent(
+            nextSelection?.kind == EditorSelectionKind.component
+                ? nextSelection!.id
+                : null,
+          ),
+        );
       case EditorTool.measure:
         final start = measurementStart;
         if (start == null) {
@@ -561,7 +641,7 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
   Widget build(BuildContext context) {
     final patch = activePatch;
     final previewPatch = adjacentPreviewPatch;
-    final inspector =
+    final baseInspector =
         engineeringChoice != null
             ? previewDetails()
             : _Inspector(
@@ -578,6 +658,13 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
               components: widget.components,
               activeComponentDefinition: activeComponentDefinition,
             );
+    final inspector =
+        powerInspectorVisible && widget.powerWorkspace != null
+            ? PowerWorkspacePanelHost(
+              binding: widget.powerWorkspace!,
+              onFindingSelected: handlePowerFinding,
+            )
+            : baseInspector;
 
     return Scaffold(
       appBar: AppBar(
@@ -587,6 +674,23 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
               : '${widget.room.name} · ${patch.surfaceId}',
         ),
         actions: [
+          if (widget.powerWorkspace != null)
+            IconButton(
+              key: const ValueKey('power-workspace-open'),
+              focusNode: _powerWorkspaceFocusNode,
+              tooltip: 'Power workspace',
+              icon: Icon(
+                powerInspectorVisible ? Icons.bolt : Icons.bolt_outlined,
+              ),
+              onPressed: openPowerWorkspace,
+            )
+          else if (widget.powerWorkspaceError != null)
+            IconButton(
+              tooltip:
+                  'Power workspace unavailable: ${widget.powerWorkspaceError}',
+              icon: const Icon(Icons.power_off_outlined),
+              onPressed: null,
+            ),
           IconButton(
             tooltip: 'Undo placement',
             icon: const Icon(Icons.undo),
@@ -677,7 +781,7 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
-          final wide = constraints.maxWidth >= 900;
+          final wide = constraints.maxWidth >= _wideEditorBreakpoint;
           final editor = _EditorCanvasShell(
             geometry: widget.geometry,
             activePatch: patch,
@@ -718,6 +822,13 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
             candidatePoint: candidatePoint,
             candidateStatus:
                 candidatePoint == null ? null : placementPreview?.status,
+            powerOverlaySegments: widget.powerOverlaySegments,
+            powerOverlay: widget.powerWorkspace?.projection.overlay,
+            powerOverlayMode:
+                widget.powerWorkspace?.state.overlayMode ??
+                PowerWorkspaceOverlayMode.none,
+            selectedPowerComponentId:
+                widget.powerWorkspace?.state.selectedComponentId,
           );
 
           return Column(
@@ -751,7 +862,14 @@ class _RoomEditorScreenState extends State<RoomEditorScreen> {
                         ? Row(
                           children: [
                             Expanded(child: editor),
-                            SizedBox(width: 320, child: inspector),
+                            SizedBox(
+                              width:
+                                  powerInspectorVisible &&
+                                          widget.powerWorkspace != null
+                                      ? 360
+                                      : 320,
+                              child: inspector,
+                            ),
                           ],
                         )
                         : Column(
@@ -932,6 +1050,10 @@ class _EditorCanvasShell extends StatelessWidget {
     this.engineeringFeedback,
     this.candidatePoint,
     this.candidateStatus,
+    this.powerOverlaySegments = const [],
+    this.powerOverlay,
+    this.powerOverlayMode = PowerWorkspaceOverlayMode.none,
+    this.selectedPowerComponentId,
   });
 
   final RoomGeometrySnapshot geometry;
@@ -953,6 +1075,10 @@ class _EditorCanvasShell extends StatelessWidget {
   final Widget? engineeringFeedback;
   final Point2Mm? candidatePoint;
   final PlacementCompatibilityStatus? candidateStatus;
+  final List<PowerWorkspaceOverlaySegment> powerOverlaySegments;
+  final PowerWorkspaceOverlayProjection? powerOverlay;
+  final PowerWorkspaceOverlayMode powerOverlayMode;
+  final String? selectedPowerComponentId;
 
   @override
   Widget build(BuildContext context) {
@@ -1051,44 +1177,76 @@ class _EditorCanvasShell extends StatelessWidget {
                                         patch,
                                         toLocal(details.localPosition),
                                       ),
-                                  child: CustomPaint(
-                                    foregroundPainter:
-                                        candidatePoint == null ||
-                                                candidateStatus == null
-                                            ? null
-                                            : EngineeringCandidatePainter(
-                                              patch: patch,
-                                              point: candidatePoint!,
-                                              status: candidateStatus!,
-                                            ),
-                                    painter: _RoomSurfacePainter(
-                                      patch: patch,
-                                      openings: geometry.openings
-                                          .where(
-                                            (item) =>
-                                                item.hostSurfacePatchId ==
-                                                patch.id,
-                                          )
-                                          .toList(growable: false),
-                                      features: geometry.features
-                                          .where(
-                                            (item) =>
-                                                item.hostSurfacePatchId ==
-                                                patch.id,
-                                          )
-                                          .toList(growable: false),
-                                      components: components
-                                          .where(
-                                            (item) =>
-                                                item.hostSurfacePatchId ==
-                                                patch.id,
-                                          )
-                                          .toList(growable: false),
-                                      selection: selection,
-                                      measurement: measurement,
-                                      measurementStart: measurementStart,
-                                      navigationCandidate: navigationCandidate,
-                                    ),
+                                  child: Stack(
+                                    fit: StackFit.expand,
+                                    children: [
+                                      CustomPaint(
+                                        painter: _RoomSurfacePainter(
+                                          patch: patch,
+                                          openings: geometry.openings
+                                              .where(
+                                                (item) =>
+                                                    item.hostSurfacePatchId ==
+                                                    patch.id,
+                                              )
+                                              .toList(growable: false),
+                                          features: geometry.features
+                                              .where(
+                                                (item) =>
+                                                    item.hostSurfacePatchId ==
+                                                    patch.id,
+                                              )
+                                              .toList(growable: false),
+                                          components: components
+                                              .where(
+                                                (item) =>
+                                                    item.hostSurfacePatchId ==
+                                                    patch.id,
+                                              )
+                                              .toList(growable: false),
+                                          selection: selection,
+                                          measurement: measurement,
+                                          measurementStart: measurementStart,
+                                          navigationCandidate:
+                                              navigationCandidate,
+                                        ),
+                                      ),
+                                      if (powerOverlay != null &&
+                                          powerOverlayMode !=
+                                              PowerWorkspaceOverlayMode.none)
+                                        IgnorePointer(
+                                          child: CustomPaint(
+                                            painter:
+                                                PowerWorkspaceOverlayPainter(
+                                                  surfacePatchId: patch.id,
+                                                  boundary: patch.boundary,
+                                                  components: components,
+                                                  segments:
+                                                      powerOverlaySegments,
+                                                  overlay: powerOverlay!,
+                                                  mode: powerOverlayMode,
+                                                  colorScheme:
+                                                      Theme.of(
+                                                        context,
+                                                      ).colorScheme,
+                                                  selectedComponentId:
+                                                      selectedPowerComponentId,
+                                                ),
+                                          ),
+                                        ),
+                                      if (candidatePoint != null &&
+                                          candidateStatus != null)
+                                        IgnorePointer(
+                                          child: CustomPaint(
+                                            painter:
+                                                EngineeringCandidatePainter(
+                                                  patch: patch,
+                                                  point: candidatePoint!,
+                                                  status: candidateStatus!,
+                                                ),
+                                          ),
+                                        ),
+                                    ],
                                   ),
                                 ),
                               ),
@@ -1348,10 +1506,13 @@ class _RoomSurfacePainter extends CustomPainter {
 
     for (final component in components) {
       final center = mapPoint(component.localPosition);
+      final selected =
+          selection?.kind == EditorSelectionKind.component &&
+          selection?.id == component.id;
       final paint =
           Paint()
             ..style = PaintingStyle.stroke
-            ..strokeWidth = 1.5;
+            ..strokeWidth = selected ? 3 : 1.5;
       canvas.drawCircle(center, 8, paint);
       canvas.drawLine(
         center + const Offset(-6, 0),

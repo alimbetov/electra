@@ -549,6 +549,97 @@ void main() {
     );
   });
 
+  test(
+    'partial resource overlap rolls back claims and survives reopen',
+    () async {
+      final dir = await Directory.systemTemp.createTemp('elv-partial-overlap-');
+      addTearDown(() => dir.delete(recursive: true));
+      final file = File('${dir.path}/project.sqlite');
+      var db = AppDatabase(NativeDatabase(file));
+      addTearDown(() => db.close());
+      await _seedBase(db);
+      await _seedConnection(db, 'owner');
+      await _seedConnection(db, 'contender');
+      await _seedCable(db, 'shared', 'ACS8');
+      final service = _service(db);
+      for (final id in ['owner', 'contender']) {
+        expect(
+          await service.createDraft(
+            CreateCableAllocationDraftCommand(
+              commandId: 'draft-$id',
+              projectId: _projectId,
+              allocationId: 'alloc-$id',
+              engineeringConnectionId: id,
+              cableId: 'shared',
+            ),
+          ),
+          isA<ElvCommandSuccess<CableAllocation>>(),
+        );
+      }
+      expect(
+        await service.reserve(
+          ReserveCableResourcesCommand(
+            commandId: 'reserve-owner',
+            projectId: _projectId,
+            allocationId: 'alloc-owner',
+            expectedRevision: 1,
+            selection: ResourceSetSelection(const ['COND-2']),
+          ),
+        ),
+        isA<ElvCommandSuccess<CableAllocation>>(),
+      );
+      final conflict = await service.reserve(
+        ReserveCableResourcesCommand(
+          commandId: 'reserve-contender',
+          projectId: _projectId,
+          allocationId: 'alloc-contender',
+          expectedRevision: 1,
+          selection: ResourceSetSelection(const ['COND-1', 'COND-2']),
+        ),
+      );
+      expect(conflict, isA<ElvCommandFailureResult<CableAllocation>>());
+      expect(
+        (conflict as ElvCommandFailureResult<CableAllocation>).failure.code,
+        'ELV_ALLOC_RESOURCE_OVERLAP',
+      );
+
+      Future<void> verifyRollback() async {
+        final claims = await db.select(db.cableResourceClaims).get();
+        expect(claims, hasLength(1));
+        expect(claims.single.allocationId, 'alloc-owner');
+        expect(claims.single.resourceAtom, 'COND-2');
+        final repo = DriftElvCableAllocationRepository(db);
+        final contender = await repo.findAllocation(
+          _projectId,
+          'alloc-contender',
+        );
+        expect(contender!.state, CableAllocationState.draft);
+        expect(contender.revision, 1);
+        expect(
+          await repo.loadSelectionEvidence(_projectId, 'alloc-contender'),
+          isNull,
+        );
+      }
+
+      await verifyRollback();
+      await db.close();
+      db = AppDatabase(NativeDatabase(file));
+      await verifyRollback();
+      expect(
+        await _service(db).reserve(
+          ReserveCableResourcesCommand(
+            commandId: 'reserve-free-atom',
+            projectId: _projectId,
+            allocationId: 'alloc-contender',
+            expectedRevision: 1,
+            selection: ResourceSetSelection(const ['COND-1']),
+          ),
+        ),
+        isA<ElvCommandSuccess<CableAllocation>>(),
+      );
+    },
+  );
+
   test('P2 resource history blocks P1 in-place definition change', () async {
     final db = AppDatabase(NativeDatabase.memory());
     addTearDown(db.close);

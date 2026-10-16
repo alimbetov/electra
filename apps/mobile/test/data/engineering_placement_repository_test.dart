@@ -1,4 +1,5 @@
 import '../support/engineering_placement_fixture.dart';
+
 import 'package:electra_mobile/data/repositories/drift_engineering_placement_aggregate.dart';
 import 'package:drift/native.dart';
 import 'package:electra_mobile/application/engineering_placement_command.dart';
@@ -29,8 +30,8 @@ void main() {
 
   tearDown(() => database.close());
 
-  test('schema 17 exposes mandatory placement operation ledger', () async {
-    expect(database.schemaVersion, 17);
+  test('current schema exposes mandatory placement operation ledger', () async {
+    expect(database.schemaVersion, 23);
 
     final rows =
         await database

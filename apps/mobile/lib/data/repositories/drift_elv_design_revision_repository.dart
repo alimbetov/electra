@@ -9,6 +9,8 @@ import '../../application/elv_design_revision_repository.dart';
 import '../../application/elv_failure_probe.dart';
 import '../database/app_database.dart';
 import 'drift_elv_runtime_support.dart';
+import 'drift_power_publication_runtime.dart';
+import 'drift_power_snapshot_facts.dart';
 
 final class DriftElvDesignRevisionRepository
     implements ElvDesignRevisionRepository {
@@ -17,13 +19,22 @@ final class DriftElvDesignRevisionRepository
     required this.originDeviceId,
     ElvFailureProbe? failureProbe,
     DateTime Function()? now,
+    DriftPowerPublicationRuntime? powerRuntime,
   }) : failureProbe = failureProbe ?? const NoopElvFailureProbe(),
-       _now = now ?? (() => DateTime.now().toUtc());
+       _now = now ?? (() => DateTime.now().toUtc()),
+       powerRuntime =
+           powerRuntime ??
+           DriftPowerPublicationRuntime(
+             database,
+             originDeviceId: originDeviceId,
+             now: now,
+           );
 
   final AppDatabase database;
   final String originDeviceId;
   final ElvFailureProbe failureProbe;
   final DateTime Function() _now;
+  final DriftPowerPublicationRuntime powerRuntime;
 
   @override
   Future<PhysicalDesignContext> context(String projectId) async {
@@ -152,23 +163,53 @@ final class DriftElvDesignRevisionRepository
     if (replay != null) return replay;
     final row = await _findRow(command.projectId, command.designRevisionId);
     if (row == null) {
-      return elvRuntimeFailure(
-        'ELV_DESIGN_REVISION_NOT_FOUND',
-        ElvFailureCategory.notFound,
+      return recordElvRuntimeRejection<ProjectDesignRevision>(
+        database: database,
+        projectId: command.projectId,
+        commandId: command.commandId,
+        commandType: type,
+        schema: schema,
+        payload: payload,
+        failure: const ElvFailure(
+          code: 'ELV_DESIGN_REVISION_NOT_FOUND',
+          category: ElvFailureCategory.notFound,
+        ),
+        originDeviceId: originDeviceId,
+        now: _now(),
       );
     }
     if (row.state != 'WORKING') {
-      return elvRuntimeFailure(
-        'ELV_DESIGN_REVISION_NOT_WORKING',
-        ElvFailureCategory.lifecycle,
+      return recordElvRuntimeRejection<ProjectDesignRevision>(
+        database: database,
+        projectId: command.projectId,
+        commandId: command.commandId,
+        commandType: type,
+        schema: schema,
+        payload: payload,
+        failure: const ElvFailure(
+          code: 'ELV_DESIGN_REVISION_NOT_WORKING',
+          category: ElvFailureCategory.lifecycle,
+        ),
+        originDeviceId: originDeviceId,
+        now: _now(),
       );
     }
     if (row.revision != command.expectedRevision) {
-      return elvRuntimeFailure(
-        'ELV_DESIGN_REVISION_REVISION_CONFLICT',
-        ElvFailureCategory.revisionConflict,
-        expectedRevision: command.expectedRevision,
-        actualRevision: row.revision,
+      return recordElvRuntimeRejection<ProjectDesignRevision>(
+        database: database,
+        projectId: command.projectId,
+        commandId: command.commandId,
+        commandType: type,
+        schema: schema,
+        payload: payload,
+        failure: ElvFailure(
+          code: 'ELV_DESIGN_REVISION_REVISION_CONFLICT',
+          category: ElvFailureCategory.revisionConflict,
+          expectedRevision: command.expectedRevision,
+          actualRevision: row.revision,
+        ),
+        originDeviceId: originDeviceId,
+        now: _now(),
       );
     }
     final snapshot = await _buildP3Snapshot(command.projectId, row.id);
@@ -186,6 +227,12 @@ final class DriftElvDesignRevisionRepository
             originDeviceId: originDeviceId,
           ),
         );
+    await powerRuntime.captureCommittedPowerSectionForFreeze(
+      projectId: row.projectId,
+      designRevisionId: row.id,
+      expectedRevisionToken: row.revision,
+      physicalSha256: snapshot.contentSha256,
+    );
     await failureProbe.hit(ElvFailurePoints.p3FreezeAfterSnapshotInsert);
     await (database.update(database.projectDesignRevisions)..where(
       (candidate) =>
@@ -264,18 +311,28 @@ final class DriftElvDesignRevisionRepository
         await (database.select(database.designRevisionPhysicalSnapshots)..where(
           (row) => row.designRevisionId.equals(base.id),
         )).getSingleOrNull();
-    if (snapshot == null || snapshot.payloadSha256 != base.snapshotHash) {
+    if (snapshot == null ||
+        snapshot.projectId != command.projectId ||
+        snapshot.payloadSha256 != base.snapshotHash ||
+        !_validPhysicalSnapshot(snapshot)) {
       return elvRuntimeFailure(
         'ELV_DESIGN_REVISION_SNAPSHOT_INVALID',
         ElvFailureCategory.referenceIntegrity,
       );
     }
+    // Restoring an older frozen base must not reuse a later revision's sequence.
+    final latestSequence =
+        await (database.select(database.projectDesignRevisions)
+              ..where((row) => row.projectId.equals(command.projectId))
+              ..orderBy([(row) => OrderingTerm.desc(row.sequence)])
+              ..limit(1))
+            .getSingle();
     final instant = _now();
     final revision = ProjectDesignRevision(
       id: command.newRevisionId,
       projectId: command.projectId,
       code: command.code.trim(),
-      sequence: base.sequence + 1,
+      sequence: latestSequence.sequence + 1,
       state: ProjectDesignRevisionState.working,
       basedOnRevisionId: base.id,
       revision: 1,
@@ -296,12 +353,18 @@ final class DriftElvDesignRevisionRepository
           ),
         );
     await failureProbe.hit(ElvFailurePoints.p3CreateNextAfterRevisionInsert);
+    final capturedPower = await powerRuntime.readRevision(
+      projectId: command.projectId,
+      designRevisionId: base.id,
+    );
+    final physicalIds = <String, String>{};
     final payloadMap = jsonDecode(snapshot.payloadJson) as Map<String, dynamic>;
     final runs =
         (payloadMap['runs'] as List? ?? const []).cast<Map<String, dynamic>>();
     for (final source in runs) {
       final sourceRunId = source['id']! as String;
       final newRunId = '${revision.id}:run:$sourceRunId';
+      physicalIds[sourceRunId] = newRunId;
       await database
           .into(database.canonicalCableRuns)
           .insert(
@@ -328,6 +391,8 @@ final class DriftElvDesignRevisionRepository
               .cast<Map<String, dynamic>>();
       for (final traversal in traversals) {
         final sequence = (traversal['sequence'] as num).toInt();
+        if (traversal['id'] is String)
+          physicalIds[traversal['id']! as String] = '$newRunId:trv:$sequence';
         await database
             .into(database.cableRunTraversals)
             .insert(
@@ -350,6 +415,16 @@ final class DriftElvDesignRevisionRepository
             );
       }
     }
+    if (capturedPower.capturedPayload != null) {
+      await DriftPowerSnapshotFacts(database).materialize(
+        projectId: revision.projectId,
+        revisionId: revision.id,
+        captured: capturedPower.capturedPayload!,
+        physicalIds: physicalIds,
+        now: instant,
+        originDeviceId: originDeviceId,
+      );
+    }
     await recordElvRuntimeSuccess(
       database: database,
       projectId: command.projectId,
@@ -363,6 +438,22 @@ final class DriftElvDesignRevisionRepository
     );
     return ElvCommandSuccess(revision);
   });
+
+  bool _validPhysicalSnapshot(DesignRevisionPhysicalSnapshotRow snapshot) {
+    try {
+      final payload = jsonDecode(snapshot.payloadJson);
+      if (payload is! Map<String, dynamic>) return false;
+      return DesignRevisionPhysicalSnapshot(
+            designRevisionId: snapshot.designRevisionId,
+            projectId: snapshot.projectId,
+            schemaVersion: snapshot.schemaVersion,
+            payload: payload,
+          ).contentSha256 ==
+          snapshot.payloadSha256;
+    } on FormatException {
+      return false;
+    }
+  }
 
   @override
   Future<ElvCommandResult<ProjectDesignRevision>> supersede(

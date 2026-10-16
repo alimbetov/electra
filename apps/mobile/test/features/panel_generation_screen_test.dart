@@ -6,6 +6,7 @@ import 'package:electra_mobile/features/calculations/panel_generation_screen.dar
 import 'package:engineering_core/engineering_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
 import 'protection_screen_test.dart' show protectionFixture;
 
 ProjectPanelGenerationSnapshot fixture({bool stale = false}) {

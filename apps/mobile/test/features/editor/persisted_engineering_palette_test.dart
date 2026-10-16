@@ -19,9 +19,11 @@ import 'package:engineering_core/engineering_core.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'dart:convert';
+
 import 'package:electra_mobile/data/repositories/drift_engineering_reference_repository.dart';
 import 'package:electra_mobile/data/repositories/drift_engineering_system_repository.dart';
 import 'package:electra_mobile/features/editor/room_editor_screen.dart';
+
 import 'engineering_profile_palette_test.dart'
     show chooseCameraPreview, pickCandidate;
 

@@ -1,0 +1,2385 @@
+{
+  "schema": "electra.elv4-qualification.v1",
+  "status": "MANDATORY_RUNTIME_MATRIX_PENDING",
+  "dataProvenance": "FICTIONAL_PRODUCT_NEUTRAL",
+  "requiredPositiveCaseIds": [
+    "Q-CCTV",
+    "Q-LAN",
+    "Q-ACS",
+    "Q-FIRE",
+    "Q-SHARED",
+    "Q-GENERIC",
+    "Q-CHARGE"
+  ],
+  "caseSemantics": {
+    "factCompletion": "Explicit inputs below plus fixed public builder recipe in qualification-builders.md; no runtime defaults may introduce technical values",
+    "notListedProcess": "NOT_APPLICABLE for this case; cannot replace another listed process",
+    "requiredStatus": "Every listed context and dimension COMPLETE/PASS/SUCCEEDED",
+    "pwr04Scope": "Complete ordered SEQUENCE with matching segment evidence",
+    "positiveUsesPartialEstimate": false
+  },
+  "positiveCases": [
+    {
+      "id": "Q-CCTV",
+      "kind": "POSITIVE",
+      "builder": "public-commands:CCTV_UPS_POE_BANK",
+      "facts": {
+        "projectId": "project-cctv",
+        "designRevisionId": "revision-1",
+        "numericPolicyVersion": "elv4.exact-rational.v2",
+        "definitionEdition": "fictional-qualification@1",
+        "sourceRef": "FICTIONAL_PRODUCT_NEUTRAL: no manufacturer/standard claim",
+        "reserveMultiplier": "1",
+        "derating": "1",
+        "peakPolicy": "ALL_SIMULTANEOUS",
+        "ac": {
+          "sourceMinV": "230",
+          "sourceMaxV": "230",
+          "frequencyHz": "50",
+          "inputPf": "1",
+          "ratingW": "500",
+          "ratingVa": "625",
+          "voltageAcceptanceMinV": "220",
+          "voltageAcceptanceMaxV": "240"
+        },
+        "bank": {
+          "id": "bank-1",
+          "unitV": "12",
+          "unitAh": "7",
+          "seriesCount": 2,
+          "parallelCount": 1,
+          "modelVoltageV": "24",
+          "sourceMinV": "24",
+          "sourceMaxV": "24",
+          "endOfDischargeV": "24",
+          "initialSoc": "1",
+          "minimumSoc": "0.2",
+          "temperatureFactor": "1",
+          "agingFactor": "1",
+          "rateFactor": "1",
+          "maximumDischargeA": "10",
+          "technology": "FICT_FLAT",
+          "capacityModel": "EXPLICIT_FLAT_VOLTAGE_WH",
+          "applicability": "Explicit fictional constant-24V model over declared SOC/rate/temperature; not a product battery curve"
+        },
+        "canonical": {
+          "connectionMedium": "wired",
+          "connectionCapacity": 1,
+          "dcConnector": "TERMINAL_2",
+          "dcProtocol": "TEST_DC_POWER@1",
+          "acConnector": "TEST_AC_TERMINAL",
+          "acProtocol": "TEST_AC_POWER@1",
+          "bidirectionalPortProjection": "Use explicit bidirectional interface/compatibility for reversible bank feeder",
+          "stateDemandDoesNotProjectToCanonical": true
+        },
+        "physicalPolicy": {
+          "allPathsRealized": true,
+          "foreignKeysEnabled": true,
+          "terminationEvidence": "Explicit resource-to-terminal mapping at both ends of every cable; PLUS/MINUS or L/N convention",
+          "contactResistance": "included in each declared LOOP_TOTAL_OHM",
+          "temperatureEvidence": "fixture rating valid at 20C; evaluation 20C",
+          "runLengthPolicy": "declared installed lengths include service allowance; no extra reserve length"
+        },
+        "applicability": {
+          "allFactorsExplicit": true,
+          "unsupportedModelAllowed": false,
+          "sourceBoundaryDeclared": true,
+          "policiesPinned": true
+        },
+        "systems": [
+          "CCTV"
+        ],
+        "components": [
+          "mains-1",
+          "ups-1",
+          "pse-1",
+          "camera-1",
+          "camera-2",
+          "bank-1"
+        ],
+        "memberships": {
+          "mains-1": [
+            "CCTV"
+          ],
+          "ups-1": [
+            "CCTV"
+          ],
+          "pse-1": [
+            "CCTV"
+          ],
+          "camera-1": [
+            "CCTV"
+          ],
+          "camera-2": [
+            "CCTV"
+          ],
+          "bank-1": [
+            "CCTV"
+          ]
+        },
+        "paths": [
+          {
+            "id": "mains-ups",
+            "from": "mains-1.OUT",
+            "to": "ups-1.AC_IN",
+            "connectionId": "connection-mains-ups",
+            "allocationId": "allocation-mains-ups",
+            "cableId": "cable-mains-ups",
+            "runId": "run-mains-ups",
+            "traversalIds": [
+              "traversal-mains-ups"
+            ],
+            "resourceIds": [
+              "forward-mains-ups",
+              "return-mains-ups"
+            ],
+            "terminationIds": [
+              "term-a-mains-ups",
+              "term-b-mains-ups"
+            ],
+            "installedLengthM": "1",
+            "resistanceConvention": "LOOP_TOTAL_OHM",
+            "loopResistanceOhm": "0",
+            "maximumCurrentA": "10",
+            "domain": "AC_BOUNDARY_NO_DROP_MODEL",
+            "powerPassage": true
+          },
+          {
+            "id": "ups-pse",
+            "from": "ups-1.AC_OUT",
+            "to": "pse-1.AC_IN",
+            "connectionId": "connection-ups-pse",
+            "allocationId": "allocation-ups-pse",
+            "cableId": "cable-ups-pse",
+            "runId": "run-ups-pse",
+            "traversalIds": [
+              "traversal-ups-pse"
+            ],
+            "resourceIds": [
+              "forward-ups-pse",
+              "return-ups-pse"
+            ],
+            "terminationIds": [
+              "term-a-ups-pse",
+              "term-b-ups-pse"
+            ],
+            "installedLengthM": "1",
+            "resistanceConvention": "LOOP_TOTAL_OHM",
+            "loopResistanceOhm": "0",
+            "maximumCurrentA": "10",
+            "domain": "AC_BOUNDARY_NO_DROP_MODEL",
+            "powerPassage": true
+          },
+          {
+            "id": "bank-ups",
+            "from": "bank-1.BI",
+            "to": "ups-1.BAT_IN",
+            "connectionId": "connection-bank-ups",
+            "allocationId": "allocation-bank-ups",
+            "cableId": "cable-bank-ups",
+            "runId": "run-bank-ups",
+            "traversalIds": [
+              "traversal-bank-ups"
+            ],
+            "resourceIds": [
+              "forward-bank-ups",
+              "return-bank-ups"
+            ],
+            "terminationIds": [
+              "term-a-bank-ups",
+              "term-b-bank-ups"
+            ],
+            "installedLengthM": "1",
+            "resistanceConvention": "LOOP_TOTAL_OHM",
+            "loopResistanceOhm": "0.05",
+            "maximumCurrentA": "10",
+            "domain": "DC_SINGLE_CP",
+            "powerPassage": true
+          },
+          {
+            "id": "poe-1",
+            "from": "pse-1.P1",
+            "to": "camera-1.IN",
+            "connectionId": "connection-poe-1",
+            "allocationId": "allocation-poe-1",
+            "cableId": "cable-poe-1",
+            "runId": "run-poe-1",
+            "traversalIds": [
+              "traversal-poe-1"
+            ],
+            "resourceIds": [
+              "forward-poe-1",
+              "return-poe-1"
+            ],
+            "terminationIds": [
+              "term-a-poe-1",
+              "term-b-poe-1"
+            ],
+            "installedLengthM": "1",
+            "resistanceConvention": "LOOP_TOTAL_OHM",
+            "loopResistanceOhm": "0.05",
+            "maximumCurrentA": "10",
+            "domain": "GUARANTEED_PD",
+            "powerPassage": true
+          },
+          {
+            "id": "poe-2",
+            "from": "pse-1.P2",
+            "to": "camera-2.IN",
+            "connectionId": "connection-poe-2",
+            "allocationId": "allocation-poe-2",
+            "cableId": "cable-poe-2",
+            "runId": "run-poe-2",
+            "traversalIds": [
+              "traversal-poe-2"
+            ],
+            "resourceIds": [
+              "forward-poe-2",
+              "return-poe-2"
+            ],
+            "terminationIds": [
+              "term-a-poe-2",
+              "term-b-poe-2"
+            ],
+            "installedLengthM": "1",
+            "resistanceConvention": "LOOP_TOTAL_OHM",
+            "loopResistanceOhm": "0.05",
+            "maximumCurrentA": "10",
+            "domain": "GUARANTEED_PD",
+            "powerPassage": true
+          }
+        ],
+        "pse": {
+          "id": "pse-1",
+          "powerInputKind": "AC_POWER_PF",
+          "conversionEfficiency": "1",
+          "idleW": "5",
+          "idleAccounting": "EXCLUDES_SEPARATE_IDLE",
+          "sharedReservedBudgetW": "35",
+          "upstreamBasis": "CONSERVATIVE_RESERVED",
+          "outputVoltageMinV": "48",
+          "outputVoltageMaxV": "48",
+          "pdAcceptanceMinV": "44",
+          "pdAcceptanceMaxV": "54",
+          "perPortLimitW": [
+            "20",
+            "20"
+          ],
+          "pdDemandW": [
+            "10",
+            "15"
+          ],
+          "guaranteedPdW": [
+            "10",
+            "15"
+          ],
+          "reservedPseW": [
+            "12",
+            "18"
+          ],
+          "pairModelCode": "TEST_TWO_PAIR_PASS",
+          "maximumPathM": "10",
+          "maximumPatchStages": 2,
+          "passageEvidence": "Both used power resources explicitly compatible; guarantee includes cable allowance"
+        },
+        "ups": {
+          "id": "ups-1",
+          "outputLimitW": "500",
+          "outputLimitVa": "625",
+          "normalEfficiency": "1",
+          "backupEfficiency": "0.8",
+          "idleW": "0",
+          "inputPf": "1",
+          "batteryInputMinV": "20",
+          "batteryInputMaxV": "28",
+          "batteryInputCurrentLimitA": "10",
+          "backupLoadModel": "SINGLE_CP_FEEDER"
+        },
+        "scenarios": [
+          {
+            "id": "normal",
+            "segments": [
+              {
+                "id": "normal-steady",
+                "durationSeconds": "3600",
+                "activeSource": "mains-1",
+                "states": {
+                  "camera-1": "NORMAL",
+                  "camera-2": "NORMAL"
+                },
+                "bankDirection": "INACTIVE",
+                "componentStates": {
+                  "mains-1": "ACTIVE",
+                  "ups-1": "ACTIVE",
+                  "pse-1": "ACTIVE",
+                  "camera-1": "NORMAL",
+                  "camera-2": "NORMAL",
+                  "bank-1": "INACTIVE"
+                },
+                "selectedTransferMode": "NORMAL_SUPPLY"
+              }
+            ]
+          },
+          {
+            "id": "backup",
+            "segments": [
+              {
+                "id": "backup-steady",
+                "durationSeconds": "3600",
+                "activeSource": "bank-1",
+                "unavailableSources": [
+                  "mains-1"
+                ],
+                "states": {
+                  "camera-1": "NORMAL",
+                  "camera-2": "NORMAL"
+                },
+                "bankDirection": "DISCHARGE",
+                "componentStates": {
+                  "mains-1": "INACTIVE",
+                  "ups-1": "ACTIVE",
+                  "pse-1": "ACTIVE",
+                  "camera-1": "NORMAL",
+                  "camera-2": "NORMAL",
+                  "bank-1": "ACTIVE"
+                },
+                "selectedTransferMode": "BACKUP_DISCHARGE"
+              }
+            ],
+            "extensionPolicy": "NONE"
+          }
+        ]
+      },
+      "requiredResults": [
+        {
+          "processCode": "ELV-PWR-01",
+          "requiredDimensions": [
+            "load",
+            "accounting"
+          ],
+          "completion": "COMPLETE",
+          "assessment": "PASS",
+          "execution": "SUCCEEDED"
+        },
+        {
+          "processCode": "ELV-PWR-02",
+          "requiredDimensions": [
+            "continuous-capacity",
+            "reserve-derating"
+          ],
+          "completion": "COMPLETE",
+          "assessment": "PASS",
+          "execution": "SUCCEEDED"
+        },
+        {
+          "processCode": "ELV-PWR-03",
+          "requiredDimensions": [
+            "terminal-voltage",
+            "section-current",
+            "power-conservation"
+          ],
+          "completion": "COMPLETE",
+          "assessment": "PASS",
+          "execution": "SUCCEEDED"
+        },
+        {
+          "processCode": "ELV-PWR-04",
+          "requiredDimensions": [
+            "sequence-energy",
+            "bank-voltage",
+            "bank-current",
+            "usable-capacity"
+          ],
+          "completion": "COMPLETE",
+          "assessment": "PASS",
+          "execution": "SUCCEEDED"
+        },
+        {
+          "processCode": "ELV-PWR-05",
+          "requiredDimensions": [
+            "output-W",
+            "output-VA",
+            "input-demand"
+          ],
+          "completion": "COMPLETE",
+          "assessment": "PASS",
+          "execution": "SUCCEEDED"
+        },
+        {
+          "processCode": "ELV-PWR-06",
+          "requiredDimensions": [
+            "PD-guarantee",
+            "port-budget",
+            "shared-budget",
+            "physical-path"
+          ],
+          "completion": "COMPLETE",
+          "assessment": "PASS",
+          "execution": "SUCCEEDED"
+        }
+      ],
+      "requiredContexts": {
+        "ELV-PWR-01": [
+          "normal/normal-steady",
+          "backup/backup-steady"
+        ],
+        "ELV-PWR-02": [
+          "normal/normal-steady",
+          "backup/backup-steady"
+        ],
+        "ELV-PWR-03": [
+          "backup/backup-steady"
+        ],
+        "ELV-PWR-04": [
+          "backup/SEQUENCE"
+        ],
+        "ELV-PWR-05": [
+          "normal/normal-steady",
+          "backup/backup-steady"
+        ],
+        "ELV-PWR-06": [
+          "normal/normal-steady",
+          "backup/backup-steady"
+        ]
+      },
+      "oracles": {
+        "reservedPseW": "30",
+        "normalPseInputW": "35",
+        "upsOutputVa": "35",
+        "backupCpTerminalW": "43.75",
+        "bankUsableWh": "134.4",
+        "bankSequenceRequiredWhBetween": [
+          "43.75",
+          "44"
+        ],
+        "cpConservationRequired": true,
+        "powerClaimDuplicates": 0
+      }
+    },
+    {
+      "id": "Q-LAN",
+      "kind": "POSITIVE",
+      "builder": "public-commands:LAN_PATCH_POE",
+      "facts": {
+        "projectId": "project-lan",
+        "designRevisionId": "revision-1",
+        "numericPolicyVersion": "elv4.exact-rational.v2",
+        "definitionEdition": "fictional-qualification@1",
+        "sourceRef": "FICTIONAL_PRODUCT_NEUTRAL: no manufacturer/standard claim",
+        "reserveMultiplier": "1",
+        "derating": "1",
+        "peakPolicy": "ALL_SIMULTANEOUS",
+        "ac": {
+          "sourceMinV": "230",
+          "sourceMaxV": "230",
+          "frequencyHz": "50",
+          "inputPf": "1",
+          "ratingW": "500",
+          "ratingVa": "625",
+          "voltageAcceptanceMinV": "220",
+          "voltageAcceptanceMaxV": "240"
+        },
+        "bank": {
+          "id": "bank-1",
+          "unitV": "12",
+          "unitAh": "7",
+          "seriesCount": 2,
+          "parallelCount": 1,
+          "modelVoltageV": "24",
+          "sourceMinV": "24",
+          "sourceMaxV": "24",
+          "endOfDischargeV": "24",
+          "initialSoc": "1",
+          "minimumSoc": "0.2",
+          "temperatureFactor": "1",
+          "agingFactor": "1",
+          "rateFactor": "1",
+          "maximumDischargeA": "10",
+          "technology": "FICT_FLAT",
+          "capacityModel": "EXPLICIT_FLAT_VOLTAGE_WH",
+          "applicability": "Explicit fictional constant-24V model over declared SOC/rate/temperature; not a product battery curve"
+        },
+        "canonical": {
+          "connectionMedium": "wired",
+          "connectionCapacity": 1,
+          "dcConnector": "TERMINAL_2",
+          "dcProtocol": "TEST_DC_POWER@1",
+          "acConnector": "TEST_AC_TERMINAL",
+          "acProtocol": "TEST_AC_POWER@1",
+          "bidirectionalPortProjection": "Use explicit bidirectional interface/compatibility for reversible bank feeder",
+          "stateDemandDoesNotProjectToCanonical": true
+        },
+        "physicalPolicy": {
+          "allPathsRealized": true,
+          "foreignKeysEnabled": true,
+          "terminationEvidence": "Explicit resource-to-terminal mapping at both ends of every cable; PLUS/MINUS or L/N convention",
+          "contactResistance": "included in each declared LOOP_TOTAL_OHM",
+          "temperatureEvidence": "fixture rating valid at 20C; evaluation 20C",
+          "runLengthPolicy": "declared installed lengths include service allowance; no extra reserve length"
+        },
+        "applicability": {
+          "allFactorsExplicit": true,
+          "unsupportedModelAllowed": false,
+          "sourceBoundaryDeclared": true,
+          "policiesPinned": true
+        },
+        "systems": [
+          "LAN"
+        ],
+        "components": [
+          "mains-1",
+          "pse-1",
+          "patch-1",
+          "outlet-1",
+          "pd-1"
+        ],
+        "memberships": {
+          "mains-1": [
+            "LAN"
+          ],
+          "pse-1": [
+            "LAN"
+          ],
+          "patch-1": [
+            "LAN"
+          ],
+          "outlet-1": [
+            "LAN"
+          ],
+          "pd-1": [
+            "LAN"
+          ]
+        },
+        "pse": {
+          "id": "pse-1",
+          "powerInputKind": "AC_POWER_PF",
+          "conversionEfficiency": "1",
+          "idleW": "5",
+          "idleAccounting": "EXCLUDES_SEPARATE_IDLE",
+          "sharedReservedBudgetW": "35",
+          "upstreamBasis": "CONSERVATIVE_RESERVED",
+          "outputVoltageMinV": "48",
+          "outputVoltageMaxV": "48",
+          "pdAcceptanceMinV": "44",
+          "pdAcceptanceMaxV": "54",
+          "perPortLimitW": [
+            "20"
+          ],
+          "pdDemandW": [
+            "10"
+          ],
+          "guaranteedPdW": [
+            "10"
+          ],
+          "reservedPseW": [
+            "12"
+          ],
+          "pairModelCode": "TEST_TWO_PAIR_PASS",
+          "maximumPathM": "10",
+          "maximumPatchStages": 2,
+          "passageEvidence": "Both used power resources explicitly compatible; guarantee includes cable allowance"
+        },
+        "paths": [
+          {
+            "id": "mains-pse",
+            "from": "mains-1.OUT",
+            "to": "pse-1.AC_IN",
+            "connectionId": "connection-mains-pse",
+            "allocationId": "allocation-mains-pse",
+            "cableId": "cable-mains-pse",
+            "runId": "run-mains-pse",
+            "traversalIds": [
+              "traversal-mains-pse"
+            ],
+            "resourceIds": [
+              "L-mains-pse",
+              "N-mains-pse"
+            ],
+            "terminationIds": [
+              "term-a-mains-pse",
+              "term-b-mains-pse"
+            ],
+            "installedLengthM": "1",
+            "resistanceConvention": "LOOP_TOTAL_OHM",
+            "loopResistanceOhm": "0",
+            "maximumCurrentA": "10",
+            "domain": "AC_BOUNDARY_NO_DROP_MODEL",
+            "powerPassage": true
+          },
+          {
+            "id": "pse-patch",
+            "from": "pse-1.P1",
+            "to": "patch-1.IN",
+            "connectionId": "connection-pse-patch",
+            "allocationId": "allocation-pse-patch",
+            "cableId": "cable-pse-patch",
+            "runId": "run-pse-patch",
+            "traversalIds": [
+              "traversal-pse-patch"
+            ],
+            "resourceIds": [
+              "forward-pse-patch",
+              "return-pse-patch"
+            ],
+            "terminationIds": [
+              "term-a-pse-patch",
+              "term-b-pse-patch"
+            ],
+            "installedLengthM": "1",
+            "resistanceConvention": "LOOP_TOTAL_OHM",
+            "loopResistanceOhm": "0.05",
+            "maximumCurrentA": "10",
+            "domain": "GUARANTEED_PD",
+            "powerPassage": true
+          },
+          {
+            "id": "patch-outlet",
+            "from": "patch-1.OUT",
+            "to": "outlet-1.IN",
+            "connectionId": "connection-patch-outlet",
+            "allocationId": "allocation-patch-outlet",
+            "cableId": "cable-patch-outlet",
+            "runId": "run-patch-outlet",
+            "traversalIds": [
+              "traversal-patch-outlet"
+            ],
+            "resourceIds": [
+              "forward-patch-outlet",
+              "return-patch-outlet"
+            ],
+            "terminationIds": [
+              "term-a-patch-outlet",
+              "term-b-patch-outlet"
+            ],
+            "installedLengthM": "1",
+            "resistanceConvention": "LOOP_TOTAL_OHM",
+            "loopResistanceOhm": "0.05",
+            "maximumCurrentA": "10",
+            "domain": "GUARANTEED_PD",
+            "powerPassage": true
+          },
+          {
+            "id": "outlet-pd",
+            "from": "outlet-1.OUT",
+            "to": "pd-1.IN",
+            "connectionId": "connection-outlet-pd",
+            "allocationId": "allocation-outlet-pd",
+            "cableId": "cable-outlet-pd",
+            "runId": "run-outlet-pd",
+            "traversalIds": [
+              "traversal-outlet-pd"
+            ],
+            "resourceIds": [
+              "forward-outlet-pd",
+              "return-outlet-pd"
+            ],
+            "terminationIds": [
+              "term-a-outlet-pd",
+              "term-b-outlet-pd"
+            ],
+            "installedLengthM": "1",
+            "resistanceConvention": "LOOP_TOTAL_OHM",
+            "loopResistanceOhm": "0.05",
+            "maximumCurrentA": "10",
+            "domain": "GUARANTEED_PD",
+            "powerPassage": true
+          }
+        ],
+        "passiveMappings": [
+          {
+            "id": "patch-pass",
+            "component": "patch-1",
+            "from": "IN",
+            "to": "OUT",
+            "powerPassage": true
+          },
+          {
+            "id": "outlet-pass",
+            "component": "outlet-1",
+            "from": "IN",
+            "to": "OUT",
+            "powerPassage": true
+          }
+        ],
+        "scenarios": [
+          {
+            "id": "normal",
+            "segments": [
+              {
+                "id": "steady",
+                "durationSeconds": "3600",
+                "activeSource": "mains-1",
+                "states": {
+                  "pd-1": "NORMAL"
+                },
+                "componentStates": {
+                  "mains-1": "ACTIVE",
+                  "pse-1": "ACTIVE",
+                  "patch-1": "ACTIVE",
+                  "outlet-1": "ACTIVE",
+                  "pd-1": "NORMAL"
+                },
+                "bankDirection": "INACTIVE",
+                "selectedTransferMode": "NORMAL_SUPPLY"
+              }
+            ]
+          }
+        ]
+      },
+      "requiredResults": [
+        {
+          "processCode": "ELV-PWR-01",
+          "requiredDimensions": [
+            "load",
+            "accounting"
+          ],
+          "completion": "COMPLETE",
+          "assessment": "PASS",
+          "execution": "SUCCEEDED"
+        },
+        {
+          "processCode": "ELV-PWR-02",
+          "requiredDimensions": [
+            "continuous-capacity",
+            "reserve-derating"
+          ],
+          "completion": "COMPLETE",
+          "assessment": "PASS",
+          "execution": "SUCCEEDED"
+        },
+        {
+          "processCode": "ELV-PWR-06",
+          "requiredDimensions": [
+            "PD-guarantee",
+            "port-budget",
+            "shared-budget",
+            "physical-path"
+          ],
+          "completion": "COMPLETE",
+          "assessment": "PASS",
+          "execution": "SUCCEEDED"
+        }
+      ],
+      "requiredContexts": {
+        "ELV-PWR-01": [
+          "normal/steady"
+        ],
+        "ELV-PWR-02": [
+          "normal/steady"
+        ],
+        "ELV-PWR-06": [
+          "normal/steady"
+        ]
+      },
+      "oracles": {
+        "reservedPseW": "12",
+        "pseInputW": "17",
+        "additionalPowerClaims": 0,
+        "poePathCableClaims": 3,
+        "totalPathCableClaims": 4
+      }
+    },
+    {
+      "id": "Q-ACS",
+      "kind": "POSITIVE",
+      "builder": "public-commands:ACS_RADIAL_BANK",
+      "facts": {
+        "projectId": "project-acs",
+        "designRevisionId": "revision-1",
+        "numericPolicyVersion": "elv4.exact-rational.v2",
+        "definitionEdition": "fictional-qualification@1",
+        "sourceRef": "FICTIONAL_PRODUCT_NEUTRAL: no manufacturer/standard claim",
+        "reserveMultiplier": "1",
+        "derating": "1",
+        "peakPolicy": "ALL_SIMULTANEOUS",
+        "ac": {
+          "sourceMinV": "230",
+          "sourceMaxV": "230",
+          "frequencyHz": "50",
+          "inputPf": "1",
+          "ratingW": "500",
+          "ratingVa": "625",
+          "voltageAcceptanceMinV": "220",
+          "voltageAcceptanceMaxV": "240"
+        },
+        "bank": {
+          "id": "bank-1",
+          "unitV": "12",
+          "unitAh": "7",
+          "seriesCount": 2,
+          "parallelCount": 1,
+          "modelVoltageV": "24",
+          "sourceMinV": "24",
+          "sourceMaxV": "24",
+          "endOfDischargeV": "24",
+          "initialSoc": "1",
+          "minimumSoc": "0.2",
+          "temperatureFactor": "1",
+          "agingFactor": "1",
+          "rateFactor": "1",
+          "maximumDischargeA": "10",
+          "technology": "FICT_FLAT",
+          "capacityModel": "EXPLICIT_FLAT_VOLTAGE_WH",
+          "applicability": "Explicit fictional constant-24V model over declared SOC/rate/temperature; not a product battery curve"
+        },
+        "canonical": {
+          "connectionMedium": "wired",
+          "connectionCapacity": 1,
+          "dcConnector": "TERMINAL_2",
+          "dcProtocol": "TEST_DC_POWER@1",
+          "acConnector": "TEST_AC_TERMINAL",
+          "acProtocol": "TEST_AC_POWER@1",
+          "bidirectionalPortProjection": "Use explicit bidirectional interface/compatibility for reversible bank feeder",
+          "stateDemandDoesNotProjectToCanonical": true
+        },
+        "physicalPolicy": {
+          "allPathsRealized": true,
+          "foreignKeysEnabled": true,
+          "terminationEvidence": "Explicit resource-to-terminal mapping at both ends of every cable; PLUS/MINUS or L/N convention",
+          "contactResistance": "included in each declared LOOP_TOTAL_OHM",
+          "temperatureEvidence": "fixture rating valid at 20C; evaluation 20C",
+          "runLengthPolicy": "declared installed lengths include service allowance; no extra reserve length"
+        },
+        "applicability": {
+          "allFactorsExplicit": true,
+          "unsupportedModelAllowed": false,
+          "sourceBoundaryDeclared": true,
+          "policiesPinned": true
+        },
+        "systems": [
+          "ACS"
+        ],
+        "components": [
+          "psu-1",
+          "charger-1",
+          "bank-1",
+          "controller-1",
+          "reader-1",
+          "lock-1"
+        ],
+        "memberships": {
+          "psu-1": [
+            "ACS"
+          ],
+          "charger-1": [
+            "ACS"
+          ],
+          "bank-1": [
+            "ACS"
+          ],
+          "controller-1": [
+            "ACS"
+          ],
+          "reader-1": [
+            "ACS"
+          ],
+          "lock-1": [
+            "ACS"
+          ]
+        },
+        "source": {
+          "minV": "24",
+          "maxV": "24",
+          "capacityW": "60",
+          "capacityA": "2",
+          "consumerMinV": "22",
+          "consumerMaxV": "26",
+          "psuEfficiency": "1",
+          "psuIdleW": "0"
+        },
+        "paths": [
+          {
+            "id": "trunk",
+            "from": "bank-1.OUT",
+            "to": "controller-1.DISTRIBUTION",
+            "connectionId": "connection-trunk",
+            "allocationId": "allocation-trunk",
+            "cableId": "cable-trunk",
+            "runId": "run-trunk",
+            "traversalIds": [
+              "traversal-trunk"
+            ],
+            "resourceIds": [
+              "forward-trunk",
+              "return-trunk"
+            ],
+            "terminationIds": [
+              "term-a-trunk",
+              "term-b-trunk"
+            ],
+            "installedLengthM": "1",
+            "resistanceConvention": "LOOP_TOTAL_OHM",
+            "loopResistanceOhm": "0.5",
+            "maximumCurrentA": "10",
+            "domain": "DC",
+            "powerPassage": true
+          },
+          {
+            "id": "reader",
+            "from": "controller-1.P1",
+            "to": "reader-1.IN",
+            "connectionId": "connection-reader",
+            "allocationId": "allocation-reader",
+            "cableId": "cable-reader",
+            "runId": "run-reader",
+            "traversalIds": [
+              "traversal-reader"
+            ],
+            "resourceIds": [
+              "forward-reader",
+              "return-reader"
+            ],
+            "terminationIds": [
+              "term-a-reader",
+              "term-b-reader"
+            ],
+            "installedLengthM": "1",
+            "resistanceConvention": "LOOP_TOTAL_OHM",
+            "loopResistanceOhm": "0.2",
+            "maximumCurrentA": "10",
+            "domain": "DC",
+            "powerPassage": true
+          },
+          {
+            "id": "lock",
+            "from": "controller-1.P2",
+            "to": "lock-1.IN",
+            "connectionId": "connection-lock",
+            "allocationId": "allocation-lock",
+            "cableId": "cable-lock",
+            "runId": "run-lock",
+            "traversalIds": [
+              "traversal-lock"
+            ],
+            "resourceIds": [
+              "forward-lock",
+              "return-lock"
+            ],
+            "terminationIds": [
+              "term-a-lock",
+              "term-b-lock"
+            ],
+            "installedLengthM": "1",
+            "resistanceConvention": "LOOP_TOTAL_OHM",
+            "loopResistanceOhm": "0.3",
+            "maximumCurrentA": "10",
+            "domain": "DC",
+            "powerPassage": true
+          }
+        ],
+        "loads": [
+          {
+            "id": "reader-load",
+            "port": "reader-1.IN",
+            "kind": "DC_CONSTANT_CURRENT",
+            "currentA": "0.3"
+          },
+          {
+            "id": "lock-load",
+            "port": "lock-1.IN",
+            "kind": "DC_CONSTANT_CURRENT",
+            "currentA": "0.5"
+          },
+          {
+            "id": "controller-own",
+            "port": "controller-1.DISTRIBUTION",
+            "kind": "DC_CONSTANT_CURRENT",
+            "currentA": "0"
+          }
+        ],
+        "relay": {
+          "controlOnly": true,
+          "doesNotSupplyLock": true
+        },
+        "charge": {
+          "chargeVoltageV": "24",
+          "currentA": "0.1",
+          "maximumCurrentA": "1",
+          "normalInterlock": "CHARGE",
+          "backupInterlock": "DISCHARGE",
+          "compatibleTechnology": "FICT_FLAT",
+          "operatingDemandAndChargeAddedOnce": true
+        },
+        "scenarios": [
+          {
+            "id": "backup",
+            "segments": [
+              {
+                "id": "steady",
+                "durationSeconds": "3600",
+                "activeSource": "bank-1",
+                "unavailableSources": [
+                  "psu-1"
+                ],
+                "states": {
+                  "reader-1": "NORMAL",
+                  "lock-1": "NORMAL"
+                },
+                "componentStates": {
+                  "psu-1": "INACTIVE",
+                  "charger-1": "INACTIVE",
+                  "bank-1": "ACTIVE",
+                  "controller-1": "ACTIVE",
+                  "reader-1": "NORMAL",
+                  "lock-1": "NORMAL"
+                },
+                "bankDirection": "DISCHARGE",
+                "selectedTransferMode": "BACKUP_DISCHARGE"
+              }
+            ],
+            "extensionPolicy": "NONE"
+          }
+        ]
+      },
+      "requiredResults": [
+        {
+          "processCode": "ELV-PWR-01",
+          "requiredDimensions": [
+            "load",
+            "accounting"
+          ],
+          "completion": "COMPLETE",
+          "assessment": "PASS",
+          "execution": "SUCCEEDED"
+        },
+        {
+          "processCode": "ELV-PWR-02",
+          "requiredDimensions": [
+            "continuous-capacity",
+            "reserve-derating"
+          ],
+          "completion": "COMPLETE",
+          "assessment": "PASS",
+          "execution": "SUCCEEDED"
+        },
+        {
+          "processCode": "ELV-PWR-03",
+          "requiredDimensions": [
+            "terminal-voltage",
+            "section-current",
+            "power-conservation"
+          ],
+          "completion": "COMPLETE",
+          "assessment": "PASS",
+          "execution": "SUCCEEDED"
+        },
+        {
+          "processCode": "ELV-PWR-04",
+          "requiredDimensions": [
+            "sequence-energy",
+            "bank-voltage",
+            "bank-current",
+            "usable-capacity"
+          ],
+          "completion": "COMPLETE",
+          "assessment": "PASS",
+          "execution": "SUCCEEDED"
+        }
+      ],
+      "requiredContexts": {
+        "ELV-PWR-01": [
+          "backup/steady"
+        ],
+        "ELV-PWR-02": [
+          "backup/steady"
+        ],
+        "ELV-PWR-03": [
+          "backup/steady"
+        ],
+        "ELV-PWR-04": [
+          "backup/SEQUENCE"
+        ]
+      },
+      "oracles": {
+        "terminalV": [
+          "23.54",
+          "23.45"
+        ],
+        "sourceW": "19.2",
+        "lossW": "0.413",
+        "sequenceWh": "19.2",
+        "bankMarginWh": "115.2"
+      }
+    },
+    {
+      "id": "Q-FIRE",
+      "kind": "POSITIVE",
+      "builder": "public-commands:FIRE_SEGMENT_BANK",
+      "facts": {
+        "projectId": "project-fire",
+        "designRevisionId": "revision-1",
+        "numericPolicyVersion": "elv4.exact-rational.v2",
+        "definitionEdition": "fictional-qualification@1",
+        "sourceRef": "FICTIONAL_PRODUCT_NEUTRAL: no manufacturer/standard claim",
+        "reserveMultiplier": "1",
+        "derating": "1",
+        "peakPolicy": "ALL_SIMULTANEOUS",
+        "ac": {
+          "sourceMinV": "230",
+          "sourceMaxV": "230",
+          "frequencyHz": "50",
+          "inputPf": "1",
+          "ratingW": "500",
+          "ratingVa": "625",
+          "voltageAcceptanceMinV": "220",
+          "voltageAcceptanceMaxV": "240"
+        },
+        "bank": {
+          "id": "bank-1",
+          "unitV": "12",
+          "unitAh": "7",
+          "seriesCount": 2,
+          "parallelCount": 1,
+          "modelVoltageV": "24",
+          "sourceMinV": "24",
+          "sourceMaxV": "24",
+          "endOfDischargeV": "24",
+          "initialSoc": "1",
+          "minimumSoc": "0.2",
+          "temperatureFactor": "1",
+          "agingFactor": "1",
+          "rateFactor": "1",
+          "maximumDischargeA": "10",
+          "technology": "FICT_FLAT",
+          "capacityModel": "EXPLICIT_FLAT_VOLTAGE_WH",
+          "applicability": "Explicit fictional constant-24V model over declared SOC/rate/temperature; not a product battery curve"
+        },
+        "canonical": {
+          "connectionMedium": "wired",
+          "connectionCapacity": 1,
+          "dcConnector": "TERMINAL_2",
+          "dcProtocol": "TEST_DC_POWER@1",
+          "acConnector": "TEST_AC_TERMINAL",
+          "acProtocol": "TEST_AC_POWER@1",
+          "bidirectionalPortProjection": "Use explicit bidirectional interface/compatibility for reversible bank feeder",
+          "stateDemandDoesNotProjectToCanonical": true
+        },
+        "physicalPolicy": {
+          "allPathsRealized": true,
+          "foreignKeysEnabled": true,
+          "terminationEvidence": "Explicit resource-to-terminal mapping at both ends of every cable; PLUS/MINUS or L/N convention",
+          "contactResistance": "included in each declared LOOP_TOTAL_OHM",
+          "temperatureEvidence": "fixture rating valid at 20C; evaluation 20C",
+          "runLengthPolicy": "declared installed lengths include service allowance; no extra reserve length"
+        },
+        "applicability": {
+          "allFactorsExplicit": true,
+          "unsupportedModelAllowed": false,
+          "sourceBoundaryDeclared": true,
+          "policiesPinned": true
+        },
+        "systems": [
+          "FIRE"
+        ],
+        "components": [
+          "psu-1",
+          "charger-1",
+          "bank-1",
+          "panel-1"
+        ],
+        "memberships": {
+          "psu-1": [
+            "FIRE"
+          ],
+          "charger-1": [
+            "FIRE"
+          ],
+          "bank-1": [
+            "FIRE"
+          ],
+          "panel-1": [
+            "FIRE"
+          ]
+        },
+        "source": {
+          "minV": "24",
+          "maxV": "24",
+          "capacityW": "60",
+          "capacityA": "2",
+          "consumerMinV": "22",
+          "consumerMaxV": "26",
+          "psuEfficiency": "1",
+          "psuIdleW": "0"
+        },
+        "paths": [
+          {
+            "id": "bank-panel",
+            "from": "bank-1.OUT",
+            "to": "panel-1.IN",
+            "connectionId": "connection-bank-panel",
+            "allocationId": "allocation-bank-panel",
+            "cableId": "cable-bank-panel",
+            "runId": "run-bank-panel",
+            "traversalIds": [
+              "traversal-bank-panel"
+            ],
+            "resourceIds": [
+              "forward-bank-panel",
+              "return-bank-panel"
+            ],
+            "terminationIds": [
+              "term-a-bank-panel",
+              "term-b-bank-panel"
+            ],
+            "installedLengthM": "1",
+            "resistanceConvention": "LOOP_TOTAL_OHM",
+            "loopResistanceOhm": "0.2",
+            "maximumCurrentA": "10",
+            "domain": "DC",
+            "powerPassage": true
+          }
+        ],
+        "loads": [
+          {
+            "id": "panel-standby-load",
+            "port": "panel-1.IN",
+            "state": "STANDBY",
+            "kind": "DC_CONSTANT_CURRENT",
+            "currentA": "0.5",
+            "originId": "panel-own"
+          },
+          {
+            "id": "panel-alarm-load",
+            "port": "panel-1.IN",
+            "state": "ALARM",
+            "kind": "DC_CONSTANT_CURRENT",
+            "currentA": "1",
+            "originId": "panel-own"
+          }
+        ],
+        "scenarios": [
+          {
+            "id": "backup",
+            "segments": [
+              {
+                "id": "standby",
+                "durationSeconds": "7200",
+                "activeSource": "bank-1",
+                "unavailableSources": [
+                  "psu-1"
+                ],
+                "states": {
+                  "panel-1": "STANDBY"
+                },
+                "componentStates": {
+                  "psu-1": "INACTIVE",
+                  "charger-1": "INACTIVE",
+                  "bank-1": "ACTIVE",
+                  "panel-1": "STANDBY"
+                },
+                "bankDirection": "DISCHARGE",
+                "selectedTransferMode": "BACKUP_DISCHARGE"
+              },
+              {
+                "id": "alarm",
+                "durationSeconds": "1800",
+                "activeSource": "bank-1",
+                "unavailableSources": [
+                  "psu-1"
+                ],
+                "states": {
+                  "panel-1": "ALARM"
+                },
+                "componentStates": {
+                  "psu-1": "INACTIVE",
+                  "charger-1": "INACTIVE",
+                  "bank-1": "ACTIVE",
+                  "panel-1": "ALARM"
+                },
+                "bankDirection": "DISCHARGE",
+                "selectedTransferMode": "BACKUP_DISCHARGE"
+              }
+            ],
+            "extensionPolicy": "NONE"
+          }
+        ],
+        "charge": {
+          "chargeVoltageV": "24",
+          "currentA": "0.1",
+          "maximumCurrentA": "1",
+          "normalInterlock": "CHARGE",
+          "backupInterlock": "DISCHARGE",
+          "compatibleTechnology": "FICT_FLAT",
+          "operatingDemandAndChargeAddedOnce": true
+        }
+      },
+      "requiredResults": [
+        {
+          "processCode": "ELV-PWR-01",
+          "requiredDimensions": [
+            "load",
+            "accounting"
+          ],
+          "completion": "COMPLETE",
+          "assessment": "PASS",
+          "execution": "SUCCEEDED"
+        },
+        {
+          "processCode": "ELV-PWR-02",
+          "requiredDimensions": [
+            "continuous-capacity",
+            "reserve-derating"
+          ],
+          "completion": "COMPLETE",
+          "assessment": "PASS",
+          "execution": "SUCCEEDED"
+        },
+        {
+          "processCode": "ELV-PWR-03",
+          "requiredDimensions": [
+            "terminal-voltage",
+            "section-current",
+            "power-conservation"
+          ],
+          "completion": "COMPLETE",
+          "assessment": "PASS",
+          "execution": "SUCCEEDED"
+        },
+        {
+          "processCode": "ELV-PWR-04",
+          "requiredDimensions": [
+            "sequence-energy",
+            "bank-voltage",
+            "bank-current",
+            "usable-capacity"
+          ],
+          "completion": "COMPLETE",
+          "assessment": "PASS",
+          "execution": "SUCCEEDED"
+        }
+      ],
+      "requiredContexts": {
+        "ELV-PWR-01": [
+          "backup/standby",
+          "backup/alarm"
+        ],
+        "ELV-PWR-02": [
+          "backup/standby",
+          "backup/alarm"
+        ],
+        "ELV-PWR-03": [
+          "backup/standby",
+          "backup/alarm"
+        ],
+        "ELV-PWR-04": [
+          "backup/SEQUENCE"
+        ]
+      },
+      "oracles": {
+        "terminalV": [
+          "23.9",
+          "23.8"
+        ],
+        "sourceSegmentW": [
+          "12",
+          "24"
+        ],
+        "sequenceBankWh": "36",
+        "bankMarginWh": "98.4",
+        "segmentPointersMustBeDistinct": true
+      }
+    },
+    {
+      "id": "Q-SHARED",
+      "kind": "POSITIVE",
+      "builder": "public-commands:SHARED_PSE_UPS",
+      "facts": {
+        "projectId": "project-shared",
+        "designRevisionId": "revision-1",
+        "numericPolicyVersion": "elv4.exact-rational.v2",
+        "definitionEdition": "fictional-qualification@1",
+        "sourceRef": "FICTIONAL_PRODUCT_NEUTRAL: no manufacturer/standard claim",
+        "reserveMultiplier": "1",
+        "derating": "1",
+        "peakPolicy": "ALL_SIMULTANEOUS",
+        "ac": {
+          "sourceMinV": "230",
+          "sourceMaxV": "230",
+          "frequencyHz": "50",
+          "inputPf": "1",
+          "ratingW": "500",
+          "ratingVa": "625",
+          "voltageAcceptanceMinV": "220",
+          "voltageAcceptanceMaxV": "240"
+        },
+        "bank": {
+          "id": "bank-1",
+          "unitV": "12",
+          "unitAh": "7",
+          "seriesCount": 2,
+          "parallelCount": 1,
+          "modelVoltageV": "24",
+          "sourceMinV": "24",
+          "sourceMaxV": "24",
+          "endOfDischargeV": "24",
+          "initialSoc": "1",
+          "minimumSoc": "0.2",
+          "temperatureFactor": "1",
+          "agingFactor": "1",
+          "rateFactor": "1",
+          "maximumDischargeA": "10",
+          "technology": "FICT_FLAT",
+          "capacityModel": "EXPLICIT_FLAT_VOLTAGE_WH",
+          "applicability": "Explicit fictional constant-24V model over declared SOC/rate/temperature; not a product battery curve"
+        },
+        "canonical": {
+          "connectionMedium": "wired",
+          "connectionCapacity": 1,
+          "dcConnector": "TERMINAL_2",
+          "dcProtocol": "TEST_DC_POWER@1",
+          "acConnector": "TEST_AC_TERMINAL",
+          "acProtocol": "TEST_AC_POWER@1",
+          "bidirectionalPortProjection": "Use explicit bidirectional interface/compatibility for reversible bank feeder",
+          "stateDemandDoesNotProjectToCanonical": true
+        },
+        "physicalPolicy": {
+          "allPathsRealized": true,
+          "foreignKeysEnabled": true,
+          "terminationEvidence": "Explicit resource-to-terminal mapping at both ends of every cable; PLUS/MINUS or L/N convention",
+          "contactResistance": "included in each declared LOOP_TOTAL_OHM",
+          "temperatureEvidence": "fixture rating valid at 20C; evaluation 20C",
+          "runLengthPolicy": "declared installed lengths include service allowance; no extra reserve length"
+        },
+        "applicability": {
+          "allFactorsExplicit": true,
+          "unsupportedModelAllowed": false,
+          "sourceBoundaryDeclared": true,
+          "policiesPinned": true
+        },
+        "systems": [
+          "CCTV",
+          "LAN"
+        ],
+        "components": [
+          "mains-1",
+          "ups-1",
+          "pse-1",
+          "camera-1",
+          "camera-2",
+          "bank-1"
+        ],
+        "memberships": {
+          "mains-1": [
+            "CCTV",
+            "LAN"
+          ],
+          "ups-1": [
+            "CCTV",
+            "LAN"
+          ],
+          "pse-1": [
+            "CCTV",
+            "LAN"
+          ],
+          "camera-1": [
+            "CCTV"
+          ],
+          "camera-2": [
+            "LAN"
+          ],
+          "bank-1": [
+            "CCTV",
+            "LAN"
+          ]
+        },
+        "paths": [
+          {
+            "id": "mains-ups",
+            "from": "mains-1.OUT",
+            "to": "ups-1.AC_IN",
+            "connectionId": "connection-mains-ups",
+            "allocationId": "allocation-mains-ups",
+            "cableId": "cable-mains-ups",
+            "runId": "run-mains-ups",
+            "traversalIds": [
+              "traversal-mains-ups"
+            ],
+            "resourceIds": [
+              "forward-mains-ups",
+              "return-mains-ups"
+            ],
+            "terminationIds": [
+              "term-a-mains-ups",
+              "term-b-mains-ups"
+            ],
+            "installedLengthM": "1",
+            "resistanceConvention": "LOOP_TOTAL_OHM",
+            "loopResistanceOhm": "0",
+            "maximumCurrentA": "10",
+            "domain": "AC_BOUNDARY_NO_DROP_MODEL",
+            "powerPassage": true
+          },
+          {
+            "id": "ups-pse",
+            "from": "ups-1.AC_OUT",
+            "to": "pse-1.AC_IN",
+            "connectionId": "connection-ups-pse",
+            "allocationId": "allocation-ups-pse",
+            "cableId": "cable-ups-pse",
+            "runId": "run-ups-pse",
+            "traversalIds": [
+              "traversal-ups-pse"
+            ],
+            "resourceIds": [
+              "forward-ups-pse",
+              "return-ups-pse"
+            ],
+            "terminationIds": [
+              "term-a-ups-pse",
+              "term-b-ups-pse"
+            ],
+            "installedLengthM": "1",
+            "resistanceConvention": "LOOP_TOTAL_OHM",
+            "loopResistanceOhm": "0",
+            "maximumCurrentA": "10",
+            "domain": "AC_BOUNDARY_NO_DROP_MODEL",
+            "powerPassage": true
+          },
+          {
+            "id": "bank-ups",
+            "from": "bank-1.BI",
+            "to": "ups-1.BAT_IN",
+            "connectionId": "connection-bank-ups",
+            "allocationId": "allocation-bank-ups",
+            "cableId": "cable-bank-ups",
+            "runId": "run-bank-ups",
+            "traversalIds": [
+              "traversal-bank-ups"
+            ],
+            "resourceIds": [
+              "forward-bank-ups",
+              "return-bank-ups"
+            ],
+            "terminationIds": [
+              "term-a-bank-ups",
+              "term-b-bank-ups"
+            ],
+            "installedLengthM": "1",
+            "resistanceConvention": "LOOP_TOTAL_OHM",
+            "loopResistanceOhm": "0.05",
+            "maximumCurrentA": "10",
+            "domain": "DC_SINGLE_CP",
+            "powerPassage": true
+          },
+          {
+            "id": "poe-1",
+            "from": "pse-1.P1",
+            "to": "camera-1.IN",
+            "connectionId": "connection-poe-1",
+            "allocationId": "allocation-poe-1",
+            "cableId": "cable-poe-1",
+            "runId": "run-poe-1",
+            "traversalIds": [
+              "traversal-poe-1"
+            ],
+            "resourceIds": [
+              "forward-poe-1",
+              "return-poe-1"
+            ],
+            "terminationIds": [
+              "term-a-poe-1",
+              "term-b-poe-1"
+            ],
+            "installedLengthM": "1",
+            "resistanceConvention": "LOOP_TOTAL_OHM",
+            "loopResistanceOhm": "0.05",
+            "maximumCurrentA": "10",
+            "domain": "GUARANTEED_PD",
+            "powerPassage": true
+          },
+          {
+            "id": "poe-2",
+            "from": "pse-1.P2",
+            "to": "camera-2.IN",
+            "connectionId": "connection-poe-2",
+            "allocationId": "allocation-poe-2",
+            "cableId": "cable-poe-2",
+            "runId": "run-poe-2",
+            "traversalIds": [
+              "traversal-poe-2"
+            ],
+            "resourceIds": [
+              "forward-poe-2",
+              "return-poe-2"
+            ],
+            "terminationIds": [
+              "term-a-poe-2",
+              "term-b-poe-2"
+            ],
+            "installedLengthM": "1",
+            "resistanceConvention": "LOOP_TOTAL_OHM",
+            "loopResistanceOhm": "0.05",
+            "maximumCurrentA": "10",
+            "domain": "GUARANTEED_PD",
+            "powerPassage": true
+          }
+        ],
+        "pse": {
+          "id": "pse-1",
+          "powerInputKind": "AC_POWER_PF",
+          "conversionEfficiency": "1",
+          "idleW": "5",
+          "idleAccounting": "EXCLUDES_SEPARATE_IDLE",
+          "sharedReservedBudgetW": "35",
+          "upstreamBasis": "CONSERVATIVE_RESERVED",
+          "outputVoltageMinV": "48",
+          "outputVoltageMaxV": "48",
+          "pdAcceptanceMinV": "44",
+          "pdAcceptanceMaxV": "54",
+          "perPortLimitW": [
+            "20",
+            "20"
+          ],
+          "pdDemandW": [
+            "10",
+            "15"
+          ],
+          "guaranteedPdW": [
+            "10",
+            "15"
+          ],
+          "reservedPseW": [
+            "12",
+            "18"
+          ],
+          "pairModelCode": "TEST_TWO_PAIR_PASS",
+          "maximumPathM": "10",
+          "maximumPatchStages": 2,
+          "passageEvidence": "Both used power resources explicitly compatible; guarantee includes cable allowance"
+        },
+        "ups": {
+          "id": "ups-1",
+          "outputLimitW": "500",
+          "outputLimitVa": "625",
+          "normalEfficiency": "1",
+          "backupEfficiency": "0.8",
+          "idleW": "0",
+          "inputPf": "1",
+          "batteryInputMinV": "20",
+          "batteryInputMaxV": "28",
+          "batteryInputCurrentLimitA": "10",
+          "backupLoadModel": "SINGLE_CP_FEEDER"
+        },
+        "scenarios": [
+          {
+            "id": "normal",
+            "segments": [
+              {
+                "id": "normal-steady",
+                "durationSeconds": "3600",
+                "activeSource": "mains-1",
+                "states": {
+                  "camera-1": "NORMAL",
+                  "camera-2": "NORMAL"
+                },
+                "bankDirection": "INACTIVE",
+                "componentStates": {
+                  "mains-1": "ACTIVE",
+                  "ups-1": "ACTIVE",
+                  "pse-1": "ACTIVE",
+                  "camera-1": "NORMAL",
+                  "camera-2": "NORMAL",
+                  "bank-1": "INACTIVE"
+                },
+                "selectedTransferMode": "NORMAL_SUPPLY"
+              }
+            ]
+          },
+          {
+            "id": "backup",
+            "segments": [
+              {
+                "id": "backup-steady",
+                "durationSeconds": "3600",
+                "activeSource": "bank-1",
+                "unavailableSources": [
+                  "mains-1"
+                ],
+                "states": {
+                  "camera-1": "NORMAL",
+                  "camera-2": "NORMAL"
+                },
+                "bankDirection": "DISCHARGE",
+                "componentStates": {
+                  "mains-1": "INACTIVE",
+                  "ups-1": "ACTIVE",
+                  "pse-1": "ACTIVE",
+                  "camera-1": "NORMAL",
+                  "camera-2": "NORMAL",
+                  "bank-1": "ACTIVE"
+                },
+                "selectedTransferMode": "BACKUP_DISCHARGE"
+              }
+            ],
+            "extensionPolicy": "NONE"
+          }
+        ]
+      },
+      "requiredResults": [
+        {
+          "processCode": "ELV-PWR-01",
+          "requiredDimensions": [
+            "load",
+            "accounting"
+          ],
+          "completion": "COMPLETE",
+          "assessment": "PASS",
+          "execution": "SUCCEEDED"
+        },
+        {
+          "processCode": "ELV-PWR-02",
+          "requiredDimensions": [
+            "continuous-capacity",
+            "reserve-derating"
+          ],
+          "completion": "COMPLETE",
+          "assessment": "PASS",
+          "execution": "SUCCEEDED"
+        },
+        {
+          "processCode": "ELV-PWR-03",
+          "requiredDimensions": [
+            "terminal-voltage",
+            "section-current",
+            "power-conservation"
+          ],
+          "completion": "COMPLETE",
+          "assessment": "PASS",
+          "execution": "SUCCEEDED"
+        },
+        {
+          "processCode": "ELV-PWR-04",
+          "requiredDimensions": [
+            "sequence-energy",
+            "bank-voltage",
+            "bank-current",
+            "usable-capacity"
+          ],
+          "completion": "COMPLETE",
+          "assessment": "PASS",
+          "execution": "SUCCEEDED"
+        },
+        {
+          "processCode": "ELV-PWR-05",
+          "requiredDimensions": [
+            "output-W",
+            "output-VA",
+            "input-demand"
+          ],
+          "completion": "COMPLETE",
+          "assessment": "PASS",
+          "execution": "SUCCEEDED"
+        },
+        {
+          "processCode": "ELV-PWR-06",
+          "requiredDimensions": [
+            "PD-guarantee",
+            "port-budget",
+            "shared-budget",
+            "physical-path"
+          ],
+          "completion": "COMPLETE",
+          "assessment": "PASS",
+          "execution": "SUCCEEDED"
+        }
+      ],
+      "requiredContexts": {
+        "ELV-PWR-01": [
+          "normal/normal-steady",
+          "backup/backup-steady"
+        ],
+        "ELV-PWR-02": [
+          "normal/normal-steady",
+          "backup/backup-steady"
+        ],
+        "ELV-PWR-03": [
+          "backup/backup-steady"
+        ],
+        "ELV-PWR-04": [
+          "backup/SEQUENCE"
+        ],
+        "ELV-PWR-05": [
+          "normal/normal-steady",
+          "backup/backup-steady"
+        ],
+        "ELV-PWR-06": [
+          "normal/normal-steady",
+          "backup/backup-steady"
+        ]
+      },
+      "oracles": {
+        "reservedPseW": "30",
+        "ownLoadCount": 1,
+        "systemFilterMustRetainProjectBudget": true,
+        "noDuplicatePhysicalComponents": true
+      }
+    },
+    {
+      "id": "Q-GENERIC",
+      "kind": "POSITIVE",
+      "builder": "public-commands:POWER_ONLY_CATALOG_CONNECT",
+      "facts": {
+        "projectId": "project-generic",
+        "designRevisionId": "revision-1",
+        "numericPolicyVersion": "elv4.exact-rational.v2",
+        "definitionEdition": "fictional-qualification@1",
+        "sourceRef": "FICTIONAL_PRODUCT_NEUTRAL: no manufacturer/standard claim",
+        "reserveMultiplier": "1",
+        "derating": "1",
+        "peakPolicy": "ALL_SIMULTANEOUS",
+        "ac": {
+          "sourceMinV": "230",
+          "sourceMaxV": "230",
+          "frequencyHz": "50",
+          "inputPf": "1",
+          "ratingW": "500",
+          "ratingVa": "625",
+          "voltageAcceptanceMinV": "220",
+          "voltageAcceptanceMaxV": "240"
+        },
+        "bank": {
+          "id": "bank-1",
+          "unitV": "12",
+          "unitAh": "7",
+          "seriesCount": 2,
+          "parallelCount": 1,
+          "modelVoltageV": "24",
+          "sourceMinV": "24",
+          "sourceMaxV": "24",
+          "endOfDischargeV": "24",
+          "initialSoc": "1",
+          "minimumSoc": "0.2",
+          "temperatureFactor": "1",
+          "agingFactor": "1",
+          "rateFactor": "1",
+          "maximumDischargeA": "10",
+          "technology": "FICT_FLAT",
+          "capacityModel": "EXPLICIT_FLAT_VOLTAGE_WH",
+          "applicability": "Explicit fictional constant-24V model over declared SOC/rate/temperature; not a product battery curve"
+        },
+        "canonical": {
+          "connectionMedium": "wired",
+          "connectionCapacity": 1,
+          "dcConnector": "TERMINAL_2",
+          "dcProtocol": "TEST_DC_POWER@1",
+          "acConnector": "TEST_AC_TERMINAL",
+          "acProtocol": "TEST_AC_POWER@1",
+          "bidirectionalPortProjection": "Use explicit bidirectional interface/compatibility for reversible bank feeder",
+          "stateDemandDoesNotProjectToCanonical": true
+        },
+        "physicalPolicy": {
+          "allPathsRealized": true,
+          "foreignKeysEnabled": true,
+          "terminationEvidence": "Explicit resource-to-terminal mapping at both ends of every cable; PLUS/MINUS or L/N convention",
+          "contactResistance": "included in each declared LOOP_TOTAL_OHM",
+          "temperatureEvidence": "fixture rating valid at 20C; evaluation 20C",
+          "runLengthPolicy": "declared installed lengths include service allowance; no extra reserve length"
+        },
+        "applicability": {
+          "allFactorsExplicit": true,
+          "unsupportedModelAllowed": false,
+          "sourceBoundaryDeclared": true,
+          "policiesPinned": true
+        },
+        "systems": [
+          "ACS"
+        ],
+        "catalogExample": "examples/minimal-power-catalog.json",
+        "components": [
+          "generic-psu",
+          "generic-load"
+        ],
+        "memberships": {
+          "generic-psu": [
+            "ACS"
+          ],
+          "generic-load": [
+            "ACS"
+          ]
+        },
+        "paths": [
+          {
+            "id": "generic-feed",
+            "from": "generic-psu.DC_OUT",
+            "to": "generic-load.DC_IN",
+            "connectionId": "connection-generic-feed",
+            "allocationId": "allocation-generic-feed",
+            "cableId": "cable-generic-feed",
+            "runId": "run-generic-feed",
+            "traversalIds": [
+              "traversal-generic-feed"
+            ],
+            "resourceIds": [
+              "forward-generic-feed",
+              "return-generic-feed"
+            ],
+            "terminationIds": [
+              "term-a-generic-feed",
+              "term-b-generic-feed"
+            ],
+            "installedLengthM": "1",
+            "resistanceConvention": "LOOP_TOTAL_OHM",
+            "loopResistanceOhm": "0.1",
+            "maximumCurrentA": "10",
+            "domain": "DC",
+            "powerPassage": true
+          }
+        ],
+        "source": {
+          "minV": "24",
+          "maxV": "24",
+          "capacityW": "20",
+          "capacityA": "2",
+          "consumerMinV": "23",
+          "consumerMaxV": "25",
+          "terminalAcceptanceMinV": "23",
+          "terminalAcceptanceMaxV": "25"
+        },
+        "loads": [
+          {
+            "id": "generic-load",
+            "port": "generic-load.DC_IN",
+            "kind": "DC_CONSTANT_CURRENT",
+            "currentA": "0.4"
+          }
+        ],
+        "scenarios": [
+          {
+            "id": "normal",
+            "segments": [
+              {
+                "id": "steady",
+                "durationSeconds": "3600",
+                "activeSource": "generic-psu",
+                "states": {
+                  "generic-load": "NORMAL"
+                },
+                "componentStates": {
+                  "generic-psu": "ACTIVE",
+                  "generic-load": "NORMAL"
+                },
+                "bankDirection": "INACTIVE",
+                "selectedTransferMode": "NORMAL_SUPPLY"
+              }
+            ]
+          }
+        ]
+      },
+      "requiredResults": [
+        {
+          "processCode": "ELV-PWR-01",
+          "requiredDimensions": [
+            "load",
+            "accounting"
+          ],
+          "completion": "COMPLETE",
+          "assessment": "PASS",
+          "execution": "SUCCEEDED"
+        },
+        {
+          "processCode": "ELV-PWR-02",
+          "requiredDimensions": [
+            "continuous-capacity",
+            "reserve-derating"
+          ],
+          "completion": "COMPLETE",
+          "assessment": "PASS",
+          "execution": "SUCCEEDED"
+        },
+        {
+          "processCode": "ELV-PWR-03",
+          "requiredDimensions": [
+            "terminal-voltage",
+            "section-current",
+            "power-conservation"
+          ],
+          "completion": "COMPLETE",
+          "assessment": "PASS",
+          "execution": "SUCCEEDED"
+        }
+      ],
+      "requiredContexts": {
+        "ELV-PWR-01": [
+          "normal/steady"
+        ],
+        "ELV-PWR-02": [
+          "normal/steady"
+        ],
+        "ELV-PWR-03": [
+          "normal/steady"
+        ]
+      },
+      "oracles": {
+        "sourceW": "9.6",
+        "terminalV": "23.96",
+        "fakeDisciplineProfiles": 0
+      }
+    },
+    {
+      "id": "Q-CHARGE",
+      "kind": "POSITIVE",
+      "builder": "public-commands:CHARGER_OPERATING_AND_RECHARGE",
+      "facts": {
+        "projectId": "project-charge",
+        "designRevisionId": "revision-1",
+        "numericPolicyVersion": "elv4.exact-rational.v2",
+        "definitionEdition": "fictional-qualification@1",
+        "sourceRef": "FICTIONAL_PRODUCT_NEUTRAL: no manufacturer/standard claim",
+        "reserveMultiplier": "1",
+        "derating": "1",
+        "peakPolicy": "ALL_SIMULTANEOUS",
+        "ac": {
+          "sourceMinV": "230",
+          "sourceMaxV": "230",
+          "frequencyHz": "50",
+          "inputPf": "1",
+          "ratingW": "500",
+          "ratingVa": "625",
+          "voltageAcceptanceMinV": "220",
+          "voltageAcceptanceMaxV": "240"
+        },
+        "bank": {
+          "id": "bank-1",
+          "unitV": "12",
+          "unitAh": "7",
+          "seriesCount": 2,
+          "parallelCount": 1,
+          "modelVoltageV": "24",
+          "sourceMinV": "24",
+          "sourceMaxV": "24",
+          "endOfDischargeV": "24",
+          "initialSoc": "0.5",
+          "minimumSoc": "0.2",
+          "temperatureFactor": "1",
+          "agingFactor": "1",
+          "rateFactor": "1",
+          "maximumDischargeA": "10",
+          "technology": "FICT_FLAT",
+          "capacityModel": "EXPLICIT_FLAT_VOLTAGE_WH",
+          "applicability": "Explicit fictional constant-24V model over declared SOC/rate/temperature; not a product battery curve"
+        },
+        "canonical": {
+          "connectionMedium": "wired",
+          "connectionCapacity": 1,
+          "dcConnector": "TERMINAL_2",
+          "dcProtocol": "TEST_DC_POWER@1",
+          "acConnector": "TEST_AC_TERMINAL",
+          "acProtocol": "TEST_AC_POWER@1",
+          "bidirectionalPortProjection": "Use explicit bidirectional interface/compatibility for reversible bank feeder",
+          "stateDemandDoesNotProjectToCanonical": true
+        },
+        "physicalPolicy": {
+          "allPathsRealized": true,
+          "foreignKeysEnabled": true,
+          "terminationEvidence": "Explicit resource-to-terminal mapping at both ends of every cable; PLUS/MINUS or L/N convention",
+          "contactResistance": "included in each declared LOOP_TOTAL_OHM",
+          "temperatureEvidence": "fixture rating valid at 20C; evaluation 20C",
+          "runLengthPolicy": "declared installed lengths include service allowance; no extra reserve length"
+        },
+        "applicability": {
+          "allFactorsExplicit": true,
+          "unsupportedModelAllowed": false,
+          "sourceBoundaryDeclared": true,
+          "policiesPinned": true
+        },
+        "systems": [
+          "ACS"
+        ],
+        "components": [
+          "mains-1",
+          "charger-1",
+          "distribution-1",
+          "operating-load",
+          "bank-1"
+        ],
+        "memberships": {
+          "mains-1": [
+            "ACS"
+          ],
+          "charger-1": [
+            "ACS"
+          ],
+          "distribution-1": [
+            "ACS"
+          ],
+          "operating-load": [
+            "ACS"
+          ],
+          "bank-1": [
+            "ACS"
+          ]
+        },
+        "source": {
+          "minV": "24",
+          "maxV": "24",
+          "capacityW": "60",
+          "capacityA": "2",
+          "consumerMinV": "22",
+          "consumerMaxV": "26",
+          "chargerEfficiency": "0.9",
+          "chargerIdleW": "1",
+          "inputPf": "1"
+        },
+        "paths": [
+          {
+            "id": "charge-ac",
+            "from": "mains-1.OUT",
+            "to": "charger-1.AC_IN",
+            "connectionId": "connection-charge-ac",
+            "allocationId": "allocation-charge-ac",
+            "cableId": "cable-charge-ac",
+            "runId": "run-charge-ac",
+            "traversalIds": [
+              "traversal-charge-ac"
+            ],
+            "resourceIds": [
+              "forward-charge-ac",
+              "return-charge-ac"
+            ],
+            "terminationIds": [
+              "term-a-charge-ac",
+              "term-b-charge-ac"
+            ],
+            "installedLengthM": "1",
+            "resistanceConvention": "LOOP_TOTAL_OHM",
+            "loopResistanceOhm": "0",
+            "maximumCurrentA": "10",
+            "domain": "AC_BOUNDARY_NO_DROP_MODEL",
+            "powerPassage": true
+          },
+          {
+            "id": "charge-trunk",
+            "from": "charger-1.DC_OUT",
+            "to": "distribution-1.IN",
+            "connectionId": "connection-charge-trunk",
+            "allocationId": "allocation-charge-trunk",
+            "cableId": "cable-charge-trunk",
+            "runId": "run-charge-trunk",
+            "traversalIds": [
+              "traversal-charge-trunk"
+            ],
+            "resourceIds": [
+              "forward-charge-trunk",
+              "return-charge-trunk"
+            ],
+            "terminationIds": [
+              "term-a-charge-trunk",
+              "term-b-charge-trunk"
+            ],
+            "installedLengthM": "1",
+            "resistanceConvention": "LOOP_TOTAL_OHM",
+            "loopResistanceOhm": "0.1",
+            "maximumCurrentA": "10",
+            "domain": "DC",
+            "powerPassage": true
+          },
+          {
+            "id": "operate",
+            "from": "distribution-1.P1",
+            "to": "operating-load.IN",
+            "connectionId": "connection-operate",
+            "allocationId": "allocation-operate",
+            "cableId": "cable-operate",
+            "runId": "run-operate",
+            "traversalIds": [
+              "traversal-operate"
+            ],
+            "resourceIds": [
+              "forward-operate",
+              "return-operate"
+            ],
+            "terminationIds": [
+              "term-a-operate",
+              "term-b-operate"
+            ],
+            "installedLengthM": "1",
+            "resistanceConvention": "LOOP_TOTAL_OHM",
+            "loopResistanceOhm": "0",
+            "maximumCurrentA": "10",
+            "domain": "DC",
+            "powerPassage": true
+          },
+          {
+            "id": "bank-charge",
+            "from": "distribution-1.P2",
+            "to": "bank-1.BI",
+            "connectionId": "connection-bank-charge",
+            "allocationId": "allocation-bank-charge",
+            "cableId": "cable-bank-charge",
+            "runId": "run-bank-charge",
+            "traversalIds": [
+              "traversal-bank-charge"
+            ],
+            "resourceIds": [
+              "forward-bank-charge",
+              "return-bank-charge"
+            ],
+            "terminationIds": [
+              "term-a-bank-charge",
+              "term-b-bank-charge"
+            ],
+            "installedLengthM": "1",
+            "resistanceConvention": "LOOP_TOTAL_OHM",
+            "loopResistanceOhm": "0",
+            "maximumCurrentA": "10",
+            "domain": "DC",
+            "powerPassage": true
+          }
+        ],
+        "loads": [
+          {
+            "id": "operating-load-current",
+            "port": "operating-load.IN",
+            "kind": "DC_CONSTANT_CURRENT",
+            "currentA": "0.5",
+            "state": "NORMAL"
+          },
+          {
+            "id": "charge-current",
+            "port": "bank-1.BI",
+            "kind": "DC_CONSTANT_CURRENT",
+            "currentA": "0.1",
+            "state": "CHARGE"
+          }
+        ],
+        "charge": {
+          "chargeVoltageV": "24",
+          "currentA": "0.1",
+          "maximumCurrentA": "1",
+          "bankChargeAcceptanceMinV": "23.5",
+          "bankChargeAcceptanceMaxV": "24.5",
+          "acceptedSocMin": "0.2",
+          "acceptedSocMax": "0.9",
+          "acceptedTemperatureC": "20",
+          "interlock": "CHARGE_ONLY",
+          "compatibleTechnology": "FICT_FLAT",
+          "operatingDemandAndChargeAddedOnce": true,
+          "guaranteedRechargeTimeComputed": false
+        },
+        "scenarios": [
+          {
+            "id": "recharge",
+            "segments": [
+              {
+                "id": "operate-and-charge",
+                "durationSeconds": "60",
+                "activeSource": "mains-1",
+                "bankDirection": "CHARGE",
+                "selectedTransferMode": "NORMAL_RECHARGE",
+                "states": {
+                  "operating-load": "NORMAL",
+                  "bank-1": "CHARGE"
+                },
+                "componentStates": {
+                  "mains-1": "ACTIVE",
+                  "charger-1": "ACTIVE",
+                  "distribution-1": "ACTIVE",
+                  "operating-load": "NORMAL",
+                  "bank-1": "CHARGE"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "requiredResults": [
+        {
+          "processCode": "ELV-PWR-01",
+          "requiredDimensions": [
+            "load",
+            "accounting"
+          ],
+          "completion": "COMPLETE",
+          "assessment": "PASS",
+          "execution": "SUCCEEDED"
+        },
+        {
+          "processCode": "ELV-PWR-02",
+          "requiredDimensions": [
+            "continuous-capacity",
+            "reserve-derating",
+            "charger-operating-and-recharge"
+          ],
+          "completion": "COMPLETE",
+          "assessment": "PASS",
+          "execution": "SUCCEEDED"
+        },
+        {
+          "processCode": "ELV-PWR-03",
+          "requiredDimensions": [
+            "terminal-voltage",
+            "section-current",
+            "power-conservation"
+          ],
+          "completion": "COMPLETE",
+          "assessment": "PASS",
+          "execution": "SUCCEEDED"
+        }
+      ],
+      "requiredContexts": {
+        "ELV-PWR-01": [
+          "recharge/operate-and-charge"
+        ],
+        "ELV-PWR-02": [
+          "recharge/operate-and-charge"
+        ],
+        "ELV-PWR-03": [
+          "recharge/operate-and-charge"
+        ]
+      },
+      "oracles": {
+        "chargerOutputW": "14.4",
+        "chargerInputW": "17",
+        "trunkCurrentA": "0.6",
+        "terminalV": "23.94",
+        "wireLossW": "0.036",
+        "guaranteedRechargeTimeComputed": false
+      }
+    }
+  ],
+  "negativeCases": [
+    {
+      "id": "N-CP-NO-SOLUTION",
+      "model": "SINGLE_CP_FEEDER",
+      "sourceV": "24",
+      "loopOhm": "1",
+      "powerW": "160",
+      "expectedAssessment": "FAIL",
+      "expectedCode": "ELV4_NO_FEASIBLE_ELECTRICAL_SOLUTION"
+    },
+    {
+      "id": "N-CP-BRANCH",
+      "model": "MULTIPLE_CP_TREE",
+      "expectedCompletion": "BLOCKED"
+    },
+    {
+      "id": "N-POE-FIBER",
+      "mutationOf": "Q-LAN",
+      "change": "replace one segment by fiber without powered converter",
+      "expectedCompletion": "BLOCKED"
+    },
+    {
+      "id": "N-REQUIRED-UNRESOLVED",
+      "mutationOf": "Q-CCTV",
+      "change": "set required terminal-voltage assessment to UNRESOLVED",
+      "expectedQualification": "REJECT"
+    },
+    {
+      "id": "N-DECIMAL-BOUNDARY",
+      "demandW": [
+        "0.1",
+        "0.2"
+      ],
+      "capacityW": "0.3",
+      "expectedAssessment": "PASS"
+    },
+    {
+      "id": "N-DECIMAL-REAL-OVERLOAD",
+      "demandW": [
+        "0.300000000001"
+      ],
+      "capacityW": "0.3",
+      "expectedAssessment": "FAIL"
+    }
+  ]
+}

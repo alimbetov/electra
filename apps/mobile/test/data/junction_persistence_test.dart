@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:drift/native.dart';
 import 'package:electra_mobile/application/geometry_repository.dart';
 import 'package:electra_mobile/application/id_generator.dart';
@@ -313,7 +314,7 @@ void main() {
       snapshot = await repository.loadRoomRouting(room.id);
       expect(snapshot.runs.length, 3);
       expect(snapshot.junctions, isEmpty);
-      expect(database.schemaVersion, 17);
+      expect(database.schemaVersion, 23);
       await database.close();
       await directory.delete(recursive: true);
     },

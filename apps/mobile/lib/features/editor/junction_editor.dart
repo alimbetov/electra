@@ -1,5 +1,6 @@
 import 'package:engineering_core/engineering_core.dart';
 import 'package:flutter/material.dart';
+
 import '../../application/cable_routing_repository.dart';
 
 /// Placement is anchored to a selected incoming endpoint, never a freehand crossing.

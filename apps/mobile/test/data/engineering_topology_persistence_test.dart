@@ -1,9 +1,11 @@
 import 'dart:convert';
+
 import 'package:electra_mobile/data/repositories/drift_engineering_reference_repository.dart';
 import 'package:electra_mobile/data/repositories/drift_dependency_recalculation_repository.dart';
 import 'package:electra_mobile/data/repositories/drift_engineering_system_repository.dart';
 import 'package:electra_mobile/data/repositories/drift_engineering_topology_repository.dart';
 import 'package:electra_mobile/application/engineering_topology_repository.dart';
+
 import 'dart:async';
 
 import 'dart:io';
@@ -1030,7 +1032,7 @@ void main() {
         originDeviceId: 'elv1-migration',
       );
       data = await topology.load(project.id);
-      expect(database.schemaVersion, 17);
+      expect(database.schemaVersion, 23);
       expect(data.ports, isEmpty);
       expect(data.connections, isEmpty);
       expect(data.systems.systems.length, 5);

@@ -1,4 +1,5 @@
 import 'package:engineering_core/engineering_core.dart';
+
 import 'engineering_system_repository.dart';
 
 enum TopologyObjectKind { port, connection, internalMapping, group, assembly }

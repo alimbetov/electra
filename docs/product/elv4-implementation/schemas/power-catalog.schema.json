@@ -1,0 +1,1286 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:electra:elv4-power-catalog-v1",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "electra.elv4-power-catalog.v1"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "code": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "source": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "power": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "const": "electra.elv4-power-definitions.v1"
+        },
+        "connectors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+              },
+              "contactCount": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "sourceRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              }
+            },
+            "required": [
+              "code",
+              "contactCount",
+              "sourceRef"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "protocols": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+              },
+              "portKinds": {
+                "type": "array",
+                "items": {
+                  "enum": [
+                    "power",
+                    "dataPower"
+                  ]
+                },
+                "minItems": 1
+              },
+              "sourceRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              }
+            },
+            "required": [
+              "code",
+              "portKinds",
+              "sourceRef"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "interfaces": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+              },
+              "portCode": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+              },
+              "sourceRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              }
+            },
+            "required": [
+              "code",
+              "portCode",
+              "sourceRef"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "portDefinitions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+              },
+              "sourceRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "kind": {
+                "enum": [
+                  "power",
+                  "dataPower"
+                ]
+              },
+              "direction": {
+                "enum": [
+                  "input",
+                  "output",
+                  "bidirectional"
+                ]
+              },
+              "capacity": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "connectorCode": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+              },
+              "protocolCode": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+              },
+              "interfaceCode": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+              },
+              "powerDirection": {
+                "enum": [
+                  "input",
+                  "output",
+                  "bidirectional"
+                ]
+              },
+              "voltage": {
+                "$ref": "#/$defs/voltage"
+              },
+              "nameplateDemandW": {
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/decimal"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "nameplateLimitW": {
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/decimal"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "code",
+              "sourceRef",
+              "kind",
+              "direction",
+              "capacity",
+              "connectorCode",
+              "protocolCode",
+              "interfaceCode",
+              "powerDirection",
+              "voltage",
+              "nameplateDemandW",
+              "nameplateLimitW"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "componentDefinitions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+              },
+              "sourceRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "portCodes": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+                },
+                "minItems": 1
+              },
+              "transferCodes": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+                },
+                "minItems": 0
+              },
+              "capabilities": {
+                "type": "array",
+                "items": {
+                  "enum": [
+                    "SOURCE",
+                    "CONSUMER",
+                    "CONVERTER",
+                    "STORE",
+                    "CHARGER",
+                    "DISTRIBUTOR",
+                    "PSE",
+                    "PD"
+                  ]
+                },
+                "minItems": 1
+              },
+              "supplyOrigin": {
+                "enum": [
+                  "EXTERNAL_DECLARED",
+                  "LOCAL_TRANSFER",
+                  "NOT_SOURCE"
+                ]
+              }
+            },
+            "required": [
+              "code",
+              "sourceRef",
+              "portCodes",
+              "transferCodes",
+              "capabilities",
+              "supplyOrigin"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "transferDefinitions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+              },
+              "sourceRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "inputPortCode": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+              },
+              "outputPortCodes": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+                },
+                "minItems": 1
+              },
+              "kind": {
+                "enum": [
+                  "AC_DC",
+                  "DC_DC",
+                  "TRANSFORMER",
+                  "UPS",
+                  "CHARGER",
+                  "DISTRIBUTOR",
+                  "POE_PSE",
+                  "SELECTOR"
+                ]
+              },
+              "loss": {
+                "$ref": "#/$defs/loss"
+              },
+              "activeStates": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+                },
+                "minItems": 1
+              }
+            },
+            "required": [
+              "code",
+              "sourceRef",
+              "inputPortCode",
+              "outputPortCodes",
+              "kind",
+              "loss",
+              "activeStates"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0
+        },
+        "poeDefinitions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+              },
+              "sourceRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "role": {
+                "enum": [
+                  "PSE_PD_DELIVERY"
+                ]
+              },
+              "psePortCode": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+              },
+              "pdPortCode": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+              },
+              "guaranteedPdW": {
+                "$ref": "#/$defs/decimal"
+              },
+              "reservedPseW": {
+                "$ref": "#/$defs/decimal"
+              },
+              "maximumPathM": {
+                "$ref": "#/$defs/decimal"
+              },
+              "maximumPatchStages": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "pairModelCode": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+              },
+              "accountingMode": {
+                "enum": [
+                  "GUARANTEED_PD"
+                ]
+              }
+            },
+            "required": [
+              "code",
+              "sourceRef",
+              "role",
+              "psePortCode",
+              "pdPortCode",
+              "guaranteedPdW",
+              "reservedPseW",
+              "maximumPathM",
+              "maximumPatchStages",
+              "pairModelCode",
+              "accountingMode"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0
+        },
+        "batteryDefinitions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+              },
+              "sourceRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "unitV": {
+                "$ref": "#/$defs/decimal"
+              },
+              "unitAh": {
+                "$ref": "#/$defs/decimal"
+              },
+              "technology": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+              },
+              "allowedSeriesCounts": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "minItems": 1
+              },
+              "allowedParallelCounts": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "minItems": 1
+              },
+              "ratingConditions": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "capacityModel": {
+                "enum": [
+                  "EXPLICIT_FLAT_VOLTAGE_WH",
+                  "CONSTANT_CURRENT_AH"
+                ]
+              }
+            },
+            "required": [
+              "code",
+              "sourceRef",
+              "unitV",
+              "unitAh",
+              "technology",
+              "allowedSeriesCounts",
+              "allowedParallelCounts",
+              "ratingConditions",
+              "capacityModel"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0
+        },
+        "policyDefinitions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+              },
+              "sourceRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "purpose": {
+                "enum": [
+                  "SUPPLY_RESERVE",
+                  "BACKUP_SEQUENCE",
+                  "PEAK"
+                ]
+              },
+              "reserveMultiplier": {
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/decimal"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "extensionPolicy": {
+                "enum": [
+                  "NONE",
+                  "CONTINUE_LAST",
+                  "REPEAT_SEQUENCE"
+                ]
+              }
+            },
+            "required": [
+              "code",
+              "sourceRef",
+              "purpose",
+              "reserveMultiplier",
+              "extensionPolicy"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0
+        },
+        "compatibilityDefinitions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+              },
+              "sourceRef": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512
+              },
+              "familyCodes": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+                },
+                "minItems": 1
+              },
+              "media": {
+                "type": "array",
+                "items": {
+                  "enum": [
+                    "wired"
+                  ]
+                },
+                "minItems": 1
+              },
+              "layer": {
+                "enum": [
+                  "power",
+                  "dataPower"
+                ]
+              },
+              "flow": {
+                "enum": [
+                  "directed",
+                  "bidirectional"
+                ]
+              },
+              "portCodeA": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+              },
+              "portCodeB": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+              },
+              "protocolCodeA": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+              },
+              "protocolCodeB": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+              },
+              "interfaceCodeA": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+              },
+              "interfaceCodeB": {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+              }
+            },
+            "required": [
+              "code",
+              "sourceRef",
+              "familyCodes",
+              "media",
+              "layer",
+              "flow",
+              "portCodeA",
+              "portCodeB",
+              "protocolCodeA",
+              "protocolCodeB",
+              "interfaceCodeA",
+              "interfaceCodeB"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "schema",
+        "connectors",
+        "protocols",
+        "interfaces",
+        "portDefinitions",
+        "componentDefinitions",
+        "transferDefinitions",
+        "poeDefinitions",
+        "batteryDefinitions",
+        "policyDefinitions",
+        "compatibilityDefinitions"
+      ],
+      "additionalProperties": false
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "schema",
+    "id",
+    "code",
+    "version",
+    "source",
+    "power",
+    "metadata"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "decimal": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]{0,29})(\\.[0-9]{1,12})?$"
+    },
+    "code": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+    },
+    "definitionRef": {
+      "type": "object",
+      "properties": {
+        "catalogId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "catalogVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "definitionKind": {
+          "enum": [
+            "PORT",
+            "COMPONENT",
+            "TRANSFER",
+            "POE",
+            "BATTERY",
+            "POLICY",
+            "INTERFACE",
+            "PROTOCOL",
+            "COMPATIBILITY"
+          ]
+        },
+        "definitionCode": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+        },
+        "definitionVersion": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "definitionSchema": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "contentSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "sourceRef": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        }
+      },
+      "required": [
+        "catalogId",
+        "catalogVersion",
+        "definitionKind",
+        "definitionCode",
+        "definitionVersion",
+        "definitionSchema",
+        "contentSha256",
+        "sourceRef"
+      ],
+      "additionalProperties": false
+    },
+    "voltage": {
+      "type": "object",
+      "properties": {
+        "currentKind": {
+          "enum": [
+            "AC",
+            "DC"
+          ]
+        },
+        "minV": {
+          "$ref": "#/$defs/decimal"
+        },
+        "nominalV": {
+          "$ref": "#/$defs/decimal"
+        },
+        "maxV": {
+          "$ref": "#/$defs/decimal"
+        },
+        "frequencyMinHz": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/decimal"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "frequencyMaxHz": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/decimal"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "terminalConvention": {
+          "enum": [
+            "PLUS_MINUS",
+            "AC_LN"
+          ]
+        }
+      },
+      "required": [
+        "currentKind",
+        "minV",
+        "nominalV",
+        "maxV",
+        "frequencyMinHz",
+        "frequencyMaxHz",
+        "terminalConvention"
+      ],
+      "additionalProperties": false
+    },
+    "loss": {
+      "type": "object",
+      "properties": {
+        "efficiency": {
+          "$ref": "#/$defs/decimal"
+        },
+        "idleW": {
+          "$ref": "#/$defs/decimal"
+        },
+        "idleAccounting": {
+          "enum": [
+            "EXCLUDES_SEPARATE_IDLE",
+            "INCLUDES_IDLE"
+          ]
+        }
+      },
+      "required": [
+        "efficiency",
+        "idleW",
+        "idleAccounting"
+      ],
+      "additionalProperties": false
+    },
+    "demand": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "DC_CONSTANT_CURRENT"
+            },
+            "currentA": {
+              "$ref": "#/$defs/decimal"
+            }
+          },
+          "required": [
+            "kind",
+            "currentA"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "DC_CONSTANT_POWER"
+            },
+            "powerW": {
+              "$ref": "#/$defs/decimal"
+            }
+          },
+          "required": [
+            "kind",
+            "powerW"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "AC_POWER"
+            },
+            "powerW": {
+              "$ref": "#/$defs/decimal"
+            },
+            "apparentVa": {
+              "$ref": "#/$defs/decimal"
+            }
+          },
+          "required": [
+            "kind",
+            "powerW",
+            "apparentVa"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "AC_POWER_PF"
+            },
+            "powerW": {
+              "$ref": "#/$defs/decimal"
+            },
+            "powerFactor": {
+              "$ref": "#/$defs/decimal"
+            }
+          },
+          "required": [
+            "kind",
+            "powerW",
+            "powerFactor"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "transfer": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "componentId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "inputPortId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "outputPortIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 1
+        },
+        "kind": {
+          "enum": [
+            "AC_DC",
+            "DC_DC",
+            "TRANSFORMER",
+            "UPS",
+            "CHARGER",
+            "DISTRIBUTOR",
+            "POE_PSE",
+            "SELECTOR"
+          ]
+        },
+        "activeStates": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+          },
+          "minItems": 1
+        },
+        "loss": {
+          "$ref": "#/$defs/loss"
+        },
+        "capacityGroupIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "id",
+        "componentId",
+        "inputPortId",
+        "outputPortIds",
+        "kind",
+        "activeStates",
+        "loss",
+        "capacityGroupIds"
+      ],
+      "additionalProperties": false
+    },
+    "limit": {
+      "type": "object",
+      "properties": {
+        "dimension": {
+          "enum": [
+            "W",
+            "A",
+            "VA"
+          ]
+        },
+        "value": {
+          "$ref": "#/$defs/decimal"
+        }
+      },
+      "required": [
+        "dimension",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "componentId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "stateCode": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+        }
+      },
+      "required": [
+        "componentId",
+        "stateCode"
+      ],
+      "additionalProperties": false
+    },
+    "selection": {
+      "type": "object",
+      "properties": {
+        "requirementId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "sourcePortId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "transferIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "requirementId",
+        "sourcePortId",
+        "transferIds"
+      ],
+      "additionalProperties": false
+    },
+    "segment": {
+      "type": "object",
+      "properties": {
+        "segmentId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "ordinal": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "durationSeconds": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/decimal"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "states": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/state"
+          },
+          "minItems": 1
+        },
+        "sourceSelections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/selection"
+          },
+          "minItems": 0
+        },
+        "unavailableSourcePortIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "segmentId",
+        "ordinal",
+        "durationSeconds",
+        "states",
+        "sourceSelections",
+        "unavailableSourcePortIds"
+      ],
+      "additionalProperties": false
+    },
+    "scope": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "SEGMENT"
+            },
+            "segmentId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            }
+          },
+          "required": [
+            "kind",
+            "segmentId"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "SEQUENCE"
+            },
+            "scenarioId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512
+            }
+          },
+          "required": [
+            "kind",
+            "scenarioId"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "pathMember": {
+      "type": "object",
+      "properties": {
+        "connectionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "allocationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "runId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "traversalIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 1
+        },
+        "powerPassMappingIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 0
+        },
+        "resourceIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 1
+        },
+        "terminationIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "connectionId",
+        "allocationId",
+        "runId",
+        "traversalIds",
+        "powerPassMappingIds",
+        "resourceIds",
+        "terminationIds"
+      ],
+      "additionalProperties": false
+    },
+    "bank": {
+      "type": "object",
+      "properties": {
+        "bankComponentId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "unitDefinitionRef": {
+          "$ref": "#/$defs/definitionRef"
+        },
+        "seriesCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "parallelCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "modelVoltageV": {
+          "$ref": "#/$defs/decimal"
+        },
+        "minimumSourceV": {
+          "$ref": "#/$defs/decimal"
+        },
+        "maximumSourceV": {
+          "$ref": "#/$defs/decimal"
+        },
+        "initialSoc": {
+          "$ref": "#/$defs/decimal"
+        },
+        "minimumSoc": {
+          "$ref": "#/$defs/decimal"
+        },
+        "temperatureFactor": {
+          "$ref": "#/$defs/decimal"
+        },
+        "agingFactor": {
+          "$ref": "#/$defs/decimal"
+        },
+        "rateFactor": {
+          "$ref": "#/$defs/decimal"
+        },
+        "applicabilitySourceRef": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        }
+      },
+      "required": [
+        "bankComponentId",
+        "unitDefinitionRef",
+        "seriesCount",
+        "parallelCount",
+        "modelVoltageV",
+        "minimumSourceV",
+        "maximumSourceV",
+        "initialSoc",
+        "minimumSoc",
+        "temperatureFactor",
+        "agingFactor",
+        "rateFactor",
+        "applicabilitySourceRef"
+      ],
+      "additionalProperties": false
+    },
+    "load": {
+      "type": "object",
+      "properties": {
+        "loadId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "inputPortId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "stateCode": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_-]{0,63}$"
+        },
+        "accountingKind": {
+          "enum": [
+            "CONSUMER_INPUT",
+            "TRANSFER_IDLE"
+          ]
+        },
+        "originId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "demand": {
+          "$ref": "#/$defs/demand"
+        }
+      },
+      "required": [
+        "loadId",
+        "inputPortId",
+        "stateCode",
+        "accountingKind",
+        "originId",
+        "demand"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

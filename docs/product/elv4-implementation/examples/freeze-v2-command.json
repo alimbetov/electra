@@ -1,0 +1,16 @@
+{
+  "schema": "electra.elv4-revision-command.v2",
+  "operation": "FREEZE_DESIGN_REVISION",
+  "payloadSchemaVersion": 2,
+  "projectId": "p",
+  "designRevisionId": "r1",
+  "commandId": "freeze-r1",
+  "expectedDesignRowRevision": 1,
+  "expectedRows": {
+    "component:c1": 1
+  },
+  "reviewedImpactFingerprint": null,
+  "payload": {
+    "powerSectionIntent": "CAPTURE_CURRENT"
+  }
+}

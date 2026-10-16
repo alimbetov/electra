@@ -1,5 +1,6 @@
 import 'package:electra_mobile/data/repositories/drift_dependency_recalculation_repository.dart';
 import 'package:electra_mobile/data/repositories/drift_engineering_system_repository.dart';
+
 import 'dart:async';
 
 import 'dart:io';
@@ -352,7 +353,7 @@ void main() {
         originDeviceId: 'elv-migration',
       );
       data = await systems.load(project.id);
-      expect(database.schemaVersion, 17);
+      expect(database.schemaVersion, 23);
       expect(data.systems, isEmpty);
       expect(data.components.single.id, instance.id);
       expect(data.families.length, 16);

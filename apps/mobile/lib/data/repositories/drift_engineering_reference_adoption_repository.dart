@@ -9,6 +9,7 @@ import '../../application/engineering_reference_repository.dart';
 import '../../application/engineering_topology_repository.dart';
 import '../../application/id_generator.dart';
 import '../database/app_database.dart';
+import '../elv_deletion_guards.dart';
 import 'drift_engineering_topology_repository.dart';
 
 enum EngineeringReferenceAdoptionFailurePoint {
@@ -410,6 +411,11 @@ WHERE ci.id = ? AND ci.deleted_at IS NULL
       for (final port in candidatePorts) {
         final old = rowsById[port.id];
         if (old != null) {
+          await guardMutableEngineeringPortAgainstPowerOwnership(
+            database,
+            command.projectId,
+            port.id,
+          );
           await (database.update(database.engineeringPortInstances)
             ..where((row) => row.id.equals(port.id))).write(
             EngineeringPortInstancesCompanion(
@@ -455,6 +461,11 @@ WHERE ci.id = ? AND ci.deleted_at IS NULL
       var retired = false;
       for (final row in portRows) {
         if (candidateIds.contains(row.id)) continue;
+        await guardMutableEngineeringPortAgainstPowerOwnership(
+          database,
+          command.projectId,
+          row.id,
+        );
         await (database.update(database.engineeringPortInstances)
           ..where((candidate) => candidate.id.equals(row.id))).write(
           EngineeringPortInstancesCompanion(

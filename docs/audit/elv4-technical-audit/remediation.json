@@ -1,0 +1,841 @@
+{
+  "schema": "electra.elv4-specification-remediation.v1",
+  "remediationDate": "2026-10-15",
+  "basedOnAuditCommit": "75cac79",
+  "originalAuditedDesignHead": "4404c02bba777515f70e58150dd8a25bff0a1573",
+  "verdict": "SPEC_RESOLVED_IMPLEMENTATION_RECONCILED_RUNTIME_BLOCKED",
+  "resolutions": [
+    {
+      "findingId": "ELV4-AUD-01",
+      "originalSeverity": "BLOCKER",
+      "requirements": [
+        "ELV4-P0-003",
+        "ELV4-P0-004",
+        "ELV4-P2-005",
+        "ELV4-P7-001",
+        "ELV4-P7-002",
+        "ELV4-P8-008",
+        "ELV4-P9-002",
+        "ELV4-P9-004"
+      ],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "IN_PROGRESS",
+      "resolutionContract": "docs/product/elv4-implementation/remediation-contract.md#RM01",
+      "acceptanceId": "RM01-T",
+      "affectedContracts": [
+        "docs/product/elv4-implementation/shared-contracts.md",
+        "docs/product/elv4-implementation/p0-baseline.md",
+        "docs/product/elv4-implementation/p2-persistence-commands.md",
+        "docs/product/elv4-implementation/p7-dependencies-workspace.md",
+        "docs/product/elv4-implementation/p8-acceptance.md",
+        "docs/product/elv4-implementation/p9-closure.md"
+      ],
+      "sourceEvidenceRequired": true,
+      "sourcePaths": [
+        "apps/mobile/lib/data/database/power_database_tables.dart",
+        "apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart",
+        "apps/mobile/lib/data/repositories/drift_elv_runtime_support.dart",
+        "apps/mobile/lib/data/repositories/drift_engineering_topology_repository.dart",
+        "apps/mobile/lib/data/repositories/drift_power_command_service.dart",
+        "apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart",
+        "apps/mobile/lib/data/repositories/drift_power_runtime_store.dart",
+        "docs/audit/elv4-p9-reconciliation.md",
+        "packages/engineering_core/lib/src/power_dc_backup.dart",
+        "packages/engineering_core/lib/src/power_dependency.dart",
+        "packages/engineering_core/lib/src/power_numeric.dart"
+      ],
+      "testPaths": [
+        "apps/mobile/test/data/elv4_p2_persistence_test.dart",
+        "apps/mobile/test/data/elv4_p2_power_command_service_test.dart",
+        "apps/mobile/test/data/elv4_p7_runtime_test.dart",
+        "apps/mobile/test/data/elv4_p8_command_outcome_durability_test.dart",
+        "apps/mobile/test/data/elv4_p8_freeze_historical_invariance_test.dart",
+        "apps/mobile/test/data/elv_p3_runtime_closure_test.dart",
+        "packages/engineering_core/test/power_dc_backup_test.dart",
+        "packages/engineering_core/test/power_dependency_test.dart",
+        "packages/engineering_core/test/power_numeric_test.dart"
+      ],
+      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
+      "openFindingIds": [
+        "C01",
+        "C02",
+        "C03"
+      ],
+      "evidence": [
+        "docs/audit/elv4-p9-reconciliation.md",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402 (technical regressions only, no full RM acceptance)"
+      ],
+      "acceptanceStatus": "PENDING"
+    },
+    {
+      "findingId": "ELV4-AUD-02",
+      "originalSeverity": "HIGH",
+      "requirements": [
+        "ELV4-P1-001",
+        "ELV4-P1-002",
+        "ELV4-P1-007",
+        "ELV4-P2-002",
+        "ELV4-P2-008",
+        "ELV4-P8-008"
+      ],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "IN_PROGRESS",
+      "resolutionContract": "docs/product/elv4-implementation/remediation-contract.md#RM02",
+      "acceptanceId": "RM02-T",
+      "affectedContracts": [
+        "docs/product/elv4-implementation/shared-contracts.md",
+        "docs/product/elv4-implementation/p1-domain-catalog.md",
+        "docs/product/elv4-implementation/p2-persistence-commands.md",
+        "docs/product/elv4-implementation/p8-acceptance.md"
+      ],
+      "sourceEvidenceRequired": true,
+      "sourcePaths": [
+        "apps/mobile/lib/data/repositories/drift_engineering_reference_adoption_repository.dart",
+        "apps/mobile/lib/data/repositories/drift_engineering_topology_repository.dart",
+        "apps/mobile/lib/data/repositories/drift_power_command_service.dart",
+        "packages/engineering_core/lib/src/power_bindings.dart",
+        "packages/engineering_core/lib/src/power_dc_backup.dart",
+        "packages/engineering_core/lib/src/power_legacy_adoption.dart",
+        "packages/engineering_core/lib/src/power_numeric.dart",
+        "packages/engineering_core/lib/src/power_profiles.dart"
+      ],
+      "testPaths": [
+        "apps/mobile/test/data/elv4_p2_power_command_service_test.dart",
+        "apps/mobile/test/data/engineering_reference_adoption_safety_test.dart",
+        "packages/engineering_core/test/power_dc_backup_test.dart",
+        "packages/engineering_core/test/power_domain_contracts_test.dart",
+        "packages/engineering_core/test/power_numeric_test.dart",
+        "packages/engineering_core/test/power_profiles_test.dart"
+      ],
+      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
+      "openFindingIds": [
+        "C02"
+      ],
+      "evidence": [
+        "docs/audit/elv4-p9-reconciliation.md",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402 (technical regressions only, no full RM acceptance)"
+      ],
+      "acceptanceStatus": "PENDING"
+    },
+    {
+      "findingId": "ELV4-AUD-03",
+      "originalSeverity": "HIGH",
+      "requirements": [
+        "ELV4-P1-002",
+        "ELV4-P1-004",
+        "ELV4-P1-007",
+        "ELV4-P2-003",
+        "ELV4-P2-008",
+        "ELV4-P3-002",
+        "ELV4-P3-005",
+        "ELV4-P7-004"
+      ],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "IN_PROGRESS",
+      "resolutionContract": "docs/product/elv4-implementation/remediation-contract.md#RM03",
+      "acceptanceId": "RM03-T",
+      "affectedContracts": [
+        "docs/product/elv4-implementation/shared-contracts.md",
+        "docs/product/elv4-implementation/p1-domain-catalog.md",
+        "docs/product/elv4-implementation/p2-persistence-commands.md",
+        "docs/product/elv4-implementation/p3-topology-trace.md",
+        "docs/product/elv4-implementation/p7-dependencies-workspace.md"
+      ],
+      "sourceEvidenceRequired": true,
+      "sourcePaths": [
+        "apps/mobile/lib/application/power_mutation_command.dart",
+        "apps/mobile/lib/data/repositories/drift_engineering_reference_adoption_repository.dart",
+        "apps/mobile/lib/data/repositories/drift_power_command_service.dart",
+        "apps/mobile/lib/data/repositories/drift_power_workspace_repository.dart",
+        "apps/mobile/lib/features/editor/power_workspace_overlay_painter.dart",
+        "packages/engineering_core/lib/src/power_bindings.dart",
+        "packages/engineering_core/lib/src/power_graph.dart",
+        "packages/engineering_core/lib/src/power_legacy_adoption.dart",
+        "packages/engineering_core/lib/src/power_scenarios.dart"
+      ],
+      "testPaths": [
+        "apps/mobile/test/data/elv4_p2_power_command_service_test.dart",
+        "apps/mobile/test/data/engineering_reference_adoption_safety_test.dart",
+        "apps/mobile/test/features/editor/power_workspace_panel_test.dart",
+        "packages/engineering_core/test/power_domain_contracts_test.dart",
+        "packages/engineering_core/test/power_graph_test.dart"
+      ],
+      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
+      "openFindingIds": [
+        "C02",
+        "C03"
+      ],
+      "evidence": [
+        "docs/audit/elv4-p9-reconciliation.md",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402 (technical regressions only, no full RM acceptance)"
+      ],
+      "acceptanceStatus": "PENDING"
+    },
+    {
+      "findingId": "ELV4-AUD-04",
+      "originalSeverity": "HIGH",
+      "requirements": [
+        "ELV4-P1-008",
+        "ELV4-P2-005",
+        "ELV4-P4-007",
+        "ELV4-P6-005",
+        "ELV4-P7-001",
+        "ELV4-P7-003",
+        "ELV4-P8-004",
+        "ELV4-P8-007"
+      ],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "IN_PROGRESS",
+      "resolutionContract": "docs/product/elv4-implementation/remediation-contract.md#RM04",
+      "acceptanceId": "RM04-T",
+      "affectedContracts": [
+        "docs/product/elv4-implementation/shared-contracts.md",
+        "docs/product/elv4-implementation/p1-domain-catalog.md",
+        "docs/product/elv4-implementation/p2-persistence-commands.md",
+        "docs/product/elv4-implementation/p4-load-conversion.md",
+        "docs/product/elv4-implementation/p6-dc-backup.md",
+        "docs/product/elv4-implementation/p7-dependencies-workspace.md",
+        "docs/product/elv4-implementation/p8-acceptance.md"
+      ],
+      "sourceEvidenceRequired": true,
+      "sourcePaths": [
+        "apps/mobile/lib/data/database/power_database_tables.dart",
+        "apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart",
+        "apps/mobile/lib/data/repositories/drift_power_batch_publication_runtime.dart",
+        "apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart",
+        "apps/mobile/lib/data/repositories/drift_power_runtime_store.dart",
+        "apps/mobile/lib/data/repositories/drift_power_workspace_repository.dart",
+        "docs/product/elv4-implementation/schemas/power-command.schema.json",
+        "packages/engineering_core/lib/src/battery_backup_evaluation.dart",
+        "packages/engineering_core/lib/src/power_dependency.dart",
+        "packages/engineering_core/lib/src/power_evaluation.dart",
+        "packages/engineering_core/lib/src/power_load_evidence.dart"
+      ],
+      "testPaths": [
+        "apps/mobile/test/data/elv4_p2_persistence_test.dart",
+        "apps/mobile/test/data/elv4_p7_batch_runtime_test.dart",
+        "apps/mobile/test/data/elv4_p7_runtime_test.dart",
+        "apps/mobile/test/data/elv4_p8_freeze_historical_invariance_test.dart",
+        "apps/mobile/test/data/elv4_p8_public_vertical_acceptance_test.dart",
+        "packages/engineering_core/test/p6_closure_test.dart",
+        "packages/engineering_core/test/power_dependency_test.dart",
+        "packages/engineering_core/test/power_evaluation_test.dart",
+        "packages/engineering_core/test/power_load_evidence_test.dart"
+      ],
+      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
+      "openFindingIds": [
+        "C01",
+        "C03",
+        "C05"
+      ],
+      "evidence": [
+        "docs/audit/elv4-p9-reconciliation.md",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402 (technical regressions only, no full RM acceptance)"
+      ],
+      "acceptanceStatus": "PENDING"
+    },
+    {
+      "findingId": "ELV4-AUD-05",
+      "originalSeverity": "HIGH",
+      "requirements": [
+        "ELV4-P0-005",
+        "ELV4-P0-006",
+        "ELV4-P1-005",
+        "ELV4-P2-002",
+        "ELV4-P2-003",
+        "ELV4-P3-001",
+        "ELV4-P3-003",
+        "ELV4-P5-007",
+        "ELV4-P8-001"
+      ],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "IN_PROGRESS",
+      "resolutionContract": "docs/product/elv4-implementation/remediation-contract.md#RM05",
+      "acceptanceId": "RM05-T",
+      "affectedContracts": [
+        "docs/product/elv4-implementation/shared-contracts.md",
+        "docs/product/elv4-implementation/p0-baseline.md",
+        "docs/product/elv4-implementation/p1-domain-catalog.md",
+        "docs/product/elv4-implementation/p2-persistence-commands.md",
+        "docs/product/elv4-implementation/p3-topology-trace.md",
+        "docs/product/elv4-implementation/p5-poe.md",
+        "docs/product/elv4-implementation/p8-acceptance.md"
+      ],
+      "sourceEvidenceRequired": true,
+      "sourcePaths": [
+        "apps/mobile/lib/application/power_mutation_command.dart",
+        "apps/mobile/lib/data/repositories/drift_engineering_reference_repository.dart",
+        "apps/mobile/lib/data/repositories/drift_engineering_topology_repository.dart",
+        "apps/mobile/lib/data/repositories/drift_power_command_service.dart",
+        "apps/mobile/test/support/elv4_power_qualification_builder.dart",
+        "packages/engineering_core/lib/src/poe_evaluation.dart",
+        "packages/engineering_core/lib/src/power_catalog.dart",
+        "packages/engineering_core/lib/src/power_dc_backup.dart",
+        "packages/engineering_core/lib/src/power_graph.dart"
+      ],
+      "testPaths": [
+        "apps/mobile/test/data/elv4_p2_power_command_service_test.dart",
+        "apps/mobile/test/data/elv4_p8_public_vertical_acceptance_test.dart",
+        "apps/mobile/test/data/engineering_reference_vocabulary_persistence_test.dart",
+        "packages/engineering_core/test/poe_evaluation_test.dart",
+        "packages/engineering_core/test/power_catalog_test.dart",
+        "packages/engineering_core/test/power_dc_backup_test.dart",
+        "packages/engineering_core/test/power_graph_test.dart"
+      ],
+      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
+      "openFindingIds": [
+        "C01",
+        "C02"
+      ],
+      "evidence": [
+        "docs/audit/elv4-p9-reconciliation.md",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402 (technical regressions only, no full RM acceptance)"
+      ],
+      "acceptanceStatus": "PENDING"
+    },
+    {
+      "findingId": "ELV4-AUD-06",
+      "originalSeverity": "HIGH",
+      "requirements": [
+        "ELV4-P0-005",
+        "ELV4-P4-008",
+        "ELV4-P6-003",
+        "ELV4-P6-005",
+        "ELV4-P6-006",
+        "ELV4-P6-007",
+        "ELV4-P8-001",
+        "ELV4-P9-006"
+      ],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "IN_PROGRESS",
+      "resolutionContract": "docs/product/elv4-implementation/remediation-contract.md#RM06",
+      "acceptanceId": "RM06-T",
+      "affectedContracts": [
+        "docs/product/elv4-implementation/shared-contracts.md",
+        "docs/product/elv4-implementation/p0-baseline.md",
+        "docs/product/elv4-implementation/p4-load-conversion.md",
+        "docs/product/elv4-implementation/p6-dc-backup.md",
+        "docs/product/elv4-implementation/p8-acceptance.md",
+        "docs/product/elv4-implementation/p9-closure.md"
+      ],
+      "sourceEvidenceRequired": true,
+      "sourcePaths": [
+        "apps/mobile/test/support/elv4_power_qualification_builder.dart",
+        "docs/audit/elv4-p9-reconciliation.md",
+        "docs/product/elv4-implementation/closure.json",
+        "packages/engineering_core/lib/src/battery_backup_evaluation.dart",
+        "packages/engineering_core/lib/src/dc_backup_orchestration.dart",
+        "packages/engineering_core/lib/src/poe_evaluation.dart",
+        "packages/engineering_core/lib/src/poe_orchestration.dart",
+        "packages/engineering_core/lib/src/power_bottom_up_evaluation.dart",
+        "packages/engineering_core/lib/src/power_dc_backup.dart"
+      ],
+      "testPaths": [
+        "apps/mobile/test/data/elv4_p8_public_vertical_acceptance_test.dart",
+        "packages/engineering_core/test/p6_closure_test.dart",
+        "packages/engineering_core/test/poe_evaluation_test.dart",
+        "packages/engineering_core/test/power_bottom_up_evaluation_test.dart",
+        "packages/engineering_core/test/power_dc_backup_test.dart",
+        "scripts/ci/check-elv4-closure.py"
+      ],
+      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
+      "openFindingIds": [
+        "C01"
+      ],
+      "evidence": [
+        "docs/audit/elv4-p9-reconciliation.md",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402 (technical regressions only, no full RM acceptance)"
+      ],
+      "acceptanceStatus": "PENDING"
+    },
+    {
+      "findingId": "ELV4-AUD-07",
+      "originalSeverity": "HIGH",
+      "requirements": [
+        "ELV4-P0-007",
+        "ELV4-P2-006",
+        "ELV4-P5-008",
+        "ELV4-P6-008",
+        "ELV4-P7-007",
+        "ELV4-P8-004",
+        "ELV4-P8-007"
+      ],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "IN_PROGRESS",
+      "resolutionContract": "docs/product/elv4-implementation/remediation-contract.md#RM07",
+      "acceptanceId": "RM07-T",
+      "affectedContracts": [
+        "docs/product/elv4-implementation/shared-contracts.md",
+        "docs/product/elv4-implementation/p0-baseline.md",
+        "docs/product/elv4-implementation/p2-persistence-commands.md",
+        "docs/product/elv4-implementation/p5-poe.md",
+        "docs/product/elv4-implementation/p6-dc-backup.md",
+        "docs/product/elv4-implementation/p7-dependencies-workspace.md",
+        "docs/product/elv4-implementation/p8-acceptance.md"
+      ],
+      "sourceEvidenceRequired": true,
+      "sourcePaths": [
+        "apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart",
+        "apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart",
+        "apps/mobile/lib/data/repositories/drift_power_workspace_repository.dart",
+        "packages/engineering_core/lib/src/battery_backup_evidence.dart",
+        "packages/engineering_core/lib/src/poe_evidence.dart"
+      ],
+      "testPaths": [
+        "apps/mobile/test/data/elv4_p7_freeze_integration_test.dart",
+        "apps/mobile/test/data/elv4_p7_runtime_test.dart",
+        "apps/mobile/test/data/elv4_p8_freeze_historical_invariance_test.dart",
+        "apps/mobile/test/data/elv4_p8_public_vertical_acceptance_test.dart",
+        "packages/engineering_core/test/p6_closure_test.dart",
+        "packages/engineering_core/test/poe_evidence_test.dart"
+      ],
+      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
+      "openFindingIds": [
+        "C01",
+        "C03"
+      ],
+      "evidence": [
+        "docs/audit/elv4-p9-reconciliation.md",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402 (technical regressions only, no full RM acceptance)"
+      ],
+      "acceptanceStatus": "PENDING"
+    },
+    {
+      "findingId": "ELV4-AUD-08",
+      "originalSeverity": "HIGH",
+      "requirements": [
+        "ELV4-P2-007",
+        "ELV4-P7-006",
+        "ELV4-P8-004",
+        "ELV4-P8-006",
+        "ELV4-P9-002"
+      ],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "IN_PROGRESS",
+      "resolutionContract": "docs/product/elv4-implementation/remediation-contract.md#RM08",
+      "acceptanceId": "RM08-T",
+      "affectedContracts": [
+        "docs/product/elv4-implementation/shared-contracts.md",
+        "docs/product/elv4-implementation/p2-persistence-commands.md",
+        "docs/product/elv4-implementation/p7-dependencies-workspace.md",
+        "docs/product/elv4-implementation/p8-acceptance.md",
+        "docs/product/elv4-implementation/p9-closure.md"
+      ],
+      "sourceEvidenceRequired": true,
+      "sourcePaths": [
+        "apps/mobile/lib/application/elv_revision_command_history.dart",
+        "apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart",
+        "apps/mobile/lib/data/repositories/drift_elv_reviewed_routing_runtime.dart",
+        "apps/mobile/lib/data/repositories/drift_power_command_service.dart",
+        "apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart",
+        "apps/mobile/lib/features/editor/power_workspace_editor_binding.dart",
+        "docs/audit/elv4-p9-reconciliation.md"
+      ],
+      "testPaths": [
+        "apps/mobile/test/data/elv4_p2_power_command_service_test.dart",
+        "apps/mobile/test/data/elv4_p7_t06_history_test.dart",
+        "apps/mobile/test/data/elv4_p8_freeze_historical_invariance_test.dart",
+        "apps/mobile/test/data/elv4_p8_idempotency_race_acceptance_test.dart",
+        "apps/mobile/test/data/elv4_p8_public_vertical_acceptance_test.dart",
+        "apps/mobile/test/data/elv4_p8_rejection_concurrency_acceptance_test.dart",
+        "apps/mobile/test/features/editor/power_workspace_panel_test.dart"
+      ],
+      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
+      "openFindingIds": [
+        "C02",
+        "C03"
+      ],
+      "evidence": [
+        "docs/audit/elv4-p9-reconciliation.md",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402 (technical regressions only, no full RM acceptance)"
+      ],
+      "acceptanceStatus": "PENDING"
+    },
+    {
+      "findingId": "ELV4-AUD-09",
+      "originalSeverity": "HIGH",
+      "requirements": [
+        "ELV4-P1-001",
+        "ELV4-P1-008",
+        "ELV4-P4-004",
+        "ELV4-P5-005",
+        "ELV4-P6-002",
+        "ELV4-P8-008"
+      ],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "IN_PROGRESS",
+      "resolutionContract": "docs/product/elv4-implementation/remediation-contract.md#RM09",
+      "acceptanceId": "RM09-T",
+      "affectedContracts": [
+        "docs/product/elv4-implementation/shared-contracts.md",
+        "docs/product/elv4-implementation/p1-domain-catalog.md",
+        "docs/product/elv4-implementation/p4-load-conversion.md",
+        "docs/product/elv4-implementation/p5-poe.md",
+        "docs/product/elv4-implementation/p6-dc-backup.md",
+        "docs/product/elv4-implementation/p8-acceptance.md"
+      ],
+      "sourceEvidenceRequired": true,
+      "sourcePaths": [
+        "docs/product/elv4-implementation/schemas/power-command.schema.json",
+        "packages/engineering_core/lib/src/poe_evaluation.dart",
+        "packages/engineering_core/lib/src/power_dc_backup.dart",
+        "packages/engineering_core/lib/src/power_evaluation.dart",
+        "packages/engineering_core/lib/src/power_load_evaluation.dart",
+        "packages/engineering_core/lib/src/power_numeric.dart",
+        "packages/engineering_core/lib/src/power_profiles.dart"
+      ],
+      "testPaths": [
+        "packages/engineering_core/test/poe_evaluation_test.dart",
+        "packages/engineering_core/test/power_dc_backup_test.dart",
+        "packages/engineering_core/test/power_evaluation_test.dart",
+        "packages/engineering_core/test/power_load_evaluation_test.dart",
+        "packages/engineering_core/test/power_numeric_test.dart",
+        "packages/engineering_core/test/power_profiles_test.dart"
+      ],
+      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
+      "openFindingIds": [
+        "C05"
+      ],
+      "evidence": [
+        "docs/audit/elv4-p9-reconciliation.md",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402 (technical regressions only, no full RM acceptance)"
+      ],
+      "acceptanceStatus": "PENDING"
+    },
+    {
+      "findingId": "ELV4-AUD-10",
+      "originalSeverity": "HIGH",
+      "requirements": [
+        "ELV4-P0-007",
+        "ELV4-P2-006",
+        "ELV4-P8-006",
+        "ELV4-P9-004"
+      ],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "IN_PROGRESS",
+      "resolutionContract": "docs/product/elv4-implementation/remediation-contract.md#RM10",
+      "acceptanceId": "RM10-T",
+      "affectedContracts": [
+        "docs/product/elv4-implementation/shared-contracts.md",
+        "docs/product/elv4-implementation/p0-baseline.md",
+        "docs/product/elv4-implementation/p2-persistence-commands.md",
+        "docs/product/elv4-implementation/p8-acceptance.md",
+        "docs/product/elv4-implementation/p9-closure.md"
+      ],
+      "sourceEvidenceRequired": true,
+      "sourcePaths": [
+        "apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart",
+        "apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart",
+        "docs/audit/elv4-p9-reconciliation.md"
+      ],
+      "testPaths": [
+        "apps/mobile/test/data/elv4_p7_freeze_integration_test.dart",
+        "apps/mobile/test/data/elv4_p8_freeze_historical_invariance_test.dart",
+        "apps/mobile/test/data/elv4_p8_idempotency_race_acceptance_test.dart",
+        "apps/mobile/test/data/elv4_p8_rejection_concurrency_acceptance_test.dart",
+        "apps/mobile/test/data/elv_p3_runtime_closure_test.dart"
+      ],
+      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
+      "openFindingIds": [
+        "C03"
+      ],
+      "evidence": [
+        "docs/audit/elv4-p9-reconciliation.md",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402 (technical regressions only, no full RM acceptance)"
+      ],
+      "acceptanceStatus": "PENDING"
+    },
+    {
+      "findingId": "ELV4-AUD-11",
+      "originalSeverity": "MEDIUM",
+      "requirements": [
+        "ELV4-P1-005",
+        "ELV4-P1-006",
+        "ELV4-P1-008",
+        "ELV4-P2-001",
+        "ELV4-P2-003",
+        "ELV4-P8-003"
+      ],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "IN_PROGRESS",
+      "resolutionContract": "docs/product/elv4-implementation/remediation-contract.md#RM11",
+      "acceptanceId": "RM11-T",
+      "affectedContracts": [
+        "docs/product/elv4-implementation/shared-contracts.md",
+        "docs/product/elv4-implementation/p1-domain-catalog.md",
+        "docs/product/elv4-implementation/p2-persistence-commands.md",
+        "docs/product/elv4-implementation/p8-acceptance.md"
+      ],
+      "sourceEvidenceRequired": true,
+      "sourcePaths": [
+        "apps/mobile/lib/application/power_mutation_command.dart",
+        "apps/mobile/lib/data/database/app_database.dart",
+        "apps/mobile/lib/data/database/power_database_tables.dart",
+        "apps/mobile/lib/data/repositories/drift_engineering_reference_repository.dart",
+        "apps/mobile/lib/data/repositories/drift_power_command_service.dart",
+        "docs/product/elv4-implementation/schemas/power-command.schema.json",
+        "packages/engineering_core/lib/src/power_assets.dart",
+        "packages/engineering_core/lib/src/power_catalog.dart",
+        "packages/engineering_core/lib/src/power_evaluation.dart"
+      ],
+      "testPaths": [
+        "apps/mobile/test/data/elv4_p2_persistence_test.dart",
+        "apps/mobile/test/data/elv4_p2_power_command_service_test.dart",
+        "apps/mobile/test/data/elv_p1_migration_test.dart",
+        "apps/mobile/test/data/elv_p2_migration_test.dart",
+        "apps/mobile/test/data/engineering_reference_vocabulary_persistence_test.dart",
+        "packages/engineering_core/test/power_catalog_test.dart",
+        "packages/engineering_core/test/power_dc_backup_test.dart",
+        "packages/engineering_core/test/power_domain_contracts_test.dart",
+        "packages/engineering_core/test/power_evaluation_test.dart"
+      ],
+      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
+      "openFindingIds": [
+        "C02",
+        "C04",
+        "C05"
+      ],
+      "evidence": [
+        "docs/audit/elv4-p9-reconciliation.md",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402 (technical regressions only, no full RM acceptance)"
+      ],
+      "acceptanceStatus": "PENDING"
+    },
+    {
+      "findingId": "ELV4-AUD-12",
+      "originalSeverity": "MEDIUM",
+      "requirements": [
+        "ELV4-P1-003",
+        "ELV4-P1-004",
+        "ELV4-P4-006",
+        "ELV4-P6-006",
+        "ELV4-P8-008"
+      ],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "IN_PROGRESS",
+      "resolutionContract": "docs/product/elv4-implementation/remediation-contract.md#RM12",
+      "acceptanceId": "RM12-T",
+      "affectedContracts": [
+        "docs/product/elv4-implementation/shared-contracts.md",
+        "docs/product/elv4-implementation/p1-domain-catalog.md",
+        "docs/product/elv4-implementation/p4-load-conversion.md",
+        "docs/product/elv4-implementation/p6-dc-backup.md",
+        "docs/product/elv4-implementation/p8-acceptance.md"
+      ],
+      "sourceEvidenceRequired": true,
+      "sourcePaths": [
+        "apps/mobile/lib/data/repositories/drift_power_command_service.dart",
+        "packages/engineering_core/lib/src/dc_backup_orchestration.dart",
+        "packages/engineering_core/lib/src/power_bindings.dart",
+        "packages/engineering_core/lib/src/power_dc_backup.dart",
+        "packages/engineering_core/lib/src/power_load_evaluation.dart",
+        "packages/engineering_core/lib/src/power_numeric.dart",
+        "packages/engineering_core/lib/src/power_profiles.dart",
+        "packages/engineering_core/lib/src/power_scenarios.dart"
+      ],
+      "testPaths": [
+        "apps/mobile/test/data/elv4_p2_power_command_service_test.dart",
+        "packages/engineering_core/test/p6_closure_test.dart",
+        "packages/engineering_core/test/power_dc_backup_test.dart",
+        "packages/engineering_core/test/power_domain_contracts_test.dart",
+        "packages/engineering_core/test/power_load_evaluation_test.dart",
+        "packages/engineering_core/test/power_numeric_test.dart",
+        "packages/engineering_core/test/power_profiles_test.dart"
+      ],
+      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
+      "openFindingIds": [],
+      "evidence": [
+        "docs/audit/elv4-p9-reconciliation.md",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402 (technical regressions only, no full RM acceptance)"
+      ],
+      "acceptanceStatus": "PENDING"
+    },
+    {
+      "findingId": "ELV4-AUD-13",
+      "originalSeverity": "MEDIUM",
+      "requirements": [
+        "ELV4-P4-007",
+        "ELV4-P7-001",
+        "ELV4-P7-002",
+        "ELV4-P7-003",
+        "ELV4-P8-002",
+        "ELV4-P8-008"
+      ],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "IN_PROGRESS",
+      "resolutionContract": "docs/product/elv4-implementation/remediation-contract.md#RM13",
+      "acceptanceId": "RM13-T",
+      "affectedContracts": [
+        "docs/product/elv4-implementation/shared-contracts.md",
+        "docs/product/elv4-implementation/p4-load-conversion.md",
+        "docs/product/elv4-implementation/p7-dependencies-workspace.md",
+        "docs/product/elv4-implementation/p8-acceptance.md"
+      ],
+      "sourceEvidenceRequired": true,
+      "sourcePaths": [
+        "apps/mobile/lib/data/repositories/drift_power_batch_publication_runtime.dart",
+        "apps/mobile/lib/data/repositories/drift_power_command_service.dart",
+        "apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart",
+        "packages/engineering_core/lib/src/power_dc_backup.dart",
+        "packages/engineering_core/lib/src/power_dependency.dart",
+        "packages/engineering_core/lib/src/power_load_evidence.dart",
+        "packages/engineering_core/lib/src/power_numeric.dart"
+      ],
+      "testPaths": [
+        "apps/mobile/test/data/elv4_p2_power_command_service_test.dart",
+        "apps/mobile/test/data/elv4_p7_batch_runtime_test.dart",
+        "apps/mobile/test/data/elv4_p7_runtime_test.dart",
+        "apps/mobile/test/data/elv4_p8_public_vertical_acceptance_test.dart",
+        "packages/engineering_core/test/power_dc_backup_test.dart",
+        "packages/engineering_core/test/power_dependency_test.dart",
+        "packages/engineering_core/test/power_load_evidence_test.dart",
+        "packages/engineering_core/test/power_numeric_test.dart"
+      ],
+      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
+      "openFindingIds": [
+        "C01",
+        "C02"
+      ],
+      "evidence": [
+        "docs/audit/elv4-p9-reconciliation.md",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402 (technical regressions only, no full RM acceptance)"
+      ],
+      "acceptanceStatus": "PENDING"
+    },
+    {
+      "findingId": "ELV4-AUD-14",
+      "originalSeverity": "MEDIUM",
+      "requirements": [
+        "ELV4-P2-006",
+        "ELV4-P7-003",
+        "ELV4-P7-007",
+        "ELV4-P8-006",
+        "ELV4-P9-008"
+      ],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "IN_PROGRESS",
+      "resolutionContract": "docs/product/elv4-implementation/remediation-contract.md#RM14",
+      "acceptanceId": "RM14-T",
+      "affectedContracts": [
+        "docs/product/elv4-implementation/shared-contracts.md",
+        "docs/product/elv4-implementation/p2-persistence-commands.md",
+        "docs/product/elv4-implementation/p7-dependencies-workspace.md",
+        "docs/product/elv4-implementation/p8-acceptance.md",
+        "docs/product/elv4-implementation/p9-closure.md"
+      ],
+      "sourceEvidenceRequired": true,
+      "sourcePaths": [
+        "apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart",
+        "apps/mobile/lib/data/repositories/drift_power_batch_publication_runtime.dart",
+        "apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart",
+        "apps/mobile/lib/data/repositories/drift_power_workspace_repository.dart",
+        "docs/product/elv4-implementation/closure.json"
+      ],
+      "testPaths": [
+        "apps/mobile/test/data/elv4_p7_batch_runtime_test.dart",
+        "apps/mobile/test/data/elv4_p7_freeze_integration_test.dart",
+        "apps/mobile/test/data/elv4_p7_runtime_test.dart",
+        "apps/mobile/test/data/elv4_p8_freeze_historical_invariance_test.dart",
+        "apps/mobile/test/data/elv4_p8_idempotency_race_acceptance_test.dart",
+        "apps/mobile/test/data/elv4_p8_rejection_concurrency_acceptance_test.dart",
+        "scripts/ci/check-elv4-closure.py"
+      ],
+      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
+      "openFindingIds": [
+        "C03"
+      ],
+      "evidence": [
+        "docs/audit/elv4-p9-reconciliation.md",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402 (technical regressions only, no full RM acceptance)"
+      ],
+      "acceptanceStatus": "PENDING"
+    },
+    {
+      "findingId": "ELV4-AUD-15",
+      "originalSeverity": "HIGH",
+      "requirements": [
+        "ELV4-P0-006",
+        "ELV4-P8-001",
+        "ELV4-P8-008",
+        "ELV4-P9-001",
+        "ELV4-P9-003",
+        "ELV4-P9-006",
+        "ELV4-P9-007",
+        "ELV4-P9-008"
+      ],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "IN_PROGRESS",
+      "resolutionContract": "docs/product/elv4-implementation/remediation-contract.md#RM15",
+      "acceptanceId": "RM15-T",
+      "affectedContracts": [
+        "docs/product/elv4-implementation/shared-contracts.md",
+        "docs/product/elv4-implementation/p0-baseline.md",
+        "docs/product/elv4-implementation/p8-acceptance.md",
+        "docs/product/elv4-implementation/p9-closure.md"
+      ],
+      "sourceEvidenceRequired": true,
+      "sourcePaths": [
+        "apps/mobile/test/support/elv4_power_qualification_builder.dart",
+        "docs/audit/elv4-p9-reconciliation.md",
+        "docs/product/elv4-authoritative-spec-index.md",
+        "docs/product/elv4-implementation/closure.json",
+        "docs/product/elv4-implementation/p9-closure.md",
+        "docs/product/elv4-implementation/requirements.json",
+        "packages/engineering_core/lib/src/dc_backup_orchestration.dart",
+        "packages/engineering_core/lib/src/poe_orchestration.dart",
+        "packages/engineering_core/lib/src/power_bottom_up_evaluation.dart",
+        "packages/engineering_core/lib/src/power_dc_backup.dart",
+        "packages/engineering_core/lib/src/power_numeric.dart"
+      ],
+      "testPaths": [
+        "apps/mobile/test/data/elv4_p8_public_vertical_acceptance_test.dart",
+        "packages/engineering_core/test/p6_closure_test.dart",
+        "packages/engineering_core/test/poe_orchestration_test.dart",
+        "packages/engineering_core/test/power_bottom_up_evaluation_test.dart",
+        "packages/engineering_core/test/power_dc_backup_test.dart",
+        "packages/engineering_core/test/power_numeric_test.dart",
+        "scripts/ci/check-elv4-closure.py"
+      ],
+      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
+      "openFindingIds": [
+        "C01"
+      ],
+      "evidence": [
+        "docs/audit/elv4-p9-reconciliation.md",
+        "https://github.com/alimbetov/electra/actions/runs/38784483402 (technical regressions only, no full RM acceptance)"
+      ],
+      "acceptanceStatus": "PENDING"
+    }
+  ],
+  "technicalEvidence": [
+    {
+      "sourceSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
+      "workflowRunId": 38784483402,
+      "technicalJobId": 116592838704,
+      "artifactId": 11997121749,
+      "artifactDigest": "sha256:3af0ee825058d16fde0ab5a079776faf0576fb6dbda63d4f80e52a2535f0bb1a",
+      "url": "https://github.com/alimbetov/electra/actions/runs/38784483402",
+      "technicalResult": "PASS",
+      "mobileTests": 278,
+      "coreTests": 307,
+      "p7P8AlignmentSubsetTests": 71,
+      "runtimeAcceptanceVerified": false,
+      "scope": "Executed technical regression files; not full requirement or seven-case qualification acceptance."
+    }
+  ]
+}

@@ -1,0 +1,529 @@
+import 'dart:async';
+
+import 'package:electra_mobile/application/elv_command_result.dart';
+import 'package:electra_mobile/application/elv_physical_routing_workspace_service.dart';
+import 'package:electra_mobile/application/elv_physical_routing_workspace_state.dart';
+import 'package:electra_mobile/application/elv_physical_trace_service.dart';
+import 'package:electra_mobile/application/elv_reviewed_workspace_command.dart';
+import 'package:electra_mobile/application/elv_revision_command_history_service.dart';
+import 'package:electra_mobile/application/id_generator.dart';
+import 'package:electra_mobile/application/power_workspace_controller.dart';
+import 'package:electra_mobile/application/power_workspace_projection.dart';
+import 'package:electra_mobile/application/power_workspace_state.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  test('P7 controller keeps exact reviewed draft on command failure', () async {
+    final repository = _Repository();
+    final routing = _RoutingService(
+      result: const ElvCommandFailureResult<Object?>(
+        ElvFailure(
+          code: 'ELV_ROUTE_CONFLICT',
+          category: ElvFailureCategory.revisionConflict,
+        ),
+      ),
+    );
+    final controller = PowerWorkspaceController(
+      repository: repository,
+      routingService: routing,
+    );
+    await controller.open('project');
+    final command = _stage(controller, 'a');
+
+    final result = await controller.commitStagedReviewedRoute();
+
+    expect(result, isA<ElvCommandFailureResult<Object?>>());
+    expect(controller.state.hasDraft, isTrue);
+    expect(controller.hasReviewedRouteCommand, isTrue);
+    expect(controller.state.previewFingerprint, command.reviewedFingerprint);
+    expect(
+      controller.state.operationState,
+      PowerWorkspaceOperationState.failed,
+    );
+    expect(controller.state.operationErrorCode, 'ELV_ROUTE_CONFLICT');
+    expect(routing.calls, 1);
+  });
+
+  test(
+    'P7 controller clears exact draft only after public command success',
+    () async {
+      final repository = _Repository();
+      final routing = _RoutingService(
+        result: const ElvCommandSuccess<Object?>('ok'),
+      );
+      final controller = PowerWorkspaceController(
+        repository: repository,
+        routingService: routing,
+      );
+      await controller.open('project');
+      _stage(controller, 'b');
+
+      final result = await controller.commitStagedReviewedRoute();
+
+      expect(result, isA<ElvCommandSuccess<Object?>>());
+      expect(controller.state.hasDraft, isFalse);
+      expect(controller.hasReviewedRouteCommand, isFalse);
+      expect(controller.state.previewFingerprint, isNull);
+      expect(
+        controller.state.operationState,
+        PowerWorkspaceOperationState.idle,
+      );
+      expect(repository.loads, 1);
+    },
+  );
+
+  test(
+    'P7 controller rejects a reviewed command for another revision',
+    () async {
+      final routing = _RoutingService(
+        result: const ElvCommandSuccess<Object?>('unexpected'),
+      );
+      final controller = PowerWorkspaceController(
+        repository: _Repository(),
+        routingService: routing,
+      );
+      await controller.open('project');
+      _stage(controller, 'c');
+
+      final result = await controller.commitReviewedRoute(
+        _Command(
+          commandId: 'cmd-stale-revision',
+          projectId: 'project',
+          designRevisionId: 'rev-stale',
+          reviewedFingerprint: _hash('c'),
+        ),
+      );
+
+      final failure = result as ElvCommandFailureResult<Object?>;
+      expect(failure.failure.code, 'ELV4_ROUTE_REVISION_MISMATCH');
+      expect(routing.calls, 0);
+      expect(controller.state.hasDraft, isTrue);
+    },
+  );
+
+  test(
+    'P7 controller rejects a command not produced by reviewed preview',
+    () async {
+      final routing = _RoutingService(
+        result: const ElvCommandSuccess<Object?>('unexpected'),
+      );
+      final controller = PowerWorkspaceController(
+        repository: _Repository(),
+        routingService: routing,
+      );
+      await controller.open('project');
+      _stage(controller, 'd');
+
+      final result = await controller.commitReviewedRoute(
+        _Command(
+          commandId: 'cmd-stale-review',
+          projectId: 'project',
+          designRevisionId: 'rev-1',
+          reviewedFingerprint: _hash('e'),
+        ),
+      );
+
+      final failure = result as ElvCommandFailureResult<Object?>;
+      expect(failure.failure.code, 'ELV4_ROUTE_REVIEW_MISMATCH');
+      expect(routing.calls, 0);
+      expect(controller.state.hasDraft, isTrue);
+    },
+  );
+
+  test(
+    'P7 controller rejects substituted command with same fingerprint',
+    () async {
+      final routing = _RoutingService(
+        result: const ElvCommandSuccess<Object?>('unexpected'),
+      );
+      final controller = PowerWorkspaceController(
+        repository: _Repository(),
+        routingService: routing,
+      );
+      await controller.open('project');
+      _stage(controller, 'f');
+
+      final result = await controller.commitReviewedRoute(
+        _Command(
+          commandId: 'cmd-substitute',
+          projectId: 'project',
+          designRevisionId: 'rev-1',
+          reviewedFingerprint: _hash('f'),
+        ),
+      );
+
+      final failure = result as ElvCommandFailureResult<Object?>;
+      expect(failure.failure.code, 'ELV4_ROUTE_REVIEW_COMMAND_CHANGED');
+      expect(routing.calls, 0);
+    },
+  );
+
+  test('P7 controller blocks mutation in frozen workspace', () async {
+    final repository = _Repository(lifecycleState: 'FROZEN');
+    final routing = _RoutingService(
+      result: const ElvCommandSuccess<Object?>('unexpected'),
+    );
+    final controller = PowerWorkspaceController(
+      repository: repository,
+      routingService: routing,
+    );
+    await controller.open('project');
+
+    final result = await controller.commitReviewedRoute(
+      _Command(
+        commandId: 'cmd-1',
+        projectId: 'project',
+        designRevisionId: 'rev-1',
+        reviewedFingerprint: _hash('0'),
+      ),
+    );
+
+    final failure = result as ElvCommandFailureResult<Object?>;
+    expect(failure.failure.code, 'ELV4_POWER_WORKSPACE_READ_ONLY');
+    expect(routing.calls, 0);
+  });
+
+  test('P7 controller routes undo and redo through revision history', () async {
+    final history = _HistoryService();
+    final controller = PowerWorkspaceController(
+      repository: _Repository(),
+      historyService: history,
+      historyCommandIds: FixedSequenceIdGenerator(const [
+        'undo-command-1',
+        'redo-command-1',
+      ]),
+    );
+    await controller.open('project');
+
+    expect(await controller.canUndo(), isTrue);
+    expect(await controller.canRedo(), isTrue);
+    expect(await controller.undo(), isA<ElvCommandSuccess<Object?>>());
+    expect(await controller.redo(), isA<ElvCommandSuccess<Object?>>());
+    expect(history.undoCalls, 1);
+    expect(history.redoCalls, 1);
+    expect(history.scopes, everyElement(('project', 'rev-1')));
+    expect(history.executionCommandIds, ['undo-command-1', 'redo-command-1']);
+  });
+
+  test('P7 frozen workspace does not expose history mutations', () async {
+    final history = _HistoryService();
+    final controller = PowerWorkspaceController(
+      repository: _Repository(lifecycleState: 'FROZEN'),
+      historyService: history,
+    );
+    await controller.open('project');
+
+    expect(await controller.canUndo(), isFalse);
+    expect(await controller.canRedo(), isFalse);
+    final result = await controller.undo();
+    expect(
+      (result as ElvCommandFailureResult<Object?>).failure.code,
+      'ELV4_POWER_WORKSPACE_READ_ONLY',
+    );
+    expect(history.undoCalls, 0);
+  });
+
+  test('P7 T08 scope change reloads the requested dataset', () async {
+    final repository = _Repository();
+    final controller = PowerWorkspaceController(repository: repository);
+    await controller.open('project');
+
+    await controller.switchScope(PowerWorkspaceScope.floor('floor-7'));
+    expect(repository.loadedScopes.single.kind, PowerWorkspaceScopeKind.floor);
+    expect(repository.loadedScopes.single.floorId, 'floor-7');
+
+    await controller.switchScope(PowerWorkspaceScope.building());
+    expect(repository.loadedScopes.last.kind, PowerWorkspaceScopeKind.building);
+    expect(repository.loadedScopes.last.floorId, isNull);
+  });
+
+  test(
+    'P7 T08 controller preserves preferred load mode across selection',
+    () async {
+      final repository = _Repository();
+      final controller = PowerWorkspaceController(repository: repository);
+      await controller.open('project');
+
+      await controller.setLoadMode(PowerWorkspaceLoadMode.selectedComponent);
+      expect(
+        controller.state.loadMode,
+        PowerWorkspaceLoadMode.selectedComponent,
+      );
+      expect(controller.state.effectiveLoadMode, PowerWorkspaceLoadMode.all);
+
+      await controller.select(componentId: 'camera-9');
+      expect(
+        controller.state.loadMode,
+        PowerWorkspaceLoadMode.selectedComponent,
+      );
+      expect(
+        controller.state.effectiveLoadMode,
+        PowerWorkspaceLoadMode.selectedComponent,
+      );
+      expect(
+        repository.loadedModes.last,
+        PowerWorkspaceLoadMode.selectedComponent,
+      );
+    },
+  );
+
+  test(
+    'P7 controller discards projection returned for obsolete generation',
+    () async {
+      final repository = _DeferredRepository();
+      final controller = PowerWorkspaceController(repository: repository);
+      await controller.open('project');
+
+      final first = controller.switchScenario(
+        scenarioId: 'BACKUP',
+        segmentId: 'SEG-2',
+      );
+      await Future<void>.delayed(Duration.zero);
+      final second = controller.switchScenario(
+        scenarioId: 'ALARM',
+        segmentId: 'SEG-3',
+      );
+      await Future<void>.delayed(Duration.zero);
+
+      repository.complete(
+        2,
+        _projection(
+          generation: 2,
+          lifecycleState: 'WORKING',
+          scenarioId: 'BACKUP',
+          segmentId: 'SEG-2',
+        ),
+      );
+      await first;
+      expect(controller.state.context.scenarioId, 'ALARM');
+
+      repository.complete(
+        3,
+        _projection(
+          generation: 3,
+          lifecycleState: 'WORKING',
+          scenarioId: 'ALARM',
+          segmentId: 'SEG-3',
+        ),
+      );
+      await second;
+      expect(controller.projection.contextGeneration, 3);
+      expect(controller.state.context.scenarioId, 'ALARM');
+    },
+  );
+}
+
+_Command _stage(PowerWorkspaceController controller, String hashChar) {
+  final command = _Command(
+    commandId: 'cmd-$hashChar',
+    projectId: 'project',
+    designRevisionId: 'rev-1',
+    reviewedFingerprint: _hash(hashChar),
+  );
+  controller.stageReviewedRoute(
+    command: command,
+    draft: const {'routeId': 'run-1'},
+  );
+  return command;
+}
+
+final class _Repository implements PowerWorkspaceRepository {
+  _Repository({this.lifecycleState = 'WORKING'});
+
+  final String lifecycleState;
+  int loads = 0;
+  final loadedScopes = <PowerWorkspaceScope>[];
+  final loadedModes = <PowerWorkspaceLoadMode>[];
+
+  @override
+  Future<PowerWorkspaceOpenResult?> open(String projectId) async {
+    final state = _state(lifecycleState: lifecycleState);
+    return PowerWorkspaceOpenResult(
+      state: state,
+      projection: _projection(generation: 1, lifecycleState: lifecycleState),
+    );
+  }
+
+  @override
+  Future<PowerWorkspaceProjection> load(PowerWorkspaceState state) async {
+    loads += 1;
+    loadedScopes.add(state.scope);
+    loadedModes.add(state.effectiveLoadMode);
+    return _projection(
+      generation: state.context.generation,
+      lifecycleState: state.context.lifecycleState,
+      scenarioId: state.context.scenarioId,
+      segmentId: state.context.segmentId,
+    );
+  }
+}
+
+final class _DeferredRepository implements PowerWorkspaceRepository {
+  final completions = <int, Completer<PowerWorkspaceProjection>>{};
+
+  @override
+  Future<PowerWorkspaceOpenResult?> open(String projectId) async {
+    final state = _state();
+    return PowerWorkspaceOpenResult(
+      state: state,
+      projection: _projection(generation: 1),
+    );
+  }
+
+  @override
+  Future<PowerWorkspaceProjection> load(PowerWorkspaceState state) {
+    final completer = Completer<PowerWorkspaceProjection>();
+    completions[state.context.generation] = completer;
+    return completer.future;
+  }
+
+  void complete(int generation, PowerWorkspaceProjection projection) =>
+      completions[generation]!.complete(projection);
+}
+
+final class _RoutingService implements ElvPhysicalRoutingWorkspaceService {
+  _RoutingService({required this.result});
+
+  final ElvCommandResult<Object?> result;
+  int calls = 0;
+
+  @override
+  Future<ElvCommandResult<Object?>> execute(ElvWorkspaceCommand command) async {
+    calls += 1;
+    return result;
+  }
+
+  @override
+  Future<PhysicalRoutingWorkspaceState> load({
+    required String projectId,
+    String? connectionId,
+  }) => throw UnimplementedError();
+
+  @override
+  Future<PhysicalTraceResult> traceCable(String projectId, String cableId) =>
+      throw UnimplementedError();
+
+  @override
+  Future<PhysicalTraceResult> traceConnection(
+    String projectId,
+    String connectionId,
+  ) => throw UnimplementedError();
+
+  @override
+  Stream<PhysicalRoutingWorkspaceState> watch(String projectId) =>
+      const Stream.empty();
+}
+
+final class _HistoryService implements ElvRevisionCommandHistoryService {
+  int undoCalls = 0;
+  int redoCalls = 0;
+  final scopes = <(String, String)>[];
+  final executionCommandIds = <String>[];
+
+  @override
+  Future<bool> canRedo({
+    required String projectId,
+    required String designRevisionId,
+  }) async {
+    scopes.add((projectId, designRevisionId));
+    return true;
+  }
+
+  @override
+  Future<bool> canUndo({
+    required String projectId,
+    required String designRevisionId,
+  }) async {
+    scopes.add((projectId, designRevisionId));
+    return true;
+  }
+
+  @override
+  Future<ElvCommandResult<Object?>> redo({
+    required String projectId,
+    required String designRevisionId,
+    required String executionCommandId,
+  }) async {
+    scopes.add((projectId, designRevisionId));
+    executionCommandIds.add(executionCommandId);
+    redoCalls += 1;
+    return const ElvCommandSuccess<Object?>('redo');
+  }
+
+  @override
+  Future<ElvCommandResult<Object?>> undo({
+    required String projectId,
+    required String designRevisionId,
+    required String executionCommandId,
+  }) async {
+    scopes.add((projectId, designRevisionId));
+    executionCommandIds.add(executionCommandId);
+    undoCalls += 1;
+    return const ElvCommandSuccess<Object?>('undo');
+  }
+}
+
+final class _Command implements ElvReviewedWorkspaceCommand {
+  const _Command({
+    required this.commandId,
+    required this.projectId,
+    required this.designRevisionId,
+    required this.reviewedFingerprint,
+  });
+
+  @override
+  final String commandId;
+  @override
+  final String projectId;
+  @override
+  final String designRevisionId;
+  @override
+  final String reviewedFingerprint;
+}
+
+PowerWorkspaceState _state({String lifecycleState = 'WORKING'}) =>
+    PowerWorkspaceState(
+      context: PowerWorkspaceReadContext(
+        projectId: 'project',
+        designRevisionId: 'rev-1',
+        lifecycleState: lifecycleState,
+        scenarioId: 'NORMAL',
+        segmentId: 'SEG-1',
+        generation: 1,
+      ),
+      cards: PowerWorkspaceCardCode.values,
+    );
+
+PowerWorkspaceProjection _projection({
+  required int generation,
+  String lifecycleState = 'WORKING',
+  String scenarioId = 'NORMAL',
+  String segmentId = 'SEG-1',
+}) => PowerWorkspaceProjection(
+  contextGeneration: generation,
+  readKind:
+      lifecycleState == 'WORKING'
+          ? PowerWorkspaceReadKind.working
+          : PowerWorkspaceReadKind.capturedEmpty,
+  lifecycleState: lifecycleState,
+  currentness: PowerWorkspaceCurrentness.empty,
+  scenarios: [
+    PowerWorkspaceScenarioOption(
+      scenarioId: scenarioId,
+      segmentId: segmentId,
+      label: '$scenarioId · $segmentId',
+    ),
+  ],
+  cards: [
+    for (final code in PowerWorkspaceCardCode.values)
+      PowerWorkspaceCardProjection(
+        code: code,
+        title: code.name,
+        summary: code.name,
+        currentness: PowerWorkspaceCurrentness.empty,
+      ),
+  ],
+  overlay: PowerWorkspaceOverlayProjection(),
+);
+
+String _hash(String char) => List.filled(64, char).join();

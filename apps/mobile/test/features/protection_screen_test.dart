@@ -4,6 +4,7 @@ import 'package:electra_mobile/features/calculations/protection_screen.dart';
 import 'package:engineering_core/engineering_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
 import 'recalculation_workspace_test.dart' show fixture;
 
 ProjectProtectionSnapshot protectionFixture() {

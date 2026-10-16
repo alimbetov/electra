@@ -157,12 +157,15 @@ final class CableDefinition {
       errors.add('Cable resource identities must be unique.');
       return errors;
     }
-    final whole = resourceDefinitions.where(
-      (resource) => resource.kind == CableResourceKind.wholeCable,
-    );
+    final whole = resourceDefinitions
+        .where((resource) => resource.kind == CableResourceKind.wholeCable)
+        .toList(growable: false);
+    CableResourceDefinition? wholeResource;
     if (whole.length != 1 || whole.single.identity != '__WHOLE_CABLE__') {
       errors.add(
           'Cable definition must contain exactly one __WHOLE_CABLE__ resource.');
+    } else {
+      wholeResource = whole.single;
     }
     for (final resource in resourceDefinitions) {
       final parentId = resource.parentResourceId;
@@ -186,6 +189,35 @@ final class CableDefinition {
       }
     }
     if (_hasCycle(byId)) errors.add('Cable resource graph must be acyclic.');
+    if (wholeResource != null) {
+      final finerAllocatable = resourceDefinitions.any(
+        (resource) =>
+            resource.identity != wholeResource!.identity &&
+            resource.allocatable,
+      );
+      if (finerAllocatable) {
+        if (wholeResource.atomic) {
+          errors.add(
+            '__WHOLE_CABLE__ must be composite when finer allocatable cable resources exist.',
+          );
+        }
+        if (wholeResource.parentResourceId != null) {
+          errors.add(
+            '__WHOLE_CABLE__ must be a root resource when finer allocatable cable resources exist.',
+          );
+        }
+        final descendants = _resourceDescendants(wholeResource.identity, byId);
+        for (final resource in resourceDefinitions.where(
+          (resource) => resource.identity != wholeResource!.identity,
+        )) {
+          if (!descendants.contains(resource.identity)) {
+            errors.add(
+              'Cable resource ${resource.identity} must be a descendant of __WHOLE_CABLE__.',
+            );
+          }
+        }
+      }
+    }
     for (final resource
         in resourceDefinitions.where((r) => r.allocatable && !r.atomic)) {
       if (_atomicDescendants(resource.identity, byId).isEmpty) {
@@ -294,6 +326,24 @@ bool _hasCycle(Map<String, CableResourceDefinition> byId) {
   }
 
   return byId.keys.any(visit);
+}
+
+Set<String> _resourceDescendants(
+  String id,
+  Map<String, CableResourceDefinition> byId, [
+  Set<String>? visiting,
+]) {
+  final resource = byId[id];
+  if (resource == null) return const {};
+  final path = visiting ?? <String>{};
+  if (!path.add(id)) return const {};
+  final result = <String>{};
+  for (final child in resource.childResourceIds) {
+    if (!byId.containsKey(child)) continue;
+    result.add(child);
+    result.addAll(_resourceDescendants(child, byId, {...path}));
+  }
+  return result;
 }
 
 Set<String> _atomicDescendants(

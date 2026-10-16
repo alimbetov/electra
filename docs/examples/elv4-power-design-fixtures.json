@@ -1,0 +1,202 @@
+{
+  "schema": "electra.elv4-design-fixtures.v1",
+  "purpose": "Design/test oracle; not an application import catalog",
+  "dataProvenance": "FICTIONAL_PRODUCT_NEUTRAL",
+  "numericPolicy": "ELV4 numeric policy v1; unrounded capacity comparison",
+  "cases": [
+    {
+      "id": "V1",
+      "scope": "CCTV_PoE_boundary",
+      "inputs": {
+        "pdDemandW": [
+          10,
+          15
+        ],
+        "reservedPseW": [
+          12,
+          18
+        ],
+        "groupBudgetW": 35,
+        "pseEfficiency": 0.9,
+        "idleW": 5,
+        "lossMode": "GUARANTEED_PD",
+        "upstreamBasis": "CONSERVATIVE_RESERVED"
+      },
+      "expected": {
+        "reservedTotalW": 30,
+        "groupMarginW": 5,
+        "upstreamInputW": 38.333333333333336
+      },
+      "negative": {
+        "groupBudgetW": 29,
+        "assessment": "FAIL"
+      }
+    },
+    {
+      "id": "V2",
+      "scope": "LAN_path",
+      "inputs": {
+        "path": [
+          "PSE",
+          "PATCH",
+          "OUTLET",
+          "PD"
+        ],
+        "allStagesExplicitPowerPassage": true,
+        "canonicalAllocationsReused": true
+      },
+      "expected": {
+        "additionalPowerCableClaims": 0
+      },
+      "negative": {
+        "removePowerPassageAt": "PATCH",
+        "dataContinuityPreserved": true,
+        "powerAssessment": "UNRESOLVED"
+      }
+    },
+    {
+      "id": "V3",
+      "scope": "ACS_constant_current_radial",
+      "inputs": {
+        "sourceV": 24,
+        "loadCurrentA": [
+          0.3,
+          0.5
+        ],
+        "trunkLoopOhm": 0.5,
+        "branchLoopOhm": [
+          0.2,
+          0.3
+        ],
+        "resistanceConvention": "LOOP_TOTAL_OHM"
+      },
+      "expected": {
+        "trunkCurrentA": 0.8,
+        "trunkDropV": 0.4,
+        "terminalV": [
+          23.54,
+          23.45
+        ],
+        "sourceW": 19.2,
+        "deliveredW": 18.787,
+        "lossW": 0.413
+      },
+      "negative": {
+        "resistanceConvention": "CONDUCTOR_OHM_PER_M",
+        "forwardResistanceKnown": true,
+        "returnResistanceOhmPerM": null,
+        "loopTotalProvided": false,
+        "completion": "BLOCKED"
+      }
+    },
+    {
+      "id": "V4",
+      "scope": "FIRE_explicit_sequence",
+      "inputs": {
+        "protectedOutputW": [
+          20,
+          40
+        ],
+        "durationSeconds": [
+          7200,
+          1800
+        ],
+        "backupEfficiency": 0.8,
+        "unitV": 12,
+        "unitAh": 7,
+        "seriesCount": 2,
+        "parallelCount": 1,
+        "simpleModelVoltageV": 24,
+        "usableSocWindow": 0.8,
+        "otherFactorsExplicitIdentity": true
+      },
+      "expected": {
+        "protectedWh": 60,
+        "bankRequiredWh": 75,
+        "bankV": 24,
+        "bankAh": 7,
+        "availableWh": 134.4,
+        "sequenceMarginWh": 59.4,
+        "estimatedAutonomySeconds": null
+      },
+      "negative": {
+        "durationPolicyMissing": true,
+        "completion": "BLOCKED"
+      }
+    },
+    {
+      "id": "V5",
+      "scope": "SHARED_project_budget",
+      "inputs": {
+        "reuseCase": "V1",
+        "systemMemberships": [
+          "CCTV",
+          "LAN"
+        ]
+      },
+      "expected": {
+        "reservedTotalW": 30,
+        "ownLoadCount": 1,
+        "filteredViewRetainsProjectBudget": true
+      }
+    },
+    {
+      "id": "V6",
+      "scope": "UPS_independent_W_VA",
+      "inputs": {
+        "protectedW": 38.333333333333336,
+        "explicitInputPf": 0.8,
+        "upsOutputLimitW": 50,
+        "upsOutputLimitVa": 45
+      },
+      "expected": {
+        "requiredVa": 47.91666666666667,
+        "wAssessment": "PASS",
+        "vaAssessment": "FAIL"
+      },
+      "negative": {
+        "explicitInputPf": null,
+        "vaAssessment": "UNRESOLVED"
+      }
+    },
+    {
+      "id": "V7",
+      "scope": "HISTORY",
+      "inputs": {
+        "sequence": [
+          "freeze_R1",
+          "create_R2",
+          "edit_load_route_edition_bank",
+          "close",
+          "reopen"
+        ]
+      },
+      "expected": {
+        "r1HashesAndTraceUnchanged": true,
+        "legacyR0PowerOutcome": "ELV4_POWER_NOT_CAPTURED",
+        "latestProfileFallbackAllowed": false
+      }
+    },
+    {
+      "id": "V8",
+      "scope": "ALTERNATIVE_supply",
+      "inputs": {
+        "normalSelectedSource": "MAINS",
+        "backupSelectedSource": "BANK",
+        "backupUnavailableSources": [
+          "MAINS"
+        ]
+      },
+      "expected": {
+        "simultaneousChargeDischargeAllowed": false
+      },
+      "negative": {
+        "activeSources": [
+          "MAINS",
+          "BANK"
+        ],
+        "assessment": "UNRESOLVED"
+      }
+    }
+  ]
+}

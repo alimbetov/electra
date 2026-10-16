@@ -1,6 +1,8 @@
 import 'dart:convert';
+
 import 'package:drift/drift.dart';
 import 'package:engineering_core/engineering_core.dart';
+
 import '../../application/protection_repository.dart';
 import '../database/app_database.dart';
 import 'drift_dependency_recalculation_repository.dart';

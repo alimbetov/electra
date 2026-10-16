@@ -3,13 +3,16 @@ import 'package:test/test.dart';
 
 void main() {
   group('CableResourceResolver', () {
-    test('whole cable resolves to the canonical whole-cable atom', () {
+    test('whole cable resolves to every physical atomic descendant', () {
       final resolved = CableResourceResolver.resolve(
         definition: _eightCoreDefinition(),
         selection: const WholeCableSelection(),
       );
 
-      expect(resolved.atomicResourceIdentities, ['__WHOLE_CABLE__']);
+      expect(
+        resolved.atomicResourceIdentities,
+        ['CORE-1', 'CORE-2', 'CORE-3', 'CORE-4'],
+      );
       expect(resolved.selectionSha256, hasLength(64));
     });
 
@@ -49,6 +52,96 @@ void main() {
             'code',
             'ELV_ALLOC_RESOURCE_UNKNOWN',
           ),
+        ),
+      );
+    });
+  });
+
+  group('CableDefinition whole-cable invariant', () {
+    test(
+        'whole cable cannot stay atomic when finer allocatable resources exist',
+        () {
+      final definition = CableDefinition(
+        code: 'INVALID-ATOMIC-WHOLE',
+        label: 'Invalid atomic whole cable',
+        mediaCode: 'COPPER',
+        resourceDefinitions: [
+          CableResourceDefinition(
+            identity: '__WHOLE_CABLE__',
+            kind: CableResourceKind.wholeCable,
+            allocatable: true,
+            atomic: true,
+            terminationPolicy: TerminationPolicy(
+              mode: TerminationPolicyMode.bothEnds,
+              terminalRequired: false,
+            ),
+          ),
+          CableResourceDefinition(
+            identity: 'CORE-1',
+            kind: CableResourceKind.conductor,
+            allocatable: true,
+            atomic: true,
+            terminationPolicy: TerminationPolicy(
+              mode: TerminationPolicyMode.bothEnds,
+              terminalRequired: true,
+            ),
+          ),
+        ],
+      );
+
+      expect(
+        definition.validate(),
+        contains(
+          '__WHOLE_CABLE__ must be composite when finer allocatable cable resources exist.',
+        ),
+      );
+    });
+
+    test('all physical resources must belong to the whole-cable graph', () {
+      final definition = CableDefinition(
+        code: 'INVALID-DETACHED-RESOURCE',
+        label: 'Invalid detached cable resource',
+        mediaCode: 'COPPER',
+        resourceDefinitions: [
+          CableResourceDefinition(
+            identity: '__WHOLE_CABLE__',
+            kind: CableResourceKind.wholeCable,
+            allocatable: true,
+            atomic: false,
+            childResourceIds: const ['CORE-1'],
+            terminationPolicy: TerminationPolicy(
+              mode: TerminationPolicyMode.bothEnds,
+              terminalRequired: false,
+            ),
+          ),
+          CableResourceDefinition(
+            identity: 'CORE-1',
+            kind: CableResourceKind.conductor,
+            allocatable: true,
+            atomic: true,
+            parentResourceId: '__WHOLE_CABLE__',
+            terminationPolicy: TerminationPolicy(
+              mode: TerminationPolicyMode.bothEnds,
+              terminalRequired: true,
+            ),
+          ),
+          CableResourceDefinition(
+            identity: 'CORE-2',
+            kind: CableResourceKind.conductor,
+            allocatable: true,
+            atomic: true,
+            terminationPolicy: TerminationPolicy(
+              mode: TerminationPolicyMode.bothEnds,
+              terminalRequired: true,
+            ),
+          ),
+        ],
+      );
+
+      expect(
+        definition.validate(),
+        contains(
+          'Cable resource CORE-2 must be a descendant of __WHOLE_CABLE__.',
         ),
       );
     });
@@ -96,9 +189,36 @@ CableDefinition _eightCoreDefinition() => CableDefinition(
           identity: '__WHOLE_CABLE__',
           kind: CableResourceKind.wholeCable,
           allocatable: true,
-          atomic: true,
+          atomic: false,
+          childResourceIds: const ['PAIR-1', 'PAIR-2'],
           terminationPolicy: TerminationPolicy(
             mode: TerminationPolicyMode.bothEnds,
+            terminalRequired: false,
+          ),
+        ),
+        CableResourceDefinition(
+          identity: 'PAIR-1',
+          kind: CableResourceKind.coreGroup,
+          allocatable: true,
+          atomic: false,
+          parentResourceId: '__WHOLE_CABLE__',
+          childResourceIds: const ['CORE-1', 'CORE-2'],
+          groupMembership: const ['ACCESS_CONTROL'],
+          terminationPolicy: TerminationPolicy(
+            mode: TerminationPolicyMode.groupLevel,
+            terminalRequired: false,
+          ),
+        ),
+        CableResourceDefinition(
+          identity: 'PAIR-2',
+          kind: CableResourceKind.coreGroup,
+          allocatable: true,
+          atomic: false,
+          parentResourceId: '__WHOLE_CABLE__',
+          childResourceIds: const ['CORE-3', 'CORE-4'],
+          groupMembership: const ['ACCESS_CONTROL'],
+          terminationPolicy: TerminationPolicy(
+            mode: TerminationPolicyMode.groupLevel,
             terminalRequired: false,
           ),
         ),
@@ -115,29 +235,5 @@ CableDefinition _eightCoreDefinition() => CableDefinition(
               terminalRequired: true,
             ),
           ),
-        CableResourceDefinition(
-          identity: 'PAIR-1',
-          kind: CableResourceKind.coreGroup,
-          allocatable: true,
-          atomic: false,
-          childResourceIds: const ['CORE-1', 'CORE-2'],
-          groupMembership: const ['ACCESS_CONTROL'],
-          terminationPolicy: TerminationPolicy(
-            mode: TerminationPolicyMode.groupLevel,
-            terminalRequired: false,
-          ),
-        ),
-        CableResourceDefinition(
-          identity: 'PAIR-2',
-          kind: CableResourceKind.coreGroup,
-          allocatable: true,
-          atomic: false,
-          childResourceIds: const ['CORE-3', 'CORE-4'],
-          groupMembership: const ['ACCESS_CONTROL'],
-          terminationPolicy: TerminationPolicy(
-            mode: TerminationPolicyMode.groupLevel,
-            terminalRequired: false,
-          ),
-        ),
       ],
     );

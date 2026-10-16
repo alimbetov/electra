@@ -1,6 +1,7 @@
 import 'package:electra_mobile/application/engineering_profile_palette.dart';
 import 'package:engineering_core/engineering_core.dart';
 import 'package:flutter_test/flutter_test.dart';
+
 import '../support/engineering_palette_fixture.dart';
 
 void main() {

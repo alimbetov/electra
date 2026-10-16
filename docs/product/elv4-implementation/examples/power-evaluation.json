@@ -1,0 +1,105 @@
+{
+  "schema": "electra.elv4-evaluation.v2",
+  "projectId": "p",
+  "designRevisionId": "r1",
+  "scenarioId": "normal",
+  "scope": {
+    "kind": "SEGMENT",
+    "segmentId": "steady"
+  },
+  "logicalNodeKey": "[\"elv4-node-v2\",\"r1\",\"normal\",\"SEGMENT\",\"steady\",\"ELV-PWR-01\",\"PORT\",\"port1\"]",
+  "evaluationId": "eval1",
+  "processCode": "ELV-PWR-01",
+  "subjectKind": "PORT",
+  "subjectId": "port1",
+  "algorithmVersion": "power-demand.v1",
+  "inputSchemaVersion": 2,
+  "outputSchemaVersion": 2,
+  "numericPolicyVersion": "elv4.exact-rational.v2",
+  "inputFingerprint": "c325c9deb48d35ff891d8b5df563ce4e8ce9b72f2867280b2496ed3ca5060b02",
+  "completion": "COMPLETE",
+  "assessment": "PASS",
+  "execution": "SUCCEEDED",
+  "dimensions": [
+    {
+      "name": "load",
+      "completion": "COMPLETE",
+      "assessment": "PASS"
+    },
+    {
+      "name": "accounting",
+      "completion": "COMPLETE",
+      "assessment": "PASS"
+    }
+  ],
+  "quantities": [
+    {
+      "id": "I",
+      "unit": "A",
+      "boundary": "port1",
+      "value": {
+        "numerator": "0",
+        "denominator": "1"
+      }
+    },
+    {
+      "id": "V",
+      "unit": "V",
+      "boundary": "port1",
+      "value": {
+        "numerator": "24",
+        "denominator": "1"
+      }
+    },
+    {
+      "id": "P",
+      "unit": "W",
+      "boundary": "port1",
+      "value": {
+        "numerator": "0",
+        "denominator": "1"
+      }
+    }
+  ],
+  "contributions": [
+    {
+      "originId": "device-own",
+      "segmentId": "steady",
+      "accountingKind": "CONSUMER_INPUT",
+      "quantityIds": [
+        "P"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "step1",
+      "operation": "MULTIPLY",
+      "inputQuantityIds": [
+        "I",
+        "V"
+      ],
+      "outputQuantityId": "P"
+    }
+  ],
+  "findings": [],
+  "dependencyKeys": [
+    "[\"elv4-dep-v1\",\"p\",\"r1\",\"LOAD\",\"load1\",\"current\"]",
+    "[\"elv4-dep-v1\",\"p\",\"r1\",\"PORT\",\"port1\",\"voltage\"]"
+  ],
+  "consumedFacts": [
+    {
+      "key": "[\"elv4-dep-v1\",\"p\",\"r1\",\"LOAD\",\"load1\",\"current\"]",
+      "valueSchema": "electra.power.current.v1",
+      "canonicalValueJson": "\"0\"",
+      "presence": "PRESENT"
+    },
+    {
+      "key": "[\"elv4-dep-v1\",\"p\",\"r1\",\"PORT\",\"port1\",\"voltage\"]",
+      "valueSchema": "electra.power.voltage.v1",
+      "canonicalValueJson": "\"24\"",
+      "presence": "PRESENT"
+    }
+  ],
+  "consumedEvaluations": []
+}

@@ -51,13 +51,16 @@ EngineeringReferenceCatalog _catalog() => EngineeringReferenceCatalog(
   cableDefinitions: [_definition()],
 );
 
-NativeDatabase _native(File file) => NativeDatabase(
-  file,
-  setup: (raw) {
-    raw.execute('PRAGMA journal_mode=WAL');
-    raw.execute('PRAGMA busy_timeout=5000');
-  },
-);
+QueryExecutor _native(File file, {bool configureWal = false}) =>
+    NativeDatabase.createInBackground(
+      file,
+      setup: (raw) {
+        if (configureWal) {
+          raw.execute('PRAGMA journal_mode=WAL');
+        }
+        raw.execute('PRAGMA busy_timeout=30000');
+      },
+    );
 
 Future<void> _seed(AppDatabase db) async {
   final now = DateTime.utc(2026, 10, 14, 9);
@@ -274,13 +277,9 @@ DefaultElvCableAllocationService _service(AppDatabase db, String device) =>
       originDeviceId: device,
     );
 
-void main() {
-  test('two sqlite connections cannot reserve the same cable atom', () async {
-    final dir = await Directory.systemTemp.createTemp('electra-elv3-p2-race-');
-    addTearDown(() => dir.delete(recursive: true));
-    final file = File('${dir.path}/race.sqlite');
-
-    final seedDb = AppDatabase(_native(file));
+Future<void> _prepareDrafts(File file) async {
+  final seedDb = AppDatabase(_native(file, configureWal: true));
+  try {
     await _seed(seedDb);
     final seedService = _service(seedDb, 'seed');
     await seedService.createDraft(
@@ -301,7 +300,27 @@ void main() {
         cableId: 'cable',
       ),
     );
+  } finally {
     await seedDb.close();
+  }
+}
+
+void _expectSingleOverlapFailure(
+  List<ElvCommandResult<CableAllocation>> results,
+) {
+  expect(results.whereType<ElvCommandSuccess<CableAllocation>>(), hasLength(1));
+  final failures =
+      results.whereType<ElvCommandFailureResult<CableAllocation>>();
+  expect(failures, hasLength(1));
+  expect(failures.single.failure.code, 'ELV_ALLOC_RESOURCE_OVERLAP');
+}
+
+void main() {
+  test('two sqlite connections cannot reserve the same cable atom', () async {
+    final dir = await Directory.systemTemp.createTemp('electra-elv3-p2-race-');
+    addTearDown(() => dir.delete(recursive: true));
+    final file = File('${dir.path}/race.sqlite');
+    await _prepareDrafts(file);
 
     final dbA = AppDatabase(_native(file));
     final dbB = AppDatabase(_native(file));
@@ -331,14 +350,7 @@ void main() {
       ),
     ]);
 
-    expect(
-      results.whereType<ElvCommandSuccess<CableAllocation>>(),
-      hasLength(1),
-    );
-    final failures =
-        results.whereType<ElvCommandFailureResult<CableAllocation>>();
-    expect(failures, hasLength(1));
-    expect(failures.single.failure.code, 'ELV_ALLOC_RESOURCE_OVERLAP');
+    _expectSingleOverlapFailure(results);
 
     final verifier = AppDatabase(_native(file));
     final claims =
@@ -347,4 +359,101 @@ void main() {
     expect(claims, hasLength(1));
     await verifier.close();
   });
+
+  test('atomic claim blocks a later whole-cable claim', () async {
+    final dir = await Directory.systemTemp.createTemp(
+      'electra-elv3-p2-atom-first-',
+    );
+    addTearDown(() => dir.delete(recursive: true));
+    final file = File('${dir.path}/atom-first.sqlite');
+    await _prepareDrafts(file);
+
+    final db = AppDatabase(_native(file));
+    addTearDown(db.close);
+    final service = _service(db, 'device-sequential');
+
+    final atomic = await service.reserve(
+      ReserveCableResourcesCommand(
+        commandId: 'reserve-atomic-first',
+        projectId: _projectId,
+        allocationId: 'alloc-a',
+        expectedRevision: 1,
+        selection: ResourceSetSelection(const ['COND-1']),
+      ),
+    );
+    expect(atomic, isA<ElvCommandSuccess<CableAllocation>>());
+
+    final whole = await service.reserve(
+      const ReserveCableResourcesCommand(
+        commandId: 'reserve-whole-second',
+        projectId: _projectId,
+        allocationId: 'alloc-b',
+        expectedRevision: 1,
+        selection: WholeCableSelection(),
+      ),
+    );
+    expect(whole, isA<ElvCommandFailureResult<CableAllocation>>());
+    expect(
+      (whole as ElvCommandFailureResult<CableAllocation>).failure.code,
+      'ELV_ALLOC_RESOURCE_OVERLAP',
+    );
+  });
+
+  test(
+    'two sqlite connections serialize whole-cable versus atomic claims',
+    () async {
+      final dir = await Directory.systemTemp.createTemp(
+        'electra-elv3-p2-whole-race-',
+      );
+      addTearDown(() => dir.delete(recursive: true));
+      final file = File('${dir.path}/whole-race.sqlite');
+      await _prepareDrafts(file);
+
+      final dbA = AppDatabase(_native(file));
+      final dbB = AppDatabase(_native(file));
+      addTearDown(dbA.close);
+      addTearDown(dbB.close);
+      final serviceA = _service(dbA, 'device-whole');
+      final serviceB = _service(dbB, 'device-atom');
+
+      final results = await Future.wait([
+        serviceA.reserve(
+          const ReserveCableResourcesCommand(
+            commandId: 'reserve-whole-race',
+            projectId: _projectId,
+            allocationId: 'alloc-a',
+            expectedRevision: 1,
+            selection: WholeCableSelection(),
+          ),
+        ),
+        serviceB.reserve(
+          ReserveCableResourcesCommand(
+            commandId: 'reserve-atom-race',
+            projectId: _projectId,
+            allocationId: 'alloc-b',
+            expectedRevision: 1,
+            selection: ResourceSetSelection(const ['COND-1']),
+          ),
+        ),
+      ]);
+
+      _expectSingleOverlapFailure(results);
+
+      final verifier = AppDatabase(_native(file));
+      final claims = await verifier.select(verifier.cableResourceClaims).get();
+      expect(
+        claims.where((claim) => claim.resourceAtom == '__WHOLE_CABLE__'),
+        isEmpty,
+      );
+      expect(
+        claims.where((claim) => claim.resourceAtom == 'COND-1'),
+        hasLength(1),
+      );
+      expect(
+        claims.map((claim) => claim.resourceAtom).toSet(),
+        anyOf({'COND-1'}, {'COND-1', 'COND-2'}),
+      );
+      await verifier.close();
+    },
+  );
 }

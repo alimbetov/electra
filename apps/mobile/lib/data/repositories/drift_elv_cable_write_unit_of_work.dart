@@ -198,7 +198,7 @@ final class _DriftElvCableWriteStore implements ElvCableWriteStore {
     final now = DateTime.now().toUtc();
     final inserted = await database
         .into(database.elvCables)
-        .insert(
+        .insertReturningOrNull(
           ElvCablesCompanion.insert(
             id: cable.id,
             projectId: cable.projectId,
@@ -217,7 +217,7 @@ final class _DriftElvCableWriteStore implements ElvCableWriteStore {
           ),
           mode: InsertMode.insertOrIgnore,
         );
-    return inserted > 0;
+    return inserted != null;
   }
 
   @override
