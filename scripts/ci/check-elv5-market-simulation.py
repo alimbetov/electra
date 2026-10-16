@@ -310,7 +310,6 @@ def main() -> None:
     require(sum(counts.values()) == 450, f"market scenario count sum must be 450, found {sum(counts.values())}")
     require(all(counts[code] >= 12 for code in process_codes), "every process needs at least 12 market scenarios")
     require(catalog.get("processStressAxes", {}).keys() == counts.keys(), "every process needs stress axes")
-    require(catalog.get("priorityComputationalCore") is None or True, "compatibility placeholder")
 
     for code in PRIORITY_CORE:
         require(counts[code] >= 23, f"priority computational core process {code} must have >=23 scenarios")
@@ -356,6 +355,7 @@ def main() -> None:
 
     scenarios: list[dict[str, object]] = []
     vector_coverage: dict[str, Counter] = defaultdict(Counter)
+    stress_coverage: dict[str, Counter] = defaultdict(Counter)
     package_coverage = Counter()
     basis_coverage = Counter()
     source_coverage = Counter()
@@ -370,7 +370,8 @@ def main() -> None:
             vector_class = VECTOR_CLASSES[index % len(VECTOR_CLASSES)]
             scale = scales[(index + len(code)) % len(scales)]
             archetype = market_profiles[(index * 3 + len(code)) % len(market_profiles)]
-            stress_axis = axes[(index * 2 + len(code)) % len(axes)]
+            # Step by one so every axis participates even when the axis count is even.
+            stress_axis = axes[(index + len(code)) % len(axes)]
             risk = risk_code(code, stress_axis)
             require(risk in error_codes, f"scenario risk {risk} missing from error taxonomy")
             path = package_paths[discipline]
@@ -395,6 +396,7 @@ def main() -> None:
             }
             scenarios.append(case)
             vector_coverage[code][vector_class] += 1
+            stress_coverage[code][stress_axis] += 1
             for package in path:
                 package_coverage[package] += 1
             basis_coverage[archetype["basis"]] += 1
@@ -408,15 +410,15 @@ def main() -> None:
         require(sum(vector_coverage[code].values()) == counts[code], f"{code} scenario count mismatch")
         for vector_class in VECTOR_CLASSES:
             require(vector_coverage[code][vector_class] > 0, f"{code} missing vector class {vector_class}")
+        expected_axes = set(catalog["processStressAxes"][code])
+        require(set(stress_coverage[code]) == expected_axes, f"{code} does not exercise every declared stress axis")
     require(set(package_coverage) == {f"P{i}" for i in range(10)}, f"aggregate package coverage must include P0-P9, found {sorted(package_coverage)}")
     require(basis_coverage["vendorFact"] > 0 and basis_coverage["marketEnvelope"] > 0 and basis_coverage["syntheticFixture"] > 0, "simulation must use all three evidence basis classes")
     require(len(risk_coverage) >= 18, f"error-prevention coverage too narrow: {len(risk_coverage)} classes")
 
-    # Explicitly protect the independently corrected ACS-03 arithmetic fixture.
     corrected = Q(24) - Q("0.8") * Q("0.5") - Q("0.3") * Q("0.3")
     require(corrected == Q("23.51"), "ACS-03 corrected reference arithmetic regressed")
 
-    # Modern-market sanity anchors from the tracked catalog.
     source_facts = " ".join(" ".join(source["observedFacts"]) for source in sources.values())
     for token in ["PoE Class 3", "600 W", "1000 W", "0.38", "88 mA", "370 mA", "560 mA", "198 addressable", "954-device"]:
         require(token in source_facts, f"market source snapshot lost sanity token: {token}")
@@ -437,6 +439,7 @@ def main() -> None:
         "processCoverage": dict(sorted(counts.items())),
         "packageCoverage": dict(sorted(package_coverage.items())),
         "vectorCoverage": {code: dict(vector_coverage[code]) for code in sorted(vector_coverage)},
+        "stressAxisCoverage": {code: dict(stress_coverage[code]) for code in sorted(stress_coverage)},
         "basisCoverage": dict(basis_coverage),
         "sourceCoverage": dict(sorted(source_coverage.items())),
         "errorClassCoverage": dict(sorted(risk_coverage.items())),
@@ -450,7 +453,7 @@ def main() -> None:
         args.output.write_text(json.dumps(result, ensure_ascii=False, sort_keys=True, indent=2) + "\n", encoding="utf-8")
 
     print("ELV5 market simulation matrix PASS")
-    print("scenarios=450 processes=27 packages=P0-P9 vectorClasses=5 marketRequirements=12")
+    print("scenarios=450 processes=27 packages=P0-P9 vectorClasses=5 allStressAxes=covered marketRequirements=12")
     print(f"vendorFact={basis_coverage['vendorFact']} marketEnvelope={basis_coverage['marketEnvelope']} syntheticFixture={basis_coverage['syntheticFixture']}")
     print(f"errorClassesCovered={len(risk_coverage)} matrixFingerprintSha256={result['matrixFingerprintSha256']}")
     print("claim=DESIGN_SIMULATION_ONLY_RUNTIME_NOT_EXECUTED")
