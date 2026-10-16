@@ -148,6 +148,22 @@ final class Acs03ElectricalKernel {
         limitingReason: 'ACS03_REQUIRED_CONDUCTIVE_FEED_MISSING',
       );
     }
+    if (input.controlPathId == null || input.controlPathId!.isEmpty) {
+      return const Acs03Result(
+        status: Acs03AssessmentStatus.blocked,
+        cases: <Acs03CaseResult>[],
+        governingCaseId: null,
+        limitingReason: 'ACS03_REQUIRED_CONTROL_PATH_MISSING',
+      );
+    }
+    if (input.controlPathId == input.conductiveFeedPathId) {
+      return const Acs03Result(
+        status: Acs03AssessmentStatus.blocked,
+        cases: <Acs03CaseResult>[],
+        governingCaseId: null,
+        limitingReason: 'ACS03_CONTROL_FEED_PATH_IDENTITY_COLLISION',
+      );
+    }
 
     final evidenceByEvent = <String, Acs03PwrEvidence>{
       for (final item in input.evidence) item.eventId: item,
