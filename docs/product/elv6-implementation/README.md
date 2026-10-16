@@ -9,13 +9,15 @@ ELV6 converts exact upstream engineering facts into reproducible physical enclos
 ## Normative artifacts
 
 1. [`code-level-runtime-contract.md`](code-level-runtime-contract.md) — mandatory Dart/runtime identities, exact µm geometry, evaluation states, replay/CAS/publication, persistence, solver and workspace contracts.
-2. [`process-registry.json`](process-registry.json) — closed 24-process layout/evaluation registry.
-3. [`command-registry.json`](command-registry.json) — closed 21-operation public command registry under `electra.elv6-layout-command.v1`.
-4. [`command-examples.json`](command-examples.json) — one canonical design-time valid payload and deterministic missing-field rejection for every registered operation.
-5. [`qualification-manifest.json`](qualification-manifest.json) — 72 process oracles: POS/NEG/BLOCKED for all 24 codes plus cross-cutting constructability/concurrency cases.
-6. [`../elv6-enclosure-layout-design-specification.md`](../elv6-enclosure-layout-design-specification.md) — stage purpose, ownership and package architecture.
-7. [`../elv6-p0-p9-delivery-plan.md`](../elv6-p0-p9-delivery-plan.md) — 80 implementation/acceptance requirements.
-8. [`../../audit/elv6-hard-technical-audit.md`](../../audit/elv6-hard-technical-audit.md) — 18 hard engineering/system-architecture findings and remediation.
+2. [`mutation-safety-contract.md`](mutation-safety-contract.md) — strict placement-intent wire union, server-derived physical geometry/provenance and fail-closed referenced-member replacement semantics.
+3. [`process-registry.json`](process-registry.json) — closed 24-process layout/evaluation registry.
+4. [`command-registry.json`](command-registry.json) — closed 21-operation public command registry under `electra.elv6-layout-command.v1`.
+5. [`command-examples.json`](command-examples.json) — one canonical design-time valid payload and deterministic missing-field rejection for every registered operation.
+6. [`qualification-manifest.json`](qualification-manifest.json) — 72 process oracles: POS/NEG/BLOCKED for all 24 codes plus cross-cutting constructability/concurrency cases.
+7. [`../elv6-enclosure-layout-design-specification.md`](../elv6-enclosure-layout-design-specification.md) — stage purpose, ownership and package architecture.
+8. [`../elv6-p0-p9-delivery-plan.md`](../elv6-p0-p9-delivery-plan.md) — 80 implementation/acceptance requirements.
+9. [`../../audit/elv6-hard-technical-audit.md`](../../audit/elv6-hard-technical-audit.md) — initial 18 hard engineering/system-architecture findings and remediation.
+10. [`../../audit/elv6-final-architecture-hardening.md`](../../audit/elv6-final-architecture-hardening.md) — findings 19–20: client-derived geometry/provenance and orphaned-reference replacement hazards.
 
 ## Closed registries
 
@@ -40,6 +42,10 @@ Each process has a mandatory positive, negative and blocked design oracle. For m
 ### 21 public command operations
 
 The command registry is exact and fail-closed. Canonical examples mirror its payload-key sets exactly. No widget- or plugin-specific mutation endpoint may bypass it. The public revision lifecycle remains the existing ELV4 revision command family.
+
+For placement commands, the wire carries only `placementSpec` intent. Body envelopes, rack/DIN spans, world-space service/protrusion geometry and proposal provenance are server-derived/materialized facts. This prevents a UI/client from forging a smaller collision envelope or impersonating solver provenance.
+
+Set-replacement commands are reference-safe: mounting surfaces and cable entries cannot be removed while active placements/assignments still reference them. There is no client `force` bypass.
 
 ## Runtime ownership gate
 
@@ -77,7 +83,7 @@ check-elv6-command-registry.py
 check-elv6-qualification-design.py
 ```
 
-They verify the 24/80/18 counts, dependency DAG and hard engineering boundary tokens; exact 21-command wire/payload registry; 21 canonical payload examples; and 72 POS/NEG/BLOCKED process oracles.
+They verify the 24/80/20 counts, dependency DAG and hard engineering boundary tokens; exact 21-command wire/payload registry including server-derived-placement constraints; 21 canonical payload examples; and 72 POS/NEG/BLOCKED process oracles.
 
 These gates prevent specification drift. They are explicitly **not runtime acceptance**.
 
