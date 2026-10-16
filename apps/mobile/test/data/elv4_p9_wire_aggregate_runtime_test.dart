@@ -11,7 +11,6 @@ import 'package:engineering_core/engineering_core.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/elv4_power_qualification_builder.dart';
-import '../support/elv4_power_qualification_topology.dart';
 
 void main() {
   test('aggregate wire load/transfer commands replace atomically and replay', () async {
