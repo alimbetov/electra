@@ -14,7 +14,7 @@ The branch name is retained as requested. ELV5 is **discipline-specific engineer
 2. [ELV5 design specification](elv5-discipline-calculations-design-specification.md).
 3. [P0–P9 delivery plan](elv5-p0-p9-delivery-plan.md).
 4. [Detailed implementation index](elv5-implementation/README.md), with one contract for each package.
-5. [Implementation binding/performance hardening](elv5-implementation/implementation-binding-hardening-v1.md) plus machine registries: [implementation bindings](elv5-implementation/implementation-binding-registry.json), [repository contracts](elv5-implementation/repository-contract-registry.json), [runtime versions](elv5-implementation/runtime-version-registry.json), [algorithm performance](elv5-implementation/algorithm-performance-registry.json), and [finding/trace codes](elv5-implementation/finding-trace-code-registry.json).
+5. [Implementation binding/performance hardening](elv5-implementation/implementation-binding-hardening-v1.md) plus machine registries: [implementation bindings](elv5-implementation/implementation-binding-registry.json), [repository contracts](elv5-implementation/repository-contract-registry.json), [runtime versions](elv5-implementation/runtime-version-registry.json), [algorithm performance](elv5-implementation/algorithm-performance-registry.json), and [finding/trace codes](elv5-implementation/finding-trace-code-registry.json). The pure-core/application resolver and nested-module architecture is separately frozen by [ADR-031 — ELV5 pure-core and module boundary](../adr/ADR-031-elv5-pure-core-and-module-boundary.md).
 6. [Code-level runtime contract](elv5-implementation/code-level-runtime-contract.md): base runtime types, strict wire envelope, 16-operation public command surface, replay/CAS/publication/persistence/dependency contracts.
 7. [Engineering primitives contract](elv5-implementation/engineering-primitives-contract.md): dimension-safe exact quantities, evidence basis/applicability, operating cases, deterministic time/frames and canonical hashing.
 8. [Typed process API](elv5-implementation/typed-process-api.md): process-specific Dart input/output boundaries for all 27 calculations. Repository-aware input resolution is application-layer only; `engineering_core` process definitions/kernels remain pure.
@@ -44,7 +44,7 @@ Existing ELV1–ELV4 identities, ownership, reference editions, physical routing
 Within ELV5 the precedence is explicit. Highest authority first:
 
 1. `project-alignment-hardening-v1.md` for the specific authority/status/resolver/source-layout/schema/oracle/downstream contradictions it reconciles;
-2. `implementation-binding-hardening-v1.md` plus `implementation-binding-registry.json`, `repository-contract-registry.json`, `runtime-version-registry.json`, `algorithm-performance-registry.json` and `finding-trace-code-registry.json` for direct implementation binding/version/performance/source ownership;
+2. `implementation-binding-hardening-v1.md` plus `implementation-binding-registry.json`, `repository-contract-registry.json`, `runtime-version-registry.json`, `algorithm-performance-registry.json`, `finding-trace-code-registry.json` and ADR-031 for direct implementation binding/version/performance/source-layer ownership;
 3. `code-level-hardening-v2.md`;
 4. `code-level-hardening-amendments.md`;
 5. `calculation-oracle-errata-v1.md` for exact corrected arithmetic it names;
@@ -62,7 +62,7 @@ A contradiction between active normative artifacts without an explicit higher-au
 
 Repository-aware `InputResolver` execution belongs to the application layer. Pure `engineering_core` process definitions/kernels receive immutable typed inputs and never read DB/Drift/UI/platform state.
 
-Public symbols, process identities, semantic contracts and layer ownership are normative. Exact filenames are tracked implementation coordinates: a path-only move requires synchronized implementation-binding/manifest update but is not an engineering formula change when public semantics and dependency direction remain identical.
+Public symbols, process identities, semantic contracts and layer ownership are normative. Exact filenames are tracked implementation coordinates: a path-only move requires synchronized implementation-binding/manifest update but is not an engineering formula change when public semantics and dependency direction remain identical. ADR-031 is the architectural decision for this pure-core/application-resolver boundary and the nested `engineering_core/lib/src/elv5/...` bounded-context layout.
 
 ### Version/status rule
 
