@@ -113,7 +113,7 @@ final class DriftElv3RealizedLinkFactSource
 
 BigInt _integerSqrt(BigInt value) {
   if (value < BigInt.zero) throw ArgumentError('sqrt input must be nonnegative.');
-  if (value < BigInt.two) return value;
+  if (value < BigInt.from(2)) return value;
   var x = BigInt.one << ((value.bitLength + 1) >> 1);
   while (true) {
     final next = (x + value ~/ x) >> 1;
