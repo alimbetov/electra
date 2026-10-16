@@ -2,7 +2,7 @@
 
 Status: DESIGN HARDENED / RUNTIME NOT STARTED
 Depends on: P1/P2 and relevant ELV3/ELV4 kernels.
-Parent: [ELV5 design](../elv5-discipline-calculations-design-specification.md); [process contracts](process-contracts.md); [typed process API](typed-process-api.md); [engineering primitives](engineering-primitives-contract.md).
+Parent: [ELV5 design](../elv5-discipline-calculations-design-specification.md); [process contracts](process-contracts.md); [typed process API](typed-process-api.md); [engineering primitives](engineering-primitives-contract.md); [CCTV code-level dossiers](process-specifications/cctv-processes.md); [Flutter performance contract](flutter-performance-contract.md).
 
 Inherited implementation and mandatory new extensions: [baseline contract P3](implemented-baseline.md#p3); [pinned evidence](baseline.json).
 
@@ -18,6 +18,29 @@ Inherited implementation and mandatory new extensions: [baseline contract P3](im
 | ELV5-P3-006 | Implement CCTV-06 realized link/media/power applicability without duplicate path/resource ownership | P3-T06 |
 | ELV5-P3-007 | Emit structured exact steps/findings/provenance/claim scope and precise old/new dependencies for all CCTV outputs | P3-T07 |
 | ELV5-P3-008 | Qualify positive/negative/boundary, restart/history, timezone/frame and shared LAN/PSE cases through public commands | P3-T08 |
+
+## Normative code-level binding
+
+The package descriptions below remain the package-level summary. Runtime implementation MUST follow the matching CCTV-01…06 entries in [process-specifications/cctv-processes.md](process-specifications/cctv-processes.md) for all 25 required sections. In particular, P3 may not locally reinterpret:
+
+```text
+applicability
+operating cases
+exact equations / interval endpoints
+rounding/ceil boundary
+worst-case selection
+requirement composition
+comparison/margin convention
+governing/limiting logic
+missing/unsupported semantics
+dependency set
+trace equation codes
+complexity/resource model
+Dart semantic surface
+positive/boundary/negative/adversarial/cross-discipline vectors
+```
+
+Implementation priority inside P3 is **CCTV-02 then CCTV-03**, because flow accounting and storage/time integration stress the reusable exact/set/time/performance primitives first.
 
 ## CCTV-01 — camera coverage geometry
 
@@ -53,13 +76,15 @@ Each stream carries expected payload bitrate and optional guaranteed/peak payloa
 
 Expected and peak outputs remain independent. Expected storage planning cannot silently substitute for peak link capacity; peak cannot silently replace expected recording bitrate.
 
+The production implementation follows the dossier’s O(F) keyed flow-edge accounting model. It must not scan every stream against every network edge. Governing capacity is the exact edge/recorder case with smallest signed headroom; multicast tree de-duplication is identity-based and explicit.
+
 ## CCTV-03 — storage and retention basis
 
 One recording pool aggregate captures together:
 
 ```text
 explicit UTC horizon
-temporalPolicy: IANA timeZoneId + tzdbVersion + DST gap/overlap rule
+temporalPolicy: IANA timeZoneId + captured timezone rules evidence + DST gap/overlap rule
 recording assignments keyed by (stream,pool,copyRole)
 schedule segment set
 sizingBasis EXPECTED_ESTIMATE or GUARANTEED_UPPER_BOUND
@@ -88,6 +113,8 @@ if an exact redundancy model applies:
 ```
 
 An expected/typical bitrate may support an estimate only. A guaranteed retention claim requires the process-declared guaranteed upper-bound evidence; reserve does not upgrade evidence certainty.
+
+The O(N log N) interval union executes as a medium/large pure kernel under the performance executor; it may not hold an SQLite transaction open while sorting/merging 10,000 schedule segments.
 
 ## CCTV-04 — shared PoE context
 
@@ -135,7 +162,7 @@ intrinsics/lens definition
 stream profile and stream-membership set
 subscription set and ordered edge paths
 recording pool/assignment/schedule sets
-temporal policy/tzdb
+temporal policy/timezone rules evidence
 reserve/redundancy/policy refs
 recorder definition/accounting assignment set
 realized link section set
@@ -155,9 +182,10 @@ REPLACE_RECORDER_ASSIGNMENTS / REPLACE_LINK_COMPOSITION
   -> schema-24 file SQLite
   -> CALCULATE_DISCIPLINE_PROCESS
   -> production capture + typed resolver
+  -> Elv5CalculationExecutor when workload requires off-main execution
   -> CCTV typed kernel
   -> guarded publication
-  -> workspace projection
+  -> targeted workspace projection
   -> close/reopen verification
 ```
 
@@ -165,7 +193,7 @@ P3 tests do not populate internal repositories directly as their only acceptance
 
 ## Required adversarial/engineering cases
 
-P3 qualification includes at least:
+P3 qualification includes the complete five-class vector inventory from the CCTV dossiers. At minimum:
 
 - mixed coordinate frames without transform → reject/block;
 - horizon/behind-plane camera ray → not complete PASS;
@@ -173,9 +201,11 @@ P3 qualification includes at least:
 - one stream / two unicast receivers on common edge → two edge copies;
 - multicast de-dup only with exact multicast model;
 - payload bitrate present but required wire-overhead evidence absent → physical capacity dimension unresolved;
+- exact edge-capacity boundary and +1 bit/s overflow;
 - overlapping recording intervals → counted once;
 - equivalent interval split/merge → same canonical result;
-- DST transition fixture under pinned temporal policy;
+- one-bit-second storage fixture proves pool-level ceil;
+- DST transition fixture under captured temporal policy;
 - EXPECTED_ESTIMATE large disk → no guaranteed-retention PASS;
 - missing upper bitrate bound under guarantee basis → unresolved;
 - duplicate `(stream,pool,copyRole)` → deterministic rejection;
@@ -184,8 +214,19 @@ P3 qualification includes at least:
 - unknown realized route → no room-distance estimate;
 - close/reopen preserves hashes/provenance and frozen historical result.
 
+## Performance obligations
+
+P3 must satisfy [flutter-performance-contract.md](flutter-performance-contract.md):
+
+- CCTV-02 flow accounting is keyed by canonical flow-edge identity and meets dossier complexity;
+- CCTV-03 schedule expansion/union runs off UI isolate for medium/large native workloads;
+- rapid bitrate/schedule edits coalesce obsolete pending recalculation;
+- exact input-fingerprint reuse may avoid duplicate pure work but cannot publish stale CURRENT;
+- capture uses bounded bulk stream/subscription/schedule loads;
+- visible workspace cards update without rebuilding hidden stream/trace rows.
+
 ## Exit
 
-P3 runtime acceptance requires P3-T01…T08 and both primary POS/NEG entries for CCTV-01…06 at the same accepted source SHA, together with required L0–L6 coverage.
+P3 runtime acceptance requires P3-T01…T08, both primary POS/NEG entries for CCTV-01…06, all CCTV boundary/adversarial/cross-discipline dossier vectors and required L0–L6/performance coverage at the same accepted source SHA and authority fingerprint.
 
 This document is a hardened design contract, not proof of source implementation.
