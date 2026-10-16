@@ -115,9 +115,10 @@ final class Elv4WireSemanticAdapter<TResult> {
   _validatedCodecs<TResult>(Iterable<Elv4WireSemanticCodec<TResult>> codecs) {
     final result = <Elv4WireCommandKey, Elv4WireSemanticCodec<TResult>>{};
     for (final codec in codecs) {
-      if (result.putIfAbsent(codec.key, () => codec) != codec) {
+      if (result.containsKey(codec.key)) {
         throw ArgumentError('Duplicate ELV4 semantic codec: ${codec.key}.');
       }
+      result[codec.key] = codec;
     }
     final expected = <Elv4WireCommandKey>{
       for (final operation in Elv4WireCommandEnvelope.powerV1Operations)
