@@ -50,6 +50,14 @@ jobs:
         working-directory: .
         run: python3 scripts/ci/check-elv5-command-examples.py
 
+      - name: Verify ELV6 process and 80-requirement specification
+        working-directory: .
+        run: python3 scripts/ci/check-elv6-specification.py
+
+      - name: Verify ELV6 exact command registry
+        working-directory: .
+        run: python3 scripts/ci/check-elv6-command-registry.py
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
