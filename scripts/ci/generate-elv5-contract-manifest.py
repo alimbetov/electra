@@ -23,10 +23,12 @@ AUTHORITY_PATHS = [
     "docs/product/elv5-p0-p9-delivery-plan.md",
     "docs/product/elv5-implementation/README.md",
     "docs/product/elv5-implementation/process-registry.json",
+    "docs/product/elv5-implementation/algorithm-registry.json",
     "docs/product/elv5-implementation/command-registry.json",
     "docs/product/elv5-implementation/requirements.json",
     "docs/product/elv5-implementation/engineering-primitives-contract.md",
     "docs/product/elv5-implementation/typed-process-api.md",
+    "docs/product/elv5-implementation/calculation-engine-contract.md",
     "docs/product/elv5-implementation/persistence-schema-contract.md",
     "docs/product/elv5-implementation/code-level-hardening-amendments.md",
     "docs/product/elv5-implementation/code-level-hardening-v2.md",
@@ -85,19 +87,26 @@ def main() -> None:
     args = parser.parse_args()
 
     process_registry_path = IMPL / "process-registry.json"
+    algorithm_registry_path = IMPL / "algorithm-registry.json"
     command_registry_path = IMPL / "command-registry.json"
     requirements_path = IMPL / "requirements.json"
 
     process_registry = load_json(process_registry_path)
+    algorithm_registry = load_json(algorithm_registry_path)
     command_registry = load_json(command_registry_path)
     requirements = load_json(requirements_path)
 
     processes = process_registry.get("processes", [])
+    algorithms = algorithm_registry.get("processes", [])
     commands = command_registry.get("commands", [])
     requirement_rows = rows_from_requirements(requirements)
 
     if len(processes) != 27:
         raise SystemExit(f"expected 27 processes, found {len(processes)}")
+    if len(algorithms) != 27:
+        raise SystemExit(f"expected 27 algorithm mappings, found {len(algorithms)}")
+    if {row.get('code') for row in processes} != {row.get('code') for row in algorithms}:
+        raise SystemExit("algorithm registry process inventory differs from process registry")
     if len(commands) != 16:
         raise SystemExit(f"expected 16 commands, found {len(commands)}")
     if len(requirement_rows) != 80:
@@ -123,6 +132,17 @@ def main() -> None:
             "requiredDimensions": sorted(row["requiredDimensions"]),
         }
         for row in sorted(processes, key=lambda item: item["code"])
+    ]
+    algorithm_inventory = [
+        {
+            "code": row["code"],
+            "families": sorted(row.get("families", [])),
+            "operatingCases": row.get("operatingCases", []),
+            "governingRule": row.get("governingRule"),
+            "marginPolicy": row.get("marginPolicy"),
+            "limitingFactor": row.get("limitingFactor"),
+        }
+        for row in sorted(algorithms, key=lambda item: item["code"])
     ]
     command_inventory = [
         {
@@ -154,14 +174,19 @@ def main() -> None:
         "wireSchema": "electra.elv5-discipline-command.v1",
         "payloadSchemaVersion": 1,
         "processCount": 27,
+        "algorithmMappingCount": 27,
         "commandCount": 16,
         "requirementCount": 80,
         "primaryProcessOracleCount": 54,
         "processRegistrySha256": sha256_file(process_registry_path),
+        "algorithmRegistrySha256": sha256_file(algorithm_registry_path),
         "commandRegistrySha256": sha256_file(command_registry_path),
         "requirementsSha256": sha256_file(requirements_path),
         "requiredDimensionInventorySha256": sha256_bytes(
             deterministic_json_bytes(required_dimension_inventory)
+        ),
+        "algorithmInventorySha256": sha256_bytes(
+            deterministic_json_bytes(algorithm_inventory)
         ),
         "commandPayloadInventorySha256": sha256_bytes(
             deterministic_json_bytes(command_inventory)
@@ -192,7 +217,7 @@ def main() -> None:
     print(f"ELV5 contract manifest generated: {output}")
     print(f"sourceSha={manifest['sourceSha']}")
     print(f"authorityFingerprintSha256={authority_fingerprint}")
-    print("processes=27 commands=16 requirements=80 primaryOracles=54 schema=24")
+    print("processes=27 algorithms=27 commands=16 requirements=80 primaryOracles=54 schema=24")
 
 
 if __name__ == "__main__":
