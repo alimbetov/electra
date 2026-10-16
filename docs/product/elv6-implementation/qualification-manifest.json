@@ -1,0 +1,72 @@
+{
+  "schema": "electra.elv6-qualification-manifest.v1",
+  "status": "DESIGN_DRAFT",
+  "runtimeStatus": "NOT_STARTED",
+  "rule": "Every registered process requires POS, NEG and BLOCKED public-path qualification; NEG is not forced to FAIL for basis/measurement processes.",
+  "fixtureFamilies": [
+    {
+      "id": "PANEL-AUTOMATION-01",
+      "purpose": "Automation panel with enclosure, DIN rails, terminal rail, ducts, door, cable entries, PSU/PLC/I-O/relays and reserved service zones."
+    },
+    {
+      "id": "WALL-CABINET-LAN-01",
+      "purpose": "Wall ELV cabinet with rack profile, patch panel, switch, cable entry, service and bend envelopes."
+    },
+    {
+      "id": "FLOOR-RACK-MIXED-01",
+      "purpose": "Floor rack with front/rear/four-post devices, shelf equipment, reserved U, airflow and mass/CoG facts."
+    },
+    {
+      "id": "BATTERY-CABINET-01",
+      "purpose": "Battery/UPS physical placement with ELV4 identity, handling envelope, support load and missing-data variants."
+    }
+  ],
+  "processOracles": [
+    {"code":"LAY-01","fixture":"PANEL-AUTOMATION-01","POS":{"id":"LAY-01-POS","completion":"COMPLETE","assessment":"PASS"},"NEG":{"id":"LAY-01-NEG","completion":"COMPLETE","assessment":"FAIL"},"BLOCKED":{"id":"LAY-01-BLOCKED","completion":"BLOCKED","assessment":"UNRESOLVED"}},
+    {"code":"LAY-02","fixture":"FLOOR-RACK-MIXED-01","POS":{"id":"LAY-02-POS","completion":"COMPLETE","assessment":"PASS"},"NEG":{"id":"LAY-02-NEG","completion":"COMPLETE","assessment":"FAIL"},"BLOCKED":{"id":"LAY-02-BLOCKED","completion":"BLOCKED","assessment":"UNRESOLVED"}},
+    {"code":"LAY-03","fixture":"PANEL-AUTOMATION-01","POS":{"id":"LAY-03-POS","completion":"COMPLETE","assessment":"PASS"},"NEG":{"id":"LAY-03-NEG","completion":"COMPLETE","assessment":"FAIL"},"BLOCKED":{"id":"LAY-03-BLOCKED","completion":"BLOCKED","assessment":"UNRESOLVED"}},
+    {"code":"LAY-04","fixture":"PANEL-AUTOMATION-01","POS":{"id":"LAY-04-POS","completion":"COMPLETE","assessment":"PASS"},"NEG":{"id":"LAY-04-NEG","completion":"COMPLETE","assessment":"FAIL"},"BLOCKED":{"id":"LAY-04-BLOCKED","completion":"BLOCKED","assessment":"UNRESOLVED"}},
+    {"code":"LAY-05","fixture":"FLOOR-RACK-MIXED-01","POS":{"id":"LAY-05-POS","completion":"COMPLETE","assessment":"PASS"},"NEG":{"id":"LAY-05-NEG","completion":"COMPLETE","assessment":"FAIL"},"BLOCKED":{"id":"LAY-05-BLOCKED","completion":"BLOCKED","assessment":"UNRESOLVED"}},
+    {"code":"LAY-06","fixture":"FLOOR-RACK-MIXED-01","POS":{"id":"LAY-06-POS","completion":"COMPLETE","assessment":"PASS"},"NEG":{"id":"LAY-06-NEG","completion":"COMPLETE","assessment":"FAIL"},"BLOCKED":{"id":"LAY-06-BLOCKED","completion":"BLOCKED","assessment":"UNRESOLVED"}},
+    {"code":"LAY-07","fixture":"PANEL-AUTOMATION-01","POS":{"id":"LAY-07-POS","completion":"COMPLETE","assessment":"PASS"},"NEG":{"id":"LAY-07-NEG","completion":"COMPLETE","assessment":"FAIL"},"BLOCKED":{"id":"LAY-07-BLOCKED","completion":"PARTIAL","assessment":"UNRESOLVED"}},
+    {"code":"LAY-08","fixture":"FLOOR-RACK-MIXED-01","POS":{"id":"LAY-08-POS","completion":"COMPLETE","assessment":"PASS"},"NEG":{"id":"LAY-08-NEG","completion":"COMPLETE","assessment":"FAIL"},"BLOCKED":{"id":"LAY-08-BLOCKED","completion":"BLOCKED","assessment":"UNRESOLVED"}},
+    {"code":"LAY-09","fixture":"PANEL-AUTOMATION-01","POS":{"id":"LAY-09-POS","completion":"COMPLETE","assessment":"PASS"},"NEG":{"id":"LAY-09-NEG","completion":"COMPLETE","assessment":"FAIL"},"BLOCKED":{"id":"LAY-09-BLOCKED","completion":"PARTIAL","assessment":"UNRESOLVED"}},
+    {"code":"LAY-10","fixture":"PANEL-AUTOMATION-01","POS":{"id":"LAY-10-POS","completion":"COMPLETE","assessment":"PASS"},"NEG":{"id":"LAY-10-NEG","completion":"COMPLETE","assessment":"FAIL"},"BLOCKED":{"id":"LAY-10-BLOCKED","completion":"BLOCKED","assessment":"UNRESOLVED"}},
+    {"code":"LAY-11","fixture":"WALL-CABINET-LAN-01","POS":{"id":"LAY-11-POS","completion":"COMPLETE","assessment":"PASS"},"NEG":{"id":"LAY-11-NEG","completion":"COMPLETE","assessment":"FAIL"},"BLOCKED":{"id":"LAY-11-BLOCKED","completion":"BLOCKED","assessment":"UNRESOLVED"}},
+    {"code":"LAY-12","fixture":"WALL-CABINET-LAN-01","POS":{"id":"LAY-12-POS","completion":"COMPLETE","assessment":"PASS"},"NEG":{"id":"LAY-12-NEG","completion":"COMPLETE","assessment":"FAIL"},"BLOCKED":{"id":"LAY-12-BLOCKED","completion":"BLOCKED","assessment":"UNRESOLVED"}},
+    {"code":"LAY-13","fixture":"PANEL-AUTOMATION-01","POS":{"id":"LAY-13-POS","completion":"COMPLETE","assessment":"PASS"},"NEG":{"id":"LAY-13-NEG","completion":"PARTIAL","assessment":"UNRESOLVED"},"BLOCKED":{"id":"LAY-13-BLOCKED","completion":"BLOCKED","assessment":"UNRESOLVED"}},
+    {"code":"LAY-14","fixture":"WALL-CABINET-LAN-01","POS":{"id":"LAY-14-POS","completion":"COMPLETE","assessment":"PASS"},"NEG":{"id":"LAY-14-NEG","completion":"COMPLETE","assessment":"FAIL"},"BLOCKED":{"id":"LAY-14-BLOCKED","completion":"BLOCKED","assessment":"UNRESOLVED"}},
+    {"code":"LAY-15","fixture":"BATTERY-CABINET-01","POS":{"id":"LAY-15-POS","completion":"COMPLETE","assessment":"PASS"},"NEG":{"id":"LAY-15-NEG","completion":"COMPLETE","assessment":"FAIL"},"BLOCKED":{"id":"LAY-15-BLOCKED","completion":"BLOCKED","assessment":"UNRESOLVED"}},
+    {"code":"LAY-16","fixture":"BATTERY-CABINET-01","POS":{"id":"LAY-16-POS","completion":"COMPLETE","assessment":"PASS"},"NEG":{"id":"LAY-16-NEG","completion":"COMPLETE","assessment":"FAIL"},"BLOCKED":{"id":"LAY-16-BLOCKED","completion":"PARTIAL","assessment":"UNRESOLVED"}},
+    {"code":"LAY-17","fixture":"FLOOR-RACK-MIXED-01","POS":{"id":"LAY-17-POS","completion":"COMPLETE","assessment":"PASS"},"NEG":{"id":"LAY-17-NEG","completion":"PARTIAL","assessment":"UNRESOLVED"},"BLOCKED":{"id":"LAY-17-BLOCKED","completion":"BLOCKED","assessment":"UNRESOLVED"}},
+    {"code":"LAY-18","fixture":"FLOOR-RACK-MIXED-01","POS":{"id":"LAY-18-POS","completion":"COMPLETE","assessment":"PASS"},"NEG":{"id":"LAY-18-NEG","completion":"COMPLETE","assessment":"FAIL"},"BLOCKED":{"id":"LAY-18-BLOCKED","completion":"PARTIAL","assessment":"UNRESOLVED"}},
+    {"code":"LAY-19","fixture":"FLOOR-RACK-MIXED-01","POS":{"id":"LAY-19-POS","completion":"COMPLETE","assessment":"PASS"},"NEG":{"id":"LAY-19-NEG","completion":"PARTIAL","assessment":"UNRESOLVED"},"BLOCKED":{"id":"LAY-19-BLOCKED","completion":"BLOCKED","assessment":"UNRESOLVED"}},
+    {"code":"LAY-20","fixture":"FLOOR-RACK-MIXED-01","POS":{"id":"LAY-20-POS","completion":"COMPLETE","assessment":"PASS"},"NEG":{"id":"LAY-20-NEG","completion":"COMPLETE","assessment":"FAIL"},"BLOCKED":{"id":"LAY-20-BLOCKED","completion":"BLOCKED","assessment":"UNRESOLVED"}},
+    {"code":"LAY-21","fixture":"PANEL-AUTOMATION-01","POS":{"id":"LAY-21-POS","completion":"COMPLETE","assessment":"PASS"},"NEG":{"id":"LAY-21-NEG","completion":"PARTIAL","assessment":"UNRESOLVED"},"BLOCKED":{"id":"LAY-21-BLOCKED","completion":"BLOCKED","assessment":"UNRESOLVED"}},
+    {"code":"LAY-22","fixture":"PANEL-AUTOMATION-01","POS":{"id":"LAY-22-POS","completion":"COMPLETE","assessment":"PASS"},"NEG":{"id":"LAY-22-NEG","completion":"PARTIAL","assessment":"UNRESOLVED"},"BLOCKED":{"id":"LAY-22-BLOCKED","completion":"BLOCKED","assessment":"UNRESOLVED"}},
+    {"code":"LAY-23","fixture":"FLOOR-RACK-MIXED-01","POS":{"id":"LAY-23-POS","completion":"COMPLETE","assessment":"PASS"},"NEG":{"id":"LAY-23-NEG","completion":"COMPLETE","assessment":"UNRESOLVED"},"BLOCKED":{"id":"LAY-23-BLOCKED","completion":"BLOCKED","assessment":"UNRESOLVED"}},
+    {"code":"LAY-24","fixture":"PANEL-AUTOMATION-01","POS":{"id":"LAY-24-POS","completion":"COMPLETE","assessment":"PASS"},"NEG":{"id":"LAY-24-NEG","completion":"COMPLETE","assessment":"FAIL"},"BLOCKED":{"id":"LAY-24-BLOCKED","completion":"BLOCKED","assessment":"UNRESOLVED"}}
+  ],
+  "crossCuttingQualifications": [
+    "FIXED_POINT_ONE_UM_BOUNDARY",
+    "LEGACY_DOUBLE_NORMALIZATION",
+    "HALF_OPEN_FACE_TOUCH",
+    "MODULE_PASS_PHYSICAL_WIDTH_FAIL",
+    "RACK_U_PASS_RAIL_DEPTH_FAIL",
+    "ELECTRICAL_BATTERY_PASS_PHYSICAL_FAIL",
+    "BODY_PASS_SERVICE_FAIL",
+    "DOOR_CLOSED_PASS_SWEEP_FAIL",
+    "MISSING_BEND_RADIUS_UNRESOLVED",
+    "MISSING_MASS_PARTIAL",
+    "LOAD_NOT_EQUAL_HEAT_LOSS",
+    "NO_NORMATIVE_PASS_FROM_INTRINSIC_PASS",
+    "SOLVER_BYTE_STABILITY",
+    "LOCKED_PLACEMENT_NEVER_MOVES",
+    "STALE_PROPOSAL_ATOMIC_REJECTION",
+    "RESPONSE_LOSS_REPLAY",
+    "COMMAND_ID_PAYLOAD_CONFLICT",
+    "FREEZE_VS_PUBLICATION_RACE",
+    "R1_R2_HISTORICAL_IMMUTABILITY",
+    "TARGETED_INVALIDATION_NEGATIVE_CONTROLS"
+  ]
+}
