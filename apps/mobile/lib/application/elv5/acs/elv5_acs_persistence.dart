@@ -17,14 +17,16 @@ final class Elv5AcsAggregateSnapshot {
   final Map<String, Object?> payload;
 }
 
-abstract interface class Elv5AcsMutationStore {
+abstract interface class Elv5AcsFactStore {
   Future<Elv5AcsAggregateSnapshot?> load({
     required String projectId,
     required String designRevisionId,
     required String operation,
     required String subjectId,
   });
+}
 
+abstract interface class Elv5AcsMutationStore implements Elv5AcsFactStore {
   Future<void> replace({
     required String projectId,
     required String designRevisionId,
