@@ -4,6 +4,7 @@ import '../../../application/elv5/calculation/elv5_initial_vertical_registry.dar
 import '../../database/app_database.dart';
 import 'drift_acs03_electrical_contract_store.dart';
 import 'drift_acs04_source_requirement_contract_store.dart';
+import 'drift_acs05_autonomy_contract_store.dart';
 import 'drift_elv3_realized_link_fact_source.dart';
 import 'drift_elv4_current_evidence_source.dart';
 import 'drift_elv4_operating_fact_source.dart';
@@ -55,6 +56,11 @@ final class DriftElv5CalculationRuntime {
       originDeviceId: originDeviceId,
       nowUtc: nowUtc,
     );
+    final acs05Contracts = DriftAcs05AutonomyContractStore(
+      database,
+      originDeviceId: originDeviceId,
+      nowUtc: nowUtc,
+    );
     final currentPowerEvidence = DriftElv4CurrentEvidenceSource(database);
     final registry = buildElv5InitialVerticalRegistry(
       cctvStore: cctvFacts,
@@ -65,6 +71,7 @@ final class DriftElv5CalculationRuntime {
       opticalSectionEvidence: DriftLan05OpticalSectionEvidenceSource(database),
       acs03Contracts: acs03Contracts,
       acs04Contracts: acs04Contracts,
+      acs05Contracts: acs05Contracts,
       currentPowerEvidence: currentPowerEvidence,
       powerOperatingFacts: DriftElv4OperatingFactSource(database),
       captureRevisions: DriftElv5CaptureRevisionSource(database),
