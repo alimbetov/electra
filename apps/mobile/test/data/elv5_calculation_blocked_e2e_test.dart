@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:electra_mobile/application/elv5/wire/elv5_wire_command.dart';
 import 'package:electra_mobile/data/database/app_database.dart';
@@ -39,7 +40,7 @@ void main() {
       commandId: 'calc-1',
       expectedDesignRowRevision: 1,
       expectedRows: const <String, int>{},
-      reviewedImpactFingerprint: '0' * 64,
+      reviewedImpactFingerprint: List<String>.filled(64, '0').join(),
       payload: <String, Object?>{
         'scope': <String, Object?>{
           'kind': 'DESIGN',
@@ -60,7 +61,7 @@ void main() {
     final evaluation = await db.customSelect(
       'SELECT execution, completion, assessment, output_json, evidence_json '
       'FROM discipline_evaluation_records WHERE logical_node_key_sha256 = ?',
-      variables: [nodeHash],
+      variables: <Variable>[Variable.withString(nodeHash)],
     ).getSingle();
     expect(evaluation.read<String>('execution'), 'BLOCKED');
     expect(evaluation.read<String>('completion'), 'INCOMPLETE');
@@ -71,7 +72,7 @@ void main() {
     final pointer = await db.customSelect(
       'SELECT freshness, generation, evaluation_id FROM discipline_evaluation_pointers '
       'WHERE logical_node_key_sha256 = ?',
-      variables: [nodeHash],
+      variables: <Variable>[Variable.withString(nodeHash)],
     ).getSingle();
     expect(pointer.read<String>('freshness'), 'CURRENT');
     expect(pointer.read<int>('generation'), 1);
