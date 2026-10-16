@@ -2,7 +2,7 @@
 
 Status: DESIGN HARDENED / RUNTIME NOT STARTED
 Depends on: P0–P7 implemented prerequisites.
-Parent: [ELV5 design](../elv5-discipline-calculations-design-specification.md); [process contracts](process-contracts.md); [code-level runtime contract](code-level-runtime-contract.md); [executable qualification contract](qualification-contract.md).
+Parent: [ELV5 design](../elv5-discipline-calculations-design-specification.md); [process contracts](process-contracts.md); [code-level runtime contract](code-level-runtime-contract.md); [unified calculation engine](calculation-engine-contract.md); [algorithm registry](algorithm-registry.json); [executable qualification contract](qualification-contract.md).
 
 Inherited implementation and mandatory new extensions: [baseline contract P8](implemented-baseline.md#p8); [pinned evidence](baseline.json).
 
@@ -17,7 +17,7 @@ Inherited implementation and mandatory new extensions: [baseline contract P8](im
 | ELV5-P8-005 | Inject durable failure checkpoints and verify same-open/reopened atomic rollback including history/ledger | P8-T05 |
 | ELV5-P8-006 | Prove response-loss replay/payload conflict and deterministic two-connection edit/publish/freeze/adoption races | P8-T06 |
 | ELV5-P8-007 | Verify supported migrations through schema 24 and mixed legacy/ELV3/ELV4/ELV5 result-owner isolation | P8-T07 |
-| ELV5-P8-008 | Assert affected/unaffected process sets, exact arithmetic/bounds/provenance and all no-false-PASS sentinels | P8-T08 |
+| ELV5-P8-008 | Assert affected/unaffected sets, exact arithmetic/provenance, 27 algorithm mappings, governing/margin/limiting/trace invariants and all no-false-PASS sentinels | P8-T08 |
 
 ## Normative qualification contract
 
@@ -25,7 +25,7 @@ The complete test architecture is [qualification-contract.md](qualification-cont
 
 ```text
 L0 primitive / exact numeric / canonical hash
-L1 pure typed process kernels
+L1 pure typed process kernels + unified solver protocol
 L2 strict wire codecs / semantic rejection
 L3 schema 24 / persistence / migration / restart
 L4 application UoW / replay / history / failure injection
@@ -70,7 +70,7 @@ sourceBasisExpectations
 publicSetupOnly
 ```
 
-Tests read the manifest and fail if process registry membership, required dimensions or expected status inventory diverges.
+Tests read the manifest and fail if process registry membership, algorithm registry membership, required dimensions or expected status inventory diverges.
 
 ## Public vertical path
 
@@ -81,8 +81,11 @@ strict public setup commands
   -> file SQLite persisted roots + canonical ELV3/ELV4 facts
   -> CALCULATE_DISCIPLINE_PROCESS
   -> production capture resolver
-  -> typed process registry
+  -> typed process + algorithm registry
+  -> applicability/input normalization/operating-case builder
   -> pure deterministic kernel
+  -> requirement composition + conservative comparisons
+  -> governing case / limiting factor / margin / trace
   -> guarded coherent publication
   -> engineer projection/read API
   -> close DB
@@ -91,6 +94,25 @@ strict public setup commands
 ```
 
 A direct call to `calculate()` is L1 evidence only.
+
+## Unified calculation-engine qualification
+
+P8 treats [calculation-engine-contract.md](calculation-engine-contract.md) as executable behavior, not presentation guidance.
+
+Required cross-process tests:
+
+1. `algorithm-registry.json` contains exactly the same 27 codes as `process-registry.json`, exactly once each;
+2. every registered solver family is code-owned and known to runtime;
+3. every multi-case process emits a deterministic governing case, or an explicit typed reason why no governing case applies;
+4. every resolved finite capacity/limit comparison emits a signed margin with **positive = acceptable headroom** convention;
+5. every limiting factor is stable under unrelated project mutations and deterministic after restart/replay;
+6. interval comparison uses the conservative edge; overlap at a required threshold cannot silently PASS;
+7. manufacturer-typical/estimated evidence cannot satisfy a guaranteed-bound comparison;
+8. calculation step equation codes, operand order and typed results are deterministic and participate in output hashing where specified;
+9. optional sensitivity/what-if calculations cannot publish CURRENT authoritative evidence unless the corresponding input mutation was actually committed;
+10. two ELV5 wrappers consuming the same exact ELV4 physical result preserve the same upstream evaluation ID/hash and cannot create discipline-reduced physical totals;
+11. host locale/timezone changes do not alter deterministic kernel output, input fingerprint or output hash;
+12. a process-specific kernel cannot bypass centralized verdict derivation to turn PARTIAL/BLOCKED/UNRESOLVED into PASS.
 
 ## Exact wire/codec qualification
 
@@ -110,7 +132,7 @@ The initial ELV5 runtime has exactly 16 public discipline command codecs under `
 Hardened operation coverage specifically includes:
 
 - CCTV stream subscriptions + transport overhead model ref;
-- recording temporal policy/tzdb/reserve/redundancy/policy basis;
+- recording temporal policy/tzdb/rules-evidence/reserve/redundancy/policy basis;
 - ACS safety mode + release truth table.
 
 ## Engineering primitive qualification
@@ -125,22 +147,22 @@ P8 executes L0 regression coverage from [engineering-primitives-contract.md](eng
 - stable canonical hash under unordered map/set insertion order;
 - ordered path/sequence hash sensitivity;
 - output hash independence from evaluation ID/timestamp;
-- deterministic timezone/DST policy;
+- deterministic timezone/DST captured-rules policy;
 - mixed coordinate-frame rejection without captured transform.
 
 ## Process qualification highlights
 
 ### CCTV
 
-P8 includes bounded H/V FOV, frame mismatch, unicast/multicast copy accounting, payload-vs-wire-rate separation, schedule union/tzdb, expected-vs-guaranteed retention, one-time reserve/redundancy, channel-accounting alternatives and shared PWR-06 contribution evidence.
+P8 includes bounded H/V FOV, frame mismatch, unicast/multicast copy accounting, governing-edge peak utilization, payload-vs-wire-rate separation, schedule union/tzdb, expected-vs-guaranteed retention, one-time reserve/redundancy, channel-accounting alternatives, recorder limiting dimension and shared PWR-06 contribution evidence.
 
 ### LAN
 
-P8 includes exact-limit/over-limit link lengths, spare ceilings, weakest-section compatibility, bidirectional sensitivity/overload, dB/dBm separation, optional reach claim isolation, rack gross/net equivalence and ELV6 layout `NOT_ASSESSED` sentinel.
+P8 includes exact-limit/over-limit link lengths, spare ceilings, weakest-section compatibility with limiting-section identity, bidirectional sensitivity/overload with smallest signed optical margin, dB/dBm separation, optional reach claim isolation, rack gross/net equivalence and ELV6 layout `NOT_ASSESSED` sentinel.
 
 ### ACS
 
-P8 includes role alternatives, separate resource pools, lock state/startup/shared trunk, shared supply/bank, and ACS-06 truth-table cases for:
+P8 includes role alternatives, separate resource pools, holding/active/startup shared-trunk cases, shared supply/bank, governing temporal event and ACS-06 truth-table cases for:
 
 ```text
 NORMAL_ACCESS
@@ -154,7 +176,7 @@ with at least one fail-safe and one fail-secure/project-defined fixture. Technic
 
 ### Fire
 
-P8 includes expanded address-set collisions, partial state-current evidence, supported-vs-unsupported electrical model, complete shared source/bank loads, explicit standby/alarm durations, notification active/startup current + terminal voltage, signal-loop closure/branch policy and policy-match-vs-certified-compliance separation.
+P8 includes expanded address-set collisions, partial standby/alarm/startup evidence, supported-vs-unsupported electrical model, complete shared source/bank loads, explicit standby/alarm durations, governing energy/current segment, notification active/startup current + terminal voltage, signal-loop closure/branch/fault-state policy and policy-match-vs-certified-compliance separation.
 
 ## Persistence/restart proof
 
@@ -168,8 +190,9 @@ All P2/P7/P8 persistence evidence uses real temporary file SQLite. After close/r
 - command ledger canonical request/logical response evidence;
 - complete forward/inverse history and cursor;
 - immutable evaluation input/output hashes;
+- operating-case results, governing-case codes, limiting factors and deterministic trace projection required by the result schema;
 - pointer generation/freshness/evaluation IDs;
-- reverse dependency keys including SET/MISSING markers;
+- reverse dependency keys including SET/MISSING/selector markers;
 - snapshot discipline section and manifest `disciplineHash`.
 
 In-memory-only tests cannot close P2/P7/P8.
@@ -219,6 +242,8 @@ P8 must fail if runtime ever produces any of these implications:
 ```text
 unsupported model -> PASS
 missing mandatory input -> PASS
+interval overlaps threshold -> PASS without an explicit supported comparison rule
+typical/estimated evidence -> guaranteed-bound PASS
 stale old PASS -> current PASS
 fictional/project policy -> verified jurisdictional compliance
 LAN-06 RU basis -> actual rack fit PASS
@@ -228,6 +253,7 @@ CCTV pixel density -> DORI/legal identification claim
 optical power budget -> reach/dispersion PASS without reach model
 ACS release topology -> verified legal egress compliance
 ELV5 discipline contribution -> shared physical source total
+what-if result -> CURRENT without committed input mutation
 old immutable evaluation -> retagged into new revision
 legacy pre-ELV5 snapshot -> captured-empty/current PASS
 ```
@@ -240,6 +266,6 @@ P8 executes deterministic supported-scale fixtures from the qualification contra
 
 ## Exit
 
-P8 closes only from executed public-command, file-SQLite, restart, migration, failure-injection, race/freeze and 54-process-oracle evidence at one tested source SHA.
+P8 closes only from executed public-command, file-SQLite, restart, migration, failure-injection, unified-engine invariant, race/freeze and 54-process-oracle evidence at one tested source SHA and matching authority fingerprint.
 
-Structural design validators—including the ELV5 specification/registry/example/hardening CI guards—prove design consistency only. They cannot be cited as runtime implementation acceptance.
+Structural design validators—including the ELV5 specification/registry/example/hardening/calculation-engine CI guards—prove design consistency only. They cannot be cited as runtime implementation acceptance.
