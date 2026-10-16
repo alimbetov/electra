@@ -38,9 +38,13 @@ jobs:
         working-directory: .
         run: bash scripts/ci/check-elv3-p7-p9-foundation.sh
 
-      - name: Verify ELV5 process and command registries
+      - name: Verify ELV5 process specification
         working-directory: .
         run: python3 scripts/ci/check-elv5-specification.py
+
+      - name: Verify ELV5 command registry
+        working-directory: .
+        run: python3 scripts/ci/check-elv5-command-registry.py
 
       - name: Verify ELV5 canonical command examples
         working-directory: .
