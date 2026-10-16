@@ -34,6 +34,7 @@ run_origin() {
   (
     cd "$worktree/apps/mobile"
     flutter pub get
+    dart run build_runner build --delete-conflicting-outputs
     ELV4_HISTORICAL_FIXTURE_OUT="$fixture" \
     ELV4_HISTORICAL_VERSION="$version" \
       flutter test --reporter expanded "$exporter_test"
