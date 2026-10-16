@@ -21,6 +21,7 @@ run_origin() {
   local sha="$2"
   local worktree="$tmp/worktree-v$version"
   local fixture="$tmp/elv4-v$version.sqlite"
+  local exporter_test="test/elv4_historical_fixture_export_test.dart"
 
   printf 'ELV4 historical migration v%s origin %s -> %s\n' \
     "$version" "$sha" "$current_sha"
@@ -28,12 +29,14 @@ run_origin() {
   git -C "$root" worktree add --detach "$worktree" "$sha" >/dev/null
   test "$(git -C "$worktree" rev-parse HEAD)" = "$sha"
 
-  mkdir -p "$worktree/apps/mobile/tool"
-  cp "$exporter" "$worktree/apps/mobile/tool/elv4_historical_fixture_export.dart"
+  mkdir -p "$worktree/apps/mobile/test"
+  cp "$exporter" "$worktree/apps/mobile/$exporter_test"
   (
     cd "$worktree/apps/mobile"
     flutter pub get
-    dart run tool/elv4_historical_fixture_export.dart "$fixture" "$version"
+    ELV4_HISTORICAL_FIXTURE_OUT="$fixture" \
+    ELV4_HISTORICAL_VERSION="$version" \
+      flutter test --reporter expanded "$exporter_test"
   )
   test -s "$fixture"
 
