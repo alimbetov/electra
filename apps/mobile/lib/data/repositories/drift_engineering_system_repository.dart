@@ -264,6 +264,13 @@ class DriftEngineeringSystemRepository implements EngineeringSystemRepository {
               )).getSingleOrNull();
         final role = membership.role.trim();
         if (old != null && old.deletedAt == null && old.role == role) return;
+        if (old != null && old.deletedAt == null && old.role != role) {
+          await guardSystemPowerOwnedMembership(
+            database,
+            membership.systemId,
+            membership.componentId,
+          );
+        }
         final now = DateTime.now().toUtc();
         await database
             .into(database.componentEngineeringMemberships)
