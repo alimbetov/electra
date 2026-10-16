@@ -25,13 +25,15 @@ The branch name is retained as requested. ELV5 is **discipline-specific engineer
 14. [Third-pass code-level engineering hardening](elv5-implementation/code-level-hardening-v2.md): strongly typed identities, explicit field-resolution algebra, bounded exact arithmetic, captured timezone-rule evidence, deterministic requirement merger, transient/simultaneity model, ACS release matrix, fire supervision/fault states, selector invalidation and bounded atomic publication. **Where it conflicts with older ELV5 wording, this document governs.**
 15. [Production source blueprint](elv5-implementation/production-source-blueprint.md): recommended Dart/Drift source tree, class/interface responsibilities, 16-handler mapping, capture/publish services, repository/UoW boundaries, UI projection and implementation slices. The performance contract adds the executor/scheduler/runtime-performance obligations.
 16. [Executable qualification contract](elv5-implementation/qualification-contract.md): L0–L6 test architecture, 54 primary process verticals, adversarial commands, failure/race/migration/freeze and false-PASS sentinels. Third/fourth-pass and unified-engine focused suites supplement rather than replace the 54 process verticals.
-17. [Machine-readable 16-command registry](elv5-implementation/command-registry.json), the exact schema/operation/payload-key authority subject to later normative hardening semantics.
-18. [Canonical command examples](elv5-implementation/command-examples.json), one valid payload and one deterministic rejection mutation for every registered ELV5 operation.
-19. [27-process contract registry](elv5-implementation/process-contracts.md) and [machine-readable process registry](elv5-implementation/process-registry.json).
-20. [Authority manifest generator](../../scripts/ci/generate-elv5-contract-manifest.py): emits an exact-head SHA-256 manifest/fingerprint over process, algorithm, command, requirement, all 27 code-level dossiers, oracle errata and performance contracts, and publishes it as a CI artifact.
-21. [Baseline and boundary audit](../audit/elv5-baseline-alignment-audit.md).
-22. [Initial technical audit](../audit/elv5-technical-audit.md), [second-pass engineering/architecture hardening audit](../audit/elv5-engineering-architecture-hardening-audit.md), [third-pass production-readiness audit](../audit/elv5-third-pass-production-readiness-audit.md) with its [machine-readable registry](../audit/elv5-third-pass-production-readiness-audit.json), and [fourth-pass algorithm/performance audit](../audit/elv5-fourth-pass-algorithm-performance-audit.md) with its [machine-readable registry](../audit/elv5-fourth-pass-algorithm-performance-audit.json).
-23. [Implemented baseline and extension contract](elv5-implementation/implemented-baseline.md) and [evidence manifest](elv5-implementation/baseline.json).
+17. [Normative requirements registry](elv5-implementation/normative-requirements-registry.json): binds the stable 80 P0–P9 requirement IDs to 42 cross-cutting MUST obligations introduced by hardening, performance and exact-oracle work.
+18. [450-case market simulation requirements](elv5-implementation/market-simulation-requirements.json), [market archetype catalog](elv5-implementation/market-simulation-catalog.json) and [simulation plan](elv5-implementation/market-simulation-450-plan.md): 12 additional design-simulation requirements, current manufacturer evidence anchors, exactly 450 deterministic market-shaped combinations across all 27 processes, all five vector classes and aggregate P0–P9 coverage. These files are stress evidence only; they cannot override process mathematics, create ELV7 compliance or select ELV8 products.
+19. [Machine-readable 16-command registry](elv5-implementation/command-registry.json), the exact schema/operation/payload-key authority subject to later normative hardening semantics.
+20. [Canonical command examples](elv5-implementation/command-examples.json), one valid payload and one deterministic rejection mutation for every registered ELV5 operation.
+21. [27-process contract registry](elv5-implementation/process-contracts.md) and [machine-readable process registry](elv5-implementation/process-registry.json).
+22. [Authority manifest generator](../../scripts/ci/generate-elv5-contract-manifest.py): emits an exact-head SHA-256 manifest/fingerprint over process, algorithm, command, stable requirements, normative obligations, market-simulation requirements/catalog, all 27 code-level dossiers, oracle errata and performance contracts, and publishes it as a CI artifact.
+23. [Baseline and boundary audit](../audit/elv5-baseline-alignment-audit.md).
+24. [Initial technical audit](../audit/elv5-technical-audit.md), [second-pass engineering/architecture hardening audit](../audit/elv5-engineering-architecture-hardening-audit.md), [third-pass production-readiness audit](../audit/elv5-third-pass-production-readiness-audit.md) with its [machine-readable registry](../audit/elv5-third-pass-production-readiness-audit.json), and [fourth-pass algorithm/performance audit](../audit/elv5-fourth-pass-algorithm-performance-audit.md) with its [machine-readable registry](../audit/elv5-fourth-pass-algorithm-performance-audit.json).
+25. [Implemented baseline and extension contract](elv5-implementation/implemented-baseline.md) and [evidence manifest](elv5-implementation/baseline.json).
 
 ## Authority and acceptance
 
@@ -45,10 +47,12 @@ Within ELV5 the precedence is explicit. Highest authority first:
 4. machine-readable command/process/algorithm registries for membership/key/solver inventories not superseded by later hardening;
 5. `process-contracts.md` plus the 27 process code-level dossiers as one calculation layer: process contracts own physical mathematical intent/claim boundaries; dossiers own the implementation-complete 25-section refinement and may not contradict higher-authority corrections;
 6. engineering primitives, typed process API, unified calculation engine, Flutter performance, schema-24 persistence and qualification contracts;
-7. base runtime contract and production source blueprint;
-8. package P0–P9 prose.
+7. stable requirement ledger plus the normative requirements registry;
+8. base runtime contract and production source blueprint;
+9. package P0–P9 prose;
+10. market-simulation requirements/catalog/plan as **stress and coverage evidence only**. Vendor facts can parameterize a scenario but cannot redefine a process equation, applicability rule, normative conclusion or procurement decision.
 
-A contradiction between active normative artifacts without an explicit higher-authority erratum is a specification failure, not a developer choice. P0 implementation entry therefore requires the generated authority fingerprint/manifest and CI consistency guards covering process/algorithm/command/requirement counts, all **27×25** process dossier sections, solver mappings, oracle corrections, payload inventories, registries, canonical format, performance contract and schema version.
+A contradiction between active normative artifacts without an explicit higher-authority erratum is a specification failure, not a developer choice. P0 implementation entry therefore requires the generated authority fingerprint/manifest and CI consistency guards covering process/algorithm/command/requirement counts, all **27×25** process dossier sections, solver mappings, oracle corrections, payload inventories, normative obligations, market-simulation contracts, canonical format, performance contract and schema version.
 
 Semantic changes require synchronized updates. Free-form package-local reinterpretation is a specification defect.
 
@@ -71,6 +75,8 @@ The fourth-pass algorithm/performance audit identified **15 HIGH + 4 MEDIUM** fi
 Total design findings resolved across the four audited passes: **56**. This count is specification hardening, not runtime fixes.
 
 The unified calculation-engine pass remains an architectural consolidation rather than a separate finding count. It standardizes how all 27 processes determine applicability, operating cases, conservative verdicts, engineering margins, governing cases, limiting factors, explanations and optional what-if results.
+
+The market-simulation layer adds **12 mandatory simulation requirements** and exactly **450 deterministic design scenarios**. These are neither new process codes nor runtime acceptance cases. They exist to prove that the active specification can represent realistic current-market combinations and catch recurring engineering mistakes before implementation is declared production-ready.
 
 ## Implementation-readiness gate
 
@@ -100,10 +106,12 @@ The following design artifacts are frozen enough to start P1/P2 implementation:
 - incremental recomputation, semantic result cache, cancellation/supersession/backpressure and deterministic parallel batch ordering;
 - bulk/indexed capture/publish and virtualized/targeted UI projection requirements;
 - L0–L6 qualification architecture and exact 54-entry primary process-oracle requirement plus mandatory third/fourth-pass/unified-engine suites;
+- **80 stable package requirements + 42 normative cross-cutting MUST obligations + 12 market-simulation MUST requirements** tracked separately so IDs remain stable while later hardening remains enforceable;
+- deterministic **450-case market-simulation matrix** with 27/27 process coverage, all five vector classes per process, current manufacturer evidence anchors, four project scales, P0–P9 aggregate coverage and structured engineer-error remediation;
 - profile-mode performance evidence using the existing scale fixtures and exact-head benchmark artifact;
-- exact-head CI authority manifest generation with SHA-256 fingerprints for process/algorithm/command/requirement inventories, all four dossier files, oracle errata and performance contracts.
+- exact-head CI authority manifest generation with SHA-256 fingerprints for process/algorithm/command/requirement inventories, normative and market requirements, all four dossier files, oracle errata and performance contracts.
 
-The generated manifest is **authority/design-entry evidence**, not runtime acceptance. Production P0/P9 source must record/verify the accepted authority fingerprint so an implementation cannot be closed against a different specification fingerprint.
+The generated authority manifest and market simulation are **design-entry evidence**, not runtime acceptance. Production P0/P9 source must record/verify the accepted authority fingerprint so an implementation cannot be closed against a different specification fingerprint.
 
 Remaining runtime artifacts are deliberately executable rather than prose:
 
@@ -112,6 +120,7 @@ Remaining runtime artifacts are deliberately executable rather than prose:
 - implement `Elv5CalculationExecutor`, native worker pool, web policy, scheduler, semantic cache and cancellation/backpressure boundaries;
 - implement the priority computational core first: CCTV-02, CCTV-03, LAN-01, LAN-05, ACS-03, ACS-04, ACS-05, FA-02, FA-04, FA-05, FA-06;
 - make ACS-03 executable reference tests use the corrected **23.51 V / +1.51 V** oracle;
+- bind production and qualification fixtures to the tracked market-simulation contracts where useful without promoting synthetic/market-envelope data to manufacturer guarantee;
 - publish the machine-readable `qualification-manifest.json` with exact fixtures/commands/statuses for all 54 primary POS/NEG entries plus focused third/fourth-pass/unified-engine suites;
 - execute schema/migration/restart, 16-codec adversarial, resource-limit, failure-injection, selector-invalidation, race/freeze, worker-determinism and cross-discipline vertical tests;
 - execute profile-mode scale/performance evidence and prove targeted UI rebuild/virtualization behavior;
