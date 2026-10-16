@@ -62,6 +62,8 @@ The second-pass engineering/architecture audit identified **10 HIGH + 4 MEDIUM**
 
 The third-pass production-readiness audit identified **11 HIGH + 4 MEDIUM** findings covering strongly typed identities, explicit missing/N-A/unsupported semantics, resource-bounded exact arithmetic, legal quantity algebra, reproducible timezone rules, measurement uncertainty, deterministic policy composition, transient simultaneity, ACS release completeness, fire supervision/fault states, negative dependency selectors, bounded atomic publication, review/result separation, diagnostic cardinality and authority-manifest drift protection. All 15 are `SPEC_RESOLVED / RUNTIME_NOT_IMPLEMENTED`.
 
+Total design findings resolved across the three passes: **37**. This historical subtotal is preserved as the exact third-pass CI invariant.
+
 The fourth-pass algorithm/performance audit identified **14 HIGH + 4 MEDIUM** findings covering per-process implementation dossier uniformity, exact equations/boundaries, governing/limiting rules, five-class vectors, algorithmic complexity, Flutter main-isolate isolation, web false-parallelism risk, deterministic parallelism, cancellation/backpressure, semantic result caching, DB N+1/query-plan risks, UI virtualization/rebuild scope, profile-mode performance evidence, atomic publish on worker failure, equation trace codes, cross-stage vectors, what-if isolation and regression policy. All 18 are `SPEC_RESOLVED / RUNTIME_NOT_IMPLEMENTED`.
 
 Total design findings resolved across the four audited passes: **55**. This count is specification hardening, not runtime fixes.
