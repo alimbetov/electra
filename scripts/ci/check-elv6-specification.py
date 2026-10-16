@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[2]
 PRODUCT = ROOT / 'docs/product'
 BASE = PRODUCT / 'elv6-implementation'
 AUDIT = ROOT / 'docs/audit/elv6-hard-technical-audit.md'
+AUDIT_ADDENDUM = ROOT / 'docs/audit/elv6-final-architecture-hardening.md'
 PINNED_ELV5 = 'ed7db01adb27ff184b0b8c91a710082fb9eafb9a'
 OLD_ELV5 = 'a20ae91ecbef1da0d16443201e48f7e1b99e8701'
 
@@ -93,13 +94,15 @@ def validate_boundary_documents():
     index = (PRODUCT / 'elv6-authoritative-spec-index.md').read_text()
     design = (PRODUCT / 'elv6-enclosure-layout-design-specification.md').read_text()
     runtime = (BASE / 'code-level-runtime-contract.md').read_text()
+    safety = (BASE / 'mutation-safety-contract.md').read_text()
     plan = (PRODUCT / 'elv6-p0-p9-delivery-plan.md').read_text()
     audit = AUDIT.read_text()
+    addendum = AUDIT_ADDENDUM.read_text()
     registry_text = (BASE / 'process-registry.json').read_text()
 
-    combined = '\n'.join([index, design, runtime, plan, registry_text])
+    combined = '\n'.join([index, design, runtime, safety, plan, registry_text])
     assert PINNED_ELV5 in index and PINNED_ELV5 in design and PINNED_ELV5 in runtime and PINNED_ELV5 in plan
-    assert OLD_ELV5 not in '\n'.join([index, design, runtime, plan]), 'ELV6 authoritative docs still pin obsolete ELV5 baseline'
+    assert OLD_ELV5 not in '\n'.join([index, design, runtime, safety, plan]), 'ELV6 authoritative docs still pin obsolete ELV5 baseline'
 
     for token in [
         'SIGNED_INTEGER_MICROMETRE_V1',
@@ -109,6 +112,8 @@ def validate_boundary_documents():
         'LAY-24',
         'ELV6_NOT_CAPTURED',
         'capture → pure kernel → guarded publication',
+        'SERVER_DERIVED_GEOMETRY',
+        'REFERENCED_MEMBER_REMOVAL',
     ]:
         assert token in combined, ('missing hardening token', token)
 
@@ -117,9 +122,9 @@ def validate_boundary_documents():
     assert 'normative' in design.lower()
     assert 'one active canonical writer' in index.lower()
 
-    audit_ids = re.findall(r'^### (ELV6-AUD-[0-9]{2})\b', audit, flags=re.M)
-    assert len(audit_ids) == len(set(audit_ids)) == 18
-    assert all(f'ELV6-AUD-{i:02d}' in audit_ids for i in range(1, 19))
+    audit_ids = re.findall(r'^###+ (ELV6-AUD-[0-9]{2})\b', audit + '\n' + addendum, flags=re.M)
+    assert len(audit_ids) == len(set(audit_ids)) == 20
+    assert all(f'ELV6-AUD-{i:02d}' in audit_ids for i in range(1, 21))
 
     validate_requirements(plan)
 
@@ -144,7 +149,9 @@ def validate_links():
         PRODUCT / 'elv6-p0-p9-delivery-plan.md',
         BASE / 'README.md',
         BASE / 'code-level-runtime-contract.md',
+        BASE / 'mutation-safety-contract.md',
         AUDIT,
+        AUDIT_ADDENDUM,
     ]
     checked = 0
     for file in documents:
@@ -164,7 +171,7 @@ def main():
     validate_boundary_documents()
     validate_repository_baseline()
     links = validate_links()
-    print(f'PASS: ELV6 24 processes, 80 P0-P9 requirements/acceptance clauses, 18 audit findings, {links} local links; design-only guard')
+    print(f'PASS: ELV6 24 processes, 80 P0-P9 requirements/acceptance clauses, 20 audit findings, {links} local links; design-only guard')
 
 
 if __name__ == '__main__':
