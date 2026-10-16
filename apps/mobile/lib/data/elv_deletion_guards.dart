@@ -38,7 +38,7 @@ Future<void> guardSystemElvTopology(
       throw StateError(
         'Release the profile binding before changing system participation.',
       );
-    await _guardPowerOwnedMembership(database, systemId, componentId);
+    await guardSystemPowerOwnedMembership(database, systemId, componentId);
   }
   final ports =
       componentId == null
@@ -71,7 +71,7 @@ Future<void> guardSystemElvTopology(
     );
 }
 
-Future<void> _guardPowerOwnedMembership(
+Future<void> guardSystemPowerOwnedMembership(
   AppDatabase database,
   String systemId,
   String componentId,
