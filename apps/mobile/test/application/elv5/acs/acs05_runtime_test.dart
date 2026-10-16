@@ -64,6 +64,30 @@ void main() {
     );
   });
 
+  test('blocks when PWR-04 consumed duration differs from contract', () async {
+    final pwr01 = _pwr01();
+    final pwr04 = _pwr04(
+      pwr01: pwr01,
+      inputFingerprint: _hash('a'),
+      durationSeconds: PowerRational.integer(7200),
+    );
+    final resolver = Acs05PersistedInputResolver(
+      contractSource: _ContractSource(_contract(_hash('a'))),
+      powerEvidence: _EvidenceSource(<Elv4CurrentEvaluationSnapshot>[pwr01, pwr04]),
+    );
+
+    await expectLater(
+      resolver.capture(_request()),
+      throwsA(
+        isA<Elv5CaptureBlockedException>().having(
+          (value) => value.reasonCode,
+          'reasonCode',
+          'ACS05_SEQUENCE_DURATION_MISMATCH',
+        ),
+      ),
+    );
+  });
+
   test('blocks when policy requires unsupported peak/EOD dimensions', () async {
     final pwr01 = _pwr01();
     final pwr04 = _pwr04(pwr01: pwr01, inputFingerprint: _hash('a'));
@@ -170,7 +194,9 @@ Elv4CurrentEvaluationSnapshot _pwr01() {
 Elv4CurrentEvaluationSnapshot _pwr04({
   required Elv4CurrentEvaluationSnapshot pwr01,
   required String inputFingerprint,
+  PowerRational? durationSeconds,
 }) {
+  final duration = durationSeconds ?? PowerRational.integer(3600);
   final key = PowerNodeKeyV2(
     revisionId: 'd',
     scenarioId: 'BACKUP',
@@ -195,9 +221,26 @@ Elv4CurrentEvaluationSnapshot _pwr04({
         'requiredWh': PowerRational.parseDecimal('19.2').toMap(),
         'availableWh': PowerRational.parseDecimal('134.4').toMap(),
         'marginWh': PowerRational.parseDecimal('115.2').toMap(),
-        'sequenceDurationSeconds': PowerRational.integer(3600).toMap(),
+        'sequenceDurationSeconds': duration.toMap(),
         'estimatedAutonomySeconds': null,
       },
+      'consumedFacts': <Object?>[
+        <String, Object?>{
+          'key': 'ignored-by-acs05-fixture',
+          'valueSchema': 'electra.elv4.backup-sequence.v1',
+          'presence': 'PRESENT',
+          'canonicalValueJson': canonicalEngineeringJsonV1(<String, Object?>{
+            'segments': <Object?>[
+              <String, Object?>{
+                'segmentId': 'standby',
+                'durationSeconds': duration.toMap(),
+                'bankInputW': PowerRational.parseDecimal('19.2').toMap(),
+              },
+            ],
+            'extensionPolicy': 'NONE',
+          }),
+        },
+      ],
       'consumedEvaluations': <Object?>[
         <String, Object?>{
           'logicalNodeKey': pwr01.nodeKey.encode(),
