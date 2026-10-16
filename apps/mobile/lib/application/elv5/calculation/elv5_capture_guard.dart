@@ -1,3 +1,6 @@
+import 'package:engineering_core/engineering_core_elv5.dart';
+
+import 'elv5_blocked_capture.dart';
 import 'elv5_calculation_runtime.dart';
 
 abstract interface class Elv5CaptureRevisionSource {
@@ -24,23 +27,31 @@ final class Elv5RevisionGuardedInputResolver<I>
   final Elv5CaptureRevisionSource revisions;
 
   @override
-  get processCode => inner.processCode;
+  Elv5ProcessCode get processCode => inner.processCode;
 
   @override
   Future<Elv5CapturedInput<I>> capture(Elv5CalculationRequest request) async {
-    final captured = await inner.capture(request);
-    final designRowRevision = await revisions.requireWorkingRevision(
-      projectId: request.projectId,
-      designRevisionId: request.designRevisionId,
-    );
-    return Elv5CapturedInput<I>(
-      request: captured.request,
-      value: captured.value,
-      inputFingerprint: captured.inputFingerprint,
-      policyFingerprint: captured.policyFingerprint,
-      dependencies: captured.dependencies,
-      upstreamPointerGenerations: captured.upstreamPointerGenerations,
-      captureRevision: designRowRevision,
-    );
+    try {
+      final captured = await inner.capture(request);
+      final designRowRevision = await revisions.requireWorkingRevision(
+        projectId: request.projectId,
+        designRevisionId: request.designRevisionId,
+      );
+      return Elv5CapturedInput<I>(
+        request: captured.request,
+        value: captured.value,
+        inputFingerprint: captured.inputFingerprint,
+        policyFingerprint: captured.policyFingerprint,
+        dependencies: captured.dependencies,
+        upstreamPointerGenerations: captured.upstreamPointerGenerations,
+        captureRevision: designRowRevision,
+      );
+    } on Elv5CaptureBlockedException catch (blocked) {
+      final designRowRevision = await revisions.requireWorkingRevision(
+        projectId: request.projectId,
+        designRevisionId: request.designRevisionId,
+      );
+      throw blocked.withCaptureRevision(designRowRevision);
+    }
   }
 }
