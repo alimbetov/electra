@@ -2,7 +2,8 @@ import 'package:engineering_core/engineering_core.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('PWR-01 PASS requires complete watt load/accounting, not solved A/VA', () {
+  test('PWR-01 PASS requires complete watt load/accounting, not solved A/VA',
+      () {
     final evidence = buildPowerDemandEvidence(
       evaluationId: 'pwr01-qualification',
       revisionId: 'revision-1',
