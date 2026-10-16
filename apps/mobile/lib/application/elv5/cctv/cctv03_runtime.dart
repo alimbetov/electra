@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:engineering_core/engineering_core_elv5.dart';
 
+import '../calculation/elv5_blocked_capture.dart';
 import '../calculation/elv5_calculation_runtime.dart';
 import '../calculation/elv5_kernel_executor.dart';
 import '../persistence/elv5_runtime_persistence.dart';
@@ -54,15 +55,54 @@ final class Cctv03PersistedInputResolver
       'schema': 'electra.elv5-cctv03-temporal-rules.v1',
       'temporalPolicy': temporal,
     });
+    final inputFingerprint = _encoder.sha256(<String, Object?>{
+      'schema': 'electra.elv5-cctv03-captured-input.v1',
+      'aggregateId': snapshot.aggregateId,
+      'aggregateRevision': snapshot.revision,
+      'payload': payload,
+    });
+    final policyFingerprint = _encoder.sha256(<String, Object?>{
+      'schema': 'electra.elv5-cctv03-policy-basis.v1',
+      'temporalPolicy': temporal,
+      'sizingBasis': payload['sizingBasis'],
+      'reserveMultiplier': payload['reserveMultiplier'],
+      'redundancyModel': payload['redundancyModel'],
+      'policyRef': payload['policyRef'],
+    });
 
     final intervalsByProfile = <String, List<Cctv03UtcInterval>>{};
     final scheduleSegments = _objectList(payload['scheduleSegments'], 'scheduleSegments');
     for (final segment in scheduleSegments) {
       final profileId = _text(segment, 'scheduleProfileId');
       if (segment['recurrence'] != null) {
-        throw StateError(
-          'CCTV03_RECURRENCE_EXPANDER_REQUIRED:$profileId:'
-          '${_text(temporal, 'tzdbVersion')}',
+        final dependencies = <Elv5DependencyMarker>[
+          _dependency(request, 'SET', 'CCTV_RECORDING_POOL', poolId),
+          _dependency(
+            request,
+            'SET',
+            'CCTV_RECORDING_SCHEDULE',
+            poolId,
+            memberId: profileId,
+          ),
+          if (payload['policyRef'] != null)
+            _dependency(request, 'POLICY', 'CCTV_RECORDING_POLICY', poolId),
+        ];
+        throw Elv5CaptureBlockedException(
+          request: request,
+          reasonCode: 'CCTV03_RECURRENCE_EXPANDER_REQUIRED',
+          inputFingerprint: inputFingerprint,
+          policyFingerprint: policyFingerprint,
+          dependencies: dependencies,
+          evidence: <String, Object?>{
+            'source': 'ELV5_PERSISTED_RECORDING_POOL',
+            'aggregateId': snapshot.aggregateId,
+            'aggregateRevision': snapshot.revision,
+            'scheduleProfileId': profileId,
+            'timeZoneId': _text(temporal, 'timeZoneId'),
+            'tzdbVersion': _text(temporal, 'tzdbVersion'),
+            'temporalRulesHash': temporalHash,
+            'requiredCapability': 'PINNED_TZDB_RECURRENCE_EXPANDER',
+          },
         );
       }
       final absolute = _map(segment['absoluteWindow'], 'absoluteWindow');
@@ -84,7 +124,11 @@ final class Cctv03PersistedInputResolver
       final upperText = assignment['upperBoundBitrateBps'];
       final upper = upperText == null
           ? null
-          : BitRate(Elv5Rational.parseDecimal(_decimal(assignment, 'upperBoundBitrateBps')));
+          : BitRate(
+              Elv5Rational.parseDecimal(
+                _decimal(assignment, 'upperBoundBitrateBps'),
+              ),
+            );
       final candidate = Cctv03StreamRate(
         streamId: streamId,
         expectedBitRate: expected,
@@ -138,7 +182,9 @@ final class Cctv03PersistedInputResolver
       sizingBasis: sizingBasis,
       streamRates: rates.values,
       assignments: assignments,
-      reserveMultiplier: Elv5Rational.parseDecimal(_decimal(payload, 'reserveMultiplier')),
+      reserveMultiplier: Elv5Rational.parseDecimal(
+        _decimal(payload, 'reserveMultiplier'),
+      ),
       redundancy: redundancy,
     );
 
@@ -167,20 +213,8 @@ final class Cctv03PersistedInputResolver
     return Elv5CapturedInput<Cctv03Input>(
       request: request,
       value: input,
-      inputFingerprint: _encoder.sha256(<String, Object?>{
-        'schema': 'electra.elv5-cctv03-captured-input.v1',
-        'aggregateId': snapshot.aggregateId,
-        'aggregateRevision': snapshot.revision,
-        'payload': payload,
-      }),
-      policyFingerprint: _encoder.sha256(<String, Object?>{
-        'schema': 'electra.elv5-cctv03-policy-basis.v1',
-        'temporalPolicy': temporal,
-        'sizingBasis': payload['sizingBasis'],
-        'reserveMultiplier': payload['reserveMultiplier'],
-        'redundancyModel': payload['redundancyModel'],
-        'policyRef': payload['policyRef'],
-      }),
+      inputFingerprint: inputFingerprint,
+      policyFingerprint: policyFingerprint,
       dependencies: dependencies,
       upstreamPointerGenerations: const <String, int>{},
       captureRevision: snapshot.revision,
