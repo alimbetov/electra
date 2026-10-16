@@ -2,75 +2,103 @@
 
 Status: DESIGN DRAFT / RUNTIME NOT STARTED
 Branch: `feat/flutter-elv7-normative-validation-design`
-Pinned upstream ELV6: `5dc25c34c1ec506ea79f0c9e7225952fa3553142`
+Pinned upstream ELV6 at branch creation: `5dc25c34c1ec506ea79f0c9e7225952fa3553142`
 Entry: [authoritative index](elv7-authoritative-spec-index.md).
+Baseline inventory: [ELV Normative Standards Matrix](elv-normative-standards-matrix.md).
 
 ## 1. Purpose
 
 ELV7 turns versioned engineering evidence into reproducible normative assessments. It must answer:
 
-- which exact normative profile and editions were adopted for the project/revision;
-- which rules apply to each subject and why;
+- which exact normative profile/edition was adopted for the project revision;
+- which standard/rule editions were in force for the validation-as-of date;
+- which precedence/rule-class relationship made a rule applicable or dominant;
 - which exact upstream facts/evaluations were consumed;
 - which rules are satisfied, violated, not applicable, not evaluable or require manual review;
 - what source/jurisdiction/clause metadata supports each rule;
-- which findings remain open, have an approved deviation or were superseded by a new validation run;
-- how a profile or project change invalidates only the affected rule closure;
-- whether a historical compliance statement can be reproduced byte-for-byte from the pinned snapshot.
+- which findings remain open or have an approved disposition;
+- how project/profile changes invalidate only affected rule closures;
+- whether historical validation can be reproduced from pinned evidence.
 
 ELV7 never mutates upstream design merely to make validation pass.
 
-## 2. Reuse and ownership
+## 2. Existing normative architecture is the baseline
 
-| Owner | ELV7 consumes | ELV7 must not own |
+`docs/product/elv-normative-standards-matrix.md` already defines the architecture-level `NormativeProfile` concept, jurisdiction, edition/effective dates, standard references, precedence, discipline bindings, project overrides, rule classes, explicit profile adoption, standards lifecycle and copyright boundary.
+
+ELV7 operationalizes that model. It must not create a second incompatible profile aggregate or silently rename semantics without a migration decision.
+
+The existing rule classes remain canonical unless P1 explicitly proves a migration:
+
+```text
+LEGAL_MANDATORY
+NATIONAL_STANDARD
+ADOPTED_INTERNATIONAL
+CONTRACTUAL
+MANUFACTURER_MANDATORY
+ENGINEERING_RECOMMENDATION
+PROJECT_POLICY
+```
+
+The existing architectural priority principle also remains: lower-priority/contractual/manufacturer/project rules cannot silently weaken higher-priority mandatory jurisdictional requirements.
+
+The standards matrix is an inventory/design baseline, **not production source verification**. Every production `VERIFIED_EXTERNAL` source/rule pack must be checked against authoritative official material for exact edition, status, applicability and effective dates before release.
+
+## 3. Ownership and upstream reuse
+
+| Owner/baseline | ELV7 consumes | ELV7 must not duplicate |
 |---|---|---|
+| Standards matrix | `NormativeProfile`, `StandardReference`, precedence, rule class, lifecycle principles | second profile/rule-class taxonomy |
 | ELV2 | immutable definitions/editions and explicit adoption | component/catalog definition identity |
 | ELV3 | physical cable/run/pathway evidence | routing, length or allocation |
 | ELV4 | power/PoE/UPS/battery evidence | electrical sizing algorithms |
-| ELV5 | CCTV/LAN/ACS/Fire discipline results and policy evidence | discipline calculations |
-| ELV6 | rack/enclosure/layout/fit projection | layout placement or solver |
+| ELV5 | CCTV/LAN/ACS/Fire discipline results/policies | discipline calculations |
+| ELV6 | owner-neutral rack/enclosure/layout/fit projection | layout placement/solver |
 | Shared runtime | revision, freeze, history, replay, UoW, command result | competing lifecycle subsystem |
 
-ELV7 owns rule-pack metadata, project profile adoption, applicability, validation executions, outcomes/findings, evidence links and deviation/waiver records.
+ELV7 owns executable rule-pack metadata, project profile edition binding, applicability/precedence resolution, validation runs/outcomes/findings, evidence links, manual reviews and deviations.
 
-## 3. Profile and source model
+## 4. Canonical profile and source model
 
-### 3.1 Stable identities
+### 4.1 Stable identities
 
-Conceptual value types:
+Conceptual types:
 
 ```dart
 typedef NormativeProfileId = String;
 typedef NormativeProfileEditionId = String;
-typedef NormativeSourceId = String;
+typedef StandardReferenceId = String;
 typedef NormativeRulePackId = String;
 typedef NormativeRuleId = String;
 typedef ValidationRunId = String;
-typedef ValidationOutcomeId = String;
 typedef ValidationFindingId = String;
 typedef DeviationId = String;
 ```
 
-Stable rule identity is independent from database row identity. A semantic rule change that can alter applicability/result requires a new rule revision/version; silent in-place mutation is forbidden.
+A semantic change that can alter applicability/result/precedence requires a new immutable edition/revision; no silent in-place mutation.
 
-### 3.2 Normative source
+### 4.2 Standard/normative source reference
 
-`NormativeSourceRef` records provenance without requiring copyrighted body text:
+Executable ELV7 source metadata is a hardened form of the existing `StandardReference`:
 
 ```text
 sourceId
-authority / publisher
-jurisdiction
-sourceKind
+issuer / authority / publisher
+standardCode?
 canonicalTitle
 edition / revision
+status: ACTIVE | SUPERSEDED | WITHDRAWN | DRAFT | PROJECT
+jurisdiction
+applicabilityScope
+ruleClass
 publicationDate?
 effectiveFrom?
 effectiveUntil?
 sourceLocator
 clauseRef?
+supersedes / supersededBy refs
 licensedExcerptRef?
-sourceContentHash?          // only for legally stored source material
+sourceContentHash?          // only for legally stored material
 licenseMetadata?
 verificationStatus
 verifiedBy?
@@ -87,30 +115,35 @@ VERIFIED_EXTERNAL
 RETIRED
 ```
 
-`VERIFIED_EXTERNAL` means source provenance/edition mapping has been reviewed according to project governance. It is not a legal guarantee by itself.
+`VERIFIED_EXTERNAL` means provenance/edition mapping has been reviewed according to product governance. It is not by itself a legal guarantee.
 
-### 3.3 Normative profile edition
+### 4.3 Normative profile edition
 
-A project adopts an immutable `NormativeProfileEdition`, which contains exact ordered references to rule-pack editions plus jurisdiction/applicability context.
+One immutable `NormativeProfileEdition` refines the matrix model:
 
 ```text
 profileId
 editionId
 semanticVersion
-jurisdictionContext
-rulePackEditionRefs
-conflictResolutionPolicyVersion
+jurisdiction
+profileEffectiveFrom?
+profileEffectiveUntil?
+standardReferenceIds[]
+rulePackEditionRefs[]
+precedencePolicyVersion
+disciplineBindings
+projectOverridePolicy
 createdAt
 publishedAt?
 status: DRAFT | PUBLISHED | RETIRED
 canonicalHash
 ```
 
-Published editions are immutable. A correction creates another edition.
+Published editions are immutable. Corrections create new editions.
 
-### 3.4 Project adoption
+### 4.4 Project adoption
 
-`ProjectNormativeProfileBinding` is revision-scoped and explicit:
+`ProjectNormativeProfileBinding` is explicit and revision-scoped:
 
 ```text
 projectId
@@ -123,11 +156,9 @@ expectedProfileHash
 validationAsOfDate
 ```
 
-Historical revisions never follow a newer profile automatically.
+Historical revisions never follow a newer profile automatically. Profile upgrade requires impact preview and explicit adoption.
 
-## 4. Rule model
-
-### 4.1 Rule metadata
+## 5. Rule model
 
 Every rule must declare:
 
@@ -135,11 +166,15 @@ Every rule must declare:
 ruleId
 ruleRevision
 packEditionId
-discipline / domain
 sourceRef + clauseRef
+ruleClass
+precedenceRank / precedence relation
+discipline / domain
 shortTitle
+obligation
 severityDefault
 applicabilitySpec
+consumedApplicabilityFactKeys
 consumedFactKeys
 checkerId + checkerVersion
 parameterSet
@@ -147,22 +182,22 @@ manualReviewRequirement?
 resultAggregationGroup?
 ```
 
-The rule itself is not identified by translated display text.
+Translated display text is never rule identity.
 
-### 4.2 Rule implementation strategy
+### 5.1 Rule implementation strategy
 
-Initial implementation uses typed pure-Dart checkers registered by stable `checkerId`. Data supplies thresholds, enumerations and applicability parameters. A constrained declarative predicate representation may be added for simple comparisons/set-membership only if it is versioned, total and non-executable.
+Initial implementation uses typed pure-Dart checkers registered by stable ID/version. Data supplies thresholds, enums, applicability and source metadata. A constrained declarative predicate representation may support simple comparison/set-membership only if it is versioned, total and non-executable.
 
 Forbidden:
 
 - arbitrary user code/eval;
-- string formulas interpreted at runtime;
-- jurisdiction logic inside Flutter widgets;
+- runtime string formulas;
+- jurisdiction logic in Flutter widgets/controllers/repositories;
 - one giant `switch(jurisdiction)`;
 - database triggers implementing engineering rules;
 - network calls from a checker.
 
-Recommended shape:
+Recommended core boundary:
 
 ```dart
 abstract interface class NormativeRuleChecker<I extends RuleInput, O extends RuleResult> {
@@ -178,23 +213,13 @@ abstract interface class NormativeRuleProvider {
 }
 ```
 
-Registration must reject duplicate `(checkerId, checkerVersion)` and duplicate active `(ruleId, ruleRevision)` definitions.
+Registration rejects duplicate `(checkerId, checkerVersion)` and active `(ruleId, ruleRevision)` conflicts.
 
-## 5. Applicability model
+## 6. Applicability
 
-Applicability is evaluated before rule checking and is deterministic. It may depend on declared facts such as:
+Applicability is deterministic and evaluated before the checker. It may use only declared facts such as discipline, subject kind, project/building classification, environment, topology/layout state, jurisdiction context, validation date and explicit project classification inputs.
 
-- discipline;
-- equipment/subject kind;
-- occupancy/project classification already present as project facts;
-- installation environment;
-- topology/layout state;
-- jurisdiction context;
-- effective validation date;
-- exact adopted technical profile/capability;
-- explicit project classification inputs.
-
-Applicability outcome:
+Outcome:
 
 ```text
 APPLICABLE
@@ -202,13 +227,30 @@ NOT_APPLICABLE
 UNRESOLVED
 ```
 
-`UNRESOLVED` means required applicability evidence is missing/ambiguous; the rule cannot be silently skipped.
+`UNRESOLVED` means required applicability evidence is missing/ambiguous and the rule cannot be silently skipped.
 
-No rule may read undeclared ambient project state. The consumed applicability fact keys are part of its dependency contract.
+No rule may read undeclared ambient project state.
 
-## 6. Validation outcome semantics
+## 7. Precedence and rule composition
 
-Per applicable rule and subject, exact outcome state is one of:
+ELV7 must implement the existing standards-matrix precedence principle explicitly rather than relying on load order.
+
+The resolution model supports:
+
+- independent simultaneous obligations;
+- higher-priority mandatory dominance where rules conflict;
+- scoped supersession/override with explicit source relation;
+- profile-level exclusion;
+- contractual/project/manufacturer additions that tighten but do not weaken mandatory rules;
+- unresolved contradiction requiring engineer review.
+
+For monotonic numeric requirement families a profile may define `max`, `min`, intersection or another composition operation. Composition is **per requirement family**. There is no universal `max()` across mode-dependent/non-monotonic obligations.
+
+Every precedence/composition decision is recorded in validation provenance.
+
+## 8. Validation outcome semantics
+
+Per applicable rule/subject:
 
 ```text
 SATISFIED
@@ -217,44 +259,31 @@ NOT_EVALUABLE
 MANUAL_REVIEW
 ```
 
-`NOT_APPLICABLE` is stored at applicability level, not disguised as SATISFIED.
+`NOT_APPLICABLE` belongs to applicability, not SATISFIED.
 
-A rule can emit one or more structured findings. Each finding contains:
+Each structured finding contains:
 
 ```text
 findingId
 runId
 ruleId / ruleRevision
 subjectRef
-severity
+ruleClass / obligation / severity
 outcome
 messageCode
 measuredFacts
 requiredFacts / threshold facts
 consumedEvidenceRefs
 sourceRef / clauseRef
+precedence/composition evidence
 stableSortKey
 ```
 
-Translated prose is presentation. `messageCode` and structured arguments are canonical.
+### 8.1 Severity and obligation
 
-### 6.1 Overall compliance status
+Severity remains separate from legal/contractual precedence and obligation.
 
-At a defined validation scope:
-
-- `FAIL` if any mandatory applicable rule is `VIOLATED` and not dispositioned according to the selected reporting policy;
-- `BLOCKED` if any mandatory rule has unresolved applicability, `NOT_EVALUABLE` or unresolved required `MANUAL_REVIEW`;
-- `PASS_WITH_DEVIATIONS` only when all mandatory applicable rules are otherwise evaluable and every violation is covered by an active explicitly approved deviation allowed by reporting policy;
-- `PASS` only when all mandatory applicable rules are satisfied and required manual reviews are accepted with evidence;
-- optional/advisory findings do not upgrade a blocked mandatory scope to PASS.
-
-The raw rule outcome never changes when a deviation is approved.
-
-## 7. Severity and obligation
-
-Keep severity separate from mandatory/optional obligation.
-
-Suggested severities:
+Suggested severity:
 
 ```text
 CRITICAL
@@ -271,11 +300,22 @@ CONDITIONAL
 ADVISORY
 ```
 
-Aggregation policy is profile-versioned. UI must not infer project compliance merely from icon color or severity count.
+A `LEGAL_MANDATORY` rule is not represented merely as a red icon; its class/precedence remains explicit data.
 
-## 8. Evidence projection
+### 8.2 Aggregate status
 
-ELV7 uses versioned adapters from upstream stages. A validation fact is immutable and traceable:
+At a declared scope:
+
+- `FAIL`: an applicable mandatory rule is violated and not validly dispositioned according to reporting policy;
+- `BLOCKED`: mandatory applicability/evidence/manual review is unresolved;
+- `PASS_WITH_DEVIATIONS`: all mandatory rules are evaluable and every allowed violation has an active approved deviation;
+- `PASS`: all mandatory applicable rules are satisfied and required manual reviews are accepted with evidence.
+
+Optional/advisory findings never upgrade a blocked mandatory scope to PASS. Raw outcomes never change when a deviation is approved.
+
+## 9. Evidence projection
+
+ELV7 consumes versioned immutable projections from upstream owners:
 
 ```text
 factKey
@@ -290,13 +330,13 @@ capturedAt
 projectionVersion
 ```
 
-Examples include installed cable length, power reserve, discipline calculation status, rack occupancy, battery service envelope and cable-entry capacity. ELV7 must use the authoritative owner projection; it must not query UI providers and rebuild facts ad hoc.
+Examples: installed cable length, power reserve, discipline result, rack/DIN utilization, battery service envelope and cable-entry capacity.
 
-If an upstream source is stale, that stale state is part of validation evidence and can block rules requiring current evidence.
+If upstream evidence is stale, that state is part of validation evidence and can block rules requiring current facts.
 
-## 9. Dependency graph and incremental validation
+## 10. Dependency graph and incremental validation
 
-Each rule declares consumed fact keys and applicability fact keys. Maintain reverse indexes:
+Each rule declares applicability/consumed fact keys. Maintain reverse dependencies:
 
 ```text
 factKey -> rule IDs
@@ -304,35 +344,18 @@ rule ID -> target selector
 subject mutation -> affected fact keys
 ```
 
-An upstream change invalidates the union of old/new affected facts and rules. Historical runs remain immutable; only current validation pointers become stale.
+An upstream change invalidates union(old,new) closures. Historical runs remain immutable; current pointers become stale.
 
 Examples:
 
-- moving one rack item invalidates layout-dependent rules on that enclosure, not unrelated CCTV storage rules;
-- changing an adopted profile invalidates all outcomes governed by changed/added/removed rule definitions;
-- changing one cable route invalidates rules consuming that cable/run/pathway facts;
-- changing a product display label without a consumed technical fact does not invalidate validation.
-
-## 10. Conflict and precedence between rules
-
-Rule packs may overlap. Conflict handling is explicit and versioned; never silently choose the last rule loaded.
-
-The resolution model must represent at least:
-
-- independent simultaneous obligations;
-- scoped override/supersession with explicit source relationship;
-- profile-level exclusion;
-- unresolved contradiction requiring engineer review.
-
-For monotonic numeric minimum/maximum requirements, a profile may define composition semantics, but this must be encoded per requirement family. ELV7 must not apply a universal `max()` to non-monotonic or mode-dependent rules.
-
-Every resolved relationship is visible in validation provenance.
+- one rack move invalidates rules consuming that host/layout, not unrelated CCTV retention rules;
+- profile edition change invalidates changed/added/removed rule definitions and affected targets;
+- cable route change invalidates only rules consuming that cable/pathway evidence;
+- display-label-only change does not invalidate technical validation.
 
 ## 11. Manual review
 
-Some requirements are inherently qualitative or outside available project facts. They use a typed manual-review obligation rather than a fake boolean calculation.
-
-`ManualReviewRecord` minimum:
+Qualitative/out-of-model obligations use a typed manual-review record, not fake boolean PASS:
 
 ```text
 run/rule/subject
@@ -344,11 +367,16 @@ evidenceAttachmentRefs
 expectedFindingRevision
 ```
 
-Acceptance of manual review is auditable and revision-aware. It does not mutate the encoded rule.
+Manual review is auditable/revision-aware and does not mutate the encoded rule.
 
-## 12. Deviations and waivers
+## 12. Profile override versus finding deviation
 
-`DeviationRecord` is an overlay on raw outcomes:
+Two different concepts must not be conflated:
+
+1. **profile/project override**: part of profile composition/adoption and subject to precedence rules; it cannot weaken higher-priority mandatory requirements;
+2. **finding deviation/waiver**: post-evaluation disposition of a concrete finding.
+
+`DeviationRecord` minimum:
 
 ```text
 deviationId
@@ -365,13 +393,11 @@ attachmentRefs
 expectedFindingFingerprint
 ```
 
-Changing the underlying finding/evidence marks the deviation stale unless its exact scope contract still matches. A stale deviation cannot suppress a new violation.
+Changed underlying evidence can stale the deviation. A stale deviation cannot suppress a new finding. Findings are never destructively deleted to mean resolved.
 
-No destructive “resolve finding = delete finding” workflow is allowed.
+## 13. Validation run/publication
 
-## 13. Validation run and publication
-
-A `ValidationRun` records:
+A run records:
 
 ```text
 project/revision
@@ -385,46 +411,41 @@ summary status
 canonical outcome hash
 ```
 
-Recommended flow:
+Publication flow:
 
-1. capture exact revision/profile/projection manifest;
-2. resolve targets and applicability;
-3. execute pure checkers outside transaction where safe;
-4. revalidate expected fingerprints/generations;
-5. atomically publish immutable run + outcomes + findings + reverse-index metadata + current pointer;
-6. if dependencies changed, discard/retry rather than publish stale PASS.
+1. capture exact revision/profile/source/projection manifest;
+2. resolve targets, applicability and precedence;
+3. execute pure checkers;
+4. aggregate outcomes;
+5. revalidate expected fingerprints/generations;
+6. atomically publish immutable run/outcomes/findings/evidence/reverse-index + current pointer;
+7. if dependencies changed, discard/retry instead of publishing stale PASS.
 
 No durable `RUNNING` current-compliance record is authoritative.
 
 ## 14. Commands
 
-Proposed public command families:
+Proposed command families:
 
 ```text
-CreateNormativeProfile
 CreateNormativeProfileEdition
-AddRulePackToProfileEdition
+Add/RemoveRulePackFromProfileEdition
 PublishNormativeProfileEdition
 RetireNormativeProfileEdition
 AdoptProjectNormativeProfile
 ReleaseProjectNormativeProfile
 RunNormativeValidation
-RecordManualReview
-ApproveManualReview
-RejectManualReview
-CreateDeviation
-ApproveDeviation
-RejectDeviation
-ExpireDeviation
+Record/Approve/RejectManualReview
+Create/Approve/Reject/ExpireDeviation
 ```
 
-Exact wire operation registry is frozen in P2. Profile/rule catalog maintenance may use a separate administrative boundary if later backend governance requires it; mobile project commands must remain usable offline for adopted/cached editions.
+P0/P1 reconcile these names with any existing reference/profile APIs before P2 freezes the wire registry. Profile/rule catalog administration may later move to backend governance; project use of cached/adopted editions remains offline-capable.
 
 All project mutations reuse existing command ID, replay-before-precondition, history and UoW semantics.
 
 ## 15. Persistence
 
-Proposed normalized Drift family:
+Proposed normalized family, subject to P0 schema audit:
 
 ```text
 normative_source
@@ -447,24 +468,24 @@ normative_validation_pointer
 
 Requirements:
 
-- immutable published profile/rule editions;
-- stable rule identity and explicit revision;
-- canonical hashes for editions/runs;
+- reuse any existing exact normative/profile identity discovered by P0; no duplicate profile truth;
+- immutable published editions/runs;
+- stable rule identity/revision and canonical hashes;
 - exact project/revision scope;
-- indexes by profile edition, rule, subject and outcome;
 - no finding overwrite across runs;
-- exact foreign keys for ELV7-owned rows and typed cross-stage refs for upstream evidence;
-- source text/excerpts stored outside relational core when large/licensed; DB stores metadata/file reference/hash;
-- historical profile editions remain readable after retirement.
+- typed cross-stage evidence refs;
+- large/licensed source text stored as controlled attachment/file resources, with metadata/hash in DB;
+- retired/superseded editions remain historically readable.
 
-## 16. Pure-core and application boundaries
+## 16. Core/application boundary
 
-Expected shape:
+Expected additive shape after baseline inventory:
 
 ```text
 packages/engineering_core/lib/src/elv7/
   profiles/
   sources/
+  precedence/
   rules/
   applicability/
   validation/
@@ -483,34 +504,34 @@ apps/mobile/lib/data/repositories/
   drift_elv7_validation_repository.dart
 ```
 
-Pure rule evaluation cannot depend on Flutter, Drift, HTTP or filesystem APIs.
+Actual existing profile/reference filenames discovered in P0 are reused rather than wrapped unnecessarily. Pure validation cannot depend on Flutter, Drift, HTTP or filesystem APIs.
 
 ## 17. Workspace UX
 
 Required engineer workflow:
 
-- show adopted profile edition, jurisdiction context and validation-as-of date;
-- explicit “adopt new edition” impact preview, never automatic upgrade;
-- dashboard by scope/discipline/subject/rule/severity/outcome;
-- distinguish `VIOLATED`, `NOT_EVALUABLE`, `MANUAL_REVIEW`, stale and deviation states;
-- navigate from finding to exact upstream entity/evidence;
-- inspect source/citation metadata and checker/version/inputs;
-- before/after comparison between validation runs;
-- manual-review evidence workflow;
-- deviation approval/history workflow;
+- adopted profile edition, jurisdiction, precedence summary and validation date visible;
+- explicit impact preview before profile upgrade;
+- dashboard by scope/discipline/subject/rule class/outcome/severity;
+- distinguish violation, not-evaluable, manual-review, stale and deviation states;
+- navigate finding → exact upstream entity/evidence;
+- inspect source/clause/checker/parameters/precedence resolution;
+- compare validation runs;
+- manual-review and deviation history;
 - frozen historical read-only mode;
-- offline access to adopted profile metadata/rules required for validation.
+- offline access to adopted profile/rules required for validation.
 
-A green summary must be impossible when mandatory evidence is unresolved.
+A green summary is impossible when mandatory evidence is unresolved.
 
 ## 18. Handoff to ELV8
 
-ELV7 exports an immutable validation projection containing:
+ELV7 exports immutable validation evidence:
 
 ```text
 profile edition/hash
 validation run/hash
-rule outcomes and obligation
+rule class / obligation / outcome
+precedence/composition evidence
 open/approved/stale deviations
 hard technical selection constraints derived from explicit rules
 subject/evidence refs
@@ -519,53 +540,47 @@ manual-review state
 summary by deliverable scope
 ```
 
-ELV8 may use verified hard constraints to filter products, but it cannot reinterpret a violation as acceptable. A selected product that changes technical facts triggers targeted revalidation and cannot silently retain the previous ELV7 PASS.
+ELV8 may use verified hard constraints to filter products but cannot reinterpret a violation as compliant. Product selection that changes technical facts triggers targeted revalidation.
 
-## 19. Acceptance requirements
+## 19. Qualification requirements
 
 Runtime closure requires at least:
 
-1. exact profile edition adoption and restart persistence;
-2. immutable published edition proof;
-3. effective-date/applicability positive and unresolved fixtures;
-4. deterministic pure checker results and stable ordering;
-5. duplicate checker/rule registration rejection;
-6. verified versus project-authored source labeling proof;
-7. mandatory missing evidence => `BLOCKED`, never PASS;
-8. manual-review lifecycle proof;
-9. deviation does not mutate raw finding proof;
-10. stale deviation after evidence change proof;
-11. profile-edition upgrade requires explicit adoption;
-12. incremental old/new dependency invalidation proof;
-13. concurrent upstream change during validation cannot publish stale PASS;
-14. command replay/idempotency/rollback/restart proof;
-15. R1 freeze → R2 profile/design change → reproducible historical R1 proof;
-16. conflict/supersession rule-pack fixture;
-17. no jurisdiction `switch` in presentation/data layers gate;
-18. offline adopted-profile validation fixture;
-19. canonical run hash reproduction;
-20. project-scale validation performance budget.
+1. standards-matrix → executable-model field/enum reconciliation proof;
+2. official-source verification gate for each production `VERIFIED_EXTERNAL` pack;
+3. exact profile edition adoption/restart persistence;
+4. immutable published edition proof;
+5. effective-date/applicability positive/unresolved cases;
+6. precedence: higher-priority mandatory cannot be weakened by lower-priority/project/manufacturer rule;
+7. deterministic checker results/stable ordering/hash;
+8. duplicate checker/rule registration rejection;
+9. mandatory missing evidence => `BLOCKED`, never PASS;
+10. manual-review lifecycle;
+11. deviation leaves raw finding unchanged;
+12. stale deviation after evidence change;
+13. explicit profile upgrade only;
+14. old/new targeted invalidation;
+15. concurrent upstream/profile change cannot publish stale PASS;
+16. command replay/idempotency/rollback/restart;
+17. R1 freeze → R2 profile/design change → historical R1 reproduction;
+18. conflict/supersession/composition fixtures;
+19. no jurisdiction switch in UI/data layers;
+20. offline adopted-profile validation;
+21. project-scale validation performance budget.
 
-## 20. Security, provenance and licensing gates
+## 20. Security, provenance and licensing
 
-- rule/profile imports are untrusted data and require schema/version/hash validation;
-- no imported field may become executable code;
-- source URLs/locators are metadata, not trusted fetch instructions inside the rule engine;
-- large or licensed documents remain attachment/file resources with controlled access;
-- exported compliance reports identify exact profile edition and validation date;
-- system wording must not claim authority beyond source/provenance status;
-- user-authored deviations/manual reviews preserve actor/time audit.
+- rule/profile imports are untrusted data with schema/version/hash validation;
+- imported data never becomes executable code;
+- source URLs are metadata, not checker fetch instructions;
+- licensed documents remain controlled resources;
+- reports identify exact profile edition/source status/validation date;
+- UI/report language cannot claim authority beyond verified provenance/applicability;
+- deviations/manual reviews preserve actor/time audit;
+- copyright-restricted source text is not copied unless licensing permits it.
 
 ## 21. Explicit non-goals
 
-ELV7 does not own:
-
-- automatic redesign/remediation of upstream engineering;
-- manufacturer/SKU ranking or commercial sourcing;
-- BOM pricing or procurement;
-- arbitrary legal advice;
-- automatic crawling/downloading of standards;
-- storage of complete copyrighted standards when licensing does not permit it;
-- free-form executable rule scripting.
+ELV7 does not own automatic redesign, manufacturer/SKU ranking, procurement/BOM pricing, arbitrary legal advice, automatic standards crawling, free-form executable rule scripting or unlicensed full-text standards storage.
 
 Future rule types are added through versioned checker/provider contracts and migration-safe profile editions.
