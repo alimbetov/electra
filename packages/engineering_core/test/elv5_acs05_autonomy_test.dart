@@ -13,6 +13,7 @@ Acs05Input _input({
   String loadFingerprint = 'loads-v1',
   Set<String> covered = const {'standby'},
   List<Acs05ContributorEnergy>? contributors,
+  String? governingSegmentId = 'standby',
 }) => Acs05Input(
   bankId: 'bank-1',
   expectedSequenceFingerprint: 'seq-v1',
@@ -27,7 +28,7 @@ Acs05Input _input({
     availableEnergy: available,
     contributors: contributors ?? [Acs05ContributorEnergy(loadId: 'acs-lock', energy: _e('10'))],
     governingDimension: Acs05GoverningDimension.energy,
-    governingSegmentId: 'standby',
+    governingSegmentId: governingSegmentId,
     peakCurrentMargin: peakMargin,
     endOfDischargePass: eodPass,
   ),
@@ -40,6 +41,19 @@ void main() {
       expect(r.status, Acs05AssessmentStatus.pass);
       expect(r.energyMargin, _e('115.2'));
       expect(r.acsContributionEnergy, _e('10'));
+    });
+
+    test('global energy result does not invent a governing segment', () {
+      final r = const Acs05AutonomyProjectionKernel().evaluate(
+        _input(
+          required: _e('19.2'),
+          available: _e('134.4'),
+          governingSegmentId: null,
+        ),
+      );
+      expect(r.status, Acs05AssessmentStatus.pass);
+      expect(r.governingDimension, Acs05GoverningDimension.energy);
+      expect(r.governingSegmentId, isNull);
     });
 
     test('zero energy margin passes', () {
