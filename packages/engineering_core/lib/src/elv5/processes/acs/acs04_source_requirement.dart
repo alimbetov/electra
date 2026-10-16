@@ -89,7 +89,9 @@ final class Acs04Input {
   static void _requireUnique(Iterable<String> values) {
     final seen = <String>{};
     for (final value in values) {
-      if (!seen.add(value)) throw ArgumentError('ACS04 duplicate case dimension: $value');
+      if (!seen.add(value)) {
+        throw ArgumentError('ACS04 duplicate case dimension: $value');
+      }
     }
   }
 }
@@ -165,74 +167,87 @@ final class Acs04SourceRequirementKernel {
       return _blocked(input, 'ACS04_REQUIREMENT_SET_FINGERPRINT_MISMATCH');
     }
 
-    final power = [...input.powerCases]..sort((a, b) => a.caseId.compareTo(b.caseId));
-    final current = [...input.currentCases]..sort((a, b) => a.caseId.compareTo(b.caseId));
+    final power = [...input.powerCases]
+      ..sort((a, b) => a.caseId.compareTo(b.caseId));
+    final current = [...input.currentCases]
+      ..sort((a, b) => a.caseId.compareTo(b.caseId));
     final powerResults = <Acs04PowerCaseResult>[];
     final currentResults = <Acs04CurrentCaseResult>[];
 
     for (final item in power) {
       final margin = item.availableCapability - item.requiredCapability;
-      powerResults.add(Acs04PowerCaseResult(
-        caseId: item.caseId,
-        globalDemand: item.globalDemand,
-        requiredCapability: item.requiredCapability,
-        availableCapability: item.availableCapability,
-        margin: margin,
-        status: margin.value >= Elv5Rational.zero
-            ? Acs04AssessmentStatus.pass
-            : Acs04AssessmentStatus.fail,
-      ));
+      powerResults.add(
+        Acs04PowerCaseResult(
+          caseId: item.caseId,
+          globalDemand: item.globalDemand,
+          requiredCapability: item.requiredCapability,
+          availableCapability: item.availableCapability,
+          margin: margin,
+          status: margin.value >= Elv5Rational.zero
+              ? Acs04AssessmentStatus.pass
+              : Acs04AssessmentStatus.fail,
+        ),
+      );
     }
     for (final item in current) {
       final margin = item.availableCapability - item.requiredCapability;
-      currentResults.add(Acs04CurrentCaseResult(
-        caseId: item.caseId,
-        globalDemand: item.globalDemand,
-        requiredCapability: item.requiredCapability,
-        availableCapability: item.availableCapability,
-        margin: margin,
-        status: margin.value >= Elv5Rational.zero
-            ? Acs04AssessmentStatus.pass
-            : Acs04AssessmentStatus.fail,
-      ));
+      currentResults.add(
+        Acs04CurrentCaseResult(
+          caseId: item.caseId,
+          globalDemand: item.globalDemand,
+          requiredCapability: item.requiredCapability,
+          availableCapability: item.availableCapability,
+          margin: margin,
+          status: margin.value >= Elv5Rational.zero
+              ? Acs04AssessmentStatus.pass
+              : Acs04AssessmentStatus.fail,
+        ),
+      );
     }
 
-    for (final result in powerResults) {
-      if (result.status == Acs04AssessmentStatus.fail) {
-        return Acs04Result(
-          status: Acs04AssessmentStatus.fail,
-          powerCases: List.unmodifiable(powerResults),
-          currentCases: List.unmodifiable(currentResults),
-          requirementContributors: List.unmodifiable(input.requirementContributors),
-          governingCaseId: result.caseId,
-          governingDimension: Acs04GoverningDimension.power,
-        );
-      }
-    }
-    for (final result in currentResults) {
-      if (result.status == Acs04AssessmentStatus.fail) {
-        return Acs04Result(
-          status: Acs04AssessmentStatus.fail,
-          powerCases: List.unmodifiable(powerResults),
-          currentCases: List.unmodifiable(currentResults),
-          requirementContributors: List.unmodifiable(input.requirementContributors),
-          governingCaseId: result.caseId,
-          governingDimension: Acs04GoverningDimension.current,
-        );
-      }
+    final failures = <_FailureRef>[
+      for (final result in powerResults)
+        if (result.status == Acs04AssessmentStatus.fail)
+          _FailureRef(result.caseId, Acs04GoverningDimension.power),
+      for (final result in currentResults)
+        if (result.status == Acs04AssessmentStatus.fail)
+          _FailureRef(result.caseId, Acs04GoverningDimension.current),
+    ]
+      ..sort((a, b) {
+        final byCase = a.caseId.compareTo(b.caseId);
+        if (byCase != 0) return byCase;
+        return a.dimension.index.compareTo(b.dimension.index);
+      });
+    if (failures.isNotEmpty) {
+      final governing = failures.first;
+      return Acs04Result(
+        status: Acs04AssessmentStatus.fail,
+        powerCases: List.unmodifiable(powerResults),
+        currentCases: List.unmodifiable(currentResults),
+        requirementContributors: List.unmodifiable(input.requirementContributors),
+        governingCaseId: governing.caseId,
+        governingDimension: governing.dimension,
+      );
     }
 
     final governingPower = _smallestPowerMargin(powerResults);
     final governingCurrent = _smallestCurrentMargin(currentResults);
+    final singleDimension = powerResults.isEmpty || currentResults.isEmpty;
     return Acs04Result(
       status: Acs04AssessmentStatus.pass,
       powerCases: List.unmodifiable(powerResults),
       currentCases: List.unmodifiable(currentResults),
       requirementContributors: List.unmodifiable(input.requirementContributors),
-      governingCaseId: governingPower?.caseId ?? governingCurrent?.caseId,
-      governingDimension: governingPower != null
-          ? Acs04GoverningDimension.power
-          : (governingCurrent != null ? Acs04GoverningDimension.current : null),
+      governingCaseId: singleDimension
+          ? (governingPower?.caseId ?? governingCurrent?.caseId)
+          : null,
+      governingDimension: singleDimension
+          ? (governingPower != null
+              ? Acs04GoverningDimension.power
+              : (governingCurrent != null
+                  ? Acs04GoverningDimension.current
+                  : null))
+          : null,
     );
   }
 
@@ -244,7 +259,9 @@ final class Acs04SourceRequirementKernel {
         blockingReason: reason,
       );
 
-  static Acs04PowerCaseResult? _smallestPowerMargin(List<Acs04PowerCaseResult> values) {
+  static Acs04PowerCaseResult? _smallestPowerMargin(
+    List<Acs04PowerCaseResult> values,
+  ) {
     Acs04PowerCaseResult? best;
     for (final value in values) {
       if (best == null || value.margin < best.margin) best = value;
@@ -252,11 +269,20 @@ final class Acs04SourceRequirementKernel {
     return best;
   }
 
-  static Acs04CurrentCaseResult? _smallestCurrentMargin(List<Acs04CurrentCaseResult> values) {
+  static Acs04CurrentCaseResult? _smallestCurrentMargin(
+    List<Acs04CurrentCaseResult> values,
+  ) {
     Acs04CurrentCaseResult? best;
     for (final value in values) {
       if (best == null || value.margin < best.margin) best = value;
     }
     return best;
   }
+}
+
+final class _FailureRef {
+  const _FailureRef(this.caseId, this.dimension);
+
+  final String caseId;
+  final Acs04GoverningDimension dimension;
 }
