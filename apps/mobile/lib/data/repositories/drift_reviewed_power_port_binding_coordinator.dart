@@ -109,10 +109,12 @@ final class DriftReviewedPowerPortBindingCoordinator {
     BindPowerPortCommand command,
     PowerCanonicalProjectionReview review,
   ) {
-    final dependencies = <PowerDependencyKey>{
-      ...review.oldClosure,
-      ...review.newClosure,
-    }.toList()..sort();
+    final dependencies =
+        <PowerDependencyKey>{
+            ...review.oldClosure,
+            ...review.newClosure,
+          }.toList()
+          ..sort();
     return BindPowerPortCommand(
       operationId: command.operationId,
       projectId: command.projectId,
@@ -128,7 +130,8 @@ final class DriftReviewedPowerPortBindingCoordinator {
     PowerCanonicalProjectionReview expected,
     PowerCanonicalProjectionReview actual,
   ) {
-    if (expected.reviewedImpactFingerprint != actual.reviewedImpactFingerprint ||
+    if (expected.reviewedImpactFingerprint !=
+            actual.reviewedImpactFingerprint ||
         expected.expectedDesignRevision != actual.expectedDesignRevision ||
         expected.expectedPortRevision != actual.expectedPortRevision) {
       throw const PowerRuntimeStorageException(
@@ -138,17 +141,18 @@ final class DriftReviewedPowerPortBindingCoordinator {
   }
 
   Future<bool> _operationExists(BindPowerPortCommand command) async {
-    final row = await database
-        .customSelect(
-          'SELECT 1 FROM power_operation_records '
-          'WHERE project_id = ? AND design_revision_id = ? AND operation_id = ?',
-          variables: [
-            Variable.withString(command.projectId),
-            Variable.withString(command.designRevisionId),
-            Variable.withString(command.operationId),
-          ],
-        )
-        .getSingleOrNull();
+    final row =
+        await database
+            .customSelect(
+              'SELECT 1 FROM power_operation_records '
+              'WHERE project_id = ? AND design_revision_id = ? AND operation_id = ?',
+              variables: [
+                Variable.withString(command.projectId),
+                Variable.withString(command.designRevisionId),
+                Variable.withString(command.operationId),
+              ],
+            )
+            .getSingleOrNull();
     return row != null;
   }
 
@@ -156,16 +160,17 @@ final class DriftReviewedPowerPortBindingCoordinator {
     String projectId,
     EngineeringPort candidate,
   ) async {
-    final row = await database
-        .customSelect(
-          'SELECT payload_json FROM engineering_port_instances '
-          'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
-          variables: [
-            Variable.withString(projectId),
-            Variable.withString(candidate.id),
-          ],
-        )
-        .getSingleOrNull();
+    final row =
+        await database
+            .customSelect(
+              'SELECT payload_json FROM engineering_port_instances '
+              'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
+              variables: [
+                Variable.withString(projectId),
+                Variable.withString(candidate.id),
+              ],
+            )
+            .getSingleOrNull();
     if (row == null ||
         row.read<String>('payload_json') !=
             canonicalEngineeringJson(candidate.toMap())) {
