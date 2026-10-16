@@ -30,11 +30,12 @@ AUTHORITY_PATHS = [
     "docs/product/elv5-discipline-calculations-design-specification.md",
     "docs/product/elv5-p0-p9-delivery-plan.md",
     "docs/product/elv5-implementation/README.md",
+    "docs/product/elv5-implementation/requirements.json",
+    "docs/product/elv5-implementation/normative-requirements-registry.json",
     "docs/product/elv5-implementation/process-contracts.md",
     "docs/product/elv5-implementation/process-registry.json",
     "docs/product/elv5-implementation/algorithm-registry.json",
     "docs/product/elv5-implementation/command-registry.json",
-    "docs/product/elv5-implementation/requirements.json",
     "docs/product/elv5-implementation/engineering-primitives-contract.md",
     "docs/product/elv5-implementation/typed-process-api.md",
     "docs/product/elv5-implementation/calculation-engine-contract.md",
@@ -73,12 +74,7 @@ def sha256_file(path: Path) -> str:
 
 
 def deterministic_json_bytes(value: object) -> bytes:
-    return json.dumps(
-        value,
-        ensure_ascii=False,
-        sort_keys=True,
-        separators=(",", ":"),
-    ).encode("utf-8")
+    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
 
 
 def load_json(path: Path):
@@ -90,9 +86,7 @@ def source_sha() -> str:
     if env_sha:
         return env_sha
     try:
-        return subprocess.check_output(
-            ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
-        ).strip()
+        return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     except (OSError, subprocess.CalledProcessError):
         return "UNKNOWN"
 
@@ -116,12 +110,7 @@ def dossier_inventory() -> list[dict[str, object]]:
         text = path.read_text(encoding="utf-8")
         file_codes = process_re.findall(text)
         codes.extend(file_codes)
-        rows.append({
-            "path": relative,
-            "sha256": sha256_file(path),
-            "byteLength": path.stat().st_size,
-            "processCodes": file_codes,
-        })
+        rows.append({"path": relative, "sha256": sha256_file(path), "byteLength": path.stat().st_size, "processCodes": file_codes})
     if len(codes) != 27 or len(set(codes)) != 27:
         raise SystemExit(f"expected 27 unique process dossiers, found {len(codes)} / {len(set(codes))} unique")
     return rows
@@ -136,17 +125,21 @@ def main() -> None:
     algorithm_registry_path = IMPL / "algorithm-registry.json"
     command_registry_path = IMPL / "command-registry.json"
     requirements_path = IMPL / "requirements.json"
+    normative_requirements_path = IMPL / "normative-requirements-registry.json"
     oracle_errata_path = IMPL / "calculation-oracle-errata-v1.md"
 
     process_registry = load_json(process_registry_path)
     algorithm_registry = load_json(algorithm_registry_path)
     command_registry = load_json(command_registry_path)
     requirements = load_json(requirements_path)
+    normative_requirements = load_json(normative_requirements_path)
 
     processes = process_registry.get("processes", [])
     algorithms = algorithm_registry.get("processes", [])
     commands = command_registry.get("commands", [])
     requirement_rows = rows_from_requirements(requirements)
+    obligations = normative_requirements.get("obligations", [])
+    fixed = normative_requirements.get("fixedInventories", {})
 
     if len(processes) != 27:
         raise SystemExit(f"expected 27 processes, found {len(processes)}")
@@ -158,6 +151,10 @@ def main() -> None:
         raise SystemExit(f"expected 16 commands, found {len(commands)}")
     if len(requirement_rows) != 80:
         raise SystemExit(f"expected 80 requirements, found {len(requirement_rows)}")
+    if len(obligations) != 42 or len({row.get('id') for row in obligations}) != 42:
+        raise SystemExit("expected 42 unique normative obligations")
+    if fixed.get("designFindingsResolved") != 56 or fixed.get("minimumProcessVectorCount") != 135:
+        raise SystemExit("unexpected normative fixed inventory")
     if command_registry.get("wireSchema") != "electra.elv5-discipline-command.v1":
         raise SystemExit("unexpected ELV5 wire schema")
     if command_registry.get("payloadSchemaVersion") != 1:
@@ -168,6 +165,8 @@ def main() -> None:
         raise SystemExit("duplicate ELV5 process code")
     if any(not row.get("requiredDimensions") for row in processes):
         raise SystemExit("every ELV5 process must have requiredDimensions")
+    if set(normative_requirements.get("processCodes", [])) != set(process_codes):
+        raise SystemExit("normative requirements process inventory differs from process registry")
 
     command_ops = [row.get("operation") for row in commands]
     if len(command_ops) != len(set(command_ops)):
@@ -201,6 +200,10 @@ def main() -> None:
         {"operation": row["operation"], "payloadKeys": sorted(row.get("payloadKeys", []))}
         for row in sorted(commands, key=lambda item: item["operation"])
     ]
+    obligation_inventory = [
+        {"id": row["id"], "severity": row["severity"], "title": row["title"], "acceptance": row["acceptance"]}
+        for row in sorted(obligations, key=lambda item: item["id"])
+    ]
 
     artifacts = []
     for relative in AUTHORITY_PATHS:
@@ -222,9 +225,12 @@ def main() -> None:
         "processCodeLevelDossierCount": 27,
         "processDossierSectionCount": 25,
         "processVectorClassCount": 5,
+        "minimumProcessVectorCount": 135,
         "fourthPassFindingCount": 19,
+        "designFindingsResolved": 56,
         "commandCount": 16,
         "requirementCount": 80,
+        "normativeObligationCount": 42,
         "primaryProcessOracleCount": 54,
         "authorityArtifactCount": len(AUTHORITY_PATHS),
         "processRegistrySha256": sha256_file(process_registry_path),
@@ -234,8 +240,10 @@ def main() -> None:
         "processDossierAggregateSha256": sha256_bytes(deterministic_json_bytes(dossier_rows)),
         "calculationOracleErrataSha256": sha256_file(oracle_errata_path),
         "flutterPerformanceContractSha256": sha256_file(IMPL / "flutter-performance-contract.md"),
-        "commandRegistrySha256": sha256_file(command_registry_path),
         "requirementsSha256": sha256_file(requirements_path),
+        "normativeRequirementsSha256": sha256_file(normative_requirements_path),
+        "normativeObligationInventorySha256": sha256_bytes(deterministic_json_bytes(obligation_inventory)),
+        "commandRegistrySha256": sha256_file(command_registry_path),
         "requiredDimensionInventorySha256": sha256_bytes(deterministic_json_bytes(required_dimension_inventory)),
         "algorithmInventorySha256": sha256_bytes(deterministic_json_bytes(algorithm_inventory)),
         "commandPayloadInventorySha256": sha256_bytes(deterministic_json_bytes(command_inventory)),
@@ -260,9 +268,9 @@ def main() -> None:
     print(f"sourceSha={manifest['sourceSha']}")
     print(f"authorityFingerprintSha256={authority_fingerprint}")
     print(
-        f"processes=27 algorithms=27 dossiers=27 sections=25 commands=16 "
-        f"requirements=80 primaryOracles=54 fourthPassFindings=19 schema=24 "
-        f"authorityArtifacts={len(AUTHORITY_PATHS)}"
+        "processes=27 algorithms=27 dossiers=27 sections=25 vectors=135 commands=16 "
+        "requirements=80 obligations=42 primaryOracles=54 fourthPassFindings=19 "
+        f"designFindingsResolved=56 schema=24 authorityArtifacts={len(AUTHORITY_PATHS)}"
     )
 
 
