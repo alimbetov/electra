@@ -1,29 +1,28 @@
 import 'dart:io';
 
 import 'package:drift/native.dart';
+import 'package:electra_mobile/data/database/app_database.dart';
+import 'package:flutter_test/flutter_test.dart';
 
-import '../lib/data/database/app_database.dart';
-
-Future<void> main(List<String> args) async {
-  if (args.length != 2) {
-    stderr.writeln('usage: export.dart <sqlite-path> <expected-schema-version>');
-    exitCode = 64;
-    return;
-  }
-  final output = File(args[0]);
-  final expectedVersion = int.parse(args[1]);
-  if (output.existsSync()) output.deleteSync();
-  output.parent.createSync(recursive: true);
-
-  final database = AppDatabase(NativeDatabase(output));
-  try {
-    await database.customSelect('SELECT 1').getSingle();
-    if (database.schemaVersion != expectedVersion) {
-      throw StateError(
-        'Historical source schema is ${database.schemaVersion}, '
-        'expected $expectedVersion.',
-      );
+void main() {
+  test('exports a real historical ELV4 migration fixture', () async {
+    final outputPath = Platform.environment['ELV4_HISTORICAL_FIXTURE_OUT'];
+    final expectedVersion = int.tryParse(
+      Platform.environment['ELV4_HISTORICAL_VERSION'] ?? '',
+    );
+    if (outputPath == null || expectedVersion == null) {
+      fail('Historical fixture output path and schema version are required.');
     }
+
+    final output = File(outputPath);
+    if (output.existsSync()) output.deleteSync();
+    output.parent.createSync(recursive: true);
+
+    final database = AppDatabase(NativeDatabase(output));
+    addTearDown(database.close);
+    await database.customSelect('SELECT 1').getSingle();
+    expect(database.schemaVersion, expectedVersion);
+
     await database.customStatement('''
 INSERT INTO projects (
   id, name, measurement_system, default_structural_height_mm,
@@ -74,16 +73,12 @@ INSERT INTO power_operating_scenarios (
 )
 ''');
     }
+
     final userVersion = await database
         .customSelect('PRAGMA user_version')
         .getSingle()
         .then((row) => row.read<int>('user_version'));
-    if (userVersion != expectedVersion) {
-      throw StateError(
-        'Historical SQLite user_version is $userVersion, expected $expectedVersion.',
-      );
-    }
-  } finally {
-    await database.close();
-  }
+    expect(userVersion, expectedVersion);
+    expect(await database.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
+  });
 }
