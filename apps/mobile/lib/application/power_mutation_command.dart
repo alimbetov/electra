@@ -165,6 +165,42 @@ final class SetPowerLoadCommand extends _BasePowerMutationCommand {
   Map<String, Object?> get body => contribution.toMap();
 }
 
+/// Public wire semantic for SET_POWER_LOAD_PROFILE: the supplied list is the
+/// complete active load profile for one component, including the empty list.
+final class ReplacePowerLoadProfileCommand extends _BasePowerMutationCommand {
+  ReplacePowerLoadProfileCommand({
+    required super.operationId,
+    required super.projectId,
+    required super.designRevisionId,
+    required super.expectedRevision,
+    required super.changedDependencies,
+    required String componentId,
+    required Iterable<PowerOwnLoadContribution> loads,
+  }) : componentId = _text(componentId, 'componentId'),
+       loads = List.unmodifiable(loads) {
+    if (this.loads.any((load) => load.componentId != this.componentId)) {
+      throw ArgumentError('Every load must belong to componentId.');
+    }
+    final ids = this.loads.map((load) => load.id).toList();
+    if (ids.toSet().length != ids.length) {
+      throw ArgumentError('Load profile ids must be unique.');
+    }
+  }
+
+  final String componentId;
+  final List<PowerOwnLoadContribution> loads;
+
+  @override
+  String get commandType => 'SET_POWER_LOAD_PROFILE';
+  @override
+  String get payloadSchema => 'electra.command.elv4.set-power-load-profile.v1';
+  @override
+  Map<String, Object?> get body => {
+    'componentId': componentId,
+    'loads': loads.map((value) => value.toMap()).toList(growable: false),
+  };
+}
+
 final class ReplacePowerTransferCommand extends _BasePowerMutationCommand {
   ReplacePowerTransferCommand({
     required super.operationId,
@@ -183,6 +219,44 @@ final class ReplacePowerTransferCommand extends _BasePowerMutationCommand {
   String get payloadSchema => 'electra.command.elv4.replace-power-transfer.v1';
   @override
   Map<String, Object?> get body => transfer.toMap();
+}
+
+/// Public wire semantic for REPLACE_POWER_TRANSFERS: the supplied list is the
+/// complete active transfer set for one component, including the empty list.
+final class ReplacePowerTransfersCommand extends _BasePowerMutationCommand {
+  ReplacePowerTransfersCommand({
+    required super.operationId,
+    required super.projectId,
+    required super.designRevisionId,
+    required super.expectedRevision,
+    required super.changedDependencies,
+    required String componentId,
+    required Iterable<PowerTransferBinding> transfers,
+  }) : componentId = _text(componentId, 'componentId'),
+       transfers = List.unmodifiable(transfers) {
+    if (this.transfers.any(
+      (transfer) => transfer.componentId != this.componentId,
+    )) {
+      throw ArgumentError('Every transfer must belong to componentId.');
+    }
+    final ids = this.transfers.map((transfer) => transfer.id).toList();
+    if (ids.toSet().length != ids.length) {
+      throw ArgumentError('Transfer ids must be unique.');
+    }
+  }
+
+  final String componentId;
+  final List<PowerTransferBinding> transfers;
+
+  @override
+  String get commandType => 'REPLACE_POWER_TRANSFERS';
+  @override
+  String get payloadSchema => 'electra.command.elv4.replace-power-transfers.v1';
+  @override
+  Map<String, Object?> get body => {
+    'componentId': componentId,
+    'transfers': transfers.map((value) => value.toMap()).toList(growable: false),
+  };
 }
 
 final class ReplacePowerCapacityGroupCommand extends _BasePowerMutationCommand {
