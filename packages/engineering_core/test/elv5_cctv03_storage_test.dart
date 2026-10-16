@@ -1,4 +1,16 @@
-import 'package:engineering_core/engineering_core_elv5.dart';
+import 'package:engineering_core/engineering_core_elv5.dart'
+    show
+        BitRate,
+        ByteCapacity,
+        Cctv03Input,
+        Cctv03RecordingAssignment,
+        Cctv03RedundancyModel,
+        Cctv03SizingBasis,
+        Cctv03StorageKernel,
+        Cctv03StreamRate,
+        Cctv03TemporalPolicy,
+        Cctv03UtcInterval,
+        Elv5Rational;
 import 'package:test/test.dart';
 
 BitRate _bps(int value) => BitRate(Elv5Rational.integer(value));
@@ -13,7 +25,7 @@ void main() {
         poolId: 'pool-a',
         horizonStartUtc: start,
         horizonEndUtc: end,
-        temporalPolicy: const Cctv03TemporalPolicy(
+        temporalPolicy: Cctv03TemporalPolicy(
           zoneId: 'UTC',
           rulesHash: 'tz-rules-v1',
         ),
@@ -43,19 +55,13 @@ void main() {
 
       final result = const Cctv03StorageKernel().evaluate(input);
 
+      expect(result.exactBaseBytes, Elv5Rational.integer(2592000000000));
+      expect(result.usable.required, _bytes(2851200000000));
+      expect(result.raw!.required, _bytes(5702400000000));
       expect(
-        result.exactBaseBytes,
-        Elv5Rational.integer(2592000000000),
+        result.recordedMicroseconds,
+        BigInt.from(const Duration(days: 30).inMicroseconds),
       );
-      expect(
-        result.usable.required,
-        _bytes(2851200000000),
-      );
-      expect(
-        result.raw!.required,
-        _bytes(5702400000000),
-      );
-      expect(result.recordedTime, const Duration(days: 30));
     });
 
     test('ceils once at pool boundary and preserves zero capacity margin', () {
@@ -66,7 +72,7 @@ void main() {
           poolId: 'pool-a',
           horizonStartUtc: start,
           horizonEndUtc: end,
-          temporalPolicy: const Cctv03TemporalPolicy(
+          temporalPolicy: Cctv03TemporalPolicy(
             zoneId: 'UTC',
             rulesHash: 'tz-rules-v1',
           ),
@@ -105,7 +111,7 @@ void main() {
           poolId: 'pool-a',
           horizonStartUtc: start,
           horizonEndUtc: start.add(const Duration(seconds: 20)),
-          temporalPolicy: const Cctv03TemporalPolicy(
+          temporalPolicy: Cctv03TemporalPolicy(
             zoneId: 'UTC',
             rulesHash: 'tz-rules-v1',
           ),
@@ -137,7 +143,7 @@ void main() {
         ),
       );
 
-      expect(result.recordedTime, const Duration(seconds: 15));
+      expect(result.recordedMicroseconds, BigInt.from(15000000));
       expect(result.usable.required, _bytes(15));
     });
 
@@ -148,7 +154,7 @@ void main() {
           poolId: 'pool-a',
           horizonStartUtc: start,
           horizonEndUtc: start.add(const Duration(seconds: 10)),
-          temporalPolicy: const Cctv03TemporalPolicy(
+          temporalPolicy: Cctv03TemporalPolicy(
             zoneId: 'UTC',
             rulesHash: 'tz-rules-v1',
           ),
@@ -176,7 +182,7 @@ void main() {
         ),
       );
 
-      expect(result.recordedTime, const Duration(seconds: 5));
+      expect(result.recordedMicroseconds, BigInt.from(5000000));
       expect(result.usable.required, _bytes(5));
     });
 
@@ -186,7 +192,7 @@ void main() {
         poolId: 'pool-a',
         horizonStartUtc: start,
         horizonEndUtc: start.add(const Duration(seconds: 1)),
-        temporalPolicy: const Cctv03TemporalPolicy(
+        temporalPolicy: Cctv03TemporalPolicy(
           zoneId: 'UTC',
           rulesHash: 'tz-rules-v1',
         ),
@@ -242,7 +248,7 @@ void main() {
         poolId: 'pool-a',
         horizonStartUtc: start,
         horizonEndUtc: start.add(const Duration(seconds: 1)),
-        temporalPolicy: const Cctv03TemporalPolicy(
+        temporalPolicy: Cctv03TemporalPolicy(
           zoneId: 'UTC',
           rulesHash: 'tz-rules-v1',
         ),

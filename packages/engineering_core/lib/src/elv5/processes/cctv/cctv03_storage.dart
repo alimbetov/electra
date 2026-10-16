@@ -4,7 +4,7 @@ import '../../numeric/rational.dart';
 enum Cctv03SizingBasis { expectedEstimate, guaranteedUpperBound }
 
 final class Cctv03TemporalPolicy {
-  const Cctv03TemporalPolicy({
+  Cctv03TemporalPolicy({
     required this.zoneId,
     required this.rulesHash,
   }) {
@@ -18,7 +18,7 @@ final class Cctv03TemporalPolicy {
 }
 
 final class Cctv03UtcInterval {
-  const Cctv03UtcInterval({required this.startUtc, required this.endUtc}) {
+  Cctv03UtcInterval({required this.startUtc, required this.endUtc}) {
     if (!startUtc.isUtc || !endUtc.isUtc) {
       throw ArgumentError('CCTV03 intervals must use UTC DateTime values.');
     }
@@ -32,7 +32,7 @@ final class Cctv03UtcInterval {
 }
 
 final class Cctv03StreamRate {
-  const Cctv03StreamRate({
+  Cctv03StreamRate({
     required this.streamId,
     required this.expectedBitRate,
     this.guaranteedUpperBoundBitRate,
@@ -75,7 +75,7 @@ final class Cctv03RecordingAssignment {
 }
 
 final class Cctv03RedundancyModel {
-  const Cctv03RedundancyModel({required this.usableFraction}) {
+  Cctv03RedundancyModel({required this.usableFraction}) {
     if (usableFraction <= Elv5Rational.zero || usableFraction > Elv5Rational.one) {
       throw ArgumentError('CCTV03 usable fraction must be in (0, 1].');
     }
@@ -149,7 +149,7 @@ final class Cctv03Result {
     required this.sizingBasis,
     required this.exactBaseBytes,
     required this.exactReservedBytes,
-    required this.recordedTime,
+    required this.recordedMicroseconds,
     required this.usable,
     required this.raw,
   });
@@ -158,7 +158,7 @@ final class Cctv03Result {
   final Cctv03SizingBasis sizingBasis;
   final Elv5Rational exactBaseBytes;
   final Elv5Rational exactReservedBytes;
-  final Duration recordedTime;
+  final BigInt recordedMicroseconds;
   final Cctv03CapacityAssessment usable;
   final Cctv03CapacityAssessment? raw;
 }
@@ -241,9 +241,7 @@ final class Cctv03StorageKernel {
       sizingBasis: input.sizingBasis,
       exactBaseBytes: baseBytes,
       exactReservedBytes: reservedBytes,
-      recordedTime: Duration(
-        microseconds: _toBoundedInt(recordedMicros, 'recorded time'),
-      ),
+      recordedMicroseconds: recordedMicros,
       usable: usableAssessment,
       raw: rawAssessment,
     );
@@ -300,12 +298,5 @@ final class Cctv03StorageKernel {
     }
     result.add(Cctv03UtcInterval(startUtc: currentStart, endUtc: currentEnd));
     return List.unmodifiable(result);
-  }
-
-  static int _toBoundedInt(BigInt value, String field) {
-    if (value > BigInt.from(0x7fffffffffffffff)) {
-      throw StateError('CCTV03_RESOURCE_LIMIT:$field');
-    }
-    return value.toInt();
   }
 }
