@@ -1,0 +1,136 @@
+{
+  "schema": "electra.elv5-development-readiness-registry.v1",
+  "status": "READY_FOR_DEVELOPMENT",
+  "runtimeStatus": "NOT_STARTED",
+  "closure": {
+    "reviewPass": "EIGHTH_IMPLEMENTATION_READINESS",
+    "high": 7,
+    "medium": 3,
+    "total": 10,
+    "resolved": 10,
+    "open": 0
+  },
+  "contracts": [
+    {
+      "id": "ELV5-R8-01",
+      "severity": "HIGH",
+      "area": "CCTV-02",
+      "rule": "Each subscription has subscriptionId. UNICAST requires null multicast fields. MULTICAST requires multicastGroupId plus an inline canonical multicastTree with treeId and edgeIds; all subscriptions for the same streamId+multicastGroupId must carry the same tree hash. Dedup identity is streamId+multicastGroupId+edgeId."
+    },
+    {
+      "id": "ELV5-R8-02",
+      "severity": "HIGH",
+      "area": "CCTV-03",
+      "rule": "Each recording assignment carries scheduleProfileId. Each schedule segment carries scheduleProfileId. Integration resolves and unions only segments belonging to the assignment profile; no implicit pool-wide schedule inheritance."
+    },
+    {
+      "id": "ELV5-R8-03",
+      "severity": "HIGH",
+      "area": "P2_EVALUATION_IDENTITY",
+      "rule": "evaluationId is globally unique across DisciplineEvaluationRecords. Schema 24 must enforce UNIQUE(evaluation_id) or an equivalent global primary key; repository lookup by evaluation ID must be single-row."
+    },
+    {
+      "id": "ELV5-R8-04",
+      "severity": "HIGH",
+      "area": "P2_AGGREGATE_IDENTITY",
+      "rule": "Exactly one active root per designRevisionId and canonical subject identity for recording pool, recorder, link composition, switch port capacity, optical link, rack, patch panel, door assembly, controller, fire loop and notification circuit."
+    },
+    {
+      "id": "ELV5-R8-05",
+      "severity": "HIGH",
+      "area": "CCTV-03_RESERVE",
+      "rule": "reserveMultiplier is an exact Ratio and must be >= 1. A value below 1 is semantic rejection and can never reduce required storage."
+    },
+    {
+      "id": "ELV5-R8-06",
+      "severity": "HIGH",
+      "area": "WIRE_CODECS",
+      "rule": "All 16 command payloads have machine-frozen nested schemas in command-registry.json. Canonical examples must satisfy exact nested key sets and declared scalar/container types."
+    },
+    {
+      "id": "ELV5-R8-07",
+      "severity": "HIGH",
+      "area": "CCTV-05",
+      "rule": "Recorder assignment carries storagePoolId end-to-end through wire, persistence, resolver and typed kernel input. CCTV-05 storage evidence must be selected by that exact pool identity."
+    },
+    {
+      "id": "ELV5-R8-08",
+      "severity": "MEDIUM",
+      "area": "VERSION_ENCODING",
+      "rule": "Registry integer schema versions are canonicalized to base-10 decimal strings at the Dart/runtime/hash boundary; registry 1 and runtime '1' are one version identity, never two encodings in a fingerprint."
+    },
+    {
+      "id": "ELV5-R8-09",
+      "severity": "MEDIUM",
+      "area": "FIRE_ADDRESS_IDENTITY",
+      "rule": "Fire address uniqueness is revision-wide within addressDomain: UNIQUE(designRevisionId,addressDomain,address). It is not limited to one loop binding."
+    },
+    {
+      "id": "ELV5-R8-10",
+      "severity": "MEDIUM",
+      "area": "LAN-06_DIMENSIONS",
+      "rule": "LAN-06 mass uses Elv5Quantity<MassDim> (Mass), not a unit-bearing field name on a dimensionless rational. ELV6 handoff preserves the Mass dimension."
+    }
+  ],
+  "aggregateActiveUniqueSubjects": [
+    {
+      "root": "RecordingPoolBindings",
+      "subject": ["designRevisionId", "poolId"]
+    },
+    {
+      "root": "RecorderCapacityBindings",
+      "subject": ["designRevisionId", "recorderId"]
+    },
+    {
+      "root": "LinkCompositionBindings",
+      "subject": ["designRevisionId", "linkId"]
+    },
+    {
+      "root": "PortCapacityBindings",
+      "subject": ["designRevisionId", "switchId"]
+    },
+    {
+      "root": "OpticalLinkBindings",
+      "subject": ["designRevisionId", "linkId"]
+    },
+    {
+      "root": "RackCapacityBindings",
+      "subject": ["designRevisionId", "rackId"]
+    },
+    {
+      "root": "PatchPanelBindings",
+      "subject": ["designRevisionId", "panelId"]
+    },
+    {
+      "root": "DoorCalculationBindings",
+      "subject": ["designRevisionId", "doorAssemblyId"]
+    },
+    {
+      "root": "ControllerResourceBindings",
+      "subject": ["designRevisionId", "controllerId"]
+    },
+    {
+      "root": "FireLoopBindings",
+      "subject": ["designRevisionId", "loopId"]
+    },
+    {
+      "root": "NotificationCircuitBindings",
+      "subject": ["designRevisionId", "circuitId"]
+    }
+  ],
+  "readinessGate": {
+    "P0": "GO",
+    "P1": "GO",
+    "P2": "READY_FOR_IMPLEMENTATION",
+    "P3": "READY_FOR_IMPLEMENTATION",
+    "P4": "READY_FOR_IMPLEMENTATION",
+    "P5": "READY_FOR_IMPLEMENTATION",
+    "P6": "READY_FOR_IMPLEMENTATION",
+    "P7": "READY_FOR_IMPLEMENTATION",
+    "P8": "ACCEPTANCE_DESIGN_READY",
+    "P9": "CLOSURE_DESIGN_READY"
+  },
+  "qualificationBoundary": "READY_FOR_DEVELOPMENT is specification authorization only; no ELV5 production runtime acceptance is claimed.",
+  "humanAuditPath": "docs/audit/elv5-eighth-pass-development-readiness-audit.md",
+  "humanAuditSha256": "cf46fad77754a40d9982a905432a891a7a3abb1e4a2f003b559259e1925fa995"
+}
