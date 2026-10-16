@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""Validate the closed ELV5 discipline command registry design contract."""
+"""Validate the frozen ELV5 discipline command registry and development-entry contract."""
 import copy
 import json
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -38,6 +39,14 @@ EXPECTED_PAYLOADS = {
     'REPLACE_NOTIFICATION_CIRCUIT_ASSIGNMENTS': {'circuitId', 'deviceAssignments', 'outputRef', 'policyRef'},
     'CALCULATE_DISCIPLINE_PROCESS': {'scope', 'processCodes', 'subjects', 'expectedPointerGenerations'},
 }
+EXPECTED_READINESS = {
+    'reviewPass': 'EIGHTH_IMPLEMENTATION_READINESS',
+    'high': 7,
+    'medium': 3,
+    'total': 10,
+    'resolved': 10,
+    'open': 0,
+}
 
 
 def load_registry():
@@ -46,12 +55,15 @@ def load_registry():
 
 def validate(registry):
     assert registry['schema'] == 'electra.elv5-command-design-registry.v1'
-    assert registry['status'] == 'DESIGN_DRAFT'
+    assert registry['status'] == 'DESIGN_FROZEN'
     assert registry['runtimeStatus'] == 'NOT_STARTED'
+    assert registry['developmentReadiness'] == 'READY_FOR_DEVELOPMENT'
+    assert re.fullmatch(r'[0-9a-f]{64}', registry['developmentReadinessRegistrySha256'])
     assert registry['wireSchema'] == 'electra.elv5-discipline-command.v1'
     assert registry['payloadSchemaVersion'] == 1
     assert registry['topLevelKeys'] == EXPECTED_TOP_LEVEL
     assert len(registry['topLevelKeys']) == len(set(registry['topLevelKeys'])) == 10
+    assert registry['readinessClosure'] == EXPECTED_READINESS
 
     revision = registry['externalRevisionBoundary']
     assert revision['schema'] == 'electra.elv4-revision-command.v2'
@@ -68,11 +80,36 @@ def validate(registry):
         assert len(row['payloadKeys']) == len(set(row['payloadKeys']))
         assert set(row['payloadKeys']) == expected, ('payload key mismatch', operation)
 
+    assert registry['nestedSchemaRegistryVersion'] == 'electra.elv5-command-nested-schema.v1'
+    schemas = registry['nestedSchemas']
+    assert isinstance(schemas, dict) and len(schemas) >= 30
+    assert all(isinstance(name, str) and name.endswith('.v1') for name in schemas)
+    for name, spec in schemas.items():
+        assert set(spec) >= {'keys', 'types'}, ('nested schema shape', name)
+        assert len(spec['keys']) == len(set(spec['keys'])), ('duplicate nested keys', name)
+        assert set(spec['keys']) == set(spec['types']), ('nested key/type drift', name)
+
+    bindings = registry['commandNestedBindings']
+    assert set(bindings) == set(EXPECTED_PAYLOADS)
+    for operation, operation_bindings in bindings.items():
+        assert isinstance(operation_bindings, list), ('nested bindings must be list', operation)
+        for binding in operation_bindings:
+            assert set(binding) in ({'path', 'schema'}, {'path', 'schema', 'nullable'}), ('nested binding shape', operation)
+            assert binding['schema'] in schemas, ('unknown nested schema', operation, binding['schema'])
+            assert isinstance(binding['path'], str) and binding['path'], ('invalid nested path', operation)
+
+    semantic = registry['semanticConstraints']
+    for operation in ['REPLACE_CAMERA_STREAMS', 'REPLACE_RECORDING_ASSIGNMENTS', 'REPLACE_RECORDER_ASSIGNMENTS']:
+        assert operation in semantic and semantic[operation], ('critical semantic constraints missing', operation)
+
     contract = (BASE / 'code-level-runtime-contract.md').read_text()
     amendments = (BASE / 'code-level-hardening-amendments.md').read_text()
+    alignment = (BASE / 'project-alignment-hardening-v1.md').read_text()
     index = (ROOT / 'docs/product/elv5-authoritative-spec-index.md').read_text()
     assert registry['wireSchema'] in contract
     assert 'command-registry.json' in index
+    assert 'development-readiness-registry.json' in index
+    assert 'READY FOR DEVELOPMENT' in alignment
     for operation in EXPECTED_PAYLOADS:
         assert operation in contract, ('command absent from base runtime contract', operation)
     for operation in [
@@ -95,7 +132,7 @@ def validate(registry):
 def must_reject(registry):
     try:
         validate(registry)
-    except AssertionError:
+    except (AssertionError, KeyError):
         return
     raise AssertionError('Invalid ELV5 command registry accepted')
 
@@ -120,9 +157,21 @@ def main():
     duplicate['commands'].append(copy.deepcopy(duplicate['commands'][0]))
     must_reject(duplicate)
 
+    draft_regression = copy.deepcopy(registry)
+    draft_regression['status'] = 'DESIGN_DRAFT'
+    must_reject(draft_regression)
+
+    no_nested = copy.deepcopy(registry)
+    del no_nested['commandNestedBindings']['REPLACE_CAMERA_STREAMS']
+    must_reject(no_nested)
+
+    reopened = copy.deepcopy(registry)
+    reopened['readinessClosure']['open'] = 1
+    must_reject(reopened)
+
     print(
-        'PASS: exact ELV5 command schema, 16 operations, hardened payload keys '
-        'and implemented ELV4 revision boundary'
+        'PASS: frozen ELV5 command schema, 16 operations, machine nested schemas, '
+        '10/10 readiness closure and accepted ELV4 revision boundary'
     )
 
 
