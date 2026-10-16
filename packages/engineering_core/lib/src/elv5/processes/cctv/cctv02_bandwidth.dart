@@ -30,8 +30,14 @@ final class Cctv02Subscription {
     if (subscriptionId.isEmpty || streamId.isEmpty || receiverId.isEmpty) {
       throw ArgumentError('CCTV02 identifiers must be non-empty.');
     }
+    if (recorderId != null && recorderId!.isEmpty) {
+      throw ArgumentError('CCTV02 recorder id must be non-empty when present.');
+    }
     if (this.directedEdgePath.isEmpty) {
       throw ArgumentError('CCTV02 subscription path must not be empty.');
+    }
+    if (this.directedEdgePath.any((edgeId) => edgeId.isEmpty)) {
+      throw ArgumentError('CCTV02 edge ids must be non-empty.');
     }
     if (this.directedEdgePath.toSet().length != this.directedEdgePath.length) {
       throw ArgumentError('CCTV02 subscription path contains duplicate edges.');
@@ -63,6 +69,9 @@ final class Cctv02MulticastTree {
     if (this.directedEdges.isEmpty) {
       throw ArgumentError('CCTV02 multicast tree must contain edges.');
     }
+    if (this.directedEdges.any((edgeId) => edgeId.isEmpty)) {
+      throw ArgumentError('CCTV02 multicast tree edge ids must be non-empty.');
+    }
   }
 
   final String streamId;
@@ -79,7 +88,16 @@ final class Cctv02Input {
   }) : streams = List.unmodifiable(streams),
        subscriptions = List.unmodifiable(subscriptions),
        multicastTrees = List.unmodifiable(multicastTrees),
-       capacities = Map.unmodifiable(capacities);
+       capacities = Map.unmodifiable(capacities) {
+    for (final entry in this.capacities.entries) {
+      if (entry.key.isEmpty) {
+        throw ArgumentError('CCTV02 capacity edge id must be non-empty.');
+      }
+      if (entry.value.value.isNegative) {
+        throw ArgumentError('CCTV02 edge capacity must be non-negative.');
+      }
+    }
+  }
 
   final List<Cctv02Stream> streams;
   final List<Cctv02Subscription> subscriptions;
@@ -242,9 +260,10 @@ final class Cctv02BandwidthKernel {
           (stream.peakBitRate?.value.isNegative ?? false)) {
         throw ArgumentError('CCTV02 bitrate must be non-negative.');
       }
-      if (result.putIfAbsent(stream.streamId, () => stream) != stream) {
+      if (result.containsKey(stream.streamId)) {
         throw ArgumentError('CCTV02 duplicate stream id: ${stream.streamId}.');
       }
+      result[stream.streamId] = stream;
     }
     return result;
   }
