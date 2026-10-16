@@ -2,7 +2,7 @@
 
 Status: DESIGN HARDENED / RUNTIME NOT STARTED
 Depends on: P1/P2, canonical assemblies and power kernels.
-Parent: [ELV5 design](../elv5-discipline-calculations-design-specification.md); [process contracts](process-contracts.md); [typed process API](typed-process-api.md); [hardening amendments](code-level-hardening-amendments.md); [ACS code-level dossiers](process-specifications/acs-processes.md); [Flutter performance contract](flutter-performance-contract.md).
+Parent: [ELV5 design](../elv5-discipline-calculations-design-specification.md); [process contracts](process-contracts.md); [typed process API](typed-process-api.md); [hardening amendments](code-level-hardening-amendments.md); [ACS code-level dossiers](process-specifications/acs-processes.md); [calculation oracle errata](calculation-oracle-errata-v1.md); [Flutter performance contract](flutter-performance-contract.md).
 
 Inherited implementation and mandatory new extensions: [baseline contract P5](implemented-baseline.md#p5); [pinned evidence](baseline.json).
 
@@ -12,7 +12,7 @@ Inherited implementation and mandatory new extensions: [baseline contract P5](im
 |---|---|---|
 | ELV5-P5-001 | Implement ACS-01 explicit door-role alternatives/multiplicities with scoped canonical assignments | P5-T01 |
 | ELV5-P5-002 | Implement ACS-02 independent controller reader/relay/input resource capacities | P5-T02 |
-| ELV5-P5-003 | Implement ACS-03 lock holding/active/startup mode and shared-trunk voltage evidence | P5-T03 |
+| ELV5-P5-003 | Implement ACS-03 lock holding/active/startup mode and shared-trunk voltage evidence, including corrected arithmetic oracle | P5-T03 |
 | ELV5-P5-004 | Implement ACS-04 shared-source requirement composition with reserve/derating once | P5-T04 |
 | ELV5-P5-005 | Implement ACS-05 full protected sequence/model policy and global bank evidence | P5-T05 |
 | ELV5-P5-006 | Implement ACS-06 independent reader/control/feed/monitoring/release topology plus explicit safety/release truth table | P5-T06 |
@@ -21,7 +21,7 @@ Inherited implementation and mandatory new extensions: [baseline contract P5](im
 
 ## Normative code-level binding
 
-Runtime implementation MUST match ACS-01…06 in [process-specifications/acs-processes.md](process-specifications/acs-processes.md) across all 25 sections. The package summary does not authorize alternate formulas, hidden steady-state assumptions or a simplified release model.
+Runtime implementation MUST match ACS-01…06 in [process-specifications/acs-processes.md](process-specifications/acs-processes.md) across all 25 sections. The package summary does not authorize alternate formulas, hidden steady-state assumptions or a simplified release model. Where [calculation-oracle-errata-v1.md](calculation-oracle-errata-v1.md) names an exact vector correction, the erratum has higher authority over the older illustrative vector text.
 
 Implementation priority inside P5 is **ACS-03 → ACS-04 → ACS-05**, because these force correct transient/shared-source/battery integration with ELV4 before the simpler role/resource and topology checks.
 
@@ -53,6 +53,25 @@ highMargin = requiredMaxVoltage - terminalVoltageUpper
 ```
 
 The governing event is the required event/dimension with the worst valid signed margin/status. A short startup event can govern despite all steady-state cases passing. Reduced ACS-only trunk arithmetic is forbidden.
+
+### ACS-03 normative positive oracle correction
+
+The executable P5-T03/P8 vector MUST use the authority-controlled corrected fixture:
+
+```text
+source = 24.00 V
+shared trunk current = 0.30 A + 0.50 A = 0.80 A
+shared trunk resistance = 0.50 ohm
+lock branch current = 0.30 A
+lock branch resistance = 0.30 ohm
+
+trunk drop = 0.80 × 0.50 = 0.40 V
+branch origin voltage = 24.00 - 0.40 = 23.60 V
+lock branch drop = 0.30 × 0.30 = 0.09 V
+lock terminal voltage = 23.60 - 0.09 = 23.51 V
+```
+
+For a `22.00 V` inclusive minimum, exact headroom is `+1.51 V`. A golden test expecting the older `23.45 V / +1.45 V` from the same inputs is invalid. The fixture is a cross-check of exact ELV4 physical evidence; ELV5 still does not own/reimplement PWR-03 voltage-drop solving.
 
 ## ACS-04 — shared source/PSU requirement
 
@@ -110,7 +129,7 @@ Dependencies include door-role and controller-resource sets/selectors, lock stat
 
 P5 primary and supplemental vectors execute through schema-24 file SQLite, production capture/resolver, `Elv5CalculationExecutor` where appropriate, pure ACS kernels, guarded atomic publication, targeted workspace projection and close/reopen verification.
 
-Required vectors include role alternatives/exact multiplicity, resource-pool boundary, control-without-feed, startup governing steady state, source reserve repeated-door adversary, shared-bank non-ACS load, energy-pass/current-fail bank case, complete fail-safe and fail-secure/project-defined five-cause truth tables, duplicate/missing cause rows and technical-vs-ELV7 claim separation.
+Required vectors include role alternatives/exact multiplicity, resource-pool boundary, control-without-feed, **ACS-03 corrected 23.51 V/+1.51 V oracle**, startup governing steady state, source reserve repeated-door adversary, shared-bank non-ACS load, energy-pass/current-fail bank case, complete fail-safe and fail-secure/project-defined five-cause truth tables, duplicate/missing cause rows and technical-vs-ELV7 claim separation.
 
 ## Performance obligations
 
@@ -126,6 +145,6 @@ P5 follows [flutter-performance-contract.md](flutter-performance-contract.md):
 
 ## Exit
 
-P5 runtime acceptance requires P5-T01…T08, both primary POS/NEG entries for ACS-01…06, all ACS boundary/adversarial/cross-discipline dossier vectors and required L0–L6/performance evidence at the same tested source SHA and authority fingerprint.
+P5 runtime acceptance requires P5-T01…T08, both primary POS/NEG entries for ACS-01…06, all ACS boundary/adversarial/cross-discipline dossier vectors, the corrected ACS-03 oracle test and required L0–L6/performance evidence at the same tested source SHA and authority fingerprint.
 
-P5 cannot close if ACS-06 reports generic PASS with an unproven required release cause, if control is mistaken for power feed, if shared-source membership is reduced by discipline filtering, or if technical release evidence is labelled verified legal/normative compliance.
+P5 cannot close if ACS-06 reports generic PASS with an unproven required release cause, if control is mistaken for power feed, if shared-source membership is reduced by discipline filtering, if the obsolete ACS-03 arithmetic is accepted, or if technical release evidence is labelled verified legal/normative compliance.
