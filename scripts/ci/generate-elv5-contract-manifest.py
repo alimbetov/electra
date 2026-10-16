@@ -40,6 +40,7 @@ AUTHORITY_PATHS = [
     "docs/product/elv5-implementation/calculation-engine-contract.md",
     "docs/product/elv5-implementation/process-code-level-specification.md",
     *DOSSIER_PATHS,
+    "docs/product/elv5-implementation/calculation-oracle-errata-v1.md",
     "docs/product/elv5-implementation/flutter-performance-contract.md",
     "docs/product/elv5-implementation/persistence-schema-contract.md",
     "docs/product/elv5-implementation/code-level-runtime-contract.md",
@@ -135,6 +136,7 @@ def main() -> None:
     algorithm_registry_path = IMPL / "algorithm-registry.json"
     command_registry_path = IMPL / "command-registry.json"
     requirements_path = IMPL / "requirements.json"
+    oracle_errata_path = IMPL / "calculation-oracle-errata-v1.md"
 
     process_registry = load_json(process_registry_path)
     algorithm_registry = load_json(algorithm_registry_path)
@@ -172,19 +174,16 @@ def main() -> None:
         raise SystemExit("duplicate ELV5 command operation")
 
     dossier_rows = dossier_inventory()
-    dossier_codes = {
-        code
-        for row in dossier_rows
-        for code in row["processCodes"]
-    }
+    dossier_codes = {code for row in dossier_rows for code in row["processCodes"]}
     if dossier_codes != set(process_codes):
         raise SystemExit("code-level dossier process inventory differs from process registry")
 
+    errata_text = oracle_errata_path.read_text(encoding="utf-8")
+    if "23.51 V" not in errata_text or "ERRATA-001 — ACS-03" not in errata_text:
+        raise SystemExit("ACS-03 calculation oracle errata is incomplete")
+
     required_dimension_inventory = [
-        {
-            "code": row["code"],
-            "requiredDimensions": sorted(row["requiredDimensions"]),
-        }
+        {"code": row["code"], "requiredDimensions": sorted(row["requiredDimensions"])}
         for row in sorted(processes, key=lambda item: item["code"])
     ]
     algorithm_inventory = [
@@ -199,10 +198,7 @@ def main() -> None:
         for row in sorted(algorithms, key=lambda item: item["code"])
     ]
     command_inventory = [
-        {
-            "operation": row["operation"],
-            "payloadKeys": sorted(row.get("payloadKeys", [])),
-        }
+        {"operation": row["operation"], "payloadKeys": sorted(row.get("payloadKeys", []))}
         for row in sorted(commands, key=lambda item: item["operation"])
     ]
 
@@ -211,13 +207,7 @@ def main() -> None:
         path = ROOT / relative
         if not path.is_file():
             raise SystemExit(f"missing authority artifact: {relative}")
-        artifacts.append(
-            {
-                "path": relative,
-                "sha256": sha256_file(path),
-                "byteLength": path.stat().st_size,
-            }
-        )
+        artifacts.append({"path": relative, "sha256": sha256_file(path), "byteLength": path.stat().st_size})
 
     manifest_core = {
         "manifestSchema": "electra.elv5-contract-manifest.v1",
@@ -232,7 +222,7 @@ def main() -> None:
         "processCodeLevelDossierCount": 27,
         "processDossierSectionCount": 25,
         "processVectorClassCount": 5,
-        "fourthPassFindingCount": 18,
+        "fourthPassFindingCount": 19,
         "commandCount": 16,
         "requirementCount": 80,
         "primaryProcessOracleCount": 54,
@@ -242,18 +232,13 @@ def main() -> None:
         "processContractsSha256": sha256_file(IMPL / "process-contracts.md"),
         "processCodeLevelSpecificationSha256": sha256_file(IMPL / "process-code-level-specification.md"),
         "processDossierAggregateSha256": sha256_bytes(deterministic_json_bytes(dossier_rows)),
+        "calculationOracleErrataSha256": sha256_file(oracle_errata_path),
         "flutterPerformanceContractSha256": sha256_file(IMPL / "flutter-performance-contract.md"),
         "commandRegistrySha256": sha256_file(command_registry_path),
         "requirementsSha256": sha256_file(requirements_path),
-        "requiredDimensionInventorySha256": sha256_bytes(
-            deterministic_json_bytes(required_dimension_inventory)
-        ),
-        "algorithmInventorySha256": sha256_bytes(
-            deterministic_json_bytes(algorithm_inventory)
-        ),
-        "commandPayloadInventorySha256": sha256_bytes(
-            deterministic_json_bytes(command_inventory)
-        ),
+        "requiredDimensionInventorySha256": sha256_bytes(deterministic_json_bytes(required_dimension_inventory)),
+        "algorithmInventorySha256": sha256_bytes(deterministic_json_bytes(algorithm_inventory)),
+        "commandPayloadInventorySha256": sha256_bytes(deterministic_json_bytes(command_inventory)),
         "authorityArtifacts": artifacts,
     }
     authority_fingerprint = sha256_bytes(deterministic_json_bytes(manifest_core))
@@ -264,25 +249,19 @@ def main() -> None:
         "sourceSha": source_sha(),
         "runtimeStatus": "NOT_STARTED",
         "qualificationStatus": "NOT_EXECUTED",
-        "note": (
-            "Authority fingerprint/design-entry evidence only. "
-            "It does not constitute ELV5 runtime implementation or engineering acceptance."
-        ),
+        "note": "Authority fingerprint/design-entry evidence only. It does not constitute ELV5 runtime implementation or engineering acceptance.",
     }
 
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(
-        json.dumps(manifest, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
-        encoding="utf-8",
-    )
+    output.write_text(json.dumps(manifest, ensure_ascii=False, sort_keys=True, indent=2) + "\n", encoding="utf-8")
 
     print(f"ELV5 contract manifest generated: {output}")
     print(f"sourceSha={manifest['sourceSha']}")
     print(f"authorityFingerprintSha256={authority_fingerprint}")
     print(
         f"processes=27 algorithms=27 dossiers=27 sections=25 commands=16 "
-        f"requirements=80 primaryOracles=54 fourthPassFindings=18 schema=24 "
+        f"requirements=80 primaryOracles=54 fourthPassFindings=19 schema=24 "
         f"authorityArtifacts={len(AUTHORITY_PATHS)}"
     )
 
