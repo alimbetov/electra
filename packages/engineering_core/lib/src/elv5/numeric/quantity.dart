@@ -91,7 +91,7 @@ final class Elv5Quantity<D extends Elv5Dimension>
       other is Elv5Quantity<D> && value == other.value;
 
   @override
-  int get hashCode => Object.hash(D, value);
+  int get hashCode => Object.hash(runtimeType, value);
 
   @override
   String toString() => value.toString();
