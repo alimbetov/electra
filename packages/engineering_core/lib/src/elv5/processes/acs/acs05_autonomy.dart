@@ -41,7 +41,7 @@ final class Acs05Pwr04Evidence {
     required this.availableEnergy,
     required this.contributors,
     required this.governingDimension,
-    required this.governingSegmentId,
+    this.governingSegmentId,
     this.peakCurrentMargin,
     this.endOfDischargePass = true,
   }) {
@@ -58,6 +58,12 @@ final class Acs05Pwr04Evidence {
         throw ArgumentError('ACS05 duplicate contributor loadId: ${contributor.loadId}');
       }
     }
+    if (governingDimension != Acs05GoverningDimension.energy &&
+        (governingSegmentId == null || governingSegmentId!.isEmpty)) {
+      throw ArgumentError(
+        'ACS05 non-energy governing dimension requires a governing segment.',
+      );
+    }
   }
 
   final String sequenceFingerprint;
@@ -67,7 +73,7 @@ final class Acs05Pwr04Evidence {
   final Energy availableEnergy;
   final List<Acs05ContributorEnergy> contributors;
   final Acs05GoverningDimension governingDimension;
-  final String governingSegmentId;
+  final String? governingSegmentId;
   final Current? peakCurrentMargin;
   final bool endOfDischargePass;
 }
@@ -121,7 +127,7 @@ final class Acs05Result {
   final Energy energyMargin;
   final Energy acsContributionEnergy;
   final Acs05GoverningDimension governingDimension;
-  final String governingSegmentId;
+  final String? governingSegmentId;
   final String? blockingReason;
 }
 
@@ -157,6 +163,7 @@ final class Acs05AutonomyProjectionKernel {
         ? Acs05AssessmentStatus.pass
         : Acs05AssessmentStatus.fail;
     var governingDimension = evidence.governingDimension;
+    var governingSegmentId = evidence.governingSegmentId;
     if (evidence.peakCurrentMargin != null &&
         evidence.peakCurrentMargin!.value < Elv5Rational.zero) {
       status = Acs05AssessmentStatus.fail;
@@ -166,6 +173,7 @@ final class Acs05AutonomyProjectionKernel {
       governingDimension = Acs05GoverningDimension.endOfDischarge;
     } else if (energyMargin.value < Elv5Rational.zero) {
       governingDimension = Acs05GoverningDimension.energy;
+      governingSegmentId = null;
     }
 
     return Acs05Result(
@@ -175,7 +183,7 @@ final class Acs05AutonomyProjectionKernel {
       energyMargin: energyMargin,
       acsContributionEnergy: acsContribution,
       governingDimension: governingDimension,
-      governingSegmentId: evidence.governingSegmentId,
+      governingSegmentId: governingSegmentId,
     );
   }
 
