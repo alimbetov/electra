@@ -132,7 +132,7 @@
     {
       "area": "RM01 result ownership",
       "implemented": "Dedicated power_evaluation_records/pointers plus reverse index, isolated from legacy ProjectDerivedResults.",
-      "disposition": "Recorded deviation from planned shared ProjectDerivedResults owner/kind extension; no assumption of shared invalidation. C01/C05 remain blocking."
+      "disposition": "Recorded deviation from planned shared ProjectDerivedResults owner/kind extension; dedicated power evaluation ownership and invalidation are verified by the resolved C01-C05 implementation evidence and final exact-head acceptance gate."
     }
   ],
   "technicalEvidence": [
