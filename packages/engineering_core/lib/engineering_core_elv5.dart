@@ -13,6 +13,7 @@ export 'src/elv5/processes/acs/acs03_electrical.dart';
 export 'src/elv5/processes/acs/acs04_source_requirement.dart';
 export 'src/elv5/processes/acs/acs05_autonomy.dart';
 export 'src/elv5/processes/acs/acs06_topology.dart';
+export 'src/elv5/processes/cctv/cctv01_geometry.dart';
 export 'src/elv5/processes/cctv/cctv02_bandwidth.dart';
 export 'src/elv5/processes/cctv/cctv03_storage.dart';
 export 'src/elv5/processes/cctv/cctv04_pse_projection.dart';
