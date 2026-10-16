@@ -1,5 +1,7 @@
 import '../acs/acs03_electrical_contract.dart';
 import '../acs/acs03_runtime.dart';
+import '../acs/acs04_runtime.dart';
+import '../acs/acs04_source_requirement_contract.dart';
 import '../acs/elv5_acs_persistence.dart';
 import '../cctv/cctv02_runtime.dart';
 import '../cctv/cctv03_runtime.dart';
@@ -17,10 +19,9 @@ import 'elv5_blocked_capture.dart';
 import 'elv5_calculation_runtime.dart';
 import 'elv5_capture_guard.dart';
 
-/// First production vertical slice backed entirely by persisted ELV3/ELV4/ELV5
-/// facts. The blocked-aware adapter preserves missing mandatory evidence as a
-/// durable BLOCKED evaluation instead of turning an engineering gap into a
-/// transient application failure.
+/// Production ELV5 persisted-fact vertical backed by revision-scoped ELV3,
+/// ELV4 and ELV5 evidence. Mandatory evidence gaps become durable BLOCKED
+/// evaluations; calculation kernels remain repository-free and deterministic.
 Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
   required Elv5CctvMutationStore cctvStore,
   required Elv5LanMutationStore lanStore,
@@ -29,6 +30,7 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
   required Elv3RealizedLinkFactSource elv3LinkFacts,
   required Lan05OpticalSectionEvidenceSource opticalSectionEvidence,
   required Acs03ElectricalContractSource acs03Contracts,
+  required Acs04SourceRequirementContractSource acs04Contracts,
   required Elv4CurrentEvidenceSource currentPowerEvidence,
   required Elv4OperatingFactSource powerOperatingFacts,
   required Elv5CaptureRevisionSource captureRevisions,
@@ -88,6 +90,17 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
         ),
       ),
       executor: buildAcs03Executor(nowUtc: nowUtc),
+      nowUtc: nowUtc,
+    ),
+    Elv5BlockedAwareTypedProcessCalculationAdapter(
+      resolver: guarded(
+        Acs04PersistedInputResolver(
+          contractSource: acs04Contracts,
+          powerEvidence: currentPowerEvidence,
+          nowUtc: nowUtc,
+        ),
+      ),
+      executor: buildAcs04Executor(nowUtc: nowUtc),
       nowUtc: nowUtc,
     ),
     Elv5BlockedAwareTypedProcessCalculationAdapter(
