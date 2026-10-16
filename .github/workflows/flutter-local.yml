@@ -88,6 +88,10 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+      - name: Verify ELV5 1500-case combinatorial contract
+        working-directory: .
+        run: python3 scripts/ci/check-elv5-combinatorial-1500.py
+
       - name: Generate ELV5 contract manifest
         working-directory: .
         run: >-
