@@ -119,7 +119,7 @@ INSERT INTO project_design_revisions (
   await db.customStatement('''
 INSERT INTO component_instances (
   id, definition_id, definition_version, room_id, host_surface_patch_id,
-  local_x_mm, local_y_mm, revision, created_at, updated_at, origin_device_id
+  local_xmm, local_ymm, revision, created_at, updated_at, origin_device_id
 ) VALUES ('lock-1', 'lock-def', 1, 'room-1', 'patch-1',
   0, 0, 1, '$now', '$now', 'test')
 ''');
