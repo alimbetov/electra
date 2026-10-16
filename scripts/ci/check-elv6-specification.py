@@ -63,6 +63,15 @@ def validate_process_registry(registry):
     assert 'LAY-23' not in by_code['LAY-24']['upstream'], 'aggregate result must not depend on proposal existence'
 
 
+def acceptance_id(requirement_id):
+    match = re.fullmatch(r'ELV6-P([0-9])-([0-9]{3})', requirement_id)
+    assert match
+    package = int(match.group(1))
+    ordinal = int(match.group(2))
+    assert 1 <= ordinal <= 8
+    return f'P{package}-T{ordinal:02d}'
+
+
 def validate_requirements(plan_text):
     ids = re.findall(r'^### (ELV6-P([0-9])-([0-9]{3}))\b', plan_text, flags=re.M)
     full = [row[0] for row in ids]
@@ -72,9 +81,12 @@ def validate_requirements(plan_text):
     for package in range(10):
         expected = {f'ELV6-P{package}-{i:03d}' for i in range(1, 9)}
         assert expected <= set(full), ('missing package requirements', package, expected - set(full))
-    acceptance = set(re.findall(r'`(P[0-9]-T[0-9]{2})`', plan_text))
-    expected_acceptance = {f'P{p}-T{i:02d}' for p in range(10) for i in range(1, 9)}
-    assert acceptance == expected_acceptance, ('acceptance ID drift', expected_acceptance - acceptance, acceptance - expected_acceptance)
+
+    acceptance_clauses = re.findall(r'^Acceptance:\s+(.+)$', plan_text, flags=re.M)
+    assert len(acceptance_clauses) == 80, ('every requirement needs one acceptance clause', len(acceptance_clauses))
+    derived = {acceptance_id(requirement_id) for requirement_id in full}
+    assert len(derived) == 80
+    assert derived == {f'P{p}-T{i:02d}' for p in range(10) for i in range(1, 9)}
 
 
 def validate_boundary_documents():
@@ -152,7 +164,7 @@ def main():
     validate_boundary_documents()
     validate_repository_baseline()
     links = validate_links()
-    print(f'PASS: ELV6 24 processes, 80 P0-P9 requirements, 18 audit findings, {links} local links; design-only guard')
+    print(f'PASS: ELV6 24 processes, 80 P0-P9 requirements/acceptance clauses, 18 audit findings, {links} local links; design-only guard')
 
 
 if __name__ == '__main__':
