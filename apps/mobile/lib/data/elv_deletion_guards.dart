@@ -24,6 +24,68 @@ Future<void> guardComponentElvPorts(
     );
 }
 
+Future<void> guardMutableEngineeringPortAgainstPowerOwnership(
+  AppDatabase database,
+  String projectId,
+  String portId,
+) async {
+  final owned =
+      await database
+          .customSelect(
+            '''
+SELECT 1
+WHERE
+  EXISTS (
+    SELECT 1 FROM power_port_bindings b
+    WHERE b.project_id = ?1 AND b.port_id = ?2 AND b.deleted_at IS NULL
+  )
+  OR EXISTS (
+    SELECT 1 FROM power_transfer_bindings b
+    WHERE b.project_id = ?1 AND b.input_port_id = ?2 AND b.deleted_at IS NULL
+  )
+  OR EXISTS (
+    SELECT 1 FROM power_transfer_outputs b
+    WHERE b.project_id = ?1 AND b.output_port_id = ?2
+  )
+  OR EXISTS (
+    SELECT 1 FROM power_load_bindings b
+    WHERE b.project_id = ?1 AND b.input_port_id = ?2 AND b.deleted_at IS NULL
+  )
+  OR EXISTS (
+    SELECT 1 FROM power_capacity_group_members b
+    WHERE b.project_id = ?1 AND b.output_port_id = ?2
+  )
+  OR EXISTS (
+    SELECT 1 FROM power_supply_requirement_inputs b
+    WHERE b.project_id = ?1 AND b.input_port_id = ?2
+  )
+  OR EXISTS (
+    SELECT 1 FROM poe_delivery_bindings b
+    WHERE b.project_id = ?1
+      AND (b.pse_port_id = ?2 OR b.pd_port_id = ?2)
+      AND b.deleted_at IS NULL
+  )
+  OR EXISTS (
+    SELECT 1 FROM backup_protected_outputs b
+    WHERE b.project_id = ?1 AND b.output_port_id = ?2
+  )
+LIMIT 1
+''',
+            variables: [
+              Variable.withString(projectId),
+              Variable.withString(portId),
+            ],
+            readsFrom: database.allTables.toSet(),
+          )
+          .getSingleOrNull();
+  if (owned != null) {
+    throw StateError(
+      'ELV4_POWER_PORT_OWNED: Release or replace revision-scoped power '
+      'ownership before editing or retiring this engineering port.',
+    );
+  }
+}
+
 Future<void> guardSystemElvTopology(
   AppDatabase database,
   String systemId, {
