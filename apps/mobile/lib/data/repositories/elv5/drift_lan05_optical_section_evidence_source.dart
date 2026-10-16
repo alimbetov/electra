@@ -48,10 +48,10 @@ final class DriftLan05OpticalSectionEvidenceSource
           throw StateError('LAN05_ATTENUATION_PROFILE_INVALID:$realizedSectionId');
         }
         final profile = Map<String, Object?>.from(raw);
-        final wave = _decimal(profile, 'wavelengthNm');
+        final wave = _exact(profile, 'wavelengthNm');
         if (wave != wavelengthNm) continue;
-        final minimum = _decimal(profile, 'minDbPerKm');
-        final maximum = _decimal(profile, 'maxDbPerKm');
+        final minimum = _exact(profile, 'minDbPerKm');
+        final maximum = _exact(profile, 'maxDbPerKm');
         if (minimum < Elv5Rational.zero || maximum < minimum) {
           throw StateError('LAN05_ATTENUATION_INTERVAL_INVALID:$realizedSectionId');
         }
@@ -86,10 +86,11 @@ final class DriftLan05OpticalSectionEvidenceSource
   }
 }
 
-Elv5Rational _decimal(Map<String, Object?> value, String key) {
+Elv5Rational _exact(Map<String, Object?> value, String key) {
   final raw = value[key];
-  if (raw is! String) {
-    throw FormatException('$key must be an exact decimal string.');
+  if (raw is String) return Elv5Rational.parseDecimal(raw);
+  if (raw is Map) {
+    return Elv5Rational.fromMap(Map<String, Object?>.from(raw));
   }
-  return Elv5Rational.parseDecimal(raw);
+  throw FormatException('$key must be an exact decimal string or rational map.');
 }
