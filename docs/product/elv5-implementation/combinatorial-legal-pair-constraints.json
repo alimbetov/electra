@@ -1,0 +1,58 @@
+{
+  "schema": "electra.elv5-combinatorial-legal-pairs.v1",
+  "status": "DESIGN_HARDENED_RUNTIME_NOT_STARTED",
+  "factorModelRef": "combinatorial-engineering-requirements.json#factorModel",
+  "policy": {
+    "defaultPairState": "LEGAL",
+    "silentExclusionAllowed": false,
+    "scenarioMayContainExcludedPair": false,
+    "coverageRule": "Every legal factor-value pair MUST be present in at least one generated per-process scenario.",
+    "antiGamingRule": "A pair may be excluded only when the process contract makes the two abstract factor states semantically impossible to coexist; inconvenience, expected FAIL/BLOCKED outcome, missing evidence, unsupported model, boundary violation or implementation difficulty are not exclusion reasons."
+  },
+  "reasonCodes": [
+    {
+      "code": "SEMANTICALLY_IMPOSSIBLE_PAIR",
+      "meaning": "The two factor values cannot coexist in one valid semantic scenario for the named process under the active process contract."
+    },
+    {
+      "code": "PROCESS_SCOPE_NOT_APPLICABLE",
+      "meaning": "One factor value has no semantic meaning for the named process and cannot be represented even as a negative/unsupported qualification state."
+    }
+  ],
+  "globalExcludedPairs": [],
+  "processOverrides": {
+    "CCTV-01": {"excludedPairs": []},
+    "CCTV-02": {"excludedPairs": []},
+    "CCTV-03": {"excludedPairs": []},
+    "CCTV-04": {"excludedPairs": []},
+    "CCTV-05": {"excludedPairs": []},
+    "CCTV-06": {"excludedPairs": []},
+    "LAN-01": {"excludedPairs": []},
+    "LAN-02": {"excludedPairs": []},
+    "LAN-03": {"excludedPairs": []},
+    "LAN-04": {"excludedPairs": []},
+    "LAN-05": {"excludedPairs": []},
+    "LAN-06": {"excludedPairs": []},
+    "LAN-07": {"excludedPairs": []},
+    "ACS-01": {"excludedPairs": []},
+    "ACS-02": {"excludedPairs": []},
+    "ACS-03": {"excludedPairs": []},
+    "ACS-04": {"excludedPairs": []},
+    "ACS-05": {"excludedPairs": []},
+    "ACS-06": {"excludedPairs": []},
+    "FA-01": {"excludedPairs": []},
+    "FA-02": {"excludedPairs": []},
+    "FA-03": {"excludedPairs": []},
+    "FA-04": {"excludedPairs": []},
+    "FA-05": {"excludedPairs": []},
+    "FA-06": {"excludedPairs": []},
+    "FA-07": {"excludedPairs": []},
+    "FA-08": {"excludedPairs": []}
+  },
+  "currentClosure": {
+    "excludedPairCount": 0,
+    "rationale": "The eight factor levels are qualification intents rather than literal product states. Negative, unsupported, zero-cardinality, cross-discipline and mutation states are deliberately representable together, so the strongest current closure treats every pair as legal instead of gaming coverage by excluding difficult pairs.",
+    "requiredLegalPairCountPerProcess": 593,
+    "requiredLegalPairCountAllProcesses": 16011
+  }
+}
