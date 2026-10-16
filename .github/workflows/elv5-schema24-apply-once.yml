@@ -1,0 +1,43 @@
+name: ELV5 Schema24 Apply Once
+
+on:
+  push:
+    branches:
+      - feat/flutter-elv5-power-topology-design
+    paths:
+      - .github/workflows/elv5-schema24-apply-once.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/flutter-elv5-power-topology-design
+          fetch-depth: 0
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Apply schema-24 patch
+        run: python3 scripts/ci/apply-elv5-p2-schema24-runtime.py
+      - name: Format database sources
+        run: |
+          dart format \
+            apps/mobile/lib/data/database/app_database.dart \
+            apps/mobile/lib/data/database/power_database_tables.dart \
+            apps/mobile/lib/data/database/discipline_database_tables.dart
+      - name: Remove one-shot tooling and commit
+        run: |
+          git rm .github/workflows/elv5-schema24-apply-once.yml
+          git rm scripts/ci/apply-elv5-p2-schema24-runtime.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/mobile/lib/data/database/app_database.dart \
+                  apps/mobile/lib/data/database/power_database_tables.dart \
+                  apps/mobile/lib/data/database/discipline_database_tables.dart
+          git commit -m "feat(elv5): integrate schema 24 into AppDatabase"
+          git push origin HEAD:feat/flutter-elv5-power-topology-design
