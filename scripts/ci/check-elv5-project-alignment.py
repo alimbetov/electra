@@ -26,6 +26,8 @@ def main() -> None:
     process_contracts = text(IMPL / 'process-contracts.md')
     acs_dossier = text(IMPL / 'process-specifications/acs-processes.md')
     persistence = text(IMPL / 'persistence-schema-contract.md')
+    baseline = text(IMPL / 'implemented-baseline.md')
+    adr = text(ROOT / 'docs/adr/ADR-031-elv5-pure-core-and-module-boundary.md')
     roadmap = text(ROOT / 'docs/product/development-roadmap.md')
     versions = json.loads(text(IMPL / 'runtime-version-registry.json'))
     handoff = json.loads(text(IMPL / 'downstream-handoff-registry.json'))
@@ -35,6 +37,7 @@ def main() -> None:
         'project-alignment-hardening-v1.md',
         'implementation-binding-hardening-v1.md',
         'downstream-handoff-registry.json',
+        'ADR-031-elv5-pure-core-and-module-boundary.md',
         '1500',
         'seventh-pass',
     ]:
@@ -48,6 +51,16 @@ def main() -> None:
         'binding hardening does not freeze resolver ownership')
     req('exact filename is not engineering semantics' in binding.lower(),
         'source-layout filename policy not reconciled')
+
+    adr_lower = adr.lower()
+    req('adr-031 — elv5 pure-core and module boundary' in adr_lower,
+        'ADR-031 identity missing')
+    req('repository-aware `resolveinput(...)` is not a method' in adr_lower,
+        'ADR-031 resolver ownership missing')
+    req('exact source filenames are **tracked implementation coordinates**' in adr_lower,
+        'ADR-031 source-layout semantics missing')
+    req('packages/engineering_core/lib/src/elv5/' in adr,
+        'ADR-031 nested ELV5 bounded-context layout missing')
 
     stale_oracles = ['23.45 V', '+1.45 V', 'lock23.45V']
     for stale in stale_oracles:
@@ -63,6 +76,12 @@ def main() -> None:
         'persistence schema-24 contract missing')
     req('supersedes earlier baseline wording' in binding,
         'schema-24 precedence sentence missing')
+    req('schema 23 → schema 24' in baseline,
+        'implemented baseline does not freeze schema 23 -> 24')
+    req('Choose an additive migration version strictly greater than 23 from the actual implementation HEAD' not in baseline,
+        'obsolete choose->23 migration directive remains active')
+    req('arbitrary version greater than 23' in baseline,
+        'baseline does not explicitly record superseded provisional schema rule')
 
     policy = handoff['runtimeEntryPolicy']
     req(policy['exactAcceptedElv5SourceShaRequired'], 'downstream exact ELV5 source SHA not required')
@@ -104,7 +123,7 @@ def main() -> None:
 
     print('ELV5 seventh-pass project alignment PASS')
     print('findings=10 resolved=10 open=0 downstreamReconciliationRequired=1')
-    print('acs03=23.51V/+1.51V resolverOwnership=application schema=24 authorityHandoff=exact-fingerprint')
+    print('acs03=23.51V/+1.51V resolverOwnership=application schema=24 authorityHandoff=exact-fingerprint adr031=verified')
 
 
 if __name__ == '__main__':
