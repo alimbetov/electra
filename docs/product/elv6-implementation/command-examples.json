@@ -1,0 +1,211 @@
+{
+  "schema": "electra.elv6-command-examples.v1",
+  "status": "DESIGN_DRAFT",
+  "wireSchema": "electra.elv6-layout-command.v1",
+  "payloadSchemaVersion": 1,
+  "envelopeTemplate": {
+    "schema": "electra.elv6-layout-command.v1",
+    "operation": "<OPERATION>",
+    "payloadSchemaVersion": 1,
+    "projectId": "project-fixture",
+    "designRevisionId": "rev-r1",
+    "commandId": "cmd-fixture-0001",
+    "expectedDesignRowRevision": 1,
+    "expectedRows": {"design:rev-r1": 1},
+    "reviewedImpactFingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "payload": {}
+  },
+  "examples": [
+    {
+      "operation": "CREATE_RACK_ENCLOSURE",
+      "validPayload": {
+        "rackId": "rack-01",
+        "logicalId": "rack-logical-01",
+        "kind": "FLOOR_RACK",
+        "geometry": {"outer": {"min": [0,0,0], "max": [600000,2000000,1000000]}, "usable": {"min": [20000,20000,20000], "max": [580000,1980000,980000]}},
+        "rackProfileRef": {"id": "rack-profile-01", "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"},
+        "locationRef": {"owner": "PROJECT", "kind": "ROOM", "id": "room-01"},
+        "technicalDefinitionRef": null
+      },
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "geometry", "expectedCode": "ELV6_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "UPDATE_RACK_ENCLOSURE",
+      "validPayload": {
+        "rackId": "rack-01",
+        "kind": "FLOOR_RACK",
+        "geometry": {"outer": {"min": [0,0,0], "max": [600000,2200000,1000000]}, "usable": {"min": [20000,20000,20000], "max": [580000,2180000,980000]}},
+        "rackProfileRef": {"id": "rack-profile-01", "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"},
+        "locationRef": {"owner": "PROJECT", "kind": "ROOM", "id": "room-01"},
+        "technicalDefinitionRef": null
+      },
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "rackId", "expectedCode": "ELV6_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "ARCHIVE_RACK_ENCLOSURE",
+      "validPayload": {"rackId": "rack-01", "archiveReason": "REPLACED_BY_REVISION"},
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "archiveReason", "expectedCode": "ELV6_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "REPLACE_PANEL_LAYOUT_ROOT",
+      "validPayload": {
+        "panelId": "panel-01",
+        "panelLogicalId": "panel-logical-01",
+        "panelType": "AUTOMATION_PANEL",
+        "enclosureGeometry": {"outer": {"min": [0,0,0], "max": [800000,1200000,300000]}, "usable": {"min": [30000,30000,20000], "max": [770000,1170000,280000]}},
+        "mountingSections": [{"id": "section-01", "name": "main"}],
+        "sourceSemanticFingerprint": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      },
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "sourceSemanticFingerprint", "expectedCode": "ELV6_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "REPLACE_MOUNTING_SURFACES",
+      "validPayload": {
+        "hostRef": {"ownerKind": "PANEL_ASSEMBLY", "hostId": "panel-01", "logicalId": "panel-logical-01"},
+        "surfaces": [{"id": "din-01", "kind": "DIN_RAIL", "frame": {"origin": [50000,100000,50000], "xAxis": "POS_X", "yAxis": "POS_Y", "zAxis": "POS_Z"}, "usableEnvelope": {"min": [0,0,0], "max": [540000,35000,20000]}}]
+      },
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "surfaces", "expectedCode": "ELV6_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "REPLACE_LAYOUT_ZONES",
+      "validPayload": {
+        "hostRef": {"ownerKind": "PANEL_ASSEMBLY", "hostId": "panel-01", "logicalId": "panel-logical-01"},
+        "zones": [{"id": "zone-service-01", "kind": "SERVICE", "envelope": {"min": [0,0,0], "max": [800000,150000,300000]}, "blocksEquipment": true, "policyRef": null}]
+      },
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "zones", "expectedCode": "ELV6_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "REPLACE_CABLE_ENTRIES",
+      "validPayload": {
+        "hostRef": {"ownerKind": "PANEL_ASSEMBLY", "hostId": "panel-01", "logicalId": "panel-logical-01"},
+        "entries": [{"id": "entry-01", "kind": "GLAND_PLATE", "frame": {"origin": [100000,0,150000], "xAxis": "POS_X", "yAxis": "POS_Z", "zAxis": "NEG_Y"}, "openingEnvelope": {"min": [0,0,0], "max": [300000,1000,100000]}, "maxCableCount": 24}]
+      },
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "entries", "expectedCode": "ELV6_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "PLACE_LAYOUT_SUBJECT",
+      "validPayload": {
+        "placementId": "placement-01",
+        "logicalId": "placement-logical-01",
+        "hostRef": {"ownerKind": "PANEL_ASSEMBLY", "hostId": "panel-01", "logicalId": "panel-logical-01"},
+        "subjectRef": {"owner": "ELV2", "kind": "COMPONENT_DEFINITION", "id": "device-def-01", "designRevisionId": "rev-r1", "fingerprint": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"},
+        "installationRole": "PRIMARY_BODY",
+        "mountingSurfaceId": "din-01",
+        "pose": {"origin": [50000,100000,50000], "xAxis": "POS_X", "yAxis": "POS_Y", "zAxis": "POS_Z"},
+        "occupiedEnvelope": {"min": [50000,100000,50000], "max": [86000,190000,120000]},
+        "rackSpan": null,
+        "dinSpan": {"start": 0, "length": 2},
+        "sourceProposalId": null
+      },
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "occupiedEnvelope", "expectedCode": "ELV6_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "MOVE_LAYOUT_SUBJECT",
+      "validPayload": {
+        "placementId": "placement-01",
+        "hostRef": {"ownerKind": "PANEL_ASSEMBLY", "hostId": "panel-01", "logicalId": "panel-logical-01"},
+        "mountingSurfaceId": "din-01",
+        "pose": {"origin": [86000,100000,50000], "xAxis": "POS_X", "yAxis": "POS_Y", "zAxis": "POS_Z"},
+        "occupiedEnvelope": {"min": [86000,100000,50000], "max": [122000,190000,120000]},
+        "rackSpan": null,
+        "dinSpan": {"start": 2, "length": 2},
+        "sourceProposalId": null
+      },
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "pose", "expectedCode": "ELV6_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "REMOVE_LAYOUT_SUBJECT",
+      "validPayload": {"placementId": "placement-01", "hostRef": {"ownerKind": "PANEL_ASSEMBLY", "hostId": "panel-01", "logicalId": "panel-logical-01"}, "removalReason": "ENGINEER_EDIT"},
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "placementId", "expectedCode": "ELV6_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "LOCK_LAYOUT_PLACEMENT",
+      "validPayload": {"placementId": "placement-01", "hostRef": {"ownerKind": "PANEL_ASSEMBLY", "hostId": "panel-01", "logicalId": "panel-logical-01"}, "lockReason": "ENGINEER_FIXED_POSITION"},
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "lockReason", "expectedCode": "ELV6_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "UNLOCK_LAYOUT_PLACEMENT",
+      "validPayload": {"placementId": "placement-01", "hostRef": {"ownerKind": "PANEL_ASSEMBLY", "hostId": "panel-01", "logicalId": "panel-logical-01"}, "unlockReason": "ENGINEER_RELAYOUT"},
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "unlockReason", "expectedCode": "ELV6_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "ASSIGN_CABLE_ENTRY",
+      "validPayload": {
+        "assignmentId": "entry-assignment-01",
+        "hostRef": {"ownerKind": "PANEL_ASSEMBLY", "hostId": "panel-01", "logicalId": "panel-logical-01"},
+        "entryId": "entry-01",
+        "cableEndRef": {"owner": "ELV3", "kind": "CABLE_END", "id": "cable-01:end-b", "designRevisionId": "rev-r1", "fingerprint": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"},
+        "approachDirection": "FROM_BOTTOM",
+        "terminationTargetRef": {"owner": "ELV6", "kind": "TERMINATION_POSITION", "id": "term-01"}
+      },
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "cableEndRef", "expectedCode": "ELV6_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "RELEASE_CABLE_ENTRY",
+      "validPayload": {"assignmentId": "entry-assignment-01", "hostRef": {"ownerKind": "PANEL_ASSEMBLY", "hostId": "panel-01", "logicalId": "panel-logical-01"}, "releaseReason": "CABLE_RETERMINATED"},
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "assignmentId", "expectedCode": "ELV6_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "REPLACE_PHYSICAL_BONDING_ASSIGNMENTS",
+      "validPayload": {
+        "hostRef": {"ownerKind": "PANEL_ASSEMBLY", "hostId": "panel-01", "logicalId": "panel-logical-01"},
+        "bondPoints": [{"id": "bond-door", "partRole": "DOOR", "location": [780000,600000,20000]}, {"id": "bond-pebar", "partRole": "PE_BAR", "location": [100000,80000,50000]}],
+        "bondLinks": [{"id": "bond-link-01", "fromPoint": "bond-door", "toPoint": "bond-pebar", "conductorRef": null, "strapRef": "strap-tech-01"}]
+      },
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "bondLinks", "expectedCode": "ELV6_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "GENERATE_LAYOUT_PROPOSAL",
+      "validPayload": {
+        "proposalId": "proposal-01",
+        "hostRef": {"ownerKind": "ELV_RACK", "hostId": "rack-01", "logicalId": "rack-logical-01"},
+        "subjectRefs": [{"owner": "ELV2", "kind": "COMPONENT_DEFINITION", "id": "switch-01", "designRevisionId": "rev-r1", "fingerprint": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"}],
+        "solverProfileRef": {"id": "solver-policy-01", "hash": "1111111111111111111111111111111111111111111111111111111111111111"},
+        "expectedPointerGenerations": {"layout:rack-01": 3}
+      },
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "solverProfileRef", "expectedCode": "ELV6_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "ACCEPT_LAYOUT_PROPOSAL",
+      "validPayload": {
+        "proposalId": "proposal-01",
+        "hostRef": {"ownerKind": "ELV_RACK", "hostId": "rack-01", "logicalId": "rack-logical-01"},
+        "expectedProposalHash": "2222222222222222222222222222222222222222222222222222222222222222",
+        "expectedOwnerRevisions": {"rack:rack-01": 4},
+        "expectedPointerGenerations": {"layout:rack-01": 3}
+      },
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "expectedProposalHash", "expectedCode": "ELV6_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "REJECT_LAYOUT_PROPOSAL",
+      "validPayload": {"proposalId": "proposal-01", "hostRef": {"ownerKind": "ELV_RACK", "hostId": "rack-01", "logicalId": "rack-logical-01"}, "rejectionReason": "ENGINEER_REJECTED"},
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "rejectionReason", "expectedCode": "ELV6_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "CALCULATE_LAYOUT_PROCESS",
+      "validPayload": {
+        "hostRef": {"ownerKind": "ELV_RACK", "hostId": "rack-01", "logicalId": "rack-logical-01"},
+        "processCodes": ["LAY-03", "LAY-04", "LAY-06", "LAY-09", "LAY-24"],
+        "subjects": [{"kind": "PLACEMENT", "id": "placement-01"}],
+        "expectedPointerGenerations": {"layout:rack-01": 3}
+      },
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "processCodes", "expectedCode": "ELV6_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "REPLACE_LAYOUT_TECHNICAL_PROFILE",
+      "validPayload": {
+        "bindingId": "layout-profile-binding-01",
+        "hostRef": {"ownerKind": "ELV_RACK", "hostId": "rack-01", "logicalId": "rack-logical-01"},
+        "profileRole": "RACK_MECHANICAL_PROFILE",
+        "definitionRef": {"id": "rack-profile-01", "editionId": "v1", "contentHash": "3333333333333333333333333333333333333333333333333333333333333333"},
+        "applicability": {"processCodes": ["LAY-05", "LAY-06"]}
+      },
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "definitionRef", "expectedCode": "ELV6_PAYLOAD_FIELDS_MISMATCH"}
+    },
+    {
+      "operation": "RELEASE_LAYOUT_TECHNICAL_PROFILE",
+      "validPayload": {"bindingId": "layout-profile-binding-01", "hostRef": {"ownerKind": "ELV_RACK", "hostId": "rack-01", "logicalId": "rack-logical-01"}, "releasePolicy": "REMOVE_BINDING_KEEP_CANONICAL_LAYOUT"},
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "releasePolicy", "expectedCode": "ELV6_PAYLOAD_FIELDS_MISMATCH"}
+    }
+  ]
+}
