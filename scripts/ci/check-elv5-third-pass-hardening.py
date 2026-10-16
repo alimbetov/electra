@@ -112,8 +112,9 @@ for token in ["code-level-hardening-v2.md", "54", "schema 24"]:
     require(token in impl_index, f"implementation index lost third-pass token: {token}")
 require(
     "37 specification resolutions" in impl_index
-    or "third-pass" in impl_index.lower() and ("37" in impl_index or "55" in impl_index),
-    "implementation index lost third-pass history",
+    or ("third-pass" in impl_index.lower() and "37" in impl_index)
+    or "Historical design findings through fourth pass: **56 resolved**" in impl_index,
+    "implementation index lost third-pass/fourth-pass finding history",
 )
 
 for token in [
