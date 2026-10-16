@@ -2,7 +2,7 @@
 
 Status: DESIGN HARDENED / RUNTIME NOT STARTED
 Depends on: P0 ownership/scope map.
-Parent: [ELV5 design](../elv5-discipline-calculations-design-specification.md); [process contracts](process-contracts.md); [code-level runtime contract](code-level-runtime-contract.md); [engineering primitives](engineering-primitives-contract.md); [typed process API](typed-process-api.md); [unified calculation engine](calculation-engine-contract.md); [algorithm registry](algorithm-registry.json).
+Parent: [ELV5 design](../elv5-discipline-calculations-design-specification.md); [process contracts](process-contracts.md); [code-level runtime contract](code-level-runtime-contract.md); [engineering primitives](engineering-primitives-contract.md); [typed process API](typed-process-api.md); [unified calculation engine](calculation-engine-contract.md); [algorithm registry](algorithm-registry.json); [27-process code-level specification](process-code-level-specification.md); [Flutter performance contract](flutter-performance-contract.md).
 
 Inherited implementation and mandatory new extensions: [baseline contract P1](implemented-baseline.md#p1); [pinned evidence](baseline.json).
 
@@ -23,7 +23,9 @@ Inherited implementation and mandatory new extensions: [baseline contract P1](im
 
 The machine-readable process registry is the design source for process membership, modes and planned oracles. [algorithm-registry.json](algorithm-registry.json) is the corresponding machine source for common solver-family mapping, operating-case inventory, governing rule, margin convention and limiting-factor semantics. Runtime registries are compiled/code-owned, not arbitrary expressions imported from profiles. Policy definitions are data, versioned and validated before adoption. Imported executable formula/script content is not supported.
 
-The runtime implementation MUST expose one closed `Elv5ProcessRegistry` containing exactly CCTV-01…06, LAN-01…07, ACS-01…06 and FA-01…08 and one closed calculation-engine registry mapping the same 27 process codes exactly once. Each definition pins `algorithmVersion`, `inputSchemaVersion`, `outputSchemaVersion`, `numericBackendVersion`, required dimension codes, discipline, legal scope kinds, typed upstream bindings and legal solver family. Startup/test construction fails on missing/duplicate code, missing algorithm mapping, unknown solver family, unknown upstream process, unknown binder, invalid scope compatibility or cycle.
+The runtime implementation MUST expose one closed `Elv5ProcessRegistry` containing exactly CCTV-01…06, LAN-01…07, ACS-01…06 and FA-01…08 and one closed calculation-engine registry mapping the same 27 process codes exactly once. Each definition pins `algorithmVersion`, `inputSchemaVersion`, `outputSchemaVersion`, `numericBackendVersion`, required dimension codes, discipline, legal scope kinds, typed upstream bindings, legal solver family and pure workload metadata. Startup/test construction fails on missing/duplicate code, missing algorithm mapping, unknown solver family, unknown upstream process, unknown binder, invalid scope compatibility or cycle.
+
+The four process-dossier files are now mandatory implementation input. For every runtime definition, its physical meaning, applicability, exact typed inputs, evidence, operating cases, mathematical model, equations, exact/bounded arithmetic, worst-case, requirement composition, comparisons, margins, governing/limiting logic, missing behavior, dependencies, trace, complexity, pseudocode/API intent and five vector classes MUST agree with the matching 25-section dossier. A developer may refactor code shape but may not reinterpret those semantics.
 
 `Elv5EngineeringNodeKeyV3` is owner-isolated from `PowerNodeKeyV2` and serializes `[engineering-node-v3, ELV5, revision, scenarioKey, scopeKind, scopeId, processCode, subjectKind, subjectId]`. DESIGN uses scenarioKey `NONE`; SEGMENT/SEQUENCE require actual scenario context when registered. UI scenario selection never silently rewrites calculation identity.
 
@@ -81,6 +83,24 @@ P1 MUST implement shared primitives equivalent to the [engineering primitives co
 
 A plain exact number does not satisfy P1 if its engineering dimension/evidence basis can be confused with another quantity.
 
+### Pure workload metadata
+
+P1 MUST expose code-owned pure metadata sufficient for the application layer to schedule kernels without importing Flutter into `engineering_core`:
+
+```dart
+enum Elv5WorkloadClass { tiny, small, medium, large }
+
+final class Elv5ProcessWorkloadProfile {
+  final Elv5WorkloadClass baseClass;
+  final String complexityCode;
+  final Elv5ResourceLimitProfile resourceLimits;
+}
+```
+
+The runtime may refine workload class from captured cardinalities using code-owned thresholds, but project payloads cannot request “run inline” or select a worker count. Scheduling remains application responsibility under [flutter-performance-contract.md](flutter-performance-contract.md).
+
+The complexity code/profile for each process MUST agree with its section 18 dossier contract and the 27-process performance matrix. A process implementation that accidentally becomes O(N²) where its dossier requires keyed O(N) behavior is a defect even if small unit tests pass.
+
 ### Canonical hashes
 
 P1-T07 includes exact canonical projections for:
@@ -96,7 +116,7 @@ Raw JSON textual ordering is not a hash contract. Unordered map/set order must n
 
 ### Typed process surface
 
-The generic interface shape alone is insufficient. P1 MUST provide process-specific input/output types equivalent to [typed-process-api.md](typed-process-api.md) for all 27 codes.
+The generic interface shape alone is insufficient. P1 MUST provide process-specific input/output types equivalent to [typed-process-api.md](typed-process-api.md) and each process dossier’s section 20 for all 27 codes.
 
 Dynamic maps are limited to strict codec/storage/projection boundaries and may not flow through calculation kernels as semantic property bags.
 
@@ -104,11 +124,13 @@ At minimum P1 proves:
 
 - all 27 typed definitions are registered exactly once;
 - all 27 algorithm mappings are registered exactly once and match process-registry membership;
+- all 27 process definitions have one matching 25-section dossier and workload/complexity profile;
 - process registry legal scope and required dimensions match definition metadata;
 - every multi-case process can expose a governing case or an explicit reason why none is defined;
 - every capacity/threshold process uses the common signed margin convention when operands are resolved;
 - every required engineering value declares acceptable evidence basis;
 - every output field affecting assessment participates in deterministic output hashing;
+- every trace step uses code-owned equation code/version and stable operand refs;
 - generic executable formula/expression fields are absent.
 
 ### Shared physical evidence rule
@@ -126,13 +148,15 @@ P1 runtime acceptance requires its numbered assertions at the same accepted sour
 P1 implementation entry is blocked until:
 
 1. 27 process registry rows, 27 typed definitions and 27 algorithm mappings are mutually consistent;
-2. primitives/canonical-hash contracts are frozen and have L0 tests;
-3. exact 16-operation registry/examples are mutually consistent;
-4. common applicability/comparison/margin/governing/limiting/trace/verdict contracts are code-owned rather than reimplemented per discipline;
-5. no dimension/evidence/time/frame behavior depends on locale, host timezone, map iteration order or UI formatting.
+2. all 27 process dossiers pass the exact 25-section CI guard and runtime definition tests prove dossier/registry parity;
+3. primitives/canonical-hash contracts are frozen and have L0 tests;
+4. exact 16-operation registry/examples are mutually consistent;
+5. common applicability/comparison/margin/governing/limiting/trace/verdict contracts are code-owned rather than reimplemented inconsistently per discipline;
+6. process workload/complexity/resource metadata is code-owned and independent of Flutter/project payload control;
+7. no dimension/evidence/time/frame behavior depends on locale, host timezone, map iteration order or UI formatting.
 
 ## Audit refinements
 
 Initial audit resolutions remain mandatory: exact pool/copy/sizing/channel basis types; integer-capacity rounding separate from UI formatting; signed optical physical-loss interval separate from design reserve; full expanded fire address sets; gross/net rack capacity tag; typed acyclic dependencies.
 
-Second/third-pass hardening remains authoritative for type-safe identities/dimensions, explicit field resolution, evidence/applicability, deterministic timezone/frame behavior, bounded arithmetic, requirement merging and transient models. The unified engine adds the shared engineering behavior expected of all 27 implementations without changing process count or stage ownership.
+Second/third-pass hardening remains authoritative for type-safe identities/dimensions, explicit field resolution, evidence/applicability, deterministic timezone/frame behavior, bounded arithmetic, requirement merging and transient models. The unified engine adds the shared engineering behavior expected of all 27 implementations. The fourth pass adds implementation-complete per-process dossiers and workload/complexity metadata; it does not add a new public process or command.
