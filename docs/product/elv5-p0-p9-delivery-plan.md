@@ -5,7 +5,7 @@ Branch: `feat/flutter-elv5-power-topology-design`
 Parent: ELV4 `31581aa6c396d5ebd6cdf1985c53719d9d05e12a`.
 Authority: [authoritative design index](elv5-authoritative-spec-index.md); [governing design](elv5-discipline-calculations-design-specification.md); [implementation contracts](elv5-implementation/README.md).
 
-Implementation obeys the explicit authority precedence, including [third-pass hardening](elv5-implementation/code-level-hardening-v2.md), the [27-process code-level specification](elv5-implementation/process-code-level-specification.md), all four process dossier files and the [Flutter performance contract](elv5-implementation/flutter-performance-contract.md). Runtime remains deliberately NOT_STARTED: specification hardening is not implementation evidence.
+Implementation obeys the explicit authority precedence, including [third-pass hardening](elv5-implementation/code-level-hardening-v2.md), the [27-process code-level specification](elv5-implementation/process-code-level-specification.md), all four process dossier files, [calculation oracle errata](elv5-implementation/calculation-oracle-errata-v1.md) and the [Flutter performance contract](elv5-implementation/flutter-performance-contract.md). Runtime remains deliberately NOT_STARTED: specification hardening is not implementation evidence.
 
 | Package | Scope | Depends on |
 |---|---|---|
@@ -14,7 +14,7 @@ Implementation obeys the explicit authority precedence, including [third-pass ha
 | P2 | [Persistence, command boundaries and revision evidence](elv5-implementation/p2-persistence-commands.md) | P1 plus shared command/history/revision platform; additive schema 24; bounded bulk capture/publish |
 | P3 | [CCTV calculation implementation](elv5-implementation/p3-cctv.md) | P1/P2, ELV3 routes, exact ELV4 evidence, CCTV 25-section dossiers |
 | P4 | [LAN and structured-cabling implementation](elv5-implementation/p4-lan.md) | P1/P2, ELV3 lengths/resources, exact PWR-06, LAN dossiers |
-| P5 | [Access-control implementation](elv5-implementation/p5-acs.md) | P1/P2, canonical assemblies, shared power kernels, ACS dossiers |
+| P5 | [Access-control implementation](elv5-implementation/p5-acs.md) | P1/P2, canonical assemblies, shared power kernels, ACS dossiers + oracle errata |
 | P6 | [Fire-alarm implementation](elv5-implementation/p6-fire.md) | P1/P2, signal topology, supported electrical/fault models, Fire dossiers |
 | P7 | [Incremental dependencies and engineer workspace](elv5-implementation/p7-dependencies-workspace.md) | P1/P2 foundations; integrates P3–P6, executor scheduling, selector-aware invalidation and targeted UI projection |
 | P8 | [Integrated verification and qualification](elv5-implementation/p8-acceptance.md) | P0–P7 implemented; 54 primary verticals, 135 process vectors, worker/performance suites |
@@ -34,11 +34,12 @@ engineering-node-v3 / owner ELV5 result identity
 canonical encoder electra.canonical-json.v1
 54 primary P8 process entries = POS + NEG/unsupported for every process
 135 total process-vector cases minimum
+authority-controlled oracle errata, currently ACS-03 = 23.51 V / +1.51 V
 shared ELV4 freeze/create-next command boundary
 shared command ledger/history/UoW platform
 ```
 
-Four audit passes have resolved **55 design findings** in specification. None is a runtime fix.
+Four audit passes have resolved **56 design findings** in specification: 8 + 14 + 15 + 19. None is a runtime fix.
 
 ## 2. Implementation sequence
 
@@ -85,7 +86,7 @@ Before production ELV5 classes stabilize, P0 establishes:
 - result-owner/read-dispatch map across legacy/ELV3/ELV4/ELV5;
 - canonical ownership map for revisions/components/ports/cables/sources/batteries/capabilities;
 - actual shared command ledger/history/UoW/freeze/create-next owners;
-- generated contract manifest/fingerprint covering the full active authority chain, including all four dossier files and performance contract;
+- generated contract manifest/fingerprint covering the full active authority chain, including all four dossier files, oracle errata and performance contract;
 - explicit ELV6/ELV7/ELV8 claim boundaries.
 
 Missing inherited platform capability becomes an explicit shared-platform delta, never an ELV5 duplicate.
@@ -131,7 +132,7 @@ No server-side silent splitting of one coherence group; no N+1 capture/publish a
 
 ## 6. P3–P6 discipline gates
 
-Every process implementation must match its dossier sections 1–25. Package-level prose is not an alternate algorithm.
+Every process implementation must match its dossier sections 1–25. Package-level prose is not an alternate algorithm. If an authority-controlled oracle erratum applies, the corrected value governs the executable fixture.
 
 ### P3 CCTV
 Must preserve frame identity, explicit unicast/multicast flow accounting, expected/peak/wire separation, exact interval storage integration, one reserve/ceil/redundancy boundary, estimate-vs-guaranteed scope and one global PSE evidence identity.
@@ -140,7 +141,7 @@ Must preserve frame identity, explicit unicast/multicast flow accounting, expect
 Must preserve installed-path accounting, physical resource identity, weakest-path compatibility, four-case bidirectional sensitivity/overload optical algebra, reach isolation and ELV6-safe rack basis.
 
 ### P5 ACS
-Must preserve role/resource multiplicity, control-versus-feed distinction, bounded startup/transient envelope, one shared source/bank result and complete five-cause fail-safe/fail-secure/project-defined release matrix.
+Must preserve role/resource multiplicity, control-versus-feed distinction, bounded startup/transient envelope, one shared source/bank result and complete five-cause fail-safe/fail-secure/project-defined release matrix. ACS-03 executable positive fixture uses the corrected **23.51 V terminal / +1.51 V headroom** oracle for the frozen 24 V / 0.8 A / 0.5 Ω trunk plus 0.3 A / 0.3 Ω branch inputs.
 
 ### P6 Fire
 Must preserve full expanded address claims, complete state-current origins, supported-vs-unsupported electrical models, shared source requirement, ordered autonomy sequence, notification startup/terminal/fault dimensions, signal topology separate from electrical topology and technical-policy/compliance separation.
@@ -176,14 +177,14 @@ Dependency capture covers positive and negative knowledge:
 ```text
 FACT
 SET
+SELECTOR
 POLICY
 EVAL
 POINTER
 MISSING
-selector-aware SET/predicate markers
 ```
 
-Mutation invalidates old/new direct+selector closure. Recalculation batch contains only affected nodes and transitive dependents. Workspace presents immutable engineering result separately from review/waiver state; acknowledgement never rewrites technical FAIL/outputHash.
+Mutation invalidates old/new direct+selector closure. Recalculation batch contains only affected nodes and transitive dependents. Scheduler coalesces superseded work; stale worker completion cannot advance CURRENT. Workspace presents immutable engineering result separately from review/waiver state; acknowledgement never rewrites technical FAIL/outputHash.
 
 ## 9. P8 executable qualification gate
 
@@ -203,7 +204,7 @@ The original **54 primary public-command entries remain unchanged** and are the 
 P8 additionally proves:
 
 - L0 exact numeric/type/hash/time/evidence primitives;
-- L1 dossier equations/worst-case/governing/trace;
+- L1 dossier equations/worst-case/governing/trace, including corrected oracle arithmetic;
 - L2 all 16 command codecs/replay/resource limits;
 - L3 schema24 migration/restart/owner isolation;
 - L4 UoW/history/failure/executor scheduling;
@@ -226,6 +227,7 @@ At one exact SHA and authority fingerprint reconcile:
 27 typed process definitions
 27 algorithm mappings
 27×25 process dossiers
+oracle errata/executable corrected vectors
 16 command codecs/handlers
 schema24 implementation/indexes/migration
 54 primary entries / 135 process vectors
@@ -256,10 +258,10 @@ ELV5 outputs exact technical requirements, margins, provenance and limitations; 
 | P2 | HARDENED | NOT_STARTED | design contracts only |
 | P3 | HARDENED | NOT_STARTED | 6×25 dossier design only |
 | P4 | HARDENED | NOT_STARTED | 7×25 dossier design only |
-| P5 | HARDENED | NOT_STARTED | 6×25 dossier design only |
+| P5 | HARDENED | NOT_STARTED | 6×25 dossier + oracle errata design only |
 | P6 | HARDENED | NOT_STARTED | 8×25 dossier design only |
-| P7 | HARDENED | NOT_STARTED | design contracts only |
+| P7 | HARDENED | NOT_STARTED | scheduler/dependency/workspace design only |
 | P8 | HARDENED | NOT_STARTED | 135-vector/performance specification only |
 | P9 | HARDENED | NOT_STARTED | exact-head closure specification only |
 
-Four audit passes resolve **55 design findings** in specification. This ledger intentionally does not convert them into runtime fixes.
+Four audit passes resolve **56 design findings** in specification. This ledger intentionally does not convert them into runtime fixes.
