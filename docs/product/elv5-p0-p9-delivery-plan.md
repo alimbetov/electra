@@ -2,7 +2,7 @@
 
 Status: DESIGN DRAFT / ALL RUNTIME PACKAGES OPEN
 Branch: `feat/flutter-elv5-power-topology-design`
-Parent: ELV4 `4c35840bf1453df8adc49cce18d937fe20a52801`.
+Parent: ELV4 `31581aa6c396d5ebd6cdf1985c53719d9d05e12a`.
 Specification: [design](elv5-discipline-calculations-design-specification.md); [detailed contracts](elv5-implementation/README.md).
 
 | Package | Scope | Depends on |
@@ -24,7 +24,7 @@ P0 → P1 → P2 → discipline packages P3/P4/P5/P6 → completed P7 → P8 →
 
 All packages have eight numbered requirements and planned acceptance IDs (80 total). Registry has 27 process codes, each with two planned positive/negative acceptance IDs. Planned IDs and fictional arithmetic are not executed tests.
 
-Each runtime gate records source/test/migration/CI evidence at one exact accepted SHA, including lifecycle, replay, rollback and reopened-state assertions. BASE-01…04 and missing ELV4 runtime entry evidence stay open. Design may proceed without fabricating their closure.
+Each runtime gate records source/test/migration/CI evidence at one exact accepted SHA, including lifecycle, replay, rollback and reopened-state assertions. BASE-01 is evidenced by accepted merged ELV4; BASE-02 is reconciled for the inherited boundary and supported migration origins. BASE-03/04 remain new ELV5 integration work. See the [baseline contract](elv5-implementation/implemented-baseline.md); inherited evidence does not change ELV5 runtime statuses.
 
 ## Stage boundaries
 

@@ -4,6 +4,8 @@ Status: DESIGN DRAFT / RUNTIME NOT STARTED
 Depends on: P1/P2, signal topology and supported electrical kernels.
 Parent: [ELV5 design](../elv5-discipline-calculations-design-specification.md); [process contracts](process-contracts.md).
 
+Inherited implementation and mandatory new extensions: [baseline contract P6](implemented-baseline.md#p6); [pinned evidence](baseline.json). This contract supersedes the original design-only parent assumptions.
+
 ## Requirements and planned proof
 
 | Requirement | Required implementation behavior | Planned acceptance |

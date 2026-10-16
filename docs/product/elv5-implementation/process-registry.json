@@ -1,7 +1,7 @@
 {
   "schema": "electra.elv5-process-design-registry.v1",
   "status": "DESIGN_DRAFT",
-  "parentElv4Head": "4c35840bf1453df8adc49cce18d937fe20a52801",
+  "parentElv4Head": "31581aa6c396d5ebd6cdf1985c53719d9d05e12a",
   "dataProvenance": "All numerical/technical example policies are FICTIONAL_PRODUCT_NEUTRAL",
   "processes": [
     {
@@ -1349,5 +1349,7 @@
     "ALWAYS",
     "POWERED"
   ],
-  "specificationAuditStatus": "8_FINDINGS_RESOLVED_IN_SPEC_ONLY"
+  "specificationAuditStatus": "8_FINDINGS_RESOLVED_IN_SPEC_ONLY",
+  "parentElv4Merge": "d2b059d4c11a284cdd32965140f6df3c40020c8d",
+  "baselineRef": "baseline.json"
 }

@@ -2,8 +2,10 @@
 
 Status: DESIGN DRAFT / RUNTIME NOT STARTED
 Branch: `feat/flutter-elv5-power-topology-design`
-Parent: ELV4 `4c35840bf1453df8adc49cce18d937fe20a52801`
+Parent: ELV4 `31581aa6c396d5ebd6cdf1985c53719d9d05e12a`
 Entry: [authoritative index](elv5-authoritative-spec-index.md).
+
+Merged implementation and mandatory P0–P9 deltas: [baseline contract](elv5-implementation/implemented-baseline.md). It supersedes original shared-store/design-only assumptions.
 
 ## 1. Scope and ten-package responsibility
 
@@ -19,15 +21,15 @@ P0 reconciles entry capabilities; P1 defines typed profiles/registry; P2 integra
 | ELV2 exact immutable catalogs and explicit adoption | Add discipline calculation definition editions; no latest-ref fallback |
 | ELV3 cables/resources/runs/installed lengths | Read exact realized path evidence; no second length/cable allocation |
 | ELV4 PWR-01…06 and scenario/source graph | Consume immutable evidence or execute the same pure kernel with exact scoped inputs; never copy formulas |
-| RM01 result ownership | Extend resultOwner enum with ELV5; pointer/evaluation kinds remain shared; old clients filter their own owner before decode/retirement |
-| RM04 segment/sequence scopes | Extend shared node codec by registered discipline namespace; add DESIGN scope for geometry/inventory independent of scenario |
+| RM01 result ownership | Preserve dedicated ELV4 power records/pointers and legacy ProjectDerivedResults; add isolated discipline records/pointers and explicit read dispatch |
+| RM04 segment/sequence scopes | Keep PowerNodeKeyV2 unchanged; introduce a discipline namespace with DESIGN/SEGMENT/SEQUENCE scope |
 | RM08 history / RM07 remapping / RM10 allocator | Same coordinated revision/session/cursors and typed identity mapping; no project-only history fallback |
 | RM09 numeric v2 | Exact decimal/rational scalar math; conservative bounded geometry/transcendental backend must be separately versioned |
 | RM13 facts and RM14 freeze | Exact consumed-input projection and nonblocking committed-evidence capture; no durable RUNNING cache state |
 
 New result key: `["engineering-node-v3", owner, revisionId, scenarioKey, scopeKind, scopeId, processCode, subjectKind, subjectId]` within project. owner=ELV5; DESIGN uses scenarioKey=`NONE` and explicit subject/design scope; SEGMENT requires actual scenario/segment; SEQUENCE actual scenario with ordered segments. Existing ELV4 v2 keys remain readable and unchanged, not rewritten by migration. Registry selects exact scope(s) and codec versions; numerical requests cannot omit scope.
 
-The existing ELV4 evaluation schema enumerates only ELV-PWR codes. ELV5 cannot insert CCTV/LAN/ACS/FA values into that schema illegally. A shared registered engineering evaluation v3 envelope adds ELV5 codes and DESIGN scope through explicit owner/schema dispatch, retaining old v1/v2 decoders and immutable hashes. Input/output payloads remain process-specific. P1/P2 must supply concrete schema/examples before implementation acceptance.
+The existing ELV4 evaluation schema enumerates only ELV-PWR codes. ELV5 cannot insert CCTV/LAN/ACS/FA values into that schema illegally. A new discipline engineering evaluation v3 envelope adds ELV5 codes and DESIGN scope through explicit owner/schema dispatch, retaining existing power/legacy decoders and immutable hashes. This is an ELV5 extension, not a replacement shared power envelope. Input/output payloads remain process-specific. P1/P2 must supply concrete schema/examples before implementation acceptance.
 
 ## 3. Inputs and policy ownership
 
@@ -61,7 +63,7 @@ Every mutation uses commandId, explicit revision/token, aggregate expected revis
 
 Persist scoped roots with composite revision/logical IDs and explicit FK-bearing members: DisciplinePolicyBindings, CameraStreamBindings, RecordingAssignments/ScheduleSegments, LinkSectionAssignments, PortCapacityAssignments, DoorCalculationAssignments, FireLoopDeviceAssignments and derived definition/provenance refs. Enclosure topology stays non-owning. Actual schema number depends on implemented parent migrations, not current design numbering.
 
-Owner ELV5 POINTER/EVALUATION shares ProjectDerivedResults after RM01 isolation. Immutable evaluations and guarded pointer generations use capture → pure run → revalidated publication. Batch publication includes exact consumed versions. Coordinated freeze adds a versioned discipline section and manifest extension under the same revision ID; retain existing physical/power hashes and verify captured content. Historical pre-ELV5 returns ELV5_NOT_CAPTURED, never empty/pass or latest-row fallback. Create-next remaps every revision-owned assignment/physical reference; DESIGN/SEGMENT/SEQUENCE keys are regenerated while original evidence stays provenance.
+Proposed DisciplineEvaluationRecords, DisciplineEvaluationPointers and a discipline dependency reverse index isolate ELV5 from both ProjectDerivedResults and PowerEvaluationRecords/PowerEvaluationPointers. Cross-stage references record exact immutable power evidence IDs, node keys, hashes and pointer generations. No migration moves or retags existing results. Immutable evaluations and guarded pointer generations use capture → pure run → revalidated publication. Batch publication includes exact consumed versions. Coordinated freeze adds a versioned discipline section and manifest extension under the same revision ID; retain existing physical/power hashes and verify captured content. Historical pre-ELV5 returns ELV5_NOT_CAPTURED, never empty/pass or latest-row fallback. Create-next remaps every revision-owned assignment/physical reference; DESIGN/SEGMENT/SEQUENCE keys are regenerated while original evidence stays provenance.
 
 ## 6. Dependencies, UI and boundaries
 
@@ -75,7 +77,7 @@ ELV6 owns actual rack/cabinet layout/fit; LAN-06 provides a demand/capacity basi
 
 All 27 codes have a planned positive technical oracle and a negative/unsupported case. Core qualification covers four disciplines in one FK-valid public-command project with shared source, change isolation, migration/restart, frozen R1/R2, replay, rollback and publication/freeze races. Required dimensions are declared per process; unsupported future dimensions cannot be passed silently. Explicit basis-only processes display that scope and do not claim later-stage completeness.
 
-P0 requires evidenced ELV4 capabilities (RM01–RM15, six PWR kernels, exact numeric/physical models, scoped snapshots and accepted qualified verticals). The inherited branch contains designs and specification probes, not that runtime evidence. No merge or SPEC_RESOLVED label closes this gate.
+P0 reuses accepted ELV4 capabilities (RM01–RM15, six PWR kernels, exact numeric/physical models, scoped snapshots and seven qualified cases). [Baseline evidence](elv5-implementation/baseline.json) pins the accepted source, separate merge SHA and executed CI. New discipline adapters, schema dispatch, cross-owner invalidation and qualification require ELV5-specific proof; inherited PASS does not close those gates.
 
 ## 8. Technical audit refinements
 

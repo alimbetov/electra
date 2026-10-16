@@ -890,5 +890,8 @@
       "upstreamReferencesAreTyped": true
     }
   },
-  "runtimeImplemented": false
+  "runtimeImplemented": false,
+  "currentBaselineRef": "docs/product/elv5-implementation/baseline.json",
+  "baselineReconciledOn": "2026-10-16",
+  "historicalAuditScope": "Original discipline design review retained; inherited platform assumptions superseded by implemented-baseline.md"
 }

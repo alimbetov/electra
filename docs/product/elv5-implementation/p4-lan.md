@@ -4,6 +4,8 @@ Status: DESIGN DRAFT / RUNTIME NOT STARTED
 Depends on: P1/P2, ELV3 lengths/resources and PWR-06.
 Parent: [ELV5 design](../elv5-discipline-calculations-design-specification.md); [process contracts](process-contracts.md).
 
+Inherited implementation and mandatory new extensions: [baseline contract P4](implemented-baseline.md#p4); [pinned evidence](baseline.json). This contract supersedes the original design-only parent assumptions.
+
 ## Requirements and planned proof
 
 | Requirement | Required implementation behavior | Planned acceptance |

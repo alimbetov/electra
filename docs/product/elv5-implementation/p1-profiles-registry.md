@@ -4,6 +4,8 @@ Status: DESIGN DRAFT / RUNTIME NOT STARTED
 Depends on: P0 ownership/scope map.
 Parent: [ELV5 design](../elv5-discipline-calculations-design-specification.md); [process contracts](process-contracts.md).
 
+Inherited implementation and mandatory new extensions: [baseline contract P1](implemented-baseline.md#p1); [pinned evidence](baseline.json). This contract supersedes the original design-only parent assumptions.
+
 ## Requirements and planned proof
 
 | Requirement | Required implementation behavior | Planned acceptance |
@@ -21,7 +23,7 @@ Parent: [ELV5 design](../elv5-discipline-calculations-design-specification.md); 
 
 The machine-readable process registry is the design source for process membership, modes and planned oracles. Runtime registry is compiled/code-owned, not arbitrary expressions imported from profiles. Policy definitions are data, versioned and validated before adoption. Imported executable formula/script content is not supported.
 
-New wire family must extend the registered engineering envelope explicitly: ELV4 v2 enumerates only ELV-PWR codes. Retain old keys/decoders and introduce v3 owner-aware scope dispatch. Signed quantities are permitted only for coordinates, dBm and signed margins; current, capacity, durations and losses remain nonnegative. Numeric uncertainty uses conservative intervals, never an epsilon allowing overload.
+New discipline evaluation/key v3 dispatch is separate from PowerNodeKeyV2 and its ELV-PWR-only evidence. Public command schemas are a different version axis: keep electra.elv4-command.v1 and electra.elv4-revision-command.v2 unchanged and register a strict ELV5 command family. Retain old keys/decoders/hashes and reject unknown owner/schema/operation/version combinations before mutation. Signed quantities are permitted only for coordinates, dBm and signed margins; current, capacity, durations and losses remain nonnegative. Numeric uncertainty uses conservative intervals, never an epsilon allowing overload.
 
 DESIGN consumers of power evidence, such as CCTV-06, declare the complete required scenario/segment applicability set in their policy and consume those exact evidence refs. They do not use whichever UI scenario happens to be selected. Source-owned requirement sets consider every participating discipline and select the strongest applicable capability constraint per dimension on one physical demand; incompatible scenario policies require explicit project composition.
 

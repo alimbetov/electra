@@ -2,7 +2,7 @@
 
 Дата: 2026-10-15. Проверенный draft: `4421346799b32a5fe41a62729480713947723b51`; tree `3aa26291a50d3247ffa2c8075e399e67cb124a24` (эквивалент локального design snapshot `510fc06`).
 
-Проверены **80 требований P0–P9 и все 27 процессов**: архитектура, контракты, математические границы, общие источники, область утверждений и критерии приёмки. Найдено **8 замечаний: 6 HIGH, 2 MEDIUM**; все получили **SPEC_RESOLVED** в документах. Это не runtime PASS и не закрывает ELV5-BASE-01…04.
+Проверены **80 требований P0–P9 и все 27 процессов**: архитектура, контракты, математические границы, общие источники, область утверждений и критерии приёмки. Найдено **8 замечаний: 6 HIGH, 2 MEDIUM**; все получили **SPEC_RESOLVED** в документах. Это не runtime PASS ELV5. Актуальные статусы BASE-01…04 после merge ELV4 приведены в [baseline reconciliation](elv5-baseline-alignment-audit.md).
 
 Полный [реестр и матрица 80 требований](elv5-technical-audit.json) сохраняет исходные алгоритмы проверенного draft, контрпримеры и связь с исправлениями. Следующие решения внесены в [registry](../product/elv5-implementation/process-registry.json), [process contracts](../product/elv5-implementation/process-contracts.md), пакеты и governing specification.
 
@@ -91,3 +91,7 @@
 Первичный audit/remediation проход завершён на уровне ТЗ. Можно продолжать дизайн/входную проверку P0 и детализировать wire/qualification contracts; реализация и acceptance пакетов требуют предусмотренных source/test/CI доказательств. Сохраняется DESIGN DRAFT / RUNTIME NOT_STARTED.
 
 Проверяемый результат design-only guard: [elv5-specification-checks.json](elv5-specification-checks.json). Запуск: `python scripts/ci/check-elv5-specification.py`. Он не подтверждает runtime/standards compliance.
+
+## Актуализация базы 2026-10-16
+
+Первичный аудит выше сохранён как история проверки discipline-контрактов. ELV4 теперь реализован, принят и замержен; предположения о design-only prerequisite заменены [контрактом реализованной базы](../product/elv5-implementation/implemented-baseline.md). Восемь замечаний к новым discipline-процессам сохраняют SPEC_RESOLVED / runtime NOT_IMPLEMENTED; их не закрывает унаследованный ELV4 PASS.

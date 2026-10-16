@@ -1,31 +1,37 @@
-# ELV5 — Baseline and boundary alignment
+# ELV5 — Baseline and boundary reconciliation
 
-Date: 2026-10-15. Parent branch: `feat/flutter-elv4-power-topology-design`.
-Pinned parent: `4c35840bf1453df8adc49cce18d937fe20a52801`.
-Scope: repository/design inspection, not runtime tests.
+Date: 2026-10-16. Branch: `feat/flutter-elv5-power-topology-design`.
+Accepted ELV4 source: `31581aa6c396d5ebd6cdf1985c53719d9d05e12a`.
+Merged main baseline: `d2b059d4c11a284cdd32965140f6df3c40020c8d` via [PR #11](https://github.com/alimbetov/electra/pull/11).
+Scope: actual merged source, existing executed ELV4 CI evidence and ELV5 design reconciliation. No new discipline runtime qualification is claimed.
 
-## Observed foundation
+## Confirmed changes since the original design baseline
 
-The parent contains ELV4 authoritative/coordinated/detailed specifications, 80 requirements, RM01–RM15 design remediation, wire examples and seven positive qualification design cases. Their own statuses are RUNTIME_NOT_IMPLEMENTED/NOT_STARTED. They cannot be cited as existing accepted power runtime.
+| Area | Implemented ELV4 | Required ELV5 change |
+|---|---|---|
+| Baseline | Schema 23; C01–C06 resolved | Start from merged main; additive schema above 23 |
+| Result ownership | Dedicated PowerEvaluationRecords/PowerEvaluationPointers and reverse index | Add isolated discipline stores; preserve legacy ProjectDerivedResults and power codecs |
+| Canonical writers | Reviewed projection/UoW and fail-closed legacy topology/reference/membership paths | Extend coordinated impact and cross-stage invalidation; no direct writer bypass |
+| Command boundary | Strict command v1/revision command v2, server-reviewed impact, aggregate CAS/ledger | Separate strict discipline command registration; replay before lifecycle checks |
+| Freeze/history | Captured facts in power section v2; manifest v1; historical reads; typed create-next materialization | Version discipline section/manifest; preserve old hashes; NOT_CAPTURED for old revisions |
+| Revision recovery | Project-max sequence allocator; physical payload hash verification | Reuse allocator/remapping; no copied CURRENT/evaluation/receipt/history state |
+| Qualification | Seven persisted public-command cases with actual evaluators | Add all 27 discipline processes, dimensions and shared-context proofs |
+| Migrations | Real v21/v22 origin matrix to schema 23 | Retain origins and add real merged v23 → ELV5 migration |
+| Closure | Read-only exact-head technical/qualification/acceptance evidence | Extend for ELV5; acceptance stays an external artifact |
 
-The inherited source declares database schema 21. ELV3 installed length code is ELV-ROUTE-01 in engineering_core/lib/src/elv_physical_calculations.dart. Existing older overview lists mixed CURRENT/RUNNING/WARNING/BLOCKED statuses and an ambiguous recordingSeconds×retentionDays example; new ELV5 contracts separate freshness/completion/assessment/execution and integrate unique recording time once.
-
-## Alignment decisions
-
-| Area | ELV5 decision |
-|---|---|
-| Stage responsibility | 27 discipline processes; keep ELV4 physical topology/power kernel and ELV3 routing |
-| Shared platform | Add ELV5 owner and registered v3 evaluation/key scope extension; preserve old v1/v2 codecs/hashes |
-| Shared power | One full project source/bank closure; context wrappers show contribution without reducing total or repeating reserves |
-| Exact evidence | Same revision/scenario scope, consumed facts, typed remapping, durable history and guarded publication |
-| Geometry | Explicit supported pinhole/plane model and bounded backend; unsupported visibility/DORI never passes |
-| Later stages | LAN-06 demand basis versus ELV6 layout; FA-08 policy/evidence basis versus ELV7 verified compliance; no ELV8 product selection |
+[Full P0–P9 integration contract](../product/elv5-implementation/implemented-baseline.md) and [machine-readable evidence](../product/elv5-implementation/baseline.json) define source/test references and remaining work. The original planned common ProjectDerivedResults owner extension was not the implemented ELV4 architecture; ELV5 now follows the recorded dedicated-store deviation.
 
 ## Entry obligations
 
-ELV5-BASE-01 HIGH: obtain actual accepted ELV4 runtime evidence for required RM01–RM15 infrastructure and PWR processes before dependent runtime acceptance.
-ELV5-BASE-02 HIGH: reconcile inherited ELV1–ELV3 baseline gaps and actual supported migrations; parent design closure labels are not evidence.
-ELV5-BASE-03 MEDIUM: define/test v3 owner/key/envelope/schema dispatch and old cached result/manual/retirement consumers.
-ELV5-BASE-04 MEDIUM: implement concrete strict discipline codecs and complete executable qualification input dataset during P1/P2/P8; planned oracles alone are not a passing vertical.
+| ID | Current disposition | Remaining scope |
+|---|---|---|
+| ELV5-BASE-01 | EVIDENCED_INHERITED | Accepted ELV4 is reusable; new discipline wrappers still need proof |
+| ELV5-BASE-02 | RECONCILED_INHERITED | Canonical/history/migration boundary mapped; no blanket certification of all historical schemas or new consumers |
+| ELV5-BASE-03 | OPEN_ELV5_EXTENSION | Discipline stores/keys/dispatch and cross-owner consumer isolation |
+| ELV5-BASE-04 | OPEN_ELV5_EXTENSION | Strict discipline codecs and complete executable qualification manifest |
 
-These are known design entry obligations, not newly proven source bugs. ELV5 design proceeds; no app or normative compliance verification has been performed in this branch preparation.
+## Evidence and limitations
+
+[Exact-head run 38859878752](https://github.com/alimbetov/electra/actions/runs/38859878752): technical job 116839507912 PASS; runtime-acceptance job 116842014688 PASS at accepted source SHA. [Foundation run 38859878966](https://github.com/alimbetov/electra/actions/runs/38859878966) also passed. PR #11 is merged; merge and acceptance retain separate SHAs/events.
+
+All 80 ELV5 runtime requirements and all 27 new process runtime statuses remain NOT_STARTED. The eight initial discipline design findings remain SPEC_RESOLVED, with runtime tests still required. No ELV6 layout, ELV7 verified compliance or ELV8 product-selection claim is added.

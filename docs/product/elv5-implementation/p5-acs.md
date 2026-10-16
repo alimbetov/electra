@@ -4,6 +4,8 @@ Status: DESIGN DRAFT / RUNTIME NOT STARTED
 Depends on: P1/P2, canonical assemblies and power kernels.
 Parent: [ELV5 design](../elv5-discipline-calculations-design-specification.md); [process contracts](process-contracts.md).
 
+Inherited implementation and mandatory new extensions: [baseline contract P5](implemented-baseline.md#p5); [pinned evidence](baseline.json). This contract supersedes the original design-only parent assumptions.
+
 ## Requirements and planned proof
 
 | Requirement | Required implementation behavior | Planned acceptance |

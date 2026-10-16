@@ -4,6 +4,8 @@ Status: DESIGN DRAFT / RUNTIME NOT STARTED
 Depends on: P8 plus complete requirement/source/test evidence.
 Parent: [ELV5 design](../elv5-discipline-calculations-design-specification.md); [process contracts](process-contracts.md).
 
+Inherited implementation and mandatory new extensions: [baseline contract P9](implemented-baseline.md#p9); [pinned evidence](baseline.json). This contract supersedes the original design-only parent assumptions.
+
 ## Requirements and planned proof
 
 | Requirement | Required implementation behavior | Planned acceptance |
@@ -11,7 +13,7 @@ Parent: [ELV5 design](../elv5-discipline-calculations-design-specification.md); 
 | ELV5-P9-001 | Reconcile all 80 requirements and 27 registry processes to actual source/tests/versions | P9-T01 |
 | ELV5-P9-002 | Audit all inherited/new mutation and query entry points for owner/scope/replay/transaction behavior | P9-T02 |
 | ELV5-P9-003 | Verify no duplicated physical kernels, source budgets, cable length, loads/reserves or storage intervals | P9-T03 |
-| ELV5-P9-004 | Reconcile prerequisite ELV4 runtime gates, schema/migrations, hashes/remapping and historical outcomes | P9-T04 |
+| ELV5-P9-004 | Verify inherited ELV4 acceptance and new ELV5 migration, hash, remapping and historical compatibility | P9-T04 |
 | ELV5-P9-005 | Run required generation/format/analyzers/core/mobile/qualification at one exact source SHA | P9-T05 |
 | ELV5-P9-006 | Disposition findings and unsupported scope without replacing a positive case by a blocked estimate | P9-T06 |
 | ELV5-P9-007 | Publish explicit ELV6/ELV7/ELV8 handoff and technical claim limits | P9-T07 |

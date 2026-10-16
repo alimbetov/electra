@@ -6,7 +6,7 @@
     {
       "requirementId": "ELV5-P0-001",
       "package": "P0",
-      "summary": "Pin actual parent source/design SHA, schema and supported migration origins",
+      "summary": "Pin accepted ELV4 source, merge SHA, schema 23 and real v21/v22 migration origins",
       "designDocument": "p0-baseline.md",
       "plannedAcceptanceIds": [
         "P0-T01"
@@ -16,12 +16,14 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p0"
     },
     {
       "requirementId": "ELV5-P0-002",
       "package": "P0",
-      "summary": "Reconcile ELV4 RM01\u2013RM15 specification resolutions with actual source/test/CI evidence",
+      "summary": "Reuse implemented ELV4 RM01–RM15 with source/test/CI evidence and recorded architecture deviations",
       "designDocument": "p0-baseline.md",
       "plannedAcceptanceIds": [
         "P0-T02"
@@ -31,7 +33,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p0"
     },
     {
       "requirementId": "ELV5-P0-003",
@@ -46,7 +50,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p0"
     },
     {
       "requirementId": "ELV5-P0-004",
@@ -61,7 +67,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p0"
     },
     {
       "requirementId": "ELV5-P0-005",
@@ -76,7 +84,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p0"
     },
     {
       "requirementId": "ELV5-P0-006",
@@ -91,7 +101,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p0"
     },
     {
       "requirementId": "ELV5-P0-007",
@@ -106,7 +118,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p0"
     },
     {
       "requirementId": "ELV5-P0-008",
@@ -121,7 +135,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p0"
     },
     {
       "requirementId": "ELV5-P1-001",
@@ -138,7 +154,9 @@
       "evidence": [],
       "specificationResolutions": [
         "ELV5-AUD-06"
-      ]
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p1"
     },
     {
       "requirementId": "ELV5-P1-002",
@@ -156,7 +174,9 @@
       "specificationResolutions": [
         "ELV5-AUD-02",
         "ELV5-AUD-03"
-      ]
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p1"
     },
     {
       "requirementId": "ELV5-P1-003",
@@ -171,7 +191,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p1"
     },
     {
       "requirementId": "ELV5-P1-004",
@@ -191,7 +213,9 @@
         "ELV5-AUD-04",
         "ELV5-AUD-05",
         "ELV5-AUD-07"
-      ]
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p1"
     },
     {
       "requirementId": "ELV5-P1-005",
@@ -209,7 +233,9 @@
       "specificationResolutions": [
         "ELV5-AUD-01",
         "ELV5-AUD-08"
-      ]
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p1"
     },
     {
       "requirementId": "ELV5-P1-006",
@@ -224,7 +250,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p1"
     },
     {
       "requirementId": "ELV5-P1-007",
@@ -239,7 +267,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p1"
     },
     {
       "requirementId": "ELV5-P1-008",
@@ -256,7 +286,9 @@
       "evidence": [],
       "specificationResolutions": [
         "ELV5-AUD-06"
-      ]
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p1"
     },
     {
       "requirementId": "ELV5-P2-001",
@@ -271,12 +303,14 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p2"
     },
     {
       "requirementId": "ELV5-P2-002",
       "package": "P2",
-      "summary": "Add explicit ELV5 result ownership/schema dispatch while preserving legacy/ELV3/ELV4 filtering",
+      "summary": "Add isolated discipline records/pointers and schema dispatch preserving legacy and dedicated ELV4 stores",
       "designDocument": "p2-persistence-commands.md",
       "plannedAcceptanceIds": [
         "P2-T02"
@@ -286,7 +320,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p2"
     },
     {
       "requirementId": "ELV5-P2-003",
@@ -301,7 +337,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p2"
     },
     {
       "requirementId": "ELV5-P2-004",
@@ -316,7 +354,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p2"
     },
     {
       "requirementId": "ELV5-P2-005",
@@ -331,7 +371,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p2"
     },
     {
       "requirementId": "ELV5-P2-006",
@@ -346,7 +388,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p2"
     },
     {
       "requirementId": "ELV5-P2-007",
@@ -361,7 +405,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p2"
     },
     {
       "requirementId": "ELV5-P2-008",
@@ -376,7 +422,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p2"
     },
     {
       "requirementId": "ELV5-P3-001",
@@ -393,7 +441,9 @@
       "evidence": [],
       "specificationResolutions": [
         "ELV5-AUD-08"
-      ]
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p3"
     },
     {
       "requirementId": "ELV5-P3-002",
@@ -410,7 +460,9 @@
       "evidence": [],
       "specificationResolutions": [
         "ELV5-AUD-05"
-      ]
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p3"
     },
     {
       "requirementId": "ELV5-P3-003",
@@ -428,7 +480,9 @@
       "specificationResolutions": [
         "ELV5-AUD-01",
         "ELV5-AUD-02"
-      ]
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p3"
     },
     {
       "requirementId": "ELV5-P3-004",
@@ -443,7 +497,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p3"
     },
     {
       "requirementId": "ELV5-P3-005",
@@ -461,7 +517,9 @@
       "specificationResolutions": [
         "ELV5-AUD-02",
         "ELV5-AUD-05"
-      ]
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p3"
     },
     {
       "requirementId": "ELV5-P3-006",
@@ -476,7 +534,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p3"
     },
     {
       "requirementId": "ELV5-P3-007",
@@ -491,7 +551,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p3"
     },
     {
       "requirementId": "ELV5-P3-008",
@@ -506,7 +568,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p3"
     },
     {
       "requirementId": "ELV5-P4-001",
@@ -521,7 +585,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p4"
     },
     {
       "requirementId": "ELV5-P4-002",
@@ -536,7 +602,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p4"
     },
     {
       "requirementId": "ELV5-P4-003",
@@ -551,7 +619,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p4"
     },
     {
       "requirementId": "ELV5-P4-004",
@@ -566,7 +636,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p4"
     },
     {
       "requirementId": "ELV5-P4-005",
@@ -583,7 +655,9 @@
       "evidence": [],
       "specificationResolutions": [
         "ELV5-AUD-03"
-      ]
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p4"
     },
     {
       "requirementId": "ELV5-P4-006",
@@ -600,7 +674,9 @@
       "evidence": [],
       "specificationResolutions": [
         "ELV5-AUD-07"
-      ]
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p4"
     },
     {
       "requirementId": "ELV5-P4-007",
@@ -615,7 +691,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p4"
     },
     {
       "requirementId": "ELV5-P4-008",
@@ -630,7 +708,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p4"
     },
     {
       "requirementId": "ELV5-P5-001",
@@ -645,7 +725,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p5"
     },
     {
       "requirementId": "ELV5-P5-002",
@@ -660,7 +742,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p5"
     },
     {
       "requirementId": "ELV5-P5-003",
@@ -675,7 +759,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p5"
     },
     {
       "requirementId": "ELV5-P5-004",
@@ -690,7 +776,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p5"
     },
     {
       "requirementId": "ELV5-P5-005",
@@ -705,7 +793,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p5"
     },
     {
       "requirementId": "ELV5-P5-006",
@@ -720,7 +810,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p5"
     },
     {
       "requirementId": "ELV5-P5-007",
@@ -735,7 +827,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p5"
     },
     {
       "requirementId": "ELV5-P5-008",
@@ -750,7 +844,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p5"
     },
     {
       "requirementId": "ELV5-P6-001",
@@ -767,7 +863,9 @@
       "evidence": [],
       "specificationResolutions": [
         "ELV5-AUD-04"
-      ]
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p6"
     },
     {
       "requirementId": "ELV5-P6-002",
@@ -782,7 +880,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p6"
     },
     {
       "requirementId": "ELV5-P6-003",
@@ -797,7 +897,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p6"
     },
     {
       "requirementId": "ELV5-P6-004",
@@ -812,7 +914,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p6"
     },
     {
       "requirementId": "ELV5-P6-005",
@@ -827,7 +931,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p6"
     },
     {
       "requirementId": "ELV5-P6-006",
@@ -842,7 +948,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p6"
     },
     {
       "requirementId": "ELV5-P6-007",
@@ -859,7 +967,9 @@
       "evidence": [],
       "specificationResolutions": [
         "ELV5-AUD-04"
-      ]
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p6"
     },
     {
       "requirementId": "ELV5-P6-008",
@@ -874,7 +984,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p6"
     },
     {
       "requirementId": "ELV5-P7-001",
@@ -891,7 +1003,9 @@
       "evidence": [],
       "specificationResolutions": [
         "ELV5-AUD-06"
-      ]
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p7"
     },
     {
       "requirementId": "ELV5-P7-002",
@@ -906,7 +1020,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p7"
     },
     {
       "requirementId": "ELV5-P7-003",
@@ -923,7 +1039,9 @@
       "evidence": [],
       "specificationResolutions": [
         "ELV5-AUD-06"
-      ]
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p7"
     },
     {
       "requirementId": "ELV5-P7-004",
@@ -938,7 +1056,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p7"
     },
     {
       "requirementId": "ELV5-P7-005",
@@ -953,7 +1073,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p7"
     },
     {
       "requirementId": "ELV5-P7-006",
@@ -968,7 +1090,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p7"
     },
     {
       "requirementId": "ELV5-P7-007",
@@ -983,7 +1107,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p7"
     },
     {
       "requirementId": "ELV5-P7-008",
@@ -998,7 +1124,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p7"
     },
     {
       "requirementId": "ELV5-P8-001",
@@ -1013,7 +1141,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p8"
     },
     {
       "requirementId": "ELV5-P8-002",
@@ -1036,7 +1166,9 @@
         "ELV5-AUD-05",
         "ELV5-AUD-07",
         "ELV5-AUD-08"
-      ]
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p8"
     },
     {
       "requirementId": "ELV5-P8-003",
@@ -1051,7 +1183,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p8"
     },
     {
       "requirementId": "ELV5-P8-004",
@@ -1066,7 +1200,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p8"
     },
     {
       "requirementId": "ELV5-P8-005",
@@ -1081,7 +1217,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p8"
     },
     {
       "requirementId": "ELV5-P8-006",
@@ -1096,7 +1234,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p8"
     },
     {
       "requirementId": "ELV5-P8-007",
@@ -1111,7 +1251,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p8"
     },
     {
       "requirementId": "ELV5-P8-008",
@@ -1132,7 +1274,9 @@
         "ELV5-AUD-04",
         "ELV5-AUD-06",
         "ELV5-AUD-08"
-      ]
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p8"
     },
     {
       "requirementId": "ELV5-P9-001",
@@ -1149,7 +1293,9 @@
       "evidence": [],
       "specificationResolutions": [
         "ELV5-AUD-06"
-      ]
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p9"
     },
     {
       "requirementId": "ELV5-P9-002",
@@ -1164,7 +1310,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p9"
     },
     {
       "requirementId": "ELV5-P9-003",
@@ -1183,12 +1331,14 @@
         "ELV5-AUD-01",
         "ELV5-AUD-03",
         "ELV5-AUD-05"
-      ]
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p9"
     },
     {
       "requirementId": "ELV5-P9-004",
       "package": "P9",
-      "summary": "Reconcile prerequisite ELV4 runtime gates, schema/migrations, hashes/remapping and historical outcomes",
+      "summary": "Verify inherited ELV4 acceptance and new ELV5 migration, hash, remapping and historical compatibility",
       "designDocument": "p9-closure.md",
       "plannedAcceptanceIds": [
         "P9-T04"
@@ -1198,7 +1348,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p9"
     },
     {
       "requirementId": "ELV5-P9-005",
@@ -1213,7 +1365,9 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p9"
     },
     {
       "requirementId": "ELV5-P9-006",
@@ -1231,7 +1385,9 @@
       "specificationResolutions": [
         "ELV5-AUD-02",
         "ELV5-AUD-08"
-      ]
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p9"
     },
     {
       "requirementId": "ELV5-P9-007",
@@ -1248,7 +1404,9 @@
       "evidence": [],
       "specificationResolutions": [
         "ELV5-AUD-07"
-      ]
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p9"
     },
     {
       "requirementId": "ELV5-P9-008",
@@ -1263,8 +1421,11 @@
       "testPaths": [],
       "testedSha": null,
       "evidence": [],
-      "specificationResolutions": []
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p9"
     }
   ],
-  "specificationAuditStatus": "8_FINDINGS_RESOLVED_IN_SPEC_ONLY"
+  "specificationAuditStatus": "8_FINDINGS_RESOLVED_IN_SPEC_ONLY",
+  "baselineRef": "baseline.json"
 }

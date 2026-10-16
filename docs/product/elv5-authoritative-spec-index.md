@@ -3,7 +3,7 @@
 Status: DESIGN DRAFT / RUNTIME NOT STARTED
 Branch: `feat/flutter-elv5-power-topology-design`
 Parent branch: `feat/flutter-elv4-power-topology-design`
-Pinned parent: `4c35840bf1453df8adc49cce18d937fe20a52801`
+Pinned parent: `31581aa6c396d5ebd6cdf1985c53719d9d05e12a`
 
 The branch name is retained as requested. ELV5 is **discipline-specific engineering calculations**, not a second power-topology foundation. ELV4 owns common physical power models; ELV5 owns explicit calling context, discipline policies and the remaining discipline calculations.
 
@@ -14,6 +14,7 @@ The branch name is retained as requested. ELV5 is **discipline-specific engineer
 3. [Detailed implementation index](elv5-implementation/README.md), with one contract for each package.
 4. [27-process contract registry](elv5-implementation/process-contracts.md) and [machine-readable registry](elv5-implementation/process-registry.json).
 5. [Baseline and boundary audit](../audit/elv5-baseline-alignment-audit.md).
+6. [Implemented baseline and extension contract](elv5-implementation/implemented-baseline.md) and [evidence manifest](elv5-implementation/baseline.json).
 
 ## Authority and acceptance
 
@@ -21,7 +22,7 @@ Existing ELV1–ELV4 identities, ownership, reference editions, physical routing
 
 Within ELV5 the design governs boundaries; process registry governs each algorithm's inputs/outputs; package contracts govern writes and proof. Semantic changes require synchronized updates, not package-local overrides. The older architecture overview remains background: its mixed state list and ambiguous recording-duration formula are refined here, not copied into runtime codecs.
 
-All P0–P9 runtime packages are NOT_STARTED. ELV4 design findings were SPEC_RESOLVED, not implemented or runtime accepted. ELV5 design may proceed; runtime acceptance depends on evidenced ELV4 prerequisite capability gates and unresolved ELV1–ELV3 baseline reconciliation. Missing evidence is not a newly proven source defect.
+All ELV5 P0–P9 runtime packages remain NOT_STARTED. ELV4 is implemented, runtime accepted at the pinned source SHA and merged through PR #11 at `d2b059d4c11a284cdd32965140f6df3c40020c8d`. The [implemented baseline contract](elv5-implementation/implemented-baseline.md) governs reuse and new integration work. ELV4 acceptance does not qualify the 27 new ELV5 processes.
 
 ## Initial technical audit
 

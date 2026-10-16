@@ -20,6 +20,47 @@ def load(path):
     return json.loads(path.read_text())
 
 
+def validate_baseline(registry, ledger):
+    baseline = load(BASE / 'baseline.json')
+    assert baseline['schema'] == 'electra.elv5-implemented-baseline.v1'
+    accepted = baseline['acceptedElv4SourceSha']
+    merged = baseline['mergedMainSha']
+    assert all(re.fullmatch(r'[a-f0-9]{40}', sha) for sha in (accepted, merged))
+    assert accepted != merged, 'Acceptance and merge are separate source events'
+    assert registry['parentElv4Head'] == accepted and registry['parentElv4Merge'] == merged
+    assert registry['baselineRef'] == ledger['baselineRef'] == 'baseline.json'
+    assert baseline['elv5RuntimeStatus'] == ledger['runtimeStatus'] == 'NOT_STARTED'
+    assert baseline['databaseSchemaVersion'] == 23
+    assert 'int get schemaVersion => 23;' in (ROOT / 'apps/mobile/lib/data/database/app_database.dart').read_text()
+    assert [o['version'] for o in baseline['migrationOrigins']] == [21, 22]
+    assert baseline['requiredNewMigrationOrigin'] == {'version': 23, 'sourceSha': merged}
+    acceptance = baseline['inheritedAcceptance']
+    assert acceptance['sourceSha'] == accepted
+    assert acceptance['technicalResult'] == acceptance['runtimeAcceptanceResult'] == 'PASS'
+    assert acceptance['workflowRunId'] == 38859878752
+    assert acceptance['technicalJobId'] != acceptance['runtimeAcceptanceJobId']
+    assert [o['status'] for o in baseline['entryObligations']] == [
+        'EVIDENCED_INHERITED', 'RECONCILED_INHERITED',
+        'OPEN_ELV5_EXTENSION', 'OPEN_ELV5_EXTENSION']
+    assert baseline['resultStorage']['copyExistingResults'] is False
+    assert baseline['resultStorage']['power'] == ['PowerEvaluationRecords', 'PowerEvaluationPointers']
+    capabilities = baseline['capabilities']
+    assert len(capabilities) == len({c['id'] for c in capabilities}) == 11
+    for capability in capabilities:
+        assert capability['inheritedSourceSha'] == accepted
+        assert capability['sourcePaths'] and capability['testPaths']
+        for path in capability['sourcePaths'] + capability['testPaths']:
+            assert (ROOT / path).is_file(), ('Missing inherited evidence', path)
+    contract = (BASE / 'implemented-baseline.md').read_text()
+    for requirement in ledger['requirements']:
+        assert requirement['baselineRef'] == 'baseline.json'
+        anchor = requirement['package'].lower()
+        assert requirement['integrationContract'] == 'implemented-baseline.md#' + anchor
+        assert '## ' + anchor.upper() + '\n' in contract
+    # These are structural provenance checks, not a fresh executed CI verdict.
+    return baseline
+
+
 def validate_registry(registry):
     rows = registry['processes']
     by_code = {r['code']: r for r in rows}
@@ -77,7 +118,9 @@ def main():
     parser.add_argument('--output', type=Path)
     args = parser.parse_args()
     registry = load(BASE / 'process-registry.json')
-    requirements = load(BASE / 'requirements.json')['requirements']
+    ledger = load(BASE / 'requirements.json')
+    requirements = ledger['requirements']
+    baseline = validate_baseline(registry, ledger)
     validate_registry(registry)
     assert len(requirements) == len({r['requirementId'] for r in requirements}) == 80
     assert Counter(r['package'] for r in requirements) == {f'P{i}': 8 for i in range(10)}
@@ -125,7 +168,7 @@ def main():
             if '://' not in target and not target.startswith('#'):
                 assert (file.parent / target.split('#')[0]).exists(), (str(file), target)
                 links += 1
-    result = {'schema': 'electra.elv5-specification-checks.v1', 'result': 'PASS', 'scope': 'Design contract/registry probes only; not Flutter/Dart/Drift runtime evidence', 'processCount': 27, 'requirementCount': 80, 'specificationFindingsResolved': 8, 'localLinksChecked': links, 'checks': ['typed upstream code/scope/subject/condition and acyclic graph', 'unknown upstream and cycle rejection', '80 requirement identity/package/evidence invariants', 'pool-level byte ceiling', 'expected versus guaranteed retention', 'optical reserve not physical loss', 'expanded address overlap', 'camera/stream channel identity', 'gross/net RU equivalence', 'recording horizon/reserve/redundancy arithmetic', 'mandatory pinhole H/V FOV interval oracles'], 'runtimeImplemented': False}
+    result = {'schema': 'electra.elv5-specification-checks.v1', 'result': 'PASS', 'scope': 'Design contract/registry probes only; not Flutter/Dart/Drift runtime evidence', 'processCount': 27, 'requirementCount': 80, 'specificationFindingsResolved': 8, 'localLinksChecked': links, 'checks': ['implemented baseline provenance, schema and 11 source/test capability references', 'all 80 requirements map to P0-P9 integration contract', 'typed upstream code/scope/subject/condition and acyclic graph', 'unknown upstream and cycle rejection', '80 requirement identity/package/evidence invariants', 'pool-level byte ceiling', 'expected versus guaranteed retention', 'optical reserve not physical loss', 'expanded address overlap', 'camera/stream channel identity', 'gross/net RU equivalence', 'recording horizon/reserve/redundancy arithmetic', 'mandatory pinhole H/V FOV interval oracles'], 'runtimeImplemented': False, 'baselineAcceptedSourceSha': baseline['acceptedElv4SourceSha'], 'baselineMergeSha': baseline['mergedMainSha'], 'baselineCapabilitiesChecked': len(baseline['capabilities'])}
     if args.output:
         args.output.write_text(json.dumps(result, indent=2) + '\n')
     print(f'PASS: 27 processes, 80 requirements, 8 specification resolutions, {links} local links; no runtime claim')
