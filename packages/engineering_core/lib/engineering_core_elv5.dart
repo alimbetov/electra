@@ -10,6 +10,7 @@ export 'src/elv5/numeric/rational.dart';
 export 'src/elv5/processes/cctv/cctv02_bandwidth.dart';
 export 'src/elv5/processes/cctv/cctv03_storage.dart';
 export 'src/elv5/processes/lan/lan01_path_length.dart';
+export 'src/elv5/processes/lan/lan05_optical_budget.dart';
 export 'src/elv5/processes/process_code.dart';
 export 'src/elv5/processes/process_definition.dart';
 export 'src/elv5/processes/process_registry.dart';
