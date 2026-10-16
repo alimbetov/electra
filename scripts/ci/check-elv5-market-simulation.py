@@ -63,7 +63,8 @@ def discipline_for(code: str) -> str:
     raise ValueError(code)
 
 
-def expected_disposition(vector_class: str, stress_axis: str, index: int) -> str:
+def planned_disposition(vector_class: str, stress_axis: str, index: int) -> str:
+    """Desired future runtime vector, never the result of the arithmetic probe."""
     if vector_class == "POSITIVE":
         return "SUCCEEDED_COMPLETE_PASS"
     if vector_class == "BOUNDARY":
@@ -269,6 +270,25 @@ def reference_computation(process_code: str, idx: int, vector_class: str) -> dic
     return {"probeIndex": idx, "vectorClass": vector_class, "note":"Structural/topology/basis scenario; exact process equations remain governed by the 25-section dossier."}
 
 
+def reference_margin_check(computation: dict[str, object]) -> dict[str, object]:
+    """Classify only the reported scalar margins; never a 27-process verdict."""
+    margins = {}
+    for name, value in computation.items():
+        if 'margin' not in name.lower():
+            continue
+        require(type(value) in (int, str), 'Invalid diagnostic margin type: ' + name)
+        try:
+            margins[name] = Q(value)
+        except (ValueError, ZeroDivisionError) as error:
+            raise SystemExit('Invalid diagnostic margin: ' + name) from error
+    negative = sorted(name for name, value in margins.items() if value < 0)
+    outcome = ('NEGATIVE_MARGIN' if negative else
+               'NONNEGATIVE_MARGINS' if margins else 'NO_MARGIN_COMPARISON')
+    return {'scope': 'REPORTED_SCALAR_MARGINS_ONLY', 'outcome': outcome,
+            'checkedFields': sorted(margins), 'negativeFields': negative,
+            'fullProcessAssessment': 'NOT_ASSESSED'}
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path)
@@ -366,7 +386,8 @@ def main() -> None:
             risk = risk_code(code, stress_axis)
             require(risk in error_codes, f"scenario risk {risk} missing from error taxonomy")
             path = package_paths[discipline]
-            disposition = expected_disposition(vector_class, stress_axis, index)
+            disposition = planned_disposition(vector_class, stress_axis, index)
+            computation = reference_computation(code, index, vector_class)
             case = {
                 "caseId": f"MKT-{code}-{index + 1:03d}",
                 "processCode": code,
@@ -377,12 +398,16 @@ def main() -> None:
                 "marketBasis": archetype["basis"],
                 "marketSourceRefs": archetype.get("sourceRefs", []),
                 "stressAxis": stress_axis,
-                "expectedDisposition": disposition,
+                "plannedDisposition": disposition,
+                "runtimeFixtureStatus": "REQUIRES_CONSTRUCTION_AND_EXECUTION",
                 "primaryErrorClass": risk,
                 "errorPreventionPackages": next(row["preventedBy"] for row in error_rows if row["code"] == risk),
                 "remediationDirection": remediation_for(risk),
                 "packagePath": path,
-                "referenceComputation": reference_computation(code, index, vector_class),
+                "referenceComputation": computation,
+                "referenceComputationBasis": "syntheticFixture",
+                "referenceComputationRole": "INDEPENDENT_ARITHMETIC_DIAGNOSTIC_NOT_SCENARIO_ORACLE",
+                "referenceMarginCheck": reference_margin_check(computation),
                 "claimScope": "DESIGN_SIMULATION_ONLY_NO_ELV7_COMPLIANCE_NO_ELV8_SELECTION",
             }
             scenarios.append(case)
@@ -415,13 +440,17 @@ def main() -> None:
         require(token in source_facts, f"market source snapshot lost sanity token: {token}")
 
     result_core = {
-        "schema": "electra.elv5-market-simulation-result.v1",
+        "schema": "electra.elv5-market-simulation-result.v2",
         "generationVersion": catalog["generationVersion"],
         "catalogSha256": canonical_sha256(catalog),
         "requirementsSha256": canonical_sha256(market_requirements),
         **provenance,
         "status": "DESIGN_SIMULATION_ONLY_RUNTIME_NOT_EXECUTED",
         "scenarioCount": 450,
+        "executedRuntimeScenarioCount": 0,
+        "scalarDiagnosticCount": 450,
+        "scalarMarginOutcomeCounts": dict(sorted(Counter(
+            row['referenceMarginCheck']['outcome'] for row in scenarios).items())),
         "processCount": 27,
         "priorityCoreCount": len(PRIORITY_CORE),
         "marketRequirementCount": 12,

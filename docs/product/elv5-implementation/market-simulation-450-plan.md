@@ -16,6 +16,35 @@ Tracked machine sources:
 - `scripts/ci/check-elv5-market-simulation.py` — deterministic generator/validator for exactly 450 cases;
 - CI artifact `elv5-market-simulation-${github.sha}` — exact-head generated matrix.
 
+## Generated evidence semantics (result schema v2)
+
+`electra.elv5-market-simulation-result.v2` distinguishes three independent layers:
+
+- `vectorClass` / `plannedDisposition`: desired future runtime test class/outcome;
+- `referenceComputation`: independent, synthetic scalar diagnostic, not the full
+  input of that scenario and not a manufacturer fact;
+- `referenceMarginCheck`: exact sign check of reported diagnostic margins only.
+  Outcomes are `NEGATIVE_MARGIN`, `NONNEGATIVE_MARGINS`, or
+  `NO_MARGIN_COMPARISON`; `fullProcessAssessment` is always `NOT_ASSESSED`.
+
+The old `expectedDisposition` name is removed because it falsely suggested that
+an algorithm had evaluated the accompanying data. For example, the independently
+sampled ACS-05 diagnostic at index 15 has a -240 Wh margin even though its planned
+vector class is POSITIVE. That row is not a passing battery calculation. Runtime
+qualification must first construct coherent typed inputs for the planned vector,
+compute an independent expected result, then execute the actual Dart/public path.
+
+Every row carries `runtimeFixtureStatus=REQUIRES_CONSTRUCTION_AND_EXECUTION`,
+`referenceComputationBasis=syntheticFixture` and its diagnostic role. The
+archetype's `marketBasis=vendorFact` applies only to cited catalog observations,
+never to invented scalar inputs. The artifact reports
+`executedRuntimeScenarioCount=0` explicitly. The 450 count proves planned coverage
+and diagnostic generation, not 450 successful engineering calculations.
+
+Statements below about P0–P9 stress, prevention and workflow describe obligations
+for future fixture construction/execution. The current generator does not run DB,
+UI, topology, scheduling, fault injection or production process kernels.
+
 ## Market evidence policy
 
 Three evidence classes are intentionally different:
