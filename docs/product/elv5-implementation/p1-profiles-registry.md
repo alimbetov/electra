@@ -2,7 +2,7 @@
 
 Status: DESIGN HARDENED / RUNTIME NOT STARTED
 Depends on: P0 ownership/scope map.
-Parent: [ELV5 design](../elv5-discipline-calculations-design-specification.md); [process contracts](process-contracts.md); [code-level runtime contract](code-level-runtime-contract.md); [engineering primitives](engineering-primitives-contract.md); [typed process API](typed-process-api.md).
+Parent: [ELV5 design](../elv5-discipline-calculations-design-specification.md); [process contracts](process-contracts.md); [code-level runtime contract](code-level-runtime-contract.md); [engineering primitives](engineering-primitives-contract.md); [typed process API](typed-process-api.md); [unified calculation engine](calculation-engine-contract.md); [algorithm registry](algorithm-registry.json).
 
 Inherited implementation and mandatory new extensions: [baseline contract P1](implemented-baseline.md#p1); [pinned evidence](baseline.json).
 
@@ -10,24 +10,58 @@ Inherited implementation and mandatory new extensions: [baseline contract P1](im
 
 | Requirement | Required implementation behavior | Planned acceptance |
 |---|---|---|
-| ELV5-P1-001 | Register exactly 27 stable discipline process codes with algorithm/input/output/numeric versions | P1-T01 |
+| ELV5-P1-001 | Register exactly 27 stable discipline process codes and exactly 27 algorithm mappings with algorithm/input/output/numeric versions | P1-T01 |
 | ELV5-P1-002 | Define typed immutable policy editions with exact applicability, units, source/evidence basis and hashes | P1-T02 |
 | ELV5-P1-003 | Define DESIGN/SEGMENT/SEQUENCE key and process input/output scope + operating-case compatibility | P1-T03 |
 | ELV5-P1-004 | Model stream/subscription/recording, link/port, door/channel and fire/address assignments without duplicate canonical identities | P1-T04 |
 | ELV5-P1-005 | Implement dimension-safe exact quantities, signed coordinate/dBm rules and versioned bounded geometry | P1-T05 |
 | ELV5-P1-006 | Define shared-source requirement composition without repeated reserves/losses or reduced membership totals | P1-T06 |
 | ELV5-P1-007 | Implement canonical serialization/hash primitives and strict 16-operation wire registry/examples | P1-T07 |
-| ELV5-P1-008 | Define code-owned dependency/evaluation registry, model-limit outcomes, per-dimension status and deterministic kernel contract | P1-T08 |
+| ELV5-P1-008 | Implement common solver protocol: applicability, operating cases, conservative comparison, margin, governing/limiting factor, deterministic trace and status derivation | P1-T08 |
 
 ## Concrete contract
 
-The machine-readable process registry is the design source for process membership, modes and planned oracles. Runtime registry is compiled/code-owned, not arbitrary expressions imported from profiles. Policy definitions are data, versioned and validated before adoption. Imported executable formula/script content is not supported.
+The machine-readable process registry is the design source for process membership, modes and planned oracles. [algorithm-registry.json](algorithm-registry.json) is the corresponding machine source for common solver-family mapping, operating-case inventory, governing rule, margin convention and limiting-factor semantics. Runtime registries are compiled/code-owned, not arbitrary expressions imported from profiles. Policy definitions are data, versioned and validated before adoption. Imported executable formula/script content is not supported.
 
-The runtime implementation MUST expose one closed `Elv5ProcessRegistry` containing exactly CCTV-01…06, LAN-01…07, ACS-01…06 and FA-01…08. Each definition pins `algorithmVersion`, `inputSchemaVersion`, `outputSchemaVersion`, `numericBackendVersion`, required dimension codes, discipline, legal scope kinds and typed upstream bindings. Startup/test construction fails on missing/duplicate code, unknown upstream process, unknown binder, invalid scope compatibility or cycle.
+The runtime implementation MUST expose one closed `Elv5ProcessRegistry` containing exactly CCTV-01…06, LAN-01…07, ACS-01…06 and FA-01…08 and one closed calculation-engine registry mapping the same 27 process codes exactly once. Each definition pins `algorithmVersion`, `inputSchemaVersion`, `outputSchemaVersion`, `numericBackendVersion`, required dimension codes, discipline, legal scope kinds, typed upstream bindings and legal solver family. Startup/test construction fails on missing/duplicate code, missing algorithm mapping, unknown solver family, unknown upstream process, unknown binder, invalid scope compatibility or cycle.
 
 `Elv5EngineeringNodeKeyV3` is owner-isolated from `PowerNodeKeyV2` and serializes `[engineering-node-v3, ELV5, revision, scenarioKey, scopeKind, scopeId, processCode, subjectKind, subjectId]`. DESIGN uses scenarioKey `NONE`; SEGMENT/SEQUENCE require actual scenario context when registered. UI scenario selection never silently rewrites calculation identity.
 
 Freshness, completion, assessment and execution are separate types. `CURRENT` is pointer freshness, not a verdict. A completed technical violation is SUCCEEDED/COMPLETE/FAIL; missing model/input may be BLOCKED/UNRESOLVED; ELV6/7/8-owned dimensions remain explicitly NOT_ASSESSED where the process contract says so.
+
+## Unified calculation-engine runtime obligation
+
+Every process definition participates in the common lifecycle from [calculation-engine-contract.md](calculation-engine-contract.md):
+
+```text
+CAPTURE
+RESOLVE_APPLICABILITY
+RESOLVE_INPUTS
+NORMALIZE_ENGINEERING_STATE
+BUILD_OPERATING_CASES
+RUN_PROCESS_KERNEL
+COMPOSE_REQUIREMENTS
+CONSERVATIVE_COMPARE
+DERIVE_MARGINS_AND_GOVERNING_CASE
+DERIVE_DIMENSION_STATUSES
+BUILD_CALCULATION_TRACE
+BUILD_FINDINGS_AND_RECOMMENDATIONS
+GUARDED_PUBLISH
+```
+
+P1 owns the reusable types/contracts for this lifecycle; P3–P6 provide discipline-specific kernels. A process may have a trivial stage, but it may not invent a different verdict/margin convention.
+
+At minimum P1 provides equivalents of:
+
+- `Elv5ModelApplicability`;
+- typed operating-case result;
+- `Elv5EngineeringComparison<Q>`;
+- signed margin with **positive = acceptable headroom** convention;
+- `Elv5LimitingFactor` and governing-case projection;
+- `Elv5CalculationStep` with stable code-owned equation code and typed operands;
+- shared `Elv5CalculationResult<O>` envelope plus strongly typed process output `O`;
+- centralized verdict derivation from required dimension statuses;
+- non-authoritative sensitivity/what-if result type that cannot publish CURRENT without committed input mutation.
 
 ### Dimension-safe engineering primitives
 
@@ -40,7 +74,7 @@ P1 MUST implement shared primitives equivalent to the [engineering primitives co
 - evidence basis (`manufacturerGuaranteed`, `manufacturerTypical`, `measured`, `estimated`, fixture, etc.);
 - applicability/environment envelope;
 - `Elv5OperatingCaseRef` and state selection;
-- deterministic temporal policy with IANA zone + tzdb version + DST policy;
+- deterministic temporal policy with IANA zone + captured rules evidence + DST policy;
 - explicit coordinate-frame/transform identity;
 - stable finding/comparison model;
 - canonical encoder `electra.canonical-json.v1`.
@@ -69,14 +103,17 @@ Dynamic maps are limited to strict codec/storage/projection boundaries and may n
 At minimum P1 proves:
 
 - all 27 typed definitions are registered exactly once;
+- all 27 algorithm mappings are registered exactly once and match process-registry membership;
 - process registry legal scope and required dimensions match definition metadata;
+- every multi-case process can expose a governing case or an explicit reason why none is defined;
+- every capacity/threshold process uses the common signed margin convention when operands are resolved;
 - every required engineering value declares acceptable evidence basis;
 - every output field affecting assessment participates in deterministic output hashing;
 - generic executable formula/expression fields are absent.
 
 ### Shared physical evidence rule
 
-DESIGN consumers of power evidence, such as CCTV-06, declare the complete required scenario/segment applicability set in their policy and consume those exact evidence refs. They do not use whichever UI scenario happens to be selected. Source-owned requirement sets consider every participating discipline and select the strongest applicable capability constraint per dimension on one physical demand; incompatible scenario policies require explicit project composition.
+DESIGN consumers of power evidence, such as CCTV-06, declare the complete required scenario/segment applicability set in their policy and consume those exact evidence refs. They do not use whichever UI scenario happens to be selected. Source-owned requirement sets consider every participating discipline using registered merger semantics. Discipline wrappers expose contribution from the same immutable ELV4 evidence; they do not run a reduced physical calculation.
 
 ### Mandatory codec examples before implementation entry
 
@@ -88,13 +125,14 @@ P1 runtime acceptance requires its numbered assertions at the same accepted sour
 
 P1 implementation entry is blocked until:
 
-1. 27 process registry rows and 27 typed definitions are mutually consistent;
+1. 27 process registry rows, 27 typed definitions and 27 algorithm mappings are mutually consistent;
 2. primitives/canonical-hash contracts are frozen and have L0 tests;
 3. exact 16-operation registry/examples are mutually consistent;
-4. no dimension/evidence/time/frame behavior depends on locale, host timezone, map iteration order or UI formatting.
+4. common applicability/comparison/margin/governing/limiting/trace/verdict contracts are code-owned rather than reimplemented per discipline;
+5. no dimension/evidence/time/frame behavior depends on locale, host timezone, map iteration order or UI formatting.
 
 ## Audit refinements
 
 Initial audit resolutions remain mandatory: exact pool/copy/sizing/channel basis types; integer-capacity rounding separate from UI formatting; signed optical physical-loss interval separate from design reserve; full expanded fire address sets; gross/net rack capacity tag; typed acyclic dependencies.
 
-Second-pass hardening additionally requires type-safe engineering dimensions, evidence-basis/applicability semantics, operating-case identity, deterministic timezone/frame behavior and canonical hash projections. These are P1 runtime obligations, not optional library conveniences.
+Second/third-pass hardening remains authoritative for type-safe identities/dimensions, explicit field resolution, evidence/applicability, deterministic timezone/frame behavior, bounded arithmetic, requirement merging and transient models. The unified engine adds the shared engineering behavior expected of all 27 implementations without changing process count or stage ownership.
