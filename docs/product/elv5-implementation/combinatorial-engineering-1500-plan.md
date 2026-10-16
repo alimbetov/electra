@@ -263,6 +263,22 @@ scenarioMatrixFingerprintSha256
 runtimeExecuted
 ```
 
+### Source and authority integrity
+
+The generator requires `--authority-manifest`. It verifies the manifest schema,
+canonical SHA-256 fingerprint, complete code-owned artifact inventory, every file's
+byte length/hash, and equality with the current manifest generator's result.
+A 64-character string or matching `sourceSha` alone is insufficient.
+
+Artifact provenance is read from checked-out Git HEAD. A supplied `GITHUB_SHA`
+must match it. Tracked or untracked worktree changes reject normal evidence
+publication. Local design checks may use `--allow-dirty`, which emits
+`sourceTreeState=DIRTY` and `evidenceScope=WORKTREE_PREVIEW`; this cannot qualify
+as exact-head P0/P9 evidence. Clean source emits `CLEAN` / `EXACT_HEAD`.
+The same provenance rule applies to the authority manifest and market artifact.
+CI always runs without `--allow-dirty` and writes generated artifacts outside the
+repository. No fallback `UNKNOWN` SHA is accepted.
+
 ## Closure rule
 
 P8/P9 may not claim combinatorial qualification from row count alone. Closure requires simultaneously:

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Generate and validate the deterministic ELV5 1500-case combinatorial matrix."""
 from __future__ import annotations
-import argparse, json, os, subprocess
+import argparse, json, importlib.util
+from elv5_evidence import source_provenance, verify_authority_manifest
 from collections import Counter
 from hashlib import sha256
 from itertools import combinations, product
@@ -24,11 +25,6 @@ def require(ok, msg):
     if not ok: raise SystemExit(msg)
 def cbytes(v): return json.dumps(v, ensure_ascii=False, sort_keys=True, separators=(",",":")).encode()
 def digest(v): return sha256(cbytes(v)).hexdigest()
-def source_sha():
-    if os.getenv("GITHUB_SHA"): return os.environ["GITHUB_SHA"]
-    try: return subprocess.check_output(["git","rev-parse","HEAD"], cwd=ROOT, text=True).strip()
-    except (OSError, subprocess.CalledProcessError): return "UNKNOWN"
-
 def all_pairs(factors):
     names=list(factors); out=set()
     for a,b in combinations(names,2):
@@ -101,8 +97,10 @@ def target_row(factors,target,process_index,target_index):
 def main():
     ap=argparse.ArgumentParser()
     ap.add_argument("--output",type=Path,required=True)
-    ap.add_argument("--authority-manifest",type=Path)
+    ap.add_argument("--authority-manifest",type=Path,required=True)
+    ap.add_argument("--allow-dirty",action="store_true",help="Generate WORKTREE_PREVIEW only")
     args=ap.parse_args()
+    provenance=source_provenance(ROOT, allow_dirty=args.allow_dirty)
     req,constraints,three,template,system,process=[load(PATHS[k]) for k in ("req","constraints","three","template","system","process")]
     require(req["scenarioTarget"]==1500 and req["priorityProcessMinimum"]==72 and req["regularProcessMinimum"]==42 and req["systemWideScenarioCount"]==36, "1500 distribution contract drift")
     require(req["priorityComputationalCore"]==PRIORITY, "priority inventory drift")
@@ -162,19 +160,19 @@ def main():
     t3_count=sum(len(x) for x in t3_cov.values())
     require(t3_count==330 and all(len(t3_cov[c])==30 for c in PRIORITY), f"targeted 3-wise closure drift: {t3_count}")
 
-    authority=None
-    if args.authority_manifest:
-        m=load(args.authority_manifest)
-        require(m["sourceSha"]==source_sha(), "authority manifest source SHA mismatch")
-        authority=m.get("authorityFingerprintSha256")
-        require(isinstance(authority,str) and len(authority)==64, "authority fingerprint missing/invalid")
+    spec=importlib.util.spec_from_file_location("elv5_manifest", Path(__file__).with_name("generate-elv5-contract-manifest.py"))
+    authority_module=importlib.util.module_from_spec(spec); spec.loader.exec_module(authority_module)
+    manifest=load(args.authority_manifest)
+    authority=verify_authority_manifest(manifest, ROOT,
+                                        authority_module.AUTHORITY_PATHS, provenance)
+    require(manifest == authority_module.build_manifest(provenance), "Authority manifest differs from current generator output")
 
     inputs={"requirements":req,"constraints":constraints,"threeWise":three,"template":template,"systemWide":system}
     core={
         "schema":"electra.elv5-combinatorial-qualification.v1",
         "generationVersion":"electra.elv5-combinatorial-generator.v1",
         "status":"DESIGN_MATRIX_GENERATED_RUNTIME_NOT_EXECUTED",
-        "sourceSha":source_sha(),
+        **provenance,
         "authorityFingerprint":authority,
         "qualificationContractFingerprintSha256":digest(inputs),
         "scenarioCount":1500,"processCount":27,"priorityProcessCount":11,"regularProcessCount":16,

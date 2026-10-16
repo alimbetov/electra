@@ -12,9 +12,8 @@ from fractions import Fraction as Q
 import hashlib
 import json
 import math
-import os
 from pathlib import Path
-import subprocess
+from elv5_evidence import source_provenance
 
 ROOT = Path(__file__).resolve().parents[2]
 IMPL = ROOT / "docs" / "product" / "elv5-implementation"
@@ -45,16 +44,6 @@ def load(path: Path):
 def require(condition: bool, message: str) -> None:
     if not condition:
         raise SystemExit(message)
-
-
-def source_sha() -> str:
-    env_sha = os.getenv("GITHUB_SHA")
-    if env_sha:
-        return env_sha
-    try:
-        return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
-    except (OSError, subprocess.CalledProcessError):
-        return "UNKNOWN"
 
 
 def canonical_sha256(value: object) -> str:
@@ -283,7 +272,9 @@ def reference_computation(process_code: str, idx: int, vector_class: str) -> dic
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path)
+    parser.add_argument("--allow-dirty", action="store_true", help="Generate WORKTREE_PREVIEW only")
     args = parser.parse_args()
+    provenance = source_provenance(ROOT, allow_dirty=args.allow_dirty or args.output is None)
 
     catalog = load(CATALOG_PATH)
     market_requirements = load(REQUIREMENTS_PATH)
@@ -428,7 +419,7 @@ def main() -> None:
         "generationVersion": catalog["generationVersion"],
         "catalogSha256": canonical_sha256(catalog),
         "requirementsSha256": canonical_sha256(market_requirements),
-        "sourceSha": source_sha(),
+        **provenance,
         "status": "DESIGN_SIMULATION_ONLY_RUNTIME_NOT_EXECUTED",
         "scenarioCount": 450,
         "processCount": 27,

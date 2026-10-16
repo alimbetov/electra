@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Generate deterministic ELV5 exact-head authority manifest."""
 from __future__ import annotations
-import argparse,hashlib,json,os,re,subprocess
+import argparse,hashlib,json,re
+from elv5_evidence import source_provenance
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[2]
@@ -13,6 +14,7 @@ DOSSIERS=[
 'docs/product/elv5-implementation/process-specifications/fire-processes.md',
 ]
 AUTHORITY_PATHS=[
+'.github/workflows/flutter-local.yml',
 'docs/product/elv5-authoritative-spec-index.md','docs/product/elv5-discipline-calculations-design-specification.md','docs/product/elv5-p0-p9-delivery-plan.md','docs/product/elv5-implementation/README.md',
 'docs/product/elv5-implementation/implemented-baseline.md','docs/product/elv5-implementation/baseline.json','docs/adr/ADR-031-elv5-pure-core-and-module-boundary.md',
 'docs/product/elv5-implementation/requirements.json','docs/product/elv5-implementation/normative-requirements-registry.json','docs/product/elv5-implementation/market-simulation-requirements.json','docs/product/elv5-implementation/market-simulation-catalog.json','docs/product/elv5-implementation/market-simulation-450-plan.md','docs/product/elv5-implementation/market-simulation-p0-p9-bindings.json',
@@ -23,6 +25,7 @@ AUTHORITY_PATHS=[
 'docs/product/elv5-implementation/project-alignment-hardening-v1.md','docs/product/elv5-implementation/downstream-handoff-registry.json','docs/product/development-roadmap.md',
 'docs/product/elv5-implementation/p0-baseline.md','docs/product/elv5-implementation/p1-profiles-registry.md','docs/product/elv5-implementation/p2-persistence-commands.md','docs/product/elv5-implementation/p3-cctv.md','docs/product/elv5-implementation/p4-lan.md','docs/product/elv5-implementation/p5-acs.md','docs/product/elv5-implementation/p6-fire.md','docs/product/elv5-implementation/p7-dependencies-workspace.md','docs/product/elv5-implementation/p8-acceptance.md','docs/product/elv5-implementation/p9-closure.md',
 'docs/audit/elv5-third-pass-production-readiness-audit.json','docs/audit/elv5-fourth-pass-algorithm-performance-audit.md','docs/audit/elv5-fourth-pass-algorithm-performance-audit.json','docs/audit/elv5-fifth-pass-specification-closure-audit.md','docs/audit/elv5-fifth-pass-specification-closure-audit.json','docs/audit/elv5-sixth-pass-code-binding-performance-audit.md','docs/audit/elv5-sixth-pass-code-binding-performance-audit.json','docs/audit/elv5-seventh-pass-project-alignment-audit.md','docs/audit/elv5-seventh-pass-project-alignment-audit.json',
+'scripts/ci/elv5_evidence.py','scripts/ci/test_elv5_evidence.py','scripts/ci/generate-elv5-contract-manifest.py','scripts/ci/check-elv5-command-examples.py','docs/product/elv5-implementation/command-examples.json',
 'scripts/ci/check-elv5-market-simulation.py','scripts/ci/check-elv5-market-p0-p9-bindings.py','scripts/ci/generate-elv5-combinatorial-1500.py','scripts/ci/check-elv5-fifth-pass-closure.py','scripts/ci/check-elv5-implementation-bindings.py','scripts/ci/check-elv5-project-alignment.py',
 ]
 
@@ -32,10 +35,6 @@ def cbytes(v): return json.dumps(v,ensure_ascii=False,sort_keys=True,separators=
 def load(p): return json.loads(p.read_text(encoding='utf-8'))
 def req(ok,msg):
     if not ok: raise SystemExit(msg)
-def source_sha():
-    if os.getenv('GITHUB_SHA'): return os.environ['GITHUB_SHA']
-    try: return subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
-    except (OSError,subprocess.CalledProcessError): return 'UNKNOWN'
 def rows(v): return v if isinstance(v,list) else v.get('requirements',[])
 def dossiers():
     pr=re.compile(r'^## (CCTV-\d{2}|LAN-\d{2}|ACS-\d{2}|FA-\d{2}) — .+$',re.M)
@@ -46,8 +45,7 @@ def dossiers():
     req(len(codes)==len(set(codes))==27,'expected 27 unique process dossiers')
     return out
 
-def main():
-    ap=argparse.ArgumentParser(); ap.add_argument('--output',required=True); args=ap.parse_args()
+def build_manifest(provenance):
     process=load(IMPL/'process-registry.json'); alg=load(IMPL/'algorithm-registry.json'); command=load(IMPL/'command-registry.json'); requirement=load(IMPL/'requirements.json')
     norm=load(IMPL/'normative-requirements-registry.json'); market_req=load(IMPL/'market-simulation-requirements.json'); market_cat=load(IMPL/'market-simulation-catalog.json')
     comb_req=load(IMPL/'combinatorial-engineering-requirements.json'); constraints=load(IMPL/'combinatorial-legal-pair-constraints.json'); three=load(IMPL/'combinatorial-targeted-three-wise.json'); template=load(IMPL/'combinatorial-covering-template-v1.json'); system=load(IMPL/'combinatorial-system-wide-inventory.json')
@@ -90,7 +88,17 @@ def main():
       'combinatorialRequirementsSha256':hfile(IMPL/'combinatorial-engineering-requirements.json'),'combinatorialPlanSha256':hfile(IMPL/'combinatorial-engineering-1500-plan.md'),'combinatorialLegalPairConstraintsSha256':hfile(IMPL/'combinatorial-legal-pair-constraints.json'),'combinatorialTargetedThreeWiseSha256':hfile(IMPL/'combinatorial-targeted-three-wise.json'),'combinatorialCoveringTemplateSha256':hfile(IMPL/'combinatorial-covering-template-v1.json'),'combinatorialSystemWideInventorySha256':hfile(IMPL/'combinatorial-system-wide-inventory.json'),'combinatorialGeneratorSha256':hfile(ROOT/'scripts/ci/generate-elv5-combinatorial-1500.py'),'fifthPassClosureAuditSha256':hfile(ROOT/'docs/audit/elv5-fifth-pass-specification-closure-audit.json'),
       'processDossierAggregateSha256':hbytes(cbytes(dossier_rows)),'calculationOracleErrataSha256':hfile(IMPL/'calculation-oracle-errata-v1.md'),'flutterPerformanceContractSha256':hfile(IMPL/'flutter-performance-contract.md'),'authorityArtifacts':artifacts,
     }
-    fp=hbytes(cbytes(core)); out={**core,'authorityFingerprintSha256':fp,'sourceSha':source_sha(),'runtimeStatus':'NOT_STARTED','qualificationStatus':'NOT_EXECUTED','marketSimulationStatus':'DESIGN_SIMULATION_ONLY','combinatorialMatrixStatus':'DESIGN_MATRIX_ONLY_RUNTIME_NOT_EXECUTED','implementationBindingStatus':'DESIGN_FROZEN_RUNTIME_NOT_EXECUTED','projectAlignmentStatus':'ELV5_SPEC_CLOSED_DOWNSTREAM_RECONCILIATION_REQUIRED','note':'Exact-head authority fingerprint/design-entry evidence only; no ELV5 production runtime, ELV7 compliance or ELV8 procurement acceptance is claimed.'}
+    fp=hbytes(cbytes(core)); out={**core,'authorityFingerprintSha256':fp,**provenance,'runtimeStatus':'NOT_STARTED','qualificationStatus':'NOT_EXECUTED','marketSimulationStatus':'DESIGN_SIMULATION_ONLY','combinatorialMatrixStatus':'DESIGN_MATRIX_ONLY_RUNTIME_NOT_EXECUTED','implementationBindingStatus':'DESIGN_FROZEN_RUNTIME_NOT_EXECUTED','projectAlignmentStatus':'ELV5_SPEC_CLOSED_DOWNSTREAM_RECONCILIATION_REQUIRED','note':'Exact-head authority fingerprint/design-entry evidence only; no ELV5 production runtime, ELV7 compliance or ELV8 procurement acceptance is claimed.'}
+    return out
+
+
+def main():
+    ap=argparse.ArgumentParser(); ap.add_argument('--output',required=True)
+    ap.add_argument('--allow-dirty', action='store_true', help='Label uncommitted checks WORKTREE_PREVIEW; never exact-head evidence')
+    args=ap.parse_args(); provenance=source_provenance(ROOT, allow_dirty=args.allow_dirty)
+    out=build_manifest(provenance)
+    req(source_provenance(ROOT, allow_dirty=args.allow_dirty)==provenance, 'Source changed during manifest generation')
+    fp=out['authorityFingerprintSha256']; repo=load(IMPL/'repository-contract-registry.json')
     path=Path(args.output); path.parent.mkdir(parents=True,exist_ok=True); path.write_text(json.dumps(out,ensure_ascii=False,sort_keys=True,indent=2)+'\n',encoding='utf-8')
     print(f'ELV5 contract manifest generated: {path}'); print(f"sourceSha={out['sourceSha']}"); print(f'authorityFingerprintSha256={fp}'); print(f"processes=27 algorithms=27 commands=16 requirements=80 obligations=42 market=450 combinatorial=1500 pairs=16011 targeted3Wise=330 implementationBindings=27 repoMethods={len(repo['readMethods'])} fifthOpen=0 sixthOpen=0 seventhOpen=0 downstreamReconciliationRequired=1 authorityArtifacts={len(AUTHORITY_PATHS)}")
 if __name__=='__main__': main()
