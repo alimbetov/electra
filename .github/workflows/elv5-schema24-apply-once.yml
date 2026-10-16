@@ -49,7 +49,7 @@ jobs:
       - name: Remove one-shot tooling and commit
         run: |
           git rm .github/workflows/elv5-schema24-apply-once.yml
-          git rm scripts/ci/apply-elv5-p2-schema24-runtime.py
+          git rm -f scripts/ci/apply-elv5-p2-schema24-runtime.py
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add apps/mobile/lib/data/database/app_database.dart \
