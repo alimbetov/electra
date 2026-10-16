@@ -7,6 +7,7 @@ export 'src/elv5/findings/comparison.dart';
 export 'src/elv5/numeric/interval.dart';
 export 'src/elv5/numeric/quantity.dart';
 export 'src/elv5/numeric/rational.dart';
+export 'src/elv5/processes/acs/acs02_resource_capacity.dart';
 export 'src/elv5/processes/acs/acs03_electrical.dart';
 export 'src/elv5/processes/acs/acs04_source_requirement.dart';
 export 'src/elv5/processes/acs/acs05_autonomy.dart';
