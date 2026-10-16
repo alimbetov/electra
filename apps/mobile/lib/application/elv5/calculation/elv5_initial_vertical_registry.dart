@@ -6,6 +6,8 @@ import '../fire/fa02_runtime.dart';
 import '../lan/elv3_realized_link_facts.dart';
 import '../lan/elv5_lan_persistence.dart';
 import '../lan/lan01_runtime.dart';
+import '../lan/lan05_optical_section_evidence.dart';
+import '../lan/lan05_runtime.dart';
 import '../power/elv4_operating_fact_source.dart';
 import 'elv5_blocked_capture.dart';
 import 'elv5_calculation_runtime.dart';
@@ -20,6 +22,7 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
   required Elv5LanMutationStore lanStore,
   required Elv5FireMutationStore fireStore,
   required Elv3RealizedLinkFactSource elv3LinkFacts,
+  required Lan05OpticalSectionEvidenceSource opticalSectionEvidence,
   required Elv4OperatingFactSource powerOperatingFacts,
   required Elv5CaptureRevisionSource captureRevisions,
   DateTime Function()? nowUtc,
@@ -54,6 +57,18 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
         ),
       ),
       executor: buildLan01Executor(nowUtc: nowUtc),
+      nowUtc: nowUtc,
+    ),
+    Elv5BlockedAwareTypedProcessCalculationAdapter(
+      resolver: guarded(
+        Lan05PersistedInputResolver(
+          lanStore: lanStore,
+          elv3Facts: elv3LinkFacts,
+          opticalEvidence: opticalSectionEvidence,
+          nowUtc: nowUtc,
+        ),
+      ),
+      executor: buildLan05Executor(nowUtc: nowUtc),
       nowUtc: nowUtc,
     ),
     Elv5BlockedAwareTypedProcessCalculationAdapter(
