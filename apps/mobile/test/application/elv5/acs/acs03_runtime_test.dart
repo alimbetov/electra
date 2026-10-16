@@ -1,13 +1,21 @@
+import 'package:electra_mobile/application/elv5/acs/acs03_electrical_contract.dart';
 import 'package:electra_mobile/application/elv5/acs/acs03_runtime.dart';
 import 'package:electra_mobile/application/elv5/acs/elv5_acs_persistence.dart';
 import 'package:electra_mobile/application/elv5/calculation/elv5_blocked_capture.dart';
 import 'package:electra_mobile/application/elv5/calculation/elv5_calculation_runtime.dart';
+import 'package:electra_mobile/application/elv5/power/elv4_current_evidence_source.dart';
+import 'package:engineering_core/engineering_core.dart'
+    show PowerEvaluationScopeKind, PowerProcessCode;
 import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('blocks when exact ACS-03 event/feed/control contract is not persisted', () async {
-    final resolver = Acs03PersistedInputResolver(acsStore: _AcsStore());
+    final resolver = Acs03PersistedInputResolver(
+      acsStore: _AcsStore(),
+      contractSource: const _NoContractSource(),
+      powerEvidence: const _NoPowerEvidence(),
+    );
 
     await expectLater(
       resolver.capture(_request()),
@@ -93,4 +101,31 @@ final class _AcsStore implements Elv5AcsMutationStore {
 
   @override
   Future<void> replace({required String projectId, required String designRevisionId, required String operation, required String subjectId, required String bindingId, required int? expectedRootRevision, required Map<String, Object?> payload, required DateTime updatedAtUtc}) => throw UnimplementedError();
+}
+
+final class _NoContractSource implements Acs03ElectricalContractSource {
+  const _NoContractSource();
+
+  @override
+  Future<Acs03ElectricalContractSnapshot?> loadActiveForDoor({
+    required String projectId,
+    required String designRevisionId,
+    required String doorId,
+  }) async => null;
+}
+
+final class _NoPowerEvidence implements Elv4CurrentEvidenceSource {
+  const _NoPowerEvidence();
+
+  @override
+  Future<List<Elv4CurrentEvaluationSnapshot>> loadCurrent({
+    required String projectId,
+    required String designRevisionId,
+    required PowerProcessCode processCode,
+    String? scenarioId,
+    PowerEvaluationScopeKind? scopeKind,
+    String? scopeId,
+    String? subjectKind,
+    String? subjectId,
+  }) async => const <Elv4CurrentEvaluationSnapshot>[];
 }
