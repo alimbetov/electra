@@ -10,20 +10,20 @@ void main() {
     );
 
     PowerEvaluationEvidence build(String id) => buildUpsLoadingEvidence(
-      evaluationId: id,
-      revisionId: 'revision-1',
-      scenarioId: 'backup',
-      segmentId: 'steady',
-      upsId: 'ups-1',
-      protectedOutputW: PowerRational.integer(100),
-      protectedOutputVa: PowerRational.integer(125),
-      ratedOutputW: PowerRational.integer(500),
-      ratedOutputVa: PowerRational.integer(625),
-      transferLoss: loss,
-      reserveMultiplier: PowerRational.one,
-      deratingFactor: PowerRational.one,
-      inputPowerFactor: PowerRational.one,
-    );
+          evaluationId: id,
+          revisionId: 'revision-1',
+          scenarioId: 'backup',
+          segmentId: 'steady',
+          upsId: 'ups-1',
+          protectedOutputW: PowerRational.integer(100),
+          protectedOutputVa: PowerRational.integer(125),
+          ratedOutputW: PowerRational.integer(500),
+          ratedOutputVa: PowerRational.integer(625),
+          transferLoss: loss,
+          reserveMultiplier: PowerRational.one,
+          deratingFactor: PowerRational.one,
+          inputPowerFactor: PowerRational.one,
+        );
 
     final first = build('eval-ups-1');
     final second = build('eval-ups-2');
