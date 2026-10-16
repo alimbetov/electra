@@ -2,7 +2,7 @@
 
 Status: DESIGN HARDENED / RUNTIME NOT STARTED
 Depends on: P0–P7 implemented prerequisites.
-Parent: [ELV5 design](../elv5-discipline-calculations-design-specification.md); [process contracts](process-contracts.md); [code-level runtime contract](code-level-runtime-contract.md); [unified calculation engine](calculation-engine-contract.md); [algorithm registry](algorithm-registry.json); [executable qualification contract](qualification-contract.md).
+Parent: [ELV5 design](../elv5-discipline-calculations-design-specification.md); [process contracts](process-contracts.md); [code-level runtime contract](code-level-runtime-contract.md); [unified calculation engine](calculation-engine-contract.md); [algorithm registry](algorithm-registry.json); [27-process code-level specification](process-code-level-specification.md); [Flutter performance contract](flutter-performance-contract.md); [executable qualification contract](qualification-contract.md).
 
 Inherited implementation and mandatory new extensions: [baseline contract P8](implemented-baseline.md#p8); [pinned evidence](baseline.json).
 
@@ -17,7 +17,7 @@ Inherited implementation and mandatory new extensions: [baseline contract P8](im
 | ELV5-P8-005 | Inject durable failure checkpoints and verify same-open/reopened atomic rollback including history/ledger | P8-T05 |
 | ELV5-P8-006 | Prove response-loss replay/payload conflict and deterministic two-connection edit/publish/freeze/adoption races | P8-T06 |
 | ELV5-P8-007 | Verify supported migrations through schema 24 and mixed legacy/ELV3/ELV4/ELV5 result-owner isolation | P8-T07 |
-| ELV5-P8-008 | Assert affected/unaffected sets, exact arithmetic/provenance, 27 algorithm mappings, governing/margin/limiting/trace invariants and all no-false-PASS sentinels | P8-T08 |
+| ELV5-P8-008 | Assert affected/unaffected sets, exact arithmetic/provenance, 27 algorithm mappings, 27×25 dossier semantics, governing/margin/limiting/trace invariants, performance execution rules and all no-false-PASS sentinels | P8-T08 |
 
 ## Normative qualification contract
 
@@ -25,12 +25,12 @@ The complete test architecture is [qualification-contract.md](qualification-cont
 
 ```text
 L0 primitive / exact numeric / canonical hash
-L1 pure typed process kernels + unified solver protocol
+L1 pure typed process kernels + unified solver protocol + dossier vectors
 L2 strict wire codecs / semantic rejection
 L3 schema 24 / persistence / migration / restart
-L4 application UoW / replay / history / failure injection
+L4 application UoW / replay / history / failure injection / executor scheduling
 L5 public-command vertical qualification
-L6 deterministic concurrency / freeze / historical matrix
+L6 deterministic concurrency / worker determinism / freeze / historical matrix
 ```
 
 No single layer substitutes for another. In particular, formula tests, registry checks and JSON examples do not close a public vertical.
@@ -46,7 +46,7 @@ schema = electra.elv5-qualification-manifest.v1
 
 The manifest contains **exactly 54 primary process entries**: POS plus NEG/unsupported for every one of the 27 process codes.
 
-Each entry includes at least:
+Each primary entry includes at least:
 
 ```text
 processCode
@@ -71,6 +71,26 @@ publicSetupOnly
 ```
 
 Tests read the manifest and fail if process registry membership, algorithm registry membership, required dimensions or expected status inventory diverges.
+
+## Fourth-pass process-vector matrix
+
+The **54 primary entries do not change**. The 27 code-level dossiers add mandatory boundary/adversarial/cross-discipline vectors.
+
+Required minimum inventory:
+
+```text
+27 positive vectors     -> satisfied by the 27 primary POS entries
+27 negative vectors     -> satisfied by the 27 primary NEG/unsupported entries
+27 boundary vectors     -> supplemental
+27 adversarial vectors  -> supplemental
+27 cross-discipline     -> supplemental
+-----------------------------------------
+135 process-vector cases total
+```
+
+A supplemental vector may execute at L1 when it tests pure numerical algebra only, but vectors that exercise persistence, dependency closure, shared ELV4 evidence, publication or stage ownership MUST execute through the public-command/file-SQLite path at L5/L6.
+
+The test harness maps every vector to the matching dossier section and fails if a dossier vector has no executable test ID.
 
 ## Public vertical path
 
@@ -112,7 +132,11 @@ Required cross-process tests:
 9. optional sensitivity/what-if calculations cannot publish CURRENT authoritative evidence unless the corresponding input mutation was actually committed;
 10. two ELV5 wrappers consuming the same exact ELV4 physical result preserve the same upstream evaluation ID/hash and cannot create discipline-reduced physical totals;
 11. host locale/timezone changes do not alter deterministic kernel output, input fingerprint or output hash;
-12. a process-specific kernel cannot bypass centralized verdict derivation to turn PARTIAL/BLOCKED/UNRESOLVED into PASS.
+12. a process-specific kernel cannot bypass centralized verdict derivation to turn PARTIAL/BLOCKED/UNRESOLVED into PASS;
+13. each process implementation satisfies every section 6–19 mathematical/algorithmic assertion in its matching dossier;
+14. every boundary vector proves exact inclusivity/rounding/interval behavior without UI-display rounding affecting verdict;
+15. every adversarial vector proves duplicate/alias/reordering/stale/false-evidence input cannot manufacture capacity or PASS;
+16. every cross-discipline vector proves shared ELV3/ELV4 facts remain single-owner and ELV6/7/8 claims are not stolen by ELV5.
 
 ## Exact wire/codec qualification
 
@@ -154,7 +178,7 @@ P8 executes L0 regression coverage from [engineering-primitives-contract.md](eng
 
 ### CCTV
 
-P8 includes bounded H/V FOV, frame mismatch, unicast/multicast copy accounting, governing-edge peak utilization, payload-vs-wire-rate separation, schedule union/tzdb, expected-vs-guaranteed retention, one-time reserve/redundancy, channel-accounting alternatives, recorder limiting dimension and shared PWR-06 contribution evidence.
+P8 includes bounded H/V FOV, frame mismatch, unicast/multicast copy accounting, governing-edge peak utilization, payload-vs-wire-rate separation, schedule union/tzdb, expected-vs-guaranteed retention, single pool-level reserve/ceil/redundancy behavior, channel-accounting alternatives, recorder limiting dimension and shared PWR-06 contribution evidence.
 
 ### LAN
 
@@ -177,6 +201,122 @@ with at least one fail-safe and one fail-secure/project-defined fixture. Technic
 ### Fire
 
 P8 includes expanded address-set collisions, partial standby/alarm/startup evidence, supported-vs-unsupported electrical model, complete shared source/bank loads, explicit standby/alarm durations, governing energy/current segment, notification active/startup current + terminal voltage, signal-loop closure/branch/fault-state policy and policy-match-vs-certified-compliance separation.
+
+## Flutter/executor performance qualification
+
+[flutter-performance-contract.md](flutter-performance-contract.md) is executable acceptance behavior.
+
+### Native worker scheduling
+
+Required tests:
+
+1. `medium` and `large` production workloads never execute through the inline executor on supported native platforms;
+2. `tiny/small` inline execution is allowed only for code-owned classes and only after profile evidence stays within the UI synchronous-slice target;
+3. long-lived worker executor accepts only sendable pure captured DTO/value graphs—no Drift rows, DB handles, Flutter state or widgets;
+4. worker crash/exception cannot partially publish a coherent batch;
+5. deterministic technical FAIL is a result, not a worker exception/retry condition.
+
+### Parallel determinism
+
+For the same captured 500-node batch:
+
+```text
+workerCount=1
+workerCount=N
+randomized artificial task completion delays
+```
+
+MUST yield identical:
+
+- per-node deterministic output hashes;
+- governing cases;
+- limiting factors;
+- dimension statuses/findings;
+- canonical calculation trace per node;
+- canonical batch result ordering/hash.
+
+Only wall-clock/timeline scheduling evidence may differ.
+
+### Incremental recomputation
+
+Mutation fixtures assert exact affected node set and recomputed node set. Production strategy “recalculate all 27 processes/all subjects after any edit” is forbidden.
+
+Required cases include:
+
+- one stream bitrate change affects only dependent CCTV-02/03/05 and exact downstream closures;
+- one LAN path change invalidates exact path-dependent CCTV/LAN nodes but not unrelated doors/fire loops;
+- new selector-matching fact invalidates nodes even if the fact did not exist during prior capture;
+- unrelated metadata/display edit changes zero engineering input fingerprints and triggers zero kernel recomputation.
+
+### Cancellation, supersession and backpressure
+
+Use explicit scheduler hooks/barriers:
+
+```text
+queue generation 10
+edit creates generation 11
+before gen10 starts -> gen10 dropped
+while gen10 runs -> completion may be cached by exact fingerprint but cannot publish CURRENT
+rapid generations 12..100 -> pending work coalesces, queue stays bounded
+```
+
+No sleeps as correctness synchronization.
+
+### Semantic cache
+
+Same full key `(processCode, algorithm/input/output/numeric versions, authority fingerprint, canonical input fingerprint)` may reuse deterministic result. Tests mutate one key constituent at a time and prove cache miss when semantics change.
+
+Mandatory miss cases include policy edition, timezone rules hash, frame transform hash, evidence basis/uncertainty, operating case and consumed upstream output hash.
+
+### Capture/publish database performance
+
+Instrumented repository fixtures assert bounded bulk access and no N+1 explosion at scale. Query-plan evidence verifies required indexes on high-cardinality revision/scope/member/dependency/pointer paths.
+
+CPU-heavy kernel work MUST occur after capture transaction closes and before short guarded publish transaction opens.
+
+### UI/render performance
+
+Profile-mode evidence is required; debug-mode timing is rejected.
+
+Acceptance includes:
+
+- active target refresh frame budget (approximately 16.67 ms at 60 Hz, 8.33 ms at 120 Hz) for UI and raster work;
+- p99 synchronous engineering-related UI orchestration slice target `<= min(2 ms, 25% of refresh interval)` on qualified test device/profile;
+- no engineering arithmetic/SQLite access in widget `build()`;
+- targeted process-card rebuild test proving one result update does not rebuild the entire workspace;
+- lazy/virtualized rendering for large finding/member/trace lists;
+- representative scrolling/expansion during background recalculation without jank regression.
+
+### Web qualification
+
+Web is qualified separately. Tests must prove the runtime does not assume Flutter `compute()` provides native isolate parallelism. Large web workload bounds/chunk/yield behavior are explicit; unqualified very-large workload may be rejected/degraded rather than freezing the page.
+
+## Performance evidence artifact
+
+P8 produces exact-head machine-readable performance evidence containing at least:
+
+```text
+sourceSha
+authorityFingerprint
+flutterVersion
+dartVersion
+platform/device profile
+refreshRate
+fixtureId
+process/batch cardinalities
+capture duration
+worker queue duration
+kernel duration
+publish duration
+workspace projection duration
+UI/raster frame percentiles
+memory high-water mark where measurable
+cache hit/miss counts
+affected node count
+recomputed node count
+```
+
+Measured timing is not part of deterministic engineering hashes.
 
 ## Persistence/restart proof
 
@@ -201,6 +341,15 @@ In-memory-only tests cannot close P2/P7/P8.
 
 For replacement commands, failure probes cover transaction boundaries after replay, root write, child replacement, invalidation, history append and ledger save. Every injected failure is checked after reopen and must leave the previous committed aggregate intact. No hybrid old/new member set is allowed.
 
+Calculation/executor failure probes additionally cover:
+
+- worker exception before any result;
+- one node exception after sibling nodes completed in memory;
+- cancellation before/between topological levels;
+- stale dependency generation discovered at publish;
+- pointer-generation conflict during publish;
+- storage failure after some immutable evaluation inserts but before pointer advance, proving transaction rollback leaves no partially current batch.
+
 ## Deterministic concurrency
 
 Use explicit barriers/hooks, not sleeps as correctness synchronization. Required races include:
@@ -214,7 +363,9 @@ Use explicit barriers/hooks, not sleeps as correctness synchronization. Required
 - replace vs replace same aggregate → one deterministic conflict, no hybrid members;
 - undo/redo vs new edit → cursor-generation conflict;
 - response loss after commit → same-hash replay returns stored logical result;
-- create-next vs old-revision late publish → no retagging/new-revision contamination.
+- create-next vs old-revision late publish → no retagging/new-revision contamination;
+- old worker batch completion → newer edit/capture generation → old batch cannot publish;
+- two independent worker nodes finish in opposite orders → canonical batch output unchanged.
 
 A multi-node `CALCULATE_DISCIPLINE_PROCESS` publish is all-or-nothing for the requested coherent batch.
 
@@ -262,10 +413,22 @@ Any false-PASS sentinel is closure-blocking.
 
 ## Scale fixture
 
-P8 executes deterministic supported-scale fixtures from the qualification contract, including 1000 streams, 10000 schedule segments, 5000 LAN assignments, 2000 ACS assignments, 10000 fire address claims and a 500-node workspace batch. Benchmark evidence is recorded without inventing an unmeasured production millisecond SLO.
+P8 executes deterministic supported-scale fixtures from the qualification/performance contracts, including:
+
+```text
+1000 CCTV streams
+10000 recording schedule segments
+5000 LAN assignments
+2000 ACS assignments
+10000 fire address claims
+5000 dependency edges
+500-node coherent calculation batch
+```
+
+Scale tests prove the dossier complexity model, resource bounds, affected-node planning, worker determinism, bounded capture/publish and UI responsiveness. They record measured evidence without inventing an unmeasured production kernel-duration SLO.
 
 ## Exit
 
-P8 closes only from executed public-command, file-SQLite, restart, migration, failure-injection, unified-engine invariant, race/freeze and 54-process-oracle evidence at one tested source SHA and matching authority fingerprint.
+P8 closes only from executed public-command, file-SQLite, restart, migration, failure-injection, unified-engine invariant, **135 process-vector cases**, worker/performance evidence, race/freeze and 54-primary-process-oracle evidence at one tested source SHA and matching authority fingerprint.
 
-Structural design validators—including the ELV5 specification/registry/example/hardening/calculation-engine CI guards—prove design consistency only. They cannot be cited as runtime implementation acceptance.
+Structural design validators—including the ELV5 specification/registry/example/hardening/calculation-engine/process-dossier CI guards—prove design consistency only. They cannot be cited as runtime implementation acceptance.
