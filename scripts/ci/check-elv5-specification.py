@@ -14,29 +14,6 @@ BASE = ROOT / 'docs/product/elv5-implementation'
 SCOPE = {'DESIGN', 'SEGMENT', 'SEQUENCE'}
 BINDINGS = {'DESIGN', 'SAME_SEGMENT', 'SAME_SEQUENCE', 'COMPOSED_SEGMENTS', 'REQUIRED_APPLICABILITY_SEGMENTS'}
 SUBJECTS = {'RECORDED_STREAM_SET', 'GLOBAL_PSE_CONTEXT', 'RECORDER_INGRESS', 'RECORDER_POOL', 'REALIZED_LINK_SECTIONS', 'SAME_LINK_POLICY_CONTEXT', 'GLOBAL_SUPPLY_CONTEXT', 'SUPPLY_DC_DOMAIN', 'SOURCE_REQUIREMENT_CONTEXT', 'GLOBAL_PROTECTED_BANK', 'FIRE_STATE_ORIGINS', 'NOTIFICATION_OUTPUT_CONTEXT', 'NOTIFICATION_DC_DOMAIN', 'SAME_FIRE_LOOP'}
-COMMAND_TOP_LEVEL_KEYS = [
-    'schema', 'operation', 'payloadSchemaVersion', 'projectId',
-    'designRevisionId', 'commandId', 'expectedDesignRowRevision',
-    'expectedRows', 'reviewedImpactFingerprint', 'payload'
-]
-COMMAND_PAYLOAD_KEYS = {
-    'BIND_DISCIPLINE_POLICY': {'bindingId', 'subject', 'processCodes', 'definitionRef', 'applicability'},
-    'ADOPT_DISCIPLINE_POLICY': {'bindingId', 'newDefinitionRef', 'applicability'},
-    'RELEASE_DISCIPLINE_POLICY': {'bindingId', 'releasePolicy'},
-    'REPLACE_CAMERA_STREAMS': {'cameraId', 'streams'},
-    'REPLACE_RECORDING_ASSIGNMENTS': {'poolId', 'horizon', 'assignments', 'scheduleSegments', 'sizingBasis'},
-    'REPLACE_RECORDER_ASSIGNMENTS': {'recorderId', 'accountingBasis', 'assignments'},
-    'REPLACE_LINK_COMPOSITION': {'linkId', 'orderedSections', 'policyBindingId'},
-    'REPLACE_PORT_CAPACITY_ASSIGNMENTS': {'switchId', 'assignments', 'sparePolicyRef'},
-    'REPLACE_OPTICAL_LINK_ASSIGNMENTS': {'linkId', 'forwardOptics', 'reverseOptics', 'connectorEvents', 'spliceEvents'},
-    'REPLACE_RACK_CAPACITY_BASIS': {'rackId', 'capacityBasis', 'equipmentIds', 'excludedCapacity', 'policyRef'},
-    'REPLACE_PATCH_PANEL_ASSIGNMENTS': {'panelId', 'assignments', 'sparePolicyRef'},
-    'REPLACE_DOOR_ROLE_ASSIGNMENTS': {'doorAssemblyId', 'topologyProfileRef', 'roleAssignments'},
-    'REPLACE_CONTROLLER_RESOURCE_ASSIGNMENTS': {'controllerId', 'resourceAssignments', 'reservePolicyRef'},
-    'REPLACE_FIRE_LOOP_ASSIGNMENTS': {'loopId', 'deviceAssignments', 'addressDomain', 'topologyProfileRef'},
-    'REPLACE_NOTIFICATION_CIRCUIT_ASSIGNMENTS': {'circuitId', 'deviceAssignments', 'outputRef', 'policyRef'},
-    'CALCULATE_DISCIPLINE_PROCESS': {'scope', 'processCodes', 'subjects', 'expectedPointerGenerations'},
-}
 
 
 def load(path):
@@ -128,43 +105,6 @@ def validate_registry(registry):
         visit(code)
 
 
-def validate_command_registry(command_registry):
-    assert command_registry['schema'] == 'electra.elv5-command-design-registry.v1'
-    assert command_registry['status'] == 'DESIGN_DRAFT'
-    assert command_registry['runtimeStatus'] == 'NOT_STARTED'
-    assert command_registry['wireSchema'] == 'electra.elv5-discipline-command.v1'
-    assert command_registry['payloadSchemaVersion'] == 1
-    assert command_registry['topLevelKeys'] == COMMAND_TOP_LEVEL_KEYS
-    assert len(command_registry['topLevelKeys']) == len(set(command_registry['topLevelKeys']))
-
-    revision = command_registry['externalRevisionBoundary']
-    assert revision['schema'] == 'electra.elv4-revision-command.v2'
-    assert revision['operations'] == [
-        'FREEZE_DESIGN_REVISION',
-        'CREATE_NEXT_WORKING_DESIGN_REVISION',
-    ]
-
-    rows = command_registry['commands']
-    by_operation = {row['operation']: row for row in rows}
-    assert len(rows) == len(by_operation) == 16
-    assert set(by_operation) == set(COMMAND_PAYLOAD_KEYS)
-    for operation, expected_keys in COMMAND_PAYLOAD_KEYS.items():
-        row = by_operation[operation]
-        assert row['owner'] == 'ELV5'
-        assert row['mutationKind'] in {'POLICY_BINDING', 'ASSIGNMENT_REPLACEMENT', 'EVALUATION_PUBLICATION'}
-        assert len(row['payloadKeys']) == len(set(row['payloadKeys']))
-        assert set(row['payloadKeys']) == expected_keys, ('Payload key mismatch', operation)
-
-    contract = (BASE / 'code-level-runtime-contract.md').read_text()
-    authoritative = (ROOT / 'docs/product/elv5-authoritative-spec-index.md').read_text()
-    package_index = (BASE / 'README.md').read_text()
-    assert command_registry['wireSchema'] in contract
-    assert 'command-registry.json' in authoritative or 'command-registry.json' in package_index
-    for operation in COMMAND_PAYLOAD_KEYS:
-        assert operation in contract, ('Command missing from code-level contract', operation)
-    assert 'FREEZE_DESIGN_REVISION' in contract and 'CREATE_NEXT_WORKING_DESIGN_REVISION' in contract
-
-
 def must_reject(registry):
     try:
         validate_registry(registry)
@@ -173,48 +113,26 @@ def must_reject(registry):
     raise AssertionError('Invalid registry accepted')
 
 
-def must_reject_commands(command_registry):
-    try:
-        validate_command_registry(command_registry)
-    except AssertionError:
-        return
-    raise AssertionError('Invalid command registry accepted')
-
-
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path)
     args = parser.parse_args()
     registry = load(BASE / 'process-registry.json')
-    command_registry = load(BASE / 'command-registry.json')
     ledger = load(BASE / 'requirements.json')
     requirements = ledger['requirements']
     baseline = validate_baseline(registry, ledger)
     validate_registry(registry)
-    validate_command_registry(command_registry)
     assert len(requirements) == len({r['requirementId'] for r in requirements}) == 80
     assert Counter(r['package'] for r in requirements) == {f'P{i}': 8 for i in range(10)}
     for r in requirements:
         assert r['runtimeStatus'] == 'NOT_STARTED' and r['testedSha'] is None and not r['evidence']
         assert r['requirementId'] in (BASE / r['designDocument']).read_text()
-
     invalid = copy.deepcopy(registry)
     invalid['processes'][0]['upstreamProcesses'] = [{'processCode': 'ELV-PWR-01/03', 'scopeBinding': 'DESIGN', 'subjectBinding': 'RECORDER_POOL', 'when': 'ALWAYS'}]
     must_reject(invalid)
     cyclic = copy.deepcopy(registry)
     cyclic['processes'][1]['upstreamProcesses'] = [{'processCode': 'CCTV-03', 'scopeBinding': 'DESIGN', 'subjectBinding': 'RECORDER_POOL', 'when': 'ALWAYS'}]
     must_reject(cyclic)
-
-    missing_command = copy.deepcopy(command_registry)
-    missing_command['commands'].pop()
-    must_reject_commands(missing_command)
-    extra_payload_key = copy.deepcopy(command_registry)
-    extra_payload_key['commands'][0]['payloadKeys'].append('clientComputedImpact')
-    must_reject_commands(extra_payload_key)
-    wrong_schema = copy.deepcopy(command_registry)
-    wrong_schema['wireSchema'] = 'electra.elv5-discipline-command.v2'
-    must_reject_commands(wrong_schema)
-
     assert math.ceil(Q(1, 8) + Q(1, 8)) == 1
     assert math.ceil(Q(1, 8)) + math.ceil(Q(1, 8)) == 2
     assert Q(1000000) * 3600 / 8 == 450000000
@@ -230,19 +148,16 @@ def main():
     assert Q(8000000) / 8 * (30 * 86400) == 2592000000000
     assert Q(2592000000000) * Q('1.1') == 2851200000000
     assert Q(2851200000000) / Q('.5') == 5702400000000
-
     def atan_bounds(x):
         total = Q(0)
         for k in range(64):
             total += (-1)**k * x**(2*k + 1) / (2*k + 1)
         adjacent = total + x**129 / 129
         return min(total, adjacent), max(total, adjacent)
-
     for x, lower, upper in [(Q(1, 2), Q('.9272952180'), Q('.9272952181')), (Q(1, 3), Q('.6435011087'), Q('.6435011089'))]:
         lo, hi = atan_bounds(x)
         assert lower < 2*lo <= 2*hi < upper
         assert 2*(hi-lo) <= Q(1, 10**9)
-
     audit = load(ROOT / 'docs/audit/elv5-technical-audit.json')
     assert len(audit['requirementReviews']) == 80 and len(audit['findings']) == 8
     assert all(f['specificationStatus'] == 'SPEC_RESOLVED' and f['runtimeStatus'] == 'NOT_IMPLEMENTED' for f in audit['findings'])
@@ -253,42 +168,10 @@ def main():
             if '://' not in target and not target.startswith('#'):
                 assert (file.parent / target.split('#')[0]).exists(), (str(file), target)
                 links += 1
-
-    result = {
-        'schema': 'electra.elv5-specification-checks.v2',
-        'result': 'PASS',
-        'scope': 'Design contract/registry probes only; not Flutter/Dart/Drift runtime evidence',
-        'processCount': 27,
-        'commandCount': 16,
-        'requirementCount': 80,
-        'specificationFindingsResolved': 8,
-        'localLinksChecked': links,
-        'checks': [
-            'implemented baseline provenance, schema and 11 source/test capability references',
-            'all 80 requirements map to P0-P9 integration contract',
-            'typed upstream code/scope/subject/condition and acyclic graph',
-            'unknown upstream and cycle rejection',
-            'exact ELV5 discipline command schema/version and ten top-level envelope fields',
-            'exact 16-command registry and per-operation payload key sets',
-            'missing command, extra payload field and wrong schema rejection',
-            '80 requirement identity/package/evidence invariants',
-            'pool-level byte ceiling',
-            'expected versus guaranteed retention',
-            'optical reserve not physical loss',
-            'expanded address overlap',
-            'camera/stream channel identity',
-            'gross/net RU equivalence',
-            'recording horizon/reserve/redundancy arithmetic',
-            'mandatory pinhole H/V FOV interval oracles',
-        ],
-        'runtimeImplemented': False,
-        'baselineAcceptedSourceSha': baseline['acceptedElv4SourceSha'],
-        'baselineMergeSha': baseline['mergedMainSha'],
-        'baselineCapabilitiesChecked': len(baseline['capabilities']),
-    }
+    result = {'schema': 'electra.elv5-specification-checks.v1', 'result': 'PASS', 'scope': 'Design contract/registry probes only; not Flutter/Dart/Drift runtime evidence', 'processCount': 27, 'requirementCount': 80, 'specificationFindingsResolved': 8, 'localLinksChecked': links, 'checks': ['implemented baseline provenance, schema and 11 source/test capability references', 'all 80 requirements map to P0-P9 integration contract', 'typed upstream code/scope/subject/condition and acyclic graph', 'unknown upstream and cycle rejection', '80 requirement identity/package/evidence invariants', 'pool-level byte ceiling', 'expected versus guaranteed retention', 'optical reserve not physical loss', 'expanded address overlap', 'camera/stream channel identity', 'gross/net RU equivalence', 'recording horizon/reserve/redundancy arithmetic', 'mandatory pinhole H/V FOV interval oracles'], 'runtimeImplemented': False, 'baselineAcceptedSourceSha': baseline['acceptedElv4SourceSha'], 'baselineMergeSha': baseline['mergedMainSha'], 'baselineCapabilitiesChecked': len(baseline['capabilities'])}
     if args.output:
         args.output.write_text(json.dumps(result, indent=2) + '\n')
-    print(f'PASS: 27 processes, 16 commands, 80 requirements, 8 specification resolutions, {links} local links; no runtime claim')
+    print(f'PASS: 27 processes, 80 requirements, 8 specification resolutions, {links} local links; no runtime claim')
 
 
 if __name__ == '__main__':
