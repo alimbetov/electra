@@ -25,6 +25,7 @@ export 'src/elv5/processes/fire/fa04_source_requirement.dart';
 export 'src/elv5/processes/fire/fa05_autonomy.dart';
 export 'src/elv5/processes/fire/fa06_notification_capacity.dart';
 export 'src/elv5/processes/fire/fa07_signal_topology.dart';
+export 'src/elv5/processes/fire/fa08_cable_policy.dart';
 export 'src/elv5/processes/lan/lan01_path_length.dart';
 export 'src/elv5/processes/lan/lan02_port_capacity.dart';
 export 'src/elv5/processes/lan/lan03_poe_projection.dart';
