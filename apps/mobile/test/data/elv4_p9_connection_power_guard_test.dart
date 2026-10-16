@@ -59,35 +59,39 @@ void main() {
       );
 
       final now = builder.instant;
-      await db.into(db.poeDeliveryBindings).insert(
-        PoeDeliveryBindingsCompanion.insert(
-          projectId: builder.projectId,
-          designRevisionId: builder.revisionId,
-          id: 'delivery-1',
-          createdAt: now,
-          updatedAt: now,
-          originDeviceId: 'connection-guard-test',
-          psePortId: source.id,
-          pdPortId: sink.id,
-          accountingMode: 'GUARANTEED_PD',
-          definitionRefJson: '{}',
-          payloadJson: '{}',
-        ),
-      );
-      await db.into(db.poeDeliveryPathMembers).insert(
-        PoeDeliveryPathMembersCompanion.insert(
-          projectId: builder.projectId,
-          designRevisionId: builder.revisionId,
-          deliveryId: 'delivery-1',
-          ordinal: 0,
-          connectionId: const Value('poe-link'),
-          evidenceJson: '{}',
-        ),
-      );
+      await db
+          .into(db.poeDeliveryBindings)
+          .insert(
+            PoeDeliveryBindingsCompanion.insert(
+              projectId: builder.projectId,
+              designRevisionId: builder.revisionId,
+              id: 'delivery-1',
+              createdAt: now,
+              updatedAt: now,
+              originDeviceId: 'connection-guard-test',
+              psePortId: source.id,
+              pdPortId: sink.id,
+              accountingMode: 'GUARANTEED_PD',
+              definitionRefJson: '{}',
+              payloadJson: '{}',
+            ),
+          );
+      await db
+          .into(db.poeDeliveryPathMembers)
+          .insert(
+            PoeDeliveryPathMembersCompanion.insert(
+              projectId: builder.projectId,
+              designRevisionId: builder.revisionId,
+              deliveryId: 'delivery-1',
+              ordinal: 0,
+              connectionId: const Value('poe-link'),
+              evidenceJson: '{}',
+            ),
+          );
 
-      final original = (await builder.topology.load(builder.projectId))
-          .connections
-          .singleWhere((value) => value.id == 'poe-link');
+      final original = (await builder.topology.load(
+        builder.projectId,
+      )).connections.singleWhere((value) => value.id == 'poe-link');
       await builder.topology.saveConnection(builder.projectId, original);
 
       final changed = EngineeringConnection.fromMap({
@@ -114,9 +118,9 @@ void main() {
         owned,
       );
 
-      final durable = (await builder.topology.load(builder.projectId))
-          .connections
-          .singleWhere((value) => value.id == 'poe-link');
+      final durable = (await builder.topology.load(
+        builder.projectId,
+      )).connections.singleWhere((value) => value.id == 'poe-link');
       expect(durable.toMap(), original.toMap());
       expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
     },
