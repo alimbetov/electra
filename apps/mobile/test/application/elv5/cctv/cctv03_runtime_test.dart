@@ -1,3 +1,4 @@
+import 'package:electra_mobile/application/elv5/calculation/elv5_blocked_capture.dart';
 import 'package:electra_mobile/application/elv5/calculation/elv5_calculation_runtime.dart';
 import 'package:electra_mobile/application/elv5/cctv/cctv03_runtime.dart';
 import 'package:electra_mobile/application/elv5/cctv/elv5_cctv_persistence.dart';
@@ -18,7 +19,7 @@ void main() {
     expect(captured.dependencies.length, 3);
   });
 
-  test('recurrence fails closed until pinned tzdb expander exists', () async {
+  test('recurrence becomes durable blocked capture until pinned tzdb exists', () async {
     final resolver = Cctv03PersistedInputResolver(
       store: _FakeCctvStore(pool: _pool(recurrence: true)),
     );
@@ -26,11 +27,17 @@ void main() {
     await expectLater(
       resolver.capture(_request()),
       throwsA(
-        isA<StateError>().having(
-          (e) => e.message,
-          'message',
-          contains('CCTV03_RECURRENCE_EXPANDER_REQUIRED'),
-        ),
+        isA<Elv5CaptureBlockedException>()
+            .having(
+              (e) => e.reasonCode,
+              'reasonCode',
+              'CCTV03_RECURRENCE_EXPANDER_REQUIRED',
+            )
+            .having(
+              (e) => e.evidence['tzdbVersion'],
+              'tzdbVersion',
+              'fixture-1',
+            ),
       ),
     );
   });
