@@ -15,15 +15,24 @@ EXPECTED_PAYLOADS = {
     'BIND_DISCIPLINE_POLICY': {'bindingId', 'subject', 'processCodes', 'definitionRef', 'applicability'},
     'ADOPT_DISCIPLINE_POLICY': {'bindingId', 'newDefinitionRef', 'applicability'},
     'RELEASE_DISCIPLINE_POLICY': {'bindingId', 'releasePolicy'},
-    'REPLACE_CAMERA_STREAMS': {'cameraId', 'streams'},
-    'REPLACE_RECORDING_ASSIGNMENTS': {'poolId', 'horizon', 'assignments', 'scheduleSegments', 'sizingBasis'},
+    'REPLACE_CAMERA_STREAMS': {
+        'cameraId', 'streams', 'subscriptions', 'transportOverheadModelRef'
+    },
+    'REPLACE_RECORDING_ASSIGNMENTS': {
+        'poolId', 'horizon', 'temporalPolicy', 'assignments',
+        'scheduleSegments', 'sizingBasis', 'reserveMultiplier',
+        'redundancyModel', 'policyRef'
+    },
     'REPLACE_RECORDER_ASSIGNMENTS': {'recorderId', 'accountingBasis', 'assignments'},
     'REPLACE_LINK_COMPOSITION': {'linkId', 'orderedSections', 'policyBindingId'},
     'REPLACE_PORT_CAPACITY_ASSIGNMENTS': {'switchId', 'assignments', 'sparePolicyRef'},
     'REPLACE_OPTICAL_LINK_ASSIGNMENTS': {'linkId', 'forwardOptics', 'reverseOptics', 'connectorEvents', 'spliceEvents'},
     'REPLACE_RACK_CAPACITY_BASIS': {'rackId', 'capacityBasis', 'equipmentIds', 'excludedCapacity', 'policyRef'},
     'REPLACE_PATCH_PANEL_ASSIGNMENTS': {'panelId', 'assignments', 'sparePolicyRef'},
-    'REPLACE_DOOR_ROLE_ASSIGNMENTS': {'doorAssemblyId', 'topologyProfileRef', 'roleAssignments'},
+    'REPLACE_DOOR_ROLE_ASSIGNMENTS': {
+        'doorAssemblyId', 'topologyProfileRef', 'safetyMode',
+        'roleAssignments', 'releaseTruthTable'
+    },
     'REPLACE_CONTROLLER_RESOURCE_ASSIGNMENTS': {'controllerId', 'resourceAssignments', 'reservePolicyRef'},
     'REPLACE_FIRE_LOOP_ASSIGNMENTS': {'loopId', 'deviceAssignments', 'addressDomain', 'topologyProfileRef'},
     'REPLACE_NOTIFICATION_CIRCUIT_ASSIGNMENTS': {'circuitId', 'deviceAssignments', 'outputRef', 'policyRef'},
@@ -60,11 +69,20 @@ def validate(registry):
         assert set(row['payloadKeys']) == expected, ('payload key mismatch', operation)
 
     contract = (BASE / 'code-level-runtime-contract.md').read_text()
+    amendments = (BASE / 'code-level-hardening-amendments.md').read_text()
     index = (ROOT / 'docs/product/elv5-authoritative-spec-index.md').read_text()
     assert registry['wireSchema'] in contract
     assert 'command-registry.json' in index
     for operation in EXPECTED_PAYLOADS:
-        assert operation in contract, ('command absent from runtime contract', operation)
+        assert operation in contract, ('command absent from base runtime contract', operation)
+    for operation in [
+        'REPLACE_CAMERA_STREAMS',
+        'REPLACE_RECORDING_ASSIGNMENTS',
+        'REPLACE_DOOR_ROLE_ASSIGNMENTS',
+    ]:
+        assert operation in amendments, ('hardened operation absent from amendment', operation)
+        for key in EXPECTED_PAYLOADS[operation]:
+            assert key in amendments, ('hardened key absent from amendment', operation, key)
 
     elv4_dispatcher = (
         ROOT / 'apps/mobile/lib/application/elv4_wire_command_dispatcher.dart'
@@ -102,7 +120,10 @@ def main():
     duplicate['commands'].append(copy.deepcopy(duplicate['commands'][0]))
     must_reject(duplicate)
 
-    print('PASS: exact ELV5 command schema, 16 operations, payload keys and implemented ELV4 revision boundary')
+    print(
+        'PASS: exact ELV5 command schema, 16 operations, hardened payload keys '
+        'and implemented ELV4 revision boundary'
+    )
 
 
 if __name__ == '__main__':
