@@ -68,6 +68,14 @@ final class DriftElv4OperatingFactSource implements Elv4OperatingFactSource {
           }
         }
         final durationJson = segment.readNullable<String>('duration_json');
+        PowerRational? duration;
+        if (durationJson != null) {
+          final decoded = jsonDecode(durationJson);
+          if (decoded is! Map || decoded['seconds'] is! String) {
+            throw StateError('ELV4_SCENARIO_DURATION_INVALID:$scenarioId:$segmentId');
+          }
+          duration = PowerRational.fromWireDecimal(decoded['seconds']! as String);
+        }
         result.add(
           Elv4ScenarioSegmentFact(
             scenarioId: scenarioId,
@@ -75,9 +83,7 @@ final class DriftElv4OperatingFactSource implements Elv4OperatingFactSource {
             scenarioRevision: scenario.read<int>('revision'),
             segmentId: segmentId,
             ordinal: segment.read<int>('ordinal'),
-            durationSeconds: durationJson == null
-                ? null
-                : PowerRational.fromWireDecimal(jsonDecode(durationJson)),
+            durationSeconds: duration,
             componentStates: byComponent,
           ),
         );
