@@ -2,7 +2,7 @@
 
 Status: DESIGN HARDENED / RUNTIME NOT STARTED
 Depends on: P1/P2, ELV3 lengths/resources and exact PWR-06 evidence where powered.
-Parent: [ELV5 design](../elv5-discipline-calculations-design-specification.md); [process contracts](process-contracts.md); [typed process API](typed-process-api.md); [engineering primitives](engineering-primitives-contract.md).
+Parent: [ELV5 design](../elv5-discipline-calculations-design-specification.md); [process contracts](process-contracts.md); [typed process API](typed-process-api.md); [engineering primitives](engineering-primitives-contract.md); [LAN code-level dossiers](process-specifications/lan-processes.md); [Flutter performance contract](flutter-performance-contract.md).
 
 Inherited implementation and mandatory new extensions: [baseline contract P4](implemented-baseline.md#p4); [pinned evidence](baseline.json).
 
@@ -19,172 +19,100 @@ Inherited implementation and mandatory new extensions: [baseline contract P4](im
 | ELV5-P4-007 | Implement LAN-07 unique patch-panel port occupancy, mapping completeness and spare policy | P4-T07 |
 | ELV5-P4-008 | Qualify exact boundaries, missing/unsupported inputs, restart/freeze, shared PSE and no-false-PASS cases | P4-T08 |
 
+## Normative code-level binding
+
+The package text below is a summary. Runtime implementation MUST match LAN-01…07 in [process-specifications/lan-processes.md](process-specifications/lan-processes.md) for all 25 dossier sections: applicability, typed inputs/evidence, cases, mathematical model/equations, exact arithmetic, worst case, requirements, comparisons/margins, governing/limiting factor, missing behavior, dependencies, trace, complexity, pseudocode, Dart interfaces and all five vector classes.
+
+Implementation priority inside P4 is **LAN-01 then LAN-05**. Together they prove exact installed-path accounting and conservative interval optical algebra before the simpler capacity/basis checks.
+
 ## LAN-01 — permanent link / channel length
 
 A realized section identity contributes once to its declared role in one selected link composition. The typed ordered path distinguishes permanent, patch and explicit allowance sections. Installed slack/service-loop allowance already represented by a realized section cannot be added again through a policy multiplier.
 
-There is no universal hardcoded `90m/100m` rule in the kernel. Limits and permitted composition come from the selected immutable policy/profile. If the product/project policy selects another technology or stricter basis, the exact edition governs.
+There is no universal hardcoded `90m/100m` rule in the kernel. Limits and permitted composition come from the selected immutable policy/profile. Maximum-length comparisons use the conservative upper installed-length bound and exact signed margin `limit - realizedUpper`; display rounding never decides verdict.
 
-Required proof includes:
-
-```text
-below limit
-exactly at limit
-one canonical unit above limit
-duplicate section identity
-missing realized section
-explicit allowance already included vs not included
-```
+Required proof includes below/exactly-at/one-canonical-unit-above limit, duplicate section identity, missing realized section and already-included versus not-included allowance.
 
 ## LAN-02 — switch-port capacity
 
-Capacity is based on canonical physical port identities and their immutable capabilities. Each assignment binds endpoint → one exact port → selected speed/media mode.
-
-Rules:
-
-- one physical port cannot be occupied twice in the same active capacity context;
-- media and speed compatibility are independent from mere port count;
-- administratively/project-reserved ports are inventory state, not duplicated demand;
-- spare requirement uses the exact selected ratio/denominator and code-owned ceiling rule;
-- available compatible ports and required spare are integer quantities; UI percentages never drive verdicts.
-
-A switch with free ports can still FAIL because the free ports are incompatible with the required media/mode.
+Capacity is based on canonical physical port identities and immutable capabilities. One physical port cannot be occupied twice in the same exclusive context; media/speed compatibility is independent from port count; spare ratios use exact rational arithmetic and code-owned `ceil` at the count boundary. Administratively/project-reserved ports are inventory state and are not duplicated as load.
 
 ## LAN-03 — shared PoE context
 
-LAN-03 references the same immutable PWR-06 physical evidence used by any CCTV/other discipline sharing the PSE. It exposes global demand/budget/margin and LAN contribution.
-
-Filtering to LAN endpoints must not recalculate a reduced PSE and publish it as global evidence. One physical PSE context has one physical budget evidence identity for the same captured facts/scenario.
+LAN-03 references the same immutable PWR-06 physical evidence used by CCTV/other disciplines sharing the PSE. It exposes the same global demand/budget/margin plus LAN contribution. Filtering to LAN endpoints cannot recompute a reduced PSE and publish it as global evidence.
 
 ## LAN-04 — copper path compatibility
 
-Compatibility is evaluated over the complete passive path, not only the main horizontal cable. Typed path evidence includes each relevant section/termination/connector/patch component and immutable capability edition.
-
-The supported speed/mode set is constrained by the weakest incompatible element. A high-category horizontal cable does not override an incompatible patch cord, connector or interface.
-
-Shielding/grounding-related evidence is reported only to the exact technical scope represented by selected policy facts; no national-compliance conclusion is inferred here.
+Compatibility evaluates every ordered relevant path element, not only the horizontal cable. Capability is limited by the weakest explicit section/property according to the selected compatibility matrix. Category/product names are not parsed into capability. Shielding/grounding facts remain technical evidence and do not manufacture ELV7 compliance.
 
 ## LAN-05 — bidirectional optical budget
 
-The kernel must enforce the physical distinction:
+The kernel enforces different types:
 
 ```text
-dB  = attenuation/loss/margin quantity
+dB  = attenuation/loss/design margin
 dBm = absolute optical power level
 ```
-
-These are different types/value objects. They cannot be passed interchangeably through a legal typed kernel call.
 
 For each direction independently:
 
 ```text
-physical loss interval = fiber attenuation + mated connector-pair losses + splice/event losses
-minimum received power = TxMin - lossMax
-maximum received power = TxMax - lossMin
-sensitivity margin     = minimum received power - receiverSensitivity
- overload margin       = receiverOverload - maximum received power
+LossMin = Σ minimum physical fiber/connector/splice/event losses
+LossMax = Σ maximum physical fiber/connector/splice/event losses
+RxLow   = TxMin - LossMax
+RxHigh  = TxMax - LossMin
+
+SensitivityMargin = RxLow - (ReceiverSensitivity + RequiredSensitivityMargin)
+OverloadMargin    = ReceiverOverloadMax - RxHigh
 ```
 
-Required design sensitivity margin remains a separate nonnegative dB requirement; it is not inserted into physical loss. Overload uses physical minimum loss and must not benefit from a fictitious reserve attenuation.
+Mandatory cases are:
 
-Each direction pins transmitter, receiver, wavelength and immutable source evidence. A connector pair is one mated-pair event unless the selected exact model explicitly defines otherwise.
+```text
+A_TO_B_SENSITIVITY
+A_TO_B_OVERLOAD
+B_TO_A_SENSITIVITY
+B_TO_A_OVERLOAD
+```
 
-### Optical reach is a separate claim
+The governing optical case is the smallest signed dB margin. Physical loss excludes design reserve; overload never receives fictitious reserve attenuation. Connector loss is counted per exact mated-pair/event model, not once per connector end.
 
-Passing sensitivity/overload does not prove transmission reach/dispersion/modal bandwidth at the selected rate. ELV5 may emit a reach-compatibility dimension only when an exact registered optic/fiber reach profile or separately versioned model is consumed. Without it, reach remains outside claim scope / NOT_ASSESSED rather than inferred from optical power budget.
-
-Required P4 tests include a case where optical power budget passes but selected reach profile fails or is unavailable.
+Passing optical power budget does not prove reach/dispersion/modal-bandwidth compatibility. Such a dimension exists only with an explicit separately versioned reach model/profile; otherwise it remains NOT_ASSESSED.
 
 ## LAN-06 — rack demand/capacity basis
 
-LAN-06 is intentionally a **demand/capacity handoff**, not cabinet layout.
-
-ELV5 may calculate/store:
-
-```text
-equipment RU demand
-declared gross or net usable RU basis
-explicit exclusions/reservations
-free RU margin
-optional aggregate weight demand
-optional maximum equipment depth demand
-exact equipment membership/provenance
-```
-
-Capacity basis is explicitly tagged:
-
-```text
-GROSS_WITH_EXCLUSIONS
-NET_USABLE
-```
-
-Known exclusions are subtracted exactly once. If both representations describe the same usable rack, their normalized usable capacity/result must agree.
-
-ELV5 must return actual slot/U-position, collision, front/rear clearance, rail fit, thermal/airflow, PDU placement and cable-management fit as NOT_ASSESSED. Those belong to ELV6. A positive RU margin is therefore not an ELV6 layout PASS.
+LAN-06 computes RU/weight/depth demand basis and optional simple available-capacity comparisons. Capacity basis is explicitly `GROSS_WITH_EXCLUSIONS` or `NET_USABLE`; known exclusions are subtracted exactly once. Slot/U-position, collision, rail/depth clearance, thermal/airflow, PDU/cable management and cabinet fit remain ELV6 `NOT_ASSESSED` even when every ELV5 numeric capacity margin is positive.
 
 ## LAN-07 — patch-panel utilization
 
-Patch-panel occupancy is based on canonical panel-port identity. One active panel port cannot terminate two independent assignments unless a later explicit hardware model supports that semantics.
-
-The process independently checks:
-
-```text
-occupied ports
-free ports
-required spare
-free-after-reserve
-interface compatibility/mapping completeness
-endpoint/destination identity
-```
-
-A numerical free-port margin cannot mask an invalid/missing endpoint mapping.
-
-## Provenance and evidence quality
-
-All capacity/compatibility/loss facts consumed from device/cable/optic definitions retain exact immutable definition reference/hash and engineering basis. Typical/estimated optical attenuation or reach must not silently satisfy a process dimension whose selected policy requires a guaranteed limit.
-
-Environmental applicability is explicit. If the consumed definition is only valid in an environmental envelope that does not cover the captured route/equipment conditions, the affected dimension is unresolved/blocked rather than evaluated at an implicit room-temperature default.
+Occupancy is keyed by canonical physical panel-port identity. Port count/spare and end-to-end mapping completeness are independent dimensions. Passive continuation and termination relationships cannot make one physical port count twice or create extra capacity.
 
 ## Dependencies and invalidation
 
-P4 dependency closure includes exact:
+P4 dependency closure includes exact realized section SET+order, switch/panel physical port SET, endpoint assignments, selected speed/media mode, immutable cable/connector/optic definitions, optical event SET+direction/wavelength, rack membership/capacity basis, spare/compatibility policies, exact PWR-06 evidence/generation and MISSING/selector markers.
 
-```text
-realized section SET + ordered path
-switch/panel physical port SET
-endpoint assignments
-selected speed/media mode
-immutable cable/connector/optic definition refs/hashes
-optical event SET + direction/wavelength
-rack equipment membership + capacity basis
-spare/compatibility/policy editions
-exact PWR-06 evidence/pointer generation for LAN-03
-MISSING markers for absent path/definition/policy/evidence
-```
-
-Removing/moving a link section or port invalidates both the old and new relevant closure. An optical event edit does not invalidate an unrelated ACS door unless they share an explicit dependency.
+Edits invalidate `union(oldClosure,newClosure)` and newly matching selector dependencies. Optical event changes must not invalidate unrelated ACS/Fire nodes absent an actual shared dependency.
 
 ## Public vertical qualification
 
-Primary LAN qualification executes through real public setup commands, schema-24 file SQLite, `CALCULATE_DISCIPLINE_PROCESS`, production capture/typed resolver/kernel/publication and close/reopen projection verification.
+Primary LAN qualification executes through public setup, schema-24 file SQLite, `CALCULATE_DISCIPLINE_PROCESS`, production capture/resolver, `Elv5CalculationExecutor` where required, typed kernel, guarded publication, targeted workspace projection and close/reopen verification.
 
-Required adversarial cases include:
+Required vector coverage includes duplicate physical port assignment, enough ports but incompatible mode, exact spare/length boundary, path cable passing while patch/connector fails, one optical direction passing while reverse fails, sensitivity passing while overload fails, power budget passing while reach is absent/fails, gross/net rack normalization and RU PASS with ELV6 layout NOT_ASSESSED.
 
-- duplicate physical port assignment;
-- enough ports but incompatible media/speed;
-- exact spare ceiling boundary;
-- path cable compatible but one patch/connector incompatible;
-- forward optical direction passes while reverse fails;
-- sensitivity passes but overload fails;
-- dB/dBm misuse impossible at typed API/tests;
-- physical budget passes but reach is unavailable/fails;
-- GROSS_WITH_EXCLUSIONS and equivalent NET_USABLE normalization;
-- positive RU margin while actual ELV6 fit remains NOT_ASSESSED;
-- shared LAN/CCTV PSE preserves one global PWR-06 evidence;
-- reopen/freeze preserves exact ordered path, hashes and provenance.
+## Performance obligations
+
+P4 follows [flutter-performance-contract.md](flutter-performance-contract.md):
+
+- LAN-01 is a single O(P) ordered-path fold, not repeated path scans;
+- LAN-02 and LAN-07 use keyed resource/mapping indexes rather than pairwise assignment searches;
+- LAN-04 is O(P×R) with code-owned bounded property count `R`;
+- LAN-05 is O(P+E) per optical path/direction and propagates intervals directly instead of enumerating uncertainty combinations;
+- medium/large captured workloads execute through the native worker executor outside the UI isolate;
+- one link/port/optic edit recalculates only the affected dependency closure;
+- large link/mapping result lists are projected lazily/virtually in Flutter.
 
 ## Exit
 
-P4 runtime acceptance requires P4-T01…T08 and both primary POS/NEG entries for LAN-01…07 at the same accepted source SHA, together with required L0–L6 coverage.
+P4 runtime acceptance requires P4-T01…T08, both primary POS/NEG entries for LAN-01…07, all LAN boundary/adversarial/cross-discipline dossier vectors, and required L0–L6/performance evidence at the same source SHA and authority fingerprint.
 
 This document is a hardened design contract, not proof of source implementation.
