@@ -32,11 +32,9 @@ void main() {
       );
     }
 
-    await builder.bindComponent(
-      'owned',
-      const [PowerComponentCapability.consumer],
-      expectedRevision: 1,
-    );
+    await builder.bindComponent('owned', const [
+      PowerComponentCapability.consumer,
+    ], expectedRevision: 1);
 
     await expectLater(
       systems.detach(builder.projectId, systemId, 'owned'),
