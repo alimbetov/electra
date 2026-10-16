@@ -74,7 +74,7 @@ def main() -> None:
     for token in forbidden_stale_tokens:
         require(token not in plan, f"stale undeclared 3-wise factor survived fifth pass: {token}")
 
-    require("scenarioCount == 1500" in amendment and "legalPairwiseCoverage == 100%" in amendment, "P8/P9 combinatorial amendment drift")
+    require("scenarioCount == 1500" in amendment and "pairwiseCoveragePercent == 100.0" in amendment, "P8/P9 combinatorial amendment drift")
     for token in ["len(universe)==593", "legal_count==covered_count==16011", "t3_count==330", "len(scenarios)==len({x[\"caseId\"] for x in scenarios})==1500"]:
         require(token in generator, f"generator missing constructive closure assertion: {token}")
     for token in [
