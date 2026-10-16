@@ -87,6 +87,7 @@ def main() -> None:
 
     bound_requirement_ids: list[str] = []
     bound_obligation_ids: set[str] = set()
+    obligation_set = set(obligation_ids)
     for binding in bindings:
         package = binding["package"]
         ids = binding.get("requirementIds", [])
@@ -94,7 +95,7 @@ def main() -> None:
         require(all(req_id.startswith(f"ELV5-{package}-") for req_id in ids), f"{package} has foreign requirement ID")
         bound_requirement_ids.extend(ids)
         for obligation_id in binding.get("obligationIds", []):
-            require(obligation_id in set(obligation_ids), f"{package} references unknown obligation {obligation_id}")
+            require(obligation_id in obligation_set, f"{package} references unknown obligation {obligation_id}")
             bound_obligation_ids.add(obligation_id)
         for ref in binding.get("contractRefs", []):
             path = resolve_from_impl(ref)
@@ -102,12 +103,11 @@ def main() -> None:
 
     require(len(bound_requirement_ids) == 80 and set(bound_requirement_ids) == set(requirement_ids), "package bindings must cover every stable requirement ID exactly once")
     require(len(bound_requirement_ids) == len(set(bound_requirement_ids)), "stable requirement ID bound more than once")
-    require(bound_obligation_ids == set(obligation_ids), f"unbound normative obligations: {sorted(set(obligation_ids) - bound_obligation_ids)}")
+    require(bound_obligation_ids == obligation_set, f"unbound normative obligations: {sorted(obligation_set - bound_obligation_ids)}")
 
     for ref in registry.get("authorityRefs", []):
         require(resolve_from_impl(ref).is_file(), f"missing normative authority ref: {ref}")
 
-    # The four dossier files must contain all 27 process headings and all 25 ordered sections.
     process_heading = re.compile(r"^## (CCTV-\d{2}|LAN-\d{2}|ACS-\d{2}|FA-\d{2}) — .+$")
     section_heading = re.compile(r"^### (\d+)\. (.+)$")
     found: dict[str, list[tuple[int, str]]] = {}
@@ -129,11 +129,9 @@ def main() -> None:
     for code, actual in found.items():
         require(actual == expected_sections, f"{code} dossier section sequence drift")
 
-    # Priority computational core is deliberately frozen by the implementation plan.
     expected_priority = ["CCTV-02", "CCTV-03", "LAN-01", "LAN-05", "ACS-03", "ACS-04", "ACS-05", "FA-02", "FA-04", "FA-05", "FA-06"]
     require(registry.get("priorityComputationalCore") == expected_priority, "priority computational core drift")
 
-    # Executable arithmetic oracle guard for the corrected ACS-03 reference fixture.
     source_v = Q(24)
     shared_trunk_i = Q("0.8")
     shared_trunk_r = Q("0.5")
@@ -148,9 +146,11 @@ def main() -> None:
     require("23.51" in errata and "+1.51" in errata, "ACS-03 corrected oracle missing from errata authority")
 
     fourth_audit = load(ROOT / "docs" / "audit" / "elv5-fourth-pass-algorithm-performance-audit.json")
-    require(fourth_audit.get("counts", {}).get("total") == 18, "fourth-pass audit subtotal must remain 18")
-    require(len(fourth_audit.get("findings", [])) == 18, "fourth-pass finding inventory must remain 18")
-    require(fixed["designFindingsResolved"] == 8 + 14 + 15 + 18 + 1, "total design finding count must include oracle-integrity erratum")
+    counts = fourth_audit.get("counts", {})
+    require(counts.get("high") == 15 and counts.get("medium") == 4 and counts.get("total") == 19, "fourth-pass audit must remain 15 HIGH + 4 MEDIUM = 19")
+    require(len(fourth_audit.get("findings", [])) == 19, "fourth-pass finding inventory must remain 19")
+    require(any(row.get("code") == "REFERENCE_ORACLE_ARITHMETIC_INTEGRITY" for row in fourth_audit.get("findings", [])), "fourth-pass audit lost oracle arithmetic integrity finding")
+    require(fixed["designFindingsResolved"] == 8 + 14 + 15 + 19, "total design finding count must remain 56")
 
     print("ELV5 normative requirements registry PASS")
     print("baseRequirements=80 packages=10 obligations=42 processes=27 sectionsPerProcess=25 vectors=135 findingsResolved=56")
