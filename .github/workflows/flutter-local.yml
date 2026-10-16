@@ -66,6 +66,10 @@ jobs:
         working-directory: .
         run: python3 scripts/ci/check-elv5-process-code-level-specs.py
 
+      - name: Verify ELV5 normative requirements registry
+        working-directory: .
+        run: python3 scripts/ci/check-elv5-normative-requirements.py
+
       - name: Generate ELV5 contract manifest
         working-directory: .
         run: >-
