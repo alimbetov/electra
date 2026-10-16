@@ -122,7 +122,7 @@ def validate_boundary_documents():
     assert 'normative' in design.lower()
     assert 'one active canonical writer' in index.lower()
 
-    audit_ids = re.findall(r'^###+ (ELV6-AUD-[0-9]{2})\b', audit + '\n' + addendum, flags=re.M)
+    audit_ids = re.findall(r'^#{2,3} (ELV6-AUD-[0-9]{2})\b', audit + '\n' + addendum, flags=re.M)
     assert len(audit_ids) == len(set(audit_ids)) == 20
     assert all(f'ELV6-AUD-{i:02d}' in audit_ids for i in range(1, 21))
 
