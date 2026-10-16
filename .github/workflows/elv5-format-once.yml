@@ -1,0 +1,44 @@
+name: ELV5 Format Once
+
+on:
+  push:
+    branches:
+      - feat/flutter-elv5-power-topology-design
+    paths:
+      - .github/workflows/elv5-format-once.yml
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/flutter-elv5-power-topology-design
+          fetch-depth: 0
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Format ELV5 runtime slice
+        run: |
+          dart format \
+            packages/engineering_core/lib/src/elv5 \
+            packages/engineering_core/test/elv5_p0_p1_foundation_test.dart \
+            apps/mobile/lib/application/elv5 \
+            apps/mobile/lib/data/database/discipline_database_tables.dart \
+            apps/mobile/test/application/elv5_wire_command_codec_test.dart
+      - name: Remove one-shot workflow and commit
+        run: |
+          git rm .github/workflows/elv5-format-once.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add packages/engineering_core/lib/src/elv5 \
+                  packages/engineering_core/test/elv5_p0_p1_foundation_test.dart \
+                  apps/mobile/lib/application/elv5 \
+                  apps/mobile/lib/data/database/discipline_database_tables.dart \
+                  apps/mobile/test/application/elv5_wire_command_codec_test.dart
+          git commit -m "style(elv5): apply Dart formatter to P0-P2 runtime slice"
+          git push origin HEAD:feat/flutter-elv5-power-topology-design
