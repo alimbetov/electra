@@ -138,19 +138,34 @@ def main() -> None:
         if token.lower() not in performance.lower():
             fail(f"performance contract missing token: {token}")
 
+    errata = (IMPL / "calculation-oracle-errata-v1.md").read_text(encoding="utf-8")
+    for token in [
+        "ERRATA-001 — ACS-03",
+        "V_lock_terminal",
+        "23.51 V",
+        "+1.51 V",
+        "ELV4 owns physical voltage-drop/current solution",
+    ]:
+        if token not in errata:
+            fail(f"ACS-03 oracle errata missing token: {token}")
+
     audit = load_json(AUDIT)
     counts = audit.get("counts", {})
-    if counts.get("high") != 14 or counts.get("medium") != 4 or counts.get("total") != 18:
+    if counts.get("high") != 15 or counts.get("medium") != 4 or counts.get("total") != 19:
         fail(f"unexpected fourth-pass audit counts: {counts}")
     findings = audit.get("findings", [])
-    if len(findings) != 18:
-        fail(f"expected 18 fourth-pass findings, found {len(findings)}")
+    if len(findings) != 19:
+        fail(f"expected 19 fourth-pass findings, found {len(findings)}")
     if any(row.get("status") != "SPEC_RESOLVED" for row in findings):
         fail("all fourth-pass findings must be SPEC_RESOLVED")
+    oracle_finding = [row for row in findings if row.get("code") == "REFERENCE_ORACLE_ARITHMETIC_INTEGRITY"]
+    if len(oracle_finding) != 1:
+        fail("missing unique REFERENCE_ORACLE_ARITHMETIC_INTEGRITY finding")
 
     print("ELV5 process code-level specification PASS")
     print("processes=27 sectionsPerProcess=25 vectorClasses=5")
-    print("fourthPassFindings=18 high=14 medium=4 runtimeImplemented=0")
+    print("fourthPassFindings=19 high=15 medium=4 runtimeImplemented=0")
+    print("acs03CorrectedTerminalVoltage=23.51V")
 
 
 if __name__ == "__main__":
