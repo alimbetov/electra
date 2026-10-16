@@ -1,68 +1,113 @@
 # Electra — ELV6 Authoritative Design Index
 
-Status: DESIGN DRAFT / RUNTIME NOT STARTED
-Branch: `feat/flutter-elv6-enclosure-layout-design`
-Parent baseline: `feat/flutter-elv5-power-topology-design`
-Pinned parent: `a20ae91ecbef1da0d16443201e48f7e1b99e8701`
+Status: **DESIGN HARDENED / RUNTIME NOT STARTED**  
+Branch: `feat/flutter-elv6-enclosure-layout-design`  
+Design upstream: `feat/flutter-elv5-power-topology-design`  
+Pinned upstream design SHA: `ed7db01adb27ff184b0b8c91a710082fb9eafb9a`
 
-ELV6 owns **enclosure, cabinet, rack and internal mounting layout**. It converts already-engineered equipment, power, battery, patching and capacity demand into deterministic physical arrangement evidence. It does not recompute ELV3 physical routing, ELV4 power, ELV5 discipline calculations, ELV7 jurisdictional compliance or ELV8 manufacturer/SKU selection.
+ELV6 owns **constructible enclosure, cabinet, rack and internal mounting layout evidence**. It turns exact upstream equipment, cable-end, power/battery and discipline requirements into revisioned physical arrangement, intrinsic-fit evidence and deterministic engineer-assisted layout proposals.
 
-The accepted physical panel model is already present: `PanelAssembly`, `PanelEnclosureGeometry`, `PanelMountingSection`, `DinRail`, `PanelModulePlacement`, cable ducts/reserved zones and ADR-019. ELV6 **reuses and extends that source of truth**. It must not introduce a second panel/DIN/placement model merely to make ELV6 naming uniform. New ELV6-owned enclosure identities are limited to enclosure kinds with no accepted canonical owner, such as ELV/telecom rack hosts.
+It does not recompute ELV3 routing, ELV4 power, ELV5 discipline algorithms, ELV7 jurisdictional compliance or ELV8 manufacturer/commercial selection.
+
+## Critical baseline correction
+
+`PanelAssembly`, `PanelEnclosureGeometry`, `PanelMountingSection`, `DinRail`, `PanelModulePlacement`, terminal rails, cable ducts and reserved zones plus ADR-019 are an accepted **semantic/domain baseline**. They are not automatically treated as a qualified revisioned runtime source of truth merely because the classes/ADR exist.
+
+P0 must separately prove persistence, public writer, revision identity, replay/history, freeze/create-next and concurrency integration. At the audited baseline, the domain classes do not themselves provide those guarantees.
+
+If no accepted persisted panel-layout writer exists, ELV6 promotes the existing `PanelAssembly` semantics into the first revision-scoped runtime owner. It must not invent a parallel panel/DIN identity hierarchy. If an accepted writer is found, ELV6 adapts/reuses it instead.
 
 ## Entry documents
 
-1. [ELV6 enclosure-layout design specification](elv6-enclosure-layout-design-specification.md).
+1. [ELV6 design specification](elv6-enclosure-layout-design-specification.md).
 2. [ELV6 P0–P9 delivery plan](elv6-p0-p9-delivery-plan.md).
-3. Existing [ELV5 authoritative index](elv5-authoritative-spec-index.md) and code-level contracts are the pinned upstream calculation boundary.
-4. [ADR-019 physical panel layout](../adr/ADR-019-physical-panel-layout-editor.md) and `packages/engineering_core/lib/src/panel_assembly.dart` are mandatory P0 baseline inputs.
-5. Existing architecture and implementation blueprint remain authoritative for offline-first persistence, command/result semantics, revisioning, deterministic derived data and immutable publication.
+3. [Implementation design index](elv6-implementation/README.md).
+4. [Code-level runtime contract](elv6-implementation/code-level-runtime-contract.md).
+5. [24-process machine registry](elv6-implementation/process-registry.json).
+6. [21-command machine registry](elv6-implementation/command-registry.json).
+7. [Hard technical audit](../audit/elv6-hard-technical-audit.md).
+8. [ADR-019 physical panel layout](../adr/ADR-019-physical-panel-layout-editor.md) and `packages/engineering_core/lib/src/panel_assembly.dart` as semantic baseline inputs.
+9. ELV5 authoritative/code-level/command contracts at the pinned upstream SHA.
 
 ## Authority hierarchy
 
-When documents disagree, use this order:
+When ELV6 artifacts disagree, use this order:
 
-1. accepted ELV1–ELV5 runtime identity/ownership/revision contracts and accepted existing panel-layout ownership;
-2. this ELV6 authoritative index and ELV6 design specification;
-3. ELV6 P0–P9 package plan;
-4. architecture overview and legacy product notes.
+1. accepted ELV1–ELV5 runtime ownership/revision contracts and any P0-proven existing canonical writer;
+2. this authoritative index;
+3. `elv6-implementation/code-level-runtime-contract.md`;
+4. machine process and command registries;
+5. ELV6 design specification and P0–P9 plan;
+6. ADR-019 as semantic baseline and older architecture/product notes.
 
-ELV6 may add owner-neutral layout projections, proposals/evaluations, extension metadata and new non-panel rack entities. It must not fork existing panel enclosure/DIN/module placement truth, `Cable`, `CableRun`, `Route`, power evaluations, discipline evaluations, catalog identity, command history or design revision ownership.
+No package-local document may weaken replay/CAS, exact geometry, claim boundaries or canonical ownership.
 
 ## Stage boundary
 
 ```text
-ELV2 exact definitions / editions
+ELV2 exact immutable technical definitions
     ↓
-ELV3 realized cables, routes, pathways and physical facts
+ELV3 realized cable/path/end facts
     ↓
-ELV4 power topology, source/UPS/battery evidence
+ELV4 source/UPS/battery/electrical evidence
     ↓
-ELV5 discipline calculations and rack/capacity demand basis
+ELV5 CCTV/LAN/ACS/Fire discipline calculations and demand basis
     ↓
-ELV6 existing-panel reuse + ELV rack physical layout and fit
+ELV6 physical host/layout/constructability evidence
     ↓
-ELV7 normative validation
+ELV7 normative/jurisdictional validation
     ↓
 ELV8 manufacturer selection, BOM and deliverables
 ```
 
-ELV6 may report intrinsic mechanical/geometric infeasibility such as overlap, out-of-bounds placement, impossible rack/DIN occupation, inaccessible cable entry or battery envelope collision. Jurisdiction-specific clearance/installation requirements remain ELV7 rules and arrive through a versioned normative profile rather than being hardcoded into ELV6.
+ELV6 may fail intrinsic physical impossibility: overlap, out-of-bounds, incompatible mounting interface, impossible rail depth, blocked service/removal/bend envelope, adopted support-load overload or explicit physical capacity overflow.
 
-## Non-negotiable decisions
+ELV6 must not infer normative compliance from intrinsic fit. Required clearance, segregation, temperature-rise, IP, protective-bonding and similar rule claims are evaluated by ELV7 from exact ELV6 evidence unless the condition is an intrinsic adopted product capability rather than a normative requirement.
 
-- Existing `PanelAssembly`/DIN/module identity is reused until a separately qualified migration/generalization replaces it.
-- One physical enclosure/placement has one active canonical owner in one revision.
-- Layout is revision-scoped and offline-capable.
-- New geometry follows the accepted project millimetre/numeric convention; ELV6 does not create an incompatible integer-mm fork.
-- Auto-layout produces a deterministic **proposal**, never silent mutation.
-- User-locked placements are immutable to auto-layout until explicitly unlocked.
-- Missing upstream evidence is `BLOCKED`/`UNRESOLVED`, never guessed.
-- Stale upstream input marks affected layout evidence stale; historical frozen revisions are immutable.
-- Battery fit, service access, cable-entry occupancy and mounting compatibility are first-class facts.
-- Manufacturer/SKU-specific optimization belongs to ELV8 unless an exact adopted technical definition already exists upstream.
+## Non-negotiable technical decisions
+
+- One active canonical writer per physical fact per design revision.
+- `PanelAssembly` identity/terminology is preserved; runtime persistence is promoted only if P0 proves it is currently absent.
+- New persisted mechanical geometry uses **signed integer micrometre fixed-point**, not binary `double`.
+- Project integer-mm geometry converts exactly; legacy double dimensions are compatibility imports only.
+- Canonical V1 layout uses host-local orthogonal 3D frames and half-open occupied volumes.
+- Rack U/DIN intervals are discrete and coexist with exact physical envelopes; neither may hide a failure in the other.
+- Body, connector protrusion, service, removal and airflow envelopes are separate physical facts.
+- Door sweep, cable entry, bend/strain-relief space, internal wiring ducts, physical terminations, batteries, support load, mass/CoG, airflow/thermal inputs, observed segregation and bonding evidence are first-class.
+- Missing technical evidence yields BLOCKED/PARTIAL/UNRESOLVED, never guessed geometry or optimistic PASS.
+- Evaluation preserves freshness, completion, assessment and execution independently.
+- Auto-layout is deterministic proposal-only; hard constraints are never traded for a weighted score.
+- Locked placements do not move until explicitly unlocked.
+- Exact public mutation surface is the 21-operation `electra.elv6-layout-command.v1` registry.
+- Server resolves impact/dependencies; wire clients cannot author trusted invalidation sets.
+- Replay precedes mutable preconditions; canonical state + invalidation + history + ledger/outbox commit atomically.
+- Calculation/proposal execution follows capture → pure kernel → guarded publication.
+- ELV4 revision commands remain the only public freeze/create-next boundary.
+- Historical snapshots return `ELV6_NOT_CAPTURED` when appropriate, never empty-valid/latest fallback.
+- ELV6 does not pre-allocate database schema 24 while ELV5 runtime migration numbering is still unresolved.
+
+## Closed design registries
+
+Initial runtime has exactly **24 layout processes** `LAY-01…LAY-24` and exactly **21 ELV6 public command operations**. Unknown custom executable processes/operations fail closed. Data-driven technical profiles may supply parameters/evidence, never arbitrary executable formulas/scripts.
 
 ## Runtime entry gate
 
-Implementation may start only after P0 inventories the current panel domain/schema/write APIs/validation behavior, pins the accepted geometry scalar convention, confirms the exact accepted ELV5 source SHA, existing replay/UoW/revision/freeze APIs and available upstream rack/battery/capacity facts. No package may duplicate an existing panel object or upstream calculation to unblock itself.
+Runtime P0 starts only after all of the following are pinned at one source baseline:
 
-All ELV6 P0–P9 runtime packages are currently `NOT_STARTED`. Design completion does not imply runtime qualification.
+- accepted upstream runtime/design SHA distinction;
+- current Drift schema and supported migration origins;
+- panel semantic/persistence/writer ownership matrix;
+- revision/replay/history/UoW/freeze/create-next capabilities;
+- exact upstream ELV3/ELV4/ELV5 physical evidence contracts;
+- canonical geometry normalization/tolerance for legacy imports;
+- one-owner matrix for every host/surface/placement/zone/entry/assignment fact.
+
+If ELV5 runtime is not yet accepted, ELV6 implementation remains blocked while ELV6 design may continue against the pinned ELV5 design contracts.
+
+## Acceptance boundary
+
+Design CI may prove registry consistency, links and contract arithmetic. It never proves ELV6 runtime.
+
+Runtime closure requires public-command/file-SQLite qualification of all 24 processes and all 21 command codecs, migrations, restart, replay, rollback, concurrency races, deterministic solver output, freeze/create-next history and stable ELV7/ELV8 projections at one exact source SHA.
+
+All ELV6 P0–P9 runtime packages remain `NOT_STARTED` until that evidence exists.
