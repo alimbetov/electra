@@ -90,28 +90,18 @@
         "hostRef": {"ownerKind": "PANEL_ASSEMBLY", "hostId": "panel-01", "logicalId": "panel-logical-01"},
         "subjectRef": {"owner": "ELV2", "kind": "COMPONENT_DEFINITION", "id": "device-def-01", "designRevisionId": "rev-r1", "fingerprint": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"},
         "installationRole": "PRIMARY_BODY",
-        "mountingSurfaceId": "din-01",
-        "pose": {"origin": [50000,100000,50000], "xAxis": "POS_X", "yAxis": "POS_Y", "zAxis": "POS_Z"},
-        "occupiedEnvelope": {"min": [50000,100000,50000], "max": [86000,190000,120000]},
-        "rackSpan": null,
-        "dinSpan": {"start": 0, "length": 2},
-        "sourceProposalId": null
+        "placementSpec": {"kind": "DIN", "mountingSurfaceId": "din-01", "position": 0}
       },
-      "rejection": {"mutation": "REMOVE_FIELD", "field": "occupiedEnvelope", "expectedCode": "ELV6_PAYLOAD_FIELDS_MISMATCH"}
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "placementSpec", "expectedCode": "ELV6_PAYLOAD_FIELDS_MISMATCH"}
     },
     {
       "operation": "MOVE_LAYOUT_SUBJECT",
       "validPayload": {
         "placementId": "placement-01",
         "hostRef": {"ownerKind": "PANEL_ASSEMBLY", "hostId": "panel-01", "logicalId": "panel-logical-01"},
-        "mountingSurfaceId": "din-01",
-        "pose": {"origin": [86000,100000,50000], "xAxis": "POS_X", "yAxis": "POS_Y", "zAxis": "POS_Z"},
-        "occupiedEnvelope": {"min": [86000,100000,50000], "max": [122000,190000,120000]},
-        "rackSpan": null,
-        "dinSpan": {"start": 2, "length": 2},
-        "sourceProposalId": null
+        "placementSpec": {"kind": "DIN", "mountingSurfaceId": "din-01", "position": 2}
       },
-      "rejection": {"mutation": "REMOVE_FIELD", "field": "pose", "expectedCode": "ELV6_PAYLOAD_FIELDS_MISMATCH"}
+      "rejection": {"mutation": "REMOVE_FIELD", "field": "placementSpec", "expectedCode": "ELV6_PAYLOAD_FIELDS_MISMATCH"}
     },
     {
       "operation": "REMOVE_LAYOUT_SUBJECT",
