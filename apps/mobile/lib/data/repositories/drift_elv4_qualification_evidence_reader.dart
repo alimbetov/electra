@@ -174,23 +174,26 @@ final class DriftElv4QualificationEvidenceReader {
   Future<List<_PersistedEvaluation>> _loadCurrentPassEvaluations(
     Elv4QualificationCaseScope scope,
   ) async {
-    final rows = await database.customSelect(
-      'SELECT e.logical_node_key_json, e.evaluation_id, e.process_code, '
-      'e.input_fingerprint, e.status, e.applicability, e.evidence_json, '
-      'e.evidence_sha256, p.generation, p.state AS pointer_state, '
-      'p.evaluation_id AS pointer_evaluation_id, '
-      'p.evidence_sha256 AS pointer_evidence_sha256 '
-      'FROM power_evaluation_records e '
-      'JOIN power_evaluation_pointers p '
-      'ON p.project_id = e.project_id '
-      'AND p.design_revision_id = e.design_revision_id '
-      'AND p.logical_node_key_sha256 = e.logical_node_key_sha256 '
-      'WHERE e.project_id = ? AND e.design_revision_id = ?',
-      variables: [
-        Variable.withString(scope.projectId),
-        Variable.withString(scope.designRevisionId),
-      ],
-    ).get();
+    final rows =
+        await database
+            .customSelect(
+              'SELECT e.logical_node_key_json, e.evaluation_id, e.process_code, '
+              'e.input_fingerprint, e.status, e.applicability, e.evidence_json, '
+              'e.evidence_sha256, p.generation, p.state AS pointer_state, '
+              'p.evaluation_id AS pointer_evaluation_id, '
+              'p.evidence_sha256 AS pointer_evidence_sha256 '
+              'FROM power_evaluation_records e '
+              'JOIN power_evaluation_pointers p '
+              'ON p.project_id = e.project_id '
+              'AND p.design_revision_id = e.design_revision_id '
+              'AND p.logical_node_key_sha256 = e.logical_node_key_sha256 '
+              'WHERE e.project_id = ? AND e.design_revision_id = ?',
+              variables: [
+                Variable.withString(scope.projectId),
+                Variable.withString(scope.designRevisionId),
+              ],
+            )
+            .get();
 
     final result = <_PersistedEvaluation>[];
     for (final row in rows) {
@@ -278,10 +281,10 @@ final class _PersistedEvaluation {
   final int pointerGeneration;
 }
 
-String _context(PowerNodeKeyV2 node) => node.scopeKind ==
-        PowerEvaluationScopeKind.sequence
-    ? '${node.scenarioId}/SEQUENCE'
-    : '${node.scenarioId}/${node.scopeId}';
+String _context(PowerNodeKeyV2 node) =>
+    node.scopeKind == PowerEvaluationScopeKind.sequence
+        ? '${node.scenarioId}/SEQUENCE'
+        : '${node.scenarioId}/${node.scopeId}';
 
 String _text(Object? value, String field) {
   if (value is! String || value.trim().isEmpty) {
