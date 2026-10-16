@@ -31,6 +31,43 @@ final class Elv4CurrentEvaluationSnapshot {
       raw.map((key, value) => MapEntry(key.toString(), value)),
     );
   }
+
+  /// Scenario-independent physical membership closure derived from the exact
+  /// PWR consumed dependency keys already persisted in ELV4 evidence.
+  ///
+  /// Scenario/segment-scoped keys are deliberately excluded; domain, load,
+  /// section, allocation, cable-run, traversal, installed-resource and
+  /// termination identities remain. Therefore two operating scenarios can only
+  /// share this fingerprint when they were solved against the same physical
+  /// closure, while their current/voltage values may legitimately differ.
+  String get physicalMembershipFingerprint {
+    final raw = evidence['dependencyKeys'];
+    if (raw is! List) {
+      throw StateError('ELV4_CURRENT_DEPENDENCY_KEYS_MISSING:$evaluationId');
+    }
+    final stable = <String>[];
+    for (final value in raw) {
+      if (value is! String) {
+        throw StateError('ELV4_CURRENT_DEPENDENCY_KEY_INVALID:$evaluationId');
+      }
+      final key = PowerDependencyKey.decode(value);
+      if (key.scenarioId == null && key.segmentId == null) stable.add(key.encode());
+    }
+    if (stable.isEmpty) {
+      throw StateError('ELV4_CURRENT_PHYSICAL_MEMBERSHIP_EMPTY:$evaluationId');
+    }
+    stable.sort();
+    return sha256HexUtf8(
+      canonicalEngineeringJsonV1(<String, Object?>{
+        'schema': 'electra.elv4-physical-membership-closure.v1',
+        'revisionId': nodeKey.revisionId,
+        'processCode': nodeKey.processCode.name,
+        'subjectKind': nodeKey.subjectKind,
+        'subjectId': nodeKey.subjectId,
+        'stableDependencyKeys': stable,
+      }),
+    );
+  }
 }
 
 abstract interface class Elv4CurrentEvidenceSource {
