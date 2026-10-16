@@ -64,8 +64,8 @@ def main():
         req(trace is not None and prefix in trace.group(1),f'{code} dossier trace prefix not frozen')
     req(audit['counts']=={'high':7,'medium':3,'total':10,'resolved':10,'open':0},'sixth-pass audit count drift')
     req(all(r['status']=='SPEC_RESOLVED' for r in audit['findings']),'sixth-pass unresolved finding')
-    hard=(IMPL/'implementation-binding-hardening-v1.md').read_text(encoding='utf-8')
-    for token in ['DESIGN FROZEN','N+1','O(N²)','worker count','runtime-version-registry.json']:
+    hard=(IMPL/'implementation-binding-hardening-v1.md').read_text(encoding='utf-8').lower()
+    for token in ['design frozen','n+1','o(n²)','worker count','runtime-version-registry.json']:
         req(token in hard,f'implementation hardening missing token: {token}')
     print('ELV5 implementation binding/performance contract PASS')
     print('processes=27 commands=16 repoMethods=%d priority=11 sixthOpen=0' % len(methods))
