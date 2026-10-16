@@ -1,0 +1,162 @@
+{
+  "schema": "electra.elv5-engineering-architecture-hardening-audit.v1",
+  "date": "2026-10-16",
+  "branch": "feat/flutter-elv5-power-topology-design",
+  "scope": "Second-pass engineering and systems architecture audit of the ELV5 specification after the initial 8-finding discipline audit. This is design evidence only, not runtime acceptance.",
+  "runtimeStatus": "NOT_STARTED",
+  "findings": [
+    {
+      "id": "ELV5-HARD-01",
+      "severity": "HIGH",
+      "title": "Engineering dimensions were exact numerically but not type-safe",
+      "risk": "dB/dBm, W/A/V, bit/s/bytes and other quantities could cross generic map/storage boundaries without a compile-time semantic barrier.",
+      "resolution": "Introduce code-owned dimension types, exact canonical units and typed Elv5Quantity wrappers shared by all 27 kernels.",
+      "resolutionRefs": ["docs/product/elv5-implementation/engineering-primitives-contract.md", "docs/product/elv5-implementation/typed-process-api.md"],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "ELV5-HARD-02",
+      "severity": "HIGH",
+      "title": "Canonical replay/input/output hash representation was underspecified",
+      "risk": "Semantically identical payloads could hash differently due to map order/number encoding, while volatile evaluation IDs/timestamps could destroy deterministic engineering output hashes.",
+      "resolution": "Freeze electra.canonical-json.v1 plus explicit request, input, output and snapshot hash projections; output hash excludes volatile record metadata.",
+      "resolutionRefs": ["docs/product/elv5-implementation/engineering-primitives-contract.md"],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "ELV5-HARD-03",
+      "severity": "HIGH",
+      "title": "Engineering evidence basis and uncertainty were not first-class",
+      "risk": "Typical or estimated manufacturer/project values could accidentally satisfy checks that require guaranteed worst-case bounds; reserve could be confused with uncertainty.",
+      "resolution": "Add evidence basis, guaranteed intervals, applicability and conservative comparison semantics. Reserve is explicitly independent of evidence certainty.",
+      "resolutionRefs": ["docs/product/elv5-implementation/engineering-primitives-contract.md"],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "ELV5-HARD-04",
+      "severity": "HIGH",
+      "title": "Operating-case and simultaneity identity was implicit",
+      "risk": "Expected/peak/startup/standby/alarm/emergency values could be combined across incompatible states or scenarios.",
+      "resolution": "Make operating case a captured input identity and require code-owned composition rules; process APIs bind state selections to the exact case.",
+      "resolutionRefs": ["docs/product/elv5-implementation/engineering-primitives-contract.md", "docs/product/elv5-implementation/typed-process-api.md"],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "ELV5-HARD-05",
+      "severity": "HIGH",
+      "title": "Schedule recurrence was not reproducible across timezone-rule changes",
+      "risk": "Host timezone or tzdb updates could alter storage/autonomy interval expansion and therefore engineering results or hashes.",
+      "resolution": "Pin IANA zone, tzdb version, DST gap/overlap policy and half-open UTC interval semantics in consumed evidence.",
+      "resolutionRefs": ["docs/product/elv5-implementation/engineering-primitives-contract.md", "docs/product/elv5-implementation/typed-process-api.md"],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "ELV5-HARD-06",
+      "severity": "MEDIUM",
+      "title": "Geometry frame identity and transform provenance were incomplete",
+      "risk": "Camera coordinates/rotations from different frames could be combined while still producing plausible numeric footprints.",
+      "resolution": "Introduce explicit frame identity, handedness, axis convention and transform-chain hash; mixed frames fail closed without captured transform evidence.",
+      "resolutionRefs": ["docs/product/elv5-implementation/engineering-primitives-contract.md", "docs/product/elv5-implementation/typed-process-api.md"],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "ELV5-HARD-07",
+      "severity": "HIGH",
+      "title": "All 27 processes lacked frozen process-specific Dart input/output boundaries",
+      "risk": "Generic maps could become de facto APIs and let different packages interpret the same process differently.",
+      "resolution": "Define typed process API shapes for CCTV-01..06, LAN-01..07, ACS-01..06 and FA-01..08, including shared typed header and output envelope.",
+      "resolutionRefs": ["docs/product/elv5-implementation/typed-process-api.md"],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "ELV5-HARD-08",
+      "severity": "HIGH",
+      "title": "P2 storage roots and schema number were not concrete enough for implementation",
+      "risk": "Developers could normalize the same wire replacement command differently, choose incompatible root/child ownership, or duplicate existing command/history platforms.",
+      "resolution": "Freeze additive Drift schema 24, exact semantic tables/PK/FK/index rules, normalized roots/children, shared command ledger/history reuse and forbidden duplicate ownership tables.",
+      "resolutionRefs": ["docs/product/elv5-implementation/persistence-schema-contract.md"],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "ELV5-HARD-09",
+      "severity": "HIGH",
+      "title": "Multi-node publication atomicity was not explicit",
+      "risk": "A CALCULATE_DISCIPLINE_PROCESS batch could publish some nodes while another node fails captured-generation checks, yielding a mixed current workspace.",
+      "resolution": "Require all-or-nothing coherent batch publication with complete revalidation/CAS before any requested node becomes CURRENT.",
+      "resolutionRefs": ["docs/product/elv5-implementation/persistence-schema-contract.md", "docs/product/elv5-implementation/qualification-contract.md"],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "ELV5-HARD-10",
+      "severity": "HIGH",
+      "title": "ACS emergency/fire/power-failure release semantics were too qualitative",
+      "risk": "Fail-safe/fail-secure behavior and emergency/fire release could be inferred from role presence or labels rather than an explicit expected-behavior matrix.",
+      "resolution": "Add lock safety mode and technical release truth table for normal access, request-to-exit, fire release, emergency break-glass and power-failure cases while preserving ELV7 compliance ownership.",
+      "resolutionRefs": ["docs/product/elv5-implementation/typed-process-api.md", "docs/product/elv5-implementation/persistence-schema-contract.md", "docs/product/elv5-implementation/qualification-contract.md"],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "ELV5-HARD-11",
+      "severity": "MEDIUM",
+      "title": "CCTV payload bitrate versus network wire-rate basis was not explicit",
+      "risk": "A payload/encoded bitrate could be compared directly with a physical link capacity without an explicit overhead/capacity model.",
+      "resolution": "Typed CCTV-02 API separates payload bitrate from optional versioned transport-overhead/wire-rate capacity evidence. No universal overhead percentage is allowed.",
+      "resolutionRefs": ["docs/product/elv5-implementation/typed-process-api.md"],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "ELV5-HARD-12",
+      "severity": "MEDIUM",
+      "title": "Optical power budget could be overinterpreted as transmission reach",
+      "risk": "Passing Rx sensitivity/overload does not by itself prove dispersion/reach compatibility at a selected data rate.",
+      "resolution": "Keep power budget mandatory and expose reach compatibility only when an exact registered reach profile/model is available; otherwise no reach claim.",
+      "resolutionRefs": ["docs/product/elv5-implementation/typed-process-api.md"],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "ELV5-HARD-13",
+      "severity": "HIGH",
+      "title": "Qualification strategy did not fully separate unit correctness from public vertical closure",
+      "risk": "Formula or structural registry tests could be mistaken for production command/persistence/concurrency acceptance.",
+      "resolution": "Define L0-L6 executable test layers, exact 54 POS/NEG primary verticals, adversarial 16-command matrix, restart/migration/failure/race tests, false-PASS sentinels and P9 exact-head evidence requirements.",
+      "resolutionRefs": ["docs/product/elv5-implementation/qualification-contract.md"],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED"
+    },
+    {
+      "id": "ELV5-HARD-14",
+      "severity": "MEDIUM",
+      "title": "Scale behavior had no explicit qualification fixture",
+      "risk": "Correct algorithms could still enter runtime with pathological query/iteration behavior or SQLite batching limits.",
+      "resolution": "Add deterministic scale fixtures and benchmark evidence without inventing unmeasured production SLO thresholds.",
+      "resolutionRefs": ["docs/product/elv5-implementation/qualification-contract.md"],
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED"
+    }
+  ],
+  "findingSummary": {
+    "HIGH": 10,
+    "MEDIUM": 4,
+    "total": 14,
+    "specResolved": 14,
+    "runtimeImplemented": 0
+  },
+  "deliberateStageBoundaries": [
+    "ELV6 owns actual rack/cabinet slot, clearance, thermal and cable-management layout fit.",
+    "ELV7 owns verified jurisdictional/normative applicability and compliance certification.",
+    "ELV8 owns commercial product selection, BOM, quote and procurement deliverables.",
+    "ELV5 may preserve technical evidence useful to those stages but cannot silently claim their conclusions."
+  ]
+}
