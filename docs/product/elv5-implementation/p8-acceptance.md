@@ -1,35 +1,52 @@
 # P8 — Integrated verification and qualification
 
-Status: DESIGN DRAFT / RUNTIME NOT STARTED
+Status: DESIGN HARDENED / RUNTIME NOT STARTED
 Depends on: P0–P7 implemented prerequisites.
-Parent: [ELV5 design](../elv5-discipline-calculations-design-specification.md); [process contracts](process-contracts.md); [code-level runtime contract](code-level-runtime-contract.md).
+Parent: [ELV5 design](../elv5-discipline-calculations-design-specification.md); [process contracts](process-contracts.md); [code-level runtime contract](code-level-runtime-contract.md); [executable qualification contract](qualification-contract.md).
 
-Inherited implementation and mandatory new extensions: [baseline contract P8](implemented-baseline.md#p8); [pinned evidence](baseline.json). This contract supersedes the original design-only parent assumptions.
+Inherited implementation and mandatory new extensions: [baseline contract P8](implemented-baseline.md#p8); [pinned evidence](baseline.json).
 
 ## Requirements and planned proof
 
 | Requirement | Required implementation behavior | Planned acceptance |
 |---|---|---|
-| ELV5-P8-001 | Implement one FK-valid public-command fixture per discipline plus shared-source project context | P8-T01 |
-| ELV5-P8-002 | Exercise all 27 process positive/negative oracles with required dimension/claim-scope manifest | P8-T02 |
-| ELV5-P8-003 | Prove exact snapshots/evaluations/policies/assignments after file-SQLite close/reopen | P8-T03 |
-| ELV5-P8-004 | Freeze R1, create/remap R2, change profiles/routes/states and prove immutable R1 results | P8-T04 |
-| ELV5-P8-005 | Inject owned durable failure checkpoints and verify same-open/reopened rollback including history/ledger | P8-T05 |
-| ELV5-P8-006 | Prove response-loss replay/payload conflict and two-connection edit/publish/freeze/adoption races | P8-T06 |
-| ELV5-P8-007 | Verify supported migration origins and mixed legacy/ELV3/ELV4/ELV5 result consumer isolation | P8-T07 |
-| ELV5-P8-008 | Assert affected and unaffected process sets, exact arithmetic/bounds and no false compliance/layout claim | P8-T08 |
+| ELV5-P8-001 | Implement FK-valid public-command integrated fixtures for all disciplines plus real shared-source contexts | P8-T01 |
+| ELV5-P8-002 | Execute all **54** primary POS/NEG/unsupported process entries with required dimension/claim-scope manifest | P8-T02 |
+| ELV5-P8-003 | Prove exact schema-24 roots/snapshots/evaluations/policies/assignments after file-SQLite close/reopen | P8-T03 |
+| ELV5-P8-004 | Freeze R1, create/remap R2, change profiles/routes/states and prove immutable R1 results/hashes | P8-T04 |
+| ELV5-P8-005 | Inject durable failure checkpoints and verify same-open/reopened atomic rollback including history/ledger | P8-T05 |
+| ELV5-P8-006 | Prove response-loss replay/payload conflict and deterministic two-connection edit/publish/freeze/adoption races | P8-T06 |
+| ELV5-P8-007 | Verify supported migrations through schema 24 and mixed legacy/ELV3/ELV4/ELV5 result-owner isolation | P8-T07 |
+| ELV5-P8-008 | Assert affected/unaffected process sets, exact arithmetic/bounds/provenance and all no-false-PASS sentinels | P8-T08 |
 
-## Concrete contract
+## Normative qualification contract
 
-Positive/negative oracle IDs are `processCode-POS/NEG` in the registry; package test IDs add cross-cutting assertions. Before runtime P1/P8 freeze an executable qualification manifest with complete technical inputs, applicable scopes, required dimensions and exact expected statuses. Boundary examples alone do not qualify a public vertical. Missing a required positive or leaving its required dimension UNRESOLVED/BLOCKED fails qualification.
+The complete test architecture is [qualification-contract.md](qualification-contract.md). P8 implements its seven layers:
 
-Use real FK-valid temporary file SQLite and public commands for current setup; raw SQL is allowed only for explicit historical migration seeds or read assertions. Failure probes cover assignment insert/old-set delete/new member, invalidation/history/ledger, snapshot section/manifest and pointer batch publication. Check every rollback after reopening.
+```text
+L0 primitive / exact numeric / canonical hash
+L1 pure typed process kernels
+L2 strict wire codecs / semantic rejection
+L3 schema 24 / persistence / migration / restart
+L4 application UoW / replay / history / failure injection
+L5 public-command vertical qualification
+L6 deterministic concurrency / freeze / historical matrix
+```
 
-Race barriers cover policy adoption versus reviewed preview, stream/route edits versus publication, shared-source membership changes, freeze versus publish, create-next/remapping and history cursor conflict. Keep immutable foreign-owner rows and old v1/v2 decoding stable during generic recalculation/manual/retirement.
+No single layer substitutes for another. In particular, formula tests, registry checks and JSON examples do not close a public vertical.
 
-### Qualification manifest
+## Qualification manifest
 
-P8 MUST introduce a machine-readable manifest whose entries contain at least:
+P8 MUST introduce:
+
+```text
+docs/product/elv5-implementation/qualification-manifest.json
+schema = electra.elv5-qualification-manifest.v1
+```
+
+The manifest contains **exactly 54 primary process entries**: POS plus NEG/unsupported for every one of the 27 process codes.
+
+Each entry includes at least:
 
 ```text
 processCode
@@ -39,77 +56,190 @@ setupCommandIds
 calculationCommandId
 scope
 subject
+operatingCaseId
 requiredDimensions
+expectedExecution
 expectedCompletion
 expectedAssessment
-expectedExecution
+expectedDimensionStatuses
 expectedFindingCodes
 expectedAffectedProcessCodes
 expectedUnaffectedProcessCodes
 claimScope
+sourceBasisExpectations
+publicSetupOnly
 ```
 
-Every one of 27 process codes has both POS and NEG/unsupported entries. Tests read this manifest and fail if runtime registry membership, required dimensions or expected status inventory diverges.
+Tests read the manifest and fail if process registry membership, required dimensions or expected status inventory diverges.
 
-### Exact wire/codec qualification
+## Public vertical path
 
-The initial ELV5 runtime has exactly 16 public discipline command codecs under `electra.elv5-discipline-command.v1`. P8 MUST prove:
+Every primary oracle executes:
 
-1. one registered codec for every operation and no extra/missing codec;
-2. valid canonical JSON example for every operation;
-3. missing field, unknown field, wrong type and unsupported schema/operation/version rejection;
-4. nested semantic rejection for duplicate/foreign identities;
-5. reviewed impact is resolved server-side rather than trusted from payload;
-6. same `(projectId,commandId,requestHash)` replay returns the original response after row revisions changed;
-7. same command ID with different request hash returns `ELV5_COMMAND_PAYLOAD_CONFLICT`;
-8. command failure leaves root/member rows, reverse dependencies, history cursor and ledger atomically unchanged after reopen.
+```text
+strict public setup commands
+  -> file SQLite persisted roots + canonical ELV3/ELV4 facts
+  -> CALCULATE_DISCIPLINE_PROCESS
+  -> production capture resolver
+  -> typed process registry
+  -> pure deterministic kernel
+  -> guarded coherent publication
+  -> engineer projection/read API
+  -> close DB
+  -> reopen DB
+  -> verify immutable evidence/current pointer/explanation
+```
 
-### Public vertical fixtures
+A direct call to `calculate()` is L1 evidence only.
 
-At least one integrated current-revision project contains all four disciplines and a genuinely shared physical ELV4 source/PSE/battery context. Setup uses the same public application/command services expected in production. The fixture must contain enough real FK-connected data to execute all relevant discipline calculations without replacing canonical ELV3/ELV4 facts by test-only ELV5 duplicates.
+## Exact wire/codec qualification
 
-Qualification must demonstrate that CCTV/LAN shared PoE wrappers consume one exact physical PWR-06 evidence and expose different contribution breakdowns without reducing the global membership set. Fire/ACS shared backup scenarios likewise consume complete protected-load closure.
+The initial ELV5 runtime has exactly 16 public discipline command codecs under `electra.elv5-discipline-command.v1`. P8 proves for every operation:
 
-### Persistence/restart proof
+1. exactly one registered codec and no extra/missing codec;
+2. canonical valid example;
+3. missing/unknown top-level field rejection;
+4. wrong top-level type and unsupported schema/operation/version rejection;
+5. missing/unknown/wrong-type nested payload rejection;
+6. semantic duplicate/foreign identity rejection;
+7. server-side reviewed impact resolution;
+8. same command ID + same canonical request hash replay after state changed;
+9. same command ID + different canonical request hash conflict;
+10. atomic rollback of root/members/dependencies/history/ledger after injected failure and reopen.
 
-After close/reopen assert exact preservation of:
+Hardened operation coverage specifically includes:
 
-- every ELV5 revision-scoped root and ordered child set;
-- immutable policy edition references/hashes;
-- command ledger request/response hashes;
+- CCTV stream subscriptions + transport overhead model ref;
+- recording temporal policy/tzdb/reserve/redundancy/policy basis;
+- ACS safety mode + release truth table.
+
+## Engineering primitive qualification
+
+P8 executes L0 regression coverage from [engineering-primitives-contract.md](engineering-primitives-contract.md), including:
+
+- dB vs dBm type separation;
+- exact bit/s→byte arithmetic and process-boundary ceil;
+- rational/decimal normalization;
+- guaranteed vs typical/estimated evidence basis;
+- reserve distinct from uncertainty/evidence certainty;
+- stable canonical hash under unordered map/set insertion order;
+- ordered path/sequence hash sensitivity;
+- output hash independence from evaluation ID/timestamp;
+- deterministic timezone/DST policy;
+- mixed coordinate-frame rejection without captured transform.
+
+## Process qualification highlights
+
+### CCTV
+
+P8 includes bounded H/V FOV, frame mismatch, unicast/multicast copy accounting, payload-vs-wire-rate separation, schedule union/tzdb, expected-vs-guaranteed retention, one-time reserve/redundancy, channel-accounting alternatives and shared PWR-06 contribution evidence.
+
+### LAN
+
+P8 includes exact-limit/over-limit link lengths, spare ceilings, weakest-section compatibility, bidirectional sensitivity/overload, dB/dBm separation, optional reach claim isolation, rack gross/net equivalence and ELV6 layout `NOT_ASSESSED` sentinel.
+
+### ACS
+
+P8 includes role alternatives, separate resource pools, lock state/startup/shared trunk, shared supply/bank, and ACS-06 truth-table cases for:
+
+```text
+NORMAL_ACCESS
+REQUEST_TO_EXIT
+FIRE_RELEASE
+EMERGENCY_BREAK_GLASS
+POWER_FAILURE
+```
+
+with at least one fail-safe and one fail-secure/project-defined fixture. Technical topology evidence never becomes verified legal/egress compliance.
+
+### Fire
+
+P8 includes expanded address-set collisions, partial state-current evidence, supported-vs-unsupported electrical model, complete shared source/bank loads, explicit standby/alarm durations, notification active/startup current + terminal voltage, signal-loop closure/branch policy and policy-match-vs-certified-compliance separation.
+
+## Persistence/restart proof
+
+All P2/P7/P8 persistence evidence uses real temporary file SQLite. After close/reopen assert exact preservation of:
+
+- all schema-24 roots and ordered member sets;
+- camera subscriptions;
+- recording temporal/reserve/redundancy basis;
+- ACS release truth table;
+- immutable policy refs/hashes;
+- command ledger canonical request/logical response evidence;
 - complete forward/inverse history and cursor;
-- immutable evaluation output/input hashes;
+- immutable evaluation input/output hashes;
 - pointer generation/freshness/evaluation IDs;
 - reverse dependency keys including SET/MISSING markers;
 - snapshot discipline section and manifest `disciplineHash`.
 
-No test may rely solely on an in-memory database for P2/P7/P8 acceptance.
+In-memory-only tests cannot close P2/P7/P8.
 
-### Publication and freeze races
+## Failure injection
 
-Use deterministic barriers around capture and publish. Prove at minimum:
+For replacement commands, failure probes cover transaction boundaries after replay, root write, child replacement, invalidation, history append and ledger save. Every injected failure is checked after reopen and must leave the previous committed aggregate intact. No hybrid old/new member set is allowed.
 
-- capture → concurrent relevant edit → publish conflict/no CURRENT;
-- capture → unrelated edit → publish allowed when consumed fingerprint/generations unchanged;
-- capture → freeze → publish returns publish-after-freeze conflict;
-- two calculations capturing same pointer generation cannot both advance the same pointer generation as if uncontended;
-- shared-source pointer generation change invalidates all exact dependent wrappers;
-- blocked result with `MISSING/...` dependency becomes stale when the missing fact is later created.
+## Deterministic concurrency
 
-### Migration and owner isolation
+Use explicit barriers/hooks, not sleeps as correctness synchronization. Required races include:
 
-Migration tests start from every supported origin, including real accepted v21/v22/v23-style seeds as governed by P0/P2. Historical legacy rows, ELV4 power rows and new ELV5 discipline rows coexist. Generic readers dispatch by explicit owner/schema and must not decode/retag one store as another.
+- capture → relevant edit → publish conflict/no stale CURRENT;
+- capture → unrelated edit → publish allowed when all consumed fingerprints/generations are unchanged;
+- two publishers from the same pointer generation: at most one advances from that generation;
+- capture → policy adoption → stale/conflict;
+- shared ELV4 pointer generation change → exact dependent wrappers stale/conflict;
+- capture → freeze → late publish rejected;
+- replace vs replace same aggregate → one deterministic conflict, no hybrid members;
+- undo/redo vs new edit → cursor-generation conflict;
+- response loss after commit → same-hash replay returns stored logical result;
+- create-next vs old-revision late publish → no retagging/new-revision contamination.
 
-Old snapshot without discipline section returns `ELV5_NOT_CAPTURED`. New snapshot with an intentionally empty discipline section returns CAPTURED_EMPTY. These are separate acceptance cases.
+A multi-node `CALCULATE_DISCIPLINE_PROCESS` publish is all-or-nothing for the requested coherent batch.
+
+## Migration and owner isolation
+
+Migration tests cover:
+
+```text
+fresh schema 24
+accepted 23 -> 24
+supported historical origin -> existing chain -> 23 -> 24
+failed migration rollback/reopen
+legacy snapshot -> ELV5_NOT_CAPTURED
+new empty discipline section -> CAPTURED_EMPTY
+```
+
+Historical legacy rows, ELV4 power rows and new ELV5 discipline rows coexist. Generic readers dispatch by explicit owner/schema and never decode or retag one store as another.
+
+Recorder capability ownership is explicitly checked: capability facts resolve from one exact immutable canonical catalog/component definition; ELV5 does not become a second editable capability source.
+
+## No-false-PASS sentinels
+
+P8 must fail if runtime ever produces any of these implications:
+
+```text
+unsupported model -> PASS
+missing mandatory input -> PASS
+stale old PASS -> current PASS
+fictional/project policy -> verified jurisdictional compliance
+LAN-06 RU basis -> actual rack fit PASS
+FA-08 policy match -> certified fire compliance
+CCTV geometry -> visibility through obstruction
+CCTV pixel density -> DORI/legal identification claim
+optical power budget -> reach/dispersion PASS without reach model
+ACS release topology -> verified legal egress compliance
+ELV5 discipline contribution -> shared physical source total
+old immutable evaluation -> retagged into new revision
+legacy pre-ELV5 snapshot -> captured-empty/current PASS
+```
+
+Any false-PASS sentinel is closure-blocking.
+
+## Scale fixture
+
+P8 executes deterministic supported-scale fixtures from the qualification contract, including 1000 streams, 10000 schedule segments, 5000 LAN assignments, 2000 ACS assignments, 10000 fire address claims and a 500-node workspace batch. Benchmark evidence is recorded without inventing an unmeasured production millisecond SLO.
 
 ## Exit
 
-P8 runtime acceptance requires its numbered assertions at the same accepted source SHA and its prerequisite gates. This document is a design contract, not proof of source implementation.
+P8 closes only from executed public-command, file-SQLite, restart, migration, failure-injection, race/freeze and 54-process-oracle evidence at one tested source SHA.
 
-P8 cannot close from structural/specification validators. It closes only from executed public-command, file-SQLite, restart, race, migration and 27-process oracle evidence at one tested source SHA.
-
-## Audit refinements
-
-Audit regression oracles include sub-byte aggregate ceiling, expected-versus-guaranteed retention, two streams/one-camera recorder licence, optical overload with design reserve, overlapping module address sets, gross/net RU equivalence, unknown upstream process/scope and registry cycle. All are required design-to-runtime tests; no structural validator substitutes for executed public-command qualification.
-
-Additional code-level regressions are mandatory: exact 16-codec registry, missing/extra codec rejection, stale reviewed-impact fingerprint, replay-first behavior after revision change, missing-input dependency invalidation, pointer generation CAS and freeze-winning publication race. No PASS may be asserted from unsupported model, absent required dimension, fictional-policy compliance or ELV6/ELV7/ELV8-owned conclusions.
+Structural design validators—including the ELV5 specification/registry/example/hardening CI guards—prove design consistency only. They cannot be cited as runtime implementation acceptance.
