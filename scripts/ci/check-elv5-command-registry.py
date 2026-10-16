@@ -65,8 +65,13 @@ def validate(registry):
     assert 'command-registry.json' in index
     for operation in EXPECTED_PAYLOADS:
         assert operation in contract, ('command absent from runtime contract', operation)
+
+    elv4_dispatcher = (
+        ROOT / 'apps/mobile/lib/application/elv4_wire_command_dispatcher.dart'
+    ).read_text()
+    assert revision['schema'] in elv4_dispatcher, 'ELV4 revision schema drifted from accepted runtime'
     for operation in revision['operations']:
-        assert operation in contract, ('revision boundary absent from runtime contract', operation)
+        assert operation in elv4_dispatcher, ('ELV4 revision operation drifted', operation)
 
 
 def must_reject(registry):
@@ -97,7 +102,7 @@ def main():
     duplicate['commands'].append(copy.deepcopy(duplicate['commands'][0]))
     must_reject(duplicate)
 
-    print('PASS: exact ELV5 command schema, 16 operations, payload keys and ELV4 revision boundary')
+    print('PASS: exact ELV5 command schema, 16 operations, payload keys and implemented ELV4 revision boundary')
 
 
 if __name__ == '__main__':
