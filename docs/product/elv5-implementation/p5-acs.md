@@ -2,7 +2,7 @@
 
 Status: DESIGN HARDENED / RUNTIME NOT STARTED
 Depends on: P1/P2, canonical assemblies and power kernels.
-Parent: [ELV5 design](../elv5-discipline-calculations-design-specification.md); [process contracts](process-contracts.md); [typed process API](typed-process-api.md); [hardening amendments](code-level-hardening-amendments.md).
+Parent: [ELV5 design](../elv5-discipline-calculations-design-specification.md); [process contracts](process-contracts.md); [typed process API](typed-process-api.md); [hardening amendments](code-level-hardening-amendments.md); [ACS code-level dossiers](process-specifications/acs-processes.md); [Flutter performance contract](flutter-performance-contract.md).
 
 Inherited implementation and mandatory new extensions: [baseline contract P5](implemented-baseline.md#p5); [pinned evidence](baseline.json).
 
@@ -19,35 +19,72 @@ Inherited implementation and mandatory new extensions: [baseline contract P5](im
 | ELV5-P5-007 | Integrate assignment/deletion/adoption guards, findings and consumed dependency projection | P5-T07 |
 | ELV5-P5-008 | Qualify role/resource/power/release positives/negatives, shared non-ACS loads, restart and historical evidence | P5-T08 |
 
-## Concrete contract
+## Normative code-level binding
 
-Door assembly membership is non-owning. Explicit OR alternatives do not mean both roles are required; one component may fill several roles only under a declared allowed mapping. Resource channels are distinct from component counts, and a relay control relation does not create a conductive supply edge.
+Runtime implementation MUST match ACS-01…06 in [process-specifications/acs-processes.md](process-specifications/acs-processes.md) across all 25 sections. The package summary does not authorize alternate formulas, hidden steady-state assumptions or a simplified release model.
 
-ACS-03/04/05 are typed wrappers over exact shared PWR evidence, not copies of formulas. An upstream trunk/bank includes all concurrent protected loads, including other systems. Lock startup model is the supported explicit simultaneous policy; no hidden duty or holding factor. Required autonomy duration/extension policy is selected data, not a default.
+Implementation priority inside P5 is **ACS-03 → ACS-04 → ACS-05**, because these force correct transient/shared-source/battery integration with ELV4 before the simpler role/resource and topology checks.
 
-## ACS-06 safety/release contract
+## ACS-01 — door role completeness
 
-ACS-06 must not infer life-safety behavior from component names such as `fire`, `emergency`, `break glass` or from mere presence of a relay/input.
+Door assembly membership is non-owning. Requirements are a closed typed expression algebra over explicit role assignments: alternatives and multiplicities are not free-form formulas. One component may satisfy multiple roles only when the exact profile/capability allows sharing. Role absence is FAIL only when the assignment closure is complete; incomplete closure is UNRESOLVED.
 
-The persisted aggregate contains:
+## ACS-02 — controller resources
+
+Reader, relay, supervised-input and other physical resource pools are independent typed pools. Capacity is based on canonical physical resource identities, not component count or labels. Spare ratio uses exact rational arithmetic and code-owned `ceil`. Unsupported sharing/multiplexing cannot manufacture additional capacity.
+
+## ACS-03 — lock electrical/transient basis
+
+ACS-03 is a discipline wrapper over exact shared ELV4 physical evidence. It MUST distinguish:
+
+```text
+control path != conductive power feed
+lock branch current != shared trunk current
+steady holding != active/release != startup/inrush
+```
+
+The runtime builds a bounded deterministic temporal-event envelope from explicit state profiles and simultaneity policy; it never enumerates an unbounded powerset and never assumes “all start together” or “none start together” without policy.
+
+For each required event it consumes exact matching PWR-01/PWR-03 evidence. Typical terminal-voltage comparisons are:
+
+```text
+lowMargin  = terminalVoltageLower - requiredMinVoltage
+highMargin = requiredMaxVoltage - terminalVoltageUpper
+```
+
+The governing event is the required event/dimension with the worst valid signed margin/status. A short startup event can govern despite all steady-state cases passing. Reduced ACS-only trunk arithmetic is forbidden.
+
+## ACS-04 — shared source/PSU requirement
+
+ACS-04 consumes complete global PWR-01 demand and exact PWR-02 source capability/requirement evidence. Source-owned deterministic requirement composition applies reserve/derating once. Conceptually, where the selected source model uses these terms:
+
+```text
+requiredCapability = globalPhysicalDemand × effectiveReserve
+availableCapability = rating × applicableDerating
+margin = availableCapability - requiredCapability
+```
+
+The actual physical demand remains separate from required capability. Repeating a source reserve per door/load is a hard defect. Fire/other disciplines sharing the source remain in the same physical closure and requirement set.
+
+## ACS-05 — shared backup/autonomy
+
+ACS-05 verifies an exact complete protected sequence against PWR-04. The sequence is ordered, duration-explicit and includes shared non-ACS loads. Simple supported energy models may expose `E=Σ(P×t)`, but battery losses/discharge/EOD/current applicability remain ELV4 PWR-04 ownership.
+
+Energy PASS cannot hide peak-current/EOD failure. Nominal Ah cannot be converted into universal usable Wh without the supported model.
+
+## ACS-06 — door control/feed/release topology
+
+Persisted aggregate includes:
 
 ```text
 doorAssemblyId
 topologyProfileRef
-safetyMode
+safetyMode = FAIL_SAFE | FAIL_SECURE | PROJECT_DEFINED
 roleAssignments
 releaseTruthTable
 ```
 
-`safetyMode` is one of:
-
-```text
-FAIL_SAFE
-FAIL_SECURE
-PROJECT_DEFINED
-```
-
-The initial technical release causes include at least:
+Exactly five initial release causes are canonical:
 
 ```text
 NORMAL_ACCESS
@@ -57,50 +94,38 @@ EMERGENCY_BREAK_GLASS
 POWER_FAILURE
 ```
 
-Each truth-table row declares the expected lock outcome and required evidence roles/paths. Runtime resolves and evaluates distinct typed paths for:
+Runtime separately evaluates typed data/control, conductive feed, monitoring/supervision and release/interlock paths. A dry contact is control evidence only. The truth table must be complete/canonical before evaluation; duplicate/missing cause rows are rejected.
 
-```text
-reader/data/control
-conductive lock feed
-monitoring/supervision
-release/interlock
-```
+Passing all five technical rows is still not verified egress/fire-code compliance; that remains ELV7.
 
-A dry contact is control evidence only unless a separately captured conductive feed path exists.
+## Shared-source and cross-discipline rules
 
-### Fail-safe/fail-secure qualification
+ACS-03/04/05 preserve complete physical membership. Discipline contribution may be projected for explanation, but source/trunk/bank totals never remove concurrent CCTV/LAN/Fire/other loads. ACS-06 may consume an exact fire-release interface fact without taking ownership of the fire system or normative determination.
 
-P5-T06/P5-T08 must include both:
+## Dependency and invalidation rules
 
-- a fail-safe fixture whose expected power-failure outcome is de-energized/unlocked according to the selected profile;
-- a fail-secure or project-defined fixture whose expected behavior is explicitly different and whose release path is proven through its selected topology.
+Dependencies include door-role and controller-resource sets/selectors, lock state profile and temporal policy, control/feed/release graph sets, safety mode/truth table, exact ELV4 evaluation hashes/generations, source/bank requirement policies and MISSING markers. Replacement invalidation uses old+new closure and newly matching selectors. Unrelated doors stay unaffected unless a shared physical source/bank/policy dependency truly changed.
 
-The test validates the project's **technical behavior model**. It does not create a verified jurisdictional egress/fire-code statement; that remains ELV7 scope.
+## Public-command qualification
 
-## Shared-source rules
+P5 primary and supplemental vectors execute through schema-24 file SQLite, production capture/resolver, `Elv5CalculationExecutor` where appropriate, pure ACS kernels, guarded atomic publication, targeted workspace projection and close/reopen verification.
 
-ACS-04/05 consume full physical source/bank closure. Discipline contribution may be displayed, but non-ACS loads cannot be filtered from the physical sizing verdict. Reserve/derating/autonomy extension is applied only at its declared owner/boundary and never per door by repetition.
+Required vectors include role alternatives/exact multiplicity, resource-pool boundary, control-without-feed, startup governing steady state, source reserve repeated-door adversary, shared-bank non-ACS load, energy-pass/current-fail bank case, complete fail-safe and fail-secure/project-defined five-cause truth tables, duplicate/missing cause rows and technical-vs-ELV7 claim separation.
 
-## Dependency rules
+## Performance obligations
 
-Changing any of the following invalidates exact affected ACS nodes:
+P5 follows [flutter-performance-contract.md](flutter-performance-contract.md):
 
-```text
-door role set
-controller resource set
-lock state/load profile evidence
-selected operating case
-safetyMode
-releaseTruthTable row/membership
-canonical control/feed/release path
-exact consumed ELV4 evaluation/pointer generation
-policy edition/hash/applicability
-```
-
-Unrelated doors/controllers must remain unaffected unless they share a physical source/bank/policy dependency that actually changed.
+- ACS-01 requirement tree/role indexing is O(A+R), not combinatorial alternative search;
+- ACS-02 resource assignment is O(R+A) keyed by canonical resource ID;
+- ACS-03 uses a bounded code-owned transient event envelope, never powerset enumeration;
+- ACS-06 scopes graph reachability to the door-local graph and runs five O(V+E) cause checks;
+- medium/large batches execute outside the native Flutter UI isolate;
+- rapid door/profile edits supersede/coalesce stale calculations;
+- one door update rebuilds only affected process cards/rows.
 
 ## Exit
 
-P5 runtime acceptance requires its numbered assertions at the same accepted source SHA and its prerequisite gates. This document is a design contract, not proof of source implementation.
+P5 runtime acceptance requires P5-T01…T08, both primary POS/NEG entries for ACS-01…06, all ACS boundary/adversarial/cross-discipline dossier vectors and required L0–L6/performance evidence at the same tested source SHA and authority fingerprint.
 
-P5 cannot close if ACS-06 reports a generic topology PASS while any required release cause remains unproven, or if a technical release result is labelled verified legal/normative compliance.
+P5 cannot close if ACS-06 reports generic PASS with an unproven required release cause, if control is mistaken for power feed, if shared-source membership is reduced by discipline filtering, or if technical release evidence is labelled verified legal/normative compliance.
