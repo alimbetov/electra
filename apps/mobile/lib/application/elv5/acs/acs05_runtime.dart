@@ -308,16 +308,32 @@ final class Acs05PersistedInputResolver
         BigInt.from(1000000),
       );
       var resolvedSegmentW = PowerRational.zero;
+      final segmentLoads = <String>{};
       for (final raw in rawContributions) {
         final contribution = _map(raw, 'PWR01 contribution');
         final originId = _text(contribution, 'originId');
         final watt = _resolvedContributionW(contribution);
         resolvedSegmentW += watt;
+        segmentLoads.add(originId);
         actualGlobalLoads.add(originId);
         if (!contract.acsProtectedLoadIds.contains(originId)) continue;
         final energyWh =
             watt * durationSeconds / PowerRational.integer(3600);
         acsEnergyByLoad[originId] = acsEnergyByLoad[originId]! + energyWh;
+      }
+      if (!_sameSet(segmentLoads, contract.globalProtectedLoadIds)) {
+        _blocked(
+          request,
+          'ACS05_SEGMENT_PROTECTED_LOAD_SET_MISMATCH',
+          contractSnapshot.contentHash,
+          contractSnapshot.contentHash,
+          dependencies,
+          <String, Object?>{
+            'segmentId': segment.segmentId,
+            'expectedLoadIds': contract.globalProtectedLoadIds.toList()..sort(),
+            'actualLoadIds': segmentLoads.toList()..sort(),
+          },
+        );
       }
       final knownW = _powerRational(pwr01.output['knownW'], 'knownW');
       if (resolvedSegmentW != knownW) {
