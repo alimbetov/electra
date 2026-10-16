@@ -38,6 +38,12 @@ jobs:
         working-directory: .
         run: bash scripts/ci/check-elv3-p7-p9-foundation.sh
 
+      - name: Verify ELV5 design contract
+        working-directory: .
+        run: |
+          python3 scripts/ci/check-elv5-specification.py
+          python3 scripts/ci/check-elv5-command-examples.py
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
