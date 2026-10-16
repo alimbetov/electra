@@ -17,13 +17,14 @@ The branch name is retained as requested. ELV5 is **discipline-specific engineer
 6. [Typed process API](elv5-implementation/typed-process-api.md): process-specific Dart input/output boundaries for all 27 calculations.
 7. [Drift schema 24 persistence contract](elv5-implementation/persistence-schema-contract.md): concrete ELV5 roots/members, PK/FK/index rules, immutable evaluations/pointers, dependency index, migration/restart and shared ledger/history reuse.
 8. [Code-level hardening amendments](elv5-implementation/code-level-hardening-amendments.md): normative reconciliation of hardened wire/storage semantics. **Where it conflicts with the older base runtime/persistence wording, this amendment governs.**
-9. [Executable qualification contract](elv5-implementation/qualification-contract.md): L0–L6 test architecture, 54 primary process verticals, adversarial commands, failure/race/migration/freeze and false-PASS sentinels.
-10. [Machine-readable 16-command registry](elv5-implementation/command-registry.json), the exact schema/operation/payload-key authority.
-11. [Canonical command examples](elv5-implementation/command-examples.json), one valid payload and one deterministic rejection mutation for every registered ELV5 operation.
-12. [27-process contract registry](elv5-implementation/process-contracts.md) and [machine-readable process registry](elv5-implementation/process-registry.json).
-13. [Baseline and boundary audit](../audit/elv5-baseline-alignment-audit.md).
-14. [Initial technical audit](../audit/elv5-technical-audit.md) and [second-pass engineering/architecture hardening audit](../audit/elv5-engineering-architecture-hardening-audit.md).
-15. [Implemented baseline and extension contract](elv5-implementation/implemented-baseline.md) and [evidence manifest](elv5-implementation/baseline.json).
+9. [Production source blueprint](elv5-implementation/production-source-blueprint.md): recommended Dart/Drift source tree, class/interface responsibilities, 16-handler mapping, capture/publish services, repository/UoW boundaries, UI projection and implementation slices.
+10. [Executable qualification contract](elv5-implementation/qualification-contract.md): L0–L6 test architecture, 54 primary process verticals, adversarial commands, failure/race/migration/freeze and false-PASS sentinels.
+11. [Machine-readable 16-command registry](elv5-implementation/command-registry.json), the exact schema/operation/payload-key authority.
+12. [Canonical command examples](elv5-implementation/command-examples.json), one valid payload and one deterministic rejection mutation for every registered ELV5 operation.
+13. [27-process contract registry](elv5-implementation/process-contracts.md) and [machine-readable process registry](elv5-implementation/process-registry.json).
+14. [Baseline and boundary audit](../audit/elv5-baseline-alignment-audit.md).
+15. [Initial technical audit](../audit/elv5-technical-audit.md) and [second-pass engineering/architecture hardening audit](../audit/elv5-engineering-architecture-hardening-audit.md).
+16. [Implemented baseline and extension contract](elv5-implementation/implemented-baseline.md) and [evidence manifest](elv5-implementation/baseline.json).
 
 ## Authority and acceptance
 
@@ -40,6 +41,7 @@ Within ELV5:
 - canonical examples fix design-time wire fixtures;
 - schema 24 contract fixes persistence ownership/identity/migration semantics;
 - hardening amendments resolve later discovered contradictions and supersede conflicting older detailed wording;
+- production source blueprint fixes the intended code decomposition and dependency direction;
 - package contracts fix implementation responsibilities;
 - qualification contract fixes what executed evidence is sufficient for runtime acceptance.
 
@@ -66,11 +68,12 @@ The following design artifacts are now frozen enough to start P1/P2 implementati
 - exactly 16 public command operations with hardened exact payload-key sets and canonical examples;
 - additive Drift target **schema 24** with ownership/PK/FK/index/migration rules;
 - replay/history/freeze/create-next integration contract;
+- production source/class decomposition with strict dependency direction and 16-handler mapping;
 - L0–L6 qualification architecture and exact 54-entry primary process-oracle requirement.
 
 Remaining implementation-entry/runtime artifacts are deliberately executable rather than prose:
 
-- implement production Dart definitions/codecs/resolvers/repositories and schema-24 migration;
+- implement production Dart definitions/codecs/resolvers/repositories and schema-24 migration following the source blueprint;
 - publish the machine-readable `qualification-manifest.json` with exact fixtures/commands/statuses for all 54 primary POS/NEG entries;
 - execute schema/migration/restart, 16-codec adversarial, failure-injection, race/freeze and cross-discipline vertical tests;
 - perform post-schema ownership reconciliation proving no ELV5 table duplicates canonical ELV3/ELV4 cable/port/component/source/battery ownership;
