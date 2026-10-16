@@ -2,7 +2,9 @@ import '../../../application/elv5/calculation/elv5_calculation_runtime.dart';
 import '../../../application/elv5/calculation/elv5_calculation_service.dart';
 import '../../../application/elv5/calculation/elv5_initial_vertical_registry.dart';
 import '../../database/app_database.dart';
+import 'drift_acs03_electrical_contract_store.dart';
 import 'drift_elv3_realized_link_fact_source.dart';
+import 'drift_elv4_current_evidence_source.dart';
 import 'drift_elv4_operating_fact_source.dart';
 import 'drift_elv5_calculation_fact_stores.dart';
 import 'drift_elv5_calculation_write_unit_of_work.dart';
@@ -44,6 +46,11 @@ final class DriftElv5CalculationRuntime {
       database,
       originDeviceId: originDeviceId,
     );
+    final acs03Contracts = DriftAcs03ElectricalContractStore(
+      database,
+      originDeviceId: originDeviceId,
+      nowUtc: nowUtc,
+    );
     final registry = buildElv5InitialVerticalRegistry(
       cctvStore: cctvFacts,
       lanStore: lanFacts,
@@ -51,6 +58,8 @@ final class DriftElv5CalculationRuntime {
       fireStore: fireFacts,
       elv3LinkFacts: DriftElv3RealizedLinkFactSource(database),
       opticalSectionEvidence: DriftLan05OpticalSectionEvidenceSource(database),
+      acs03Contracts: acs03Contracts,
+      currentPowerEvidence: DriftElv4CurrentEvidenceSource(database),
       powerOperatingFacts: DriftElv4OperatingFactSource(database),
       captureRevisions: DriftElv5CaptureRevisionSource(database),
       nowUtc: nowUtc,
