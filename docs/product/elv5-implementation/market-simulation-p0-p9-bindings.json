@@ -1,0 +1,97 @@
+{
+  "schema": "electra.elv5-market-simulation-p0-p9-bindings.v1",
+  "status": "DESIGN_HARDENED_RUNTIME_NOT_STARTED",
+  "scenarioMatrixTarget": 450,
+  "packages": [
+    {
+      "package":"P0",
+      "purpose":"Prove every market-shaped fact has one canonical ELV3/ELV4/ELV5 owner and that ELV6/7/8 claim boundaries remain explicit.",
+      "baseRequirementIds":["ELV5-P0-001","ELV5-P0-002","ELV5-P0-003","ELV5-P0-004","ELV5-P0-005","ELV5-P0-006","ELV5-P0-007","ELV5-P0-008"],
+      "marketRequirementIds":["ELV5-MKT-001","ELV5-MKT-005","ELV5-MKT-007","ELV5-MKT-010","ELV5-MKT-012"],
+      "checks":["canonical equipment/profile/path/source ownership","accepted ELV4 evidence reuse","market facts never replace physical owner facts","ELV6/ELV7/ELV8 claim boundaries","exact-head market catalog provenance"],
+      "errorClasses":["DUPLICATE_PHYSICAL_RESOURCE","TECHNICAL_MATCH_EQUALS_COMPLIANCE","RACK_CAPACITY_EQUALS_LAYOUT"],
+      "evidence":"Market matrix sourceRefs/basis/claimScope plus P0 ownership reconciliation."
+    },
+    {
+      "package":"P1",
+      "purpose":"Stress the typed engineering language required to represent current-market values without unit, evidence or applicability ambiguity.",
+      "baseRequirementIds":["ELV5-P1-001","ELV5-P1-002","ELV5-P1-003","ELV5-P1-004","ELV5-P1-005","ELV5-P1-006","ELV5-P1-007","ELV5-P1-008"],
+      "marketRequirementIds":["ELV5-MKT-003","ELV5-MKT-006","ELV5-MKT-007","ELV5-MKT-008"],
+      "checks":["dimension-safe quantities","Known/Missing/Unsupported/Unresolved","vendorFact vs marketEnvelope vs syntheticFixture","operating/transient cases","signed margins/governing/limiting semantics"],
+      "errorClasses":["UNIT_DIMENSION_COLLAPSE","TYPICAL_AS_GUARANTEED","DOUBLE_RESERVE_OR_DERATING"],
+      "evidence":"P1 primitive tests plus generated scenario evidence basis and referenceComputation fields."
+    },
+    {
+      "package":"P2",
+      "purpose":"Prove all market-shaped scenario state remains representable through schema 24 and the fixed 16-command public boundary without UI-only mutation shortcuts.",
+      "baseRequirementIds":["ELV5-P2-001","ELV5-P2-002","ELV5-P2-003","ELV5-P2-004","ELV5-P2-005","ELV5-P2-006","ELV5-P2-007","ELV5-P2-008"],
+      "marketRequirementIds":["ELV5-MKT-002","ELV5-MKT-011","ELV5-MKT-012"],
+      "checks":["schema-24 representability","atomic replacement","replay/CAS","immutable evaluations","bulk capture/publish","historical reconstruction"],
+      "errorClasses":["STALE_EVIDENCE_PUBLISH","N_PLUS_ONE_CAPTURE","DUPLICATE_PHYSICAL_RESOURCE"],
+      "evidence":"File-SQLite L2-L4 qualification plus scenario IDs/fingerprint at exact source SHA."
+    },
+    {
+      "package":"P3",
+      "purpose":"Stress CCTV geometry, directed flow, storage/time integration, global PoE context, recorder capacity and realized path behavior using current camera/network classes.",
+      "baseRequirementIds":["ELV5-P3-001","ELV5-P3-002","ELV5-P3-003","ELV5-P3-004","ELV5-P3-005","ELV5-P3-006","ELV5-P3-007","ELV5-P3-008"],
+      "marketRequirementIds":["ELV5-MKT-003","ELV5-MKT-004","ELV5-MKT-006","ELV5-MKT-008","ELV5-MKT-009"],
+      "checks":["multiple stream copy accounting","multicast evidence","expected/peak/wire separation","DST/interval union","reserve/ceil/redundancy once","recorder independent dimensions","shared PSE totals"],
+      "errorClasses":["BITRATE_INFERENCE_FROM_LABEL","MULTICAST_FALSE_DEDUP","STORAGE_INTERVAL_DOUBLE_COUNT","DOUBLE_RESERVE_OR_DERATING","DISCIPLINE_FILTERED_SHARED_TOTAL"],
+      "evidence":"CCTV dossier vectors plus market matrix CCTV scenarios and remediation direction."
+    },
+    {
+      "package":"P4",
+      "purpose":"Stress installed path accounting, physical port capacity, shared PoE, weakest-section copper compatibility, bidirectional optical budgets and rack demand boundaries.",
+      "baseRequirementIds":["ELV5-P4-001","ELV5-P4-002","ELV5-P4-003","ELV5-P4-004","ELV5-P4-005","ELV5-P4-006","ELV5-P4-007","ELV5-P4-008"],
+      "marketRequirementIds":["ELV5-MKT-003","ELV5-MKT-004","ELV5-MKT-006","ELV5-MKT-008","ELV5-MKT-009"],
+      "checks":["installed length counted once","8/24/48-port resource classes","spare ceil","shared PSE closure","weakest path section","four-case fiber sensitivity/overload","rack demand not fit"],
+      "errorClasses":["PORT_OR_ADDRESS_ALIAS","OPTICAL_OVERLOAD_IGNORED","OPTICAL_BUDGET_EQUALS_REACH","RACK_CAPACITY_EQUALS_LAYOUT","DISCIPLINE_FILTERED_SHARED_TOTAL"],
+      "evidence":"LAN dossier vectors plus market matrix LAN scenarios and current OS2/switch anchors."
+    },
+    {
+      "package":"P5",
+      "purpose":"Stress door roles/resources, low-to-high current lock classes, shared-trunk voltage, source sizing, autonomy and five-cause release behavior.",
+      "baseRequirementIds":["ELV5-P5-001","ELV5-P5-002","ELV5-P5-003","ELV5-P5-004","ELV5-P5-005","ELV5-P5-006","ELV5-P5-007","ELV5-P5-008"],
+      "marketRequirementIds":["ELV5-MKT-003","ELV5-MKT-004","ELV5-MKT-006","ELV5-MKT-008","ELV5-MKT-009"],
+      "checks":["88/370/560mA-class lock diversity","control vs conductive feed","startup governing case","corrected 23.51V oracle","shared source/bank","energy vs current","five release causes"],
+      "errorClasses":["CONTROL_PATH_EQUALS_POWER_FEED","STARTUP_OR_INRUSH_IGNORED","DOUBLE_RESERVE_OR_DERATING","DISCIPLINE_FILTERED_SHARED_TOTAL","BATTERY_AH_SHORTCUT","FAIL_SAFE_RELEASE_LOGIC_INCOMPLETE"],
+      "evidence":"ACS dossier vectors, oracle errata and market matrix ACS scenarios."
+    },
+    {
+      "package":"P6",
+      "purpose":"Stress fire addresses, standby/alarm state currents, supported electrical models, shared source, backup sequence, notification circuits, signal topology and technical-policy scope.",
+      "baseRequirementIds":["ELV5-P6-001","ELV5-P6-002","ELV5-P6-003","ELV5-P6-004","ELV5-P6-005","ELV5-P6-006","ELV5-P6-007","ELV5-P6-008"],
+      "marketRequirementIds":["ELV5-MKT-003","ELV5-MKT-004","ELV5-MKT-006","ELV5-MKT-008","ELV5-MKT-009","ELV5-MKT-010"],
+      "checks":["50/198/954 point classes","multi-address claims","standby/alarm current separation","supported electrical model","source reserve once","ordered backup sequence","notification startup/terminal voltage","signal vs power topology","policy vs compliance"],
+      "errorClasses":["FIRE_ADDRESS_OVERLAP","STARTUP_OR_INRUSH_IGNORED","BATTERY_AH_SHORTCUT","SIGNAL_TOPOLOGY_EQUALS_POWER_MODEL","TECHNICAL_MATCH_EQUALS_COMPLIANCE"],
+      "evidence":"Fire dossier vectors plus market matrix Fire scenarios and current panel/tool anchors."
+    },
+    {
+      "package":"P7",
+      "purpose":"Prove realistic edits invalidate/recompute only the exact affected closure and that the workspace explains the resulting engineering impact without stale publication or global rebuilds.",
+      "baseRequirementIds":["ELV5-P7-001","ELV5-P7-002","ELV5-P7-003","ELV5-P7-004","ELV5-P7-005","ELV5-P7-006","ELV5-P7-007","ELV5-P7-008"],
+      "marketRequirementIds":["ELV5-MKT-005","ELV5-MKT-008","ELV5-MKT-009","ELV5-MKT-011"],
+      "checks":["selector/MISSING invalidation","affected-node DAG","shared-source fan-out","cancellation/coalescing","stale publish rejection","structured remediation","targeted UI projection"],
+      "errorClasses":["STALE_EVIDENCE_PUBLISH","N_PLUS_ONE_CAPTURE","UI_GLOBAL_REBUILD","DISCIPLINE_FILTERED_SHARED_TOTAL"],
+      "evidence":"Generated case error class/remediation fields plus P7 affected/unaffected instrumentation."
+    },
+    {
+      "package":"P8",
+      "purpose":"Execute market-shaped combination coverage as a supplemental qualification layer without replacing the 54 primary or 135 dossier vectors.",
+      "baseRequirementIds":["ELV5-P8-001","ELV5-P8-002","ELV5-P8-003","ELV5-P8-004","ELV5-P8-005","ELV5-P8-006","ELV5-P8-007","ELV5-P8-008"],
+      "marketRequirementIds":["ELV5-MKT-002","ELV5-MKT-003","ELV5-MKT-004","ELV5-MKT-005","ELV5-MKT-006","ELV5-MKT-008","ELV5-MKT-011","ELV5-MKT-012"],
+      "checks":["exactly 450 generated cases","27/27 process coverage","5/5 vector classes per process","all declared stress axes exercised","P0-P9 aggregate coverage",">=18 error classes","exact-head artifact","runtime promotion only after executable implementation"],
+      "errorClasses":["ALL_TRACKED_MARKET_ERROR_CLASSES"],
+      "evidence":"CI elv5-market-simulation-${github.sha} plus future runtime mapping from caseId to executable qualification IDs."
+    },
+    {
+      "package":"P9",
+      "purpose":"Reconcile the simulation source, generated artifact and future runtime evidence at one exact source SHA/authority fingerprint while preserving downstream claim boundaries.",
+      "baseRequirementIds":["ELV5-P9-001","ELV5-P9-002","ELV5-P9-003","ELV5-P9-004","ELV5-P9-005","ELV5-P9-006","ELV5-P9-007","ELV5-P9-008"],
+      "marketRequirementIds":["ELV5-MKT-001","ELV5-MKT-002","ELV5-MKT-005","ELV5-MKT-007","ELV5-MKT-010","ELV5-MKT-011","ELV5-MKT-012"],
+      "checks":["catalog/requirements/matrix fingerprints","source SHA","authority fingerprint compatibility","no vendor/synthetic evidence conflation","no design-simulation-as-runtime acceptance","ELV6/7/8 handoff"],
+      "errorClasses":["TECHNICAL_MATCH_EQUALS_COMPLIANCE","RACK_CAPACITY_EQUALS_LAYOUT","OPTICAL_BUDGET_EQUALS_REACH"],
+      "evidence":"P9 closure ledger records design simulation, runtime qualification and performance qualification as separate events."
+    }
+  ]
+}
