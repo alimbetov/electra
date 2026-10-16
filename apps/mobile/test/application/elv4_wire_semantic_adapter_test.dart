@@ -35,82 +35,92 @@ void main() {
     expect(
       () => Elv4WireSemanticAdapter<int>(
         codecs: const [],
-        resolveImpact: (_) async => Elv4ResolvedWireImpact(
-          verifiedRows: const {'aggregate': 3},
-          changedDependencyRefs: const ['dep'],
-          reviewedImpactFingerprint: fingerprint,
-        ),
+        resolveImpact:
+            (_) async => Elv4ResolvedWireImpact(
+              verifiedRows: const {'aggregate': 3},
+              changedDependencyRefs: const ['dep'],
+              reviewedImpactFingerprint: fingerprint,
+            ),
       ),
       throwsArgumentError,
     );
   });
 
-  test('aggregate payload reaches handler whole and impact is server-resolved', () async {
-    late List<Map<String, Object?>> handledMembers;
-    late Elv4ResolvedWireImpact handledImpact;
-    final adapter = Elv4WireSemanticAdapter<int>(
-      codecs: _completeCodecs(
-        loadHandler: (envelope, payload, impact) async {
-          handledMembers = payload.members;
-          handledImpact = impact;
-          return payload.members.length;
+  test(
+    'aggregate payload reaches handler whole and impact is server-resolved',
+    () async {
+      late List<Map<String, Object?>> handledMembers;
+      late Elv4ResolvedWireImpact handledImpact;
+      final adapter = Elv4WireSemanticAdapter<int>(
+        codecs: _completeCodecs(
+          loadHandler: (envelope, payload, impact) async {
+            handledMembers = payload.members;
+            handledImpact = impact;
+            return payload.members.length;
+          },
+        ),
+        resolveImpact: (envelope) async {
+          expect(envelope.payload.containsKey('changedDependencies'), isFalse);
+          return Elv4ResolvedWireImpact(
+            verifiedRows: const {'aggregate': 3},
+            changedDependencyRefs: const ['dep-new', 'dep-old'],
+            reviewedImpactFingerprint: fingerprint,
+          );
         },
-      ),
-      resolveImpact: (envelope) async {
-        expect(envelope.payload.containsKey('changedDependencies'), isFalse);
-        return Elv4ResolvedWireImpact(
-          verifiedRows: const {'aggregate': 3},
-          changedDependencyRefs: const ['dep-new', 'dep-old'],
-          reviewedImpactFingerprint: fingerprint,
-        );
-      },
-    );
+      );
 
-    expect(await adapter.dispatchMap(command()), 2);
-    expect(handledMembers.map((value) => value['id']), ['load-a', 'load-b']);
-    expect(handledImpact.changedDependencyRefs, ['dep-new', 'dep-old']);
-  });
+      expect(await adapter.dispatchMap(command()), 2);
+      expect(handledMembers.map((value) => value['id']), ['load-a', 'load-b']);
+      expect(handledImpact.changedDependencyRefs, ['dep-new', 'dep-old']);
+    },
+  );
 
-  test('stale review and expected-row drift reject before semantic handler', () async {
-    var handled = false;
-    final codecs = _completeCodecs(
-      loadHandler: (envelope, payload, impact) async {
-        handled = true;
-        return 1;
-      },
-    );
-    final stale = Elv4WireSemanticAdapter<int>(
-      codecs: codecs,
-      resolveImpact: (_) async => Elv4ResolvedWireImpact(
-        verifiedRows: const {'aggregate': 3},
-        changedDependencyRefs: const ['dep'],
-        reviewedImpactFingerprint:
-            'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
-      ),
-    );
-    await expectLater(stale.dispatchMap(command()), throwsStateError);
-    expect(handled, isFalse);
+  test(
+    'stale review and expected-row drift reject before semantic handler',
+    () async {
+      var handled = false;
+      final codecs = _completeCodecs(
+        loadHandler: (envelope, payload, impact) async {
+          handled = true;
+          return 1;
+        },
+      );
+      final stale = Elv4WireSemanticAdapter<int>(
+        codecs: codecs,
+        resolveImpact:
+            (_) async => Elv4ResolvedWireImpact(
+              verifiedRows: const {'aggregate': 3},
+              changedDependencyRefs: const ['dep'],
+              reviewedImpactFingerprint:
+                  'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+            ),
+      );
+      await expectLater(stale.dispatchMap(command()), throwsStateError);
+      expect(handled, isFalse);
 
-    final rowDrift = Elv4WireSemanticAdapter<int>(
-      codecs: codecs,
-      resolveImpact: (_) async => Elv4ResolvedWireImpact(
-        verifiedRows: const {'aggregate': 4},
-        changedDependencyRefs: const ['dep'],
-        reviewedImpactFingerprint: fingerprint,
-      ),
-    );
-    await expectLater(rowDrift.dispatchMap(command()), throwsStateError);
-    expect(handled, isFalse);
-  });
+      final rowDrift = Elv4WireSemanticAdapter<int>(
+        codecs: codecs,
+        resolveImpact:
+            (_) async => Elv4ResolvedWireImpact(
+              verifiedRows: const {'aggregate': 4},
+              changedDependencyRefs: const ['dep'],
+              reviewedImpactFingerprint: fingerprint,
+            ),
+      );
+      await expectLater(rowDrift.dispatchMap(command()), throwsStateError);
+      expect(handled, isFalse);
+    },
+  );
 
   test('aggregate payload shape and missing review fail closed', () async {
     final adapter = Elv4WireSemanticAdapter<int>(
       codecs: _completeCodecs(),
-      resolveImpact: (_) async => Elv4ResolvedWireImpact(
-        verifiedRows: const {'aggregate': 3},
-        changedDependencyRefs: const ['dep'],
-        reviewedImpactFingerprint: fingerprint,
-      ),
+      resolveImpact:
+          (_) async => Elv4ResolvedWireImpact(
+            verifiedRows: const {'aggregate': 3},
+            changedDependencyRefs: const ['dep'],
+            reviewedImpactFingerprint: fingerprint,
+          ),
     );
     await expectLater(
       adapter.dispatchMap(
@@ -125,15 +135,14 @@ void main() {
   });
 }
 
-typedef _LoadHandler = Future<int> Function(
-  Elv4WireCommandEnvelope envelope,
-  Elv4WireAggregatePayload payload,
-  Elv4ResolvedWireImpact impact,
-);
+typedef _LoadHandler =
+    Future<int> Function(
+      Elv4WireCommandEnvelope envelope,
+      Elv4WireAggregatePayload payload,
+      Elv4ResolvedWireImpact impact,
+    );
 
-List<Elv4WireSemanticCodec<int>> _completeCodecs({
-  _LoadHandler? loadHandler,
-}) {
+List<Elv4WireSemanticCodec<int>> _completeCodecs({_LoadHandler? loadHandler}) {
   Elv4WireSemanticCodec<int> generic(
     String schema,
     String operation,
@@ -157,27 +166,20 @@ List<Elv4WireSemanticCodec<int>> _completeCodecs({
             operation: 'SET_POWER_LOAD_PROFILE',
             payloadSchemaVersion: 1,
           ),
-          decodePayload: (payload) => decodeElv4AggregatePayload(
-            payload,
-            ownerField: 'componentId',
-            memberField: 'loads',
-            exactKeys: const {'componentId', 'loads'},
-          ),
+          decodePayload:
+              (payload) => decodeElv4AggregatePayload(
+                payload,
+                ownerField: 'componentId',
+                memberField: 'loads',
+                exactKeys: const {'componentId', 'loads'},
+              ),
           handler:
               loadHandler ??
               (envelope, payload, impact) async => payload.members.length,
         )
       else
-        generic(
-          Elv4WireCommandEnvelope.powerCommandSchema,
-          operation,
-          1,
-        ),
+        generic(Elv4WireCommandEnvelope.powerCommandSchema, operation, 1),
     for (final operation in Elv4WireCommandEnvelope.revisionV2Operations)
-      generic(
-        Elv4WireCommandEnvelope.revisionCommandSchema,
-        operation,
-        2,
-      ),
+      generic(Elv4WireCommandEnvelope.revisionCommandSchema, operation, 2),
   ];
 }
