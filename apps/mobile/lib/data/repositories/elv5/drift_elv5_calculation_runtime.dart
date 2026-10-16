@@ -3,6 +3,7 @@ import '../../../application/elv5/calculation/elv5_calculation_service.dart';
 import '../../../application/elv5/calculation/elv5_initial_vertical_registry.dart';
 import '../../database/app_database.dart';
 import 'drift_acs03_electrical_contract_store.dart';
+import 'drift_acs04_source_requirement_contract_store.dart';
 import 'drift_elv3_realized_link_fact_source.dart';
 import 'drift_elv4_current_evidence_source.dart';
 import 'drift_elv4_operating_fact_source.dart';
@@ -11,11 +12,9 @@ import 'drift_elv5_calculation_write_unit_of_work.dart';
 import 'drift_elv5_capture_revision_source.dart';
 import 'drift_lan05_optical_section_evidence_source.dart';
 
-/// Production composition root for the first ELV5 persisted-fact vertical.
-///
-/// This is intentionally data-layer code: application runtime depends only on
-/// interfaces while Drift construction stays at the edge. All six process codes
-/// in the initial vertical are registered here.
+/// Production composition root for the persisted ELV5 calculation vertical.
+/// Application runtime depends on interfaces; Drift construction remains here
+/// at the data edge.
 final class DriftElv5CalculationRuntime {
   DriftElv5CalculationRuntime._({
     required this.registry,
@@ -51,6 +50,12 @@ final class DriftElv5CalculationRuntime {
       originDeviceId: originDeviceId,
       nowUtc: nowUtc,
     );
+    final acs04Contracts = DriftAcs04SourceRequirementContractStore(
+      database,
+      originDeviceId: originDeviceId,
+      nowUtc: nowUtc,
+    );
+    final currentPowerEvidence = DriftElv4CurrentEvidenceSource(database);
     final registry = buildElv5InitialVerticalRegistry(
       cctvStore: cctvFacts,
       lanStore: lanFacts,
@@ -59,7 +64,8 @@ final class DriftElv5CalculationRuntime {
       elv3LinkFacts: DriftElv3RealizedLinkFactSource(database),
       opticalSectionEvidence: DriftLan05OpticalSectionEvidenceSource(database),
       acs03Contracts: acs03Contracts,
-      currentPowerEvidence: DriftElv4CurrentEvidenceSource(database),
+      acs04Contracts: acs04Contracts,
+      currentPowerEvidence: currentPowerEvidence,
       powerOperatingFacts: DriftElv4OperatingFactSource(database),
       captureRevisions: DriftElv5CaptureRevisionSource(database),
       nowUtc: nowUtc,
