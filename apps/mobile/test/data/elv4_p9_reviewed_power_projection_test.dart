@@ -2,9 +2,11 @@ import 'dart:convert';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:electra_mobile/application/power_mutation_command.dart';
 import 'package:electra_mobile/data/database/app_database.dart';
 import 'package:electra_mobile/data/repositories/drift_power_canonical_projection_write_store.dart';
 import 'package:electra_mobile/data/repositories/drift_power_publication_runtime.dart';
+import 'package:electra_mobile/data/repositories/drift_reviewed_power_port_binding_coordinator.dart';
 import 'package:engineering_core/engineering_core.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -13,7 +15,7 @@ import '../support/elv4_power_qualification_topology.dart';
 
 void main() {
   test(
-    'RM03 reviewed connected projection invalidates exact dependent closure',
+    'RM03 reviewed bind projects and invalidates exact closure in one UoW',
     () async {
       final db = AppDatabase(NativeDatabase.memory());
       addTearDown(db.close);
@@ -110,13 +112,30 @@ void main() {
       expect(review.affectedConnectionIds, ['source-consumer']);
       expect(review.reviewedImpactFingerprint, hasLength(64));
 
-      final receipt = await store.applyReviewedProjection(
-        review: review,
-        candidate: candidate,
+      final coordinator = DriftReviewedPowerPortBindingCoordinator(
+        db,
+        originDeviceId: 'rm03-test',
+        now: () => builder.instant,
+      );
+      final command = BindPowerPortCommand(
+        operationId: 'reviewed-bind-source',
+        projectId: builder.projectId,
+        designRevisionId: builder.revisionId,
+        expectedRevision: 1,
+        // Deliberately wrong caller input. The coordinator must ignore it and
+        // replace it with the exact server-reviewed old/new closure.
+        changedDependencies: [unrelatedFact],
+        bindingId: 'binding-source-out',
         binding: binding,
       );
-      expect(receipt.previousRevisionToken, 1);
-      expect(receipt.currentRevisionToken, 2);
+      final receipt = await coordinator.execute(
+        command: command,
+        candidate: candidate,
+        review: review,
+      );
+      expect(receipt.previousRevision, 1);
+      expect(receipt.currentRevision, 2);
+      expect(receipt.replayed, isFalse);
       expect(
         receipt.invalidatedNodeKeys.map((value) => value.encode()),
         contains(affectedNode.encode()),
@@ -144,6 +163,30 @@ void main() {
         ).voltage!.minimumV,
         10,
       );
+      expect(
+        await db
+            .customSelect(
+              'SELECT COUNT(*) AS c FROM power_port_bindings '
+              'WHERE design_revision_id = ? AND id = ? AND deleted_at IS NULL',
+              variables: [
+                Variable.withString(builder.revisionId),
+                Variable.withString('binding-source-out'),
+              ],
+            )
+            .map((row) => row.read<int>('c'))
+            .getSingle(),
+        1,
+      );
+
+      final replay = await coordinator.execute(
+        command: command,
+        candidate: candidate,
+        review: review,
+      );
+      expect(replay.replayed, isTrue);
+      expect(replay.currentRevision, 2);
+      final revision = await (db.select(db.projectDesignRevisions)).getSingle();
+      expect(revision.revision, 2);
       expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
     },
   );
