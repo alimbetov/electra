@@ -32,6 +32,7 @@ def main():
         BASE / 'persistence-schema-contract.md',
         BASE / 'qualification-contract.md',
         BASE / 'code-level-hardening-amendments.md',
+        BASE / 'production-source-blueprint.md',
         ROOT / 'docs/audit/elv5-engineering-architecture-hardening-audit.md',
         AUDIT,
     ]
@@ -158,6 +159,28 @@ def main():
     )
     assert 'exactly 16 operations' in amendments
 
+    blueprint = require_text(
+        BASE / 'production-source-blueprint.md',
+        [
+            'engineering_core -> Drift/SQLite',
+            'Elv5CanonicalJsonV1',
+            'Elv5WireCommandDispatcher',
+            'Elv5CalculationService',
+            'Elv5PublicationService',
+            'Elv5InvalidationService',
+            'Elv5FreezeExtension',
+            'Elv5CreateNextRevisionExtension',
+            'Elv5WorkspaceQueryService',
+            'Definition of Done for one process',
+            'Definition of Done for one replacement command',
+        ],
+    )
+    handler_rows = re.findall(r'^\| ([A-Z0-9_]+) \| `[^`]+` \|$', blueprint, re.M)
+    assert len(handler_rows) == len(set(handler_rows)) == 16
+    assert set(handler_rows) == {
+        row['operation'] for row in load(BASE / 'command-registry.json')['commands']
+    }
+
     registry = load(BASE / 'command-registry.json')
     examples = load(BASE / 'command-examples.json')
     commands = {row['operation']: row for row in registry['commands']}
@@ -203,8 +226,8 @@ def main():
     print(
         'PASS: ELV5 engineering hardening guard — '
         '14 findings SPEC_RESOLVED, 27 typed process APIs, schema 24, '
-        '16 hardened command payloads and L0-L6 qualification contract; '
-        'no runtime claim'
+        '16 hardened command payloads/handlers, production source blueprint '
+        'and L0-L6 qualification contract; no runtime claim'
     )
 
 
