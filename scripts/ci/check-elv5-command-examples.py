@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Validate ELV5 canonical design-time wire examples against command registry."""
+import copy
 import json
 from pathlib import Path
 
@@ -9,6 +10,24 @@ BASE = ROOT / 'docs/product/elv5-implementation'
 
 def load(name):
     return json.loads((BASE / name).read_text())
+
+
+def validate_payload_fields(operation, payload, commands):
+    """Design key-set probe only; not the nested production semantic codec."""
+    if operation not in commands:
+        raise ValueError('ELV5_UNSUPPORTED_OPERATION')
+    if type(payload) is not dict or set(payload) != set(commands[operation]['payloadKeys']):
+        raise ValueError('ELV5_PAYLOAD_FIELDS_MISMATCH')
+
+
+def require_rejection(operation, payload, commands, expected_code):
+    try:
+        validate_payload_fields(operation, payload, commands)
+    except ValueError as error:
+        if str(error) != expected_code:
+            raise AssertionError(('Wrong rejection code', operation, str(error))) from error
+        return
+    raise AssertionError(('Invalid payload accepted', operation))
 
 
 def main():
@@ -34,14 +53,30 @@ def main():
     assert len(rows) == len(by_operation) == len(commands) == 16
     assert set(by_operation) == set(commands)
 
+    negative_probes = 0
     for operation, command in commands.items():
         row = by_operation[operation]
         payload = row['validPayload']
-        assert set(payload) == set(command['payloadKeys']), ('Example payload mismatch', operation)
+        validate_payload_fields(operation, payload, commands)
         rejection = row['rejection']
         assert rejection['mutation'] == 'REMOVE_FIELD'
         assert rejection['field'] in command['payloadKeys']
         assert rejection['expectedCode'] == 'ELV5_PAYLOAD_FIELDS_MISMATCH'
+        # Execute the advertised mutation; reading its descriptor is not proof.
+        invalid = copy.deepcopy(payload)
+        del invalid[rejection['field']]
+        require_rejection(operation, invalid, commands, rejection['expectedCode'])
+        negative_probes += 1
+        for field in command['payloadKeys']:
+            invalid = copy.deepcopy(payload); del invalid[field]
+            require_rejection(operation, invalid, commands, 'ELV5_PAYLOAD_FIELDS_MISMATCH')
+            negative_probes += 1
+        invalid = {**payload, 'clientComputedImpact': []}
+        require_rejection(operation, invalid, commands, 'ELV5_PAYLOAD_FIELDS_MISMATCH')
+        require_rejection(operation, list(payload), commands, 'ELV5_PAYLOAD_FIELDS_MISMATCH')
+        negative_probes += 2
+    require_rejection('UNKNOWN_OPERATION', {}, commands, 'ELV5_UNSUPPORTED_OPERATION')
+    negative_probes += 1
 
     critical = {
         'REPLACE_CAMERA_STREAMS': 'streams',
@@ -54,7 +89,8 @@ def main():
     for operation, key in critical.items():
         assert key in by_operation[operation]['validPayload']
 
-    print('PASS: 16 canonical ELV5 command examples match exact registry payload keys and rejection cases')
+    print(f'PASS: 16 ELV5 example payload key sets and {negative_probes} executed negative key-set probes; '
+          'nested semantic codecs and runtime commands NOT EXECUTED')
 
 
 if __name__ == '__main__':

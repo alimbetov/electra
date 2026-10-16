@@ -585,3 +585,13 @@ AND P9 ledger points to the exact tested SHA
 ```
 
 This specification itself remains design evidence and does not imply those runtime results have occurred.
+
+## Design checker evidence boundary
+
+`check-elv5-command-examples.py` executes payload-key removal/unknown-field/
+non-object/unknown-operation probes, including every advertised rejection in
+`command-examples.json`. It must not count a rejection descriptor as an executed
+negative test. This checker verifies only closed top-level payload key sets.
+Nested field types, ownership, enum/value limits, canonical decode and actual
+error receipts still require the L2/L4 production Dart tests above. Its PASS
+cannot substitute for any of the 16 runtime codec/handler qualifications.
