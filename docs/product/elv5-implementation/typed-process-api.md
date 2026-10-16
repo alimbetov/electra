@@ -1,14 +1,16 @@
 # ELV5 — Typed process API for all 27 discipline calculations
 
-Status: DESIGN DRAFT / RUNTIME NOT STARTED  
+Status: DESIGN FROZEN / RUNTIME NOT STARTED  
 Branch: `feat/flutter-elv5-power-topology-design`  
-Authority: [27 process contracts](process-contracts.md), [process registry](process-registry.json), [engineering primitives](engineering-primitives-contract.md), [code-level runtime contract](code-level-runtime-contract.md).
+Authority: [implementation binding hardening](implementation-binding-hardening-v1.md), [27 process contracts](process-contracts.md), [process registry](process-registry.json), [engineering primitives](engineering-primitives-contract.md), [code-level runtime contract](code-level-runtime-contract.md).
 
-This document defines the minimum typed Dart boundary for every ELV5 process. It does not replace the formulas in `process-contracts.md`; it removes ambiguity about what a kernel receives and what it is allowed to return.
+This document defines the minimum typed Dart boundary for every ELV5 process. It does not replace the formulas in `process-contracts.md`; it removes ambiguity about what a pure kernel receives and what it is allowed to return.
 
-The exact source-file split may differ. The process code, input/output semantic fields, identity rules and claim boundaries are normative.
+Public process symbols, semantic input/output fields, identity rules, claim boundaries and layer ownership are normative. Exact filenames are tracked implementation coordinates rather than engineering semantics; a layout-only rename is permitted only with synchronized implementation-binding registry and authority-manifest update, while preserving the same module/layer ownership and public contracts.
 
 ## 1. Shared typed API
+
+`engineering_core` process definitions are pure. They never resolve repositories, Drift rows, UI state or platform services.
 
 ```dart
 abstract interface class Elv5TypedProcessDefinition<I, O> {
@@ -18,16 +20,26 @@ abstract interface class Elv5TypedProcessDefinition<I, O> {
   Set<Elv5ScopeKind> get legalScopes;
   Set<String> get requiredDimensionCodes;
 
-  Elv5InputResolution<I> resolveInput(
-    Elv5CapturedProjectContext context,
-    Elv5ProcessRequest request,
-  );
-
   O calculate(I input);
 
   Elv5EvaluationDraft evaluate(I input, O output);
 }
+```
 
+Repository-aware input assembly belongs to the application layer under `apps/mobile/lib/application/elv5/calculation/resolvers/`. Its schematic boundary is:
+
+```dart
+abstract interface class Elv5InputResolver<I> {
+  Future<Elv5InputResolution<I>> resolve(
+    Elv5CapturedProjectContext context,
+    Elv5ProcessRequest request,
+  );
+}
+```
+
+The resolver MUST bulk-load the declared dependency closure, resolve exact immutable editions/evidence, capture dependency markers and upstream evaluation identities, enforce resource limits, canonicalize order-invariant sets, preserve physical order where significant, and return an immutable sendable typed input before worker execution. `Elv5TypedProcessDefinition` MUST NOT delegate repository access back into `engineering_core`.
+
+```dart
 final class Elv5ProcessVersions {
   final String algorithmVersion;
   final String inputSchemaVersion;
@@ -973,7 +985,8 @@ CI rejects:
 - disagreement in legal scopes or required dimension codes;
 - a typed input containing free-form executable expression/formula fields;
 - an output field that affects assessment but is omitted from deterministic output hashing;
-- an engineering value whose basis/applicability is discarded by the resolver.
+- an engineering value whose basis/applicability is discarded by the application-layer resolver;
+- any repository, Drift, UI or platform access from `Elv5TypedProcessDefinition.calculate/evaluate`.
 
 ## 32. Implementation package recommendation
 
@@ -995,7 +1008,7 @@ packages/engineering_core/lib/src/elv5/processes/
   registry.dart
 ```
 
-Application-layer resolvers/adapters live outside the pure kernel package. Drift rows and JSON maps must be converted to typed inputs before entering `calculate()`.
+Application-layer resolvers/adapters live outside the pure kernel package. Drift rows and JSON maps must be converted to typed inputs before entering `calculate()`. These paths are the default tracked production layout; a layout-only rename requires synchronized registry/manifest updates but does not change engineering semantics when public symbols and dependency direction remain unchanged.
 
 ## 33. Acceptance rule
 
@@ -1003,7 +1016,7 @@ A process is not implemented merely because its formula unit test passes. Runtim
 
 1. strict public-command setup of its ELV5-owned inputs;
 2. capture from real file SQLite plus canonical ELV3/ELV4 evidence;
-3. typed resolution into the input type in this document;
+3. application-layer typed resolution into the input type in this document;
 4. pure deterministic calculation;
 5. complete dimension/status aggregation;
 6. guarded publication to immutable evaluation + current pointer;
