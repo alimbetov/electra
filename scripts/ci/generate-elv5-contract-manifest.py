@@ -22,6 +22,7 @@ AUTHORITY_PATHS = [
     "docs/product/elv5-discipline-calculations-design-specification.md",
     "docs/product/elv5-p0-p9-delivery-plan.md",
     "docs/product/elv5-implementation/README.md",
+    "docs/product/elv5-implementation/process-contracts.md",
     "docs/product/elv5-implementation/process-registry.json",
     "docs/product/elv5-implementation/algorithm-registry.json",
     "docs/product/elv5-implementation/command-registry.json",
@@ -30,10 +31,21 @@ AUTHORITY_PATHS = [
     "docs/product/elv5-implementation/typed-process-api.md",
     "docs/product/elv5-implementation/calculation-engine-contract.md",
     "docs/product/elv5-implementation/persistence-schema-contract.md",
+    "docs/product/elv5-implementation/code-level-runtime-contract.md",
     "docs/product/elv5-implementation/code-level-hardening-amendments.md",
     "docs/product/elv5-implementation/code-level-hardening-v2.md",
     "docs/product/elv5-implementation/production-source-blueprint.md",
     "docs/product/elv5-implementation/qualification-contract.md",
+    "docs/product/elv5-implementation/p0-baseline.md",
+    "docs/product/elv5-implementation/p1-profiles-registry.md",
+    "docs/product/elv5-implementation/p2-persistence-commands.md",
+    "docs/product/elv5-implementation/p3-cctv.md",
+    "docs/product/elv5-implementation/p4-lan.md",
+    "docs/product/elv5-implementation/p5-acs.md",
+    "docs/product/elv5-implementation/p6-fire.md",
+    "docs/product/elv5-implementation/p7-dependencies-workspace.md",
+    "docs/product/elv5-implementation/p8-acceptance.md",
+    "docs/product/elv5-implementation/p9-closure.md",
     "docs/audit/elv5-third-pass-production-readiness-audit.json",
 ]
 
@@ -178,8 +190,10 @@ def main() -> None:
         "commandCount": 16,
         "requirementCount": 80,
         "primaryProcessOracleCount": 54,
+        "authorityArtifactCount": len(AUTHORITY_PATHS),
         "processRegistrySha256": sha256_file(process_registry_path),
         "algorithmRegistrySha256": sha256_file(algorithm_registry_path),
+        "processContractsSha256": sha256_file(IMPL / "process-contracts.md"),
         "commandRegistrySha256": sha256_file(command_registry_path),
         "requirementsSha256": sha256_file(requirements_path),
         "requiredDimensionInventorySha256": sha256_bytes(
@@ -217,7 +231,10 @@ def main() -> None:
     print(f"ELV5 contract manifest generated: {output}")
     print(f"sourceSha={manifest['sourceSha']}")
     print(f"authorityFingerprintSha256={authority_fingerprint}")
-    print("processes=27 algorithms=27 commands=16 requirements=80 primaryOracles=54 schema=24")
+    print(
+        f"processes=27 algorithms=27 commands=16 requirements=80 "
+        f"primaryOracles=54 schema=24 authorityArtifacts={len(AUTHORITY_PATHS)}"
+    )
 
 
 if __name__ == "__main__":
