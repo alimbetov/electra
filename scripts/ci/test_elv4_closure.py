@@ -79,10 +79,19 @@ class ClosureGateTest(unittest.TestCase):
 
     def test_open_findings_prevent_acceptance_even_with_green_reports(self):
         record = closure.read(closure.BASE / 'closure.json')
+        record['findings'][0]['status'] = 'OPEN'
         ledger = closure.read(closure.BASE / 'requirements.json')
-        with self.assertRaises(ValueError):
-            closure.check_acceptance(ledger, record, {'sourceSha':self.sha, 'technicalResult':'PASS'},
-                                     self.report, self.sha)
+        for requirement in ledger['requirements']:
+            requirement.update(runtimeStatus='IMPLEMENTED', openFindingIds=[])
+        report = copy.deepcopy(self.report)
+        report['requirementResults'] = [
+            dict(requirementId=r['requirementId'], status='PASS',
+                 evidenceRefs=['executed-test:' + r['requirementId']])
+            for r in ledger['requirements']]
+        technical = dict(sourceSha=self.sha, technicalResult='PASS',
+                         phases={p: 'PASS' for p in closure.PHASES})
+        with self.assertRaisesRegex(ValueError, 'unresolved HIGH/BLOCKER'):
+            closure.check_acceptance(ledger, record, technical, report, self.sha)
 
 
 if __name__ == '__main__':
