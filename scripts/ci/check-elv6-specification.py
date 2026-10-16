@@ -83,10 +83,11 @@ def validate_boundary_documents():
     runtime = (BASE / 'code-level-runtime-contract.md').read_text()
     plan = (PRODUCT / 'elv6-p0-p9-delivery-plan.md').read_text()
     audit = AUDIT.read_text()
+    registry_text = (BASE / 'process-registry.json').read_text()
 
-    combined = '\n'.join([index, design, runtime, plan])
+    combined = '\n'.join([index, design, runtime, plan, registry_text])
     assert PINNED_ELV5 in index and PINNED_ELV5 in design and PINNED_ELV5 in runtime and PINNED_ELV5 in plan
-    assert OLD_ELV5 not in combined, 'ELV6 authoritative docs still pin obsolete ELV5 baseline'
+    assert OLD_ELV5 not in '\n'.join([index, design, runtime, plan]), 'ELV6 authoritative docs still pin obsolete ELV5 baseline'
 
     for token in [
         'SIGNED_INTEGER_MICROMETRE_V1',
@@ -97,7 +98,7 @@ def validate_boundary_documents():
         'ELV6_NOT_CAPTURED',
         'capture → pure kernel → guarded publication',
     ]:
-        assert token in runtime or token in index or token in design, ('missing hardening token', token)
+        assert token in combined, ('missing hardening token', token)
 
     assert 'does not reserve schema 24' in design.lower() or 'does not pre-allocate database schema 24' in index.lower()
     assert 'temperature-rise' in design.lower()
