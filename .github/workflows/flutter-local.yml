@@ -20,9 +20,6 @@ on:
       - '.gitignore'
       - '.github/workflows/**'
 
-permissions:
-  contents: write
-
 jobs:
   flutter-local:
     runs-on: ubuntu-latest
@@ -32,8 +29,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event_name == 'push' && github.ref_name || github.event.pull_request.head.sha }}
 
       - name: Reject tracked generated artifacts
         working-directory: .
@@ -57,27 +52,6 @@ jobs:
 
       - name: Generate Drift code
         run: dart run build_runner build
-
-      - name: Normalize ELV4 closure formatting
-        if: github.event_name == 'push'
-        run: |
-          dart format \
-            test/data/elv4_p9_runtime_qualification_test.dart \
-            test/data/elv4_p9_wire_public_roundtrip_test.dart \
-            test/data/elv4_p9_wire_semantic_drift_backend_test.dart
-          if ! git diff --quiet -- \
-            test/data/elv4_p9_runtime_qualification_test.dart \
-            test/data/elv4_p9_wire_public_roundtrip_test.dart \
-            test/data/elv4_p9_wire_semantic_drift_backend_test.dart; then
-            git config user.name github-actions[bot]
-            git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-            git add \
-              test/data/elv4_p9_runtime_qualification_test.dart \
-              test/data/elv4_p9_wire_public_roundtrip_test.dart \
-              test/data/elv4_p9_wire_semantic_drift_backend_test.dart
-            git commit -m "style(elv4): normalize final qualification formatting"
-            git push origin HEAD:${GITHUB_REF_NAME}
-          fi
 
       - name: Verify mobile formatting
         run: |
