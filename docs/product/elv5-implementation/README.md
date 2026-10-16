@@ -13,28 +13,30 @@ The runtime specification is intentionally split by concern, with explicit prece
 - [Code-level runtime contract](code-level-runtime-contract.md): base runtime model, `engineering-node-v3`, status axes, strict ELV5 wire envelope, replay-first protocol, dependencies and guarded publication.
 - [Engineering primitives](engineering-primitives-contract.md): dimension-safe exact quantities, evidence basis/applicability, operating cases, deterministic time/frames and `electra.canonical-json.v1` hashing.
 - [Typed process API](typed-process-api.md): concrete Dart input/output semantics for all 27 process definitions.
+- [Unified calculation engine](calculation-engine-contract.md): one deterministic solver lifecycle for all 27 processes, code-owned solver families, applicability resolution, operating-case evaluation, conservative comparison, margin/headroom, governing case, limiting factor, deterministic calculation trace and bounded sensitivity/what-if semantics.
+- [Machine algorithm registry](algorithm-registry.json): exact 27/27 binding from process code to solver families, required operating cases, governing rule, margin policy and limiting-factor semantics.
 - [Drift schema 24 contract](persistence-schema-contract.md): concrete persistence/migration/root/member/evaluation/pointer/index/snapshot design.
 - [Code-level hardening amendments](code-level-hardening-amendments.md): normative reconciliation of wire/storage details.
 - [Third-pass code-level engineering hardening](code-level-hardening-v2.md): **highest-priority ELV5 amendment** for strongly typed identities, explicit field-resolution semantics, bounded exact arithmetic, legal quantity algebra, captured timezone-rule evidence, measurement uncertainty, deterministic policy composition, transient simultaneity, ACS release completeness, fire supervision/fault states, selector invalidation, bounded atomic publication and result/review separation.
 - [Production source blueprint](production-source-blueprint.md): recommended Dart/Drift source tree, one-way dependency direction, typed command/handler/repository boundaries, exact 16-handler mapping, capture/resolver/publication/invalidation/revision/workspace services and Definition of Done. It is subordinate to the third-pass hardening where the latter tightens a type/resource/behavior contract.
-- [Executable qualification contract](qualification-contract.md): L0–L6 proof model, 54 primary process verticals, command adversarial tests, failure/race/restart/migration/freeze and false-PASS sentinels. Third-pass focused suites are additional mandatory evidence.
+- [Executable qualification contract](qualification-contract.md): L0–L6 proof model, 54 primary process verticals, command adversarial tests, failure/race/restart/migration/freeze and false-PASS sentinels. Third-pass and unified-engine focused suites are additional mandatory evidence.
 
-The machine wire authority remains [command-registry.json](command-registry.json), with exactly 16 operations; [command-examples.json](command-examples.json) must match its exact key sets. The third-pass amendment does not change that count or the fixed 27-process inventory.
+The machine wire authority remains [command-registry.json](command-registry.json), with exactly 16 operations; [command-examples.json](command-examples.json) must match its exact key sets. The process inventory remains exactly 27 and must match both [process-registry.json](process-registry.json) and [algorithm-registry.json](algorithm-registry.json).
 
 | Package | Specification | Outcome |
 |---|---|---|
 | P0 | [Baseline and stage integration](p0-baseline.md) | Pin actual parent source/design SHA, inherited schema/capabilities and migration origins; generate/verify authoritative contract manifest |
-| P1 | [Typed discipline profiles and process registry](p1-profiles-registry.md) | Register exactly 27 stable process codes; implement strongly typed identities, bounded engineering primitives, evidence/time/requirement algebra and typed definitions |
+| P1 | [Typed discipline profiles and process registry](p1-profiles-registry.md) | Register exactly 27 stable process codes; implement strongly typed identities, bounded engineering primitives, unified solver protocol, evidence/time/requirement algebra and typed definitions |
 | P2 | [Persistence, command boundaries and revision evidence](p2-persistence-commands.md) | Implement the exact 16-operation wire family, additive schema 24, strict resource bounds, revision-scoped aspects and isolated evaluation/pointer storage |
-| P3 | [CCTV calculation implementation](p3-cctv.md) | Implement CCTV-01…06 with deterministic geometry/time/bandwidth/storage/source-evidence semantics and captured timezone-rule reproduction |
-| P4 | [LAN and structured-cabling implementation](p4-lan.md) | Implement LAN-01…07 including ordered path, typed dB/dBm bidirectional optical budget, isolated reach claim and ELV6-safe rack demand basis |
-| P5 | [Access-control implementation](p5-acs.md) | Implement ACS-01…06 including typed resources, transient/startup composition, power wrappers and five-cause release truth-table behavior |
-| P6 | [Fire-alarm implementation](p6-fire.md) | Implement FA-01…08 including full address claims, state currents, supported electrical models, supervision/fault-state behavior where selected and claim-scope separation |
-| P7 | [Incremental dependencies and engineer workspace](p7-dependencies-workspace.md) | Encode owner/scope-aware dependency keys, missing/set/selector markers, canonical fingerprints and bounded all-or-nothing coherent publication |
-| P8 | [Integrated verification and qualification](p8-acceptance.md) | Execute 54 primary POS/NEG public-command verticals plus command/resource-limit/restart/failure/selector/race/migration/freeze and third-pass hardening matrices |
-| P9 | [Architecture reconciliation and stage handoff](p9-closure.md) | Reconcile 80 requirements, 27 definitions, 16 codecs/handlers, schema 24, contract manifest and executable evidence to one exact source SHA |
+| P3 | [CCTV calculation implementation](p3-cctv.md) | Implement CCTV-01…06 through unified geometry/flow/time/resource/evidence families with deterministic governing-case and limiting-factor output |
+| P4 | [LAN and structured-cabling implementation](p4-lan.md) | Implement LAN-01…07 through ordered-path/resource/optical/evidence families including typed dB/dBm bidirectional budgets and ELV6-safe rack basis |
+| P5 | [Access-control implementation](p5-acs.md) | Implement ACS-01…06 through topology/resource/transient/physical-wrapper families including five-cause release truth-table behavior |
+| P6 | [Fire-alarm implementation](p6-fire.md) | Implement FA-01…08 through resource/sequence/power-wrapper/topology/policy families including supervision/fault-state behavior where selected |
+| P7 | [Incremental dependencies and engineer workspace](p7-dependencies-workspace.md) | Encode owner/scope-aware dependency keys, missing/set/selector markers, canonical fingerprints, governing/limiting projections and bounded all-or-nothing coherent publication |
+| P8 | [Integrated verification and qualification](p8-acceptance.md) | Execute 54 primary POS/NEG public-command verticals plus unified-engine invariants, command/resource-limit/restart/failure/selector/race/migration/freeze matrices |
+| P9 | [Architecture reconciliation and stage handoff](p9-closure.md) | Reconcile 80 requirements, 27 process definitions, 27 algorithm mappings, 16 codecs/handlers, schema 24, contract manifest and executable evidence to one exact source SHA |
 
-[Process contracts](process-contracts.md) and [process registry](process-registry.json) cover CCTV6/LAN7/ACS6/Fire8. [Requirement ledger](requirements.json) contains 80 stable package requirements. Every runtime evidence field is intentionally empty until implementation evidence exists.
+[Process contracts](process-contracts.md) and [process registry](process-registry.json) cover CCTV6/LAN7/ACS6/Fire8. [Algorithm registry](algorithm-registry.json) makes their common solver semantics machine-checkable. [Requirement ledger](requirements.json) contains 80 stable package requirements. Every runtime evidence field is intentionally empty until implementation evidence exists.
 
 ELV4 is an implemented, runtime-accepted and merged prerequisite. Reuse its dedicated power persistence, reviewed writers, captured facts and numerical kernels under the [implemented baseline contract](implemented-baseline.md). ELV5 schema 24 is additive and must not reinterpret or duplicate ELV3/ELV4 canonical ownership.
 
@@ -45,16 +47,18 @@ The [initial technical audit](../../audit/elv5-technical-audit.md) resolved 8 di
 Before an implementation package can claim completion, these inventories must agree exactly:
 
 1. **27** process codes/scopes/dependencies/required dimensions in registry, process contracts and typed runtime definitions.
-2. Strongly typed subject/scope identities and explicit known/missing/N-A/unsupported/unresolved field semantics at the domain/kernel boundary.
-3. Engineering quantity/evidence/measurement/time/frame/hash semantics in primitives and production codecs/kernels, including captured timezone-rule evidence and code-owned legal quantity algebra.
-4. **16** command operations and their exact payload key sets in registry, examples, production handler registry and runtime semantic codecs.
-5. Hardened camera subscriptions, recording temporal/reserve/redundancy basis and ACS release truth table across wire → persistence → typed resolver.
-6. Deterministic requirement-merger and simultaneity/transient policies where required; no intuitive policy winner or hidden steady-state approximation.
-7. Drift **schema 24** tables/indexes/migration and ownership map.
-8. Selector/set/missing dependency capture invalidates on old/new closure and on creation of newly matching facts.
-9. Coherent batch publication remains all-or-nothing while respecting explicit target/resource/SQL bounds.
-10. **54** primary POS/NEG entries in the executable qualification manifest plus the third-pass focused suites and L0–L6 acceptance inventory.
-11. Pure engineering core has no Flutter/Drift dependency; application orchestration owns capture/publish; repository adapters reconstruct typed domain identities and hide generated Drift rows.
-12. Generated contract manifest/fingerprint and P0–P9 evidence at the exact tested source SHA.
+2. **27** algorithm mappings with legal solver families, explicit operating cases, governing rules, margin policies and limiting-factor semantics.
+3. Strongly typed subject/scope identities and explicit known/missing/N-A/unsupported/unresolved field semantics at the domain/kernel boundary.
+4. Engineering quantity/evidence/measurement/time/frame/hash semantics in primitives and production codecs/kernels, including captured timezone-rule evidence and code-owned legal quantity algebra.
+5. Unified engine lifecycle `capture → applicability → resolve → normalize → cases → kernel → requirements → conservative compare → governing/margin → statuses → trace → findings → guarded publish` implemented without hidden UI/database dependencies.
+6. **16** command operations and their exact payload key sets in registry, examples, production handler registry and runtime semantic codecs.
+7. Hardened camera subscriptions, recording temporal/reserve/redundancy basis and ACS release truth table across wire → persistence → typed resolver.
+8. Deterministic requirement-merger and simultaneity/transient policies where required; no intuitive policy winner or hidden steady-state approximation.
+9. Drift **schema 24** tables/indexes/migration and ownership map.
+10. Selector/set/missing dependency capture invalidates on old/new closure and on creation of newly matching facts.
+11. Coherent batch publication remains all-or-nothing while respecting explicit target/resource/SQL bounds.
+12. **54** primary POS/NEG entries in the executable qualification manifest plus third-pass and unified-engine focused suites and L0–L6 acceptance inventory.
+13. Pure engineering core has no Flutter/Drift dependency; application orchestration owns capture/publish; repository adapters reconstruct typed domain identities and hide generated Drift rows.
+14. Generated contract manifest fingerprints process, algorithm, command and requirement inventories plus the full governing authority chain at the exact tested source SHA.
 
 Any mismatch is a specification/runtime defect and must not be resolved by ad-hoc fallback, label inference, latest-definition lookup, `null` convention, UI-side engineering calculation, package-local formula override or engineer waiver that mutates an immutable technical result.
