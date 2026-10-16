@@ -229,39 +229,37 @@ final class Acs01RoleCompletenessKernel {
 
       late Acs01AssessmentStatus status;
       List<String> selected = const [];
-      switch (node.kind) {
-        case Acs01RequirementKind.allOf:
-          status = childResults.any((e) => e.status == Acs01AssessmentStatus.fail)
-              ? Acs01AssessmentStatus.fail
-              : (childResults.any((e) => e.status == Acs01AssessmentStatus.unresolved)
-                  ? Acs01AssessmentStatus.unresolved
-                  : Acs01AssessmentStatus.pass);
-          if (status == Acs01AssessmentStatus.pass) {
-            selected = childResults.map((e) => e.nodeId).toList();
-          }
-        case Acs01RequirementKind.anyOf:
-          if (passChildren.isNotEmpty) {
-            status = Acs01AssessmentStatus.pass;
-            selected = [passChildren.first.nodeId];
-          } else if (unresolvedChildren.isNotEmpty) {
-            status = Acs01AssessmentStatus.unresolved;
-          } else {
-            status = Acs01AssessmentStatus.fail;
-          }
-        case Acs01RequirementKind.exactlyOneOf:
-          if (passChildren.length == 1 && unresolvedChildren.isEmpty) {
-            status = Acs01AssessmentStatus.pass;
-            selected = [passChildren.single.nodeId];
-          } else if (passChildren.length > 1) {
-            status = Acs01AssessmentStatus.fail;
-          } else if (unresolvedChildren.isNotEmpty) {
-            status = Acs01AssessmentStatus.unresolved;
-          } else {
-            status = Acs01AssessmentStatus.fail;
-          }
-        case Acs01RequirementKind.atLeast:
-        case Acs01RequirementKind.exactly:
-          throw StateError('ACS01 unreachable requirement kind.');
+      if (node.kind == Acs01RequirementKind.allOf) {
+        status = childResults.any((e) => e.status == Acs01AssessmentStatus.fail)
+            ? Acs01AssessmentStatus.fail
+            : (childResults.any((e) => e.status == Acs01AssessmentStatus.unresolved)
+                ? Acs01AssessmentStatus.unresolved
+                : Acs01AssessmentStatus.pass);
+        if (status == Acs01AssessmentStatus.pass) {
+          selected = childResults.map((e) => e.nodeId).toList();
+        }
+      } else if (node.kind == Acs01RequirementKind.anyOf) {
+        if (passChildren.isNotEmpty) {
+          status = Acs01AssessmentStatus.pass;
+          selected = [passChildren.first.nodeId];
+        } else if (unresolvedChildren.isNotEmpty) {
+          status = Acs01AssessmentStatus.unresolved;
+        } else {
+          status = Acs01AssessmentStatus.fail;
+        }
+      } else if (node.kind == Acs01RequirementKind.exactlyOneOf) {
+        if (passChildren.length == 1 && unresolvedChildren.isEmpty) {
+          status = Acs01AssessmentStatus.pass;
+          selected = [passChildren.single.nodeId];
+        } else if (passChildren.length > 1) {
+          status = Acs01AssessmentStatus.fail;
+        } else if (unresolvedChildren.isNotEmpty) {
+          status = Acs01AssessmentStatus.unresolved;
+        } else {
+          status = Acs01AssessmentStatus.fail;
+        }
+      } else {
+        throw StateError('ACS01 unreachable group requirement kind.');
       }
 
       final result = Acs01NodeResult(
