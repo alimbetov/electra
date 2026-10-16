@@ -63,12 +63,16 @@ final class Elv4QualificationMatrixContract {
       manifest['requiredPositiveCaseIds'],
       'requiredPositiveCaseIds',
     );
-    if (requiredCaseIds.isEmpty || requiredCaseIds.toSet().length != requiredCaseIds.length) {
+    if (requiredCaseIds.isEmpty ||
+        requiredCaseIds.toSet().length != requiredCaseIds.length) {
       throw const FormatException(
         'requiredPositiveCaseIds must be non-empty and unique.',
       );
     }
-    final positiveCases = _objectList(manifest['positiveCases'], 'positiveCases');
+    final positiveCases = _objectList(
+      manifest['positiveCases'],
+      'positiveCases',
+    );
     final casesById = <String, Map<String, Object?>>{};
     for (final caseValue in positiveCases) {
       final caseId = _text(caseValue['id'], 'positiveCases.id');
@@ -111,7 +115,8 @@ final class Elv4QualificationMatrixContract {
           result['requiredDimensions'],
           '$caseId.$processCode.requiredDimensions',
         );
-        if (dimensions.isEmpty || dimensions.toSet().length != dimensions.length) {
+        if (dimensions.isEmpty ||
+            dimensions.toSet().length != dimensions.length) {
           throw FormatException(
             '$caseId/$processCode dimensions must be non-empty and unique.',
           );
@@ -150,7 +155,9 @@ final class Elv4QualificationMatrixContract {
               execution: execution,
             );
             if (!seen.add(row.key)) {
-              throw FormatException('Duplicate qualification obligation ${row.key}.');
+              throw FormatException(
+                'Duplicate qualification obligation ${row.key}.',
+              );
             }
             rows.add(row);
           }
@@ -175,7 +182,9 @@ final class Elv4QualificationMatrixContract {
     final actual = <String, Elv4QualificationEvidenceRow>{};
     for (final row in evidence) {
       if (row.evaluationId.trim().isEmpty) {
-        throw StateError('Qualification evidence ${row.key} has no evaluationId.');
+        throw StateError(
+          'Qualification evidence ${row.key} has no evaluationId.',
+        );
       }
       if (actual.containsKey(row.key)) {
         throw StateError('Duplicate qualification evidence ${row.key}.');
@@ -183,10 +192,10 @@ final class Elv4QualificationMatrixContract {
       actual[row.key] = row;
     }
     final expected = {for (final row in expectedRows) row.key: row};
-    final missing = expected.keys.toSet().difference(actual.keys.toSet()).toList()
-      ..sort();
-    final extra = actual.keys.toSet().difference(expected.keys.toSet()).toList()
-      ..sort();
+    final missing =
+        expected.keys.toSet().difference(actual.keys.toSet()).toList()..sort();
+    final extra =
+        actual.keys.toSet().difference(expected.keys.toSet()).toList()..sort();
     if (missing.isNotEmpty || extra.isNotEmpty) {
       throw StateError(
         'ELV4 qualification matrix mismatch: missing=$missing extra=$extra',
