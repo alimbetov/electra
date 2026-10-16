@@ -88,9 +88,9 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      - name: Verify ELV5 1500-case combinatorial contract
+      - name: Verify ELV5 fifth-pass specification closure
         working-directory: .
-        run: python3 scripts/ci/check-elv5-combinatorial-1500.py
+        run: python3 scripts/ci/check-elv5-fifth-pass-closure.py
 
       - name: Generate ELV5 contract manifest
         working-directory: .
@@ -103,6 +103,21 @@ jobs:
         with:
           name: elv5-contract-manifest-${{ github.sha }}
           path: ${{ runner.temp }}/elv5-contract-manifest.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Generate ELV5 1500-case combinatorial matrix
+        working-directory: .
+        run: >-
+          python3 scripts/ci/generate-elv5-combinatorial-1500.py
+          --authority-manifest "${RUNNER_TEMP}/elv5-contract-manifest.json"
+          --output "${RUNNER_TEMP}/elv5-combinatorial-1500.json"
+
+      - name: Publish ELV5 combinatorial matrix
+        uses: actions/upload-artifact@v4
+        with:
+          name: elv5-combinatorial-1500-${{ github.sha }}
+          path: ${{ runner.temp }}/elv5-combinatorial-1500.json
           if-no-files-found: error
           retention-days: 30
 
