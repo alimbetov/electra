@@ -88,11 +88,12 @@ void main() {
 
       final candidate = EngineeringPort.fromMap({
         ...source.toMap(),
-        'voltage': const PortVoltageDomain(
-          currentKind: PortCurrentKind.dc,
-          minimumV: 10,
-          maximumV: 60,
-        ).toMap(),
+        'voltage':
+            const PortVoltageDomain(
+              currentKind: PortCurrentKind.dc,
+              minimumV: 10,
+              maximumV: 60,
+            ).toMap(),
       });
       final binding = builder.portBinding(source.id, PowerPortRole.source);
       final store = DriftPowerCanonicalProjectionWriteStore(
