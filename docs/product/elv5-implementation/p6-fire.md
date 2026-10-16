@@ -2,7 +2,7 @@
 
 Status: DESIGN HARDENED / RUNTIME NOT STARTED
 Depends on: P1/P2, signal topology and supported electrical kernels.
-Parent: [ELV5 design](../elv5-discipline-calculations-design-specification.md); [process contracts](process-contracts.md); [typed process API](typed-process-api.md); [engineering primitives](engineering-primitives-contract.md).
+Parent: [ELV5 design](../elv5-discipline-calculations-design-specification.md); [process contracts](process-contracts.md); [typed process API](typed-process-api.md); [engineering primitives](engineering-primitives-contract.md); [Fire code-level dossiers](process-specifications/fire-processes.md); [Flutter performance contract](flutter-performance-contract.md).
 
 Inherited implementation and mandatory new extensions: [baseline contract P6](implemented-baseline.md#p6); [pinned evidence](baseline.json).
 
@@ -19,79 +19,82 @@ Inherited implementation and mandatory new extensions: [baseline contract P6](im
 | ELV5-P6-007 | Implement FA-07 signal closure/branch/address topology and FA-08 project policy/evidence basis without false survivability/compliance claims | P6-T07 |
 | ELV5-P6-008 | Qualify safety-critical missing-policy/evidence behavior, restart/history and no-false-PASS scenarios through public commands | P6-T08 |
 
+## Normative code-level binding
+
+Runtime implementation MUST match FA-01…08 in [process-specifications/fire-processes.md](process-specifications/fire-processes.md) across all 25 dossier sections. Safety-critical missing/unsupported behavior is part of the algorithm, not optional error handling.
+
+Implementation priority inside P6 is **FA-02 → FA-04 → FA-05 → FA-06**. This sequence proves state-current accounting, shared-source composition, autonomy sequence and notification transient/terminal behavior before the remaining address/topology/policy basis processes.
+
 ## FA-01 — loop device/address capacity
 
-Physical device count and consumed address count are separate resources. One device/module may occupy multiple, non-contiguous addresses only when its exact immutable expansion profile allows it.
+Physical device count and consumed address count are separate resources. Runtime expands the complete effective address set in an explicit domain and collision-checks `(domain,address)` across device claims and reserved resources. Expansion cardinality must match the immutable device profile. Distinct start addresses are insufficient if expanded sets overlap.
 
-Runtime materializes the full effective address claim set in an explicit scoped domain. Collision detection is on `(addressDomain,address)`, not only on device start addresses. Reserved addresses participate in availability/uniqueness rules.
+Capacity margin is exact integer headroom; any collision governs FAIL even when numerical address/device limits are not exhausted.
 
-A passing physical device-count dimension cannot mask address exhaustion or overlap.
+## FA-02 — standby/alarm/startup current
 
-## FA-02 — standby/alarm current
+Canonical physical load origins are counted exactly once. Each origin has explicit state-current evidence; signal-return/multiple graph participation cannot duplicate a physical current.
 
-Device, module, panel and auxiliary current origins are identified exactly once. Each current value carries an explicit state and evidence basis. State labels do not invent current values.
-
-Standby/alarm/active/startup/project-defined cases are explicit operating-case selections. A missing mandatory alarm current produces a known partial subtotal plus missing membership evidence; it cannot become a complete PASS because the known subtotal fits.
-
-Where the same physical loads feed ELV4 PWR calculations, FA-02 must reference/prepare the same uniquely identified origins rather than create a second additive copy of their load.
-
-## FA-03 — electrical basis
-
-FA-03 only applies to an explicitly registered electrical model supported by the underlying physical kernel. A closed signal loop, return path or ring topology does **not** prove that a dual-fed/shared-return electrical network is correctly solved.
-
-Supported radial/one-common-point cases may consume PWR-03 exact evidence and compare declared manufacturer/project voltage limits. Unsupported mesh/dual-feed arrangements return BLOCKED/UNRESOLVED according to the contract, even when FA-07 signal topology passes.
-
-The model discriminator, applicability envelope and exact consumed PWR evidence are part of input fingerprint/provenance.
-
-## FA-04 — shared fire supply requirement
-
-The physical source demand includes every concurrent load actually on the source, including non-fire loads when the source is shared. Fire-specific reserve/capability requirements are composed into the source-owned requirement set once.
-
-No per-loop/per-device repetition of reserve or derating is allowed if the factor is owned at source capability boundary. Contribution views are explanatory only; the global physical source evidence remains authoritative.
-
-## FA-05 — standby/alarm backup
-
-Autonomy is an ordered protected sequence, not a nominal current × guessed hours shortcut.
-
-Each phase has:
+Required cases are explicit standby/alarm and startup/inrush where profiled. For each case:
 
 ```text
-phase identity
-selected state case
-explicit duration
-source/policy provenance
-complete protected membership
+Icase = Σ I(origin, selectedState)
 ```
 
-The exact bank/PWR-04 model must be applicable to the captured sequence/voltage/current/environment conditions. Missing duration or model applicability blocks the affected claim. No national/project standby/alarm hours are silently inserted as defaults.
+Known subtotal plus missing mandatory current remains UNRESOLVED, never PASS. Pulse/current durations remain explicit and are not averaged into a guessed duty factor.
 
-The result separates required sequence energy, available usable energy and margin. It does not relabel a technical project policy as verified national compliance.
+## FA-03 — electrical terminal-voltage basis
+
+FA-03 only consumes an explicitly supported electrical-model/PWR-03 result. A closed signal loop does not authorize solving an unsupported dual-feed/shared-return mesh. For a required allowed voltage range:
+
+```text
+lowMargin  = terminalVoltageLower - requiredMin
+highMargin = requiredMax - terminalVoltageUpper
+```
+
+The worst required terminal/case margin governs. Unsupported model is BLOCKED even if FA-07 signal topology passes.
+
+## FA-04 — shared fire source requirement
+
+FA-04 consumes complete global PWR-01 demand and exact PWR-02 capability/requirement evidence. Fire current facts such as FA-02 may explain contribution/state selection but are not added a second time onto an already complete global PWR demand.
+
+Source-owned requirement composition applies reserve/derating once and retains all discipline contributors. Fire-only filtering cannot create a passing physical source result.
+
+## FA-05 — standby/alarm backup sequence
+
+Autonomy is an ordered explicit protected sequence, not `nominal current × assumed hours`.
+
+Each segment carries state, exact duration, policy provenance and complete protected membership. The exact PWR-04 model owns battery losses/discharge/EOD/current physics. In a simple supported energy case:
+
+```text
+Erequired = Σ(Psegment × duration)
+EnergyMargin = Eavailable - Erequired
+```
+
+Energy PASS cannot hide peak-current/EOD FAIL. No national/project hours are inserted as defaults, and nominal Ah is not universally converted to usable energy.
 
 ## FA-06 — notification circuit capacity
 
-Notification circuit checks remain independent:
+Independent mandatory dimensions/cases can include:
 
 ```text
 active device count
-active output current
-startup/inrush current where applicable
-output current limit
-worst terminal voltage over supported physical path
+ACTIVE_NOTIFICATION current
+STARTUP_INRUSH current when profiled
+output current capability
+worst terminal voltage
+supported OPEN/SHORT/RETURN_LOSS supervision cases when selected
 ```
 
-Count fitting does not mask current or voltage failure. A current/voltage PASS does not assert sound-pressure, intelligibility, candela or visual/audibility coverage; those dimensions are outside this process version unless a future exact model is added.
+Count PASS cannot mask current/voltage/fault-state failure. Acoustic/audibility/candela coverage is NOT_ASSESSED unless a future explicit model exists.
 
 ## FA-07 — signal topology integrity
 
-FA-07 validates signal-layer source/return closure, branch policy, membership and consistency with the full FA-01 address set.
+FA-07 evaluates signal-layer closure/branch/address consistency and only supported fault transformations. Isolator presence or marketing label is not survivability evidence. Graph processing is deterministic and separate from FA-03 electrical applicability.
 
-Presence of isolator devices/components alone is not proof of short-circuit survivability, fault containment or normative loop survivability. Such a claim requires an explicit supported behavior/fault model and later normative applicability where relevant.
+## FA-08 — cable/environment technical policy basis
 
-A topology can therefore be technically closed while survivability remains NOT_ASSESSED/UNRESOLVED.
-
-## FA-08 — fire cable/project policy evidence basis
-
-FA-08 separates three concepts:
+FA-08 keeps separate:
 
 ```text
 technical project-policy match
@@ -99,57 +102,38 @@ route/cable evidence completeness
 verified jurisdictional compliance
 ```
 
-ELV5 can evaluate the first two against exact selected policy/definition editions. `FICTIONAL` or `PROJECT_AUTHORED` policy can never yield verified regulatory compliance. ELV7 owns authoritative jurisdiction/rule applicability and certification.
-
-Missing cable/route/environment evidence blocks the technical basis rather than falling back to a device label or generic “fire cable” class.
+The first two are ELV5 technical outputs. Verified compliance requires actual ELV7 evidence; project/fictional policy titles cannot manufacture it.
 
 ## Engineering evidence and environmental applicability
 
-Manufacturer/project values retain source ref/hash, basis and applicability. Typical/estimated current, capacity or cable/environment properties cannot satisfy dimensions whose selected policy requires guaranteed limits.
-
-Environmental conditions required by a consumed definition—temperature, installation environment, enclosure/route class or other exact applicability tags—must be provably covered. No room-temperature/default-environment substitution is allowed in a safety-critical claim.
+Manufacturer/project values retain immutable source hash, evidence basis and applicability envelope. Typical/estimated current/capacity/property data cannot satisfy guaranteed-bound requirements. Environmental constraints must be captured rather than silently assuming room/default conditions.
 
 ## Dependencies and invalidation
 
-Exact dependency closure includes:
+Dependency closure includes fire-loop device/address sets and selectors, expanded claims/domain, state-current definitions/state selection, panel/module/auxiliary membership, electrical model and exact PWR evidence, source requirement policy, ordered autonomy segments/durations, notification assignments/output/path, signal graph/fault model, route/cable/environment facts, FA-08 policy and MISSING markers.
 
-```text
-fire-loop device SET
-expanded address-claim SET/address domain
-state-current profile refs and state selection
-panel/module/auxiliary membership SET
-selected electrical model + exact PWR evidence
-source requirement policy
-ordered autonomy phase set/durations
-notification assignment/output/path evidence
-signal graph/branch/return set
-route/cable/environment evidence
-FA-08 policy edition/hash/source status
-MISSING markers for absent mandatory evidence
-```
-
-Adding a previously missing address/current/policy fact must invalidate a prior blocked result. Unrelated optical/CCTV edits remain negative controls unless a shared physical power dependency actually changed.
+Adding a previously absent fact or a newly selector-matching device invalidates prior blocked/current nodes through P7. Unrelated CCTV/LAN/ACS edits remain negative controls except where a true shared physical source/bank/path dependency exists.
 
 ## Public-command qualification
 
-Primary FA-01…08 oracles execute through public setup, schema-24 file SQLite, production capture/resolver/kernel/publication, workspace projection and close/reopen verification.
+Primary and supplemental FA vectors execute through public setup, schema-24 file SQLite, production capture/resolver, `Elv5CalculationExecutor` where workload requires, pure Fire kernel, guarded atomic publication, targeted workspace projection and close/reopen verification.
 
-Required cases include:
+Required cases include multi-address overlap, reserved collision, exact address capacity boundary, missing alarm current, signal topology PASS with unsupported electrical model BLOCKED, shared non-fire source load retained, standby+alarm sequence with explicit durations, energy-pass/current-fail bank case, count PASS with startup-current/terminal FAIL, supported/unsupported supervision behavior, technical fire policy without verified compliance, stale prior PASS and frozen historical evidence.
 
-- multi-address overlap despite distinct start addresses;
-- reserved address consumption/collision;
-- missing mandatory alarm current → partial/unresolved, not PASS;
-- FA-07 signal closure PASS while unsupported FA-03 electrical model remains BLOCKED;
-- non-fire shared source load retained in FA-04;
-- explicit standby+alarm sequence with no default hours;
-- count PASS but notification startup-current or terminal-voltage FAIL;
-- isolator present but survivability not proven;
-- fictional/project policy match without verified compliance;
-- stale prior PASS remains stale after relevant evidence mutation;
-- frozen R1 remains immutable after R2 fire-loop/policy edits.
+## Performance obligations
+
+P6 follows [flutter-performance-contract.md](flutter-performance-contract.md):
+
+- FA-01 uses O(D+A) hash-set address collision detection and supports the 10,000-claim fixture without pairwise comparison;
+- FA-02 uses O(N×C) over load origins and a small bounded case set, never duplicate graph-origin scans;
+- FA-05 is O(S+C) over ordered sequence/contributors and does not perform battery physics again;
+- FA-06/FA-07 graph fault evaluation is scoped/bounded and cannot enumerate an unbounded multi-fault powerset;
+- medium/large native work is off the Flutter UI isolate;
+- adding one fire device/address invalidates exact dependent loops/processes only;
+- large address/finding/trace collections are virtualized/lazy in the workspace UI.
 
 ## Exit
 
-P6 runtime acceptance requires P6-T01…T08 and both primary POS/NEG entries for FA-01…08 at the same accepted source SHA, together with required L0–L6 qualification.
+P6 runtime acceptance requires P6-T01…T08, both primary POS/NEG entries for FA-01…08, all Fire boundary/adversarial/cross-discipline dossier vectors and required L0–L6/performance evidence at the same source SHA and authority fingerprint.
 
-This document is a hardened design contract, not proof of source implementation.
+P6 cannot close if missing safety-critical evidence produces PASS, signal closure is treated as an unsupported electrical mesh solution, source/bank loads are discipline-filtered, or technical project-policy match is labelled verified compliance.
