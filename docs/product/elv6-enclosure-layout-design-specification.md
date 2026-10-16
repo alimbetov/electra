@@ -1,475 +1,701 @@
-# Electra — ELV6 Enclosure, Rack and Layout Design Specification
+# Electra — ELV6 Enclosure, Rack and Constructability Design Specification
 
-Status: DESIGN DRAFT / RUNTIME NOT STARTED
-Branch: `feat/flutter-elv6-enclosure-layout-design`
-Pinned upstream ELV5: `a20ae91ecbef1da0d16443201e48f7e1b99e8701`
-Entry: [authoritative index](elv6-authoritative-spec-index.md).
+Status: **DESIGN HARDENED / RUNTIME NOT STARTED**  
+Branch: `feat/flutter-elv6-enclosure-layout-design`  
+Pinned design upstream ELV5: `ed7db01adb27ff184b0b8c91a710082fb9eafb9a`  
+Entry: [authoritative index](elv6-authoritative-spec-index.md)  
+Runtime detail: [code-level contract](elv6-implementation/code-level-runtime-contract.md)
 
-## 1. Purpose
+## 1. Engineering purpose
 
-ELV6 is the physical enclosure-layout stage. Its job is to answer, reproducibly and at code level:
+ELV6 answers the question an experienced design/installation engineer actually asks after electrical and ELV calculations are complete:
 
-- what cabinet/rack/enclosure contains each already-engineered item;
-- on which mounting plane, rail, shelf or rack-unit span it is placed;
-- whether placements overlap or exceed physical envelopes;
-- whether battery assemblies and service envelopes fit;
-- where cable entries and patching interfaces terminate inside the enclosure;
-- what is locked by an engineer versus generated as a proposal;
-- which exact upstream revisions and facts produced the current layout;
-- what changed and what must be revalidated after an upstream mutation.
+> **Can the selected technical functions be physically assembled, wired, accessed, cooled, maintained and reproduced inside the proposed panel/rack without inventing missing facts?**
 
-ELV6 is not a second equipment catalog, routing engine, power calculator or normative engine.
+For every host ELV6 must make the following explicit and reproducible:
 
-## 2. Existing physical-panel baseline is authoritative
+- host/enclosure identity and exact usable geometry;
+- mounting surfaces and interfaces;
+- exact position/orientation of placed subjects;
+- rack U and DIN occupation;
+- physical body/depth and front/rear protrusions;
+- service/removal/connector envelopes;
+- door-mounted equipment and swept access envelope;
+- cable entry/gland/knockout assignments;
+- cable approach/bend/strain-relief space where exact technical facts exist;
+- internal wiring duct and physical termination capacity basis;
+- battery body/orientation/service/handling fit;
+- local support load, total mass and centre-of-gravity basis;
+- ventilation openings, fan/airflow physical facts and heat-loss input basis;
+- observed physical segregation geometry;
+- physical protective-bonding points/declared links;
+- reserve/spare physical capacity;
+- exact reason for every intrinsic FAIL, unresolved dimension or stale result;
+- deterministic proposal explaining why the solver placed or could not place each item.
 
-ELV6 starts from an already accepted physical panel-layout model. The repository contains `PanelAssembly`, `PanelEnclosureGeometry`, `PanelMountingSection`, `DinRail`, `PanelModulePlacement`, `PanelTerminalRail`, `PanelCableDuct` and `PanelReservedZone`, and ADR-019 explicitly makes them the physical source of truth for electrical/automation panels.
+ELV6 is **not** an equipment selector, power calculator, cable routing engine or normative compliance engine.
 
-Therefore ELV6 **must extend/reuse this model, not create a parallel enclosure/DIN model**.
+---
 
-### 2.1 Ownership rule
+## 2. Corrected baseline and ownership model
 
-- Existing electrical/automation panel enclosure identity remains `PanelAssembly`.
-- Existing panel DIN/module placement remains `DinRail` + `PanelModulePlacement` until an explicit migration/generalization contract proves a safe replacement.
-- ELV6 may introduce new rack/cabinet entities only for enclosure kinds that have no existing canonical owner, for example telecom/server floor racks.
-- A unified ELV6 workspace is built through typed adapters/projections over owner-specific sources; it does not require copying them into one mutable table.
-- If future refactoring extracts a shared enclosure abstraction from `PanelAssembly`, the migration must preserve IDs, revision/history semantics and historical snapshots. No big-bang rename is assumed by this specification.
+### 2.1 What already exists
 
-Conceptual host reference:
-
-```text
-EnclosureHostRef
-- ownerKind: PANEL_ASSEMBLY | ELV_RACK_ENCLOSURE | FUTURE_CANONICAL_OWNER
-- projectId
-- revisionId
-- entityId
-- logicalId?
-- expectedFingerprint
-```
-
-A given physical enclosure may have exactly one active canonical owner in one revision.
-
-## 3. Upstream reuse and nonduplication
-
-| Upstream owner | ELV6 consumes | ELV6 must not duplicate |
-|---|---|---|
-| Existing panel domain / ADR-019 | panel enclosure geometry, DIN rows, module placements, ducts, reserved zones | second panel/DIN/placement truth |
-| ELV2 | exact component/catalog definition identity, immutable editions, technical envelopes when already defined | latest-edition lookup, mutable copies of canonical definitions |
-| ELV3 | realized cables/runs, route endpoints, pathways, physical termination facts | cable allocation, installed-length calculation, route topology |
-| ELV4 | power-source, PSU/UPS/battery evidence and exact physical requirement references | source sizing, battery capacity/runtime or DC-drop calculations |
-| ELV5 | discipline calculations, rack demand/capacity basis, patching/load requirements | CCTV/LAN/ACS/Fire calculations |
-| Shared runtime | project/revision identity, command result, replay ledger, history, UoW, stale/freeze protocol | parallel history/revision subsystem |
-
-ELV6 creates only data with no accepted prior owner plus immutable layout proposals/evaluations and owner-safe extension metadata.
-
-## 4. Canonical ELV6 model
-
-The pure Dart domain uses explicit stable references. Exact names are frozen in P1 after the baseline audit.
-
-```dart
-typedef EnclosureLayoutId = String;
-typedef RackEnclosureId = String;
-typedef LayoutPlacementId = String;
-typedef LayoutConstraintId = String;
-typedef LayoutProposalId = String;
-typedef CableEntryId = String;
-typedef ReservedZoneId = String;
-```
-
-### 4.1 Non-panel rack enclosure
-
-A new `ElvRackEnclosure` (name provisional) is allowed only when no existing canonical enclosure owns the object. It represents telecom/server/ELV rack physical capacity and provenance:
+The repository has an accepted semantic model and ADR vocabulary:
 
 ```text
-id
-projectId
-revisionId
-logicalId
-kind: WALL_CABINET | FLOOR_RACK | BOX | CUSTOM
-coordinateSystem
-outerEnvelopeMm
-usableEnvelopeMm
-rackUnitRange?
-frontAccess / rearAccess / sideAccess
-mountingSurfaceRefs
-cableEntryRefs
+PanelAssembly
+PanelEnclosureGeometry
+PanelMountingSection
+DinRail
+PanelModulePlacement
+PanelTerminalRail
+PanelCableDuct
+PanelReservedZone
+ADR-019 physical panel layout
+```
+
+This vocabulary is preserved. However, a domain class or accepted ADR does not by itself prove persisted revision-scoped ownership.
+
+### 2.2 What P0 must prove
+
+For each physical fact family P0 creates a row in the ownership matrix:
+
+```text
+factKind
+semanticOwner
+runtimeTable/path
+publicWriter
+revisionIdentity
+rowCAS
+replayLedger
+historyUndoRedo
+freezeSection
+createNextRemap
+qualificationEvidence
 status
-createdAt / updatedAt / deletedAt?
-originDeviceId
-technicalDefinitionRef?
 ```
 
-For `PANEL`/electrical/automation cabinets, the host is `PanelAssembly`, not a new `ElvRackEnclosure` row.
-
-### 4.2 Mounting surfaces and owner adapters
-
-ELV6 exposes one read/proposal abstraction over owner-specific mounting surfaces:
+Status is one of:
 
 ```text
-BACKPLATE
+SEMANTIC_ONLY
+PERSISTED
+PUBLIC_WRITER
+REVISION_INTEGRATED
+QUALIFIED
+ABSENT
+```
+
+No later package may write a new table merely because a P0 owner is inconvenient.
+
+### 2.3 Promotion rule
+
+If the current repository has no persisted runtime owner for `PanelAssembly` physical layout, ELV6 implements the first persisted owner **using the existing semantic identity**, not a second generic-panel model. If an accepted writer exists, ELV6 routes through it.
+
+The normalized workspace can unify panel and rack views through adapters while preserving the canonical writer underneath.
+
+---
+
+## 3. Upstream contract
+
+| Owner | ELV6 consumes | ELV6 must not duplicate |
+|---|---|---|
+| ELV2 | immutable selected/adopted technical definitions and physical data | product selection, latest-edition fallback |
+| ELV3 | cable/run/end/termination/path identities and exact physical facts | route topology, cable allocation, installed length |
+| ELV4 | source/UPS/battery identities and immutable evidence | load/source/battery runtime sizing |
+| ELV5 | discipline results, rack/patch/capacity demand facts and exact evidence refs | CCTV/LAN/ACS/Fire calculations |
+| shared runtime | design revision, command result, ledger/history/UoW/freeze/create-next | parallel revision/history system |
+
+Every consumed upstream row/evaluation is pinned by immutable identity/fingerprint. “Current selected UI object” is never sufficient provenance.
+
+---
+
+## 4. Stage claim boundary
+
+### ELV6 may conclude intrinsic `FAIL` when exact facts prove:
+
+- body outside usable enclosure;
+- occupied-volume collision;
+- rack U conflict;
+- rail-depth or mounting-interface incompatibility;
+- DIN interval/physical-width overflow;
+- service/removal/door-sweep collision;
+- cable-entry exclusive conflict or explicit physical capacity overflow;
+- adopted technical bend envelope collision;
+- physical termination count overflow;
+- battery physical/orientation incompatibility;
+- adopted shelf/surface static-load overload;
+- intrinsic airflow keepout blocked.
+
+### ELV6 must not conclude normative compliance/non-compliance for:
+
+- IEC 61439 assembly conformity;
+- project/jurisdiction minimum clearances or segregation;
+- temperature-rise conformity;
+- IP degree after openings/glands/modifications;
+- protective-bonding conductor sizing/mandatory topology;
+- seismic/anchorage/anti-tip compliance;
+- manufacturer/SKU suitability as a purchasing decision.
+
+ELV6 exports the physical evidence needed by ELV7. ELV8 later selects products against ELV6 technical requirements and must trigger revalidation when selected physical facts change.
+
+---
+
+## 5. Canonical mechanical geometry
+
+### 5.1 Fixed-point units
+
+New persisted ELV6 mechanical geometry uses exact integer micrometres (`µm`).
+
+```text
+1 mm = 1000 µm
+```
+
+Why this is mandatory:
+
+- project persisted floor geometry is integer millimetres and converts exactly;
+- rack mechanics can contain sub-mm dimensions;
+- deterministic hashing/replay cannot depend on binary floating formatting/tolerance;
+- collision boundaries must have one exact interpretation.
+
+Legacy `double` values are compatibility inputs only and pass through a versioned normalizer with explicit import tolerance.
+
+### 5.2 Canonical host frame
+
+```text
++X: left → right when viewed from front
++Y: bottom → top
++Z: front → rear
+```
+
+All persisted V1 placement transforms are orthogonal. Front/rear/side/section UI views derive from this frame.
+
+### 5.3 Occupancy math
+
+AABB uses half-open bounds:
+
+```text
+[minX,maxX) × [minY,maxY) × [minZ,maxZ)
+```
+
+Containment:
+
+```text
+host.minAxis <= item.minAxis
+item.maxAxis <= host.maxAxis
+for X,Y,Z
+```
+
+Two occupied AABBs overlap iff all three axis intersections have positive length:
+
+```text
+max(a.minX,b.minX) < min(a.maxX,b.maxX)
+and same for Y,Z
+```
+
+Touching faces are not collision by body geometry. A required service/clearance envelope can still collide.
+
+---
+
+## 6. Host model
+
+### 6.1 Host kinds
+
+```text
+PANEL_ASSEMBLY
+ELV_WALL_CABINET
+ELV_FLOOR_RACK
+ELV_FLOOR_CABINET
+BOX
+CUSTOM
+```
+
+Panel identity remains `PanelAssembly`. Non-panel telecom/ELV hosts are ELV6-owned.
+
+### 6.2 Host required facts
+
+```text
+id + logicalId
+projectId + designRevisionId
+ownerKind + hostKind
+outer AABB
+usable AABB
+locationRef
+mounting surfaces
+rack profile if applicable
+technicalDefinitionRef if adopted
+rowRevision + fingerprint
+```
+
+Optional technical facts are independent: environmental/IP claim refs, material/surface refs, static load capability, ventilation openings, door mechanics, grounding/bond points. Missing optional facts block only dependent processes.
+
+---
+
+## 7. Mounting surfaces
+
+Supported initial kinds:
+
+```text
+DIN_RAIL
 FRONT_RACK_RAILS
 REAR_RACK_RAILS
-DIN_RAIL
+FOUR_POST_RACK_RAILS
 SHELF
-DOOR
+BACKPLATE
+DOOR_INNER
+DOOR_OUTER
+TERMINAL_RAIL
+BATTERY_TRAY
 CUSTOM_PLANE
 ```
 
-For a `PanelAssembly`, DIN/backplate/duct/reserved-zone facts are adapted from existing panel objects. For a new rack enclosure, ELV6 owns the corresponding rack mounting surfaces.
+A surface is not just a label. It has host-local frame, usable envelope and typed capabilities.
 
-A proposal/evaluator may operate on a normalized immutable `MountingSurfaceSnapshot`; accepting a proposal writes through the canonical owner command path.
+Unknown capability is `UNRESOLVED`, not unlimited.
 
-### 4.3 Placement ownership
+---
 
-A generic `LayoutPlacementSnapshot` is a solver/evaluation projection, not automatically a new source-of-truth row.
+## 8. Rack engineering
 
-For existing panels:
+### 8.1 Rack profile
+
+Rack interface dimensions come from an adopted versioned technical profile. The engine must not assume every rack is a universal “19 inch” host.
+
+A profile includes:
 
 ```text
-PanelModulePlacement / existing panel placement owner
-    ↓ adapter
-LayoutPlacementSnapshot
+rackUnitPitchUm
+frontInterfaceWidthUm
+rearInterfaceWidthUm?
+railDepthRange
+mountingModes
+sourceRef/hash
 ```
 
-For new ELV racks:
+IEC 60297-3-100 may be a source for a profile, but the project ruleset/applicability is not encoded as an ELV6 global constant.
+
+### 8.2 U interval
 
 ```text
-ElvRackPlacement (ELV6-owned)
-    ↓ adapter
-LayoutPlacementSnapshot
+span = [firstU, firstU + heightU)
 ```
 
-Required normalized fields:
+Utilization:
 
 ```text
-placementRef(ownerKind, entityId)
-hostRef
-subjectRef(owner, kind, id, revisionId)
-mountingSurfaceRef
-pose / anchor
-occupiedEnvelopeMm
-rackUnitSpan?
-dinRailSpan?
-depthMm
+occupiedU = cardinality(union(active exclusive U positions))
+reservedU = cardinality(explicit reserve set not already occupied)
+freeU = usableU - occupiedU - reservedU
+```
+
+Do not sum overlapping reservations twice.
+
+### 8.3 Front/rear/depth
+
+U PASS does not imply mountability. Rail-depth/mounting mode/body/protrusion checks are independent.
+
+---
+
+## 9. DIN engineering
+
+Legacy concepts remain recognizable:
+
+```text
+position
+moduleWidthUnits
+modulePitch
+physicalWidth
+railLength
+```
+
+But runtime placement gains stable identity/revision and exact geometry.
+
+DIN interval:
+
+```text
+[position, position + moduleWidthUnits)
+```
+
+If both discrete module and physical-width bases exist, both must pass. A module-count PASS cannot hide millimetre overflow.
+
+Reserved modules are explicit reservations, not fake devices.
+
+---
+
+## 10. Physical subject definition
+
+Every placed item resolves an immutable physical definition with independent facts:
+
+```text
+body envelope
+allowed mounting modes
+supported orientations
+connector protrusions
+service envelopes
+removal envelopes
+airflow keepouts
+mass
+local center of gravity
+heat loss
+```
+
+This prevents a common engineering error: equating “device footprint fits” with “device can be wired and maintained”.
+
+A missing heat-loss fact does not erase valid placement geometry; it makes the thermal basis partial.
+
+---
+
+## 11. Serviceability and door mechanics
+
+Service/removal envelopes are first-class geometry. Typical examples:
+
+- front access needed to replace an MCB/relay/module;
+- rear space to disconnect a server/patch lead;
+- battery lift/remove path;
+- plug/terminal screwdriver/access volume;
+- fan/filter maintenance access.
+
+Door model stores hinge axis, closed frame and allowed opening range. V1 uses a versioned conservative swept-envelope backend. Door-mounted devices participate in the sweep.
+
+---
+
+## 12. Cable entry and internal wiring
+
+### 12.1 Cable entry
+
+Entry types include gland, gland plate, knockout, brush panel, floor/roof/side/rear opening and custom.
+
+Assignment identity is the exact cable end, not a cable label. Exclusive cable end may not be simultaneously assigned to two physical entries in one revision.
+
+### 12.2 Bend/strain envelope
+
+When exact cable/connector technical facts give minimum bend or protrusion/strain requirements, ELV6 evaluates them geometrically. It never invents a generic bend multiplier.
+
+### 12.3 Internal wiring duct
+
+For each positioned duct ELV6 can store:
+
+```text
+body geometry
+usable cross-sectional area
+usable length
+assigned bundle/conductor refs
+observed area/volume basis
+```
+
+ELV6 does not hardcode a regulatory fill percentage. It exports used/free physical basis to ELV7.
+
+### 12.4 Terminations and patching
+
+Physical positions are separate from ELV5 logical port counts. ELV6 checks exact assignment uniqueness, physical position capacity and adopted interface facts.
+
+---
+
+## 13. Battery constructability
+
+Battery physical fit consumes exact ELV4 battery/bank identity but does not recalculate runtime/capacity.
+
+Independent dimensions:
+
+```text
+body containment
 orientation
-locked? / extension metadata
-sourceProposalId?
-expectedSubjectFingerprint
+terminal access
+handling/removal envelope
+surface/support load
+contribution to total host mass/CoG
+thermal contribution only when exact heat-loss fact exists
 ```
 
-A subject is referenced, never cloned.
+Electrical battery PASS never implies physical PASS.
 
-### 4.4 Zones and access envelopes
+---
 
-Existing `PanelReservedZone`/`PanelCableDuct` remain authoritative for current panel semantics. ELV6 may add typed extension records for concepts not represented there, such as service/removal envelope, cable-entry bend envelope, battery handling envelope and explicit future rack reserve.
+## 14. Mass and centre of gravity
 
-Jurisdiction-specific clearance values belong to ELV7. ELV6 may enforce only intrinsic geometry/capability from adopted technical facts.
-
-### 4.5 Cable entry and patching anchors
-
-`CableEntry` is a typed ingress/egress anchor only where an equivalent canonical owner does not already exist. It contains location/orientation, kind, intrinsic capacity and non-owning cable endpoint assignments. ELV3 remains cable/run owner.
-
-Assignment validation prevents inconsistent exclusive claims within one revision.
-
-### 4.6 Battery placement
-
-Battery placement consumes exact ELV4 battery evidence plus technical footprint/orientation/mass/service facts. It uses the canonical host placement mechanism for that enclosure owner. Missing mandatory dimensions produce unresolved fit, never a guessed form factor.
-
-## 5. Coordinate, unit and occupancy rules
-
-### 5.1 Units and numeric compatibility
-
-The existing panel/geometry code uses millimetres with `double` fields (`widthMm`, `heightMm`, `depthMm`, rail lengths and placement widths). ELV6 must **not create an incompatible integer-mm fork**.
-
-P0/P1 must pin the accepted geometry scalar/serialization/tolerance convention used by the existing geometry kernel and `PanelAssembly`. New ELV6 geometry follows that convention. Discrete capacities such as rack U, module positions and counts remain integer/discrete where naturally required.
-
-UI unit conversion is presentation-only. Deterministic hashes use the project canonical numeric serialization, not locale-formatted floating-point strings.
-
-### 5.2 Coordinate frames
-
-Every normalized placement resolves into a stable enclosure-local frame. Front/rear views are projections of the same canonical geometry, not independent mutable layouts.
-
-### 5.3 Rack units
-
-Rack placement stores logical U span plus resolved physical envelope. Rules:
-
-- one canonical interval convention is frozen in P1;
-- exclusive occupancy lanes cannot overlap;
-- front/rear sharing is allowed only when mounting/depth capabilities prove non-collision;
-- usable U range cannot be exceeded;
-- zero/negative spans are invalid;
-- reserved U is an explicit zone/reservation, not fake equipment.
-
-### 5.4 Existing DIN rails
-
-Existing `DinRail.capacityModules`, `railLengthMm`, `modulePitchMm`, `PanelModulePlacement.position`, `moduleWidthUnits` and `physicalWidthMm` are reused for panel DIN placement. ELV6 hardens interval/collision validation around these facts instead of creating another DIN placement table.
-
-If a future generic DIN abstraction is extracted, a compatibility adapter and migration proof are mandatory before `PanelModulePlacement` stops being authoritative.
-
-### 5.5 Shelves/backplates
-
-Shelf/backplate placement uses footprint plus depth in the accepted geometry representation. When load capacity is known, weight is another independent result dimension. Missing load data yields `UNRESOLVED` for load, without erasing valid geometry results.
-
-## 6. Intrinsic fit evaluation
-
-ELV6 emits structured findings such as:
+Mass is integer grams. Exact moments:
 
 ```text
-OUT_OF_BOUNDS
-PLACEMENT_OVERLAP
-MOUNTING_MODE_INCOMPATIBLE
-RACK_U_CONFLICT
-DIN_INTERVAL_CONFLICT
-DEPTH_CONFLICT
-SERVICE_ENVELOPE_CONFLICT
-CABLE_ENTRY_CONFLICT
-CABLE_ENTRY_CAPACITY_EXCEEDED
-BATTERY_ENVELOPE_CONFLICT
-BATTERY_ORIENTATION_UNSUPPORTED
-WEIGHT_CAPABILITY_EXCEEDED
-VENTILATION_ENVELOPE_CONFLICT
-UPSTREAM_EVIDENCE_MISSING
-UPSTREAM_EVIDENCE_STALE
+Mx = Σ(m_i * x_i)
+My = Σ(m_i * y_i)
+Mz = Σ(m_i * z_i)
+M  = Σ(m_i)
+CoG = (Mx/M, My/M, Mz/M)
 ```
 
-Each finding stores host/placement/subject refs, measured facts, expected capability, provenance and stable ordering key.
+Moments are integer gram·µm; division yields an exact rational/bounded persisted result according to the numeric codec.
 
-`PASS`, `FAIL`, `UNRESOLVED` and `NOT_APPLICABLE` are separate. Missing data never becomes PASS.
+If one required mass is unknown, aggregate CoG is partial/unresolved rather than computed from the known subset and mislabeled complete.
 
-Existing panel validation is not discarded. P0 maps each existing panel validator/result to ELV6 finding semantics and proves whether it is reused directly, wrapped or extended.
+---
 
-## 7. Deterministic auto-layout
+## 15. Ventilation and thermal preparation
 
-Auto-layout is advisory and operates on immutable normalized host snapshots, regardless of underlying owner.
+ELV6 must preserve the data that later thermal verification needs:
 
-### Input
+- declared equipment heat losses;
+- positioned heat-source distribution;
+- enclosure dimensions/surfaces/material technical refs when available;
+- ventilation openings and free areas;
+- fans, positions, directions and adopted ratings;
+- partitions;
+- blocked airflow keepouts;
+- adjacent-wall/exposed-surface facts where modelled.
+
+Heat loss sum:
 
 ```text
-exact project/revision
-host snapshot(s)
-current canonical placements
-locked placements/extension metadata
-unplaced subjects
-intrinsic mounting/envelope capabilities
-reserved/service zones
-cable-entry affinity facts
-battery/service facts
-versioned optimization policy
+P_loss_declared = Σ exact adopted subject heatLoss
 ```
 
-### Output
+A device supply/load wattage is not substituted for heat loss without an exact model.
 
-`LayoutProposal` contains owner-targeted proposed mutations, unresolved subjects, score breakdown, conflicts and exact input fingerprint. It never mutates a host directly.
+IEC TR 60890:2022 demonstrates why enclosure geometry, power-loss distribution, ventilation, material/surface and adjacency facts matter, but ELV6 produces only a thermal-input basis. ELV7/rules profiles own method applicability and compliance conclusions.
 
-### Determinism
+---
 
-Identical canonical input + solver/policy version produces identical canonical proposal ordering/coordinates. Tie-breaking uses stable IDs, never map iteration, DB row order or widget order.
+## 16. Environmental/IP evidence boundary
 
-### Priorities
+ELV6 may store the selected enclosure protection claim/reference and the physical openings/glands/doors that can affect that evidence. It must not recalculate or guarantee an IP code from geometry alone.
 
-1. hard fit/mounting constraints;
-2. locked/manual placements;
-3. physical patching/power affinity where exact evidence exists;
-4. service/cable-entry access;
-5. rack/DIN fragmentation minimization;
-6. declared expansion reserve;
-7. stable readable ordering.
+IEC 60529 is therefore an ELV7/reference concern; ELV6 supplies exact physical modification/provenance facts.
 
-These are layout priorities, not jurisdictional law.
+---
 
-### Acceptance
+## 17. Segregation and bonding
 
-Proposal acceptance rechecks host owner revisions, subject fingerprints and proposal input hash, then routes writes through owner-specific command services. Stale proposal acceptance fails without destroying the draft.
+### Segregation
 
-## 8. Revision and dependency semantics
+ELV6 measures observed intersection/shortest-distance geometry between declared groups/zones. Required minimum values belong to ELV7 unless they are an intrinsic manufacturer constraint.
 
-A layout evaluation/proposal is tied to exact `projectId` + `revisionId` and an immutable consumed-input manifest.
+### Bonding
 
-Targeted invalidation examples:
+ELV6 records physical bond points/links for host body, door, plate, rail, PE bar/rack frame where provided. It does not size protective conductors or declare electrical-safety compliance.
 
-- device envelope change → its placement + collision closure;
-- battery requirement change → battery fit + affected host totals;
-- cable endpoint/entry change → entry/patching closure;
-- unrelated recording-policy change → no rack invalidation unless a consumed capacity/physical fact changed;
-- normative profile change → ELV7 stale state, not intrinsic ELV6 geometry mutation.
+---
 
-Frozen revisions retain exact owner-specific panel/rack data plus ELV6 proposal/evaluation capture. Pre-ELV6 revisions return `ELV6_NOT_CAPTURED`, not empty-valid.
+## 18. Process architecture
 
-Create-next remapping preserves existing panel owner semantics and remaps ELV6-owned rack/layout extension identities without overwriting history.
+The runtime closed registry contains exactly 24 codes `LAY-01…LAY-24`; see `elv6-implementation/process-registry.json`.
 
-## 9. Command boundary
+Processes are separated deliberately so one successful subtotal cannot hide another engineering failure. Examples:
 
-Reuse existing `ElvCommandResult<T>`, replay-before-precondition, ledger/history and atomic UoW.
+- U fit and rail-depth fit are different results;
+- body containment and serviceability are different results;
+- battery electrical evidence and physical battery fit are different stages;
+- airflow physical clearance and thermal verification are different claims;
+- observed segregation and normative required segregation are different stages.
 
-P0/P2 must first inventory current panel mutation services. The final command registry then has two classes:
+The aggregate `LAY-24` may PASS only if all applicable required intrinsic dimensions are complete/pass. Later-stage normative dimensions remain explicitly `NOT_ASSESSED`.
 
-1. **reused/extended canonical panel commands** for `PanelAssembly`/DIN/module/reserved-zone mutations;
-2. **new ELV6 commands** only for non-panel rack hosts, ELV6 extensions, proposals/evaluations and cable-entry assignments not already owned elsewhere.
+---
 
-Conceptual operations include:
+## 19. Evaluation states
+
+ELV6 uses four axes:
 
 ```text
-Create/Update/ArchiveRackEnclosure
-Create/Update/ArchiveRackMountingSurface
-Create/Update/ArchiveLayoutExtensionZone
-Place/Move/RemoveRackSubject
-Lock/UnlockLayoutPlacement
-Assign/ReleaseCableEntry
-GenerateLayoutProposal
-AcceptLayoutProposal
-RejectLayoutProposal
-ValidateEnclosureLayout
+Freshness:  CURRENT | STALE
+Completion: COMPLETE | PARTIAL | BLOCKED
+Assessment: PASS | FAIL | UNRESOLVED | NOT_ASSESSED
+Execution:  SUCCEEDED | FAILED
 ```
 
-Do not create `CreateEnclosure` or `PlaceLayoutSubject` APIs that shadow existing `PanelAssembly` ownership without an explicit migration decision.
+Examples:
 
-Cross-owner commands carry expected revisions/reviewed impact. Replay returns original committed result even if current mutable preconditions changed.
+- body collision: `SUCCEEDED / COMPLETE / FAIL`;
+- missing depth, known width/height: `SUCCEEDED / PARTIAL / UNRESOLVED`;
+- unsupported mechanical model: `SUCCEEDED / BLOCKED / UNRESOLVED`;
+- exception/invalid engine state: `FAILED`;
+- upstream changed after publication: pointer `STALE`, immutable record unchanged.
 
-## 10. Persistence design
+---
 
-P0 must inventory existing panel persistence before adding schema. The target is additive, not duplicative.
+## 20. Deterministic auto-layout
 
-Existing canonical panel tables/records continue to store panel enclosure geometry, DIN/module placement and current panel zones. New ELV6 tables are limited to missing domains, for example:
+Auto-layout is an engineer assistant, never an auto-commit engine.
+
+### Hard constraints
+
+Cannot be traded for score:
 
 ```text
-elv_rack_enclosure
-elv_rack_mounting_surface
-elv_rack_placement
-elv_layout_extension_zone
-elv_layout_extension_metadata
-elv_cable_entry
-elv_cable_entry_assignment
-elv_layout_constraint
-elv_layout_proposal
-elv_layout_proposal_item
-elv_layout_evaluation
-elv_layout_finding
-elv_layout_dependency_ref
+host/surface bounds
+exclusive collision
+mounting compatibility
+locked placements
+rack/DIN discrete capacity
+required intrinsic service/bend/door constraints
+explicit support-load capability
 ```
 
-Exact table names are frozen only after the P0 schema audit.
+### Lexicographic optimization vector
 
-Requirements:
+After feasibility:
 
-- no second active row for one existing `PanelAssembly` enclosure or `PanelModulePlacement`;
-- stable logical/revision IDs for new ELV6 owners;
-- typed owner references for cross-domain hosts/placements;
-- foreign keys where both sides share ownership;
-- exact upstream owner/kind/id/revision/fingerprint for cross-stage refs;
-- indexes by project/revision/host/subject;
-- uniqueness for active ELV6-owned placements and exclusive cable-entry claims;
-- immutable published proposal/evaluation evidence;
-- no retagging of ELV3/4/5 results during migration.
+1. preserve existing manual placement;
+2. reduce unresolved service/access/bend conflicts;
+3. minimize exact physical affinity cost where evidence exists;
+4. reduce fragmentation;
+5. preserve declared reserve;
+6. stable readable ordering;
+7. stable-ID lexical tie-break.
 
-Opaque JSON is diagnostics/export payload only, not mutable layout truth.
+No random seed, timestamp, DB ordering, hash-map iteration or widget position may affect output.
 
-## 11. Code boundaries
+Proposal is immutable and stores exact capture fingerprint, solver version, policy version, item mutations, unresolved subjects, findings and complete score vector.
 
-Expected additive shape after P0:
+Acceptance is CAS-guarded and atomic across all targeted owners.
+
+---
+
+## 21. Public command and wire architecture
+
+Strict schema:
 
 ```text
-packages/engineering_core/lib/src/panel_assembly.dart     // reuse; extend compatibly only
-packages/engineering_core/lib/src/elv6/
-  host_projection/
-  rack/
-  constraints/
-  solver/
-  evaluation/
-
-apps/mobile/lib/application/
-  existing panel application APIs                          // reuse
-  elv6_rack_repository.dart
-  elv6_layout_command_service.dart
-  elv6_layout_query_service.dart
-  elv6_layout_workspace_controller.dart
-
-apps/mobile/lib/data/repositories/
-  existing panel Drift repository                          // reuse
-  drift_elv6_rack_repository.dart
-  drift_elv6_layout_repository.dart
+electra.elv6-layout-command.v1
 ```
 
-The actual existing panel repository/service filenames are discovered in P0; this spec does not invent a competing abstraction merely to fit naming.
+Exactly 21 initial operations are registered in `elv6-implementation/command-registry.json`. The same ten-field strict envelope pattern used by ELV4/ELV5 is retained.
 
-`engineering_core` remains Flutter/Drift/HTTP independent. Widgets never query Drift directly.
+Client-provided dependency closures or impact lists are untrusted. Server re-resolves old/new impact before mutation.
 
-## 12. Workspace UX
+Replay rules, row CAS, reviewed impact, history, ledger/outbox and invalidation are one atomic transaction.
 
-One enclosure workspace may show panel and rack hosts uniformly while preserving canonical ownership.
+ELV4 `FREEZE_DESIGN_REVISION` and `CREATE_NEXT_WORKING_DESIGN_REVISION` remain the only public revision boundary; ELV6 adds its snapshot/remap participant internally.
 
-Required views/capabilities:
+---
 
-- enclosure/rack list with owner/type/status;
-- front view and rear view when supported;
-- existing panel DIN/backplate view through adapter;
-- rack U view;
-- eligible-subject palette;
-- exact inspector/provenance;
-- U/DIN/reserve/cable-entry capacity summaries;
-- findings and source navigation;
-- stale dependency banner;
-- auto-layout before/after proposal diff;
-- explicit accept/reject and lock state;
-- frozen historical read-only mode.
+## 22. Persistence and migration
 
-Drag/drop is preview then canonical owner command. Canvas position is never authoritative before commit success.
+Current repository schema at design time is 23. ELV5 runtime migration is not yet finalized, therefore ELV6 does not reserve schema 24 in advance.
 
-## 13. Handoff to ELV7
-
-ELV6 exports a stable owner-neutral validation projection:
+At implementation entry:
 
 ```text
-host identity + canonical owner
-placement identity + canonical owner
-physical envelopes/coordinates
-mounting modes
-rack/DIN capacity/utilization
-battery placement/service facts
-cable-entry assignments/capacity
+ELV6 migration origin = exact accepted ELV5 runtime schema
+ELV6 target = additive migration(s) above that schema
+```
+
+Required normalized roots are defined in the code-level contract. P0 decides whether panel-layout tables are promotion of currently semantic-only identity or adapters to existing accepted persistence.
+
+All mutable layout roots are revision-scoped with logical IDs, row revisions and typed provenance.
+
+Opaque JSON cannot be the sole mutable placement truth.
+
+---
+
+## 23. Freeze and create-next
+
+Freeze captures canonical layout plus selected immutable proposal/evaluation evidence and adds a versioned `elv6Layout` section/hash without rewriting existing ELV3/4/5 hashes.
+
+Historical pre-ELV6 revision:
+
+```text
+ELV6_NOT_CAPTURED
+```
+
+not empty/pass and not latest fallback.
+
+Create-next uses typed logical mappings for every layout-owned ID. Old revision evidence is immutable.
+
+---
+
+## 24. Engineer workspace
+
+Minimum serious engineering UX:
+
+- host tree/list with owner and revision;
+- front/rear/side/section projections;
+- rack U and DIN rulers;
+- exact numeric inspector and direct coordinate/span editing;
+- keyboard nudge plus optional drag;
+- U/DIN/grid/anchor snapping modes;
+- multi-select and group-move preview;
+- explicit lock/unlock;
+- equipment/zones/ducts/entries/service/removal/airflow/segregation/bonding layers;
+- “why not here?” pure-validator diagnostic before commit;
+- capacity summaries for U/DIN/termination/entry/reserve/mass;
+- exact source/provenance navigation;
+- stale versus FAIL versus BLOCKED display;
+- proposal diff with solver score vector;
+- conflict retains draft;
+- frozen read-only historical mode.
+
+Drag/drop is never the only editing method.
+
+---
+
+## 25. ELV7 handoff
+
+ELV6 produces a versioned immutable validation projection with:
+
+```text
+host/owner identity
+exact geometry and placements
+mounting capabilities
+zones/ducts/entries
+rack/DIN/termination capacity basis
+service/removal/door/bend envelopes
+battery/mass/CoG basis
+ventilation/heat-loss physical facts
+observed segregation geometry
+bonding physical evidence
 intrinsic findings
-upstream fingerprints
-revision/projection/hash
+consumed upstream fingerprints
+canonical hash
 ```
 
-ELV7 adds jurisdictional rules. ELV6 contains no country-specific branches.
+ELV7 can change normative profile and recompute compliance without changing ELV6 physical truth.
 
-## 14. Handoff to ELV8
+---
 
-ELV8 may use ELV6 physical requirements to filter manufacturer candidates. A selected product dimension/mounting change triggers explicit impact/revalidation. ELV8 cannot silently resize or rearrange a panel/rack.
+## 26. ELV8 handoff
 
-## 15. Acceptance requirements
+ELV8 consumes technical envelope/mounting/load/thermal/connection requirements. Product substitution emits targeted impact keys. If selected dimensions or mounting facts change, affected ELV6 evidence becomes stale and must be recomputed/revalidated.
 
-Runtime closure requires at least:
+ELV8 cannot silently rearrange a host.
 
-1. **baseline ownership proof** that existing `PanelAssembly`/DIN/module data is not duplicated;
-2. legacy panel persistence/restart behavior remains accepted;
-3. existing panel layout fixtures remain green after ELV6 extensions;
-4. new non-panel rack create/edit/restart restore;
-5. owner-neutral deterministic collision/bounds evaluation;
-6. existing panel DIN and new rack-U positive/negative fixtures;
-7. battery fit positive/negative/unknown-dimension fixtures;
-8. cable-entry conflict/capacity fixtures;
-9. locked-placement auto-layout proof across supported host owners;
-10. identical-input deterministic proposal proof;
-11. stale proposal rejection after concurrent owner/dependency mutation;
-12. command replay/idempotency and atomic rollback proof;
-13. create-next/freeze/historical-read proof for both reused and new owners;
-14. targeted invalidation proof;
-15. ELV7 projection provenance/hash proof;
-16. project-scale rack/panel performance budget.
+---
 
-No fixture may treat missing evidence as PASS or use fictional data to claim normative compliance.
+## 27. Runtime qualification
 
-## 16. Explicit non-goals
+P8 must execute at one exact source SHA:
+
+- all `LAY-01…24` positive/negative/blocked cases;
+- all 21 command codecs through the public semantic adapter;
+- panel-layout owner promotion/reuse proof;
+- fresh DB + accepted migration origin;
+- file-SQLite close/reopen;
+- exact fixed-point/hash tests;
+- legacy double normalization boundaries;
+- response-loss replay and payload conflict;
+- failure-injection rollback at every multi-table checkpoint;
+- two-connection edit/proposal acceptance races;
+- freeze/publication race;
+- R1 freeze → R2 create-next/remap → immutable R1 read;
+- targeted old+new invalidation plus unrelated negative controls;
+- deterministic proposal byte/hash proof;
+- ELV7 projection hash proof;
+- workload-scale benchmark on a pinned CI benchmark class.
+
+A design validator or green unrelated Flutter test never substitutes for this qualification.
+
+---
+
+## 28. Explicit non-goals
 
 ELV6 does not own:
 
-- replacement of accepted `PanelAssembly` merely for naming consistency;
-- manufacturer/SKU selection or purchasing;
-- commercial BOM/estimate/price books;
-- jurisdictional compliance;
-- ELV4 power/battery sizing;
-- ELV5 discipline algorithms;
-- ELV3 cable routing/allocation;
-- full 3D CAD or photorealistic rendering.
+- electrical protection/source calculations;
+- CCTV/LAN/ACS/Fire engineering algorithms;
+- external cable route design;
+- product procurement/price/BOM selection;
+- national/jurisdictional compliance;
+- manufacturer-certification claims;
+- photorealistic rendering;
+- arbitrary free-angle/full-solid CAD.
 
-Future shared-enclosure refactoring is a separately qualified migration, not an implicit prerequisite for ELV6.
+Those boundaries are deliberate. The goal of ELV6 is a **deterministic, constructability-grade physical engineering model**, not an unbounded CAD package.
