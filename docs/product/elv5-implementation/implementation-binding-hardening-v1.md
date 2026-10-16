@@ -20,6 +20,8 @@ The runtime-version registry freezes the initial ELV5 additive database target a
 
 ## Process definition versus resolver ownership
 
+Repository-aware input resolution belongs to the application layer.
+
 `engineering_core` owns pure process metadata, typed input/output semantics, `calculate()` and `evaluate()`. It does **not** own repository-aware input resolution.
 
 Application-layer `*InputResolver` symbols own semantic input assembly and may depend only on declared repository interfaces/capture projections. The architecture is:
