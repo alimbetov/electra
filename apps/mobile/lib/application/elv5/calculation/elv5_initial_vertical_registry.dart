@@ -1,3 +1,4 @@
+import '../acs/acs03_electrical_contract.dart';
 import '../acs/acs03_runtime.dart';
 import '../acs/elv5_acs_persistence.dart';
 import '../cctv/cctv02_runtime.dart';
@@ -10,6 +11,7 @@ import '../lan/elv5_lan_persistence.dart';
 import '../lan/lan01_runtime.dart';
 import '../lan/lan05_optical_section_evidence.dart';
 import '../lan/lan05_runtime.dart';
+import '../power/elv4_current_evidence_source.dart';
 import '../power/elv4_operating_fact_source.dart';
 import 'elv5_blocked_capture.dart';
 import 'elv5_calculation_runtime.dart';
@@ -26,6 +28,8 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
   required Elv5FireMutationStore fireStore,
   required Elv3RealizedLinkFactSource elv3LinkFacts,
   required Lan05OpticalSectionEvidenceSource opticalSectionEvidence,
+  required Acs03ElectricalContractSource acs03Contracts,
+  required Elv4CurrentEvidenceSource currentPowerEvidence,
   required Elv4OperatingFactSource powerOperatingFacts,
   required Elv5CaptureRevisionSource captureRevisions,
   DateTime Function()? nowUtc,
@@ -76,7 +80,12 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
     ),
     Elv5BlockedAwareTypedProcessCalculationAdapter(
       resolver: guarded(
-        Acs03PersistedInputResolver(acsStore: acsStore, nowUtc: nowUtc),
+        Acs03PersistedInputResolver(
+          acsStore: acsStore,
+          contractSource: acs03Contracts,
+          powerEvidence: currentPowerEvidence,
+          nowUtc: nowUtc,
+        ),
       ),
       executor: buildAcs03Executor(nowUtc: nowUtc),
       nowUtc: nowUtc,
