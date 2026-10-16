@@ -70,6 +70,20 @@ jobs:
         working-directory: .
         run: python3 scripts/ci/check-elv5-normative-requirements.py
 
+      - name: Generate ELV5 450-case market simulation
+        working-directory: .
+        run: >-
+          python3 scripts/ci/check-elv5-market-simulation.py
+          --output "${RUNNER_TEMP}/elv5-market-simulation.json"
+
+      - name: Publish ELV5 market simulation
+        uses: actions/upload-artifact@v4
+        with:
+          name: elv5-market-simulation-${{ github.sha }}
+          path: ${{ runner.temp }}/elv5-market-simulation.json
+          if-no-files-found: error
+          retention-days: 30
+
       - name: Generate ELV5 contract manifest
         working-directory: .
         run: >-
