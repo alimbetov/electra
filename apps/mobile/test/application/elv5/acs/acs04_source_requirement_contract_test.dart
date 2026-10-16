@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('ACS-04 contract round-trips canonically with stable requirement-set hash', () {
-    final contract = _contract('a' * 64);
+    final contract = _contract(_hash('a'));
     final restored = Acs04SourceRequirementContract.fromMap(
       contract.toCanonicalValue(),
     );
@@ -17,17 +17,17 @@ void main() {
     expect(
       () => Acs04SourceRequirementContract(
         sourceId: 'psu-1',
-        sourceDefinitionContentHash: 'b' * 64,
+        sourceDefinitionContentHash: _hash('b'),
         contributors: [
           Acs04RequirementContributorRef(
             contributorId: 'fire',
             disciplineCode: 'FIRE',
             policyCode: 'FIRE-PSU',
             editionId: 'fire-v1',
-            contentHash: 'c' * 64,
+            contentHash: _hash('c'),
           ),
         ],
-        cases: [_case('d' * 64)],
+        cases: [_case(_hash('d'))],
       ),
       throwsArgumentError,
     );
@@ -37,21 +37,21 @@ void main() {
 Acs04SourceRequirementContract _contract(String pwr02InputHash) =>
     Acs04SourceRequirementContract(
       sourceId: 'psu-1',
-      sourceDefinitionContentHash: 'b' * 64,
+      sourceDefinitionContentHash: _hash('b'),
       contributors: [
         Acs04RequirementContributorRef(
           contributorId: 'fire',
           disciplineCode: 'FIRE',
           policyCode: 'FIRE-PSU',
           editionId: 'fire-v1',
-          contentHash: 'c' * 64,
+          contentHash: _hash('c'),
         ),
         Acs04RequirementContributorRef(
           contributorId: 'acs',
           disciplineCode: 'ACS',
           policyCode: 'ACS-PSU',
           editionId: 'acs-v1',
-          contentHash: 'd' * 64,
+          contentHash: _hash('d'),
         ),
       ],
       cases: [_case(pwr02InputHash)],
@@ -68,3 +68,5 @@ Acs04SourceCaseContract _case(String pwr02InputHash) => Acs04SourceCaseContract(
       pwr02SubjectId: 'psu-1',
       expectedPwr02InputFingerprint: pwr02InputHash,
     );
+
+String _hash(String char) => List<String>.filled(64, char).join();
