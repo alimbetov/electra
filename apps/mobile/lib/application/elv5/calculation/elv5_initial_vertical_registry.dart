@@ -2,6 +2,8 @@ import '../acs/acs03_electrical_contract.dart';
 import '../acs/acs03_runtime.dart';
 import '../acs/acs04_runtime.dart';
 import '../acs/acs04_source_requirement_contract.dart';
+import '../acs/acs05_autonomy_contract.dart';
+import '../acs/acs05_runtime.dart';
 import '../acs/elv5_acs_persistence.dart';
 import '../cctv/cctv02_runtime.dart';
 import '../cctv/cctv03_runtime.dart';
@@ -31,6 +33,7 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
   required Lan05OpticalSectionEvidenceSource opticalSectionEvidence,
   required Acs03ElectricalContractSource acs03Contracts,
   required Acs04SourceRequirementContractSource acs04Contracts,
+  required Acs05AutonomyContractSource acs05Contracts,
   required Elv4CurrentEvidenceSource currentPowerEvidence,
   required Elv4OperatingFactSource powerOperatingFacts,
   required Elv5CaptureRevisionSource captureRevisions,
@@ -101,6 +104,17 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
         ),
       ),
       executor: buildAcs04Executor(nowUtc: nowUtc),
+      nowUtc: nowUtc,
+    ),
+    Elv5BlockedAwareTypedProcessCalculationAdapter(
+      resolver: guarded(
+        Acs05PersistedInputResolver(
+          contractSource: acs05Contracts,
+          powerEvidence: currentPowerEvidence,
+          nowUtc: nowUtc,
+        ),
+      ),
+      executor: buildAcs05Executor(nowUtc: nowUtc),
       nowUtc: nowUtc,
     ),
     Elv5BlockedAwareTypedProcessCalculationAdapter(
