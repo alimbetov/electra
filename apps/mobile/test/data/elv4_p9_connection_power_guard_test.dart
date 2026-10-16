@@ -95,10 +95,38 @@ void main() {
       )).connections.singleWhere((value) => value.id == 'poe-link');
       await builder.topology.saveConnection(builder.projectId, original);
 
-      final changed = EngineeringConnection.fromMap({
-        ...original.toMap(),
-        'evidence': 'changed outside reviewed power path',
-      });
+      const alternateProfileId = 'qualification-profile-cctv-alt';
+      await builder.topology.saveConnectionProfile(
+        ConnectionCompatibilityProfile(
+          identity: ProfileIdentity(
+            id: alternateProfileId,
+            projectId: builder.projectId,
+            code: 'CCTV_DATA_POWER_ALT',
+            version: '1',
+            source: 'ELV4 P9 power ownership regression',
+          ),
+          familyCodes: const ['CCTV'],
+          media: const [ConnectionMedium.wired],
+          semanticCode: 'DATA_POWER',
+          layer: ConnectionLayer.dataPower,
+          flow: CompatibilityFlow.directed,
+          kindA: EngineeringPortKind.dataPower,
+          kindB: EngineeringPortKind.dataPower,
+          connectorA: 'RJ45',
+          connectorB: 'RJ45',
+          protocolA: protocol,
+          protocolB: protocol,
+        ),
+      );
+      final changed = EngineeringConnection(
+        id: original.id,
+        systemId: original.systemId,
+        fromPortId: original.fromPortId,
+        toPortId: original.toPortId,
+        profileId: alternateProfileId,
+        medium: original.medium,
+        groupId: original.groupId,
+      );
       final owned = throwsA(
         isA<StateError>().having(
           (error) => error.message,
