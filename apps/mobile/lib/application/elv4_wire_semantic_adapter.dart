@@ -19,19 +19,17 @@ final class Elv4ResolvedWireImpact {
   final String reviewedImpactFingerprint;
 }
 
-typedef Elv4WireImpactResolver = Future<Elv4ResolvedWireImpact> Function(
-  Elv4WireCommandEnvelope envelope,
-);
+typedef Elv4WireImpactResolver =
+    Future<Elv4ResolvedWireImpact> Function(Elv4WireCommandEnvelope envelope);
 
-typedef Elv4WirePayloadDecoder<T> = T Function(
-  Map<String, Object?> payload,
-);
+typedef Elv4WirePayloadDecoder<T> = T Function(Map<String, Object?> payload);
 
-typedef Elv4WireSemanticHandler<TPayload, TResult> = Future<TResult> Function(
-  Elv4WireCommandEnvelope envelope,
-  TPayload payload,
-  Elv4ResolvedWireImpact impact,
-);
+typedef Elv4WireSemanticHandler<TPayload, TResult> =
+    Future<TResult> Function(
+      Elv4WireCommandEnvelope envelope,
+      TPayload payload,
+      Elv4ResolvedWireImpact impact,
+    );
 
 abstract interface class Elv4WireSemanticCodec<TResult> {
   Elv4WireCommandKey get key;
@@ -139,10 +137,12 @@ final class Elv4WireSemanticAdapter<TResult> {
     if (actual.length != expected.length ||
         !actual.containsAll(expected) ||
         !expected.containsAll(actual)) {
-      final missing = expected.difference(actual).toList()
-        ..sort((a, b) => _keyText(a).compareTo(_keyText(b)));
-      final extra = actual.difference(expected).toList()
-        ..sort((a, b) => _keyText(a).compareTo(_keyText(b)));
+      final missing =
+          expected.difference(actual).toList()
+            ..sort((a, b) => _keyText(a).compareTo(_keyText(b)));
+      final extra =
+          actual.difference(expected).toList()
+            ..sort((a, b) => _keyText(a).compareTo(_keyText(b)));
       throw ArgumentError(
         'ELV4 semantic codec registry mismatch. '
         'missing=${missing.map(_keyText).toList()} '
@@ -170,9 +170,7 @@ final class Elv4WireAggregatePayload {
         if (value is! Map) {
           throw FormatException('$memberField members must be objects.');
         }
-        return Map<String, Object?>.unmodifiable(
-          value.cast<String, Object?>(),
-        );
+        return Map<String, Object?>.unmodifiable(value.cast<String, Object?>());
       }),
     );
   }
