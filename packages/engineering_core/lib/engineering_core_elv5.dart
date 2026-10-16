@@ -23,6 +23,7 @@ export 'src/elv5/processes/fire/fa06_notification_capacity.dart';
 export 'src/elv5/processes/fire/fa07_signal_topology.dart';
 export 'src/elv5/processes/lan/lan01_path_length.dart';
 export 'src/elv5/processes/lan/lan02_port_capacity.dart';
+export 'src/elv5/processes/lan/lan04_path_compatibility.dart';
 export 'src/elv5/processes/lan/lan05_optical_budget.dart';
 export 'src/elv5/processes/lan/lan07_patch_panel.dart';
 export 'src/elv5/processes/process_code.dart';
