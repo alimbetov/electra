@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:electra_mobile/application/elv4_wire_command_dispatcher.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -21,6 +24,37 @@ void main() {
       'loads': <Object?>[],
     },
   };
+
+  test('runtime registry exactly matches authoritative command schema', () {
+    final file = File(
+      '../../docs/product/elv4-implementation/schemas/power-command.schema.json',
+    );
+    expect(file.existsSync(), isTrue);
+    final root =
+        (jsonDecode(file.readAsStringSync()) as Map).cast<String, Object?>();
+    final oneOf = (root['oneOf'] as List<Object?>)
+        .cast<Map<String, Object?>>();
+    final schemaKeys = <String>{};
+    for (final branch in oneOf) {
+      final properties = (branch['properties'] as Map).cast<String, Object?>();
+      String constant(String field) =>
+          ((properties[field] as Map).cast<String, Object?>()['const']) as String;
+      final version =
+          ((properties['payloadSchemaVersion'] as Map)
+              .cast<String, Object?>()['const']) as int;
+      schemaKeys.add(
+        '${constant('schema')}|${constant('operation')}|$version',
+      );
+    }
+
+    final runtimeKeys = <String>{
+      for (final operation in Elv4WireCommandEnvelope.powerV1Operations)
+        '${Elv4WireCommandEnvelope.powerCommandSchema}|$operation|1',
+      for (final operation in Elv4WireCommandEnvelope.revisionV2Operations)
+        '${Elv4WireCommandEnvelope.revisionCommandSchema}|$operation|2',
+    };
+    expect(runtimeKeys, schemaKeys);
+  });
 
   test('registered v1 envelope round-trips without version inference', () {
     final decoded = Elv4WireCommandEnvelope.fromMap(command());
