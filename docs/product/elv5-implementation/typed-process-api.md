@@ -141,11 +141,28 @@ Rules:
 ## 4. CCTV-02 — stream and network bandwidth
 
 ```dart
+enum CctvRateEvidenceKind {
+  expectedEstimate,
+  configuredTarget,
+  measuredWindow,
+  guaranteedWindowUpperBound,
+  guaranteedPointwiseUpperBound,
+}
+
+final class CctvRateEvidence {
+  final CctvRateEvidenceKind kind;
+  final Elv5ResolvedField<Duration> averagingWindow;
+  final String rateBoundary; // closed PAYLOAD or WIRE enum in production
+  final Elv5SourceRef exactEvidence;
+  final String applicabilityHash; // stream settings + supported time/model domain
+}
+
 final class CctvEncodedStream {
   final String cameraId;
   final String encodedStreamId;
   final Elv5EngineeringValue<BitRate> expectedPayloadBitRate;
   final Elv5EngineeringValue<BitRate>? peakPayloadBitRate;
+  final Elv5ResolvedField<CctvRateEvidence> peakRateEvidence;
   final String codecProfileRef;
 }
 
@@ -195,6 +212,47 @@ final class Cctv02Output {
 
 Wire-rate/capacity comparison is evaluated only when an exact overhead/capacity basis exists. Missing overhead MUST NOT be silently replaced by a universal percentage. The canonical required dimensions remain those declared by `process-registry.json`; extra capacity fields are supplementary until a registry version promotes them to required dimensions.
 
+### Bitrate claim boundary
+
+A non-null `peakPayloadBitRate`, an MBR/CBR name, or a configured device target is
+not proof of a guaranteed peak. `peakRateEvidence` is captured from the exact
+selected evidence/profile; it is not inferred from the numeric field or accepted
+as an unverified caller assertion. Its kind, window, rate boundary, evidence hash
+and settings applicability participate in the input fingerprint and frozen
+capture. Missing evidence remains an explicit `Elv5Missing` value.
+
+- `expectedEstimate` / `configuredTarget` never qualify a guaranteed capacity claim.
+- `measuredWindow` describes observations only; it does not bound future scenes.
+- `guaranteedWindowUpperBound` requires a known positive averaging window and an
+  exact statement of the windows/settings to which the guarantee applies. Only
+  an identical supported comparison window may use it. A longer-window average
+  cannot be used to pass a shorter-window peak, nor infer absence of packet loss.
+- `guaranteedPointwiseUpperBound` requires explicit evidence supporting that
+  stronger bound; a configuration label is insufficient. `averagingWindow` is
+  explicitly `Elv5NotApplicable`, not silently zero.
+- A PAYLOAD bound cannot be compared to WIRE capacity without the exact transport
+  model. Buffer/queue/loss-free delivery is outside the initial scalar rate model.
+
+CCTV-03's initial guaranteed `rate * recordedDuration` integration accepts a
+qualified pointwise upper bound. A window-only bound cannot cover arbitrary
+recording start/stop intervals without a separately versioned burst/integration
+model; return UNRESOLVED for guaranteed retention. Expected sizing may still be
+shown as an estimate. Do not invent a burst allowance or multiply a long-term
+average into a purported guaranteed storage figure.
+
+Counterexample for acceptance: two consecutive 1 s intervals carry 8 Mbit/s and
+0 Mbit/s. Their 2 s average is 4 Mbit/s. A 4 Mbit/s configured/2 s bound must not
+qualify a 5 Mbit/s link's 1 s peak claim; recording only the first second needs
+1,000,000 bytes rather than the 500,000-byte average estimate. Required tests:
+missing window, mismatched window, target-as-guarantee, measured-as-guarantee,
+payload/wire mismatch, and propagation through CCTV-02 → CCTV-03/05.
+
+Public source supporting the configuration/peak distinction: Axis,
+[Bitrate control for IP video](https://whitepapers.axis.com/en-us/bitrate-control-for-ip-video),
+March 2023, MBR section (reviewed 2026-10-16). It describes temporary overshoot;
+this specification's fail-closed evidence rules are our implementation contract,
+not a manufacturer-provided universal burst bound.
+
 ## 5. CCTV-03 — recording storage
 
 ```dart
@@ -207,6 +265,7 @@ final class CctvRecordingAssignment {
   final String poolId;
   final String copyRoleCode;
   final Elv5EngineeringValue<BitRate> recordingBitRate;
+  final Elv5ResolvedField<CctvRateEvidence> recordingRateEvidence;
 }
 
 final class CctvRecordingScheduleSegment {

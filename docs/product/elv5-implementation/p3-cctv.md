@@ -230,3 +230,11 @@ P3 must satisfy [flutter-performance-contract.md](flutter-performance-contract.m
 P3 runtime acceptance requires P3-T01…T08, both primary POS/NEG entries for CCTV-01…06, all CCTV boundary/adversarial/cross-discipline dossier vectors and required L0–L6/performance coverage at the same accepted source SHA and authority fingerprint.
 
 This document is a hardened design contract, not proof of source implementation.
+
+## Rate evidence qualification
+
+CCTV-02/03/05 MUST implement the `CctvRateEvidence` claim/window/boundary rules in
+`typed-process-api.md`. A configured limit or measured/window average is not a
+guaranteed peak; a window bound is not a pointwise bound for arbitrary recording
+intervals. Acceptance includes the 8/0 Mbit/s two-second counterexample and
+propagation of missing or incompatible evidence to every downstream claim.

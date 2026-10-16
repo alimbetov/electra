@@ -142,7 +142,7 @@ Computes expected and peak encoded traffic carried by each realized directed net
 `EncodedStreamId`, expected/peak `BitRateQ`, `CameraId`, `SubscriptionId`, source/receiver endpoint IDs, `DeliveryMode {unicast,multicast}`, ordered directed `NetworkEdgeId` paths or multicast tree edges, recorder assignment role, optional `TransportOverheadModelRef`, and optional edge capacity facts for technical headroom display.
 
 ### 4. Evidence requirements
-Bitrate carries basis (`manufacturerGuaranteed`, measured, projectSpecified, estimated, etc.). Guaranteed capacity qualification requires a guaranteed/upper-bound peak basis when the policy demands it. Paths come from captured realized network topology; membership sets and multicast group/tree definitions are fingerprinted.
+Bitrate carries basis (`manufacturerGuaranteed`, measured, projectSpecified, estimated, etc.) plus the typed rate-evidence kind/window/boundary from `typed-process-api.md`. A configured MBR/CBR target or measured average is never promoted to a guaranteed peak. Guaranteed capacity qualification requires a guaranteed/upper-bound peak basis when the policy demands it. Paths come from captured realized network topology; membership sets and multicast group/tree definitions are fingerprinted.
 
 ### 5. Operating cases
 At minimum `EXPECTED_PAYLOAD` and `PEAK_PAYLOAD`. `WIRE_RATE_EXPECTED`/`WIRE_RATE_PEAK` exist only when a compatible explicit overhead model is applicable. Recorder ingress is evaluated for expected and peak where both are known.
@@ -258,7 +258,7 @@ Computes required usable and, when a declared redundancy model applies, raw stor
 `RecordingPoolId`, horizon `[startUtc,endUtc)`, captured `TemporalPolicy` including zone and exact rules hash, `RecordingAssignment(streamId,poolId,copyRole,scheduleRef)`, canonical half-open schedule intervals/recurrence definitions, sizing basis enum, bitrate evidence refs, exact reserve multiplier `>=1`, optional `RedundancyModel(usableFraction)`, and optional available usable/raw capacity facts.
 
 ### 4. Evidence requirements
-Stream bitrate comes from exact CCTV-02 basis or captured equivalent. Guaranteed sizing requires a guaranteed upper bound for every recorded stream/case. Schedule recurrence expansion must be reproducible from captured timezone rules; host tzdb drift is forbidden. Redundancy fraction is a versioned technical model, not inferred from RAID marketing text.
+Stream bitrate comes from exact CCTV-02 basis or captured equivalent. Guaranteed sizing requires a qualified pointwise upper bound for every recorded stream/case in the initial scalar integration model. Window-only guarantees require a separately versioned integration/burst model and otherwise leave guaranteed retention UNRESOLVED; the typed bitrate claim boundary is normative. Schedule recurrence expansion must be reproducible from captured timezone rules; host tzdb drift is forbidden. Redundancy fraction is a versioned technical model, not inferred from RAID marketing text.
 
 ### 5. Operating cases
 `EXPECTED_ESTIMATE` and `GUARANTEED_UPPER_BOUND` are separate claim scopes. One calculation request selects the required sizing basis but may expose the other only if fully evidenced and clearly labeled.
