@@ -116,3 +116,12 @@ The following are frozen enough to start implementation:
 The generated authority manifest, market simulation and combinatorial matrix are **design-entry evidence**, not runtime acceptance. Production P0/P9 source must record/verify the accepted authority fingerprint so implementation cannot close against a different specification.
 
 Remaining work is executable runtime work: implement production Dart/Drift source, schema-24 migration, 27 process kernels/resolvers, 16 codecs/handlers, worker executor/scheduler/cache, public-command qualification, migration/restart/race/failure evidence, performance evidence and exact-SHA P9 closure. Downstream ELV6 runtime remains blocked until the accepted ELV5 runtime/source/fingerprint handoff is reconciled.
+## Executable diff audit — 2026-10-16
+
+The [scoped diff audit](../audit/elv5-diff-review-2026-10-16.md) and
+[executed check log](../audit/elv5-diff-review-checks.json) record five P1 and one P2
+corrections after the historical seventh-pass closure: authority/source integrity,
+market-plan versus diagnostic evidence, cross-binding fire-address uniqueness,
+CCTV rate-window/bound claims, and executed command rejection probes. Historical
+finding counts above remain historical; this pass does not create runtime acceptance.
+The affected normative contracts are updated in place. ELV5 remains NOT_STARTED.
