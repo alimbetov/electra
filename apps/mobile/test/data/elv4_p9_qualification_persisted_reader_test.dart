@@ -56,18 +56,30 @@ void main() {
     final reader = DriftElv4QualificationEvidenceReader(db);
     final rows = await reader.collect(
       contract: contract,
-      caseScopes:
-          DriftElv4QualificationEvidenceReader.caseScopesFromManifest(manifest),
+      caseScopes: DriftElv4QualificationEvidenceReader.caseScopesFromManifest(
+        manifest,
+      ),
     );
 
     expect(rows, hasLength(2));
+    expect(rows.map((value) => value.row.dimension).toSet(), {
+      'continuous-capacity',
+      'reserve-derating',
+    });
     expect(
-      rows.map((value) => value.row.dimension).toSet(),
-      {'continuous-capacity', 'reserve-derating'},
+      rows.every((value) => value.row.evaluationId == evidence.evaluationId),
+      isTrue,
     );
-    expect(rows.every((value) => value.row.evaluationId == evidence.evaluationId), isTrue);
-    expect(rows.every((value) => value.evidenceSha256 == evidence.evidenceSha256), isTrue);
-    expect(rows.every((value) => value.inputFingerprint == evidence.inputFingerprint), isTrue);
+    expect(
+      rows.every((value) => value.evidenceSha256 == evidence.evidenceSha256),
+      isTrue,
+    );
+    expect(
+      rows.every(
+        (value) => value.inputFingerprint == evidence.inputFingerprint,
+      ),
+      isTrue,
+    );
     expect(rows.every((value) => value.pointerGeneration == 1), isTrue);
 
     await db.customUpdate(
@@ -82,10 +94,9 @@ void main() {
     await expectLater(
       reader.collect(
         contract: contract,
-        caseScopes:
-            DriftElv4QualificationEvidenceReader.caseScopesFromManifest(
-              manifest,
-            ),
+        caseScopes: DriftElv4QualificationEvidenceReader.caseScopesFromManifest(
+          manifest,
+        ),
       ),
       throwsA(
         isA<StateError>().having(
@@ -111,10 +122,7 @@ Map<String, Object?> _manifest(Elv4QualificationBuilder builder) => {
       'requiredResults': [
         {
           'processCode': 'ELV-PWR-02',
-          'requiredDimensions': [
-            'continuous-capacity',
-            'reserve-derating',
-          ],
+          'requiredDimensions': ['continuous-capacity', 'reserve-derating'],
           'completion': 'COMPLETE',
           'assessment': 'PASS',
           'execution': 'SUCCEEDED',
