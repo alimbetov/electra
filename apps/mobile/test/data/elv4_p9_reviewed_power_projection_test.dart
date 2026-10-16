@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:electra_mobile/data/database/app_database.dart';
@@ -136,9 +138,8 @@ void main() {
       expect(stored.read<int>('revision'), 2);
       expect(
         EngineeringPort.fromMap(
-          (canonicalEngineeringJsonDecode(
-            stored.read<String>('payload_json'),
-          ) as Map).cast<String, dynamic>(),
+          (jsonDecode(stored.read<String>('payload_json')) as Map)
+              .cast<String, dynamic>(),
         ).voltage!.minimumV,
         10,
       );
