@@ -73,7 +73,7 @@ def main():
     errata=(IMPL/'calculation-oracle-errata-v1.md').read_text(encoding='utf-8'); req('ERRATA-001 — ACS-03' in errata and '23.51 V' in errata and '+1.51 V' in errata,'ACS-03 errata missing')
     contracts=(IMPL/'process-contracts.md').read_text(encoding='utf-8'); acs=(IMPL/'process-specifications/acs-processes.md').read_text(encoding='utf-8'); req('23.45 V' not in contracts and 'lock23.45V' not in contracts and '23.45 V' not in acs and '+1.45 V' not in acs,'stale ACS-03 active oracle')
     baseline=(IMPL/'implemented-baseline.md').read_text(encoding='utf-8'); req('schema 23 → schema 24' in baseline and 'arbitrary version greater than 23' in baseline,'baseline schema-24 reconciliation missing')
-    adr=(ROOT/'docs/adr/ADR-031-elv5-pure-core-and-module-boundary.md').read_text(encoding='utf-8'); req('repository-aware `resolveInput(...)` is not a method' in adr.lower() and 'exact source filenames are **tracked implementation coordinates**' in adr.lower(),'ADR-031 module/resolver boundary missing')
+    adr=(ROOT/'docs/adr/ADR-031-elv5-pure-core-and-module-boundary.md').read_text(encoding='utf-8'); req('repository-aware `resolveinput(...)` is not a method' in adr.lower() and 'exact source filenames are **tracked implementation coordinates**' in adr.lower(),'ADR-031 module/resolver boundary missing')
     dossier_rows=dossiers(); artifacts=[]
     for rel in AUTHORITY_PATHS:
         path=ROOT/rel; req(path.is_file(),f'missing authority artifact: {rel}'); artifacts.append({'path':rel,'sha256':hfile(path),'byteLength':path.stat().st_size})
