@@ -17,13 +17,21 @@ final class Elv5CctvAggregateSnapshot {
   final Map<String, Object?> payload;
 }
 
-abstract interface class Elv5CctvMutationStore {
+abstract interface class Elv5CctvFactStore {
   Future<Elv5CctvAggregateSnapshot?> loadCameraStreams({
     required String projectId,
     required String designRevisionId,
     required String cameraId,
   });
 
+  Future<Elv5CctvAggregateSnapshot?> loadRecordingPool({
+    required String projectId,
+    required String designRevisionId,
+    required String poolId,
+  });
+}
+
+abstract interface class Elv5CctvMutationStore implements Elv5CctvFactStore {
   Future<void> replaceCameraStreams({
     required String projectId,
     required String designRevisionId,
@@ -32,12 +40,6 @@ abstract interface class Elv5CctvMutationStore {
     required int? expectedRootRevision,
     required Map<String, Object?> payload,
     required DateTime updatedAtUtc,
-  });
-
-  Future<Elv5CctvAggregateSnapshot?> loadRecordingPool({
-    required String projectId,
-    required String designRevisionId,
-    required String poolId,
   });
 
   Future<void> replaceRecordingPool({
