@@ -1,6 +1,6 @@
 # ELV6 — implementation design index
 
-Status: **DESIGN DRAFT / RUNTIME NOT STARTED**  
+Status: **DESIGN HARDENED / RUNTIME NOT STARTED**  
 Branch: `feat/flutter-elv6-enclosure-layout-design`  
 Pinned design upstream: ELV5 `ed7db01adb27ff184b0b8c91a710082fb9eafb9a`.
 
@@ -11,9 +11,11 @@ ELV6 converts exact upstream engineering facts into reproducible physical enclos
 1. [`code-level-runtime-contract.md`](code-level-runtime-contract.md) — mandatory Dart/runtime identities, exact µm geometry, evaluation states, replay/CAS/publication, persistence, solver and workspace contracts.
 2. [`process-registry.json`](process-registry.json) — closed 24-process layout/evaluation registry.
 3. [`command-registry.json`](command-registry.json) — closed 21-operation public command registry under `electra.elv6-layout-command.v1`.
-4. [`../elv6-enclosure-layout-design-specification.md`](../elv6-enclosure-layout-design-specification.md) — stage purpose, ownership and package architecture.
-5. [`../elv6-p0-p9-delivery-plan.md`](../elv6-p0-p9-delivery-plan.md) — implementation/acceptance sequence.
-6. [`../../audit/elv6-hard-technical-audit.md`](../../audit/elv6-hard-technical-audit.md) — hard engineering/system-architecture audit and finding disposition.
+4. [`command-examples.json`](command-examples.json) — one canonical design-time valid payload and deterministic missing-field rejection for every registered operation.
+5. [`qualification-manifest.json`](qualification-manifest.json) — 72 process oracles: POS/NEG/BLOCKED for all 24 codes plus cross-cutting constructability/concurrency cases.
+6. [`../elv6-enclosure-layout-design-specification.md`](../elv6-enclosure-layout-design-specification.md) — stage purpose, ownership and package architecture.
+7. [`../elv6-p0-p9-delivery-plan.md`](../elv6-p0-p9-delivery-plan.md) — 80 implementation/acceptance requirements.
+8. [`../../audit/elv6-hard-technical-audit.md`](../../audit/elv6-hard-technical-audit.md) — 18 hard engineering/system-architecture findings and remediation.
 
 ## Closed registries
 
@@ -33,9 +35,11 @@ LAY-23      deterministic auto-layout proposal
 LAY-24      aggregate intrinsic validation
 ```
 
+Each process has a mandatory positive, negative and blocked design oracle. For measurement/basis processes a negative case may intentionally be `UNRESOLVED` rather than a fake engineering FAIL.
+
 ### 21 public command operations
 
-The command registry is exact and fail-closed. No widget- or plugin-specific mutation endpoint may bypass it. The public revision lifecycle remains the existing ELV4 revision command family.
+The command registry is exact and fail-closed. Canonical examples mirror its payload-key sets exactly. No widget- or plugin-specific mutation endpoint may bypass it. The public revision lifecycle remains the existing ELV4 revision command family.
 
 ## Runtime ownership gate
 
@@ -63,6 +67,20 @@ New canonical mechanical geometry is integer micrometre fixed-point. Project int
 
 A physical `FAIL` means an intrinsic constructability/capability violation supported by exact technical facts. It does **not** mean normative non-compliance. ELV7 applies jurisdictional/ruleset requirements to the exact ELV6 physical projection. ELV8 may select products only through explicit substitution/revalidation impact.
 
+## CI design guards
+
+The main Flutter workflow runs three independent ELV6 design gates before Flutter setup:
+
+```text
+check-elv6-specification.py
+check-elv6-command-registry.py
+check-elv6-qualification-design.py
+```
+
+They verify the 24/80/18 counts, dependency DAG and hard engineering boundary tokens; exact 21-command wire/payload registry; 21 canonical payload examples; and 72 POS/NEG/BLOCKED process oracles.
+
+These gates prevent specification drift. They are explicitly **not runtime acceptance**.
+
 ## Runtime status
 
-All ELV6 P0–P9 runtime packages are `NOT_STARTED`. Design artifacts and CI structural checks never count as runtime qualification.
+All ELV6 P0–P9 runtime packages are `NOT_STARTED`. Runtime evidence fields must remain empty until actual source/tests/CI exist.
