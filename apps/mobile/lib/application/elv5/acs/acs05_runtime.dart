@@ -145,6 +145,44 @@ final class Acs05PersistedInputResolver
         _text(pwr04Inputs, 'bankId') != contract.bankId) {
       throw StateError('ACS05_PWR04_CONTRACT_IDENTITY_MISMATCH');
     }
+
+    final persistedDurations = _pwr04SequenceDurations(pwr04.evidence);
+    final contractSegmentIds = contract.segments.map((value) => value.segmentId).toSet();
+    if (!_sameSet(persistedDurations.keys.toSet(), contractSegmentIds)) {
+      _blocked(
+        request,
+        'ACS05_SEQUENCE_SEGMENT_SET_MISMATCH',
+        contractSnapshot.contentHash,
+        contractSnapshot.contentHash,
+        dependencies,
+        <String, Object?>{
+          'expectedSegmentIds': contractSegmentIds.toList()..sort(),
+          'actualSegmentIds': persistedDurations.keys.toList()..sort(),
+        },
+      );
+    }
+    for (final segment in contract.segments) {
+      final expectedSeconds = PowerRational(
+        segment.durationMicroseconds,
+        BigInt.from(1000000),
+      );
+      final actualSeconds = persistedDurations[segment.segmentId]!;
+      if (actualSeconds != expectedSeconds) {
+        _blocked(
+          request,
+          'ACS05_SEQUENCE_DURATION_MISMATCH',
+          contractSnapshot.contentHash,
+          contractSnapshot.contentHash,
+          dependencies,
+          <String, Object?>{
+            'segmentId': segment.segmentId,
+            'expectedSeconds': expectedSeconds.toMap(),
+            'actualSeconds': actualSeconds.toMap(),
+          },
+        );
+      }
+    }
+
     final pwr04Output = pwr04.output;
     final requiredWh = _powerRational(pwr04Output['requiredWh'], 'requiredWh');
     final availableWh = _powerRational(pwr04Output['availableWh'], 'availableWh');
@@ -269,15 +307,23 @@ final class Acs05PersistedInputResolver
         segment.durationMicroseconds,
         BigInt.from(1000000),
       );
+      var resolvedSegmentW = PowerRational.zero;
       for (final raw in rawContributions) {
         final contribution = _map(raw, 'PWR01 contribution');
         final originId = _text(contribution, 'originId');
+        final watt = _resolvedContributionW(contribution);
+        resolvedSegmentW += watt;
         actualGlobalLoads.add(originId);
         if (!contract.acsProtectedLoadIds.contains(originId)) continue;
-        final watt = _resolvedContributionW(contribution);
         final energyWh =
             watt * durationSeconds / PowerRational.integer(3600);
         acsEnergyByLoad[originId] = acsEnergyByLoad[originId]! + energyWh;
+      }
+      final knownW = _powerRational(pwr01.output['knownW'], 'knownW');
+      if (resolvedSegmentW != knownW) {
+        throw StateError(
+          'ACS05_PWR01_CONTRIBUTION_SUM_MISMATCH:${segment.segmentId}',
+        );
       }
 
       coveredSegments.add(segment.segmentId);
@@ -474,6 +520,48 @@ final class _ConsumedEvaluationRef {
       inputFingerprint: _text(map, 'inputFingerprint'),
     );
   }
+}
+
+Map<String, PowerRational> _pwr04SequenceDurations(
+  Map<String, Object?> evidence,
+) {
+  final rawFacts = evidence['consumedFacts'];
+  if (rawFacts is! List) {
+    throw StateError('ACS05_PWR04_CONSUMED_FACTS_MISSING');
+  }
+  final sequenceFacts = <Map<String, Object?>>[];
+  for (final raw in rawFacts) {
+    final fact = _map(raw, 'PWR04 consumed fact');
+    if (fact['valueSchema'] == 'electra.elv4.backup-sequence.v1' &&
+        fact['presence'] == 'PRESENT') {
+      sequenceFacts.add(fact);
+    }
+  }
+  if (sequenceFacts.length != 1) {
+    throw StateError(
+      'ACS05_PWR04_PROTECTED_SEQUENCE_FACT_COUNT:${sequenceFacts.length}',
+    );
+  }
+  final canonicalValueJson = sequenceFacts.single['canonicalValueJson'];
+  if (canonicalValueJson is! String) {
+    throw StateError('ACS05_PWR04_SEQUENCE_CANONICAL_VALUE_MISSING');
+  }
+  final decoded = jsonDecode(canonicalValueJson);
+  final sequence = _map(decoded, 'PWR04 protected sequence');
+  final rawSegments = sequence['segments'];
+  if (rawSegments is! List) {
+    throw StateError('ACS05_PWR04_SEQUENCE_SEGMENTS_MISSING');
+  }
+  final result = <String, PowerRational>{};
+  for (final raw in rawSegments) {
+    final segment = _map(raw, 'PWR04 sequence segment');
+    final id = _text(segment, 'segmentId');
+    if (result.containsKey(id)) {
+      throw StateError('ACS05_PWR04_SEQUENCE_SEGMENT_DUPLICATE:$id');
+    }
+    result[id] = _powerRational(segment['durationSeconds'], 'durationSeconds');
+  }
+  return result;
 }
 
 PowerRational _resolvedContributionW(Map<String, Object?> contribution) {
