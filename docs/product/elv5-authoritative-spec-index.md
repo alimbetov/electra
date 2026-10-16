@@ -23,9 +23,10 @@ The branch name is retained as requested. ELV5 is **discipline-specific engineer
 12. [Machine-readable 16-command registry](elv5-implementation/command-registry.json), the exact schema/operation/payload-key authority subject to later normative hardening semantics.
 13. [Canonical command examples](elv5-implementation/command-examples.json), one valid payload and one deterministic rejection mutation for every registered ELV5 operation.
 14. [27-process contract registry](elv5-implementation/process-contracts.md) and [machine-readable process registry](elv5-implementation/process-registry.json).
-15. [Baseline and boundary audit](../audit/elv5-baseline-alignment-audit.md).
-16. [Initial technical audit](../audit/elv5-technical-audit.md), [second-pass engineering/architecture hardening audit](../audit/elv5-engineering-architecture-hardening-audit.md), and [third-pass production-readiness audit](../audit/elv5-third-pass-production-readiness-audit.md) with its [machine-readable registry](../audit/elv5-third-pass-production-readiness-audit.json).
-17. [Implemented baseline and extension contract](elv5-implementation/implemented-baseline.md) and [evidence manifest](elv5-implementation/baseline.json).
+15. [Authority manifest generator](../../scripts/ci/generate-elv5-contract-manifest.py): emits an exact-head SHA-256 manifest/fingerprint over machine registries and the highest-value normative code-level contracts and publishes it as a CI artifact.
+16. [Baseline and boundary audit](../audit/elv5-baseline-alignment-audit.md).
+17. [Initial technical audit](../audit/elv5-technical-audit.md), [second-pass engineering/architecture hardening audit](../audit/elv5-engineering-architecture-hardening-audit.md), and [third-pass production-readiness audit](../audit/elv5-third-pass-production-readiness-audit.md) with its [machine-readable registry](../audit/elv5-third-pass-production-readiness-audit.json).
+18. [Implemented baseline and extension contract](elv5-implementation/implemented-baseline.md) and [evidence manifest](elv5-implementation/baseline.json).
 
 ## Authority and acceptance
 
@@ -41,7 +42,7 @@ Within ELV5 the precedence is explicit. Highest authority first:
 6. base runtime contract;
 7. package P0–P9 prose.
 
-A contradiction between active normative artifacts is a specification failure, not a developer choice. P0 implementation entry therefore requires a generated machine contract manifest/fingerprint and CI consistency guard covering process/command counts, required dimensions, registries, canonical format and schema version.
+A contradiction between active normative artifacts is a specification failure, not a developer choice. P0 implementation entry therefore requires the generated authority fingerprint/manifest and CI consistency guards covering process/command/requirement counts, required dimensions, payload inventories, registries, canonical format and schema version.
 
 Semantic changes require synchronized updates. Free-form package-local reinterpretation is a specification defect.
 
@@ -74,13 +75,15 @@ The following design artifacts are frozen enough to start P1/P2 implementation:
 - replay/history/freeze/create-next integration contract;
 - bounded coherent all-or-nothing publication contract;
 - production source/class decomposition with strict dependency direction and 16-handler mapping;
-- L0–L6 qualification architecture and exact 54-entry primary process-oracle requirement plus mandatory third-pass hardening suites.
+- L0–L6 qualification architecture and exact 54-entry primary process-oracle requirement plus mandatory third-pass hardening suites;
+- exact-head CI authority manifest generation with SHA-256 fingerprints for process/command/requirement inventories and normative contracts.
 
-Remaining implementation-entry/runtime artifacts are deliberately executable rather than prose:
+The generated manifest is **authority/design-entry evidence**, not runtime acceptance. Production P0/P9 source must record/verify the accepted authority fingerprint so an implementation cannot be closed against a different specification fingerprint.
 
-- generate `contract-manifest.json` and a CI guard that proves authoritative artifact consistency;
+Remaining runtime artifacts are deliberately executable rather than prose:
+
 - implement production Dart definitions/codecs/resolvers/repositories and schema-24 migration following the source blueprint and all hardening amendments;
 - publish the machine-readable `qualification-manifest.json` with exact fixtures/commands/statuses for all 54 primary POS/NEG entries plus the focused third-pass suites;
 - execute schema/migration/restart, 16-codec adversarial, resource-limit, failure-injection, selector-invalidation, race/freeze and cross-discipline vertical tests;
 - perform post-schema ownership reconciliation proving no ELV5 table duplicates canonical ELV3/ELV4 cable/port/component/source/battery ownership;
-- close P9 only from evidence generated at the exact tested source SHA.
+- close P9 only from evidence generated at the exact tested source SHA **and matching accepted authority fingerprint**.
