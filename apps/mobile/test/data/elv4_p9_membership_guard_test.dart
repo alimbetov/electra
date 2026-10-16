@@ -8,7 +8,7 @@ import '../support/elv4_power_qualification_builder.dart';
 import '../support/elv4_power_qualification_topology.dart';
 
 void main() {
-  test('system detach rejects active ELV4 power ownership', () async {
+  test('system membership writers reject active ELV4 power ownership', () async {
     final db = AppDatabase(NativeDatabase.memory());
     addTearDown(db.close);
     final builder = Elv4QualificationBuilder(db);
@@ -37,6 +37,43 @@ void main() {
     ], expectedRevision: 1);
 
     await expectLater(
+      systems.assign(
+        builder.projectId,
+        ComponentSystemMembership(
+          systemId: systemId,
+          componentId: 'owned',
+          role: 'POWER_DEVICE',
+        ),
+      ),
+      throwsA(
+        isA<StateError>().having(
+          (error) => error.message,
+          'message',
+          contains('ELV4_POWER_MEMBERSHIP_OWNED'),
+        ),
+      ),
+    );
+
+    var snapshot = await systems.load(builder.projectId);
+    expect(
+      snapshot.memberships.singleWhere(
+        (membership) =>
+            membership.systemId == systemId &&
+            membership.componentId == 'owned',
+      ).role,
+      'DEVICE',
+    );
+
+    await systems.assign(
+      builder.projectId,
+      ComponentSystemMembership(
+        systemId: systemId,
+        componentId: 'owned',
+        role: 'DEVICE',
+      ),
+    );
+
+    await expectLater(
       systems.detach(builder.projectId, systemId, 'owned'),
       throwsA(
         isA<StateError>().having(
@@ -47,14 +84,32 @@ void main() {
       ),
     );
 
-    final afterRejectedDetach = await systems.load(builder.projectId);
+    snapshot = await systems.load(builder.projectId);
     expect(
-      afterRejectedDetach.memberships.any(
+      snapshot.memberships.any(
         (membership) =>
             membership.systemId == systemId &&
             membership.componentId == 'owned',
       ),
       isTrue,
+    );
+
+    await systems.assign(
+      builder.projectId,
+      ComponentSystemMembership(
+        systemId: systemId,
+        componentId: 'plain',
+        role: 'AUXILIARY',
+      ),
+    );
+    snapshot = await systems.load(builder.projectId);
+    expect(
+      snapshot.memberships.singleWhere(
+        (membership) =>
+            membership.systemId == systemId &&
+            membership.componentId == 'plain',
+      ).role,
+      'AUXILIARY',
     );
 
     await systems.detach(builder.projectId, systemId, 'plain');
