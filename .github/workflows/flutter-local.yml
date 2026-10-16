@@ -92,6 +92,10 @@ jobs:
         working-directory: .
         run: python3 scripts/ci/check-elv5-fifth-pass-closure.py
 
+      - name: Verify ELV5 implementation bindings and performance freeze
+        working-directory: .
+        run: python3 scripts/ci/check-elv5-implementation-bindings.py
+
       - name: Generate ELV5 contract manifest
         working-directory: .
         run: >-
