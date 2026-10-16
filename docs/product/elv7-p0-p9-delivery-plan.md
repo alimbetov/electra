@@ -1,148 +1,179 @@
 # ELV7 — P0–P9 delivery plan
 
-Status: DESIGN DRAFT / ALL RUNTIME PACKAGES OPEN
+Status: DESIGN DRAFT / ALL ELV7 RUNTIME PACKAGES OPEN
 Branch: `feat/flutter-elv7-normative-validation-design`
-Pinned upstream ELV6: `5dc25c34c1ec506ea79f0c9e7225952fa3553142`
+ELV6 design baseline at audit: `f5cc382942225d340b54461f37a9efd8d280f814`
 Specification: [design](elv7-normative-validation-design-specification.md).
+Normative architecture baseline: [ELV Normative Standards Matrix](elv-normative-standards-matrix.md).
 
 | Package | Scope | Mandatory outputs | Depends on |
 |---|---|---|---|
-| P0 | Baseline/provenance audit | accepted ELV6 head/schema; upstream fact-projection matrix; rule/source governance boundary | Accepted ELV1–ELV6 |
-| P1 | Profiles, editions and rule registry | stable IDs; source provenance; immutable editions; checker/provider registry; adoption model | P0 |
-| P2 | Persistence and command lifecycle | Drift schema; exact command registry; replay/UoW/history; profile adoption; freeze/create-next hooks | P1 + shared runtime |
-| P3 | Applicability and pure validation engine | applicability resolver; typed checkers; constrained predicates; deterministic aggregation; conflict/precedence model | P1/P2 |
-| P4 | Upstream adapters and rule packs | versioned ELV2–ELV6 fact projections; first discipline/layout rule families; dependency declarations | P1–P3 |
-| P5 | Findings, evidence and incremental invalidation | structured outcomes/findings; reverse dependency index; targeted old/new invalidation; current pointers | P2–P4 |
-| P6 | Manual review and deviations | manual-review workflow; deviation/waiver audit; stale/disposition semantics | P2/P5 |
-| P7 | Validation workspace | profile adoption impact, dashboard, navigation, source/provenance, compare runs, deviation/review UX | P2–P6 |
-| P8 | Integrated qualification | determinism, provenance, profile versioning, fail-closed, replay/rollback/race/restart/freeze/performance fixtures | P0–P7 |
-| P9 | Closure and ELV8 handoff | exact-head reconciliation; compliance projection; selection-constraint handoff; limitations/evidence manifest | P8 |
+| P0 | Baseline/provenance audit | accepted ELV6/schema/API inventory; standards-matrix field/enum reconciliation; upstream fact projection; official-source verification governance | Accepted ELV1–ELV6 + standards matrix |
+| P1 | Canonical profile/rule identity | one `NormativeProfile` model; StandardReference/source lifecycle; existing rule classes; precedence; immutable editions; checker/provider registry | P0 |
+| P2 | Persistence and command lifecycle | additive/reuse schema map; exact command registry; replay/UoW/history; explicit profile adoption; freeze/create-next hooks | P1 + shared runtime |
+| P3 | Applicability, precedence and pure validation | applicability resolver; typed checkers; declared facts; rule composition/precedence; deterministic aggregate semantics | P1/P2 |
+| P4 | Upstream adapters and verified rule packs | versioned ELV2–ELV6 facts; first rule families; exact official-source evidence; dependencies and fixtures | P1–P3 |
+| P5 | Findings/evidence/invalidation | immutable outcomes/findings; evidence refs; reverse dependency index; targeted old/new invalidation; guarded current pointers | P2–P4 |
+| P6 | Manual review, profile overrides and deviations | typed qualitative review; precedence-safe project/profile override; finding deviation/waiver audit; stale disposition rules | P2/P5 |
+| P7 | Validation workspace | adoption impact; rule-class/precedence visibility; dashboard/navigation/provenance; run compare; review/deviation UX | P2–P6 |
+| P8 | Integrated qualification | source governance, precedence, determinism, fail-closed, replay/rollback/race/restart/freeze/offline/performance evidence | P0–P7 |
+| P9 | Closure and ELV8 handoff | exact-head reconciliation; verified coverage matrix; immutable compliance/selection-constraint projection; limitations/evidence manifest | P8 |
 
 ## P0 — baseline and provenance boundary
 
-Prove the exact upstream source/schema and enumerate every fact ELV7 is allowed to consume. For each fact define authoritative owner, projection version, identity, unit and stale semantics. Also freeze governance for `FICTIONAL`, `PROJECT_AUTHORED`, `UNVERIFIED_EXTERNAL`, `VERIFIED_EXTERNAL` and `RETIRED` sources.
+P0 must produce source-reality evidence before any production rule pack starts:
 
-P0 explicitly rejects any design that depends on widget state, `latest` profile lookup or scraping external standards during validation.
+- exact ELV6/current schema and revision/freeze/history/replay APIs;
+- every ELV2–ELV6 fact ELV7 may consume, including owner, identity, unit, projection version and stale semantics;
+- exact mapping from existing `NormativeProfile`, `StandardReference`, precedence, lifecycle and rule-class concepts in `elv-normative-standards-matrix.md` to executable types;
+- proof that no second competing normative profile taxonomy exists;
+- governance for `FICTIONAL`, `PROJECT_AUTHORED`, `UNVERIFIED_EXTERNAL`, `VERIFIED_EXTERNAL`, `RETIRED` source verification states;
+- official-source verification procedure for production rule packs, including edition/status/effective-date/applicability evidence;
+- licensing/file-storage boundary for standards material.
 
-## P1 — immutable profile and rule identity
+The standards matrix is an architecture/inventory baseline. Its listed publications are not automatically production-verified merely because they appear in documentation.
+
+P0 rejects widget-state rules, `latest` fallback and network scraping during validation.
+
+## P1 — one canonical profile, source and rule registry
 
 Freeze:
 
-- normative source identity/citation fields;
-- profile/rule-pack/rule edition semantics;
-- canonical hashes;
-- project adoption and `validationAsOfDate`;
-- rule obligation/severity/outcome enums;
-- checker/provider registration and duplicate rejection;
-- exact semantic-change policy requiring a new edition/revision;
-- source licensing/file-reference boundary.
+- stable profile/source/rule/rule-pack IDs and immutable edition semantics;
+- `StandardReference`-compatible issuer/code/title/edition/status/jurisdiction/effective-date/lifecycle fields;
+- existing rule classes:
+  `LEGAL_MANDATORY`, `NATIONAL_STANDARD`, `ADOPTED_INTERNATIONAL`, `CONTRACTUAL`, `MANUFACTURER_MANDATORY`, `ENGINEERING_RECOMMENDATION`, `PROJECT_POLICY`;
+- precedence and per-requirement-family composition semantics;
+- explicit project adoption and `validationAsOfDate`;
+- source verification/provenance and copyright boundary;
+- rule obligation/severity/outcome as separate dimensions;
+- checker/provider ID/version registry and duplicate rejection;
+- semantic-change rules requiring new edition/revision and canonical hash.
 
-No jurisdiction-specific rule runtime implementation starts before these contracts are accepted.
+No production jurisdiction rule implementation starts before this contract is accepted.
 
-## P2 — storage and commands
+## P2 — persistence and project commands
 
-Implement normalized profile/source/rule metadata, project bindings, validation run/outcome/finding records, evidence refs, manual review and deviations. Published editions and completed runs are immutable.
+P0/P1 first determine whether any existing exact profile/reference persistence can be reused. New Drift schema is additive and must not create duplicate normative identity.
 
-Freeze the command registry and codecs. All project mutation reuses command replay/history/UoW and project revision semantics. Profile adoption and validation publication are CAS/revision guarded.
+Persist immutable published profile/rule editions, project profile binding, validation runs/outcomes/findings/evidence/dependencies, manual review and deviations. Historical retired/superseded editions remain readable.
 
-## P3 — applicability and engine
+Freeze the exact command registry/codecs. All project mutation uses `commandId`, replay-before-precondition, project/revision/aggregate expected generations, history/UoW and atomic publication semantics. Profile upgrade is explicit and impact-reviewed.
+
+## P3 — applicability, precedence and engine
 
 Implement:
 
-- deterministic applicability `APPLICABLE/NOT_APPLICABLE/UNRESOLVED`;
-- pure checker registry by versioned ID;
-- strict declared consumed-fact access;
-- `SATISFIED/VIOLATED/NOT_EVALUABLE/MANUAL_REVIEW`;
-- profile-defined aggregation;
-- overlap/supersession/conflict handling;
-- stable result/finding ordering and canonical hashing.
+- `APPLICABLE / NOT_APPLICABLE / UNRESOLVED` applicability;
+- pure checker registry with declared fact access only;
+- `SATISFIED / VIOLATED / NOT_EVALUABLE / MANUAL_REVIEW` raw outcomes;
+- precedence that prevents lower-priority/project/manufacturer rules from silently weakening higher-priority mandatory requirements;
+- explicit independent, superseding, excluded and contradictory rule relationships;
+- per-family monotonic/non-monotonic composition policy rather than universal `max()`;
+- aggregate `PASS / PASS_WITH_DEVIATIONS / FAIL / BLOCKED` semantics;
+- stable finding/result order and canonical hashes.
 
-A generic arbitrary formula evaluator is explicitly out of scope.
+Arbitrary executable formula/rule scripting is out of scope.
 
-## P4 — projections and initial rule families
+## P4 — upstream projections and verified rule packs
 
-Build typed adapters from ELV2–ELV6 projections. Each rule family must publish:
+Build versioned adapters from ELV2–ELV6 projections. Every production rule family publishes:
 
-- exact rule IDs/revisions;
-- source provenance/classification;
-- applicability facts;
-- consumed facts;
-- checker and parameter versions;
-- positive, violation, not-applicable and missing-evidence fixtures where applicable;
-- manual-review scope if not machine-evaluable.
+- exact rule ID/revision and rule class;
+- exact verified source/edition/status/effective date/jurisdiction and clause metadata;
+- applicability and consumed fact keys;
+- precedence/composition relationship where overlapping requirements exist;
+- checker/parameter versions;
+- positive, violation, not-applicable, unresolved/missing-evidence fixtures;
+- manual-review scope for qualitative requirements;
+- source-verification evidence showing why `VERIFIED_EXTERNAL` is justified.
 
-Project-authored/fictional fixtures may prove engine arithmetic but cannot qualify verified jurisdictional compliance.
+Project-authored/fictional fixtures may qualify engine mechanics but never verified statutory/national compliance.
 
-## P5 — findings and incremental validation
+## P5 — immutable findings and targeted invalidation
 
-Persist immutable outcomes/findings/evidence and maintain reverse dependencies. Mutations invalidate union(old,new) closures. Prove that unrelated design changes do not invalidate unrelated rule results.
+Persist raw outcomes/findings/evidence and reverse dependencies. Mutations invalidate the union of old/new closures; unrelated facts do not trigger global revalidation.
 
-Validation capture → pure run → CAS publication must reject a stale PASS if any consumed upstream fingerprint or adopted profile generation changes before publication.
+Validation publication follows capture → pure resolve/evaluate → aggregate → CAS revalidate → atomic immutable publication/current pointer. Any changed consumed fingerprint/profile generation rejects a stale PASS.
 
-## P6 — disposition workflow
+## P6 — review and disposition
 
-Implement manual review and deviations as overlays. Required gates:
+Keep three concepts separate:
 
-- raw finding remains immutable;
-- actor/time/reason/evidence are mandatory according to policy;
-- underlying evidence change can stale the disposition;
-- expired/rejected/superseded deviations cannot suppress findings;
-- aggregate status distinguishes PASS, PASS_WITH_DEVIATIONS, FAIL and BLOCKED.
+1. manual review for qualitative/not-machine-evaluable obligations;
+2. project/profile override during profile composition, constrained by precedence and unable to weaken higher-priority mandatory rules;
+3. post-evaluation deviation/waiver overlay on a concrete finding.
+
+Required gates:
+
+- raw finding immutable;
+- actor/time/reason/evidence recorded according to policy;
+- changed finding/evidence can stale disposition;
+- expired/rejected/superseded/stale deviation cannot suppress a new result;
+- reporting status remains distinct from raw outcome.
 
 ## P7 — engineer workspace
 
 Minimum UX:
 
-- exact adopted profile/version and validation date always visible;
-- impact preview before adopting a new edition;
-- filters by scope/discipline/subject/rule/outcome/severity;
-- direct navigation to upstream subject/evidence;
-- source/clause/checker/inputs inspector;
-- clear missing-evidence/manual-review states;
+- exact adopted profile edition, jurisdiction and validation-as-of date visible;
+- impact preview before profile upgrade;
+- rule class/precedence/source status visible in finding inspector;
+- filters by scope/discipline/subject/rule/outcome/severity/class;
+- finding → exact upstream entity/evidence/source navigation;
+- checker/parameters/consumed facts/precedence decision inspector;
+- missing evidence/manual review/deviation states clearly distinct;
 - validation-run comparison;
-- deviation/manual-review history;
-- stale and frozen read-only modes;
-- offline validation from cached adopted profile.
+- frozen historical mode;
+- offline validation using cached adopted profile/rules.
+
+A green summary is impossible when a mandatory applicable obligation is unresolved.
 
 ## P8 — integrated qualification
 
-At one exact SHA, capture code/migration/test/CI evidence for:
+At one exact SHA capture code/migration/test/CI evidence for:
 
+- standards-matrix → executable-model field/enum reconciliation;
+- production source-verification gate and source-status claim boundaries;
 - immutable edition and explicit adoption;
 - effective-date/applicability cases;
-- checker deterministic output/hash;
-- missing mandatory evidence fail-closed;
-- source-status claim boundaries;
-- rule conflict/supersession;
-- manual review and deviation lifecycle;
+- mandatory precedence cannot be weakened by project/manufacturer/lower-priority rule;
+- conflict/supersession/composition cases;
+- deterministic checker/finding order/hash;
+- duplicate registry rejection;
+- mandatory missing evidence fail-closed;
+- manual-review lifecycle;
+- deviation leaves raw finding unchanged and stales when evidence changes;
 - targeted invalidation;
-- concurrent upstream/profile mutation during run;
+- concurrent upstream/profile mutation cannot publish stale PASS;
 - replay, rollback, restart and duplicate command IDs;
 - R1/R2 frozen historical reproduction;
-- imported malformed/untrusted rule metadata rejection;
+- malformed/untrusted rule metadata rejection;
+- no jurisdiction switch in presentation/data layers;
 - offline execution;
 - project-scale performance.
 
-No planned test ID counts as evidence before execution.
+Planned fixture IDs are not evidence until executed.
 
 ## P9 — closure and ELV8 contract
 
-Reconcile requirement ↔ source/rule ↔ code ↔ migration ↔ test ↔ CI and publish:
+Reconcile requirement ↔ source/rule ↔ code ↔ migration ↔ test ↔ exact-head CI and publish:
 
-- exact accepted profile/rule engine versions;
-- verified versus project-authored rule-pack coverage;
+- exact accepted profile/rule/checker engine versions;
+- verified/project-authored/fictional coverage matrix;
 - unsupported/manual-only rule matrix;
+- precedence/composition coverage and known jurisdiction gaps;
 - ELV8 immutable compliance projection schema/hash;
-- hard selection-constraint mapping rules;
-- known limitations and explicit non-certification boundaries;
-- exact accepted source SHA.
+- mapping from eligible ELV7 rules/findings to hard equipment-selection constraints;
+- non-certification/legal limitation statement grounded in actual source coverage;
+- exact accepted source SHA and evidence manifest.
 
 ## Current ledger
 
 | Package | Design | Runtime | Evidence |
 |---|---|---|---|
-| P0 | DRAFT | NOT_STARTED | — |
-| P1 | DRAFT | NOT_STARTED | — |
+| P0 | DRAFT | NOT_STARTED | standards matrix is design baseline only |
+| P1 | DRAFT | NOT_STARTED | existing profile/rule-class concepts require runtime reconciliation |
 | P2 | DRAFT | NOT_STARTED | — |
 | P3 | DRAFT | NOT_STARTED | — |
 | P4 | DRAFT | NOT_STARTED | — |
@@ -152,4 +183,4 @@ Reconcile requirement ↔ source/rule ↔ code ↔ migration ↔ test ↔ CI and
 | P8 | DRAFT | NOT_STARTED | — |
 | P9 | DRAFT | NOT_STARTED | — |
 
-Default runtime sequence: P0 → P1 → P2 → P3 → P4/P5 → P6 → P7 → P8 → P9. Rule-fixture and UI contract design should begin earlier, but qualification remains dependency-gated.
+Default runtime sequence: P0 → P1 → P2 → P3 → P4/P5 → P6 → P7 → P8 → P9. Rule-fixture/source-verification design and UX contracts should start earlier, but runtime qualification remains dependency-gated.

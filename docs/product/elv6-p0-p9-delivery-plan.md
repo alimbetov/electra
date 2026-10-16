@@ -7,15 +7,15 @@ Specification: [design](elv6-enclosure-layout-design-specification.md).
 
 | Package | Scope | Mandatory outputs | Depends on |
 |---|---|---|---|
-| P0 | Baseline, ownership and stage-entry audit | accepted upstream SHA/schema/API matrix; no-duplication map; migration baseline | Accepted ELV1–ELV5 |
-| P1 | Domain/revision model | enclosure/layout/placement/plane/zone/cable-entry types; IDs; exact units; revision and stale contracts | P0 |
-| P2 | Persistence and commands | Drift schema, repositories, command wire registry, replay/UoW/history, migration and create-next/freeze hooks | P1 + shared runtime |
-| P3 | Rack/enclosure geometry | bounds, front/rear planes, rack-U occupancy, shelf/backplate placement, intrinsic collision engine | P1/P2 |
-| P4 | DIN, battery, service and reserved-space fit | DIN intervals; battery envelopes; service/ventilation/keep-out zones; partial/unresolved semantics | P1–P3 + ELV4 evidence |
-| P5 | Deterministic auto-layout | pure solver, versioned policy, stable scoring/tie-break, immutable proposal and CAS acceptance | P3/P4 |
+| P0 | Baseline, ownership and stage-entry audit | accepted upstream SHA/schema/API matrix; `PanelAssembly`/ADR-019 ownership map; no-duplication matrix; migration baseline | Accepted ELV1–ELV5 + existing panel domain |
+| P1 | Owner-neutral layout/revision model | host refs/adapters; rack/layout/zone/cable-entry extensions; accepted mm numeric convention; IDs; revision/stale contracts | P0 |
+| P2 | Persistence and commands | reuse map for existing panel stores/commands; additive Drift schema; exact new command registry; replay/UoW/history; migrations/freeze hooks | P1 + shared runtime |
+| P3 | Rack/panel geometry adapters | panel projection reuse; bounds/front/rear views; rack-U occupancy; shelf/backplate placement; collision engine | P1/P2 |
+| P4 | DIN, battery, service and reserved-space fit | existing DIN hardening; battery envelopes; service/ventilation/keep-out extensions; partial/unresolved semantics | P1–P3 + ELV4 evidence |
+| P5 | Deterministic auto-layout | owner-neutral pure solver; versioned policy; stable scoring/tie-break; owner-targeted immutable proposal and CAS acceptance | P3/P4 |
 | P6 | Cable-entry and patching integration | typed entry anchors, assignments/capacity, ELV3 termination refs, dependency invalidation | P2–P5 + ELV3/ELV5 facts |
-| P7 | Engineer workspace | front/rear/internal views, drag preview, inspector, findings, capacity, stale/proposal diff, frozen view | P2–P6 |
-| P8 | Qualification | positive/negative/history/replay/rollback/race/restart/performance fixtures and evidence manifest | P0–P7 |
+| P7 | Engineer workspace | unified panel/rack front/rear/internal views; drag preview; inspector; findings; stale/proposal diff; frozen view | P2–P6 |
+| P8 | Qualification | baseline nonduplication, legacy regression, positive/negative/history/replay/rollback/race/restart/performance evidence | P0–P7 |
 | P9 | Closure and handoff | exact-head reconciliation, limitations, ELV7 validation projection, ELV8 impact contract | P8 |
 
 ## P0 — baseline and stage ownership
@@ -23,61 +23,70 @@ Specification: [design](elv6-enclosure-layout-design-specification.md).
 P0 must prove, not assume:
 
 - exact current schema and migration origin;
+- exact existing `PanelAssembly`, `PanelEnclosureGeometry`, `DinRail`, `PanelModulePlacement`, panel reserved-zone/duct persistence and mutation APIs;
+- ADR-019 physical panel ownership and current validator behavior;
+- accepted millimetre scalar/serialization/tolerance convention used by panel/geometry code;
 - exact existing `ElvCommandResult`, replay, command-ledger, history and UoW semantics;
 - exact revision/freeze/create-next hooks;
 - exact upstream physical/power/discipline facts available to ELV6;
-- identity ownership for every subject placed in an enclosure;
-- absence of a competing enclosure-layout source of truth.
+- identity ownership for every host and every subject placed in it;
+- absence of any other competing enclosure-layout source of truth.
 
-P0 blocks runtime work if a required upstream fact is not actually available. The resolution is either an explicit upstream extension or a blocked ELV6 dimension, never a duplicate local calculation.
+P0 blocks runtime work if a required upstream fact is unavailable. The resolution is an explicit owner-stage extension or an unresolved ELV6 dimension, never a duplicate model/calculation.
 
-## P1 — typed layout model
+## P1 — typed owner-neutral layout model
 
 Freeze:
 
-- canonical IDs and logical/revision identity;
-- integer-mm and rack/DIN interval conventions;
+- `EnclosureHostRef` and owner-specific adapter semantics;
+- existing panel ownership versus new non-panel rack ownership;
+- stable IDs and logical/revision identity for ELV6-owned records;
+- the accepted existing mm numeric representation rather than a new unit fork;
+- rack/DIN interval conventions;
 - coordinate-frame semantics;
 - placement occupancy and mounting capabilities;
-- reserved/clearance/service zones;
+- reserved/clearance/service extension zones;
 - exact upstream `subjectRef` and fingerprint format;
 - `PASS/FAIL/UNRESOLVED/NOT_APPLICABLE` dimensions;
 - stale and historical-read rules.
 
-Acceptance design must include examples for wall cabinet, floor rack, DIN enclosure and battery placement.
+Acceptance design includes existing electrical/automation panel, wall cabinet, floor rack, DIN and battery placement cases.
 
 ## P2 — persistence and mutation contract
 
-Freeze the public command registry before implementation. Every mutating operation carries `commandId`, project/revision scope and required expected revisions. Replay runs before mutable-state preconditions. State, dependency invalidation, history, ledger and sync outbox commit atomically.
+First produce an explicit reuse table: existing panel row/type/API → reused unchanged / compatibly extended / migrated with proof. No new table may shadow an existing `PanelAssembly` or `PanelModulePlacement` source of truth.
 
-Migration tests cover fresh DB, accepted previous schema, restart and rollback. New rows never rewrite historical ELV3/4/5 evidence.
+Freeze only the **new** public ELV6 command registry after inventorying canonical panel commands. Every mutation carries `commandId`, project/revision scope and required expected revisions. Replay precedes mutable-state preconditions. State, dependency invalidation, history, ledger and sync outbox commit atomically.
 
-## P3 — enclosure/rack placement kernel
+Migration tests cover fresh DB, accepted previous schema, restart and rollback. New rows never rewrite historical ELV3/4/5 or accepted panel evidence.
 
-Implement pure deterministic kernels for:
+## P3 — panel/rack placement kernel
 
-- enclosure containment;
+Implement owner-neutral immutable projections and pure deterministic kernels for:
+
+- existing panel enclosure/row/DIN facts through adapters;
+- new rack containment and rack-U occupancy;
 - 2D footprint + depth collision;
-- rack-U interval occupancy;
 - front/rear mounting compatibility;
 - shelf/backplate capability;
-- exact capacity summaries.
+- stable capacity summaries.
 
-Findings must be structured and stable-order. Widgets must not contain collision logic.
+Findings are structured and stable-order. Widgets do not contain collision logic.
 
 ## P4 — specialized fit
 
-Implement DIN linear occupancy, service/removal envelopes, battery footprint/orientation and intrinsic ventilation/keep-out geometry. Unknown mandatory source dimensions produce unresolved dimensions. Jurisdictional spacing values are not embedded here.
+Harden existing DIN occupancy using current `DinRail`/`PanelModulePlacement` facts; add only missing service/removal envelopes, battery footprint/orientation and intrinsic ventilation/keep-out semantics. Unknown mandatory source dimensions produce unresolved dimensions. Jurisdictional spacing values are not embedded here.
 
 ## P5 — proposal solver
 
-Auto-layout is a preview engine. Required proofs:
+Auto-layout is owner-neutral preview. Required proofs:
 
 - identical canonical input + algorithm version => byte-stable canonical proposal payload/hash;
 - locked placements never move;
-- unsatisfied hard constraints return unresolved subjects and diagnostics;
+- unsatisfied hard constraints return unresolved subjects/diagnostics;
 - tie-breaks are stable-ID based;
-- stale input fingerprint prevents acceptance;
+- proposal items identify the canonical owner command target;
+- stale owner/dependency fingerprint prevents acceptance;
 - rejection has no project mutation.
 
 ## P6 — cable and patching integration
@@ -86,26 +95,29 @@ Cable-entry assignment reads ELV3 cable/endpoints and ELV5 capacity/patching fac
 
 ## P7 — workspace
 
-The UI must remain a projection over application/query services. Minimum UX qualification:
+The UI is a projection over application/query services and owner adapters. Minimum UX qualification:
 
+- one panel/rack host list with canonical owner visible in diagnostics;
 - desktop + compact navigation;
 - front/rear/internal switching preserves selection;
 - exact position/dimension inspector;
-- keyboard and pointer movement through the same command path;
-- conflict does not destroy the engineer's draft;
-- stale/frozen states are visually distinct;
+- keyboard/pointer movement through canonical command path;
+- conflicts retain engineer draft;
+- stale/frozen states are distinct;
 - proposal before/after and score diagnostics are inspectable.
 
 ## P8 — integrated qualification
 
 At one exact SHA record source, tests, migrations and CI for:
 
-- valid/invalid geometry;
+- no duplicate panel enclosure/DIN/module truth;
+- existing panel tests/regressions remain green;
+- valid/invalid rack/panel geometry;
 - rack/DIN/battery/cable-entry cases;
-- proposal determinism;
+- proposal determinism across supported owner types;
 - replay and duplicate command ID;
 - rollback on injected failure;
-- concurrent edit/proposal acceptance race;
+- concurrent owner edit/proposal acceptance race;
 - restart persistence;
 - R1 freeze → R2 changes → historical R1 proof;
 - targeted invalidation;
@@ -116,9 +128,10 @@ Planned fixture IDs are not PASS until executed.
 
 ## P9 — closure
 
-P9 must reconcile requirements ↔ code ↔ migrations ↔ tests ↔ exact-head CI. It publishes:
+P9 reconciles requirements ↔ existing/new owner code ↔ migrations ↔ tests ↔ exact-head CI and publishes:
 
 - ELV6 accepted/blocked/unsupported matrix;
+- explicit reused `PanelAssembly` baseline map;
 - known limitations;
 - ELV7 canonical validation projection schema/version/hash;
 - ELV8 substitution/revalidation impact contract;
@@ -139,4 +152,4 @@ P9 must reconcile requirements ↔ code ↔ migrations ↔ tests ↔ exact-head 
 | P8 | DRAFT | NOT_STARTED | — |
 | P9 | DRAFT | NOT_STARTED | — |
 
-P0 → P1 → P2 → P3/P4 → P5/P6 → P7 → P8 → P9 is the default runtime sequence. Interface/fixture design for downstream packages should start earlier, but no package may mark accepted before its actual dependencies are qualified.
+Default runtime sequence: P0 → P1 → P2 → P3/P4 → P5/P6 → P7 → P8 → P9. Interface/fixture design for downstream packages starts earlier, but no package may mark accepted before actual dependencies are qualified.
