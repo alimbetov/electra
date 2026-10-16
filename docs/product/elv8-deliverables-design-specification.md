@@ -1,187 +1,195 @@
 # Electra — ELV8 Equipment Selection and Deliverables Design Specification
 
-Status: DESIGN DRAFT / RUNTIME NOT STARTED
+Status: DESIGN DRAFT / INHERITED FL14 BASELINE PRESENT / ELV8 CLOSURE NOT STARTED
 Branch: `feat/flutter-elv8-deliverables-design`
-Pinned upstream ELV7: `6d7aef8349dc04526a3beba16b2e2483bec0009e`
+Pinned upstream ELV7 at branch creation: `6d7aef8349dc04526a3beba16b2e2483bec0009e`
 Entry: [authoritative index](elv8-authoritative-spec-index.md).
+Baseline ADRs: [ADR-021](../adr/ADR-021-manufacturer-catalog-mapping.md), [ADR-025](../adr/ADR-025-report-bom-estimate-generation.md).
 
 ## 1. Purpose
 
-ELV8 closes the engineering chain from requirements to exact equipment choices and reproducible project deliverables. It must answer:
+ELV8 closes the engineering chain from exact requirements to reviewed product selections and reproducible project documents. It must answer:
 
-- which exact manufacturer catalog edition was used;
-- which hard requirements were applied to a selection request;
-- why each candidate passed or failed hard filtering;
-- how surviving candidates were ranked and why one was selected;
-- what accessories/configuration items are mandatory for a valid candidate;
-- whether the selected product changes any upstream physical/power/normative facts;
-- whether revalidation has completed after selection;
-- which exact selection, validation and template versions produced a BOM/schedule/report;
-- whether the same frozen revision can reproduce the same canonical deliverable bundle and hashes.
+- which exact manufacturer catalog/version and product technical snapshot were used;
+- which hard requirements each candidate satisfied, violated or could not evidence;
+- how eligible candidates were ranked and why one was selected;
+- what accessory/configuration components are required;
+- whether a selected product changes upstream physical/power/capacity/normative facts;
+- whether required upstream revalidation is complete;
+- which exact selection/validation/template/snapshot versions produced BOM/schedules/report;
+- whether a frozen revision can reproduce equivalent canonical report content and artifact hashes.
 
-ELV8 is not procurement, dynamic distributor pricing or a hidden auto-redesign engine.
+ELV8 is not procurement, live distributor pricing or a hidden auto-redesign engine.
 
-## 2. Ownership and upstream reuse
+## 2. Existing manufacturer-selection runtime is authoritative baseline
 
-| Owner | ELV8 consumes | ELV8 must not duplicate |
+The repository already implements the FL14 electrical manufacturer-selection baseline:
+
+```text
+FunctionalDeviceRequirement
+ManufacturerProductVariant
+ManufacturerCatalog
+ProjectManufacturerPolicy
+ManufacturerMatch
+ManufacturerProductMatcher
+ManufacturerRepository
+DriftManufacturerRepository
+manufacturer_screen.dart
+manufacturer matching/persistence tests
+```
+
+`ManufacturerProductMatcher.algorithmVersion == fl14-strict-product-match-v1` is an existing semantic contract. Current matching includes role/lifecycle/project policy and typed electrical requirements such as current, voltage, breaking capacity, poles, trip/residual characteristics, module width, mounting type and AC/DC kind. Current deterministic ranking uses manufacturer/series preference then manufacturer/SKU/ID ordering.
+
+Current Drift behavior already provides important guarantees that ELV8 must preserve unless a separately qualified migration supersedes them:
+
+- catalog ID/manufacturer/version/source/products required;
+- product IDs/SKUs unique within catalog;
+- product IDs cannot be reused across catalog versions;
+- catalog version payload is immutable after import;
+- manufacturer/version/region duplicate rejection;
+- archived catalogs retain historical selection snapshots;
+- project manufacturer policy is persisted/versioned;
+- circuit product selection stores product snapshot, requirement fingerprint and policy JSON;
+- selection is rejected when requirement changed/stale;
+- dependency recalculation runs after policy/selection changes.
+
+ELV8 is therefore a **generalization/hardening** of this baseline from electrical-protection circuit selection to all supported ELV selection subjects. It is not permission to replace the FL14 model with differently named parallel tables/classes.
+
+## 3. Accepted reporting architecture is authoritative baseline
+
+ADR-025 already defines:
+
+```text
+PublishedProjectSnapshot
+       ↓
+ReportAssembler
+       ↓
+ReportModel
+       ├── drawings / schedules
+       ├── panel/DIN/terminal/I/O data
+       ├── cable schedules
+       ├── BOM
+       ├── estimate (when supplied by separate pricing layer)
+       ├── issues / validation
+       └── engineering decisions
+       ↓
+PDF Renderer
+       ↓
+Document artifact
+```
+
+It also requires traceable quantity takeoff, engineering BOM separated from prices, deterministic report version metadata, local offline rendering and optional server rendering from immutable snapshots.
+
+ELV8 preserves `ReportAssembler` + canonical `ReportModel`. A new `DeliverableManifest`/`ReportBundleSnapshot` may wrap the model with provenance/hash/template/export metadata, but **must not become a second independent report content model**.
+
+## 4. Ownership and nonduplication
+
+| Owner/baseline | ELV8 consumes / extends | ELV8 must not duplicate |
 |---|---|---|
-| ELV2 | canonical component/definition identity and edition semantics | mutable copies of definitions or latest-edition fallback |
-| ELV3 | realized cable/run/pathway quantities and identities | route/length/allocation calculation |
-| ELV4 | exact power/PoE/UPS/battery requirements/evidence | power sizing algorithms |
-| ELV5 | exact discipline requirements/evaluations | CCTV/LAN/ACS/Fire calculations |
-| ELV6 | enclosure/rack/layout capacity/fit projection | placement solver/layout source of truth |
-| ELV7 | normative profile, outcomes, hard constraints, deviations | compliance reinterpretation |
-| Shared runtime | revision/freeze, command replay/history/UoW, immutable snapshots, file metadata | parallel project lifecycle |
+| FL14 / ADR-021 | functional requirements, catalog/product/policy/matcher/selection snapshot | second manufacturer catalog/product truth |
+| ADR-025 | `PublishedProjectSnapshot`, `ReportAssembler`, `ReportModel`, BOM/estimate boundary | competing canonical report model |
+| ELV2 | canonical definitions/edition semantics | mutable duplicate definitions |
+| ELV3 | realized cable/run/pathway quantities | route/length/allocation calculation |
+| ELV4 | power/PoE/UPS/battery evidence | power sizing algorithms |
+| ELV5 | discipline requirements/evaluations | CCTV/LAN/ACS/Fire algorithms |
+| ELV6 | enclosure/rack/layout fit projection | layout solver/source of truth |
+| ELV7 | normative profile/outcomes/hard constraints/deviations | compliance reinterpretation |
+| Shared runtime | revision/freeze, command replay/history/UoW, immutable snapshots, files | parallel project lifecycle |
 
-ELV8 owns manufacturer catalog metadata/cache, selection requests/candidates/decisions, selection revalidation state and canonical deliverable snapshots/manifests.
+ELV8 owns new generic selection request/evaluation/decision state where the FL14 circuit-specific model is insufficient, selection impact/revalidation evidence, canonical report-manifest snapshots, template editions and export artifact metadata.
 
-## 3. Manufacturer catalog model
+## 5. Manufacturer catalog evolution
 
-### 3.1 Stable identities
+### 5.1 Preserve existing names and identities
 
-Conceptual IDs:
-
-```dart
-typedef ManufacturerCatalogId = String;
-typedef CatalogEditionId = String;
-typedef CatalogProductId = String;
-typedef CatalogProductRevisionId = String;
-typedef ProductConfigurationId = String;
-typedef SelectionRequestId = String;
-typedef SelectionDecisionId = String;
-typedef DeliverableBundleId = String;
-typedef DeliverableTemplateEditionId = String;
-```
-
-A product code/SKU string is data, not the stable database identity. A corrected technical record creates a new catalog/product revision when semantic selection behavior can change.
-
-### 3.2 Catalog edition
-
-`CatalogEdition` is immutable after publication:
+Initial ELV8 implementation reuses:
 
 ```text
-catalogId
-editionId
-manufacturerId
-editionName/version
-publishedAt?
-effectiveFrom?
-effectiveUntil?
-sourceRef
-sourceHash?
-importSchemaVersion
-verificationStatus
-canonicalHash
-status: DRAFT | PUBLISHED | RETIRED
+ManufacturerCatalog
+ManufacturerProductVariant
+ProjectManufacturerPolicy
+FunctionalDeviceRequirement
+ManufacturerProductMatcher
 ```
 
-Historical selections retain their edition even after retirement.
+P0/P1 define compatibility-safe extension points. Do not introduce `CatalogProduct` or `CatalogEdition` as competing roots merely for naming consistency.
 
-### 3.3 Product technical record
+A published/imported catalog version remains identified by current catalog identity/version/region/source semantics. If ELV8 requires an additional immutable edition ID/hash, add it as an extension/migration that preserves current catalog IDs and historical snapshots.
 
-`CatalogProduct`/revision contains typed technical capabilities needed by selection and upstream impact analysis. Typical dimensions are domain-dependent and may include:
+### 5.2 Product capability extension
+
+`ManufacturerProductVariant` must become capable of representing ELV domains beyond current electrical protection while preserving current fields/codecs. Extension may include typed capability facets, for example:
 
 ```text
-manufacturerPartNumber
-productFamily
-productKind
-technicalCapabilitySet
-physicalEnvelopeMm / mass / mounting capabilities
-power input/output capabilities
-PoE capabilities
-ports/interfaces/media categories
-capacity/channel/address limits
-environmental ratings
+physical envelope / mass / mounting capabilities
+power input/output / PoE capabilities
+ports/interfaces/media
+network/channel/address/capacity limits
+CCTV/storage/controller capabilities
+environmental classifications
 battery/accessory compatibility
-rack/DIN/shelf mounting data
-required accessory rules
-incompatible configuration rules
+rack/DIN/shelf mounting facts
+required accessory/configuration rules
 vendor-document refs/hashes
-lifecycle status
 ```
 
-No selection-critical number may exist only inside a PDF description string. If a required fact is not structured, the candidate is `UNKNOWN` for that hard constraint.
+A selection-critical value cannot exist only in display prose/PDF. Missing structured fact remains unknown for the related hard constraint.
 
-Large datasheets/images remain file/blob resources. The DB keeps metadata and hashes.
+Prefer typed domain facets/versioned capability codecs over an unbounded `metadata` map for selection-critical semantics. Existing `metadata` remains readable for backward compatibility but is not sufficient evidence for new mandatory rules unless a versioned adapter explicitly defines it.
 
-### 3.4 Product configuration
+### 5.3 Product configuration
 
-A selectable solution may contain a primary product plus mandatory modules, power supplies, transceivers, batteries, mounting kits or licenses. Represent this as `ProductConfigurationCandidate`, not by pretending one SKU has every capability.
-
-A configuration records:
+ELV8 adds a deterministic configuration layer where one purchasable solution requires multiple products/accessories:
 
 ```text
-primaryProductRevisionRef
-component/accessory refs with quantities
-compatibility-edge evidence
-resolved technical capability projection
-configuration fingerprint/hash
+ProductConfigurationCandidate
+- primary ManufacturerProductVariant ref
+- required accessory/product refs + quantities
+- compatibility-edge evidence
+- resolved capability projection
+- configuration fingerprint/hash
 ```
 
-Configuration building is deterministic and bounded. Cyclic accessory requirements are rejected.
+Examples include transceivers, PSUs, batteries, rack kits, modules and licenses. Cyclic configuration requirements are rejected. Configuration does not flatten multiple SKUs into a fake single product.
 
-## 4. Requirement projection and selection request
+## 6. Requirement projection and generic selection request
 
-`SelectionRequest` is an immutable capture of exact upstream requirements for one logical selection subject.
+The current `FunctionalDeviceRequirement` remains valid for the existing protection vertical. ELV8 introduces an owner-neutral immutable selection request around exact upstream requirements rather than replacing it.
+
+Conceptual request:
 
 ```text
-requestId
-projectId
-revisionId
-subjectRef
-requirementProjectionVersion
-upstreamEvidenceManifest/hash
-hardConstraints
-softPreferences
-eligibleCatalogEditionRefs
-selectionPolicyEditionId
-createdAt
+SelectionRequest
+- requestId
+- projectId
+- revisionId
+- subjectRef
+- requirementKind / schemaVersion
+- upstream evidence manifest/hash
+- hardConstraints[]
+- softPreferences[]
+- eligible ManufacturerCatalog refs/versions
+- selectionPolicyVersion
+- legacyRequirementRef?       // e.g. FunctionalDeviceRequirement adapter
+- createdAt
 ```
 
-### 4.1 Constraint classes
+### 6.1 Hard versus soft constraints
 
-`SelectionConstraint` minimum:
+Hard constraints come from:
 
-```text
-constraintId
-sourceOwnerStage
-sourceEvidenceRef / ruleRef
-field/path
-operator
-requiredValue/range/set
-unit?
-obligation: HARD | SOFT
-missingCandidateFactPolicy
-```
+- exact engineering minima/capabilities from ELV2–ELV6;
+- product/configuration compatibility;
+- applicable ELV7 mandatory/contractual constraints;
+- explicit project allowlists that are intentionally hard policy.
 
-Hard constraints originate from engineering minima, exact compatibility requirements and applicable normative requirements. Soft preferences may encode preferred manufacturer/family, spare capacity, footprint preference or standardized project choices.
+Soft preferences come from ranking policies such as preferred manufacturer/series, spare capacity, footprint or standardization goals.
 
-Hard versus soft is not inferred from UI wording.
+The current `ProjectManufacturerPolicy.allowedManufacturers`/`requiredRegion` hard behavior and `preferredManufacturers`/`preferredSeriesByRole` ranking behavior are preserved through adapters.
 
-### 4.2 Missing candidate fact
+### 6.2 Missing candidate fact
 
-For a hard constraint, missing candidate data cannot be treated as pass. Outcome is `UNKNOWN_HARD_FACT` and the candidate is excluded from compliant candidate set unless an explicit policy allows manual noncompliant review. Such candidate can never be reported compliant without resolving evidence.
-
-## 5. Candidate evaluation
-
-Each candidate/configuration gets a structured result:
-
-```text
-candidateId
-configurationHash
-hardConstraintResults
-hardEligibility: ELIGIBLE | INELIGIBLE | UNKNOWN
-softScoreBreakdown
-impactPreview
-explanations
-stableSortKey
-```
-
-Hard filter executes before soft scoring.
-
-### 5.1 Hard result
-
-Per hard constraint:
+For an applicable hard constraint:
 
 ```text
 SATISFIED
@@ -190,19 +198,42 @@ UNKNOWN
 NOT_APPLICABLE
 ```
 
-All required applicable hard constraints must be `SATISFIED` for `ELIGIBLE`.
+Missing mandatory candidate data => `UNKNOWN`; it is never compatible by omission.
 
-### 5.2 Soft ranking
+## 7. Existing matcher version and new selection engine
 
-Ranking uses a versioned `SelectionPolicyEdition` with named criteria, normalization and weights. The engine must expose each score contribution. Tie-breaking uses stable product/configuration IDs, never load order.
+`fl14-strict-product-match-v1` must remain replayable/testable for legacy protection selection. Do not alter its comparison semantics under the same version string.
 
-Identical request + exact catalog editions + exact policy edition + engine version must produce identical ordered candidates.
+ELV8 can add a new generic engine, for example `elv8-selection-v1`, which consumes structured constraints and can adapt legacy v1 results.
 
-No machine-learning black-box ranker is authoritative for initial ELV8 qualification. A future advisory model may propose candidates, but final eligibility/ranking must remain reproducible and explainable.
+Required candidate result:
 
-## 6. Selection decision state machine
+```text
+candidate/configuration ref
+hardConstraintResults[]
+hardEligibility: ELIGIBLE | INELIGIBLE | UNKNOWN
+softScoreBreakdown[]
+legacyMatcherEvidence?
+impactPreview
+stableSortKey
+canonicalEvaluationHash
+```
 
-A selected candidate is not immediately “closed”. Required lifecycle:
+Hard filtering precedes soft ranking. A score can never compensate for hard violation/unknown.
+
+### 7.1 Explainable ranking
+
+A versioned selection policy exposes named criteria, normalization/weights and tie-break rules. Existing FL14 manufacturer/series preference ordering is an inherited v1 ranking basis for applicable legacy requests.
+
+Identical request + catalog versions + policy + engine versions produces identical canonical candidate order independent of DB row/load order.
+
+No black-box ML model is authoritative for initial ELV8 selection. A future ML assistant may suggest candidates but cannot bypass deterministic hard validation.
+
+## 8. Selection decision lifecycle and controlled feedback loop
+
+The current circuit selection snapshot stores product, requirement fingerprint and policy snapshot. ELV8 generalizes that to a stateful decision without rewriting historical current rows in place.
+
+Target lifecycle:
 
 ```text
 DRAFT
@@ -215,27 +246,28 @@ STALE
 SUPERSEDED
 ```
 
-Suggested flow:
+Flow:
 
-1. capture requirements/catalog/policy;
-2. evaluate candidates;
-3. engineer selects one eligible configuration;
-4. generate exact technical impact projection;
-5. if selected technical facts differ from assumptions used upstream, mark `PENDING_REVALIDATION` and schedule/require explicit affected-stage recalculation/validation through owner commands;
-6. after exact ELV4/ELV5/ELV6/ELV7 evidence closes against the selected configuration, mark `VALIDATED`;
-7. only validated selection can become normal `FROZEN` deliverable input;
-8. later upstream/catalog change marks current selection stale without deleting its history.
+1. capture exact requirement/catalog/policy;
+2. evaluate deterministic candidates;
+3. engineer selects an eligible candidate/configuration;
+4. capture exact product technical snapshot and impact projection;
+5. if selected facts differ from assumptions consumed by ELV4/5/6/7, mark `PENDING_REVALIDATION`;
+6. invoke affected stages only through their authoritative command/application boundaries;
+7. collect new exact evidence refs/fingerprints;
+8. when closure is current and acceptable, mark `VALIDATED`;
+9. freeze only an acceptable validated selection under normal publication policy;
+10. later requirement/catalog/profile changes mark current decision stale without deleting history.
 
-This breaks cyclic dependencies deliberately. ELV8 does not call itself recursively through upstream recalculation.
+This replaces hidden cycles with an explicit convergence protocol. The existing `engine.recalculate(projectId)` behavior is inventoried in P0 and adapted; ELV8 must not introduce recursive “selection → silent upstream mutation → selection” loops.
 
-## 7. Candidate impact projection
+## 9. Selection impact projection
 
-`SelectionImpactProjection` identifies candidate technical facts that can change earlier conclusions:
+Capture candidate facts that can invalidate earlier stages:
 
 ```text
-subjectRef
-selectedConfigurationHash
-physical envelope/mounting delta
+selected product/configuration fingerprint
+physical envelope / mounting delta
 power/load/source capability delta
 port/interface/capacity delta
 battery/accessory delta
@@ -244,129 +276,157 @@ normative fact delta
 affected owner stages/processes/rules
 ```
 
-Before acceptance UI shows impact. Accepting a candidate may create/update only the ELV8 selection binding. Any upstream canonical binding/adoption needed for exact product technical facts is executed through the authoritative owner command surface with reviewed impact.
+ELV8 repository code may not directly update ELV2–ELV7 tables. Owner changes are explicit commands/use cases with reviewed impact.
 
-No direct database writes into ELV2–ELV7 tables from an ELV8 repository are allowed.
+## 10. Overrides and disposition
 
-## 8. Noncompliant/manual override
+### 10.1 Soft override
 
-An engineer may need to record a product choice that does not satisfy current hard requirements. This is modeled explicitly:
+Engineer may select another **hard-eligible** candidate regardless of soft rank. Record reason/actor/time and retain candidate-evaluation evidence. It remains technically compliant.
 
-```text
-selection status = NONCOMPLIANT_OVERRIDE
-reason
-actor/time
-violated/unknown hard constraint refs
-required ELV7 deviation/manual-review refs
-```
+### 10.2 Hard noncompliant selection
 
-The product may appear in a draft deliverable marked noncompliant if project policy permits, but a normal compliant/final publication cannot hide this state.
+A violated/unknown hard requirement can be recorded only as explicit `NONCOMPLIANT_OVERRIDE` when project policy permits draft recording.
 
-Soft ranking can be overridden freely with reason/history because all hard constraints are still satisfied. Hard-constraint override requires the noncompliant path.
-
-## 9. Catalog import and governance
-
-Catalog imports are untrusted input. Import pipeline:
-
-1. validate schema/version;
-2. normalize units/enums;
-3. validate stable manufacturer/product keys;
-4. reject malformed numbers, duplicate conflicting product identities and cyclic configuration rules;
-5. generate canonical hashes;
-6. produce import diagnostics;
-7. publish immutable edition only after required review.
-
-Importer cannot execute vendor scripts/macros. External URLs are metadata. Remote fetching, if added, occurs outside engineering core and yields a validated local artifact before import.
-
-## 10. Canonical deliverable model
-
-All output formats consume one immutable `DeliverableBundle` assembled from a frozen project snapshot.
-
-Minimum bundle metadata:
+Required disposition reference is owner-specific:
 
 ```text
-bundleId
-projectId
-revisionId
-bundleSchemaVersion
-sourceSnapshotHash
-ELV2–ELV7 evidence manifest/hashes
-selected catalog edition hashes
-selection snapshot hash
-normative profile + validation run hash
-template edition/hash
-locale/unit presentation settings
-generatedAt
-canonicalBundleHash
+ConstraintDispositionRef
+- sourceOwnerStage
+- constraint/evidence ref
+- disposition kind/ref
+- status/fingerprint
 ```
 
-### 10.1 Canonical sections
+Examples:
 
-Initial bundle supports at least:
+- ELV7 normative violation → approved ELV7 deviation where legally/project-policy permissible;
+- engineering requirement from ELV4/5/6 → explicit authoritative engineering override/change workflow if such a workflow exists;
+- unresolved mandatory technical fact with no valid owner disposition → remains blocking.
 
-- project/revision metadata;
+An ELV7 deviation is **not** a universal mechanism for non-normative engineering violations. A noncompliant selection may appear in draft documents with clear status but cannot be rendered as normal compliant/final without all required dispositions.
+
+## 11. Catalog import/governance hardening
+
+Current `DriftManufacturerRepository.importCatalog()` already enforces immutable version payloads, identity/SKU uniqueness, source/manufacturer consistency and product validation. P1 extends rather than replaces it.
+
+Additional ELV8 gates for new capability/configuration data:
+
+1. schema/version validation;
+2. canonical unit/enum normalization;
+3. structured capability codec validation;
+4. duplicate/conflicting identity rejection;
+5. compatibility/configuration cycle detection;
+6. canonical content hashes;
+7. import diagnostics/provenance;
+8. explicit published/retired lifecycle if added.
+
+Imported vendor scripts/macros are never executed. URLs are metadata. Remote retrieval, if added, is outside engineering core and must yield validated local input before import.
+
+## 12. Canonical reporting and deliverable envelope
+
+ELV8 follows ADR-025 exactly:
+
+```text
+PublishedProjectSnapshot
+    ↓
+ReportAssembler
+    ↓
+ReportModel              // canonical engineering report content
+    ↓
+renderer/export adapters
+```
+
+ELV8 may persist an immutable envelope:
+
+```text
+ReportBundleSnapshot
+- bundleId
+- projectId / revisionId
+- reportModelSchemaVersion
+- publishedProjectSnapshotId/hash
+- ELV2–ELV7 evidence manifest/hashes
+- manufacturer catalog/version hashes
+- selection snapshot hash
+- ELV7 profile/run hash
+- report template edition/hash
+- locale/unit presentation profile
+- assembledAt
+- canonical ReportModel hash
+- bundle/manifest hash
+```
+
+The envelope does not duplicate report section content. Exporters consume `ReportModel` plus immutable manifest/options.
+
+## 13. ReportModel content for ELV8
+
+ADR-025 content remains valid and ELV8 adds ELV-specific sections through a versioned schema. Minimum supported engineering content includes:
+
+- project/revision summary;
 - equipment schedule;
-- engineering BOM quantities;
 - cable schedule;
-- enclosure/rack layout schedule and references;
-- power/capacity calculation summary references;
-- CCTV/LAN/ACS/Fire calculation summary references;
-- normative validation/compliance matrix;
-- open/manual/deviation summary;
-- selected product/configuration rationale;
-- source/catalog/template manifest;
-- document/revision issue metadata.
+- route/pathway schedule/drawings where available;
+- panel/rack/enclosure layout schedules and drawings;
+- power/capacity summary references;
+- CCTV/LAN/ACS/Fire calculation summaries;
+- engineering BOM;
+- ELV7 validation/compliance matrix;
+- manual review/deviation/open issue summary;
+- selected manufacturer products/configurations and rationale;
+- source/catalog/profile/template manifest;
+- document/revision issue metadata;
+- optional estimate section **only when supplied by the separate PriceBook/estimate layer**.
 
-The canonical bundle contains data, not renderer-specific widget objects.
+Renderer-specific widget/layout objects are not engineering truth.
 
-## 11. BOM semantics
+## 14. BOM and quantity takeoff
 
-Engineering BOM and commercial estimate are separate.
+Preserve ADR-025:
 
-`BomLine` conceptually:
+```text
+engineering objects/selections/routes/panels/supports/terminals
+    ↓
+QuantityTakeoff
+    ↓
+BOM
+```
+
+A BOM line conceptually contains:
 
 ```text
 lineId
-productRevisionRef
-configuration/component role
+ManufacturerProductVariant/configuration component ref
 quantity
 unit
-sourceSubjectRefs
-selectionDecisionRefs
-spare/reserve classification?
-notesCode?
-traceabilityRefs
-stableSortKey
+source subject refs
+selection decision refs
+reserve/spare classification?
+technical description code/data
+stable sort key
 ```
 
-Quantities are derived from exact selected configurations and project demand. Unit price, currency, vendor quote, tax and procurement status are outside core ELV8 BOM unless a separate estimate/procurement module is explicitly introduced.
+Aggregation is allowed only while drill-down to contributing project entities remains recoverable.
 
-Same product/configuration may aggregate into one BOM line only if traceability to contributing subjects remains recoverable.
+Engineering quantity is independent from price. PriceBook, currency, material/labor rate, tax, vendor quote and price date belong to the estimate/commercial layer (FL18 boundary). Changing prices must not invalidate engineering selection/geometry/calculations.
 
-## 12. Equipment and cable schedules
+## 15. Schedules and traceability
 
-Each row is canonical, deterministic and traceable.
+`EquipmentScheduleRow` references logical project equipment + exact selected product snapshot + location/enclosure + selection state.
 
-`EquipmentScheduleRow` includes logical project equipment identity, selected manufacturer/product revision, technical summary fields, location/enclosure refs and selection state.
+`CableScheduleRow` references authoritative ELV3 cable/run facts, installed length, endpoints and definitions. ELV8 never recomputes route length.
 
-`CableScheduleRow` references ELV3 cable/run identity and may include route length, cable definition, endpoints, enclosure entries and derived technical metadata. ELV8 never recomputes route length.
+Rack/panel rows consume ELV6 owner-neutral layout projection. Compliance rows consume ELV7 exact profile/run/rule/finding/disposition refs.
 
-Stable sorting is defined in the bundle schema; exporters cannot choose arbitrary row order that changes hashes/review diffs.
+Every row has deterministic stable sorting defined by `ReportModel` schema and source drill-down refs.
 
-## 13. Layout and validation sections
+## 16. Template model
 
-Enclosure/rack deliverable rows reference ELV6 frozen layout projection/hash. Renderer may generate front/rear diagrams from canonical coordinates, but must not mutate layout.
-
-Compliance matrix references ELV7 exact profile edition, validation run, rule/finding identities, source refs and disposition state. If ELV7 is stale/blocked, the deliverable status must expose that condition.
-
-## 14. Template model
-
-`DeliverableTemplateEdition` is immutable after publication and contains declarative presentation/layout configuration:
+A published `ReportTemplateEdition` is immutable/versioned declarative data:
 
 ```text
 templateId / editionId
 templateSchemaVersion
-supported bundle schema range
+supported ReportModel schema range
 branding metadata
 page/section definitions
 field mappings
@@ -374,255 +434,256 @@ formatting rules
 canonicalHash
 ```
 
-Templates cannot execute arbitrary Dart/JavaScript/shell code. Unsupported/missing field mapping is a renderer error, not permission to read live DB state.
+No arbitrary Dart/JavaScript/shell execution. Unsupported/missing mapping is renderer error, not permission to query live mutable DB/UI state.
 
-## 15. Snapshot and publication
+## 17. Snapshot, assembly and publication
 
-Deliverable generation follows:
+Required flow:
 
-1. verify project revision/freeze state required by publication policy;
-2. verify required selection decisions and ELV7 state;
-3. capture exact upstream/selection/template manifest;
-4. assemble canonical bundle through repository/query ports;
-5. validate bundle schema and traceability completeness;
-6. compute canonical hash;
-7. persist immutable bundle snapshot + manifest;
-8. render one or more export formats from that snapshot;
-9. persist generated-file metadata/hash linked to bundle;
-10. never re-open mutable project state during renderer execution.
+1. verify publication/freeze policy for project revision;
+2. verify required selections and ELV7 validation/readiness state;
+3. capture exact `PublishedProjectSnapshot` and selection/profile/template manifest;
+4. `ReportAssembler` builds canonical `ReportModel` from repository/query ports;
+5. validate schema, required sections and source traceability;
+6. compute canonical content hash;
+7. persist immutable report bundle/manifest snapshot;
+8. render one or more artifacts from that immutable input;
+9. persist artifact metadata/hash;
+10. renderer never re-opens mutable project state.
 
-A renderer retry must use the same bundle snapshot.
+Renderer retry uses the same immutable report model/bundle snapshot.
 
-## 16. Exporter boundary
+## 18. Exporter boundary
 
-Pure application/core boundary:
+Conceptual adapter:
 
 ```dart
-abstract interface class DeliverableExporter {
+abstract interface class ReportExporter {
   String get exporterId;
   String get exporterVersion;
-  Future<ExportArtifact> export(DeliverableBundle bundle, ExportOptions options);
+  Future<ExportArtifact> export(
+    ReportModel model,
+    DeliverableManifest manifest,
+    ExportOptions options,
+  );
 }
 ```
 
-Initial target adapters:
+Initial outputs:
 
-- canonical JSON for machine exchange/debug/reproducibility;
-- CSV for BOM and tabular schedules;
-- PDF project report/sheets using an approved rendering adapter;
-- future XLSX/DXF/other adapters without changing canonical engineering truth.
+- canonical JSON for report-model exchange/reproducibility;
+- CSV for BOM/tabular schedules;
+- local PDF per ADR-025 product requirement;
+- optional server PDF from the same immutable published snapshot/model contract;
+- future XLSX/DXF/etc. adapters without changing canonical engineering truth.
 
-PDF implementation may be local or backend-assisted, but the export contract and bundle are identical. Offline-capable export remains a product requirement for supported local formats.
+Local/server content-equivalence must be contract-tested at the canonical model/content level even if PDF byte streams differ by renderer metadata.
 
-## 17. Persistence
+## 19. Persistence strategy: extend existing tables, do not fork
 
-Proposed normalized Drift family:
+P0 inventories current tables including `manufacturerCatalogs`, `manufacturerProducts`, `manufacturerPolicies`, `circuitProductSelections` and any report/file metadata.
+
+Existing catalog/product/selection rows remain readable/canonical for their current scope. New schema is additive or migration-backed. Potential extensions:
 
 ```text
-manufacturer_catalog
-manufacturer_catalog_edition
-catalog_product
-catalog_product_revision
-catalog_product_capability
-catalog_product_compatibility
-catalog_configuration_rule
-project_catalog_binding
-selection_policy_edition
-selection_request
+selection_request                       // generic non-circuit subject request
 selection_constraint
 selection_candidate_snapshot
 selection_candidate_result
-selection_decision
+selection_decision                      // generic decision if legacy table cannot generalize safely
 selection_decision_component
 selection_impact_ref
 selection_revalidation_ref
-deliverable_template
-deliverable_template_edition
-deliverable_bundle_snapshot
-deliverable_bundle_manifest_ref
-deliverable_export_artifact
+report_template / report_template_edition
+report_bundle_snapshot
+report_bundle_manifest_ref
+report_export_artifact
 ```
+
+Do **not** add parallel `manufacturer_catalog` / `catalog_product` tables unless P0/P1 explicitly migrates existing tables with ID/snapshot/history/codec compatibility proof.
 
 Requirements:
 
-- immutable published catalog/template editions;
-- exact project/revision and catalog/profile hashes;
-- candidate snapshots may be immutable large derived records; current pointers are guarded;
-- selected decisions/history never overwritten;
-- generated large files stored outside DB with path/object key/hash/size/MIME metadata;
-- indexes by product part number, family/kind, capability keys needed for filtering, project/revision/subject, selection state and bundle;
-- no live price columns inside engineering BOM source of truth.
+- preserve FL14 immutable catalog/version behavior;
+- preserve old `CircuitProductSelections` snapshots and status semantics;
+- migration may create generic selection rows from legacy circuit rows only if reversible/proven and source legacy IDs remain traceable;
+- current pointers guarded by expected revisions/generations;
+- completed selection/report snapshots immutable;
+- generated large files outside DB with ref/path/object key/hash/size/MIME metadata;
+- no mandatory live price columns in engineering BOM truth.
 
-## 18. Commands
+## 20. Commands and legacy API transition
 
-Proposed public command families:
+Current `ManufacturerRepository` methods (`importCatalog`, `archiveCatalog`, `savePolicy`, `selectProduct`, `clearSelection`) are inherited application APIs. P0/P2 decide which stay as compatibility facades and which route through new command services.
+
+New project mutations must converge on standard ELV command semantics: `commandId`, replay-before-preconditions, expected project/revision/aggregate generations, atomic state/history/ledger/outbox where applicable.
+
+Conceptual ELV8 operations:
 
 ```text
-ImportCatalogEdition
-PublishCatalogEdition
-RetireCatalogEdition
-BindProjectCatalogEdition
-ReleaseProjectCatalogEdition
-CreateSelectionRequest
-EvaluateSelectionRequest
+Import/Publish/RetireManufacturerCatalogVersion
+Bind/ReleaseProjectManufacturerCatalog
+Create/EvaluateSelectionRequest
 SelectEquipmentCandidate
 OverrideSoftSelection
 RecordNoncompliantSelection
 RecordSelectionRevalidation
-FreezeSelectionDecision
-SupersedeSelectionDecision
-CreateDeliverableTemplateEdition
-PublishDeliverableTemplateEdition
-AssembleDeliverableBundle
-ExportDeliverableBundle
+Freeze/SupersedeSelectionDecision
+Create/PublishReportTemplateEdition
+AssembleReportBundle
+ExportReportBundle
 ```
 
-Administrative catalog/template publication may later move to backend governance; project use of already available editions remains offline-capable.
+Exact registry names/count are frozen in P2 after compatibility analysis. Long-running rendering is outside the database write transaction; immutable report snapshot publication precedes rendering.
 
-Every project mutation uses existing command replay/history/UoW semantics. Long-running rendering is not held inside one database write transaction; immutable bundle publication precedes rendering.
+## 21. Code boundaries
 
-## 19. Code boundaries
+Reuse current source first:
 
-Expected shape:
+```text
+packages/engineering_core/lib/src/manufacturer_catalog.dart
+apps/mobile/lib/application/manufacturer_repository.dart
+apps/mobile/lib/data/repositories/drift_manufacturer_repository.dart
+apps/mobile/lib/features/calculations/manufacturer_screen.dart
+```
+
+Additive ELV8 shape may include:
 
 ```text
 packages/engineering_core/lib/src/elv8/
-  catalog/
-  requirements/
-  selection/
+  selection_constraints/
   configuration/
+  impact/
+  report_model_extensions/
   bom/
-  deliverables/
 
 apps/mobile/lib/application/
-  elv8_catalog_repository.dart
-  elv8_selection_repository.dart
   elv8_selection_command_service.dart
-  elv8_deliverable_repository.dart
-  elv8_deliverable_assembler.dart
-  elv8_export_service.dart
+  elv8_selection_query_service.dart
+  report_assembler.dart
+  report_export_service.dart
   elv8_workspace_controller.dart
 
 apps/mobile/lib/data/repositories/
-  drift_elv8_catalog_repository.dart
-  drift_elv8_selection_repository.dart
-  drift_elv8_deliverable_repository.dart
+  drift_elv8_selection_repository.dart      // generic extensions only
+  drift_report_repository.dart
 ```
 
-Candidate hard filtering/scoring/configuration resolution belongs in pure Dart. Export adapters may depend on platform/file/PDF packages outside engineering core.
+Do not create `elv8_catalog_repository.dart` that simply duplicates `ManufacturerRepository`. Pure matching/configuration/quantity-takeoff stays Flutter/Drift/HTTP independent.
 
-## 20. Selection workspace UX
+## 22. Selection workspace UX
+
+Extend current manufacturer screen/workflow rather than introduce a disconnected second selector.
 
 Required UX:
 
-- exact subject requirements and their ELV2–ELV7 source refs;
-- exact catalog editions in scope;
-- candidate table with hard eligibility before score;
-- per-constraint pass/fail/unknown diagnostics;
-- explainable soft score breakdown;
-- configuration/accessory tree and resolved capabilities;
-- compare candidates;
-- exact impact preview on power/layout/normative evidence;
-- explicit select/override/revalidate/freeze actions;
-- stale/pending-revalidation/noncompliant states clearly separated;
-- read-only historical/frozen decision view.
+- exact selection subject/requirements with ELV2–ELV7 source refs;
+- exact catalog versions in scope;
+- legacy and generic candidate hard eligibility;
+- per-constraint pass/fail/unknown diagnostics rather than only concatenated strings for new engine;
+- explainable soft rank;
+- configuration/accessory tree;
+- candidate comparison;
+- impact preview on power/layout/normative evidence;
+- explicit select/override/revalidate/freeze;
+- clear selected/review-required/stale/pending/noncompliant states;
+- frozen historical snapshot view.
 
-A candidate with unknown/violated hard constraints cannot be visually presented as a normal recommended compliant choice.
+Legacy FL14 circuit behavior/tests remain regression gates.
 
-## 21. Deliverables workspace UX
+## 23. Deliverables workspace UX
 
 Required capabilities:
 
-- bundle readiness gate showing blocking stale/noncompliant/manual states;
-- select published template edition;
-- preview canonical section data before render;
-- trace any row back to selection/upstream source;
-- deterministic diff between bundle snapshots;
-- export format/options selection;
-- generated artifact metadata/hash/history;
-- regenerate renderer output from the same immutable bundle;
-- clear distinction between draft and final/frozen publication.
+- publication readiness showing blocked/stale/noncompliant/manual states;
+- exact `PublishedProjectSnapshot` and template edition;
+- canonical `ReportModel` preview;
+- row/item → source traceability;
+- report bundle history/diff;
+- export format/options;
+- artifact metadata/hash/history;
+- regenerate renderer output from same immutable model/bundle;
+- clear draft/final/frozen status.
 
-## 22. Stale and dependency semantics
+No final/compliant publication hides blocked ELV7 or pending selection revalidation.
 
-Targeted invalidation:
+## 24. Targeted stale semantics
 
-- catalog edition replacement does not alter historical selection; an explicit project binding/adoption can mark affected current selection requests stale;
-- upstream requirement change invalidates requests/decisions consuming it;
-- selected product technical correction/new revision never rewrites old selection, but may require a new decision;
-- ELV7 finding/profile change invalidates dependent selection constraints and deliverable compliance sections;
-- ELV6 layout change invalidates relevant location/layout rows and possibly candidate fit;
-- template-only change invalidates rendered deliverables, not engineering selection;
-- price/quote changes, if future commercial module exists, must not invalidate engineering calculations unless technical product identity changes.
+- requirement fingerprint change → dependent current selection stale;
+- manufacturer policy change → affected selection review required; preserve historical snapshot;
+- catalog archive/new version → old snapshot remains historical; explicit adoption required for current migration;
+- product technical correction requires new version/revision, never silent mutation of selected snapshot;
+- ELV6 layout change → relevant fit/selection/report sections stale;
+- ELV7 profile/finding change → dependent normative constraints/report section stale;
+- report-template-only change → report artifact/bundle presentation stale, not engineering selection;
+- price-only change in separate estimate layer → estimate/report estimate section stale, not engineering BOM/selection.
 
-## 23. Freeze and historical reproduction
+## 25. Freeze and historical reproduction
 
-A frozen project revision captures:
+Frozen ELV8 evidence records:
 
-- exact selection decisions/configuration hashes;
-- exact catalog editions/product revisions;
-- ELV7 profile/run refs;
-- ELV6 layout hash;
-- ELV4/ELV5 calculation refs required by report;
-- template edition for each published bundle;
-- canonical bundle hash and artifact hashes.
+```text
+selection decisions + exact product/configuration snapshots
+catalog IDs/versions/source refs/hashes
+selection engine/policy versions
+upstream evidence fingerprints
+ELV7 profile/run refs
+ELV6 layout hash
+PublishedProjectSnapshot ID/hash
+ReportModel schema/content hash
+report template edition/hash
+exporter/version/options + artifact hashes
+```
 
-Historical reading never resolves current/latest product or template data.
+Historical reading never resolves current/latest catalog/template data. Pre-ELV8 history returns `ELV8_NOT_CAPTURED` rather than interpreting empty BOM as complete.
 
-Pre-ELV8 revisions return `ELV8_NOT_CAPTURED`, not an empty BOM interpreted as complete.
-
-## 24. Acceptance requirements
+## 26. Acceptance requirements
 
 Runtime closure requires at least:
 
-1. catalog import normalization and malformed-data rejection;
-2. immutable published catalog edition and historical read proof;
-3. hard filter `SATISFIED/VIOLATED/UNKNOWN` fixtures;
-4. missing hard candidate fact cannot pass;
-5. deterministic candidate ordering/hash for identical input;
-6. stable tie-break proof independent of DB insertion/load order;
-7. accessory/configuration resolution positive and cycle rejection fixtures;
-8. no-candidate diagnostic fixture;
-9. soft override remains hard-compliant and audited;
-10. noncompliant override is visibly noncompliant and requires disposition;
-11. selection impact triggers `PENDING_REVALIDATION` when required;
-12. upstream revalidation closure before normal freeze;
-13. stale selection after upstream fact mutation;
-14. command replay/idempotency/rollback/restart proof;
-15. R1 frozen selection remains reproducible after R2 catalog/project changes;
-16. canonical BOM quantity/traceability proof;
-17. engineering BOM has no mandatory price dependency;
-18. canonical bundle assembly deterministic hash proof;
-19. exporter renders only from immutable bundle snapshot;
-20. renderer retry produces artifact from same bundle without live DB read;
-21. JSON/CSV export fixtures; PDF adapter golden/structural qualification when implemented;
-22. stale/blocked ELV7 state visible in deliverable readiness;
-23. template edition upgrade is explicit and historical bundle unchanged;
-24. large-file metadata/hash persistence and missing-artifact handling;
-25. project-scale candidate filtering/bundle/export performance budget.
+1. P0 inventory of FL14 domain/repository/Drift/schema/UI/tests with exact accepted source SHA;
+2. all inherited manufacturer matching/persistence tests remain green;
+3. `fl14-strict-product-match-v1` behavior remains unchanged/replayable;
+4. current catalog immutability/identity/archive semantics regression proof;
+5. legacy circuit selection snapshot/review-required semantics regression proof;
+6. generic hard constraint `SATISFIED/VIOLATED/UNKNOWN` fixtures;
+7. missing hard candidate fact cannot pass;
+8. deterministic generic candidate ordering/hash independent of DB/load order;
+9. accessory/configuration positive and cycle-rejection fixtures;
+10. no-candidate diagnostics;
+11. soft override remains hard-eligible/audited;
+12. hard noncompliant override uses typed owner disposition and remains visibly noncompliant;
+13. candidate impact enters `PENDING_REVALIDATION` when required;
+14. normal freeze blocked until required revalidation closes;
+15. no direct ELV8 DB writes into ELV2–ELV7 owners;
+16. stale selection after upstream requirement/profile/layout change;
+17. command replay/idempotency/rollback/restart for new ELV8 mutations;
+18. R1 frozen selection remains reproducible after R2 catalog/project changes;
+19. `PublishedProjectSnapshot → ReportAssembler → ReportModel` deterministic content/hash proof;
+20. BOM quantity aggregation with source drill-down proof;
+21. engineering BOM independent of PriceBook changes;
+22. renderer reads only immutable report model/manifest;
+23. JSON/CSV export fixtures;
+24. local PDF structural/golden/content fixture when renderer implemented;
+25. local/server canonical content-equivalence contract when server renderer implemented;
+26. stale/blocked ELV7 state visible in publication readiness;
+27. template upgrade explicit; historical bundle unchanged;
+28. large-file metadata/hash/missing-artifact handling;
+29. project-scale catalog filtering/configuration/report/export performance budget.
 
-## 25. Security and trust boundaries
+## 27. Security and trust boundaries
 
 - catalog/template imports are untrusted structured data;
-- no imported scripts/macros are executed;
-- file names/paths from external data are sanitized by adapters;
-- output paths cannot escape project/export sandbox;
-- vendor documents retain provenance/hash and are not authoritative structured capability data unless imported/verified;
-- exporter input is canonical bundle only;
-- generated artifacts record exporter/version/options/hash;
-- selection explanations cannot conceal failed/unknown hard constraints.
+- no imported scripts/macros execute;
+- external file names/paths sanitized by adapters;
+- output paths cannot escape export sandbox;
+- vendor PDFs are provenance documents, not structured capability evidence unless explicitly imported/verified;
+- renderer input is immutable `ReportModel` + manifest only;
+- generated artifacts store exporter/version/options/source model hash;
+- explanations cannot conceal failed/unknown hard constraints.
 
-## 26. Explicit non-goals
+## 28. Explicit non-goals
 
-ELV8 does not own:
+ELV8 does not own live distributor inventory/price scraping, purchase orders/payment/tax, hidden product substitution, weakening upstream engineering/normative requirements, direct ELV2–ELV7 table mutation, arbitrary executable templates, full BIM/CAD authoring or legal certification beyond ELV7 evidence.
 
-- live distributor inventory/price scraping;
-- purchase orders, payment, tax or procurement workflow;
-- automatic substitution without engineer review;
-- hidden weakening of normative/engineering requirements;
-- direct mutation of ELV2–ELV7 database tables;
-- arbitrary executable document templates;
-- full BIM/CAD authoring;
-- legal certification beyond exactly recorded ELV7 evidence.
-
-Future procurement/estimate integrations must remain downstream of the engineering BOM and preserve its quantity/source provenance.
+PriceBook/estimate/procurement features remain downstream/separate from the engineering BOM and preserve quantity/source provenance.
