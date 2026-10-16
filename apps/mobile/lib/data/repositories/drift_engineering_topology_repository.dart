@@ -5,6 +5,7 @@ import 'package:engineering_core/engineering_core.dart';
 
 import '../../application/engineering_topology_repository.dart';
 import '../database/app_database.dart';
+import '../elv_deletion_guards.dart';
 import 'drift_engineering_system_repository.dart';
 
 class DriftEngineeringTopologyRepository
@@ -303,7 +304,11 @@ class DriftEngineeringTopologyRepository
     if (old != null && _payload(old)['componentId'] != p.componentId)
       throw StateError('Port identity cannot move between components.');
     if (_same(old, p.toMap())) return;
-    await _requireUnboundPowerPort(projectId, p.id);
+    await guardMutableEngineeringPortAgainstPowerOwnership(
+      database,
+      projectId,
+      p.id,
+    );
     final binding =
         await (database.select(database.componentReferenceBindings)..where(
           (r) => r.componentId.equals(p.componentId) & r.deletedAt.isNull(),
@@ -512,24 +517,6 @@ class DriftEngineeringTopologyRepository
               ),
             );
       });
-  Future<void> _requireUnboundPowerPort(String projectId, String portId) async {
-    final binding =
-        await (database.select(database.powerPortBindings)
-              ..where(
-                (row) =>
-                    row.projectId.equals(projectId) &
-                    row.portId.equals(portId) &
-                    row.deletedAt.isNull(),
-              )
-              ..limit(1))
-            .getSingleOrNull();
-    if (binding != null) {
-      throw StateError(
-        'ELV4_POWER_PORT_OWNED: Release the power binding through its '
-        'revision-scoped command before editing or retiring this port.',
-      );
-    }
-  }
 
   @override
   Future<void> archive(
@@ -549,7 +536,11 @@ class DriftEngineeringTopologyRepository
     if (old == null || old.readNullable<DateTime>('deleted_at') != null)
       throw StateError('Topology object is unavailable.');
     if (kind == TopologyObjectKind.port) {
-      await _requireUnboundPowerPort(projectId, id);
+      await guardMutableEngineeringPortAgainstPowerOwnership(
+        database,
+        projectId,
+        id,
+      );
     }
     if (kind == TopologyObjectKind.port &&
         (s.connections.any((c) => c.fromPortId == id || c.toPortId == id) ||
