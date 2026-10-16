@@ -20,9 +20,6 @@ on:
       - '.gitignore'
       - '.github/workflows/**'
 
-permissions:
-  contents: write
-
 jobs:
   flutter-local:
     runs-on: ubuntu-latest
@@ -32,27 +29,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event_name == 'push' && github.ref_name || github.event.pull_request.head.sha }}
-
-      - name: Remove unused Drift import
-        if: github.event_name == 'push'
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          path = Path('test/data/elv4_p9_runtime_qualification_test.dart')
-          text = path.read_text()
-          line = "import 'package:drift/drift.dart' hide isNotNull;\n"
-          if line in text:
-              path.write_text(text.replace(line, '', 1))
-          PY
-          if ! git diff --quiet -- test/data/elv4_p9_runtime_qualification_test.dart; then
-            git config user.name github-actions[bot]
-            git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-            git add test/data/elv4_p9_runtime_qualification_test.dart
-            git commit -m "fix(elv4): remove unused qualification Drift import"
-            git push origin HEAD:${GITHUB_REF_NAME}
-          fi
 
       - name: Reject tracked generated artifacts
         working-directory: .
