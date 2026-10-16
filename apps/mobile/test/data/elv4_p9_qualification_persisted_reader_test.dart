@@ -115,6 +115,7 @@ Map<String, Object?> _manifest(Elv4QualificationBuilder builder) => {
   'positiveCases': [
     {
       'id': 'Q-TEST',
+      'kind': 'POSITIVE',
       'facts': {
         'projectId': builder.projectId,
         'designRevisionId': builder.revisionId,
