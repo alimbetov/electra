@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:engineering_core/engineering_core_elv5.dart';
 
+import '../calculation/elv5_blocked_capture.dart';
 import '../calculation/elv5_calculation_runtime.dart';
 import '../calculation/elv5_kernel_executor.dart';
 import '../persistence/elv5_runtime_persistence.dart';
@@ -48,21 +49,72 @@ final class Lan01PersistedInputResolver
     if (linkId != request.subject.id) {
       throw StateError('LAN01_LINK_ID_MISMATCH:$linkId:${request.subject.id}');
     }
+    final policyBindingId = _text(composition.payload, 'policyBindingId');
+    final baseInputFingerprint = _encoder.sha256(<String, Object?>{
+      'schema': 'electra.elv5-lan01-composition-capture.v1',
+      'aggregateId': composition.aggregateId,
+      'aggregateRevision': composition.revision,
+      'payload': composition.payload,
+    });
+    final policyFingerprint = _encoder.sha256(<String, Object?>{
+      'schema': 'electra.elv5-lan01-policy-basis.v1',
+      'policyBindingId': policyBindingId,
+      'resolvedNumericPolicy': null,
+    });
 
     final sections = <Lan01RealizedSection>[];
     final factFingerprints = <String>[];
     final dependencies = <Elv5DependencyMarker>[
       _dependency(request, 'SET', 'LAN_LINK_COMPOSITION', linkId),
+      _dependency(request, 'POLICY', 'DISCIPLINE_POLICY', policyBindingId),
     ];
     final seen = <String>{};
     for (final raw in _objectList(composition.payload['orderedSections'])) {
       final id = _text(raw, 'realizedSectionId');
       if (!seen.add(id)) throw StateError('LAN01_DUPLICATE_SECTION:$id');
-      final fact = await elv3Facts.requireSectionLength(
-        projectId: request.projectId,
-        designRevisionId: request.designRevisionId,
-        realizedSectionId: id,
-      );
+      Elv3RealizedSectionLengthFact fact;
+      try {
+        fact = await elv3Facts.requireSectionLength(
+          projectId: request.projectId,
+          designRevisionId: request.designRevisionId,
+          realizedSectionId: id,
+        );
+      } on StateError catch (error) {
+        final message = error.message.toString();
+        if (message.startsWith('ELV3_REALIZED_SECTION_EXACT_RESERVE_REQUIRED') ||
+            message.startsWith(
+              'ELV3_REALIZED_SECTION_ALLOWANCE_PROVENANCE_REQUIRED',
+            )) {
+          final reasonCode = message.split(':').first;
+          final sectionDependency = _dependency(
+            request,
+            'FACT',
+            'ELV3_REALIZED_LINK_SECTION',
+            id,
+          );
+          throw Elv5CaptureBlockedException(
+            request: request,
+            reasonCode: reasonCode,
+            inputFingerprint: baseInputFingerprint,
+            policyFingerprint: policyFingerprint,
+            dependencies: <Elv5DependencyMarker>[
+              ...dependencies,
+              sectionDependency,
+            ],
+            evidence: <String, Object?>{
+              'source': 'ELV5_LINK_COMPOSITION_PLUS_ELV3_INTEGER_GEOMETRY',
+              'compositionAggregateId': composition.aggregateId,
+              'compositionRevision': composition.revision,
+              'realizedSectionId': id,
+              'requiredCapability': reasonCode ==
+                      'ELV3_REALIZED_SECTION_EXACT_RESERVE_REQUIRED'
+                  ? 'EXACT_RESERVE_EVIDENCE'
+                  : 'SECTION_ALLOWANCE_PROVENANCE',
+            },
+          );
+        }
+        rethrow;
+      }
       factFingerprints.add(fact.sourceFingerprint);
       final sectionClass = switch (_text(raw, 'classification')) {
         'PERMANENT' => Lan01SectionClass.permanent,
@@ -92,16 +144,6 @@ final class Lan01PersistedInputResolver
     // resolved numeric policy definition. Reporting the exact installed value
     // is valid; inventing 90/100 m limits is not. Policy thresholds therefore
     // remain absent until the immutable definition resolver is wired.
-    final policyBindingId = _text(composition.payload, 'policyBindingId');
-    dependencies.add(
-      _dependency(
-        request,
-        'POLICY',
-        'DISCIPLINE_POLICY',
-        policyBindingId,
-      ),
-    );
-
     final fingerprintBasis = <String, Object?>{
       'schema': 'electra.elv5-lan01-captured-input.v1',
       'compositionAggregateId': composition.aggregateId,
@@ -127,11 +169,7 @@ final class Lan01PersistedInputResolver
         policy: const Lan01Policy(),
       ),
       inputFingerprint: _encoder.sha256(fingerprintBasis),
-      policyFingerprint: _encoder.sha256(<String, Object?>{
-        'schema': 'electra.elv5-lan01-policy-basis.v1',
-        'policyBindingId': policyBindingId,
-        'resolvedNumericPolicy': null,
-      }),
+      policyFingerprint: policyFingerprint,
       dependencies: dependencies,
       upstreamPointerGenerations: const <String, int>{},
       captureRevision: composition.revision,
