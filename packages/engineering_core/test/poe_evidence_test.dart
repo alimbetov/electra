@@ -17,7 +17,7 @@ void main() {
         scenarioFacts: const {'state': 'NORMAL'},
       );
 
-      expect(demandEvidence.status, PowerEvaluationStatus.unresolved);
+      expect(demandEvidence.status, PowerEvaluationStatus.pass);
       expect(demandEvidence.output['completeW'], isTrue);
       expect(record.evaluation.status, PowerEvaluationStatus.pass);
       expect(record.evaluation.nodeKey.processCode, PowerProcessCode.pwr06);
