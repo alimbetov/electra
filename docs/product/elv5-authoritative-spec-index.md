@@ -34,7 +34,7 @@ ELV5 is **discipline-specific engineering calculations**, not a second power-top
 22. [27-process contract registry](elv5-implementation/process-contracts.md) and [machine process registry](elv5-implementation/process-registry.json).
 23. [Downstream handoff registry](elv5-implementation/downstream-handoff-registry.json): ELV5 → ELV6/ELV7/ELV8 boundary.
 24. [Authority manifest generator](../../scripts/ci/generate-elv5-contract-manifest.py): exact-head SHA-256 authority manifest/fingerprint.
-25. Baseline/audit evidence through the [seventh-pass project-alignment audit](../audit/elv5-seventh-pass-project-alignment-audit.md).
+25. Baseline/audit evidence: baseline alignment, initial/second engineering audits, **third-pass production-readiness audit**, fourth-pass algorithm/performance audit, fifth-pass specification closure, sixth-pass implementation binding/performance closure and seventh-pass project-alignment audit.
 26. [Implemented baseline](elv5-implementation/implemented-baseline.md) and [baseline evidence](elv5-implementation/baseline.json).
 27. [Development-readiness registry](elv5-implementation/development-readiness-registry.json) and [eighth-pass development-readiness audit](../audit/elv5-eighth-pass-development-readiness-audit.md): **7 HIGH + 3 MEDIUM = 10 resolved, open=0**. The registry is transitively exact-head pinned by its SHA-256 in `command-registry.json` and verified by the project-alignment CI guard.
 
@@ -83,7 +83,7 @@ Historical specification hardening:
 
 - first pass: **6 HIGH + 2 MEDIUM = 8**, resolved;
 - second pass: **10 HIGH + 4 MEDIUM = 14**, resolved;
-- third pass: **11 HIGH + 4 MEDIUM = 15**, resolved;
+- third-pass production-readiness audit: **11 HIGH + 4 MEDIUM = 15**, resolved; historical subtotal through third-pass = **37**;
 - fourth pass: **15 HIGH + 4 MEDIUM = 19**, resolved; historical subtotal through fourth pass = **56**;
 - fifth-pass specification/combinatorial closure: **6 HIGH + 2 MEDIUM = 8**, resolved, open=0;
 - sixth-pass implementation binding/performance closure: **7 HIGH + 3 MEDIUM = 10**, resolved, open=0;
