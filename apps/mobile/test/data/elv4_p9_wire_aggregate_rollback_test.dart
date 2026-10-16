@@ -128,7 +128,7 @@ void main() {
                 ],
               )
               .getSingleOrNull();
-      expect(failedLedgerRow, isNull);
+      expect(failedLedgerRow, null);
       expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
     },
   );
