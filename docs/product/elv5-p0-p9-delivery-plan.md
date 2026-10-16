@@ -5,128 +5,171 @@ Branch: `feat/flutter-elv5-power-topology-design`
 Parent: ELV4 `31581aa6c396d5ebd6cdf1985c53719d9d05e12a`.
 Authority: [authoritative design index](elv5-authoritative-spec-index.md); [governing design](elv5-discipline-calculations-design-specification.md); [implementation contracts](elv5-implementation/README.md).
 
-The implementation must also obey the explicit precedence in [third-pass code-level hardening](elv5-implementation/code-level-hardening-v2.md). Runtime is deliberately still NOT_STARTED: the design is hardened, but Dart/Drift implementation and executable P8/P9 evidence do not yet exist.
+Implementation obeys the explicit authority precedence, including [third-pass hardening](elv5-implementation/code-level-hardening-v2.md), the [27-process code-level specification](elv5-implementation/process-code-level-specification.md), all four process dossier files and the [Flutter performance contract](elv5-implementation/flutter-performance-contract.md). Runtime remains deliberately NOT_STARTED: specification hardening is not implementation evidence.
 
 | Package | Scope | Depends on |
 |---|---|---|
-| P0 | [Baseline and stage integration](elv5-implementation/p0-baseline.md) | Existing ELV1–ELV4 source/design/evidence; authority manifest/ownership reconciliation |
-| P1 | [Typed discipline profiles and process registry](elv5-implementation/p1-profiles-registry.md) | P0 ownership/scope map; strongly typed identities/fields/quantities and bounded exact arithmetic |
-| P2 | [Persistence, command boundaries and revision evidence](elv5-implementation/p2-persistence-commands.md) | P1 contracts plus shared command/history/revision platform; additive schema 24 |
-| P3 | [CCTV calculation implementation](elv5-implementation/p3-cctv.md) | P1/P2, ELV3 routes, exact ELV4 evidence, captured temporal/frame rules |
-| P4 | [LAN and structured-cabling implementation](elv5-implementation/p4-lan.md) | P1/P2, ELV3 lengths/resources, exact PWR-06, immutable cable/optic capabilities |
-| P5 | [Access-control implementation](elv5-implementation/p5-acs.md) | P1/P2, canonical assemblies, shared power kernels and transient/release policies |
-| P6 | [Fire-alarm implementation](elv5-implementation/p6-fire.md) | P1/P2, signal topology, supported electrical and selected supervision/fault models |
-| P7 | [Incremental dependencies and engineer workspace](elv5-implementation/p7-dependencies-workspace.md) | Design begins P1/P2; integrates P3–P6; selector-aware invalidation and bounded coherent publication |
-| P8 | [Integrated verification and qualification](elv5-implementation/p8-acceptance.md) | P0–P7 implemented prerequisites; 54 primary verticals plus hardening suites |
-| P9 | [Architecture reconciliation and stage handoff](elv5-implementation/p9-closure.md) | P8 plus exact-head requirement/source/test/manifest evidence |
+| P0 | [Baseline and stage integration](elv5-implementation/p0-baseline.md) | Existing ELV1–ELV4 source/design/evidence; complete authority manifest/ownership reconciliation |
+| P1 | [Typed discipline profiles and process registry](elv5-implementation/p1-profiles-registry.md) | P0; typed identities/fields/quantities, exact arithmetic, common solver/result/trace types, workload metadata |
+| P2 | [Persistence, command boundaries and revision evidence](elv5-implementation/p2-persistence-commands.md) | P1 plus shared command/history/revision platform; additive schema 24; bounded bulk capture/publish |
+| P3 | [CCTV calculation implementation](elv5-implementation/p3-cctv.md) | P1/P2, ELV3 routes, exact ELV4 evidence, CCTV 25-section dossiers |
+| P4 | [LAN and structured-cabling implementation](elv5-implementation/p4-lan.md) | P1/P2, ELV3 lengths/resources, exact PWR-06, LAN dossiers |
+| P5 | [Access-control implementation](elv5-implementation/p5-acs.md) | P1/P2, canonical assemblies, shared power kernels, ACS dossiers |
+| P6 | [Fire-alarm implementation](elv5-implementation/p6-fire.md) | P1/P2, signal topology, supported electrical/fault models, Fire dossiers |
+| P7 | [Incremental dependencies and engineer workspace](elv5-implementation/p7-dependencies-workspace.md) | P1/P2 foundations; integrates P3–P6, executor scheduling, selector-aware invalidation and targeted UI projection |
+| P8 | [Integrated verification and qualification](elv5-implementation/p8-acceptance.md) | P0–P7 implemented; 54 primary verticals, 135 process vectors, worker/performance suites |
+| P9 | [Architecture reconciliation and stage handoff](elv5-implementation/p9-closure.md) | P8 plus exact-head functional/performance/manifest evidence |
 
 ## 1. Frozen inventories
-
-The following are design-frozen implementation inventories, not developer choices:
 
 ```text
 80 stable package requirements
 27 process codes = CCTV-01..06 + LAN-01..07 + ACS-01..06 + FA-01..08
+27 algorithm mappings
+25 mandatory code-level dossier sections per process
+5 process vector classes = positive/boundary/negative/adversarial/cross-discipline
 16 public ELV5 discipline command operations
 schema 23 inherited -> additive schema 24 target
 engineering-node-v3 / owner ELV5 result identity
 canonical encoder electra.canonical-json.v1
 54 primary P8 process entries = POS + NEG/unsupported for every process
+135 total process-vector cases minimum
 shared ELV4 freeze/create-next command boundary
 shared command ledger/history/UoW platform
 ```
 
-The third-pass hardening adds mandatory focused suites for typed identity safety, explicit field resolution, resource bounds, quantity algebra, captured timezone rules, measurement quality, requirement composition, transient simultaneity, selector invalidation, supervision/fault behavior, bounded atomic publication, review separation and finding cardinality. These suites supplement the 54 process entries rather than replacing them.
+Four audit passes have resolved **55 design findings** in specification. None is a runtime fix.
 
-## 2. Sequencing
+## 2. Implementation sequence
 
-Recommended implementation sequence is deliberately foundation-first:
+Foundation-first sequence:
 
 ```text
-P0 baseline/contract manifest
-  -> P1 engineering primitives + typed identities/registry
-  -> P2 schema 24 + repositories/UoW + strict 16-command infrastructure
-  -> early scalar/resource verticals
-  -> P3/P4/P5/P6 discipline completion
+P0 exact baseline + authority fingerprint
+  -> P1 primitives / identities / common solver-result-trace / workload metadata
+  -> P2 schema24 / repositories / UoW / strict 16-command infrastructure
+  -> executor/scheduler/cache/cancellation skeleton
+  -> priority computational core
+  -> remaining P3/P4/P5/P6 processes
   -> P7 dependency/workspace integration
-  -> P8 executable qualification
+  -> P8 135-vector + L0-L6 + performance qualification
   -> P9 exact-head closure
 ```
 
-The [production source blueprint](elv5-implementation/production-source-blueprint.md) defines the recommended code decomposition and implementation slices. UI-first or formula-by-formula development that bypasses P1/P2 is rejected because it would recreate wire/storage/numeric semantics independently in each discipline.
+Priority computational core:
 
-P7 consumed-input/invalidation design and P8 fixture design begin with P1/P2. Discipline packages may be developed in parallel only where their actual shared primitives, repositories and upstream kernels are already accepted. No package may copy a power/length formula to bypass a missing dependency.
+```text
+1  CCTV-02  directed bandwidth/flow accounting
+2  CCTV-03  storage/time integration
+3  LAN-01   installed path length
+4  LAN-05   bidirectional optical interval budget
+5  ACS-03   lock electrical/transient evidence
+6  ACS-04   source/PSU requirement projection
+7  ACS-05   backup/autonomy projection
+8  FA-02    standby/alarm/startup current aggregation
+9  FA-04    source requirement projection
+10 FA-05    standby/alarm autonomy sequence
+11 FA-06    notification circuit capacity
+```
 
-## 3. P0 implementation-entry gate
+This order deliberately exercises exact quantities, intervals, time rules, keyed set/path accounting, shared ELV4 evidence, transient events, deterministic requirement composition and governing-case logic before the simpler wrappers/basis processes.
 
-Before production ELV5 classes are considered stable, P0 establishes:
+UI-first or isolated formula-by-formula development that bypasses P1/P2/executor foundations is rejected.
+
+## 3. P0 gate
+
+Before production ELV5 classes stabilize, P0 establishes:
 
 - exact accepted ELV4 source/merge/runtime evidence and schema 23 baseline;
 - supported historical migration origins;
 - result-owner/read-dispatch map across legacy/ELV3/ELV4/ELV5;
-- canonical ownership map for revisions/components/ports/cables/sources/batteries/capability definitions;
+- canonical ownership map for revisions/components/ports/cables/sources/batteries/capabilities;
 - actual shared command ledger/history/UoW/freeze/create-next owners;
-- generated `contract-manifest.json` and authority fingerprint/CI consistency test required by the third-pass contract;
+- generated contract manifest/fingerprint covering the full active authority chain, including all four dossier files and performance contract;
 - explicit ELV6/ELV7/ELV8 claim boundaries.
 
-If a required inherited platform capability is missing, it becomes an explicit shared-platform delta. ELV5 does not invent a second platform locally.
+Missing inherited platform capability becomes an explicit shared-platform delta, never an ELV5 duplicate.
 
-## 4. P1 implementation gate
+## 4. P1 gate
 
-P1 is the non-negotiable engineering foundation. It must provide before broad process coding:
+P1 must provide:
 
 ```text
 opaque typed identities and closed subject/scope kinds
-explicit Known/Missing/NotApplicable/Unsupported/Unresolved field algebra
+Known/Missing/NotApplicable/Unsupported/Unresolved field algebra
 dimension-safe exact quantity/value objects
-code-owned legal quantity operations
-bounded exact decimal/rational codecs
-source/evidence/applicability + measurement uncertainty/calibration semantics
-operating case and transient/simultaneity policies
-captured timezone-rules evidence, not host-tzdb dependence
+code-owned legal quantity algebra
+bounded exact decimal/rational/interval operations
+evidence/applicability/measurement uncertainty
+operating-case + transient/simultaneity policies
+captured timezone-rule evidence
 coordinate frame/transform evidence
-stable finding/comparison model
+stable finding/comparison/margin/limiting-factor types
+stable equation-code calculation trace
 canonical request/input/output/snapshot hashing
-exact 27-definition process registry
+exact 27 process definitions + 27 algorithm mappings
+pure workload/complexity/resource metadata
 ```
 
-A plain `String`, nullable scalar, `Map<String,dynamic>` or generic arithmetic operator is not accepted where the domain contract requires a typed engineering meaning.
+Every process definition must map to one exact 25-section dossier. `String`, nullable scalar, generic `Map<String,dynamic>` or generic arithmetic is not accepted where a typed engineering meaning is required.
 
-## 5. P2 implementation gate
+## 5. P2 gate
 
-P2 implements additive Drift schema 24 and the exact 16-operation wire surface. It must preserve ELV3/ELV4 ownership and reuse the existing command ledger/history/revision platform.
+P2 implements additive Drift schema 24 and exactly 16 public operations while preserving prior ownership.
 
-Every durable replacement follows replay-first, CAS/reviewed-impact, atomic root+children replacement, selector-aware `union(old,new)` invalidation, complete forward/inverse history and ledger commit in one short transaction.
+Every durable replacement follows replay-first, CAS/reviewed-impact, atomic root+children replacement, selector-aware old+new invalidation, complete history and ledger commit in one short transaction.
 
-Long calculation uses:
+Calculation architecture:
 
 ```text
-short coherent capture
--> pure typed kernels outside DB write transaction
--> bounded all-or-nothing guarded publication
+short indexed/bulk coherent CAPTURE
+-> pure typed calculation outside DB write transaction
+-> short bounded all-or-nothing guarded PUBLISH
 ```
 
-The server never silently splits one requested coherence group into independently committed subcommands.
+No server-side silent splitting of one coherence group; no N+1 capture/publish at scale.
 
-## 6. Discipline implementation gates
+## 6. P3–P6 discipline gates
+
+Every process implementation must match its dossier sections 1–25. Package-level prose is not an alternate algorithm.
 
 ### P3 CCTV
-
-Must preserve frame/transform identity, expected/peak/wire-rate separation, explicit stream subscriptions, captured timezone rules, estimate-vs-guaranteed storage basis, single reserve/redundancy application and one shared physical PSE evidence identity.
+Must preserve frame identity, explicit unicast/multicast flow accounting, expected/peak/wire separation, exact interval storage integration, one reserve/ceil/redundancy boundary, estimate-vs-guaranteed scope and one global PSE evidence identity.
 
 ### P4 LAN
-
-Must preserve complete physical path accounting, unique resource identity, weakest-section compatibility, bidirectional dB/dBm optics, sensitivity/overload separation, optional reach/dispersion claim isolation and ELV6-safe rack demand handoff.
+Must preserve installed-path accounting, physical resource identity, weakest-path compatibility, four-case bidirectional sensitivity/overload optical algebra, reach isolation and ELV6-safe rack basis.
 
 ### P5 ACS
-
-Must preserve explicit role/resource multiplicity, lock state/transient demand, one shared physical source/bank requirement, fail-safe/fail-secure/project-defined safety mode and complete technical release matrix including normal access, request-to-exit, fire release, emergency break-glass and power failure.
+Must preserve role/resource multiplicity, control-versus-feed distinction, bounded startup/transient envelope, one shared source/bank result and complete five-cause fail-safe/fail-secure/project-defined release matrix.
 
 ### P6 Fire
+Must preserve full expanded address claims, complete state-current origins, supported-vs-unsupported electrical models, shared source requirement, ordered autonomy sequence, notification startup/terminal/fault dimensions, signal topology separate from electrical topology and technical-policy/compliance separation.
 
-Must preserve full expanded address claims, state-current membership completeness, supported-vs-unsupported electrical models, ordered autonomy sequence, notification active/startup/terminal-voltage dimensions, signal topology separate from power topology and selected supervision/fault-state behavior without false normative claims.
+## 7. Runtime performance gate
 
-## 7. P7 dependency/workspace gate
+Native production runtime uses `Elv5CalculationExecutor`; medium/large workloads run outside the Flutter UI isolate. Repeated work uses a bounded long-lived worker strategy rather than one isolate per node.
+
+Web has a separate qualified policy: it must not assume Flutter `compute()` gives native isolate parallelism.
+
+Runtime performance architecture requires:
+
+```text
+deterministic topological batch planning
+canonical aggregation independent of worker completion order
+incremental affected-node recomputation via reverse dependencies
+full semantic input-fingerprint result cache
+cancellation + supersession + coalescing/backpressure
+minimal worker payloads
+bulk/indexed capture/publish
+no engineering math/SQLite in widget build()
+immutable targeted process-card projections
+lazy/virtualized large lists/tables
+profile-mode performance evidence
+```
+
+Performance optimization may change wall-clock behavior only, never engineering hashes/verdicts.
+
+## 8. P7 dependency/workspace gate
 
 Dependency capture covers positive and negative knowledge:
 
@@ -137,73 +180,86 @@ POLICY
 EVAL
 POINTER
 MISSING
-selector-aware SET markers for derived membership predicates
+selector-aware SET/predicate markers
 ```
 
-Every mutation invalidates old and new direct/selector closure. Runtime graph traversal is bounded and iterative. One calculation coherence group publishes all requested nodes or none.
+Mutation invalidates old/new direct+selector closure. Recalculation batch contains only affected nodes and transitive dependents. Workspace presents immutable engineering result separately from review/waiver state; acknowledgement never rewrites technical FAIL/outputHash.
 
-Workspace displays immutable engineering result/provenance and separate review/workflow state. Engineer acknowledgement/waiver must never rewrite kernel FAIL to PASS or alter `outputHash`.
+## 9. P8 executable qualification gate
 
-## 8. P8 executable qualification gate
+P8 executes production source/file SQLite. Minimum process vector inventory:
 
-Planned IDs and design examples are not evidence. P8 runs against production source and file SQLite.
+```text
+27 positive
+27 negative/unsupported
+27 boundary
+27 adversarial
+27 cross-discipline
+= 135 process-vector cases
+```
 
-Required evidence includes:
+The original **54 primary public-command entries remain unchanged** and are the positive + negative/unsupported pair for every process. Boundary/adversarial/cross-discipline suites supplement them.
 
-- exactly 54 primary public-command process entries;
-- L0 primitive/identity/quantity/hash/time/evidence suites;
-- L1 typed kernel boundaries/metamorphic tests;
-- L2 all 16 strict command codec/adversarial/replay/resource-limit suites;
-- L3 schema-24 migration/restart/historical-owner isolation;
-- L4 UoW/history/undo-redo/failure-injection atomicity;
-- L5 end-to-end public process verticals;
-- L6 deterministic races/freeze/create-next/selector invalidation;
-- third-pass transient, requirement-composition, measurement, supervision/fault and cardinality suites;
-- no-false-PASS sentinels and scale fixtures.
+P8 additionally proves:
 
-All evidence identifies one exact tested Git SHA and actual test names/artifacts.
+- L0 exact numeric/type/hash/time/evidence primitives;
+- L1 dossier equations/worst-case/governing/trace;
+- L2 all 16 command codecs/replay/resource limits;
+- L3 schema24 migration/restart/owner isolation;
+- L4 UoW/history/failure/executor scheduling;
+- L5 public process verticals/cross-discipline ownership;
+- L6 DB/worker concurrency, cancellation, freeze/create-next;
+- workerCount=1 vs N deterministic 500-node batch;
+- incremental recomputation exact affected set;
+- semantic cache correctness;
+- no N+1/query-plan regressions;
+- profile-mode UI/raster/worker metrics on scale fixtures;
+- targeted rebuild and virtualization behavior;
+- no-false-PASS sentinels.
 
-## 9. P9 closure gate
+## 10. P9 closure gate
 
-P9 reconciles at one exact source SHA:
+At one exact SHA and authority fingerprint reconcile:
 
 ```text
 80 requirements
-27 production typed process definitions
-16 production command codecs/handlers
-schema-24 implementation/indexes/migration
+27 typed process definitions
+27 algorithm mappings
+27×25 process dossiers
+16 command codecs/handlers
+schema24 implementation/indexes/migration
+54 primary entries / 135 process vectors
+worker/executor/incremental/cache/cancellation evidence
+profile-mode performance artifact
 contract manifest/fingerprint
-54 primary qualification entries + focused hardening suites
 source/test/evidence ledger
-ELV6/ELV7/ELV8 handoff limits
-zero open BLOCKER/HIGH findings
+ELV6/7/8 handoff
+zero open BLOCKER/HIGH
 ```
 
-A documentation or source change after the accepted SHA invalidates exact-head closure until the gate is rerun.
+Any normative or source change after accepted SHA invalidates affected closure until rerun.
 
-Design hardening, runtime implementation, exact-head runtime acceptance, merge and stage CLOSED are separate events.
+## 11. Stage boundaries
 
-## 10. Stage boundaries
-
-- **ELV6** owns actual rack/cabinet U-position, layout, depth/clearance, thermal/ventilation and cable-management fit.
+- **ELV6** owns actual rack/cabinet U-position, physical layout, depth/clearance, thermal/ventilation and cable-management fit.
 - **ELV7** owns verified jurisdictional/normative applicability, compliance/certification and normative waiver/approval semantics.
-- **ELV8** owns concrete commercial equipment/SKU selection, BOM, quote and procurement/deliverable generation.
+- **ELV8** owns concrete commercial SKU selection, BOM, quote, procurement and deliverables.
 
-ELV5 provides exact technical requirements, margins, provenance and unresolved/unsupported limitations to these stages; it does not pre-claim their outcomes.
+ELV5 outputs exact technical requirements, margins, provenance and limitations; it does not pre-claim downstream outcomes.
 
-## 11. Current ledger
+## 12. Current ledger
 
 | Package | Design | Runtime | Evidence |
 |---|---|---|---|
 | P0 | HARDENED | NOT_STARTED | design contracts only |
 | P1 | HARDENED | NOT_STARTED | design contracts only |
 | P2 | HARDENED | NOT_STARTED | design contracts only |
-| P3 | HARDENED | NOT_STARTED | design contracts only |
-| P4 | HARDENED | NOT_STARTED | design contracts only |
-| P5 | HARDENED | NOT_STARTED | design contracts only |
-| P6 | HARDENED | NOT_STARTED | design contracts only |
+| P3 | HARDENED | NOT_STARTED | 6×25 dossier design only |
+| P4 | HARDENED | NOT_STARTED | 7×25 dossier design only |
+| P5 | HARDENED | NOT_STARTED | 6×25 dossier design only |
+| P6 | HARDENED | NOT_STARTED | 8×25 dossier design only |
 | P7 | HARDENED | NOT_STARTED | design contracts only |
-| P8 | HARDENED | NOT_STARTED | qualification specification only |
-| P9 | HARDENED | NOT_STARTED | closure specification only |
+| P8 | HARDENED | NOT_STARTED | 135-vector/performance specification only |
+| P9 | HARDENED | NOT_STARTED | exact-head closure specification only |
 
-Three audit passes now resolve **37 design findings** in specification. This ledger intentionally does not convert them into runtime fixes.
+Four audit passes resolve **55 design findings** in specification. This ledger intentionally does not convert them into runtime fixes.
