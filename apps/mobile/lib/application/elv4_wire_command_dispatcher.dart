@@ -192,11 +192,13 @@ final class Elv4WireCommandEnvelope {
     String operation,
     int payloadSchemaVersion,
   ) {
-    final valid = switch ((schema, payloadSchemaVersion)) {
-      (powerCommandSchema, 1) => powerV1Operations.contains(operation),
-      (revisionCommandSchema, 2) => revisionV2Operations.contains(operation),
-      _ => false,
-    };
+    final valid =
+        (schema == powerCommandSchema &&
+            payloadSchemaVersion == 1 &&
+            powerV1Operations.contains(operation)) ||
+        (schema == revisionCommandSchema &&
+            payloadSchemaVersion == 2 &&
+            revisionV2Operations.contains(operation));
     if (!valid) {
       throw FormatException(
         'Unsupported ELV4 command schema/operation/version: '
