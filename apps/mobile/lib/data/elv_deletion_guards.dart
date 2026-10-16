@@ -153,7 +153,7 @@ LIMIT 1
 ''',
             variables: [
               Variable.withString(systemId),
-              for (var i = 0; i < 12; i++) Variable.withString(componentId),
+              for (var i = 0; i < 11; i++) Variable.withString(componentId),
             ],
             readsFrom: database.allTables.toSet(),
           )
