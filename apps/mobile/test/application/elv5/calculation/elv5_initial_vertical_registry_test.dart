@@ -23,9 +23,10 @@ void main() {
         Elv5ProcessCode.lan01,
         Elv5ProcessCode.lan05,
         Elv5ProcessCode.acs03,
+        Elv5ProcessCode.acs04,
         Elv5ProcessCode.fa02,
       }),
     );
-    expect(runtime.registry.registeredCodes, hasLength(6));
+    expect(runtime.registry.registeredCodes, hasLength(7));
   });
 }
