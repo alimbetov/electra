@@ -313,7 +313,10 @@ List<Elv4WireSemanticCodec<TResult>> createElv4WireRuntimeCodecs<TResult>(
     validate: (payload) {
       payload.string('assemblyId');
       _nullableString(payload.value['upsComponentId'], 'upsComponentId');
-      _nullableString(payload.value['chargerComponentId'], 'chargerComponentId');
+      _nullableString(
+        payload.value['chargerComponentId'],
+        'chargerComponentId',
+      );
       payload.string('bankComponentId');
       payload.list('protectedOutputs');
       payload.list('transferIds');
@@ -392,11 +395,12 @@ List<Elv4WireSemanticCodec<TResult>> createElv4WireRuntimeCodecs<TResult>(
 ];
 
 typedef _PayloadValidator = void Function(Elv4ValidatedWirePayload payload);
-typedef _RuntimeHandler<TResult> = Future<TResult> Function(
-  Elv4WireCommandEnvelope envelope,
-  Elv4ValidatedWirePayload payload,
-  Elv4ResolvedWireImpact impact,
-);
+typedef _RuntimeHandler<TResult> =
+    Future<TResult> Function(
+      Elv4WireCommandEnvelope envelope,
+      Elv4ValidatedWirePayload payload,
+      Elv4ResolvedWireImpact impact,
+    );
 
 Elv4WireSemanticCodec<TResult> _codec<TResult>({
   required String operation,
