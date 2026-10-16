@@ -15,6 +15,7 @@ export 'src/elv5/processes/cctv/cctv03_storage.dart';
 export 'src/elv5/processes/fire/fa02_current_aggregation.dart';
 export 'src/elv5/processes/fire/fa04_source_requirement.dart';
 export 'src/elv5/processes/fire/fa05_autonomy.dart';
+export 'src/elv5/processes/fire/fa06_notification_capacity.dart';
 export 'src/elv5/processes/lan/lan01_path_length.dart';
 export 'src/elv5/processes/lan/lan05_optical_budget.dart';
 export 'src/elv5/processes/process_code.dart';
