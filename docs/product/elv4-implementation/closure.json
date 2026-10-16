@@ -1,6 +1,6 @@
 {
   "schema": "electra.elv4-runtime-closure.v1",
-  "sourceReviewedSha": "eeadf3fb83c209c6280953413edab6790c3dc7b8",
+  "sourceReviewedSha": "fcf1ece97507a981e88e2afd31826d2e8aeeb4aa",
   "runtimeStatus": "IN_PROGRESS",
   "runtimeAcceptanceVerified": false,
   "events": [],
@@ -22,14 +22,17 @@
       "severity": "HIGH",
       "status": "OPEN",
       "owner": "P1/P2/P7",
-      "summary": "Power bindings do not yet provide the complete reviewed static canonical projection/invalidation bridge across every ELV1-ELV3 canonical writer. Port ownership rejection is only a partial repair.",
+      "summary": "Power bindings still lack the complete reviewed RM03 static canonical projection/invalidation bridge across every ELV1-ELV3 canonical writer. Port/reference/membership ownership guards now close additional bypasses but do not replace reviewed positive projection and exact old/new invalidation coordination.",
       "evidence": [
+        "apps/mobile/lib/data/elv_deletion_guards.dart",
         "apps/mobile/lib/data/repositories/drift_power_command_service.dart",
         "apps/mobile/lib/data/repositories/drift_engineering_topology_repository.dart",
         "apps/mobile/lib/data/repositories/drift_engineering_reference_adoption_repository.dart",
-        "apps/mobile/test/data/elv4_p9_canonical_port_guard_test.dart"
+        "apps/mobile/test/data/elv4_p9_canonical_port_guard_test.dart",
+        "apps/mobile/test/data/elv4_p9_membership_guard_test.dart",
+        "apps/mobile/test/data/elv4_p9_reference_adoption_power_guard_test.dart"
       ],
-      "requiredResolution": "Implement reviewed field-level projection/ownership and shared transaction coordination for all relevant topology/reference/membership writers; invalidate exact old/new dependency sets and prove affected/unaffected behavior under direct-repository races."
+      "requiredResolution": "Implement PowerCanonicalProjectionWriteStore.applyReviewedProjection (or an equivalent single-UoW owner) with reviewed field-level projection, full candidate graph revalidation, exact old/new dependency capture and invalidation, and direct-writer/concurrency regressions for every relevant topology/reference/membership path."
     },
     {
       "id": "C03",
@@ -51,41 +54,46 @@
     {
       "id": "C04",
       "severity": "HIGH",
-      "status": "OPEN",
+      "status": "RESOLVED",
       "owner": "P8",
-      "summary": "ELV4 persistence tests still do not establish the complete supported-origin upgrade matrix for historical power/history schemas.",
+      "summary": "The supported historical migration matrix is executed from real v21 and v22 source origins and upgrades to v23/current without inventing power/history facts.",
       "evidence": [
-        "apps/mobile/test/data/elv4_p2_persistence_test.dart",
-        "apps/mobile/lib/data/database/app_database.dart"
+        "apps/mobile/test/data/elv4_p9_historical_migration_matrix_test.dart",
+        "scripts/ci/elv4_historical_fixture_export.dart",
+        "scripts/ci/run-elv4-historical-migration-matrix.sh",
+        "https://github.com/alimbetov/electra/actions/runs/38839558588"
       ],
-      "requiredResolution": "Execute real supported historical schemas, including baseline v21 and preceding v22, with legacy identities/hashes retained, FK/integrity checks and no synthetic power backfill."
+      "requiredResolution": "Execute real supported historical schemas, including baseline v21 and preceding v22, with legacy identities/hashes retained, FK/integrity checks and no synthetic power backfill.",
+      "resolution": "Exact-head technical run 38839558588 at fcf1ece97507a981e88e2afd31826d2e8aeeb4aa reports historical-migrations PASS. The runner checks out v21 origin 74c61f6443c3beaf98e69f0d5f21af3f09474c5c and v22 origin b5e3dc94ba026ecb76e3b6e1b17853bf0f63ccb4, regenerates Drift from each historical source, exports a real SQLite fixture under Flutter, opens it with current AppDatabase, preserves legacy project/revision/physical hash/result facts, preserves the v22 scenario, creates no synthetic power/history rows and finishes with an empty PRAGMA foreign_key_check."
     },
     {
       "id": "C05",
       "severity": "HIGH",
       "status": "OPEN",
       "owner": "P1/P2",
-      "summary": "Documented power-command/evaluation wire schemas are not yet demonstrated as the actual public application serialization/version-dispatch boundary.",
+      "summary": "The strict wire registry/envelope now matches the documented command schema and fails closed, but it is not yet the complete public semantic adapter into aggregate runtime commands and reviewed dependency/projection resolution.",
       "evidence": [
         "docs/product/elv4-implementation/schemas/power-command.schema.json",
         "docs/product/elv4-implementation/schemas/power-evaluation.schema.json",
+        "apps/mobile/lib/application/elv4_wire_command_dispatcher.dart",
+        "apps/mobile/test/application/elv4_wire_command_dispatcher_test.dart",
         "apps/mobile/lib/application/power_mutation_command.dart"
       ],
-      "requiredResolution": "Reconcile the canonical envelope and persisted schema versions with the actual decoder/dispatch; execute round-trip, malformed payload and unknown-version rejection controls through the public boundary."
+      "requiredResolution": "Reconcile complete aggregate wire payload semantics with actual runtime handlers/ledger versions. Dispatch must resolve reviewed impact and exact changed dependencies rather than inventing them; execute public round-trip, malformed payload, unknown-version and aggregate-handler controls."
     },
     {
       "id": "C06",
       "severity": "GATE",
       "status": "RESOLVED",
       "owner": "P9",
-      "summary": "Exact-head technical gate passed at eeadf3fb; artifact and logs are retained. Runtime acceptance remains blocked by C01/C02/C04/C05.",
+      "summary": "Exact-head technical gate passed at fcf1ece with the real historical migration matrix included. Runtime acceptance remains blocked by C01/C02/C05, and every later source HEAD still requires its own exact-head technical run.",
       "evidence": [
         ".github/workflows/elv4-exact-head.yml",
-        "https://github.com/alimbetov/electra/actions/runs/38792145445",
-        "https://github.com/alimbetov/electra/actions/runs/38792145445/job/116619140018"
+        "https://github.com/alimbetov/electra/actions/runs/38839558588",
+        "https://github.com/alimbetov/electra/actions/runs/38839558588/job/116776257460"
       ],
-      "requiredResolution": "Run generation, format, both analyzers, full mobile/core and explicit acceptance/alignment tests on one clean SHA; preserve report and logs with run metadata.",
-      "resolution": "GitHub technical job PASS at eeadf3fb. Artifact 12001250252 digest sha256:ae3055f15b1245dc5caa9bc599db657aa4b950a47d029a9d06fdb00c4e3d5763. Separate runtime-acceptance job correctly fails while four HIGH findings remain."
+      "requiredResolution": "Run generation, format, both analyzers, full mobile/core, historical migrations and explicit acceptance/alignment tests on one clean SHA; preserve report and logs with run metadata.",
+      "resolution": "GitHub technical job PASS at fcf1ece97507a981e88e2afd31826d2e8aeeb4aa. Artifact 12020474364 digest sha256:bab094660a9c1274140ace80f5c53061569f9d92c67ad18bba02f71532e5611c. Separate runtime-acceptance correctly fails while three HIGH findings remain."
     }
   ],
   "repairedInThisReview": [
@@ -94,9 +102,11 @@
     "Replay committed power-operation receipt before mutable lifecycle checks; reject command type/schema reuse.",
     "Validate canonical component ownership for load/transfer/group/supply ports.",
     "Replace synthetic four-vertical PASS with calculated persisted-load evidence and explicit partial scope.",
-    "ELV1 savePort/archive rejects active ELV4 power bindings; exact no-op and explicit release remain supported.",
+    "ELV1 savePort/archive rejects complete active ELV4 port ownership, including indirect load/transfer/capacity/supply/PoE/backup references; exact no-op and explicit release remain supported.",
+    "P6 reference adoption and engineering-system membership writers cannot bypass active ELV4 ownership.",
     "Capture complete immutable power/canonical facts at freeze and materialize scoped power configuration into create-next with explicit physical identity remapping.",
-    "Serve frozen power workspace/scenario/budget/history reads from verified captured facts after reopen instead of mutable operational rows."
+    "Serve frozen power workspace/scenario/budget/history reads from verified captured facts after reopen instead of mutable operational rows.",
+    "Execute real v21/v22 historical source fixtures through current v23 migration with legacy identity/hash/FK invariance and no synthetic power/history backfill."
   ],
   "architectureDeviations": [
     {
@@ -119,6 +129,17 @@
       "p7P8AlignmentSubsetTests": 71,
       "runtimeAcceptanceVerified": false,
       "scope": "Full technical regression at eeadf3fb including elv4_p9_snapshot_materialization_test; not the missing seven-case qualification matrix."
+    },
+    {
+      "sourceSha": "fcf1ece97507a981e88e2afd31826d2e8aeeb4aa",
+      "workflowRunId": 38839558588,
+      "technicalJobId": 116776257460,
+      "artifactId": 12020474364,
+      "artifactDigest": "sha256:bab094660a9c1274140ace80f5c53061569f9d92c67ad18bba02f71532e5611c",
+      "url": "https://github.com/alimbetov/electra/actions/runs/38839558588",
+      "technicalResult": "PASS",
+      "runtimeAcceptanceVerified": false,
+      "scope": "Full regression, real v21/v22 historical migration matrix and existing P7/P8 integration tests; not the missing seven-case qualification matrix."
     }
   ]
 }
