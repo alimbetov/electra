@@ -29,8 +29,10 @@ void main() {
 
   group('ELV5 exact numeric primitives', () {
     test('normalizes rationals and enforces reserve >= 1', () {
-      expect(Elv5Rational(BigInt.from(2), BigInt.from(4)),
-          Elv5Rational(BigInt.one, BigInt.from(2)));
+      expect(
+        Elv5Rational(BigInt.from(2), BigInt.from(4)),
+        Elv5Rational(BigInt.one, BigInt.from(2)),
+      );
       expect(
         Elv5RuntimeContract.validateReserveMultiplier(
           Elv5Rational.parseDecimal('1.10'),
@@ -67,10 +69,7 @@ void main() {
         'set': <String>{'a', 'b'},
       };
       expect(encoder.sha256(a), encoder.sha256(b));
-      expect(
-        encoder.sha256(<int>[1, 2]),
-        isNot(encoder.sha256(<int>[2, 1])),
-      );
+      expect(encoder.sha256(<int>[1, 2]), isNot(encoder.sha256(<int>[2, 1])));
       expect(jsonDecode(utf8.decode(encoder.encode(a))), isA<Map>());
     });
   });
@@ -80,9 +79,14 @@ void main() {
       expect(Elv5ProcessCode.values, hasLength(27));
       expect(Elv5ProcessCatalog.all, hasLength(27));
       expect(Elv5ProcessCatalog.byCode, hasLength(27));
-      final wireCodes = Elv5ProcessCode.values.map((code) => code.wireCode).toSet();
+      final wireCodes = Elv5ProcessCode.values
+          .map((code) => code.wireCode)
+          .toSet();
       expect(wireCodes, hasLength(27));
-      expect(wireCodes, containsAll(<String>['CCTV-01', 'LAN-07', 'ACS-06', 'FA-08']));
+      expect(
+        wireCodes,
+        containsAll(<String>['CCTV-01', 'LAN-07', 'ACS-06', 'FA-08']),
+      );
       for (final descriptor in Elv5ProcessCatalog.all) {
         expect(descriptor.versions.inputSchemaVersion, '1');
         expect(descriptor.versions.outputSchemaVersion, '1');
@@ -104,20 +108,17 @@ void main() {
         processCode: Elv5ProcessCode.cctv02,
         subject: Elv5SubjectRef(kind: 'CAMERA', id: 'camera-01'),
       );
-      expect(
-        node.toCanonicalValue(),
-        <Object?>[
-          'engineering-node-v3',
-          'ELV5',
-          'revision-r1',
-          'NONE',
-          'DESIGN',
-          'design-root',
-          'CCTV-02',
-          'CAMERA',
-          'camera-01',
-        ],
-      );
+      expect(node.toCanonicalValue(), <Object?>[
+        'engineering-node-v3',
+        'ELV5',
+        'revision-r1',
+        'NONE',
+        'DESIGN',
+        'design-root',
+        'CCTV-02',
+        'CAMERA',
+        'camera-01',
+      ]);
       expect(
         () => Elv5ScopeRef(
           kind: Elv5ScopeKind.design,

@@ -4,52 +4,98 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 abstract final class Elv5WireCommandRegistry {
   static const payloadKeys = <String, Set<String>>{
     'BIND_DISCIPLINE_POLICY': {
-      'bindingId', 'subject', 'processCodes', 'definitionRef', 'applicability'
+      'bindingId',
+      'subject',
+      'processCodes',
+      'definitionRef',
+      'applicability',
     },
     'ADOPT_DISCIPLINE_POLICY': {
-      'bindingId', 'newDefinitionRef', 'applicability'
+      'bindingId',
+      'newDefinitionRef',
+      'applicability',
     },
     'RELEASE_DISCIPLINE_POLICY': {'bindingId', 'releasePolicy'},
     'REPLACE_CAMERA_STREAMS': {
-      'cameraId', 'streams', 'subscriptions', 'transportOverheadModelRef'
+      'cameraId',
+      'streams',
+      'subscriptions',
+      'transportOverheadModelRef',
     },
     'REPLACE_RECORDING_ASSIGNMENTS': {
-      'poolId', 'horizon', 'temporalPolicy', 'assignments', 'scheduleSegments',
-      'sizingBasis', 'reserveMultiplier', 'redundancyModel', 'policyRef'
+      'poolId',
+      'horizon',
+      'temporalPolicy',
+      'assignments',
+      'scheduleSegments',
+      'sizingBasis',
+      'reserveMultiplier',
+      'redundancyModel',
+      'policyRef',
     },
     'REPLACE_RECORDER_ASSIGNMENTS': {
-      'recorderId', 'accountingBasis', 'assignments'
+      'recorderId',
+      'accountingBasis',
+      'assignments',
     },
     'REPLACE_LINK_COMPOSITION': {
-      'linkId', 'orderedSections', 'policyBindingId'
+      'linkId',
+      'orderedSections',
+      'policyBindingId',
     },
     'REPLACE_PORT_CAPACITY_ASSIGNMENTS': {
-      'switchId', 'assignments', 'sparePolicyRef'
+      'switchId',
+      'assignments',
+      'sparePolicyRef',
     },
     'REPLACE_OPTICAL_LINK_ASSIGNMENTS': {
-      'linkId', 'forwardOptics', 'reverseOptics', 'connectorEvents', 'spliceEvents'
+      'linkId',
+      'forwardOptics',
+      'reverseOptics',
+      'connectorEvents',
+      'spliceEvents',
     },
     'REPLACE_RACK_CAPACITY_BASIS': {
-      'rackId', 'capacityBasis', 'equipmentIds', 'excludedCapacity', 'policyRef'
+      'rackId',
+      'capacityBasis',
+      'equipmentIds',
+      'excludedCapacity',
+      'policyRef',
     },
     'REPLACE_PATCH_PANEL_ASSIGNMENTS': {
-      'panelId', 'assignments', 'sparePolicyRef'
+      'panelId',
+      'assignments',
+      'sparePolicyRef',
     },
     'REPLACE_DOOR_ROLE_ASSIGNMENTS': {
-      'doorAssemblyId', 'topologyProfileRef', 'safetyMode', 'roleAssignments',
-      'releaseTruthTable'
+      'doorAssemblyId',
+      'topologyProfileRef',
+      'safetyMode',
+      'roleAssignments',
+      'releaseTruthTable',
     },
     'REPLACE_CONTROLLER_RESOURCE_ASSIGNMENTS': {
-      'controllerId', 'resourceAssignments', 'reservePolicyRef'
+      'controllerId',
+      'resourceAssignments',
+      'reservePolicyRef',
     },
     'REPLACE_FIRE_LOOP_ASSIGNMENTS': {
-      'loopId', 'deviceAssignments', 'addressDomain', 'topologyProfileRef'
+      'loopId',
+      'deviceAssignments',
+      'addressDomain',
+      'topologyProfileRef',
     },
     'REPLACE_NOTIFICATION_CIRCUIT_ASSIGNMENTS': {
-      'circuitId', 'deviceAssignments', 'outputRef', 'policyRef'
+      'circuitId',
+      'deviceAssignments',
+      'outputRef',
+      'policyRef',
     },
     'CALCULATE_DISCIPLINE_PROCESS': {
-      'scope', 'processCodes', 'subjects', 'expectedPointerGenerations'
+      'scope',
+      'processCodes',
+      'subjects',
+      'expectedPointerGenerations',
     },
   };
 
@@ -115,16 +161,28 @@ void _cameraStreams(Map<String, Object?> payload) {
   final streamIds = <String>{};
   for (final stream in streams) {
     _exact(stream, const {
-      'encodedStreamId', 'codecProfileRef', 'expectedBitrateBps',
-      'peakBitrateBps', 'expectedRateEvidence', 'peakRateEvidence'
+      'encodedStreamId',
+      'codecProfileRef',
+      'expectedBitrateBps',
+      'peakBitrateBps',
+      'expectedRateEvidence',
+      'peakRateEvidence',
     }, 'stream');
     final id = _text(stream['encodedStreamId'], 'encodedStreamId');
     if (!streamIds.add(id)) {
       throw const FormatException('Duplicate encodedStreamId.');
     }
     _text(stream['codecProfileRef'], 'codecProfileRef');
-    _decimal(stream['expectedBitrateBps'], 'expectedBitrateBps', nonnegative: true);
-    _nullableDecimal(stream['peakBitrateBps'], 'peakBitrateBps', nonnegative: true);
+    _decimal(
+      stream['expectedBitrateBps'],
+      'expectedBitrateBps',
+      nonnegative: true,
+    );
+    _nullableDecimal(
+      stream['peakBitrateBps'],
+      'peakBitrateBps',
+      nonnegative: true,
+    );
     _rateEvidence(stream['expectedRateEvidence'], 'expectedRateEvidence');
     if (stream['peakRateEvidence'] != null) {
       _rateEvidence(stream['peakRateEvidence'], 'peakRateEvidence');
@@ -137,10 +195,18 @@ void _cameraStreams(Map<String, Object?> payload) {
   const encoder = Elv5CanonicalJsonV1();
   for (final subscription in subscriptions) {
     _exact(subscription, const {
-      'subscriptionId', 'encodedStreamId', 'receiverId', 'deliveryMode',
-      'orderedNetworkEdgeIds', 'multicastGroupId', 'multicastTree'
+      'subscriptionId',
+      'encodedStreamId',
+      'receiverId',
+      'deliveryMode',
+      'orderedNetworkEdgeIds',
+      'multicastGroupId',
+      'multicastTree',
     }, 'subscription');
-    final subscriptionId = _text(subscription['subscriptionId'], 'subscriptionId');
+    final subscriptionId = _text(
+      subscription['subscriptionId'],
+      'subscriptionId',
+    );
     if (!subscriptionIds.add(subscriptionId)) {
       throw const FormatException('Duplicate subscriptionId.');
     }
@@ -150,9 +216,14 @@ void _cameraStreams(Map<String, Object?> payload) {
     }
     _text(subscription['receiverId'], 'receiverId');
     final mode = _text(subscription['deliveryMode'], 'deliveryMode');
-    final path = _stringList(subscription['orderedNetworkEdgeIds'], 'orderedNetworkEdgeIds');
+    final path = _stringList(
+      subscription['orderedNetworkEdgeIds'],
+      'orderedNetworkEdgeIds',
+    );
     if (path.isEmpty || path.toSet().length != path.length) {
-      throw const FormatException('Network path must be non-empty with unique edges.');
+      throw const FormatException(
+        'Network path must be non-empty with unique edges.',
+      );
     }
     if (mode == 'UNICAST') {
       if (subscription['multicastGroupId'] != null ||
@@ -166,16 +237,22 @@ void _cameraStreams(Map<String, Object?> payload) {
       _text(tree['treeId'], 'treeId');
       final treeEdges = _stringList(tree['edgeIds'], 'edgeIds');
       if (treeEdges.isEmpty || treeEdges.toSet().length != treeEdges.length) {
-        throw const FormatException('Multicast tree edges must be non-empty/unique.');
+        throw const FormatException(
+          'Multicast tree edges must be non-empty/unique.',
+        );
       }
       if (path.any((edge) => !treeEdges.contains(edge))) {
-        throw const FormatException('Subscription path must be contained in multicast tree.');
+        throw const FormatException(
+          'Subscription path must be contained in multicast tree.',
+        );
       }
       final key = '$streamId\u0000$group';
       final hash = encoder.sha256(tree);
       final previous = multicastHashes[key];
       if (previous != null && previous != hash) {
-        throw const FormatException('Same stream/multicast group has different tree.');
+        throw const FormatException(
+          'Same stream/multicast group has different tree.',
+        );
       }
       multicastHashes[key] = hash;
     } else {
@@ -190,7 +267,11 @@ void _cameraStreams(Map<String, Object?> payload) {
 void _rateEvidence(Object? value, String field) {
   final map = _object(value, field);
   _exact(map, const {
-    'kind', 'averagingWindowMs', 'rateBoundary', 'evidenceRef', 'applicabilityHash'
+    'kind',
+    'averagingWindowMs',
+    'rateBoundary',
+    'evidenceRef',
+    'applicabilityHash',
   }, field);
   final kind = _text(map['kind'], '$field.kind');
   const kinds = {
@@ -223,7 +304,12 @@ void _recordingAssignments(Map<String, Object?> payload) {
   _text(payload['poolId'], 'poolId');
   _utcWindow(payload['horizon'], 'horizon');
   final temporal = _object(payload['temporalPolicy'], 'temporalPolicy');
-  _exact(temporal, const {'timeZoneId', 'tzdbVersion', 'gapRule', 'overlapRule'}, 'temporalPolicy');
+  _exact(temporal, const {
+    'timeZoneId',
+    'tzdbVersion',
+    'gapRule',
+    'overlapRule',
+  }, 'temporalPolicy');
   for (final key in temporal.keys) {
     _text(temporal[key], 'temporalPolicy.$key');
   }
@@ -231,24 +317,37 @@ void _recordingAssignments(Map<String, Object?> payload) {
   if (basis != 'EXPECTED_ESTIMATE' && basis != 'GUARANTEED_UPPER_BOUND') {
     throw const FormatException('Unsupported storage sizingBasis.');
   }
-  final reserve = _decimal(payload['reserveMultiplier'], 'reserveMultiplier', nonnegative: true);
+  final reserve = _decimal(
+    payload['reserveMultiplier'],
+    'reserveMultiplier',
+    nonnegative: true,
+  );
   Elv5RuntimeContract.validateReserveMultiplier(reserve);
 
   final segments = _objectList(payload['scheduleSegments'], 'scheduleSegments');
   final scheduleProfiles = <String>{};
   final segmentIds = <String>{};
   for (final segment in segments) {
-    _exact(segment, const {'scheduleProfileId', 'segmentId', 'absoluteWindow', 'recurrence'}, 'scheduleSegment');
+    _exact(segment, const {
+      'scheduleProfileId',
+      'segmentId',
+      'absoluteWindow',
+      'recurrence',
+    }, 'scheduleSegment');
     final profile = _text(segment['scheduleProfileId'], 'scheduleProfileId');
     final segmentId = _text(segment['segmentId'], 'segmentId');
     if (!segmentIds.add('$profile\u0000$segmentId')) {
-      throw const FormatException('Duplicate recording schedule segment identity.');
+      throw const FormatException(
+        'Duplicate recording schedule segment identity.',
+      );
     }
     scheduleProfiles.add(profile);
     final absolute = segment['absoluteWindow'];
     final recurrence = segment['recurrence'];
     if ((absolute == null) == (recurrence == null)) {
-      throw const FormatException('Schedule segment requires exactly one time model.');
+      throw const FormatException(
+        'Schedule segment requires exactly one time model.',
+      );
     }
     if (absolute != null) _utcWindow(absolute, 'absoluteWindow');
     if (recurrence != null) {
@@ -256,7 +355,9 @@ void _recordingAssignments(Map<String, Object?> payload) {
       _exact(recur, const {'rule', 'timeZoneLocal'}, 'recurrence');
       _text(recur['rule'], 'recurrence.rule');
       if (recur['timeZoneLocal'] is! bool) {
-        throw const FormatException('recurrence.timeZoneLocal must be boolean.');
+        throw const FormatException(
+          'recurrence.timeZoneLocal must be boolean.',
+        );
       }
     }
   }
@@ -265,29 +366,53 @@ void _recordingAssignments(Map<String, Object?> payload) {
   final assignmentIds = <String>{};
   for (final assignment in assignments) {
     _exact(assignment, const {
-      'encodedStreamId', 'copyRole', 'scheduleProfileId', 'expectedBitrateBps',
-      'upperBoundBitrateBps', 'evidenceBasis'
+      'encodedStreamId',
+      'copyRole',
+      'scheduleProfileId',
+      'expectedBitrateBps',
+      'upperBoundBitrateBps',
+      'evidenceBasis',
     }, 'recordingAssignment');
     final stream = _text(assignment['encodedStreamId'], 'encodedStreamId');
     final role = _text(assignment['copyRole'], 'copyRole');
     final profile = _text(assignment['scheduleProfileId'], 'scheduleProfileId');
     if (!assignmentIds.add('$stream\u0000$role')) {
-      throw const FormatException('Duplicate recording stream/copyRole identity.');
+      throw const FormatException(
+        'Duplicate recording stream/copyRole identity.',
+      );
     }
     if (!scheduleProfiles.contains(profile)) {
-      throw const FormatException('Recording assignment references missing schedule profile.');
+      throw const FormatException(
+        'Recording assignment references missing schedule profile.',
+      );
     }
-    _decimal(assignment['expectedBitrateBps'], 'expectedBitrateBps', nonnegative: true);
-    _nullableDecimal(assignment['upperBoundBitrateBps'], 'upperBoundBitrateBps', nonnegative: true);
+    _decimal(
+      assignment['expectedBitrateBps'],
+      'expectedBitrateBps',
+      nonnegative: true,
+    );
+    _nullableDecimal(
+      assignment['upperBoundBitrateBps'],
+      'upperBoundBitrateBps',
+      nonnegative: true,
+    );
     _text(assignment['evidenceBasis'], 'evidenceBasis');
   }
 
   final redundancy = payload['redundancyModel'];
   if (redundancy != null) {
     final model = _object(redundancy, 'redundancyModel');
-    _exact(model, const {'modelCode', 'usableFraction', 'contentHash'}, 'redundancyModel');
+    _exact(model, const {
+      'modelCode',
+      'usableFraction',
+      'contentHash',
+    }, 'redundancyModel');
     _text(model['modelCode'], 'redundancyModel.modelCode');
-    final usable = _decimal(model['usableFraction'], 'usableFraction', nonnegative: true);
+    final usable = _decimal(
+      model['usableFraction'],
+      'usableFraction',
+      nonnegative: true,
+    );
     if (usable <= Elv5Rational.zero || usable > Elv5Rational.one) {
       throw const FormatException('usableFraction must be in (0,1].');
     }
@@ -300,14 +425,25 @@ void _recordingAssignments(Map<String, Object?> payload) {
 void _recorderAssignments(Map<String, Object?> payload) {
   _text(payload['recorderId'], 'recorderId');
   final accounting = _text(payload['accountingBasis'], 'accountingBasis');
-  if (!const {'DEVICE', 'ENCODED_STREAM', 'LICENSE_CHANNEL'}.contains(accounting)) {
+  if (!const {
+    'DEVICE',
+    'ENCODED_STREAM',
+    'LICENSE_CHANNEL',
+  }.contains(accounting)) {
     throw const FormatException('Unsupported recorder accountingBasis.');
   }
   final ids = <String>{};
   for (final row in _objectList(payload['assignments'], 'assignments')) {
-    _exact(row, const {'assignmentId', 'cameraId', 'encodedStreamId', 'licenseChannelId', 'storagePoolId'}, 'recorderAssignment');
+    _exact(row, const {
+      'assignmentId',
+      'cameraId',
+      'encodedStreamId',
+      'licenseChannelId',
+      'storagePoolId',
+    }, 'recorderAssignment');
     final id = _text(row['assignmentId'], 'assignmentId');
-    if (!ids.add(id)) throw const FormatException('Duplicate recorder assignmentId.');
+    if (!ids.add(id))
+      throw const FormatException('Duplicate recorder assignmentId.');
     _text(row['cameraId'], 'cameraId');
     _text(row['encodedStreamId'], 'encodedStreamId');
     _text(row['licenseChannelId'], 'licenseChannelId');
@@ -320,8 +456,15 @@ void _linkComposition(Map<String, Object?> payload) {
   _text(payload['policyBindingId'], 'policyBindingId');
   final ordinals = <int>{};
   final sections = <String>{};
-  for (final row in _objectList(payload['orderedSections'], 'orderedSections')) {
-    _exact(row, const {'ordinal', 'realizedSectionId', 'classification'}, 'linkSection');
+  for (final row in _objectList(
+    payload['orderedSections'],
+    'orderedSections',
+  )) {
+    _exact(row, const {
+      'ordinal',
+      'realizedSectionId',
+      'classification',
+    }, 'linkSection');
     final ordinal = _nonnegativeInt(row['ordinal'], 'ordinal');
     final section = _text(row['realizedSectionId'], 'realizedSectionId');
     _text(row['classification'], 'classification');
@@ -336,13 +479,20 @@ void _portCapacity(Map<String, Object?> payload) {
   _policyRef(payload['sparePolicyRef'], 'sparePolicyRef');
   final ports = <String>{};
   for (final row in _objectList(payload['assignments'], 'assignments')) {
-    _exact(row, const {'portId', 'endpointId', 'media', 'speedBps'}, 'portAssignment');
+    _exact(row, const {
+      'portId',
+      'endpointId',
+      'media',
+      'speedBps',
+    }, 'portAssignment');
     final port = _text(row['portId'], 'portId');
-    if (!ports.add(port)) throw const FormatException('Duplicate port assignment.');
+    if (!ports.add(port))
+      throw const FormatException('Duplicate port assignment.');
     _text(row['endpointId'], 'endpointId');
     _text(row['media'], 'media');
     final speed = _decimal(row['speedBps'], 'speedBps', nonnegative: true);
-    if (speed <= Elv5Rational.zero) throw const FormatException('speedBps must be positive.');
+    if (speed <= Elv5Rational.zero)
+      throw const FormatException('speedBps must be positive.');
   }
 }
 
@@ -353,12 +503,18 @@ void _opticalLink(Map<String, Object?> payload) {
   final ids = <String>{};
   for (final field in const ['connectorEvents', 'spliceEvents']) {
     for (final row in _objectList(payload[field], field)) {
-      _exact(row, const {'eventId', 'lossMinDb', 'lossMaxDb'}, 'opticalLossEvent');
+      _exact(row, const {
+        'eventId',
+        'lossMinDb',
+        'lossMaxDb',
+      }, 'opticalLossEvent');
       final id = _text(row['eventId'], 'eventId');
-      if (!ids.add(id)) throw const FormatException('Duplicate optical loss eventId.');
+      if (!ids.add(id))
+        throw const FormatException('Duplicate optical loss eventId.');
       final min = _decimal(row['lossMinDb'], 'lossMinDb', nonnegative: true);
       final max = _decimal(row['lossMaxDb'], 'lossMaxDb', nonnegative: true);
-      if (min > max) throw const FormatException('Optical loss interval is reversed.');
+      if (min > max)
+        throw const FormatException('Optical loss interval is reversed.');
     }
   }
 }
@@ -366,8 +522,14 @@ void _opticalLink(Map<String, Object?> payload) {
 void _optics(Object? value, String field) {
   final map = _object(value, field);
   _exact(map, const {
-    'txPortId', 'rxPortId', 'wavelengthNm', 'txMinDbm', 'txMaxDbm',
-    'receiverSensitivityDbm', 'receiverOverloadDbm', 'requiredSensitivityMarginDb'
+    'txPortId',
+    'rxPortId',
+    'wavelengthNm',
+    'txMinDbm',
+    'txMaxDbm',
+    'receiverSensitivityDbm',
+    'receiverOverloadDbm',
+    'requiredSensitivityMarginDb',
   }, field);
   _text(map['txPortId'], '$field.txPortId');
   _text(map['rxPortId'], '$field.rxPortId');
@@ -376,7 +538,11 @@ void _optics(Object? value, String field) {
   _decimal(map['txMaxDbm'], '$field.txMaxDbm');
   _decimal(map['receiverSensitivityDbm'], '$field.receiverSensitivityDbm');
   _decimal(map['receiverOverloadDbm'], '$field.receiverOverloadDbm');
-  _decimal(map['requiredSensitivityMarginDb'], '$field.requiredSensitivityMarginDb', nonnegative: true);
+  _decimal(
+    map['requiredSensitivityMarginDb'],
+    '$field.requiredSensitivityMarginDb',
+    nonnegative: true,
+  );
 }
 
 void _rackCapacity(Map<String, Object?> payload) {
@@ -390,7 +556,11 @@ void _rackCapacity(Map<String, Object?> payload) {
     throw const FormatException('Duplicate equipmentIds.');
   }
   final excluded = _object(payload['excludedCapacity'], 'excludedCapacity');
-  _exact(excluded, const {'reservedRu', 'unavailableRu', 'provenance'}, 'excludedCapacity');
+  _exact(excluded, const {
+    'reservedRu',
+    'unavailableRu',
+    'provenance',
+  }, 'excludedCapacity');
   _decimal(excluded['reservedRu'], 'reservedRu', nonnegative: true);
   _decimal(excluded['unavailableRu'], 'unavailableRu', nonnegative: true);
   _text(excluded['provenance'], 'provenance');
@@ -402,9 +572,14 @@ void _patchPanel(Map<String, Object?> payload) {
   _policyRef(payload['sparePolicyRef'], 'sparePolicyRef');
   final ports = <String>{};
   for (final row in _objectList(payload['assignments'], 'assignments')) {
-    _exact(row, const {'panelPortId', 'terminationId', 'linkId'}, 'patchAssignment');
+    _exact(row, const {
+      'panelPortId',
+      'terminationId',
+      'linkId',
+    }, 'patchAssignment');
     final port = _text(row['panelPortId'], 'panelPortId');
-    if (!ports.add(port)) throw const FormatException('Duplicate patch panel port.');
+    if (!ports.add(port))
+      throw const FormatException('Duplicate patch panel port.');
     _text(row['terminationId'], 'terminationId');
     _text(row['linkId'], 'linkId');
   }
@@ -418,8 +593,15 @@ void _doorRoles(Map<String, Object?> payload) {
     throw const FormatException('Unsupported safetyMode.');
   }
   final roleSlots = <String>{};
-  for (final row in _objectList(payload['roleAssignments'], 'roleAssignments')) {
-    _exact(row, const {'roleCode', 'slot', 'componentId'}, 'doorRoleAssignment');
+  for (final row in _objectList(
+    payload['roleAssignments'],
+    'roleAssignments',
+  )) {
+    _exact(row, const {
+      'roleCode',
+      'slot',
+      'componentId',
+    }, 'doorRoleAssignment');
     final role = _text(row['roleCode'], 'roleCode');
     final slot = _nonnegativeInt(row['slot'], 'slot');
     _text(row['componentId'], 'componentId');
@@ -428,19 +610,32 @@ void _doorRoles(Map<String, Object?> payload) {
     }
   }
   final causes = <String>{};
-  for (final row in _objectList(payload['releaseTruthTable'], 'releaseTruthTable')) {
-    _exact(row, const {'causeCode', 'expectedOutcomeCode', 'requiredEvidenceRoles'}, 'releaseTruthRow');
+  for (final row in _objectList(
+    payload['releaseTruthTable'],
+    'releaseTruthTable',
+  )) {
+    _exact(row, const {
+      'causeCode',
+      'expectedOutcomeCode',
+      'requiredEvidenceRoles',
+    }, 'releaseTruthRow');
     final cause = _text(row['causeCode'], 'causeCode');
-    if (!causes.add(cause)) throw const FormatException('Duplicate release cause.');
+    if (!causes.add(cause))
+      throw const FormatException('Duplicate release cause.');
     _text(row['expectedOutcomeCode'], 'expectedOutcomeCode');
     _stringList(row['requiredEvidenceRoles'], 'requiredEvidenceRoles');
   }
   const requiredCauses = {
-    'NORMAL_ACCESS', 'REQUEST_TO_EXIT', 'FIRE_RELEASE',
-    'EMERGENCY_BREAK_GLASS', 'POWER_FAILURE'
+    'NORMAL_ACCESS',
+    'REQUEST_TO_EXIT',
+    'FIRE_RELEASE',
+    'EMERGENCY_BREAK_GLASS',
+    'POWER_FAILURE',
   };
   if (!causes.containsAll(requiredCauses)) {
-    throw const FormatException('Door release truth table misses required cause.');
+    throw const FormatException(
+      'Door release truth table misses required cause.',
+    );
   }
 }
 
@@ -448,10 +643,19 @@ void _controllerResources(Map<String, Object?> payload) {
   _text(payload['controllerId'], 'controllerId');
   _policyRef(payload['reservePolicyRef'], 'reservePolicyRef');
   final resources = <String>{};
-  for (final row in _objectList(payload['resourceAssignments'], 'resourceAssignments')) {
-    _exact(row, const {'resourceId', 'resourceKind', 'assignmentRole', 'subjectId'}, 'controllerResourceAssignment');
+  for (final row in _objectList(
+    payload['resourceAssignments'],
+    'resourceAssignments',
+  )) {
+    _exact(row, const {
+      'resourceId',
+      'resourceKind',
+      'assignmentRole',
+      'subjectId',
+    }, 'controllerResourceAssignment');
     final resource = _text(row['resourceId'], 'resourceId');
-    if (!resources.add(resource)) throw const FormatException('Duplicate controller resource assignment.');
+    if (!resources.add(resource))
+      throw const FormatException('Duplicate controller resource assignment.');
     _text(row['resourceKind'], 'resourceKind');
     _text(row['assignmentRole'], 'assignmentRole');
     _text(row['subjectId'], 'subjectId');
@@ -462,34 +666,58 @@ void _fireLoop(Map<String, Object?> payload) {
   _text(payload['loopId'], 'loopId');
   _topologyRef(payload['topologyProfileRef'], 'topologyProfileRef');
   final domain = _object(payload['addressDomain'], 'addressDomain');
-  _exact(domain, const {'panelId', 'loopId', 'minAddress', 'maxAddress', 'reservedAddresses'}, 'addressDomain');
+  _exact(domain, const {
+    'panelId',
+    'loopId',
+    'minAddress',
+    'maxAddress',
+    'reservedAddresses',
+  }, 'addressDomain');
   _text(domain['panelId'], 'addressDomain.panelId');
   _text(domain['loopId'], 'addressDomain.loopId');
   final min = _nonnegativeInt(domain['minAddress'], 'minAddress');
   final max = _nonnegativeInt(domain['maxAddress'], 'maxAddress');
   if (min > max) throw const FormatException('Address domain is reversed.');
-  final reserved = _integerList(domain['reservedAddresses'], 'reservedAddresses');
+  final reserved = _integerList(
+    domain['reservedAddresses'],
+    'reservedAddresses',
+  );
   if (reserved.toSet().length != reserved.length ||
       reserved.any((value) => value < min || value > max)) {
     throw const FormatException('Invalid reserved address set.');
   }
   final claimed = <int>{};
   final devices = <String>{};
-  for (final row in _objectList(payload['deviceAssignments'], 'deviceAssignments')) {
-    _exact(row, const {'deviceId', 'profileRef', 'expandedAddresses'}, 'fireDeviceAssignment');
+  for (final row in _objectList(
+    payload['deviceAssignments'],
+    'deviceAssignments',
+  )) {
+    _exact(row, const {
+      'deviceId',
+      'profileRef',
+      'expandedAddresses',
+    }, 'fireDeviceAssignment');
     final device = _text(row['deviceId'], 'deviceId');
-    if (!devices.add(device)) throw const FormatException('Duplicate fire device assignment.');
+    if (!devices.add(device))
+      throw const FormatException('Duplicate fire device assignment.');
     _text(row['profileRef'], 'profileRef');
-    final addresses = _integerList(row['expandedAddresses'], 'expandedAddresses');
+    final addresses = _integerList(
+      row['expandedAddresses'],
+      'expandedAddresses',
+    );
     if (addresses.isEmpty || addresses.toSet().length != addresses.length) {
-      throw const FormatException('Expanded fire addresses must be non-empty/unique.');
+      throw const FormatException(
+        'Expanded fire addresses must be non-empty/unique.',
+      );
     }
     for (final address in addresses) {
       if (address < min || address > max || reserved.contains(address)) {
         throw const FormatException('Fire address is outside allowed domain.');
       }
       if (!claimed.add(address)) {
-        throw const FormatException('Fire address collision in replacement set.');
+        throw const FormatException(
+          'Fire address collision in replacement set.',
+        );
       }
     }
   }
@@ -500,12 +728,20 @@ void _notificationCircuit(Map<String, Object?> payload) {
   _outputRef(payload['outputRef'], 'outputRef');
   _policyRef(payload['policyRef'], 'policyRef');
   final devices = <String>{};
-  for (final row in _objectList(payload['deviceAssignments'], 'deviceAssignments')) {
-    _exact(row, const {'deviceId', 'stateCurrentMa'}, 'notificationDeviceAssignment');
+  for (final row in _objectList(
+    payload['deviceAssignments'],
+    'deviceAssignments',
+  )) {
+    _exact(row, const {
+      'deviceId',
+      'stateCurrentMa',
+    }, 'notificationDeviceAssignment');
     final device = _text(row['deviceId'], 'deviceId');
-    if (!devices.add(device)) throw const FormatException('Duplicate notification device.');
+    if (!devices.add(device))
+      throw const FormatException('Duplicate notification device.');
     final currents = _object(row['stateCurrentMa'], 'stateCurrentMa');
-    if (currents.isEmpty) throw const FormatException('stateCurrentMa cannot be empty.');
+    if (currents.isEmpty)
+      throw const FormatException('stateCurrentMa cannot be empty.');
     for (final entry in currents.entries) {
       _text(entry.key, 'state code');
       _decimal(entry.value, 'state current', nonnegative: true);
@@ -526,7 +762,10 @@ void _calculate(Map<String, Object?> payload) {
   for (final subject in _objectList(payload['subjects'], 'subjects')) {
     _subject(subject, 'subject');
   }
-  final generations = _object(payload['expectedPointerGenerations'], 'expectedPointerGenerations');
+  final generations = _object(
+    payload['expectedPointerGenerations'],
+    'expectedPointerGenerations',
+  );
   for (final entry in generations.entries) {
     _text(entry.key, 'pointer key');
     _nonnegativeInt(entry.value, 'pointer generation');
@@ -550,7 +789,8 @@ void _subject(Object? value, String field) {
   _text(map['id'], '$field.id');
 }
 
-void _definitionRef(Object? value, String field) => _policyLikeRef(value, field);
+void _definitionRef(Object? value, String field) =>
+    _policyLikeRef(value, field);
 void _policyRef(Object? value, String field) => _policyLikeRef(value, field);
 
 void _policyLikeRef(Object? value, String field) {
@@ -597,7 +837,8 @@ void _utcWindow(Object? value, String field) {
   _exact(map, const {'startUtc', 'endUtc'}, field);
   final start = _utc(map['startUtc'], '$field.startUtc');
   final end = _utc(map['endUtc'], '$field.endUtc');
-  if (!start.isBefore(end)) throw FormatException('$field start must precede end.');
+  if (!start.isBefore(end))
+    throw FormatException('$field start must precede end.');
 }
 
 void _outputRef(Object? value, String field) {
@@ -611,7 +852,8 @@ Map<String, Object?> _object(Object? value, String field) {
   if (value is! Map) throw FormatException('$field must be an object.');
   final result = <String, Object?>{};
   for (final entry in value.entries) {
-    if (entry.key is! String) throw FormatException('$field keys must be strings.');
+    if (entry.key is! String)
+      throw FormatException('$field keys must be strings.');
     result[entry.key as String] = entry.value;
   }
   return result;
@@ -634,7 +876,8 @@ List<String> _stringList(Object? value, String field) {
 List<int> _integerList(Object? value, String field) {
   if (value is! List) throw FormatException('$field must be an integer array.');
   return <int>[
-    for (var i = 0; i < value.length; i++) _nonnegativeInt(value[i], '$field[$i]'),
+    for (var i = 0; i < value.length; i++)
+      _nonnegativeInt(value[i], '$field[$i]'),
   ];
 }
 
@@ -646,12 +889,14 @@ String _text(Object? value, String field) {
 }
 
 int _nonnegativeInt(Object? value, String field) {
-  if (value is! int || value < 0) throw FormatException('$field must be a non-negative integer.');
+  if (value is! int || value < 0)
+    throw FormatException('$field must be a non-negative integer.');
   return value;
 }
 
 Elv5Rational _decimal(Object? value, String field, {bool nonnegative = false}) {
-  if (value is! String) throw FormatException('$field must be a decimal string.');
+  if (value is! String)
+    throw FormatException('$field must be a decimal string.');
   final parsed = Elv5Rational.parseDecimal(value);
   if (nonnegative && parsed < Elv5Rational.zero) {
     throw FormatException('$field must be non-negative.');

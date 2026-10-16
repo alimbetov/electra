@@ -17,7 +17,11 @@ final class Elv5SourceRef {
       throw ArgumentError('Source kind/reference must be non-empty.');
     }
     if (!_sha256.hasMatch(contentHash)) {
-      throw ArgumentError.value(contentHash, 'contentHash', 'Expected SHA-256.');
+      throw ArgumentError.value(
+        contentHash,
+        'contentHash',
+        'Expected SHA-256.',
+      );
     }
   }
 
@@ -28,10 +32,10 @@ final class Elv5SourceRef {
   final String contentHash;
 
   Map<String, Object?> toMap() => <String, Object?>{
-        'kind': kind,
-        'reference': reference,
-        'contentHash': contentHash,
-      };
+    'kind': kind,
+    'reference': reference,
+    'contentHash': contentHash,
+  };
 }
 
 final class Elv5Applicability {
@@ -44,9 +48,9 @@ final class Elv5Applicability {
   final Set<String> environmentCodes;
 
   Map<String, Object?> toMap() => <String, Object?>{
-        'modelCode': modelCode,
-        'environmentCodes': environmentCodes,
-      };
+    'modelCode': modelCode,
+    'environmentCodes': environmentCodes,
+  };
 }
 
 final class Elv5EngineeringValue<T> {

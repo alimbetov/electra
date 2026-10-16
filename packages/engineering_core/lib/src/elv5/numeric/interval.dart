@@ -17,18 +17,14 @@ final class Elv5Interval<D extends Elv5Dimension> {
 
   bool get isExact => lower == upper;
 
-  Elv5Interval<D> operator +(Elv5Interval<D> other) => Elv5Interval<D>(
-        lower + other.lower,
-        upper + other.upper,
-      );
+  Elv5Interval<D> operator +(Elv5Interval<D> other) =>
+      Elv5Interval<D>(lower + other.lower, upper + other.upper);
 
-  Elv5Interval<D> operator -(Elv5Interval<D> other) => Elv5Interval<D>(
-        lower - other.upper,
-        upper - other.lower,
-      );
+  Elv5Interval<D> operator -(Elv5Interval<D> other) =>
+      Elv5Interval<D>(lower - other.upper, upper - other.lower);
 
   Map<String, Object?> toMap() => <String, Object?>{
-        'lower': lower.toMap(),
-        'upper': upper.toMap(),
-      };
+    'lower': lower.toMap(),
+    'upper': upper.toMap(),
+  };
 }

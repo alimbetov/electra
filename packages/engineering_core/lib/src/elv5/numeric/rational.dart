@@ -9,10 +9,7 @@ final class Elv5Rational implements Comparable<Elv5Rational> {
     }
     final sign = denominator.isNegative ? -BigInt.one : BigInt.one;
     final gcd = numerator.gcd(denominator);
-    return Elv5Rational._(
-      numerator ~/ gcd * sign,
-      denominator ~/ gcd * sign,
-    );
+    return Elv5Rational._(numerator ~/ gcd * sign, denominator ~/ gcd * sign);
   }
 
   const Elv5Rational._(this.numerator, this.denominator);
@@ -44,8 +41,7 @@ final class Elv5Rational implements Comparable<Elv5Rational> {
     );
   }
 
-  static final _decimal =
-      RegExp(r'^-?(0|[1-9][0-9]{0,29})(\.[0-9]{1,12})?$');
+  static final _decimal = RegExp(r'^-?(0|[1-9][0-9]{0,29})(\.[0-9]{1,12})?$');
   static final zero = Elv5Rational.integer(0);
   static final one = Elv5Rational.integer(1);
 
@@ -57,15 +53,15 @@ final class Elv5Rational implements Comparable<Elv5Rational> {
   bool get isInteger => numerator.remainder(denominator) == BigInt.zero;
 
   Elv5Rational operator +(Elv5Rational other) => Elv5Rational(
-        numerator * other.denominator + other.numerator * denominator,
-        denominator * other.denominator,
-      );
+    numerator * other.denominator + other.numerator * denominator,
+    denominator * other.denominator,
+  );
   Elv5Rational operator -(Elv5Rational other) => this + -other;
   Elv5Rational operator -() => Elv5Rational(-numerator, denominator);
   Elv5Rational operator *(Elv5Rational other) => Elv5Rational(
-        numerator * other.numerator,
-        denominator * other.denominator,
-      );
+    numerator * other.numerator,
+    denominator * other.denominator,
+  );
   Elv5Rational operator /(Elv5Rational other) {
     if (other.isZero) throw ArgumentError('Cannot divide by zero.');
     return Elv5Rational(
@@ -91,9 +87,9 @@ final class Elv5Rational implements Comparable<Elv5Rational> {
   bool operator >=(Elv5Rational other) => compareTo(other) >= 0;
 
   Map<String, Object?> toMap() => <String, Object?>{
-        'numerator': numerator.toString(),
-        'denominator': denominator.toString(),
-      };
+    'numerator': numerator.toString(),
+    'denominator': denominator.toString(),
+  };
 
   @override
   bool operator ==(Object other) =>

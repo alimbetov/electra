@@ -73,8 +73,7 @@ final class Elv5Quantity<D extends Elv5Dimension>
       Elv5Quantity<D>(value - other.value);
   Elv5Quantity<D> operator -() => Elv5Quantity<D>(-value);
 
-  Elv5Quantity<D> scale(Elv5Rational factor) =>
-      Elv5Quantity<D>(value * factor);
+  Elv5Quantity<D> scale(Elv5Rational factor) => Elv5Quantity<D>(value * factor);
 
   @override
   int compareTo(Elv5Quantity<D> other) => value.compareTo(other.value);

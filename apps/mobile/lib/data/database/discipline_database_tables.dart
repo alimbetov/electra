@@ -86,8 +86,7 @@ class CameraStreamSubscriptions extends Table {
 }
 
 @DataClassName('RecordingPoolBindingRow')
-class RecordingPoolBindings extends Table
-    with DisciplineRevisionAuditColumns {
+class RecordingPoolBindings extends Table with DisciplineRevisionAuditColumns {
   TextColumn get poolId => text()();
   TextColumn get horizonJson => text()();
   TextColumn get temporalPolicyJson => text()();
@@ -181,7 +180,8 @@ class LinkCompositionBindings extends Table
     with DisciplineRevisionAuditColumns {
   TextColumn get linkId => text()();
   TextColumn get policyBindingId => text()();
-  TextColumn get compositionKind => text().withDefault(const Constant('ORDERED'))();
+  TextColumn get compositionKind =>
+      text().withDefault(const Constant('ORDERED'))();
 
   @override
   Set<Column<Object>> get primaryKey => {designRevisionId, id};
@@ -203,8 +203,7 @@ class LinkSectionAssignments extends Table {
 }
 
 @DataClassName('PortCapacityBindingRow')
-class PortCapacityBindings extends Table
-    with DisciplineRevisionAuditColumns {
+class PortCapacityBindings extends Table with DisciplineRevisionAuditColumns {
   TextColumn get switchId => text().references(ComponentInstances, #id)();
   TextColumn get sparePolicyRefJson => text()();
 
@@ -227,8 +226,7 @@ class PortCapacityAssignments extends Table {
 }
 
 @DataClassName('OpticalLinkBindingRow')
-class OpticalLinkBindings extends Table
-    with DisciplineRevisionAuditColumns {
+class OpticalLinkBindings extends Table with DisciplineRevisionAuditColumns {
   TextColumn get linkId => text()();
   TextColumn get forwardOpticsJson => text()();
   TextColumn get reverseOpticsJson => text()();
@@ -261,8 +259,7 @@ class OpticalLossEvents extends Table {
 }
 
 @DataClassName('RackCapacityBindingRow')
-class RackCapacityBindings extends Table
-    with DisciplineRevisionAuditColumns {
+class RackCapacityBindings extends Table with DisciplineRevisionAuditColumns {
   TextColumn get rackId => text().references(ComponentInstances, #id)();
   TextColumn get capacityBasis => text()();
   TextColumn get capacityJson => text()();
@@ -292,8 +289,7 @@ class RackEquipmentMemberships extends Table {
 }
 
 @DataClassName('PatchPanelBindingRow')
-class PatchPanelBindings extends Table
-    with DisciplineRevisionAuditColumns {
+class PatchPanelBindings extends Table with DisciplineRevisionAuditColumns {
   TextColumn get panelId => text().references(ComponentInstances, #id)();
   TextColumn get sparePolicyRefJson => text()();
 
@@ -307,7 +303,8 @@ class PatchPanelAssignments extends Table {
   TextColumn get designRevisionId =>
       text().references(ProjectDesignRevisions, #id)();
   TextColumn get bindingId => text()();
-  TextColumn get panelPortId => text().references(EngineeringPortInstances, #id)();
+  TextColumn get panelPortId =>
+      text().references(EngineeringPortInstances, #id)();
   TextColumn get endpointId => text()();
   TextColumn get destinationRefJson => text()();
 
@@ -398,8 +395,7 @@ class ControllerResourceAssignments extends Table {
 }
 
 @DataClassName('FireLoopBindingRow')
-class FireLoopBindings extends Table
-    with DisciplineRevisionAuditColumns {
+class FireLoopBindings extends Table with DisciplineRevisionAuditColumns {
   TextColumn get loopId => text()();
   TextColumn get addressDomainJson => text()();
   TextColumn get addressDomain => text()();
@@ -421,11 +417,7 @@ class FireLoopDeviceAssignments extends Table {
   IntColumn get ordinal => integer()();
 
   @override
-  Set<Column<Object>> get primaryKey => {
-    designRevisionId,
-    bindingId,
-    deviceId,
-  };
+  Set<Column<Object>> get primaryKey => {designRevisionId, bindingId, deviceId};
 }
 
 @DataClassName('FireAddressClaimRow')

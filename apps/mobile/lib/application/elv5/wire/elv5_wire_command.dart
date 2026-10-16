@@ -16,10 +16,10 @@ final class Elv5WireCommandEnvelope {
     required Map<String, int> expectedRows,
     required this.reviewedImpactFingerprint,
     required Map<String, Object?> payload,
-  })  : schema = Elv5RuntimeContract.wireSchema,
-        payloadSchemaVersion = Elv5RuntimeContract.wirePayloadSchemaVersion,
-        expectedRows = Map.unmodifiable(expectedRows),
-        payload = Map.unmodifiable(payload) {
+  }) : schema = Elv5RuntimeContract.wireSchema,
+       payloadSchemaVersion = Elv5RuntimeContract.wirePayloadSchemaVersion,
+       expectedRows = Map.unmodifiable(expectedRows),
+       payload = Map.unmodifiable(payload) {
     Elv5WireCommandRegistry.requireOperation(operation);
     _wireText(projectId, 'projectId');
     _wireText(designRevisionId, 'designRevisionId');
@@ -72,17 +72,17 @@ final class Elv5WireCommandEnvelope {
   final Map<String, Object?> payload;
 
   Map<String, Object?> toMap() => <String, Object?>{
-        'schema': schema,
-        'operation': operation,
-        'payloadSchemaVersion': payloadSchemaVersion,
-        'projectId': projectId,
-        'designRevisionId': designRevisionId,
-        'commandId': commandId,
-        'expectedDesignRowRevision': expectedDesignRowRevision,
-        'expectedRows': expectedRows,
-        'reviewedImpactFingerprint': reviewedImpactFingerprint,
-        'payload': payload,
-      };
+    'schema': schema,
+    'operation': operation,
+    'payloadSchemaVersion': payloadSchemaVersion,
+    'projectId': projectId,
+    'designRevisionId': designRevisionId,
+    'commandId': commandId,
+    'expectedDesignRowRevision': expectedDesignRowRevision,
+    'expectedRows': expectedRows,
+    'reviewedImpactFingerprint': reviewedImpactFingerprint,
+    'payload': payload,
+  };
 
   /// Hash used by the shared durable command ledger for replay/conflict checks.
   String get normalizedRequestSha256 =>

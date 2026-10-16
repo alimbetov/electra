@@ -13,8 +13,7 @@ abstract final class Elv5RuntimeContract {
   static const wireSchema = 'electra.elv5-discipline-command.v1';
   static const wirePayloadSchemaVersion = 1;
   static const canonicalEncoderVersion = 'electra.canonical-json.v1';
-  static const numericBackendVersion =
-      'electra.elv5.exact-bounded-rational.v1';
+  static const numericBackendVersion = 'electra.elv5.exact-bounded-rational.v1';
   static const engineeringNodeSchema = 'engineering-node-v3';
   static const engineeringNodeOwner = 'ELV5';
 
