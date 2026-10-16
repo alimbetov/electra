@@ -1,21 +1,25 @@
 {
   "schema": "electra.elv4-runtime-closure.v1",
-  "sourceReviewedSha": "df8ae8ca350c95682af5a3e1d5708d33705fa9e5",
-  "runtimeStatus": "IN_PROGRESS",
+  "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+  "runtimeStatus": "IMPLEMENTED",
   "runtimeAcceptanceVerified": false,
   "events": [],
   "findings": [
     {
       "id": "C01",
       "severity": "HIGH",
-      "status": "OPEN",
+      "status": "RESOLVED",
       "owner": "P8",
-      "summary": "Full seven-case qualification manifest is not executed through persisted public-command topology and all required process/context/dimension rows.",
+      "summary": "The mandatory seven-case qualification matrix executes through persisted public-command fixtures, real evaluators and immutable CURRENT evidence.",
       "evidence": [
-        "apps/mobile/test/data/elv4_p8_public_vertical_acceptance_test.dart",
-        "docs/product/elv4-implementation/qualification.json"
+        "docs/product/elv4-implementation/qualification.json",
+        "apps/mobile/test/data/elv4_p9_runtime_qualification_test.dart",
+        "apps/mobile/lib/data/repositories/drift_elv4_qualification_evidence_reader.dart",
+        "packages/engineering_core/lib/src/power_load_evidence.dart",
+        "https://github.com/alimbetov/electra/actions/runs/38853248099"
       ],
-      "requiredResolution": "Build and execute Q-CCTV/Q-LAN/Q-ACS/Q-FIRE/Q-SHARED/Q-GENERIC/Q-CHARGE from persisted canonical/physical facts. Persisted PWR-01 load publication is not whole-design qualification."
+      "requiredResolution": "Build and execute Q-CCTV/Q-LAN/Q-ACS/Q-FIRE/Q-SHARED/Q-GENERIC/Q-CHARGE from persisted canonical/physical facts. Persisted PWR-01 load publication is not whole-design qualification.",
+      "resolution": "Q-CCTV/Q-LAN/Q-ACS/Q-FIRE/Q-SHARED/Q-GENERIC/Q-CHARGE execute from manifest facts without oracle-derived PASS values. Real engineering evaluators produce immutable evidence, CURRENT pointer identity/hash is verified, the exact process/context/dimension matrix is enforced and every file-backed SQLite fixture is FK-clean. Foundation run 38853248099 passes the complete mobile/core suite at the reviewed SHA."
     },
     {
       "id": "C02",
@@ -77,34 +81,36 @@
     {
       "id": "C05",
       "severity": "HIGH",
-      "status": "OPEN",
+      "status": "RESOLVED",
       "owner": "P1/P2",
-      "summary": "The strict wire registry/envelope now matches the documented command schema and fails closed, but it is not yet the complete public semantic adapter into aggregate runtime commands and reviewed dependency/projection resolution.",
+      "summary": "The strict public wire boundary resolves reviewed server impact and executes aggregate load/transfer replacement through the production Drift transaction and ledger boundary.",
       "evidence": [
-        "docs/product/elv4-implementation/schemas/power-command.schema.json",
-        "docs/product/elv4-implementation/schemas/power-evaluation.schema.json",
         "apps/mobile/lib/application/elv4_wire_command_dispatcher.dart",
         "apps/mobile/lib/application/elv4_wire_semantic_adapter.dart",
         "apps/mobile/lib/application/elv4_wire_runtime_registry.dart",
-        "apps/mobile/test/application/elv4_wire_command_dispatcher_test.dart",
-        "apps/mobile/test/application/elv4_wire_runtime_registry_test.dart",
-        "apps/mobile/lib/application/power_mutation_command.dart"
+        "apps/mobile/lib/data/repositories/drift_elv4_wire_runtime_backend.dart",
+        "apps/mobile/test/data/elv4_p9_wire_public_roundtrip_test.dart",
+        "apps/mobile/test/data/elv4_p9_wire_semantic_drift_backend_test.dart",
+        "apps/mobile/test/data/elv4_p9_wire_aggregate_runtime_test.dart",
+        "apps/mobile/test/data/elv4_p9_wire_aggregate_rollback_test.dart",
+        "https://github.com/alimbetov/electra/actions/runs/38853248099"
       ],
-      "requiredResolution": "Reconcile complete aggregate wire payload semantics with actual runtime handlers/ledger versions. Dispatch must resolve reviewed impact and exact changed dependencies rather than inventing them; execute public round-trip, malformed payload, unknown-version and aggregate-handler controls."
+      "requiredResolution": "Reconcile complete aggregate wire payload semantics with actual runtime handlers/ledger versions. Dispatch must resolve reviewed impact and exact changed dependencies rather than inventing them; execute public round-trip, malformed payload, unknown-version and aggregate-handler controls.",
+      "resolution": "Documented loads[]/transfers[] payloads execute as complete aggregate replacements in one Drift UoW with one design CAS and durable receipt. Expected rows and reviewed impact are verified, dependencies are server-resolved rather than caller supplied, malformed or unknown envelopes fail closed, replay is idempotent and an invalid member rolls back the aggregate. Public round-trip, semantic-backend, aggregate and rollback regressions pass in Foundation run 38853248099."
     },
     {
       "id": "C06",
       "severity": "GATE",
       "status": "RESOLVED",
       "owner": "P9",
-      "summary": "Exact-head technical gate passed with the real historical migration matrix included. Runtime acceptance remains blocked by C01/C05, and every later source HEAD still requires its own exact-head technical run.",
+      "summary": "Exact-head gate architecture is resolved; the post-reconciliation immutable source SHA must still pass technical, qualification and runtime-acceptance jobs before merge.",
       "evidence": [
         ".github/workflows/elv4-exact-head.yml",
         "https://github.com/alimbetov/electra/actions/runs/38839558588",
         "https://github.com/alimbetov/electra/actions/runs/38845804811"
       ],
       "requiredResolution": "Run generation, format, both analyzers, full mobile/core, historical migrations and explicit acceptance/alignment tests on one clean SHA; preserve report and logs with run metadata.",
-      "resolution": "Technical gates have passed on closure milestones including fcf1ece97507a981e88e2afd31826d2e8aeeb4aa and C02 evidence SHA df8ae8ca350c95682af5a3e1d5708d33705fa9e5. Separate runtime-acceptance correctly remains blocked while C01/C05 are open."
+      "resolution": "The permanent read-only exact-head workflow covers generation, formatting, both analyzers, full mobile/core suites, real v21/v22 historical migrations, explicit P7/P8 acceptance, seven-case runtime qualification and clean-tree verification. Final acceptance remains an external executed event at the immutable reconciliation SHA."
     }
   ],
   "repairedInThisReview": [
@@ -118,7 +124,9 @@
     "Capture complete immutable power/canonical facts at freeze and materialize scoped power configuration into create-next with explicit physical identity remapping.",
     "Serve frozen power workspace/scenario/budget/history reads from verified captured facts after reopen instead of mutable operational rows.",
     "Execute real v21/v22 historical source fixtures through current v23 migration with legacy identity/hash/FK invariance and no synthetic power/history backfill.",
-    "Implement RM03 reviewed canonical projection, exact old/new dependency invalidation and fail-closed legacy topology/reference/membership/PoE path writers."
+    "Implement RM03 reviewed canonical projection, exact old/new dependency invalidation and fail-closed legacy topology/reference/membership/PoE path writers.",
+    "Execute the complete seven-case ELV4 qualification matrix from persisted public-command fixtures and immutable CURRENT evidence.",
+    "Route aggregate public wire load/transfer commands through reviewed server impact and one production Drift transaction/ledger boundary."
   ],
   "architectureDeviations": [
     {

@@ -1,7 +1,7 @@
 {
   "schema": "electra.elv4-implementation-requirements.v1",
   "designStatus": "IMPLEMENTATION_RECONCILED",
-  "runtimeStatus": "IN_PROGRESS",
+  "runtimeStatus": "IMPLEMENTED",
   "requirements": [
     {
       "requirementId": "ELV4-P0-001",
@@ -26,7 +26,7 @@
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
@@ -34,12 +34,12 @@
     {
       "requirementId": "ELV4-P0-002",
       "package": "P0",
-      "summary": "Map each ELV3 RC0–RC9 gate to source, public entry point and exact-head evidence or an explicit unresolved gap",
+      "summary": "Map each ELV3 RC0\u2013RC9 gate to source, public entry point and exact-head evidence or an explicit unresolved gap",
       "designDocument": "p0-baseline.md",
       "plannedAcceptanceIds": [
         "P0-T02"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "docs/audit/elv4-p9-reconciliation.md",
         "docs/audit/elv4-p0-implementation-entry.md"
@@ -51,14 +51,13 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C01 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C01"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
     },
@@ -70,7 +69,7 @@
       "plannedAcceptanceIds": [
         "P0-T03"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "apps/mobile/lib/data/repositories/drift_power_command_service.dart",
         "apps/mobile/lib/data/repositories/drift_engineering_topology_repository.dart"
@@ -81,7 +80,8 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C02 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [
         "ELV4-AUD-01"
@@ -89,10 +89,8 @@
       "remediationAcceptanceIds": [
         "RM01-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C02"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
     },
@@ -123,7 +121,7 @@
       "remediationAcceptanceIds": [
         "RM01-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
@@ -158,7 +156,7 @@
         "RM05-T",
         "RM06-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -171,7 +169,7 @@
       "plannedAcceptanceIds": [
         "P0-T06"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "apps/mobile/test/support/elv4_power_qualification_builder.dart"
       ],
@@ -181,7 +179,8 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C01 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [
         "ELV4-AUD-05",
@@ -191,10 +190,8 @@
         "RM05-T",
         "RM15-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C01"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
     },
@@ -206,7 +203,7 @@
       "plannedAcceptanceIds": [
         "P0-T07"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart",
         "apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart"
@@ -217,7 +214,8 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C03 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [
         "ELV4-AUD-07",
@@ -227,17 +225,15 @@
         "RM07-T",
         "RM10-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C03"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
     },
     {
       "requirementId": "ELV4-P0-008",
       "package": "P0",
-      "summary": "Record entry outcome with no fabricated runtime closure or implicit resolution of BASE-01…04",
+      "summary": "Record entry outcome with no fabricated runtime closure or implicit resolution of BASE-01\u202604",
       "designDocument": "p0-baseline.md",
       "plannedAcceptanceIds": [
         "P0-T08"
@@ -256,7 +252,7 @@
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
@@ -291,7 +287,7 @@
         "RM02-T",
         "RM09-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -304,7 +300,7 @@
       "plannedAcceptanceIds": [
         "P1-T02"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "packages/engineering_core/lib/src/power_bindings.dart",
         "apps/mobile/lib/data/repositories/drift_power_command_service.dart"
@@ -316,7 +312,8 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C02 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [
         "ELV4-AUD-02",
@@ -326,10 +323,8 @@
         "RM02-T",
         "RM03-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C02"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
     },
@@ -361,7 +356,7 @@
       "remediationAcceptanceIds": [
         "RM12-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -396,7 +391,7 @@
         "RM03-T",
         "RM12-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
@@ -409,7 +404,7 @@
       "plannedAcceptanceIds": [
         "P1-T05"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "packages/engineering_core/lib/src/power_catalog.dart",
         "apps/mobile/lib/data/repositories/drift_engineering_reference_repository.dart"
@@ -421,7 +416,8 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C02 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [
         "ELV4-AUD-05",
@@ -431,10 +427,8 @@
         "RM05-T",
         "RM11-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C02"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
     },
@@ -465,7 +459,7 @@
       "remediationAcceptanceIds": [
         "RM11-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -478,7 +472,7 @@
       "plannedAcceptanceIds": [
         "P1-T07"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "packages/engineering_core/lib/src/power_legacy_adoption.dart",
         "apps/mobile/lib/data/repositories/drift_engineering_reference_adoption_repository.dart"
@@ -490,7 +484,8 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C02 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [
         "ELV4-AUD-02",
@@ -500,10 +495,8 @@
         "RM02-T",
         "RM03-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C02"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
     },
@@ -515,7 +508,7 @@
       "plannedAcceptanceIds": [
         "P1-T08"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "packages/engineering_core/lib/src/power_evaluation.dart",
         "docs/product/elv4-implementation/schemas/power-command.schema.json"
@@ -526,7 +519,8 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C05 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [
         "ELV4-AUD-04",
@@ -538,10 +532,8 @@
         "RM09-T",
         "RM11-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C05"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
     },
@@ -553,7 +545,7 @@
       "plannedAcceptanceIds": [
         "P2-T01"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "apps/mobile/lib/data/database/app_database.dart",
         "apps/mobile/lib/data/database/power_database_tables.dart"
@@ -564,7 +556,8 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C04 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [
         "ELV4-AUD-11"
@@ -572,10 +565,8 @@
       "remediationAcceptanceIds": [
         "RM11-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C04"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
     },
@@ -587,7 +578,7 @@
       "plannedAcceptanceIds": [
         "P2-T02"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "apps/mobile/lib/data/repositories/drift_power_command_service.dart",
         "apps/mobile/lib/data/repositories/drift_engineering_topology_repository.dart"
@@ -598,7 +589,8 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C02 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [
         "ELV4-AUD-02",
@@ -608,10 +600,8 @@
         "RM02-T",
         "RM05-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C02"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
     },
@@ -623,7 +613,7 @@
       "plannedAcceptanceIds": [
         "P2-T03"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "apps/mobile/lib/data/repositories/drift_power_command_service.dart",
         "apps/mobile/lib/application/power_mutation_command.dart"
@@ -634,7 +624,8 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C02 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [
         "ELV4-AUD-03",
@@ -646,10 +637,8 @@
         "RM05-T",
         "RM11-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C02"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
     },
@@ -661,7 +650,7 @@
       "plannedAcceptanceIds": [
         "P2-T04"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "apps/mobile/lib/data/repositories/drift_power_command_service.dart",
         "apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart"
@@ -673,14 +662,13 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C02 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C02"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
     },
@@ -713,7 +701,7 @@
         "RM01-T",
         "RM04-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
@@ -726,7 +714,7 @@
       "plannedAcceptanceIds": [
         "P2-T06"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart",
         "apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart"
@@ -738,7 +726,8 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C03 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [
         "ELV4-AUD-07",
@@ -750,10 +739,8 @@
         "RM10-T",
         "RM14-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C03"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
     },
@@ -784,7 +771,7 @@
       "remediationAcceptanceIds": [
         "RM08-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
@@ -797,7 +784,7 @@
       "plannedAcceptanceIds": [
         "P2-T08"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "apps/mobile/lib/data/repositories/drift_power_command_service.dart",
         "apps/mobile/lib/data/repositories/drift_engineering_reference_adoption_repository.dart"
@@ -808,7 +795,8 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C02 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [
         "ELV4-AUD-02",
@@ -818,10 +806,8 @@
         "RM02-T",
         "RM03-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C02"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
     },
@@ -833,7 +819,7 @@
       "plannedAcceptanceIds": [
         "P3-T01"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "packages/engineering_core/lib/src/power_graph.dart"
       ],
@@ -843,7 +829,8 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C01 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [
         "ELV4-AUD-05"
@@ -851,10 +838,8 @@
       "remediationAcceptanceIds": [
         "RM05-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C01"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
     },
@@ -885,7 +870,7 @@
       "remediationAcceptanceIds": [
         "RM03-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -916,7 +901,7 @@
       "remediationAcceptanceIds": [
         "RM05-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -943,7 +928,7 @@
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -974,7 +959,7 @@
       "remediationAcceptanceIds": [
         "RM03-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -1001,7 +986,7 @@
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -1028,7 +1013,7 @@
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -1041,7 +1026,7 @@
       "plannedAcceptanceIds": [
         "P3-T08"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "packages/engineering_core/lib/src/power_trace_evidence.dart",
         "apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart"
@@ -1053,14 +1038,13 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C03 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C03"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
     },
@@ -1086,7 +1070,7 @@
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -1115,7 +1099,7 @@
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -1142,7 +1126,7 @@
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -1173,7 +1157,7 @@
       "remediationAcceptanceIds": [
         "RM09-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -1200,7 +1184,7 @@
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -1231,7 +1215,7 @@
       "remediationAcceptanceIds": [
         "RM12-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -1264,7 +1248,7 @@
         "RM04-T",
         "RM13-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -1298,7 +1282,7 @@
       "remediationAcceptanceIds": [
         "RM06-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -1325,7 +1309,7 @@
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -1338,7 +1322,7 @@
       "plannedAcceptanceIds": [
         "P5-T02"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "packages/engineering_core/lib/src/poe_evaluation.dart"
       ],
@@ -1349,14 +1333,13 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C01 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C01"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
     },
@@ -1382,7 +1365,7 @@
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -1409,7 +1392,7 @@
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -1440,7 +1423,7 @@
       "remediationAcceptanceIds": [
         "RM09-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -1467,7 +1450,7 @@
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -1498,7 +1481,7 @@
       "remediationAcceptanceIds": [
         "RM05-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -1511,7 +1494,7 @@
       "plannedAcceptanceIds": [
         "P5-T08"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "packages/engineering_core/lib/src/poe_evidence.dart",
         "apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart"
@@ -1523,7 +1506,8 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C01 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [
         "ELV4-AUD-07"
@@ -1531,10 +1515,8 @@
       "remediationAcceptanceIds": [
         "RM07-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C01"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
     },
@@ -1546,7 +1528,7 @@
       "plannedAcceptanceIds": [
         "P6-T01"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "packages/engineering_core/lib/src/power_dc_backup.dart"
       ],
@@ -1556,14 +1538,13 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C01 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C01"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
     },
@@ -1593,7 +1574,7 @@
       "remediationAcceptanceIds": [
         "RM09-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -1624,7 +1605,7 @@
       "remediationAcceptanceIds": [
         "RM06-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -1653,7 +1634,7 @@
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -1686,7 +1667,7 @@
         "RM04-T",
         "RM06-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -1721,7 +1702,7 @@
         "RM06-T",
         "RM12-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -1752,7 +1733,7 @@
       "remediationAcceptanceIds": [
         "RM06-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -1765,7 +1746,7 @@
       "plannedAcceptanceIds": [
         "P6-T08"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "packages/engineering_core/lib/src/battery_backup_evidence.dart",
         "apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart"
@@ -1777,7 +1758,8 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C01 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [
         "ELV4-AUD-07"
@@ -1785,10 +1767,8 @@
       "remediationAcceptanceIds": [
         "RM07-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C01"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
     },
@@ -1800,7 +1780,7 @@
       "plannedAcceptanceIds": [
         "P7-T01"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "packages/engineering_core/lib/src/power_dependency.dart",
         "apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart"
@@ -1812,7 +1792,8 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C01 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [
         "ELV4-AUD-01",
@@ -1824,10 +1805,8 @@
         "RM04-T",
         "RM13-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C01"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
     },
@@ -1839,7 +1818,7 @@
       "plannedAcceptanceIds": [
         "P7-T02"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart",
         "apps/mobile/lib/data/repositories/drift_power_command_service.dart"
@@ -1851,7 +1830,8 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C02 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [
         "ELV4-AUD-01",
@@ -1861,10 +1841,8 @@
         "RM01-T",
         "RM13-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C02"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
     },
@@ -1900,7 +1878,7 @@
         "RM13-T",
         "RM14-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
@@ -1913,7 +1891,7 @@
       "plannedAcceptanceIds": [
         "P7-T04"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "apps/mobile/lib/data/repositories/drift_power_workspace_repository.dart",
         "apps/mobile/lib/features/editor/power_workspace_overlay_painter.dart"
@@ -1924,7 +1902,8 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C03 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [
         "ELV4-AUD-03"
@@ -1932,10 +1911,8 @@
       "remediationAcceptanceIds": [
         "RM03-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C03"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
     },
@@ -1963,7 +1940,7 @@
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
@@ -1996,7 +1973,7 @@
       "remediationAcceptanceIds": [
         "RM08-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
@@ -2009,7 +1986,7 @@
       "plannedAcceptanceIds": [
         "P7-T07"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart",
         "apps/mobile/lib/data/repositories/drift_power_workspace_repository.dart"
@@ -2021,7 +1998,8 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C03 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [
         "ELV4-AUD-07",
@@ -2031,10 +2009,8 @@
         "RM07-T",
         "RM14-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C03"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
     },
@@ -2060,7 +2036,7 @@
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
@@ -2073,7 +2049,7 @@
       "plannedAcceptanceIds": [
         "P8-T01"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "apps/mobile/test/support/elv4_power_qualification_builder.dart"
       ],
@@ -2083,7 +2059,8 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C01 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [
         "ELV4-AUD-05",
@@ -2095,10 +2072,8 @@
         "RM06-T",
         "RM15-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C01"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
     },
@@ -2110,7 +2085,7 @@
       "plannedAcceptanceIds": [
         "P8-T02"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "apps/mobile/lib/data/repositories/drift_power_command_service.dart",
         "apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart"
@@ -2122,7 +2097,8 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C01 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [
         "ELV4-AUD-13"
@@ -2130,10 +2106,8 @@
       "remediationAcceptanceIds": [
         "RM13-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C01"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
     },
@@ -2145,7 +2119,7 @@
       "plannedAcceptanceIds": [
         "P8-T03"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "apps/mobile/lib/data/database/app_database.dart"
       ],
@@ -2157,7 +2131,8 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C04 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [
         "ELV4-AUD-11"
@@ -2165,10 +2140,8 @@
       "remediationAcceptanceIds": [
         "RM11-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C04"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
     },
@@ -2180,7 +2153,7 @@
       "plannedAcceptanceIds": [
         "P8-T04"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart",
         "apps/mobile/lib/data/repositories/drift_power_publication_runtime.dart"
@@ -2192,7 +2165,8 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C03 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [
         "ELV4-AUD-04",
@@ -2204,10 +2178,8 @@
         "RM07-T",
         "RM08-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C03"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
     },
@@ -2219,7 +2191,7 @@
       "plannedAcceptanceIds": [
         "P8-T05"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "apps/mobile/lib/data/repositories/drift_power_command_service.dart",
         "apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart"
@@ -2230,14 +2202,13 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C01 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C01"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
     },
@@ -2273,7 +2244,7 @@
         "RM10-T",
         "RM14-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
@@ -2286,7 +2257,7 @@
       "plannedAcceptanceIds": [
         "P8-T07"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart",
         "apps/mobile/lib/data/repositories/drift_power_workspace_repository.dart"
@@ -2297,7 +2268,8 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C03 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [
         "ELV4-AUD-04",
@@ -2307,10 +2279,8 @@
         "RM04-T",
         "RM07-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C03"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
     },
@@ -2352,7 +2322,7 @@
         "RM13-T",
         "RM15-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -2384,7 +2354,7 @@
       "remediationAcceptanceIds": [
         "RM15-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
@@ -2397,7 +2367,7 @@
       "plannedAcceptanceIds": [
         "P9-T02"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "docs/audit/elv4-p9-reconciliation.md",
         "apps/mobile/lib/data/repositories/drift_power_command_service.dart"
@@ -2408,7 +2378,8 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C02 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [
         "ELV4-AUD-01",
@@ -2418,10 +2389,8 @@
         "RM01-T",
         "RM08-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C02"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
     },
@@ -2455,7 +2424,7 @@
       "remediationAcceptanceIds": [
         "RM15-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "PURE_CORE"
@@ -2468,7 +2437,7 @@
       "plannedAcceptanceIds": [
         "P9-T04"
       ],
-      "runtimeStatus": "BLOCKED",
+      "runtimeStatus": "IMPLEMENTED",
       "sourcePaths": [
         "docs/audit/elv4-p9-reconciliation.md",
         "apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart"
@@ -2480,7 +2449,8 @@
       "testedSha": "ca281015876829b7d95c23dee0854bbb255f11b2",
       "evidence": [
         "Source/test reconciliation: docs/audit/elv4-p9-reconciliation.md. Existing tests prove only their named scope; final exact-head execution is recorded in CI artifact, not inferred from paths.",
-        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING."
+        "Executed regression files at ca281015876829b7d95c23dee0854bbb255f11b2: https://github.com/alimbetov/electra/actions/runs/38784483402, technical job 116592838704; complete requirement acceptance remains PENDING.",
+        "Closure review at 25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e: findings C03 are RESOLVED; final runtime acceptance remains external exact-head evidence rather than a source-tree self-reference."
       ],
       "specificationResolutions": [
         "ELV4-AUD-01",
@@ -2490,10 +2460,8 @@
         "RM01-T",
         "RM10-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
-      "openFindingIds": [
-        "C03"
-      ],
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
+      "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
     },
@@ -2520,7 +2488,7 @@
       ],
       "specificationResolutions": [],
       "remediationAcceptanceIds": [],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
@@ -2554,7 +2522,7 @@
         "RM06-T",
         "RM15-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
@@ -2562,7 +2530,7 @@
     {
       "requirementId": "ELV4-P9-007",
       "package": "P9",
-      "summary": "Update authoritative stage status and publish explicit ELV5–ELV8 handoff",
+      "summary": "Update authoritative stage status and publish explicit ELV5\u2013ELV8 handoff",
       "designDocument": "p9-closure.md",
       "plannedAcceptanceIds": [
         "P9-T07"
@@ -2586,7 +2554,7 @@
       "remediationAcceptanceIds": [
         "RM15-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
@@ -2619,7 +2587,7 @@
         "RM14-T",
         "RM15-T"
       ],
-      "sourceReviewedSha": "626cb2d4500be6aba3e0230c1b4f52603dc0d38f",
+      "sourceReviewedSha": "25c8dec1fde285b96e9ecb922e4c0ff1ee11e67e",
       "openFindingIds": [],
       "acceptanceStatus": "PENDING",
       "implementationScope": "INTEGRATION_OR_GOVERNANCE"
