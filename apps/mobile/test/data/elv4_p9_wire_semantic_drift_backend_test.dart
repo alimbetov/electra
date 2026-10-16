@@ -1,4 +1,4 @@
-import 'package:drift/drift.dart';
+import 'package:drift/drift.dart' hide isNotNull;
 import 'package:drift/native.dart';
 import 'package:electra_mobile/application/elv4_wire_command_dispatcher.dart';
 import 'package:electra_mobile/application/elv4_wire_runtime_registry.dart';
