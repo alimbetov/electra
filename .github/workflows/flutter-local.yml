@@ -58,6 +58,10 @@ jobs:
         working-directory: .
         run: python3 scripts/ci/check-elv6-command-registry.py
 
+      - name: Verify ELV6 command examples and qualification manifest
+        working-directory: .
+        run: python3 scripts/ci/check-elv6-qualification-design.py
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
