@@ -7,13 +7,14 @@ import '../lan/elv3_realized_link_facts.dart';
 import '../lan/elv5_lan_persistence.dart';
 import '../lan/lan01_runtime.dart';
 import '../power/elv4_operating_fact_source.dart';
+import 'elv5_blocked_capture.dart';
 import 'elv5_calculation_runtime.dart';
 import 'elv5_capture_guard.dart';
 
 /// First production vertical slice backed entirely by persisted ELV3/ELV4/ELV5
-/// facts. Processes with mandatory evidence gaps are intentionally not
-/// registered: a missing adapter is safer than a nominal calculation that could
-/// publish an unsupported PASS.
+/// facts. The blocked-aware adapter preserves missing mandatory evidence as a
+/// durable BLOCKED evaluation instead of turning an engineering gap into a
+/// transient application failure.
 Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
   required Elv5CctvMutationStore cctvStore,
   required Elv5LanMutationStore lanStore,
@@ -30,19 +31,21 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
       );
 
   return Elv5ProcessCalculationRegistry(<Elv5ProcessCalculationAdapter>[
-    Elv5TypedProcessCalculationAdapter(
+    Elv5BlockedAwareTypedProcessCalculationAdapter(
       resolver: guarded(
         Cctv02PersistedInputResolver(store: cctvStore, nowUtc: nowUtc),
       ),
       executor: buildCctv02Executor(nowUtc: nowUtc),
+      nowUtc: nowUtc,
     ),
-    Elv5TypedProcessCalculationAdapter(
+    Elv5BlockedAwareTypedProcessCalculationAdapter(
       resolver: guarded(
         Cctv03PersistedInputResolver(store: cctvStore, nowUtc: nowUtc),
       ),
       executor: buildCctv03Executor(nowUtc: nowUtc),
+      nowUtc: nowUtc,
     ),
-    Elv5TypedProcessCalculationAdapter(
+    Elv5BlockedAwareTypedProcessCalculationAdapter(
       resolver: guarded(
         Lan01PersistedInputResolver(
           lanStore: lanStore,
@@ -51,8 +54,9 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
         ),
       ),
       executor: buildLan01Executor(nowUtc: nowUtc),
+      nowUtc: nowUtc,
     ),
-    Elv5TypedProcessCalculationAdapter(
+    Elv5BlockedAwareTypedProcessCalculationAdapter(
       resolver: guarded(
         Fa02PersistedInputResolver(
           fireStore: fireStore,
@@ -61,6 +65,7 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
         ),
       ),
       executor: buildFa02Executor(nowUtc: nowUtc),
+      nowUtc: nowUtc,
     ),
   ]);
 }
