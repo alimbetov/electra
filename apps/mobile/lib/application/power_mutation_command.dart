@@ -255,7 +255,9 @@ final class ReplacePowerTransfersCommand extends _BasePowerMutationCommand {
   @override
   Map<String, Object?> get body => {
     'componentId': componentId,
-    'transfers': transfers.map((value) => value.toMap()).toList(growable: false),
+    'transfers': transfers
+        .map((value) => value.toMap())
+        .toList(growable: false),
   };
 }
 
