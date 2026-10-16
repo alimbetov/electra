@@ -32,19 +32,18 @@ void main() {
     expect(file.existsSync(), isTrue);
     final root =
         (jsonDecode(file.readAsStringSync()) as Map).cast<String, Object?>();
-    final oneOf = (root['oneOf'] as List<Object?>)
-        .cast<Map<String, Object?>>();
+    final oneOf = (root['oneOf'] as List<Object?>).cast<Map<String, Object?>>();
     final schemaKeys = <String>{};
     for (final branch in oneOf) {
       final properties = (branch['properties'] as Map).cast<String, Object?>();
       String constant(String field) =>
-          ((properties[field] as Map).cast<String, Object?>()['const']) as String;
+          ((properties[field] as Map).cast<String, Object?>()['const'])
+              as String;
       final version =
           ((properties['payloadSchemaVersion'] as Map)
-              .cast<String, Object?>()['const']) as int;
-      schemaKeys.add(
-        '${constant('schema')}|${constant('operation')}|$version',
-      );
+                  .cast<String, Object?>()['const'])
+              as int;
+      schemaKeys.add('${constant('schema')}|${constant('operation')}|$version');
     }
 
     final runtimeKeys = <String>{
