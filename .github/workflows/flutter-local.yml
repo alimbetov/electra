@@ -3,43 +3,81 @@ name: Flutter Local Foundation
 on:
   push:
     branches:
+      - main
       - 'feat/flutter-*'
-
-permissions:
-  contents: write
+      - 'feat/elv3-*'
+      - 'audit/elv2-*'
+    paths-ignore:
+      - '.github/workflows/tmp-*.yml'
+      - 'scripts/ci/apply-elv3-runtime-rc*.py'
+  pull_request:
+    paths:
+      - 'apps/mobile/**'
+      - 'packages/engineering_core/**'
+      - 'docs/product/**'
+      - 'docs/audit/**'
+      - 'scripts/**'
+      - '.gitignore'
+      - '.github/workflows/**'
 
 jobs:
-  reconcile-elv4:
+  flutter-local:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/mobile
     steps:
-      - name: Checkout branch
+      - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Reject tracked generated artifacts
+        working-directory: .
+        run: bash scripts/ci/check-no-generated-artifacts.sh
+
+      - name: Verify ELV3 P7-P9 foundation contract
+        working-directory: .
+        run: bash scripts/ci/check-elv3-p7-p9-foundation.sh
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
         with:
-          ref: ${{ github.ref_name }}
+          channel: stable
+          cache: true
 
-      - name: Normalize final closure wording
+      - name: Flutter version
+        run: flutter --version
+
+      - name: Install mobile dependencies
+        run: flutter pub get --enforce-lockfile
+
+      - name: Generate Drift code
+        run: dart run build_runner build
+
+      - name: Verify mobile formatting
         run: |
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
+          dart format lib test
+          git diff --exit-code -- lib test
 
-          path = Path('docs/product/elv4-implementation/closure.json')
-          data = json.loads(path.read_text())
-          for deviation in data.get('architectureDeviations', []):
-              if deviation.get('area') == 'RM01 result ownership':
-                  deviation['disposition'] = (
-                      'Recorded deviation from planned shared ProjectDerivedResults owner/kind extension; '
-                      'dedicated power evaluation ownership and invalidation are verified by the resolved '
-                      'C01-C05 implementation evidence and final exact-head acceptance gate.'
-                  )
-          path.write_text(json.dumps(data, indent=2) + '\n')
-          PY
+      - name: Analyze mobile app
+        run: flutter analyze
 
-          python3 scripts/ci/check-elv4-closure.py
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add docs/product/elv4-implementation/closure.json
-          if ! git diff --cached --quiet; then
-            git commit -m "docs(elv4): normalize final closure wording"
-            git push origin HEAD:${GITHUB_REF_NAME}
-          fi
+      - name: Test mobile app
+        run: flutter test
+
+      - name: Install engineering core dependencies
+        working-directory: packages/engineering_core
+        run: dart pub get
+
+      - name: Verify engineering core formatting
+        working-directory: packages/engineering_core
+        run: |
+          dart format lib test
+          git diff --exit-code -- lib test
+
+      - name: Analyze engineering core
+        working-directory: packages/engineering_core
+        run: dart analyze
+
+      - name: Test engineering core
+        working-directory: packages/engineering_core
+        run: dart test
