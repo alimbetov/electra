@@ -35,6 +35,9 @@ AUTHORITY_PATHS = [
     "docs/product/elv5-implementation/market-simulation-requirements.json",
     "docs/product/elv5-implementation/market-simulation-catalog.json",
     "docs/product/elv5-implementation/market-simulation-450-plan.md",
+    "docs/product/elv5-implementation/combinatorial-engineering-requirements.json",
+    "docs/product/elv5-implementation/combinatorial-engineering-1500-plan.md",
+    "docs/product/elv5-implementation/p8-p9-combinatorial-1500-amendment.md",
     "docs/product/elv5-implementation/process-contracts.md",
     "docs/product/elv5-implementation/process-registry.json",
     "docs/product/elv5-implementation/algorithm-registry.json",
@@ -65,6 +68,11 @@ AUTHORITY_PATHS = [
     "docs/audit/elv5-third-pass-production-readiness-audit.json",
     "docs/audit/elv5-fourth-pass-algorithm-performance-audit.md",
     "docs/audit/elv5-fourth-pass-algorithm-performance-audit.json",
+]
+
+PRIORITY_COMBINATORIAL_CORE = [
+    "CCTV-02", "CCTV-03", "LAN-01", "LAN-05", "ACS-03", "ACS-04",
+    "ACS-05", "FA-02", "FA-04", "FA-05", "FA-06",
 ]
 
 
@@ -131,6 +139,9 @@ def main() -> None:
     normative_requirements_path = IMPL / "normative-requirements-registry.json"
     market_requirements_path = IMPL / "market-simulation-requirements.json"
     market_catalog_path = IMPL / "market-simulation-catalog.json"
+    combinatorial_requirements_path = IMPL / "combinatorial-engineering-requirements.json"
+    combinatorial_plan_path = IMPL / "combinatorial-engineering-1500-plan.md"
+    combinatorial_amendment_path = IMPL / "p8-p9-combinatorial-1500-amendment.md"
     oracle_errata_path = IMPL / "calculation-oracle-errata-v1.md"
 
     process_registry = load_json(process_registry_path)
@@ -140,6 +151,7 @@ def main() -> None:
     normative_requirements = load_json(normative_requirements_path)
     market_requirements = load_json(market_requirements_path)
     market_catalog = load_json(market_catalog_path)
+    combinatorial_requirements = load_json(combinatorial_requirements_path)
 
     processes = process_registry.get("processes", [])
     algorithms = algorithm_registry.get("processes", [])
@@ -147,6 +159,7 @@ def main() -> None:
     requirement_rows = rows_from_requirements(requirements)
     obligations = normative_requirements.get("obligations", [])
     market_requirement_rows = market_requirements.get("requirements", [])
+    combinatorial_requirement_rows = combinatorial_requirements.get("requirements", [])
     fixed = normative_requirements.get("fixedInventories", {})
 
     if len(processes) != 27:
@@ -163,11 +176,29 @@ def main() -> None:
         raise SystemExit("expected 42 unique normative obligations")
     if len(market_requirement_rows) != 12 or len({row.get('id') for row in market_requirement_rows}) != 12:
         raise SystemExit("expected 12 unique market-simulation requirements")
+    if len(combinatorial_requirement_rows) != 12 or len({row.get('id') for row in combinatorial_requirement_rows}) != 12:
+        raise SystemExit("expected 12 unique combinatorial-engineering requirements")
     if market_requirements.get("scenarioMatrixTarget") != 450:
         raise SystemExit("market-simulation requirements must target exactly 450 scenarios")
     market_counts = market_catalog.get("processScenarioCounts", {})
     if len(market_counts) != 27 or sum(market_counts.values()) != 450:
         raise SystemExit("market-simulation catalog must allocate exactly 450 scenarios across 27 processes")
+    if combinatorial_requirements.get("scenarioTarget") != 1500:
+        raise SystemExit("combinatorial engineering matrix must target exactly 1500 scenarios")
+    if combinatorial_requirements.get("priorityProcessMinimum") != 72:
+        raise SystemExit("combinatorial priority minimum must be 72")
+    if combinatorial_requirements.get("regularProcessMinimum") != 42:
+        raise SystemExit("combinatorial regular minimum must be 42")
+    if combinatorial_requirements.get("systemWideScenarioCount") != 36:
+        raise SystemExit("combinatorial system-wide count must be 36")
+    if combinatorial_requirements.get("priorityComputationalCore") != PRIORITY_COMBINATORIAL_CORE:
+        raise SystemExit("combinatorial priority core drift")
+    if 11 * 72 + 16 * 42 + 36 != 1500:
+        raise SystemExit("combinatorial arithmetic invariant failed")
+    if combinatorial_requirements.get("pairwiseCoverageTarget") != "100_PERCENT_LEGAL_PAIRS":
+        raise SystemExit("combinatorial pairwise target must be 100% legal pairs")
+    if combinatorial_requirements.get("threeWisePolicy") != "TARGETED_HIGH_RISK_ONLY":
+        raise SystemExit("combinatorial 3-wise policy must be targeted high risk")
     if fixed.get("designFindingsResolved") != 56 or fixed.get("minimumProcessVectorCount") != 135:
         raise SystemExit("unexpected normative fixed inventory")
     if command_registry.get("wireSchema") != "electra.elv5-discipline-command.v1":
@@ -184,6 +215,8 @@ def main() -> None:
         raise SystemExit("normative requirements process inventory differs from process registry")
     if set(market_counts) != set(process_codes):
         raise SystemExit("market-simulation process inventory differs from process registry")
+    if not set(PRIORITY_COMBINATORIAL_CORE).issubset(set(process_codes)):
+        raise SystemExit("combinatorial priority core contains unknown process")
 
     command_ops = [row.get("operation") for row in commands]
     if len(command_ops) != len(set(command_ops)):
@@ -225,6 +258,10 @@ def main() -> None:
         {"id": row["id"], "severity": row["severity"], "title": row["title"]}
         for row in sorted(market_requirement_rows, key=lambda item: item["id"])
     ]
+    combinatorial_requirement_inventory = [
+        {"id": row["id"], "severity": row["severity"], "title": row["title"]}
+        for row in sorted(combinatorial_requirement_rows, key=lambda item: item["id"])
+    ]
 
     artifacts = []
     for relative in AUTHORITY_PATHS:
@@ -248,12 +285,21 @@ def main() -> None:
         "processVectorClassCount": 5,
         "minimumProcessVectorCount": 135,
         "marketSimulationScenarioCount": 450,
+        "combinatorialEngineeringScenarioTarget": 1500,
+        "combinatorialPriorityProcessCount": 11,
+        "combinatorialPriorityProcessMinimum": 72,
+        "combinatorialRegularProcessCount": 16,
+        "combinatorialRegularProcessMinimum": 42,
+        "combinatorialSystemWideScenarioCount": 36,
+        "combinatorialLegalPairwiseCoverageTarget": "100_PERCENT_LEGAL_PAIRS",
+        "combinatorialThreeWisePolicy": "TARGETED_HIGH_RISK_ONLY",
         "fourthPassFindingCount": 19,
         "designFindingsResolved": 56,
         "commandCount": 16,
         "requirementCount": 80,
         "normativeObligationCount": 42,
         "marketSimulationRequirementCount": 12,
+        "combinatorialRequirementCount": 12,
         "primaryProcessOracleCount": 54,
         "authorityArtifactCount": len(AUTHORITY_PATHS),
         "processRegistrySha256": sha256_file(process_registry_path),
@@ -270,6 +316,10 @@ def main() -> None:
         "marketSimulationRequirementInventorySha256": sha256_bytes(deterministic_json_bytes(market_requirement_inventory)),
         "marketSimulationCatalogSha256": sha256_file(market_catalog_path),
         "marketSimulationScenarioDistributionSha256": sha256_bytes(deterministic_json_bytes(market_counts)),
+        "combinatorialEngineeringRequirementsSha256": sha256_file(combinatorial_requirements_path),
+        "combinatorialEngineeringRequirementInventorySha256": sha256_bytes(deterministic_json_bytes(combinatorial_requirement_inventory)),
+        "combinatorialEngineeringPlanSha256": sha256_file(combinatorial_plan_path),
+        "combinatorialP8P9AmendmentSha256": sha256_file(combinatorial_amendment_path),
         "commandRegistrySha256": sha256_file(command_registry_path),
         "requiredDimensionInventorySha256": sha256_bytes(deterministic_json_bytes(required_dimension_inventory)),
         "algorithmInventorySha256": sha256_bytes(deterministic_json_bytes(algorithm_inventory)),
@@ -285,6 +335,7 @@ def main() -> None:
         "runtimeStatus": "NOT_STARTED",
         "qualificationStatus": "NOT_EXECUTED",
         "marketSimulationStatus": "DESIGN_SIMULATION_ONLY",
+        "combinatorialQualificationStatus": "DESIGN_CONTRACT_ONLY_NOT_EXECUTED",
         "note": "Authority fingerprint/design-entry evidence only. It does not constitute ELV5 runtime implementation, engineering acceptance, ELV7 compliance or ELV8 procurement acceptance.",
     }
 
@@ -296,9 +347,10 @@ def main() -> None:
     print(f"sourceSha={manifest['sourceSha']}")
     print(f"authorityFingerprintSha256={authority_fingerprint}")
     print(
-        "processes=27 algorithms=27 dossiers=27 sections=25 vectors=135 marketSimulation=450 commands=16 "
-        "requirements=80 obligations=42 marketRequirements=12 primaryOracles=54 fourthPassFindings=19 "
-        f"designFindingsResolved=56 schema=24 authorityArtifacts={len(AUTHORITY_PATHS)}"
+        "processes=27 algorithms=27 dossiers=27 sections=25 vectors=135 marketSimulation=450 "
+        "combinatorialTarget=1500 pairwise=100% targeted3Wise=required commands=16 "
+        "requirements=80 obligations=42 marketRequirements=12 combinatorialRequirements=12 primaryOracles=54 "
+        f"fourthPassFindings=19 designFindingsResolved=56 schema=24 authorityArtifacts={len(AUTHORITY_PATHS)}"
     )
 
 
