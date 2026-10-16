@@ -1,7 +1,7 @@
 # ELV6 — Placement and collection mutation safety contract
 
 Status: **DESIGN HARDENED / RUNTIME NOT STARTED**  
-Authority: `elv6-authoritative-spec-index.md` → code-level runtime contract → this safety contract → command registry/examples.
+Authority: `elv6-authoritative-spec-index.md` → code-level runtime contract → this safety contract → command registry/examples. For placement wire/materialization and collection-replacement semantics, this document is the more specific contract and supersedes illustrative field shapes in the broader code-level document.
 
 This document closes two mutation hazards that are easy to miss in a visual layout editor:
 
@@ -130,7 +130,15 @@ A mismatch between stored derivation metadata and canonical recomputation is dat
 
 `sourceProposalId` is never accepted from a manual PLACE/MOVE payload.
 
-It is written internally only by `ACCEPT_LAYOUT_PROPOSAL` for proposal items actually committed in that acceptance UoW. This prevents manual edits from impersonating solver-generated evidence.
+Persisted placement provenance is explicitly nullable:
+
+```dart
+final String? sourceProposalId;
+```
+
+Manual placement/move stores `null`. A non-null value is written internally only by `ACCEPT_LAYOUT_PROPOSAL` for proposal items actually committed in that acceptance UoW. This more specific type supersedes the earlier illustrative non-null field in the generic `Elv6Placement` sketch until source implementation replaces the sketch.
+
+This prevents manual edits from impersonating solver-generated evidence and makes “manual” versus “accepted proposal” provenance unambiguous.
 
 ---
 
@@ -229,6 +237,7 @@ P2/P8 must include at least:
 PLACE with forged occupiedEnvelope -> ELV6_SERVER_DERIVED_GEOMETRY_ON_WIRE
 MOVE with forged rackSpan/dinSpan -> ELV6_SERVER_DERIVED_GEOMETRY_ON_WIRE
 manual PLACE with sourceProposalId -> ELV6_SERVER_DERIVED_GEOMETRY_ON_WIRE
+manual placement persists sourceProposalId = null
 DIN placement width derived from subject definition
 RACK placement heightU derived from subject definition
 subject definition changes -> placement/evaluation stale through definition hash
@@ -236,7 +245,7 @@ surface removal while referenced -> ELV6_REFERENCED_MEMBER_REMOVAL
 cable entry removal while assigned -> ELV6_REFERENCED_MEMBER_REMOVAL
 successful removal after references released
 replacement failure leaves old collection/references unchanged after reopen
-proposal acceptance writes sourceProposalId internally only
+proposal acceptance writes non-null sourceProposalId internally only
 ```
 
 These are runtime qualification requirements, not merely codec unit tests.
