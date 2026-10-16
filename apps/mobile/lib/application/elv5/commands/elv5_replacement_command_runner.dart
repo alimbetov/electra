@@ -62,15 +62,15 @@ final class Elv5ReplacementRunResult {
   final bool replayed;
 }
 
-typedef Elv5PrepareReplacement =
+typedef Elv5PrepareReplacement<S extends Elv5ReplacementWriteSession> =
     Future<Elv5PreparedReplacement> Function(
-      Elv5ReplacementWriteSession session,
+      S session,
       Elv5WireCommandEnvelope command,
     );
 
-typedef Elv5ApplyReplacement =
+typedef Elv5ApplyReplacement<S extends Elv5ReplacementWriteSession> =
     Future<Elv5AppliedReplacement> Function(
-      Elv5ReplacementWriteSession session,
+      S session,
       Elv5WireCommandEnvelope command,
       Elv5PreparedReplacement prepared,
     );
@@ -79,22 +79,24 @@ typedef Elv5ApplyReplacement =
 ///
 /// Strict decoding happens before this runner. Everything from durable replay
 /// lookup through revision CAS, invalidation, history and ledger persistence is
-/// executed inside one [Elv5ReplacementWriteUnitOfWork] transaction.
-final class Elv5ReplacementCommandRunner {
+/// executed inside one transaction owned by [unitOfWork].
+final class Elv5ReplacementCommandRunner<
+  S extends Elv5ReplacementWriteSession
+> {
   Elv5ReplacementCommandRunner({
     required this.unitOfWork,
     required this.originDeviceId,
     DateTime Function()? now,
   }) : _now = now ?? (() => DateTime.now().toUtc());
 
-  final Elv5ReplacementWriteUnitOfWork unitOfWork;
+  final ElvWriteUnitOfWork<S> unitOfWork;
   final String originDeviceId;
   final DateTime Function() _now;
 
   Future<Elv5ReplacementRunResult> run(
     Elv5WireCommandEnvelope command, {
-    required Elv5PrepareReplacement prepare,
-    required Elv5ApplyReplacement apply,
+    required Elv5PrepareReplacement<S> prepare,
+    required Elv5ApplyReplacement<S> apply,
   }) => unitOfWork.run((session) async {
     final requestHash = command.normalizedRequestSha256;
     final replay = await session.commandLedger.find(
