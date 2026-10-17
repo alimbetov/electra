@@ -1,0 +1,41 @@
+name: Temporary ELV5 Mobile Format
+
+on:
+  push:
+    branches:
+      - feat/flutter-elv5-power-topology-design
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    if: ${{ !contains(github.event.head_commit.message, '[skip-format-bot]') }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/flutter-elv5-power-topology-design
+          fetch-depth: 0
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Format mobile Dart sources
+        run: dart format lib test
+      - name: Commit formatter output
+        working-directory: .
+        run: |
+          if git diff --quiet -- apps/mobile/lib apps/mobile/test; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/mobile/lib apps/mobile/test
+          git commit -m "style(lan05): apply Dart formatter [skip-format-bot]"
+          git push origin HEAD:feat/flutter-elv5-power-topology-design
