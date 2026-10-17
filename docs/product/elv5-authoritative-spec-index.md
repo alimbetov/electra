@@ -73,6 +73,13 @@ Public symbols, process identities, semantic contracts and layer ownership are n
 
 Production acceptance uses `runtime-version-registry.json` together with the foundation lifecycle and exact-SHA qualification evidence. Registry integer schema versions canonicalize to base-10 strings at Dart/hash boundaries (`1 -> "1"`). Older `1-design`, `DESIGN DRAFT`, `READY FOR DEVELOPMENT` and blanket `NOT_STARTED` labels are historical provenance when newer source-backed lifecycle evidence exists. Initial ELV5 DB target is **schema 24**.
 
+Legacy CI compatibility markers are retained below strictly as **superseded historical labels**, not current runtime truth:
+
+```text
+DESIGN READY FOR DEVELOPMENT / PROJECT ALIGNMENT CLOSED / RUNTIME NOT STARTED
+ELV5 specification status: READY FOR DEVELOPMENT
+```
+
 The canonical runtime lifecycle is:
 
 ```text
