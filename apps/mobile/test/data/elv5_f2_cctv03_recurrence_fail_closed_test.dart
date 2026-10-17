@@ -182,31 +182,35 @@ String _nodeSha() => const Elv5CanonicalJsonV1().sha256(
 
 Future<void> _seedProject(AppDatabase db) async {
   final now = _now();
-  await db.into(db.projects).insert(
-    ProjectsCompanion.insert(
-      id: 'p',
-      name: 'F2 CCTV03 recurrence qualification',
-      measurementSystem: 'metric',
-      defaultStructuralHeightMm: 3000,
-      defaultFinishedCeilingHeightMm: 2700,
-      createdAt: now,
-      updatedAt: now,
-      originDeviceId: 'f2-cctv03-recurrence',
-    ),
-  );
-  await db.into(db.projectDesignRevisions).insert(
-    ProjectDesignRevisionsCompanion.insert(
-      id: 'd',
-      projectId: 'p',
-      code: 'R1',
-      sequence: 1,
-      state: 'WORKING',
-      revision: const Value(1),
-      createdAt: now,
-      updatedAt: now,
-      originDeviceId: 'f2-cctv03-recurrence',
-    ),
-  );
+  await db
+      .into(db.projects)
+      .insert(
+        ProjectsCompanion.insert(
+          id: 'p',
+          name: 'F2 CCTV03 recurrence qualification',
+          measurementSystem: 'metric',
+          defaultStructuralHeightMm: 3000,
+          defaultFinishedCeilingHeightMm: 2700,
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'f2-cctv03-recurrence',
+        ),
+      );
+  await db
+      .into(db.projectDesignRevisions)
+      .insert(
+        ProjectDesignRevisionsCompanion.insert(
+          id: 'd',
+          projectId: 'p',
+          code: 'R1',
+          sequence: 1,
+          state: 'WORKING',
+          revision: const Value(1),
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'f2-cctv03-recurrence',
+        ),
+      );
 }
 
 DateTime _now() => DateTime.utc(2026, 10, 17, 15, 30);
