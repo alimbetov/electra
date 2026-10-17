@@ -195,20 +195,40 @@ final class Elv5F2ProductionLifecycle {
     expect(changed.generation, 3);
 
     // Separate SQLite connections and production runtimes contend for one CAS.
-    // SQLite may serialize BEGIN IMMEDIATE before the ELV5 pointer CAS executes;
-    // wait through that physical writer lock so the losing writer is judged by
-    // the logical generation precondition rather than by transient SQLITE_BUSY.
+    // SQLite can reject one BEGIN IMMEDIATE with SQLITE_BUSY before ELV5 reaches
+    // its pointer-generation precondition. In that case, retry the exact same
+    // immutable envelope after the winner committed and require the domain CAS
+    // verdict. Any non-BUSY infrastructure error still fails immediately.
     final competingDb = AppDatabase(NativeDatabase(file));
     await db.customStatement('PRAGMA busy_timeout = 5000');
     await competingDb.customStatement('PRAGMA busy_timeout = 5000');
-    Future<({Elv5WireCommandEnvelope command, String? logical, Object? error})>
-    attempt(AppDatabase database, String id) async {
-      final cmd = command(id, designRevision, 3);
+    Future<
+      ({
+        AppDatabase database,
+        Elv5WireCommandEnvelope command,
+        String? logical,
+        Object? error,
+      })
+    >
+    attempt(
+      AppDatabase database,
+      Elv5WireCommandEnvelope cmd,
+    ) async {
       try {
         final result = await runtime(database).service.execute(cmd);
-        return (command: cmd, logical: result.logicalResultJson, error: null);
+        return (
+          database: database,
+          command: cmd,
+          logical: result.logicalResultJson,
+          error: null,
+        );
       } catch (error) {
-        return (command: cmd, logical: null, error: error);
+        return (
+          database: database,
+          command: cmd,
+          logical: null,
+          error: error,
+        );
       }
     }
 
@@ -217,15 +237,24 @@ final class Elv5F2ProductionLifecycle {
     try {
       // Open both connections before starting the writers.
       await competingDb.customSelect('SELECT 1').get();
+      final raceA = command('race-a', designRevision, 3);
+      final raceB = command('race-b', designRevision, 3);
       final outcomes = await Future.wait([
-        attempt(db, 'race-a'),
-        attempt(competingDb, 'race-b'),
+        attempt(db, raceA),
+        attempt(competingDb, raceB),
       ]);
       expect(outcomes.where((v) => v.error == null), hasLength(1));
       final winner = outcomes.singleWhere((v) => v.error == null);
       final loser = outcomes.singleWhere((v) => v.error != null);
+      var loserError = loser.error!;
+      if (_isTransientSqliteBusy(loserError)) {
+        final retry = await attempt(loser.database, loser.command);
+        expect(retry.logical, isNull);
+        expect(retry.error, isNotNull);
+        loserError = retry.error!;
+      }
       expect(
-        loser.error,
+        loserError,
         isA<Elv5ReplacementCommandException>().having(
           (e) => e.code,
           'code',
@@ -326,4 +355,12 @@ final class Elv5F2ProductionLifecycle {
     );
     expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
   }
+}
+
+bool _isTransientSqliteBusy(Object error) {
+  final text = error.toString();
+  return error.runtimeType.toString() == 'SqliteException' &&
+      text.contains('SqliteException(5)') &&
+      text.contains('database is locked') &&
+      text.contains('BEGIN IMMEDIATE');
 }
