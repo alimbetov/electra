@@ -40,7 +40,13 @@ final class DriftLan05OpticalSectionEvidenceSource
       final decoded = jsonDecode(encoded);
       if (decoded is! Map || decoded.isEmpty) continue;
       final map = decoded.cast<String, Object?>();
-      if (map['schema'] != 'electra.elv5-optical-fiber-evidence.v1') continue;
+      if (map['schema'] != Lan05OpticalFiberEvidenceDocument.schema) continue;
+      final documentSection = map['realizedSectionId'];
+      if (documentSection != null && documentSection != realizedSectionId) {
+        throw StateError(
+          'LAN05_ATTENUATION_SECTION_IDENTITY_MISMATCH:$realizedSectionId',
+        );
+      }
       final profilesRaw = map['attenuationProfiles'];
       if (profilesRaw is! List) {
         throw StateError(
@@ -96,6 +102,140 @@ final class DriftLan05OpticalSectionEvidenceSource
     }
     return resolved;
   }
+}
+
+final class DriftLan05OpticalSectionEvidenceWriter
+    implements Lan05OpticalSectionEvidenceWriter {
+  DriftLan05OpticalSectionEvidenceWriter(
+    this.database, {
+    required this.originDeviceId,
+    DateTime Function()? nowUtc,
+  }) : _nowUtc = nowUtc ?? (() => DateTime.now().toUtc());
+
+  final AppDatabase database;
+  final String originDeviceId;
+  final DateTime Function() _nowUtc;
+  static const _encoder = Elv5CanonicalJsonV1();
+
+  @override
+  Future<void> replace(ReplaceLan05OpticalSectionEvidenceCommand command) =>
+      database.transaction(() async {
+        final revision = await database
+            .customSelect(
+              'SELECT state, revision FROM project_design_revisions '
+              'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
+              variables: <Variable>[
+                Variable.withString(command.projectId),
+                Variable.withString(command.designRevisionId),
+              ],
+            )
+            .getSingleOrNull();
+        if (revision == null) {
+          throw StateError('LAN05_DESIGN_REVISION_NOT_FOUND');
+        }
+        if (revision.read<String>('state') != 'WORKING') {
+          throw StateError('LAN05_DESIGN_REVISION_READ_ONLY');
+        }
+        if (revision.read<int>('revision') != command.expectedDesignRevision) {
+          throw StateError('LAN05_DESIGN_REVISION_CAS_CONFLICT');
+        }
+
+        final binding = await database
+            .customSelect(
+              'SELECT revision FROM link_composition_bindings '
+              'WHERE project_id = ? AND design_revision_id = ? AND id = ? '
+              'AND deleted_at IS NULL',
+              variables: <Variable>[
+                Variable.withString(command.projectId),
+                Variable.withString(command.designRevisionId),
+                Variable.withString(command.bindingId),
+              ],
+            )
+            .getSingleOrNull();
+        if (binding == null) {
+          throw StateError('LAN05_LINK_COMPOSITION_BINDING_NOT_FOUND');
+        }
+        if (binding.read<int>('revision') != command.expectedBindingRevision) {
+          throw StateError('LAN05_LINK_COMPOSITION_BINDING_CAS_CONFLICT');
+        }
+
+        final rows = await database
+            .customSelect(
+              'SELECT ordinal FROM link_section_assignments '
+              'WHERE project_id = ? AND design_revision_id = ? '
+              'AND binding_id = ? AND realized_section_id = ?',
+              variables: <Variable>[
+                Variable.withString(command.projectId),
+                Variable.withString(command.designRevisionId),
+                Variable.withString(command.bindingId),
+                Variable.withString(command.evidence.realizedSectionId),
+              ],
+            )
+            .get();
+        if (rows.length != 1) {
+          throw StateError(
+            rows.isEmpty
+                ? 'LAN05_REALIZED_SECTION_NOT_ASSIGNED'
+                : 'LAN05_REALIZED_SECTION_ASSIGNMENT_AMBIGUOUS',
+          );
+        }
+
+        final now = _nowUtc().toUtc();
+        final encoded = utf8.decode(
+          _encoder.encode(command.evidence.toCanonicalValue()),
+          allowMalformed: false,
+        );
+        final evidenceUpdated = await database.customUpdate(
+          'UPDATE link_section_assignments SET evidence_json = ? '
+          'WHERE project_id = ? AND design_revision_id = ? '
+          'AND binding_id = ? AND realized_section_id = ?',
+          variables: <Variable>[
+            Variable.withString(encoded),
+            Variable.withString(command.projectId),
+            Variable.withString(command.designRevisionId),
+            Variable.withString(command.bindingId),
+            Variable.withString(command.evidence.realizedSectionId),
+          ],
+        );
+        if (evidenceUpdated != 1) {
+          throw StateError('LAN05_OPTICAL_EVIDENCE_WRITE_CONFLICT');
+        }
+
+        final bindingUpdated = await database.customUpdate(
+          'UPDATE link_composition_bindings '
+          'SET revision = revision + 1, updated_at = ?, origin_device_id = ? '
+          'WHERE project_id = ? AND design_revision_id = ? AND id = ? '
+          'AND revision = ? AND deleted_at IS NULL',
+          variables: <Variable>[
+            Variable<DateTime>(now),
+            Variable.withString(originDeviceId),
+            Variable.withString(command.projectId),
+            Variable.withString(command.designRevisionId),
+            Variable.withString(command.bindingId),
+            Variable<int>(command.expectedBindingRevision),
+          ],
+        );
+        if (bindingUpdated != 1) {
+          throw StateError('LAN05_LINK_COMPOSITION_BINDING_CAS_CONFLICT');
+        }
+
+        final designUpdated = await database.customUpdate(
+          'UPDATE project_design_revisions '
+          'SET revision = revision + 1, updated_at = ?, origin_device_id = ? '
+          'WHERE project_id = ? AND id = ? AND revision = ? '
+          "AND state = 'WORKING' AND deleted_at IS NULL",
+          variables: <Variable>[
+            Variable<DateTime>(now),
+            Variable.withString(originDeviceId),
+            Variable.withString(command.projectId),
+            Variable.withString(command.designRevisionId),
+            Variable<int>(command.expectedDesignRevision),
+          ],
+        );
+        if (designUpdated != 1) {
+          throw StateError('LAN05_DESIGN_REVISION_CAS_CONFLICT');
+        }
+      });
 }
 
 Elv5Rational _exact(Map<String, Object?> value, String key) {
