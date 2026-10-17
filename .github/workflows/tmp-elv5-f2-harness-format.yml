@@ -1,0 +1,50 @@
+name: Temporary ELV5 F2 Harness Formatter
+
+on:
+  push:
+    branches:
+      - feat/flutter-elv5-power-topology-design
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Format ELV5 F2 harness integration
+        working-directory: apps/mobile
+        run: |
+          dart format \
+            test/support/elv5_f2_qualification_harness.dart \
+            test/data/elv5_f2_cctv03_full_runtime_e2e_test.dart \
+            test/data/elv5_f2_lan05_full_runtime_e2e_test.dart \
+            test/data/elv5_f2_acs03_full_runtime_e2e_test.dart
+
+      - name: Remove one-shot workflow and commit formatter output
+        run: |
+          git rm .github/workflows/tmp-elv5-f2-harness-format.yml
+          if git diff --quiet --cached && git diff --quiet; then
+            echo 'No formatter changes produced.'
+            exit 1
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add apps/mobile/test/support/elv5_f2_qualification_harness.dart \
+                  apps/mobile/test/data/elv5_f2_cctv03_full_runtime_e2e_test.dart \
+                  apps/mobile/test/data/elv5_f2_lan05_full_runtime_e2e_test.dart \
+                  apps/mobile/test/data/elv5_f2_acs03_full_runtime_e2e_test.dart
+          git commit -m 'style(f2): format qualification harness integration'
+          git push origin HEAD:feat/flutter-elv5-power-topology-design
