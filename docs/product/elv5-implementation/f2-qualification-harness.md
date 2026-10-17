@@ -12,6 +12,8 @@ It does not replace process-specific engineering assertions. It centralizes the 
 
 ## Q6 — production publication
 
+Q6 requires `SUCCEEDED` and `COMPLETE`; a persisted `BLOCKED` result cannot satisfy production qualification.
+
 The shared harness requires a production-runtime publication to persist a non-empty evaluation identity, publish a `CURRENT` pointer with a positive generation, persist a 64-character input fingerprint, and produce a non-empty logical result.
 
 Where the fixture has a mutable authoritative dependency, replacement and recalculation must publish a new evaluation and a changed input fingerprint.
@@ -25,6 +27,8 @@ The shared harness requires durable SQLite reopen/restart replay to preserve:
 - pointer generation;
 - evaluation identity;
 - logical result.
+
+Replay additionally preserves the exact input fingerprint and the execution/completion axes.
 
 A stale writer must fail closed with `ELV5_POINTER_GENERATION_CONFLICT`.
 
@@ -63,3 +67,23 @@ The formatter residue after that import cleanup was limited to one leading blank
 A process is not promoted merely because it imports or calls the harness. Q6/Q7/Q8 status is promoted only when the corresponding production witness is present in the canonical F2 matrix and the exact source SHA has passed the repository Flutter CI gates.
 
 The remaining ELV5 processes must be migrated in controlled waves using this same lifecycle contract before final `ELV5 = ACCEPTED`.
+
+## FA-08 reference wave
+
+The FA-08 production witness uses file-backed SQLite, the production runtime,
+production environment/ampacity/policy writers, and a foreign-key-valid route
+including its floor, surface patch, endpoints and traversal. Foreign keys stay
+enabled, and `PRAGMA foreign_key_check` must be empty.
+
+Normal conditions produce exactly 27 A against a 25 A policy minimum (PASS,
++2 A). Replacing the environment and its pinned correction produces 21 A
+(FAIL, -4 A), with STALE invalidation followed by guarded republication.
+Restart and frozen replay preserve the exact persisted output hash and input
+fingerprint. Verified compliance remains `notAssessed`, owned by ELV7.
+
+Q9 has a finite 512-section, two-requirement expansion vector in
+`packages/engineering_core/test/elv5_fa08_cable_policy_test.dart`; reordering
+requirements must produce the same 1024 policy results.
+
+These source assertions remain pending qualification until their exact source
+commit passes the complete workflow. The wave does not claim ELV5 acceptance.

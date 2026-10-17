@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:drift/drift.dart' show Value, Variable;
@@ -90,7 +91,12 @@ void main() {
       );
       final first = await runtime.service.execute(firstCommand);
       expect(first.replayed, isFalse);
-      final firstSnapshot = await _snapshot(db, first.logicalResultJson);
+      final firstSnapshot = await _snapshot(
+        db,
+        first.logicalResultJson,
+        expectedAssessment: 'PASS',
+        expectedMargin: 2,
+      );
       harness.assertQ6Initial('FA-08', firstSnapshot);
       await _expectDependencies(db);
 
@@ -148,7 +154,12 @@ void main() {
       );
       final second = await runtime.service.execute(secondCommand);
       expect(second.replayed, isFalse);
-      final secondSnapshot = await _snapshot(db, second.logicalResultJson);
+      final secondSnapshot = await _snapshot(
+        db,
+        second.logicalResultJson,
+        expectedAssessment: 'FAIL',
+        expectedMargin: -4,
+      );
       harness.assertQ6Republished('FA-08', firstSnapshot, secondSnapshot);
 
       await harness.expectQ7StaleWriter('FA-08', () async {
@@ -169,7 +180,12 @@ void main() {
       policyStore = _policyStore(db);
       final replay = await runtime.service.execute(secondCommand);
       expect(replay.replayed, isTrue);
-      final restartedSnapshot = await _snapshot(db, replay.logicalResultJson);
+      final restartedSnapshot = await _snapshot(
+        db,
+        replay.logicalResultJson,
+        expectedAssessment: 'FAIL',
+        expectedMargin: -4,
+      );
       harness.assertQ7Replay('FA-08', secondSnapshot, restartedSnapshot);
 
       await db.customUpdate(
@@ -178,7 +194,12 @@ void main() {
       );
       final frozenReplay = await runtime.service.execute(secondCommand);
       expect(frozenReplay.replayed, isTrue);
-      final frozenSnapshot = await _snapshot(db, frozenReplay.logicalResultJson);
+      final frozenSnapshot = await _snapshot(
+        db,
+        frozenReplay.logicalResultJson,
+        expectedAssessment: 'FAIL',
+        expectedMargin: -4,
+      );
       harness.assertQ8Replay('FA-08', secondSnapshot, frozenSnapshot);
 
       await harness.expectQ8ReadOnly('FA-08', () async {
@@ -312,12 +333,14 @@ String _nodeSha() => const Elv5CanonicalJsonV1().sha256(
 
 Future<Elv5F2PublicationSnapshot> _snapshot(
   AppDatabase db,
-  String logicalResultJson,
-) async {
+  String logicalResultJson, {
+  required String expectedAssessment,
+  required int expectedMargin,
+}) async {
   final pointer =
       await db
           .customSelect(
-            'SELECT freshness, generation, evaluation_id, input_fingerprint '
+            'SELECT freshness, generation, evaluation_id, input_fingerprint, output_sha256 '
             'FROM discipline_evaluation_pointers '
             'WHERE project_id = ? AND design_revision_id = ? '
             'AND logical_node_key_sha256 = ?',
@@ -331,7 +354,8 @@ Future<Elv5F2PublicationSnapshot> _snapshot(
   final evaluation =
       await db
           .customSelect(
-            'SELECT execution, completion FROM discipline_evaluation_records '
+            'SELECT execution, completion, assessment, input_fingerprint, output_sha256, output_json '
+            'FROM discipline_evaluation_records '
             'WHERE project_id = ? AND evaluation_id = ?',
             variables: <Variable>[
               Variable.withString('p'),
@@ -339,6 +363,34 @@ Future<Elv5F2PublicationSnapshot> _snapshot(
             ],
           )
           .getSingle();
+  expect(evaluation.read<String>('execution'), 'SUCCEEDED');
+  expect(evaluation.read<String>('completion'), 'COMPLETE');
+  expect(evaluation.read<String>('assessment'), expectedAssessment);
+  expect(
+    evaluation.read<String>('input_fingerprint'),
+    pointer.read<String>('input_fingerprint'),
+  );
+  expect(
+    evaluation.read<String>('output_sha256'),
+    pointer.read<String>('output_sha256'),
+  );
+  final output =
+      jsonDecode(evaluation.read<String>('output_json'))
+          as Map<String, dynamic>;
+  expect(
+    const Elv5CanonicalJsonV1().sha256(output),
+    evaluation.read<String>('output_sha256'),
+  );
+  expect(output['technicalPolicyMatch'], expectedAssessment.toLowerCase());
+  expect(output['verifiedCompliance'], 'notAssessed');
+  final policies = (output['policyResults'] as List).cast<Map>();
+  final ampacity = policies.singleWhere(
+    (p) => p['requirementCode'] == 'MIN_IZ',
+  );
+  expect(
+    ampacity['numericMargin'],
+    Elv5Rational.integer(expectedMargin).toMap(),
+  );
   return Elv5F2PublicationSnapshot(
     generation: pointer.read<int>('generation'),
     evaluationId: pointer.read<String>('evaluation_id'),
@@ -456,15 +508,12 @@ Elv5AmpacitySectionContract _ampacityContract({
   ),
 );
 
-Fa08CablePolicyContract _policy({String minimumIz = '20'}) =>
+Fa08CablePolicyContract _policy({String minimumIz = '25'}) =>
     Fa08CablePolicyContract(
       cableRunId: 'run-1',
       policyId: 'fire-cable-policy',
       requirements: <Fa08Requirement>[
-        Fa08Requirement.cableClass(
-          code: 'FIRE_CLASS',
-          expectedClass: 'PH120',
-        ),
+        Fa08Requirement.cableClass(code: 'FIRE_CLASS', expectedClass: 'PH120'),
         Fa08Requirement.numeric(
           code: 'MIN_IZ',
           kind: Fa08RequirementKind.numericMinimum,
@@ -504,7 +553,6 @@ EngineeringReferenceCatalog _catalog() => EngineeringReferenceCatalog(
 );
 
 Future<void> _seedTopology(AppDatabase db) async {
-  await db.customStatement('PRAGMA foreign_keys = OFF');
   final now = DateTime.utc(2026, 10, 17, 12);
   await db
       .into(db.projects)
@@ -535,12 +583,68 @@ Future<void> _seedTopology(AppDatabase db) async {
           originDeviceId: 'f2-fa08-production',
         ),
       );
+  await db
+      .into(db.floors)
+      .insert(
+        FloorsCompanion.insert(
+          id: 'floor-x',
+          projectId: 'p',
+          name: 'Qualification floor',
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'f2-fa08-production',
+        ),
+      );
   await db.customStatement(
     "INSERT INTO rooms (id,floor_id,name,room_type,room_category,width_mm,depth_mm,structural_height_mm_override,finished_ceiling_height_mm_override,revision,created_at,updated_at,deleted_at,origin_device_id) VALUES ('room-1','floor-x','Electrical room','technical','technical',4000,4000,NULL,NULL,1,'${now.millisecondsSinceEpoch ~/ 1000}','${now.millisecondsSinceEpoch ~/ 1000}',NULL,'f2-fa08-production')",
   );
+  await db
+      .into(db.surfacePatches)
+      .insert(
+        SurfacePatchesCompanion.insert(
+          id: 'patch-x',
+          roomId: 'room-1',
+          surfaceId: 'floor',
+          originXmm: 0,
+          originYmm: 0,
+          originZmm: 0,
+          uAxisX: 1,
+          uAxisY: 0,
+          uAxisZ: 0,
+          vAxisX: 0,
+          vAxisY: 1,
+          vAxisZ: 0,
+          orientation: 'horizontal',
+          boundaryJson: '[[0,0],[4000,0],[4000,4000],[0,4000]]',
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'f2-fa08-production',
+        ),
+      );
   await db.customStatement(
     "INSERT INTO cable_routes (id,room_id,name,revision,created_at,updated_at,deleted_at,origin_device_id) VALUES ('route-1','room-1','Fire route',1,'${now.millisecondsSinceEpoch ~/ 1000}','${now.millisecondsSinceEpoch ~/ 1000}',NULL,'f2-fa08-production')",
   );
+  for (final entry in {'node-a': 0, 'node-b': 1000}.entries) {
+    await db
+        .into(db.cableRouteNodes)
+        .insert(
+          CableRouteNodesCompanion.insert(
+            id: entry.key,
+            routeId: 'route-1',
+            sequence: entry.value == 0 ? 1 : 2,
+            kind: 'WAYPOINT',
+            patchId: 'patch-x',
+            localXmm: entry.value,
+            localYmm: 0,
+            worldXmm: entry.value,
+            worldYmm: 0,
+            worldZmm: 0,
+            createdAt: now,
+            updatedAt: now,
+            originDeviceId: 'f2-fa08-production',
+          ),
+        );
+  }
   await db.customStatement(
     "INSERT INTO cable_route_segments (id,route_id,sequence,from_node_id,to_node_id,surface_patch_id,laying_method,physical_channel_id,revision,created_at,updated_at,deleted_at,origin_device_id) VALUES ('section-1','route-1',1,'node-a','node-b','patch-x','TRAY',NULL,1,'${now.millisecondsSinceEpoch ~/ 1000}','${now.millisecondsSinceEpoch ~/ 1000}',NULL,'f2-fa08-production')",
   );
@@ -612,7 +716,7 @@ Future<void> _seedTopology(AppDatabase db) async {
           originDeviceId: 'f2-fa08-production',
         ),
       );
-  await db.customStatement('PRAGMA foreign_keys = ON');
+  expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
 }
 
 DateTime _now() => DateTime.utc(2026, 10, 17, 14);

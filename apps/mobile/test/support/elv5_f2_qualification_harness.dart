@@ -171,8 +171,8 @@ final class Elv5F2QualificationHarness {
     expect(snapshot.freshness, 'CURRENT');
     expect(snapshot.generation, greaterThanOrEqualTo(minimumGeneration));
     expect(snapshot.evaluationId, isNotEmpty);
-    expect(snapshot.execution, anyOf('SUCCEEDED', 'BLOCKED'));
-    expect(snapshot.completion, anyOf('COMPLETE', 'INCOMPLETE'));
+    expect(snapshot.execution, 'SUCCEEDED');
+    expect(snapshot.completion, 'COMPLETE');
     expect(snapshot.inputFingerprint, hasLength(64));
     expect(snapshot.logicalResultJson, isNotEmpty);
   }
@@ -184,6 +184,13 @@ final class Elv5F2QualificationHarness {
     required String gate,
   }) {
     expect(actual.freshness, 'CURRENT');
+    expect(
+      actual.inputFingerprint,
+      expected.inputFingerprint,
+      reason: '$processCode $gate replay must preserve input identity',
+    );
+    expect(actual.execution, expected.execution);
+    expect(actual.completion, expected.completion);
     expect(
       actual.generation,
       expected.generation,
