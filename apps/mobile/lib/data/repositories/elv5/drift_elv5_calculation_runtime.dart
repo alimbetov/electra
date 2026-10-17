@@ -11,6 +11,8 @@ import 'drift_elv4_operating_fact_source.dart';
 import 'drift_elv5_calculation_fact_stores.dart';
 import 'drift_elv5_calculation_write_unit_of_work.dart';
 import 'drift_elv5_capture_revision_source.dart';
+import 'drift_fa04_source_requirement_contract_store.dart';
+import 'drift_fa05_autonomy_contract_store.dart';
 import 'drift_lan05_optical_section_evidence_source.dart';
 
 /// Production composition root for the persisted ELV5 calculation vertical.
@@ -61,6 +63,16 @@ final class DriftElv5CalculationRuntime {
       originDeviceId: originDeviceId,
       nowUtc: nowUtc,
     );
+    final fa04Contracts = DriftFa04SourceRequirementContractStore(
+      database,
+      originDeviceId: originDeviceId,
+      nowUtc: nowUtc,
+    );
+    final fa05Contracts = DriftFa05AutonomyContractStore(
+      database,
+      originDeviceId: originDeviceId,
+      nowUtc: nowUtc,
+    );
     final currentPowerEvidence = DriftElv4CurrentEvidenceSource(database);
     final registry = buildElv5InitialVerticalRegistry(
       cctvStore: cctvFacts,
@@ -72,6 +84,8 @@ final class DriftElv5CalculationRuntime {
       acs03Contracts: acs03Contracts,
       acs04Contracts: acs04Contracts,
       acs05Contracts: acs05Contracts,
+      fa04Contracts: fa04Contracts,
+      fa05Contracts: fa05Contracts,
       currentPowerEvidence: currentPowerEvidence,
       powerOperatingFacts: DriftElv4OperatingFactSource(database),
       captureRevisions: DriftElv5CaptureRevisionSource(database),
