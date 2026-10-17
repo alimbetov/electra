@@ -11,6 +11,7 @@ import 'drift_elv4_operating_fact_source.dart';
 import 'drift_elv5_calculation_fact_stores.dart';
 import 'drift_elv5_calculation_write_unit_of_work.dart';
 import 'drift_elv5_capture_revision_source.dart';
+import 'drift_fa03_terminal_voltage_contract_store.dart';
 import 'drift_fa04_source_requirement_contract_store.dart';
 import 'drift_fa05_autonomy_contract_store.dart';
 import 'drift_fa06_notification_contract_store.dart';
@@ -64,6 +65,11 @@ final class DriftElv5CalculationRuntime {
       originDeviceId: originDeviceId,
       nowUtc: nowUtc,
     );
+    final fa03Contracts = DriftFa03TerminalVoltageContractStore(
+      database,
+      originDeviceId: originDeviceId,
+      nowUtc: nowUtc,
+    );
     final fa04Contracts = DriftFa04SourceRequirementContractStore(
       database,
       originDeviceId: originDeviceId,
@@ -90,6 +96,7 @@ final class DriftElv5CalculationRuntime {
       acs03Contracts: acs03Contracts,
       acs04Contracts: acs04Contracts,
       acs05Contracts: acs05Contracts,
+      fa03Contracts: fa03Contracts,
       fa04Contracts: fa04Contracts,
       fa05Contracts: fa05Contracts,
       fa06Contracts: fa06Contracts,
