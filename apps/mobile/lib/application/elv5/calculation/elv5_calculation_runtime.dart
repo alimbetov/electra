@@ -68,6 +68,7 @@ final class Elv5ProcessEvaluationCandidate {
     required Map<String, Object?> evidence,
     required Iterable<Elv5DependencyMarker> dependencies,
     required this.completedAtUtc,
+    this.qualificationIdentity,
   }) : output = Map.unmodifiable(output),
        evidence = Map.unmodifiable(evidence),
        dependencies = List.unmodifiable(dependencies) {
@@ -77,6 +78,11 @@ final class Elv5ProcessEvaluationCandidate {
         descriptor.versions.outputSchemaVersion != outputSchemaVersion ||
         descriptor.versions.numericBackendVersion != numericBackendVersion) {
       throw StateError('ELV5_PROCESS_VERSION_MISMATCH');
+    }
+    final identity = qualificationIdentity;
+    if (identity != null &&
+        identity.processVersion != descriptor.versions.processVersion) {
+      throw StateError('ELV5_QUALIFICATION_PROCESS_VERSION_MISMATCH');
     }
   }
 
@@ -95,6 +101,12 @@ final class Elv5ProcessEvaluationCandidate {
   final Map<String, Object?> evidence;
   final List<Elv5DependencyMarker> dependencies;
   final DateTime completedAtUtc;
+  final Elv5QualificationIdentity? qualificationIdentity;
+
+  bool get isQualificationAddressed => qualificationIdentity != null;
+  String get evaluationIdentitySchema => qualificationIdentity == null
+      ? 'electra.elv5-evaluation-identity.v1'
+      : 'electra.elv5-evaluation-identity.v2';
 
   String get nodeKeyJson => _canonicalJson(nodeKey.toCanonicalValue());
   String get nodeKeySha256 => _encoder.sha256(nodeKey.toCanonicalValue());
@@ -103,10 +115,11 @@ final class Elv5ProcessEvaluationCandidate {
   String get evidenceJson => _canonicalJson(evidence);
   String get evidenceSha256 => _encoder.sha256(evidence);
 
-  /// Evaluation identity is content-addressed. Re-running the exact same input
-  /// and algorithm produces the same immutable evaluation identity.
+  /// Evaluation identity remains backward compatible for ordinary/historical
+  /// runtime evaluations. Qualification-addressed builds use v2 and include the
+  /// exact build/ruleset/authority identity in the immutable content address.
   String get evaluationId => _encoder.sha256({
-    'schema': 'electra.elv5-evaluation-identity.v1',
+    'schema': evaluationIdentitySchema,
     'nodeKey': nodeKey.toCanonicalValue(),
     'algorithmVersion': algorithmVersion,
     'inputSchemaVersion': inputSchemaVersion,
@@ -117,7 +130,30 @@ final class Elv5ProcessEvaluationCandidate {
     'policyFingerprint': policyFingerprint,
     'outputSha256': outputSha256,
     'evidenceSha256': evidenceSha256,
+    if (qualificationIdentity != null)
+      'qualificationIdentity': qualificationIdentity!.toCanonicalValue(),
   });
+
+  Elv5ProcessEvaluationCandidate withQualificationIdentity(
+    Elv5QualificationIdentity identity,
+  ) => Elv5ProcessEvaluationCandidate(
+    nodeKey: nodeKey,
+    algorithmVersion: algorithmVersion,
+    inputSchemaVersion: inputSchemaVersion,
+    outputSchemaVersion: outputSchemaVersion,
+    numericBackendVersion: numericBackendVersion,
+    canonicalEncoderVersion: canonicalEncoderVersion,
+    inputFingerprint: inputFingerprint,
+    policyFingerprint: policyFingerprint,
+    execution: execution,
+    completion: completion,
+    assessment: assessment,
+    output: output,
+    evidence: evidence,
+    dependencies: dependencies,
+    completedAtUtc: completedAtUtc,
+    qualificationIdentity: identity,
+  );
 
   Elv5EvaluationRecord toRecord({required String projectId}) =>
       Elv5EvaluationRecord(
@@ -147,6 +183,7 @@ final class Elv5ProcessEvaluationCandidate {
         evidenceJson: evidenceJson,
         evidenceSha256: evidenceSha256,
         completedAtUtc: completedAtUtc,
+        qualificationIdentity: qualificationIdentity,
       );
 
   static const _encoder = Elv5CanonicalJsonV1();
