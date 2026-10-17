@@ -7,6 +7,11 @@ Infrastructure UTC timestamps (`DateTime.now().toUtc()`) are allowed because
 they timestamp commands/evidence; calculation inputs must still come from
 persisted/pinned engineering facts.
 
+Structural identities are allowed when they are explicit and semantics-preserving:
+* `?.length ?? 0` is empty-set cardinality;
+* a named `_zero...` value is an explicit additive identity;
+* `?? throw`, including formatter-wrapped `(throw ...)`, is fail-closed.
+
 A reviewed exception must be placed on the same line as the expression using:
     // elv5-explicit-default: <authority/rule rationale>
 The rationale is mandatory so a default cannot become invisible provenance.
@@ -26,7 +31,8 @@ PRODUCTION_ROOTS = (
 
 EXPLICIT_DEFAULT_MARKER = "elv5-explicit-default:"
 SENSITIVE_NAME = re.compile(
-    r"(?i)(?<![A-Za-z0-9_])(?:medium|interface|shield|voltage|current|"
+    r"(?i)(?<![A-Za-z0-9_])(?:medium|interface|shield|voltage|"
+    r"current(?:a|amp|value|demand|limit|rating|draw|load|rms|peak|holding|startup)?|"
     r"powerfactor|power_factor|temperature|ambient|length|distance|bitrate|"
     r"rate|capacity|timezone|time_zone|tzdb|redundancy|conductor|material|"
     r"evidence|policy|environment|route|path|ampacity|attenuation|optical|"
@@ -36,6 +42,7 @@ SENSITIVE_NAME = re.compile(
 HOST_LOCAL_TEMPORAL = re.compile(
     r"(?:\.toLocal\s*\(\)|Platform\.localeName)"
 )
+NAMED_ZERO_IDENTITY = re.compile(r"^_zero[A-Za-z0-9_]*[,;)]?$", re.IGNORECASE)
 
 
 @dataclass(frozen=True)
@@ -65,27 +72,46 @@ def _has_reviewed_exception(line: str) -> bool:
     return len(rationale) >= 12
 
 
-def _coalescing_left(line: str) -> str | None:
-    if "??" not in line:
-        return None
-    left, right = line.split("??", 1)
-    if right.lstrip().startswith("throw "):
-        return None
-    return left
+def _is_structural_identity(left: str, right: str) -> bool:
+    right = right.strip()
+    if re.search(r"\?\.length\s*$", left) and re.match(r"^0\b", right):
+        return True
+    return NAMED_ZERO_IDENTITY.match(right) is not None
+
+
+def _is_fail_closed(lines: list[str], index: int, right: str) -> bool:
+    stripped = right.lstrip()
+    if stripped.startswith("throw ") or stripped.startswith("(throw "):
+        return True
+    if stripped:
+        return False
+    for following in lines[index + 1 :]:
+        candidate = following.strip()
+        if not candidate:
+            continue
+        return candidate.startswith("throw ") or candidate.startswith("(throw ")
+    return False
 
 
 def scan_text(path: Path, text: str) -> list[Finding]:
     findings: list[Finding] = []
-    for number, raw in enumerate(text.splitlines(), start=1):
+    lines = text.splitlines()
+    for index, raw in enumerate(lines):
+        number = index + 1
         line = raw.strip()
         if not line or line.startswith("//") or _has_reviewed_exception(line):
             continue
 
-        left = _coalescing_left(line)
-        if left is not None and SENSITIVE_NAME.search(left):
-            findings.append(
-                Finding(path, number, raw, "engineering-sensitive null fallback")
-            )
+        if "??" in line:
+            left, right = line.split("??", 1)
+            if (
+                not _is_fail_closed(lines, index, right)
+                and not _is_structural_identity(left, right)
+                and SENSITIVE_NAME.search(left)
+            ):
+                findings.append(
+                    Finding(path, number, raw, "engineering-sensitive null fallback")
+                )
 
         # ELV5 calculations must never infer timezone from the executing host.
         # Explicit UTC wall-clock reads used for metadata/audit timestamps are
