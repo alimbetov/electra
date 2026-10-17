@@ -7,6 +7,7 @@ import '../../../application/elv5/fire/fa07_topology_contract.dart';
 import '../../../application/elv5/fire/fa07_topology_contract_write.dart';
 import '../../database/app_database.dart';
 import '../../database/drift_raw_statement.dart';
+import 'drift_elv5_dependency_invalidator.dart';
 
 final class DriftFa07TopologyContractStore
     implements Fa07TopologyContractSource, Fa07TopologyContractWriter {
@@ -117,6 +118,11 @@ final class DriftFa07TopologyContractStore
       throw StateError('FA07_DESIGN_REVISION_READ_ONLY');
     if (rev.read<int>('revision') != command.expectedDesignRevision)
       throw StateError('FA07_DESIGN_REVISION_CONFLICT');
+    final previous = await loadActiveForLoop(
+      projectId: command.projectId,
+      designRevisionId: command.designRevisionId,
+      loopId: command.contract.loopId,
+    );
     final payload = command.contract.toCanonicalValue();
     final hash = _encoder.sha256(payload);
     final ref = 'FA07:${command.contract.loopId}:$hash';
@@ -225,6 +231,17 @@ final class DriftFa07TopologyContractStore
       ],
     );
     if (changedDesign != 1) throw StateError('FA07_DESIGN_REVISION_CAS_FAILED');
+    await DriftElv5DependencyInvalidator(
+      database,
+      originDeviceId: originDeviceId,
+      nowUtc: _nowUtc,
+    ).invalidateSubject(
+      projectId: command.projectId,
+      designRevisionId: command.designRevisionId,
+      relationKind: previous == null ? 'SET' : 'POLICY',
+      domain: previous == null ? 'FIRE_LOOP' : 'FA07_TOPOLOGY_CONTRACT',
+      subjectId: previous?.evidenceRef ?? command.contract.loopId,
+    );
   });
   String _canonical(Object? value) =>
       utf8.decode(_encoder.encode(value), allowMalformed: false);
