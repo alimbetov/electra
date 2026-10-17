@@ -7,7 +7,10 @@ import 'package:electra_mobile/data/database/app_database.dart';
 import 'package:electra_mobile/data/repositories/elv5/drift_elv5_fire_write_unit_of_work.dart';
 import 'package:engineering_core/engineering_core.dart';
 
-Future<void> seedF2FireTopology(AppDatabase db) async {
+Future<void> seedF2FireTopology(
+  AppDatabase db, {
+  bool notificationDevices = false,
+}) async {
   final now = DateTime.utc(2026, 10, 17, 12);
   await db
       .into(db.projects)
@@ -77,16 +80,29 @@ Future<void> seedF2FireTopology(AppDatabase db) async {
         ),
       );
 
-  final catalog = EngineeringReferenceCatalog.fromMap(
-    Map<String, Object?>.from(
-      jsonDecode(
-            File(
-              '../../docs/examples/elv2-interface-catalog.json',
-            ).readAsStringSync(),
-          )
-          as Map,
-    ),
+  final catalogMap = Map<String, Object?>.from(
+    jsonDecode(
+          File(
+            '../../docs/examples/elv2-interface-catalog.json',
+          ).readAsStringSync(),
+        )
+        as Map,
   );
+  if (notificationDevices) {
+    final profiles =
+        (catalogMap['profiles'] as List)
+            .map((v) => Map<String, Object?>.from(v as Map))
+            .toList();
+    final template = profiles.singleWhere((v) => v['code'] == 'DETECTOR');
+    profiles.add({
+      ...template,
+      'code': 'SOUNDER',
+      'label': 'Fictional addressed notification module',
+      'engineeringClass': 'loopModule',
+    });
+    catalogMap['profiles'] = profiles;
+  }
+  final catalog = EngineeringReferenceCatalog.fromMap(catalogMap);
   await db
       .into(db.engineeringReferenceCatalogs)
       .insert(
@@ -104,9 +120,9 @@ Future<void> seedF2FireTopology(AppDatabase db) async {
   for (final entry
       in {
         'panel-1': 'FACP',
-        'd1': 'DETECTOR',
-        'd2': 'DETECTOR',
-        'd3': 'DETECTOR',
+        'd1': notificationDevices ? 'SOUNDER' : 'DETECTOR',
+        'd2': notificationDevices ? 'SOUNDER' : 'DETECTOR',
+        'd3': notificationDevices ? 'SOUNDER' : 'DETECTOR',
       }.entries) {
     final profile = catalog.profile(entry.value);
     await db

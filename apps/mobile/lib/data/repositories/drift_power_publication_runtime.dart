@@ -7,6 +7,7 @@ import '../database/app_database.dart';
 import '../database/drift_raw_statement.dart';
 import 'drift_power_runtime_store.dart';
 import 'drift_power_snapshot_facts.dart';
+import 'elv5/drift_elv5_dependency_invalidator.dart';
 
 enum PowerDependencyRefType { fact, evaluation }
 
@@ -307,6 +308,24 @@ final class DriftPowerPublicationRuntime {
         evidence: evidence,
         storedSha256: envelopeSha256,
       );
+      // ELV5 projections consume exact ELV4 CURRENT generations. Advancing
+      // this pointer must invalidate those consumers in this same transaction,
+      // including an advance that reuses an immutable evaluation identity.
+      final previousEvaluationId = capture.targetEvaluationId;
+      if (previousEvaluationId != null) {
+        await DriftElv5DependencyInvalidator(
+          database,
+          originDeviceId: originDeviceId,
+          nowUtc: now,
+        ).invalidateSubject(
+          projectId: capture.projectId,
+          designRevisionId: capture.designRevisionId,
+          relationKind: 'EVAL',
+          domain:
+              'ELV4_${evidence.nodeKey.processCode.name.toUpperCase()}_CURRENT',
+          subjectId: previousEvaluationId,
+        );
+      }
       await _replaceReverseIndex(
         projectId: capture.projectId,
         designRevisionId: capture.designRevisionId,
