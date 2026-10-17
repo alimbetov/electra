@@ -1,6 +1,6 @@
 # Engineering Foundation F1 — source-backed primitive inventory
 
-Status: **IN PROGRESS / SOURCE AUDIT STARTED / ACCEPTANCE NOT CLAIMED**  
+Status: **IN PROGRESS / SOURCE AUDIT ACTIVE / ACCEPTANCE NOT CLAIMED**  
 Branch: `feat/flutter-elv5-power-topology-design`
 
 This inventory is derived from production source, not from historical `NOT_STARTED` labels. It records what can be reused, what was hardened during F1, and what remains a gate before pilot qualification.
@@ -39,7 +39,8 @@ The shared quantity inventory now also distinguishes:
 ### Remaining numeric gaps
 
 - canonical unit metadata/conversion is still process-owned rather than represented by one shared unit registry;
-- the generic canonical JSON encoder accepts Dart `num`, including `double`; engineering public contracts must continue to reject floating verdict inputs at their typed boundaries. A source/CI audit for accidental engineering `double` ingress remains required;
+- the generic canonical JSON encoder accepts Dart `num`, including `double`; engineering public contracts must continue to reject floating verdict inputs at their typed boundaries;
+- inherited ELV3 `LocalCoordinateFrame` axes are binary floating values. CCTV-01 captures them deterministically as decimal rationals for replay but this is not equivalent to an exact/bounded source geometry contract;
 - tolerance/quantization remains algorithm-specific and must be inventoried for the few calculations that genuinely require floating/transcendental math.
 
 ## 2. Evidence primitives
@@ -73,21 +74,45 @@ Added `evidence/evidence_contract.dart` with:
 
 Existing process-specific contracts have not yet all migrated to the shared descriptor. Migration must be incremental and evidence-preserving; the new primitive must not reinterpret historical evidence as `VERIFIED` by default.
 
+CCTV-06 and LAN-04 currently share realized path identity but still carry related immutable categorical section capability evidence in process-specific contracts. This is a reuse/provenance debt, not a reason to create a second path or cable record. The F1 target is the smallest shared physical-section capability primitive that preserves existing evidence editions.
+
 ## 3. Unknown / fail-closed policy
 
 Current production application resolvers already use durable `Elv5CaptureBlockedException` in many mandatory-input gaps and several processes preserve `UNRESOLVED/NOT_ASSESSED` independently.
 
-Status: **PARTIAL / AUDIT REQUIRED**.
+Status: **PARTIAL / TWO SOURCE PASSES COMPLETED / FULL REPOSITORY AUDIT NOT COMPLETE**.
 
-First-pass critical-path review completed for ampacity reference/corrections, environment profile/route resolution and CCTV-03 storage/recurrence. No `UNKNOWN -> implicit engineering default -> PASS` path was found in those reviewed paths: temperature/grouping/material/installation evidence is mandatory; missing environment/section evidence blocks; CCTV-03 guaranteed-rate sizing does not fall back to expected bitrate; recurrence without a pinned expander blocks; reserve multiplier is explicit and validated.
+### First pass
 
-Required remaining audit:
+Reviewed ampacity reference/corrections, environment profile/route resolution and CCTV-03 storage/recurrence. No `UNKNOWN -> implicit engineering default -> PASS` path was found in those reviewed paths:
 
-- search application/core for engineering `?? 0`, `?? 1`, implicit material/temperature/efficiency/reserve defaults;
-- explicitly inspect efficiency/transfer loss, resistance/current rating, optical loss and battery inputs in addition to the already reviewed temperature/grouping/material/reserve paths;
-- classify every hit as domain invariant, UI-only default, optional dimension, or false-PASS risk.
+- temperature/grouping/material/installation evidence is mandatory;
+- missing environment/section evidence blocks;
+- CCTV-03 guaranteed-rate sizing does not fall back to expected bitrate;
+- recurrence without a pinned expander blocks;
+- reserve multiplier is explicit and validated.
 
-Any false-PASS risk preempts new vertical development.
+One false-PASS defect was found outside those clean paths in CCTV-01: missing explicit minimum coverage policy returned `PASS`. It was changed to `NOT_ASSESSED` with an explicit reason.
+
+### Second pass
+
+Reviewed transfer loss/efficiency, DC resistance/current rating, optical attenuation and battery availability:
+
+- `PowerLossDefinition` requires explicit efficiency, idle watts and idle-accounting basis; transfer input demand does not synthesize 100% efficiency;
+- `DcSection` requires explicit loop resistance or explicit per-meter forward/return resistance plus installed length/contact resistance, and always requires an explicit current rating;
+- missing optical attenuation evidence for the selected wavelength blocks LAN-05; attenuation intervals must be nonnegative and ordered;
+- `BatteryWhAvailabilityModel` requires explicit model voltage, bank Ah, initial/minimum SOC, temperature factor, aging factor and rate factor; no factor silently defaults to `1` inside the model;
+- battery evidence records the availability model as a consumed immutable fact and PWR-04 binds it into the input fingerprint.
+
+No additional false-PASS default was found in these reviewed paths.
+
+### Remaining audit
+
+- repository-wide search for engineering `?? 0`, `?? 1`, nullable-to-pass coercions and UI defaults leaking into engineering capture;
+- inherited/current consumers that construct the reviewed core types must still be checked for synthesized evidence before the core boundary;
+- classify every remaining hit as domain invariant, UI-only default, optional dimension, or false-PASS risk.
+
+Any false-PASS risk preempts qualification promotion.
 
 ## 4. Deterministic canonicalization
 
@@ -106,6 +131,7 @@ Remaining qualification:
 
 - explicit insertion-order metamorphic tests for shared evidence/result envelopes;
 - repository-row-order and worker-order determinism on pilot paths;
+- CCTV-05 assignment-scope set ordering must be normalized independently of persisted ordinal when ordinal is not engineering-significant;
 - engineering-double ingress guard noted above.
 
 ## 5. Calculation identity
@@ -119,7 +145,7 @@ Current `Elv5ProcessEvaluationCandidate` content-addresses evaluation identity w
 - output hash;
 - evidence hash.
 
-This is a strong reusable base.
+A shared `Elv5CurrentEvaluationSource` has also been introduced so downstream ELV5 processes can bind CURRENT immutable evaluations together with pointer generation, input/output/evidence hashes and node identity rather than re-querying process-specific rows.
 
 ### F1-HIGH-01 — acceptance identity incomplete
 
@@ -168,9 +194,12 @@ Current reusable building blocks:
 - dependency markers;
 - upstream pointer generations;
 - process evidence payload;
-- canonical node/evaluation identities.
+- canonical node/evaluation identities;
+- shared CURRENT ELV5 evaluation snapshot/source for downstream reuse.
 
-Status: **PARTIAL**.
+Status: **PARTIAL / IMPROVED**.
+
+CCTV-05 now binds exact CURRENT CCTV-02/CCTV-03 evaluation identities, input fingerprints, output/evidence hashes and pointer generations instead of recomputing bitrate/storage. CCTV-06 reuses ELV3 realized path facts and CURRENT PWR-06 rather than creating another physical path/power solver.
 
 Missing shared capability: a minimal typed provenance relation vocabulary/envelope capable of answering source fact → evidence → derived input → algorithm/scenario → result/finding without embedding whole source objects. Existing process dependency markers should be reconciled rather than replaced.
 
@@ -184,7 +213,14 @@ F1 must extract only the minimal common metadata shape needed by qualification a
 
 ## 9. Shared qualification support
 
-Status: **TODO**.
+Status: **TODO / PROCESS REFERENCE TESTS ADDED, SHARED HARNESS NOT YET EXTRACTED**.
+
+Recent process-level qualification now covers, among other paths:
+
+- CCTV-02 explicit recorder-assignment ingress binding;
+- CCTV-05 CURRENT CCTV-02 ingress + CURRENT CCTV-03 storage reuse without reserve reapplication;
+- CCTV-06 exact ELV3 realized-length boundary and no-power `NOT_APPLICABLE` path;
+- 27-process production registry membership.
 
 Minimum reusable test-only support still required:
 
@@ -197,17 +233,33 @@ Minimum reusable test-only support still required:
 
 No production dependency on a test framework is allowed.
 
-## 10. Current F1 disposition
+## 10. Runtime integration versus foundation qualification
+
+The production registry is now source-wired for all 27 ELV5 processes. This is **runtime completeness**, not Foundation qualification.
+
+```text
+ACS   6 / 6
+FIRE  8 / 8
+LAN   7 / 7
+CCTV  6 / 6
+TOTAL 27 / 27
+```
+
+GitHub Actions had not produced a run for the current source SHA at the time this inventory was updated. Therefore analyze/test/CI PASS is not claimed by this document.
+
+## 11. Current F1 disposition
 
 | Work item | Status |
 |---|---|
 | Quantity inventory | IMPLEMENTED / qualification pending |
 | Typed evidence primitive | IMPLEMENTED / process migration pending |
-| Unknown/default audit | PARTIAL / critical-path first pass clean |
+| Unknown/default audit | PARTIAL / two targeted passes complete / 1 false PASS fixed |
 | Canonicalization | IMPLEMENTED CORE / qualification pending |
 | Result axes | PARTIAL — F1-HIGH-02 open |
 | Calculation identity | PARTIAL — F1-HIGH-01 open |
-| Provenance graph | PARTIAL |
+| ELV3 exact/bounded frame basis | OPEN — F1-HIGH-03 |
+| Section capability evidence reuse | OPEN — F1-MEDIUM-04 |
+| Provenance graph | PARTIAL / shared CURRENT reader added |
 | Governing metadata | PARTIAL process-specific |
 | Shared qualification support | TODO |
 
