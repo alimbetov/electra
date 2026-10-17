@@ -11,6 +11,7 @@ CORE = ROOT / "packages/engineering_core/lib/src/elv5/evidence/environment_profi
 ROUTE = ROOT / "packages/engineering_core/lib/src/elv5/evidence/route_ampacity_contract.dart"
 STORE = ROOT / "apps/mobile/lib/data/repositories/elv5/drift_environment_profile_store.dart"
 RESOLVER = ROOT / "apps/mobile/lib/data/repositories/elv5/drift_environment_scope_resolver.dart"
+AMPACITY_RESOLVER = ROOT / "apps/mobile/lib/application/elv5/environment/ampacity_route_resolver.dart"
 
 
 def require(condition: bool, message: str) -> None:
@@ -44,6 +45,7 @@ def main() -> None:
     route = ROUTE.read_text(encoding="utf-8")
     store = STORE.read_text(encoding="utf-8")
     resolver = RESOLVER.read_text(encoding="utf-8")
+    ampacity_resolver = AMPACITY_RESOLVER.read_text(encoding="utf-8")
 
     for token in (
         "Room.roomType",
@@ -68,7 +70,20 @@ def main() -> None:
     require("results.sort" in route, "route ampacity must select deterministic governing section")
     require("ELV5_ENVIRONMENT_PROFILE" in store, "immutable environment persistence missing")
     require("ROUTE_SECTION" in resolver and "ROOM" in resolver, "scope precedence resolver missing")
+    require(
+        resolver.index("scopeKind: 'ROUTE_SECTION'") < resolver.index("scopeKind: 'ROOM'"),
+        "ROUTE_SECTION lookup must precede ROOM fallback",
+    )
     require("roomType" not in resolver and "roomCategory" not in resolver, "resolver must not infer environment from room classification")
+
+    for token in (
+        "Elv5AmpacityRouteResolver",
+        "ELV5_AMPACITY_ENVIRONMENT_PROFILE_REQUIRED",
+        "ELV5_AMPACITY_SECTION_EVIDENCE_REQUIRED",
+        "ELV5_AMPACITY_TEMPERATURE_EVIDENCE_SCOPE_MISMATCH",
+        "temperatureC.maximum",
+    ):
+        require(token in ampacity_resolver, f"ampacity route resolver missing {token!r}")
 
     print("ELV5 environment profile contract: PASS")
 
