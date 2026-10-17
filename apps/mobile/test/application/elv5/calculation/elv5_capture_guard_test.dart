@@ -1,6 +1,7 @@
 import 'package:electra_mobile/application/elv5/calculation/elv5_blocked_capture.dart';
 import 'package:electra_mobile/application/elv5/calculation/elv5_calculation_runtime.dart';
 import 'package:electra_mobile/application/elv5/calculation/elv5_capture_guard.dart';
+import 'package:electra_mobile/application/elv5/persistence/elv5_runtime_persistence.dart';
 import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -93,7 +94,7 @@ final class _Resolver implements Elv5ProcessInputResolver<String> {
       value: 'capture-$captureCount',
       inputFingerprint: _hash('a'),
       policyFingerprint: _hash('b'),
-      dependencies: const <dynamic>[],
+      dependencies: const <Elv5DependencyMarker>[],
       upstreamPointerGenerations: const <String, int>{},
       captureRevision: 999,
     );
@@ -116,7 +117,7 @@ final class _BlockedResolver implements Elv5ProcessInputResolver<String> {
       reasonCode: 'TEST_BLOCKED',
       inputFingerprint: _hash('c'),
       policyFingerprint: _hash('d'),
-      dependencies: const <dynamic>[],
+      dependencies: const <Elv5DependencyMarker>[],
       evidence: const <String, Object?>{'test': true},
     );
   }
