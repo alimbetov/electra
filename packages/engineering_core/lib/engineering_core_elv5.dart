@@ -6,6 +6,7 @@ export 'src/elv5/evidence/ampacity_contract.dart';
 export 'src/elv5/evidence/engineering_value.dart';
 export 'src/elv5/evidence/environment_profile.dart';
 export 'src/elv5/evidence/evidence_contract.dart';
+export 'src/elv5/evidence/physical_section_evidence.dart';
 export 'src/elv5/evidence/route_ampacity_contract.dart';
 export 'src/elv5/findings/comparison.dart';
 export 'src/elv5/foundation/authority_manifest.dart';
