@@ -1,0 +1,168 @@
+{
+  "schema": "electra.killer-capability-layer.v1",
+  "status": "TARGET_NORTH_STAR_NOT_IMPLEMENTATION_NOT_ACCEPTANCE",
+  "parentTarget": "electra-professional-electrical-platform-target.md",
+  "capabilityCount": 13,
+  "capabilities": [
+    {
+      "id": "K0",
+      "name": "Automatic Switchboard Synthesis",
+      "intent": "Generate validated switchboard variants from finalized circuits, protection requirements, phase constraints, reserve policy and physical enclosure constraints.",
+      "primaryDependencies": ["CAP-04", "CAP-05", "CAP-07", "CAP-08", "CAP-15", "CAP-16"],
+      "outputs": ["board_variant", "phase_allocation", "device_set", "enclosure_candidate", "layout_candidate", "explanation"]
+    },
+    {
+      "id": "K1",
+      "name": "Project Autopilot",
+      "intent": "Generate candidate electrical distribution architectures from loads, locations, sources, criticality and engineering policies.",
+      "primaryDependencies": ["CAP-02", "CAP-03", "CAP-04", "CAP-05", "CAP-07", "CAP-08", "CAP-15", "CAP-17", "K0"],
+      "outputs": ["candidate_topology", "board_hierarchy", "circuit_plan", "source_assignment", "candidate_sld"]
+    },
+    {
+      "id": "K2",
+      "name": "Engineering Audit + Auto-Fix",
+      "intent": "Generate validated remediation alternatives for engineering findings and simulate their project-wide consequences before acceptance.",
+      "primaryDependencies": ["CAP-18", "CAP-01"],
+      "outputs": ["finding_root_cause", "candidate_fix", "impact_simulation", "ranked_valid_fixes"]
+    },
+    {
+      "id": "K3",
+      "name": "Failure X-Ray",
+      "intent": "Show deterministic downstream functional and electrical consequences of failure of any selected source, board, breaker, feeder, cable or critical asset.",
+      "primaryDependencies": ["CAP-02", "CAP-03", "CAP-12", "CAP-13", "CAP-14"],
+      "outputs": ["affected_assets", "critical_load_impact", "alternate_supply_status", "spof_finding", "failure_trace"]
+    },
+    {
+      "id": "K4",
+      "name": "Revision Impact Intelligence",
+      "intent": "Explain engineering consequences of project edits and revision changes rather than only structural/database differences.",
+      "primaryDependencies": ["CAP-01"],
+      "outputs": ["engineering_diff", "invalidated_results", "new_findings", "resolved_findings", "stale_deliverables"]
+    },
+    {
+      "id": "K5",
+      "name": "Multi-Objective Design Optimizer",
+      "intent": "Search valid alternatives and expose Pareto trade-offs across cost, size, losses, reserve, reliability, maintainability and other declared objectives.",
+      "primaryDependencies": ["CAP-07", "CAP-08", "CAP-14", "CAP-15", "CAP-16"],
+      "outputs": ["pareto_candidates", "objective_vectors", "governing_constraints", "tradeoff_explanation"]
+    },
+    {
+      "id": "K6",
+      "name": "Critical Power Simulator",
+      "intent": "Simulate deterministic time-ordered normal/emergency power behavior for grid loss, generator start, ATS transfer, UPS ride-through and load shedding.",
+      "primaryDependencies": ["CAP-03", "CAP-04", "CAP-13", "CAP-14"],
+      "outputs": ["scenario_timeline", "source_states", "load_states", "generator_loading", "load_shedding_trace"]
+    },
+    {
+      "id": "K7",
+      "name": "As-Built / Commissioning Twin",
+      "intent": "Track and validate DESIGNED, INSTALLED, VERIFIED and COMMISSIONED states in the same project model.",
+      "primaryDependencies": ["CAP-01", "CAP-07", "CAP-08", "CAP-20", "CAP-21"],
+      "outputs": ["design_vs_installed_diff", "field_evidence", "commissioning_state", "recalculation_requirement"]
+    },
+    {
+      "id": "K8",
+      "name": "Vendor-Neutral Equipment Optimizer",
+      "intent": "Derive engineering requirements first, then rank technically valid manufacturer/SKU candidates independently of vendor ownership.",
+      "primaryDependencies": ["CAP-08", "CAP-15", "CAP-16"],
+      "outputs": ["engineering_requirement", "candidate_set", "validated_candidates", "ranked_equipment"]
+    },
+    {
+      "id": "K9",
+      "name": "Company Engineering Rules",
+      "intent": "Encode organization-specific engineering policies without overriding physical truth or applicable mandatory normative rules.",
+      "primaryDependencies": ["CAP-01", "CAP-15", "CAP-16"],
+      "outputs": ["company_policy_profile", "policy_findings", "generation_constraints", "preferred_design_patterns"]
+    },
+    {
+      "id": "K10",
+      "name": "Brownfield Reconstruction",
+      "intent": "Reconstruct a trustworthy editable electrical model of an existing installation from partial legacy evidence and field survey data.",
+      "primaryDependencies": ["CAP-01", "CAP-02", "CAP-18", "CAP-21"],
+      "outputs": ["candidate_existing_model", "evidence_state_map", "unknowns", "contradictions", "verification_tasks"]
+    },
+    {
+      "id": "K11",
+      "name": "Explainable Engineering Copilot",
+      "intent": "Provide natural-language query, explanation and orchestration while deterministic engineering kernels remain the calculation authority.",
+      "primaryDependencies": ["CAP-18", "K3", "K4"],
+      "outputs": ["explanation", "project_query_result", "candidate_command", "validated_alternative_summary"]
+    },
+    {
+      "id": "K12",
+      "name": "Smart Room Electrical Layout",
+      "intent": "Generate editable geometry-aware layouts for lighting, sockets, switches and related room electrical devices using subtle guide axes, openings, room semantics and deterministic placement rules.",
+      "primaryDependencies": ["CAP-02", "CAP-04", "CAP-11", "CAP-15", "CAP-16"],
+      "guideFamilies": [
+        "ROOM_HORIZONTAL_CENTER",
+        "ROOM_VERTICAL_CENTER",
+        "ROOM_CENTROID",
+        "WALL_CENTER",
+        "PROPORTIONAL_WALL_GUIDE",
+        "DOOR_CENTER_OR_EDGE",
+        "WINDOW_CENTER_OR_EDGE",
+        "USABLE_WALL_SEGMENT",
+        "FUNCTIONAL_ZONE_AXIS"
+      ],
+      "patterns": [
+        "CENTERED_SINGLE",
+        "CENTERED_PAIR",
+        "SYMMETRIC_PAIR",
+        "EVEN_DISTRIBUTION",
+        "ALONG_LONG_AXIS",
+        "ALONG_SHORT_AXIS",
+        "PERIMETER",
+        "BETWEEN_WINDOWS",
+        "CENTERED_ON_WALL",
+        "ABOVE_WORKTOP",
+        "AROUND_BED",
+        "AROUND_MIRROR",
+        "DOOR_ENTRY_CONTROL",
+        "CUSTOM_ANCHOR_SEQUENCE"
+      ],
+      "roomProfiles": [
+        "BEDROOM",
+        "LIVING_ROOM",
+        "KITCHEN",
+        "BATHROOM",
+        "CORRIDOR",
+        "OFFICE",
+        "TECHNICAL_ROOM",
+        "GENERIC"
+      ],
+      "deviceFamilies": [
+        "CEILING_LUMINAIRE",
+        "SPOT_DOWNLIGHT",
+        "LINEAR_LUMINAIRE",
+        "LED_STRIP_PROFILE",
+        "WALL_LIGHT",
+        "SOCKET_OUTLET",
+        "SWITCH",
+        "MULTI_GANG_GROUP",
+        "EMERGENCY_LIGHTING_POINT"
+      ],
+      "outputs": ["reference_guides", "placement_candidate", "symmetry_alignment_state", "accepted_project_devices"]
+    }
+  ],
+  "crossCuttingInvariants": [
+    "KC-01_CANDIDATE_BEFORE_MUTATION",
+    "KC-02_DETERMINISTIC_VALIDATION",
+    "KC-03_EXPLAINABILITY",
+    "KC-04_PROVENANCE",
+    "KC-05_UNKNOWNS_FAIL_VISIBLY",
+    "KC-06_HUMAN_AUTHORITY",
+    "KC-07_NO_FAKE_OPTIMUM",
+    "KC-08_REVISION_SAFETY",
+    "KC-09_OFFLINE_DETERMINISM",
+    "KC-10_NORMATIVE_SEPARATION"
+  ],
+  "recommendedDeliveryOrder": ["K4", "K3", "K0", "K12", "K2", "K8", "K5", "K6", "K7", "K9", "K10", "K1", "K11"],
+  "marketValidationQuestions": [
+    "Does it save measurable engineering time?",
+    "Does it catch or prevent costly errors?",
+    "Does it reduce tool switching?",
+    "Do users repeatedly invoke it on real projects?",
+    "Would users pay or upgrade for it?",
+    "Does it preserve or increase professional trust?"
+  ]
+}
