@@ -23,7 +23,7 @@ void main() {
   test('qualification identity requires exact source and authority SHA-256', () {
     final descriptor = Elv5ProcessCatalog.require(Elv5ProcessCode.cctv01);
     final authority = Elv5FoundationAuthorityManifest.instance.fingerprint();
-    final sourceSha = 'a' * 64;
+    final sourceSha = List<String>.filled(64, 'a').join();
 
     final identity = Elv5QualificationIdentity(
       processVersion: descriptor.versions.processVersion,
