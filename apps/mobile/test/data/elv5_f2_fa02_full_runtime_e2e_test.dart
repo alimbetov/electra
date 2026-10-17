@@ -2,6 +2,7 @@ import 'package:electra_mobile/application/elv4_wire_command_dispatcher.dart';
 import 'package:electra_mobile/application/elv4_wire_power_payload.dart';
 import 'package:electra_mobile/application/power_mutation_command.dart';
 import 'package:electra_mobile/data/database/app_database.dart';
+import 'package:electra_mobile/data/repositories/drift_power_runtime_store.dart';
 import 'package:electra_mobile/data/repositories/elv5/drift_elv5_power_mutation_coordinator.dart';
 import 'package:engineering_core/engineering_core.dart';
 import 'package:engineering_core/engineering_core_elv5.dart';
@@ -141,11 +142,17 @@ void main() {
               startupA: '0.090',
             ),
             throwsA(
-              predicate(
-                (error) => error.toString().contains(
-                  'ELV4_DESIGN_REVISION_CAS_FAILED',
-                ),
-              ),
+              isA<PowerRuntimeStorageException>()
+                  .having(
+                    (error) => error.code,
+                    'code',
+                    'ELV4_REVISION_NOT_WORKING',
+                  )
+                  .having(
+                    (error) => error.details['state'],
+                    'state',
+                    'FROZEN',
+                  ),
             ),
           );
         },
