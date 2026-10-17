@@ -5,16 +5,15 @@
   "acceptanceClaimed": false,
   "runtimeBaseline": {
     "processCount": 27,
-    "productionAdapters": 21,
-    "remainingAdapters": 6,
+    "productionAdapters": 22,
+    "remainingAdapters": 5,
     "byDiscipline": {
       "ACS": {"integrated": 6, "total": 6},
       "FIRE": {"integrated": 8, "total": 8},
-      "LAN": {"integrated": 5, "total": 7},
+      "LAN": {"integrated": 6, "total": 7},
       "CCTV": {"integrated": 2, "total": 6}
     },
     "remaining": [
-      "LAN-06",
       "LAN-07",
       "CCTV-01",
       "CCTV-04",
@@ -34,17 +33,26 @@
       "name": "SHARED_PRIMITIVES_RECONCILIATION",
       "status": "IN_PROGRESS",
       "exitGateSatisfied": false,
+      "sourceInventory": "docs/product/elv5-implementation/engineering-foundation-f1-source-inventory.md",
       "workItems": {
-        "quantityInventory": "TODO_AUDIT_EXISTING_FIRST",
-        "typedEvidenceReconciliation": "TODO_AUDIT_EXISTING_FIRST",
-        "unknownFailClosedAudit": "TODO",
+        "quantityInventory": "IMPLEMENTED_SHARED_DIMENSIONS_QUALIFICATION_PENDING",
+        "typedEvidenceReconciliation": "SHARED_PRIMITIVE_IMPLEMENTED_PROCESS_MIGRATION_PENDING",
+        "unknownFailClosedAudit": "TODO_HIGH_PRIORITY",
         "provenanceGraph": "PARTIAL_EXISTING_PRIMITIVES_TO_RECONCILE",
-        "calculationIdentity": "PARTIAL_EXISTING_PRIMITIVES_TO_RECONCILE",
-        "deterministicCanonicalization": "PARTIAL_EXISTING_PRIMITIVES_TO_RECONCILE",
+        "calculationIdentity": "PARTIAL_F1_HIGH_01_OPEN",
+        "deterministicCanonicalization": "IMPLEMENTED_CORE_QUALIFICATION_PENDING",
         "independentStatusAxes": "IMPLEMENTED_IN_ELV5_RUNTIME",
         "governingCasePrimitive": "PARTIAL_PROCESS_SPECIFIC",
         "sharedQualificationSupport": "TODO"
-      }
+      },
+      "openFindings": [
+        {
+          "id": "F1-HIGH-01",
+          "severity": "HIGH",
+          "summary": "Persisted evaluation identity does not yet carry explicit sourceSha, authorityFingerprint and rulesetVersion required for foundation acceptance.",
+          "acceptanceImpact": "BLOCKS_QUALIFIED_AND_ACCEPTED_PROMOTION"
+        }
+      ]
     },
     "F2": {
       "name": "PILOT_QUALIFICATION",
@@ -86,10 +94,11 @@
     }
   },
   "executionOrder": {
-    "runtimeTrack": ["LAN-06", "LAN-07", "CCTV-04", "CCTV-01", "CCTV-05", "CCTV-06"],
+    "runtimeTrack": ["LAN-07", "CCTV-04", "CCTV-01", "CCTV-05", "CCTV-06"],
     "foundationTrack": [
-      "F1_INVENTORY_AND_AUDIT",
-      "F1_FALSE_PASS_AND_DETERMINISM_DEFECT_FIXES",
+      "F1_UNKNOWN_AND_SILENT_DEFAULT_AUDIT",
+      "F1_CALCULATION_IDENTITY_RECONCILIATION",
+      "F1_PROVENANCE_RECONCILIATION",
       "F1_SHARED_QUALIFICATION_SUPPORT",
       "F2_AMPACITY_ROUTE_IZ",
       "F2_FA-03",
