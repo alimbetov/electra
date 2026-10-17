@@ -59,6 +59,21 @@ final class Cctv01PersistedInputResolver
       memberId:'${snapshot.bindingId}:${snapshot.bindingRevision}:${snapshot.contentHash}',
     ));
 
+    if (!contract.hasExactSurfaceFrames) {
+      _blocked(
+        request,
+        'CCTV01_EXACT_SURFACE_FRAME_CONTRACT_REQUIRED',
+        basis,
+        snapshot.contentHash,
+        dependencies,
+        <String,Object?>{
+          'cameraId':cameraId,
+          'contractSchema':contract.effectiveSchema,
+          'requiredSchema':Cctv01GeometryContract.schema,
+        },
+      );
+    }
+
     final roomComponents = await components.loadRoomComponents(contract.roomId);
     final matching = roomComponents.where((item) => item.id == cameraId).toList(growable:false);
     if (matching.length != 1) {
@@ -73,6 +88,12 @@ final class Cctv01PersistedInputResolver
         'expectedDefinitionVersion':contract.expectedDefinitionVersion,
         'actualDefinitionId':camera.definitionId,
         'actualDefinitionVersion':camera.definitionVersion,
+      });
+    }
+    if (camera.hostSurfacePatchId != contract.expectedHostSurfacePatchId) {
+      _blocked(request,'CCTV01_HOST_SURFACE_PATCH_MISMATCH',basis,snapshot.contentHash,dependencies,<String,Object?>{
+        'expectedHostSurfacePatchId':contract.expectedHostSurfacePatchId,
+        'actualHostSurfacePatchId':camera.hostSurfacePatchId,
       });
     }
 
@@ -93,8 +114,25 @@ final class Cctv01PersistedInputResolver
 
     final hostPatch = host!;
     final targetPatch = target!;
-    final hostU = _vec(hostPatch.frame.uAxis);
-    final hostV = _vec(hostPatch.frame.vAxis);
+    final tolerance = contract.legacyFrameAxisTolerance!;
+    if (!_frameCompatible(hostPatch.frame, contract.hostSurfaceFrame!, tolerance)) {
+      _blocked(request,'CCTV01_HOST_FRAME_COMPATIBILITY_MISMATCH',basis,snapshot.contentHash,dependencies,<String,Object?>{
+        'hostSurfacePatchId':hostPatch.id,
+        'legacyAxisTolerance':tolerance.toMap(),
+      });
+    }
+    if (!_frameCompatible(targetPatch.frame, contract.targetSurfaceFrame!, tolerance)) {
+      _blocked(request,'CCTV01_TARGET_FRAME_COMPATIBILITY_MISMATCH',basis,snapshot.contentHash,dependencies,<String,Object?>{
+        'targetSurfacePatchId':targetPatch.id,
+        'legacyAxisTolerance':tolerance.toMap(),
+      });
+    }
+
+    // Engineering math below uses integer-mm persisted origins/placement plus
+    // exact immutable v2 axes only. ELV3 floating axes are compatibility
+    // witnesses and cannot affect the verdict once the v2 contract is bound.
+    final hostU = contract.hostSurfaceFrame!.uAxis;
+    final hostV = contract.hostSurfaceFrame!.vAxis;
     final localX = Elv5Rational.integer(camera.localPosition.xMm);
     final localY = Elv5Rational.integer(camera.localPosition.yMm);
     final opticalCenter = Cctv01Point3(
@@ -102,8 +140,8 @@ final class Cctv01PersistedInputResolver
       Elv5Rational.integer(hostPatch.frame.origin.yMm) + hostU.y * localX + hostV.y * localY,
       Elv5Rational.integer(hostPatch.frame.origin.zMm) + hostU.z * localX + hostV.z * localY,
     );
-    final targetU = _vec(targetPatch.frame.uAxis);
-    final targetV = _vec(targetPatch.frame.vAxis);
+    final targetU = contract.targetSurfaceFrame!.uAxis;
+    final targetV = contract.targetSurfaceFrame!.vAxis;
     final targetZone = Cctv01Polygon2(<Cctv01Point2>[
       for (final point in targetPatch.boundary.vertices)
         Cctv01Point2(Elv5Rational.integer(point.xMm),Elv5Rational.integer(point.yMm)),
@@ -152,11 +190,13 @@ final class Cctv01PersistedInputResolver
     final hostFact = _patchFact(hostPatch);
     final targetFact = _patchFact(targetPatch);
     final inputFingerprint = _encoder.sha256(<String,Object?>{
-      'schema':'electra.elv5-cctv01-captured-input.v1',
+      'schema':'electra.elv5-cctv01-captured-input.v2',
       'contractContentHash':snapshot.contentHash,
       'camera':cameraFact,
       'hostPatch':hostFact,
       'targetPatch':targetFact,
+      'exactHostFrame':contract.hostSurfaceFrame!.toCanonicalValue(),
+      'exactTargetFrame':contract.targetSurfaceFrame!.toCanonicalValue(),
     });
     dependencies.addAll(<Elv5DependencyMarker>[
       _dependency(request,'FACT','ELV3_COMPONENT_PLACEMENT',cameraId,memberId:_encoder.sha256(cameraFact)),
@@ -185,8 +225,8 @@ final class Cctv01PersistedInputResolver
     'roomId':patch.roomId,
     'surfaceId':patch.surfaceId,
     'originMm':<String,Object?>{'x':patch.frame.origin.xMm,'y':patch.frame.origin.yMm,'z':patch.frame.origin.zMm},
-    'uAxis':<String,Object?>{'x':_legacyDecimal(patch.frame.uAxis.x),'y':_legacyDecimal(patch.frame.uAxis.y),'z':_legacyDecimal(patch.frame.uAxis.z)},
-    'vAxis':<String,Object?>{'x':_legacyDecimal(patch.frame.vAxis.x),'y':_legacyDecimal(patch.frame.vAxis.y),'z':_legacyDecimal(patch.frame.vAxis.z)},
+    'legacyUAxis':<String,Object?>{'x':_legacyDecimal(patch.frame.uAxis.x),'y':_legacyDecimal(patch.frame.uAxis.y),'z':_legacyDecimal(patch.frame.uAxis.z)},
+    'legacyVAxis':<String,Object?>{'x':_legacyDecimal(patch.frame.vAxis.x),'y':_legacyDecimal(patch.frame.vAxis.y),'z':_legacyDecimal(patch.frame.vAxis.z)},
     'boundary':<Object?>[
       for(final point in patch.boundary.vertices)<String,Object?>{'xMm':point.xMm,'yMm':point.yMm},
     ],
@@ -226,9 +266,10 @@ Elv5PureKernelExecutor<Cctv01Input,Cctv01Result> buildCctv01Executor({DateTime F
       'reasonCode':r.reasonCode,
     },
     encodeEvidence:(c,_)=><String,Object?>{
-      'schema':'electra.elv5-cctv01-evidence.v1',
-      'source':'ELV3_COMPONENT_PLUS_SURFACE_GEOMETRY_AND_IMMUTABLE_CCTV01_CONTRACT',
-      'legacyElv3FrameNumericBasis':'NORMALIZED_DOUBLE_DECIMAL_CAPTURE_V1',
+      'schema':'electra.elv5-cctv01-evidence.v2',
+      'source':'ELV3_COMPONENT_AND_INTEGER_ORIGINS_PLUS_IMMUTABLE_EXACT_CCTV01_SURFACE_FRAMES',
+      'surfaceFrameBasis':'IMMUTABLE_EXACT_SURFACE_FRAME_CONTRACT_V2',
+      'legacyElv3FrameRole':'COMPATIBILITY_WITNESS_ONLY',
       'cameraOrientationBasis':'IMMUTABLE_EXACT_ORTHONORMAL_CONTRACT',
       'captureRevision':c.captureRevision,
     },
@@ -246,9 +287,37 @@ Elv5PureKernelExecutor<Cctv01Input,Cctv01Result> buildCctv01Executor({DateTime F
   );
 
 Cctv01Vec3 _kernelVec(Cctv01ExactVec3Contract v)=>Cctv01Vec3(v.x,v.y,v.z);
-Cctv01ExactVec3Contract _vec(Vector3D value)=>Cctv01ExactVec3Contract(
-  x:Elv5Rational.parseDecimal(_legacyDecimal(value.x)),
-  y:Elv5Rational.parseDecimal(_legacyDecimal(value.y)),
-  z:Elv5Rational.parseDecimal(_legacyDecimal(value.z)),
-);
-String _legacyDecimal(double value){if(!value.isFinite)throw StateError('CCTV01_ELV3_FRAME_AXIS_NON_FINITE');return value.toString();}
+
+bool _frameCompatible(
+  LocalCoordinateFrame legacy,
+  Cctv01ExactSurfaceFrameContract exact,
+  Elv5Rational tolerance,
+) =>
+    _axisCompatible(legacy.uAxis, exact.uAxis, tolerance) &&
+    _axisCompatible(legacy.vAxis, exact.vAxis, tolerance);
+
+bool _axisCompatible(
+  Vector3D legacy,
+  Cctv01ExactVec3Contract exact,
+  Elv5Rational tolerance,
+) =>
+    _componentCompatible(legacy.x, exact.x, tolerance) &&
+    _componentCompatible(legacy.y, exact.y, tolerance) &&
+    _componentCompatible(legacy.z, exact.z, tolerance);
+
+bool _componentCompatible(
+  double legacy,
+  Elv5Rational exact,
+  Elv5Rational tolerance,
+) {
+  if (!legacy.isFinite) return false;
+  final exactDouble = exact.numerator.toDouble() / exact.denominator.toDouble();
+  final toleranceDouble =
+      tolerance.numerator.toDouble() / tolerance.denominator.toDouble();
+  return (legacy - exactDouble).abs() <= toleranceDouble;
+}
+
+String _legacyDecimal(double value){
+  if(!value.isFinite)throw StateError('CCTV01_ELV3_FRAME_AXIS_NON_FINITE');
+  return value.toString();
+}
