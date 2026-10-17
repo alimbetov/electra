@@ -16,6 +16,7 @@ import 'drift_ampacity_section_contract_store.dart';
 import 'drift_cctv01_geometry_contract_store.dart';
 import 'drift_cctv04_pse_contract_store.dart';
 import 'drift_cctv05_capability_contract_store.dart';
+import 'drift_cctv06_link_contract_store.dart';
 import 'drift_cctv_recorder_assignment_source.dart';
 import 'drift_elv3_realized_link_fact_source.dart';
 import 'drift_elv4_current_evidence_source.dart';
@@ -76,6 +77,7 @@ final class DriftElv5CalculationRuntime {
     final cctv01Contracts = DriftCctv01GeometryContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
     final cctv04Contracts = DriftCctv04PseProjectionContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
     final cctv05Contracts = DriftCctv05CapabilityContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
+    final cctv06Contracts = DriftCctv06LinkContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
     final lan02Contracts = DriftLan02PortContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
     final lan03Contracts = DriftLan03PoeProjectionContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
     final lan04Contracts = DriftLan04CompatibilityContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
@@ -108,6 +110,7 @@ final class DriftElv5CalculationRuntime {
       recorderAssignments: recorderAssignments,
       cctv04Contracts: cctv04Contracts,
       cctv05Contracts: cctv05Contracts,
+      cctv06Contracts: cctv06Contracts,
       currentEvaluations: currentEvaluations,
       elv3LinkFacts: DriftElv3RealizedLinkFactSource(database),
       opticalSectionEvidence: DriftLan05OpticalSectionEvidenceSource(database),
