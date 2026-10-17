@@ -1,8 +1,8 @@
 import 'package:drift/native.dart';
-import 'package:electra_mobile/application/elv5/calculation/elv5_calculation_persistence.dart';
 import 'package:electra_mobile/application/elv5/calculation/elv5_calculation_runtime.dart';
 import 'package:electra_mobile/application/elv5/calculation/elv5_calculation_service.dart';
 import 'package:electra_mobile/application/elv5/commands/elv5_replacement_command_runner.dart';
+import 'package:electra_mobile/application/elv5/persistence/elv5_runtime_persistence.dart';
 import 'package:electra_mobile/application/elv5/wire/elv5_wire_command.dart';
 import 'package:electra_mobile/data/database/app_database.dart';
 import 'package:electra_mobile/data/repositories/elv5/drift_elv5_calculation_write_unit_of_work.dart';
@@ -10,7 +10,7 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('F2 FA-03 Q7 rejects stale concurrent generation and replays after restart', () async {
+  test('F2 FA-03 Q6/Q7/Q8 qualifies publication CAS, restart and frozen replay', () async {
     final db = AppDatabase(NativeDatabase.memory());
     addTearDown(db.close);
     await _seed(db);
@@ -23,6 +23,24 @@ void main() {
     expect(first.replayed, isFalse);
     expect(firstAdapter.captureCount, 1);
 
+    final uow = DriftElv5CalculationWriteUnitOfWork(
+      db,
+      originDeviceId: 'f2-fa03-q7',
+    );
+    final persistedPointers = await uow.run(
+      (session) => session.pointers.loadPointersBulk(
+        projectId: 'project-1',
+        designRevisionId: 'rev-1',
+        logicalNodeKeySha256s: <String>{_nodeSha()},
+      ),
+    );
+    final published = persistedPointers[_nodeSha()]!;
+    expect(published.freshness, Elv5PointerFreshness.current);
+    expect(published.generation, 1);
+    expect(published.evaluationId, isNotNull);
+    expect(published.outputSha256, isNotNull);
+
+    // Q7: another writer that captured generation 0 cannot overwrite CURRENT.
     final competing = _command(commandId: 'cmd-fa03-2', expectedGeneration: 0);
     await expectLater(
       firstService.execute(competing),
@@ -35,15 +53,40 @@ void main() {
       ),
     );
 
-    // Simulate process restart: a fresh service/adapter over the same durable DB
-    // must replay the committed command from the ledger before recapturing facts.
+    // Freeze the exact historical revision after the successful publication.
+    await db.customUpdate(
+      "UPDATE project_design_revisions SET state = 'FROZEN', revision = revision + 1 "
+      "WHERE project_id = 'project-1' AND id = 'rev-1'",
+    );
+
+    // Q8/restart: a fresh service over the same durable DB replays the historical
+    // command before any recapture and therefore preserves the exact result.
     final restartedAdapter = _Fa03FixtureAdapter();
     final restartedService = _service(db, restartedAdapter);
     final replay = await restartedService.execute(command);
-
     expect(replay.replayed, isTrue);
     expect(replay.logicalResultJson, first.logicalResultJson);
     expect(restartedAdapter.captureCount, 0);
+
+    // A new calculation on the frozen revision is forbidden even when it knows
+    // the latest pointer generation. Historical replay and new mutation are kept
+    // deliberately separate.
+    await expectLater(
+      restartedService.execute(
+        _command(
+          commandId: 'cmd-fa03-after-freeze',
+          expectedGeneration: 1,
+          expectedDesignRowRevision: 2,
+        ),
+      ),
+      throwsA(
+        isA<Elv5ReplacementCommandException>().having(
+          (value) => value.code,
+          'code',
+          'ELV5_DESIGN_REVISION_READ_ONLY',
+        ),
+      ),
+    );
   });
 }
 
@@ -63,43 +106,43 @@ Elv5CalculationService _service(AppDatabase db, _Fa03FixtureAdapter adapter) =>
 Elv5WireCommandEnvelope _command({
   required String commandId,
   required int expectedGeneration,
-}) {
-  final scope = Elv5ScopeRef(
-    kind: Elv5ScopeKind.design,
-    scopeId: 'rev-1',
-    scenarioKey: 'NONE',
-  );
-  final subject = Elv5SubjectRef(kind: 'FIRE_CIRCUIT', id: 'fire-circuit-1');
+  int expectedDesignRowRevision = 1,
+}) => Elv5WireCommandEnvelope(
+  operation: 'CALCULATE_DISCIPLINE_PROCESS',
+  projectId: 'project-1',
+  designRevisionId: 'rev-1',
+  commandId: commandId,
+  expectedDesignRowRevision: expectedDesignRowRevision,
+  expectedRows: const <String, int>{},
+  reviewedImpactFingerprint: _hash('9'),
+  payload: <String, Object?>{
+    'scope': <String, Object?>{
+      'kind': 'DESIGN',
+      'scopeId': 'rev-1',
+      'scenarioKey': 'NONE',
+    },
+    'processCodes': <String>[Elv5ProcessCode.fa03.wireCode],
+    'subjects': <Object?>[
+      <String, Object?>{'kind': 'FIRE_CIRCUIT', 'id': 'fire-circuit-1'},
+    ],
+    'expectedPointerGenerations': <String, Object?>{
+      _nodeSha(): expectedGeneration,
+    },
+  },
+);
+
+String _nodeSha() {
   final node = Elv5EngineeringNodeKeyV3(
     designRevisionId: 'rev-1',
-    scope: scope,
+    scope: Elv5ScopeRef(
+      kind: Elv5ScopeKind.design,
+      scopeId: 'rev-1',
+      scenarioKey: 'NONE',
+    ),
     processCode: Elv5ProcessCode.fa03,
-    subject: subject,
+    subject: Elv5SubjectRef(kind: 'FIRE_CIRCUIT', id: 'fire-circuit-1'),
   );
-  final nodeSha = const Elv5CanonicalJsonV1().sha256(node.toCanonicalValue());
-  return Elv5WireCommandEnvelope(
-    operation: 'CALCULATE_DISCIPLINE_PROCESS',
-    projectId: 'project-1',
-    designRevisionId: 'rev-1',
-    commandId: commandId,
-    expectedDesignRowRevision: 1,
-    expectedRows: const <String, int>{},
-    reviewedImpactFingerprint: _hash('9'),
-    payload: <String, Object?>{
-      'scope': <String, Object?>{
-        'kind': 'DESIGN',
-        'scopeId': 'rev-1',
-        'scenarioKey': 'NONE',
-      },
-      'processCodes': <String>[Elv5ProcessCode.fa03.wireCode],
-      'subjects': <Object?>[
-        <String, Object?>{'kind': 'FIRE_CIRCUIT', 'id': 'fire-circuit-1'},
-      ],
-      'expectedPointerGenerations': <String, Object?>{
-        nodeSha: expectedGeneration,
-      },
-    },
-  );
+  return const Elv5CanonicalJsonV1().sha256(node.toCanonicalValue());
 }
 
 final class _Fa03FixtureAdapter implements Elv5ProcessCalculationAdapter {
@@ -119,7 +162,7 @@ final class _Fa03FixtureAdapter implements Elv5ProcessCalculationAdapter {
       request: request,
       opaqueInput: request,
       inputFingerprint: _hash('1'),
-      captureRevision: 1,
+      captureRevision: request.designRevisionId == 'rev-1' ? 1 : 0,
     );
   }
 
@@ -144,7 +187,7 @@ final class _Fa03FixtureAdapter implements Elv5ProcessCalculationAdapter {
       },
       evidence: <String, Object?>{
         'schema': 'electra.elv5-fa03-evidence.v1',
-        'fixture': 'F2_Q7_PUBLICATION',
+        'fixture': 'F2_Q6_Q7_Q8_PUBLICATION',
       },
       dependencies: const <Never>[],
       completedAtUtc: DateTime.utc(2026, 10, 17, 12),
