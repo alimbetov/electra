@@ -139,18 +139,13 @@ final class Fa06NotificationContract {
   Fa06NotificationContract({
     required String circuitId,
     required this.deviceLimit,
-    required String outputCurrentLimitA,
-    required String minimumTerminalVoltageV,
-    required String maximumTerminalVoltageV,
+    required this.outputCurrentLimitA,
+    required this.minimumTerminalVoltageV,
+    required this.maximumTerminalVoltageV,
     required Iterable<Fa06CaseContract> cases,
     required Map<String, String> terminalLoadIdByDeviceId,
     required this.supervision,
   })  : circuitId = _text(circuitId, 'circuitId'),
-        outputCurrentLimitA = _decimal(outputCurrentLimitA, 'outputCurrentLimitA'),
-        minimumTerminalVoltageV =
-            _decimal(minimumTerminalVoltageV, 'minimumTerminalVoltageV'),
-        maximumTerminalVoltageV =
-            _decimal(maximumTerminalVoltageV, 'maximumTerminalVoltageV'),
         cases = List.unmodifiable(_cases(cases)),
         terminalLoadIdByDeviceId = Map.unmodifiable(
           _terminalMap(terminalLoadIdByDeviceId),
@@ -158,9 +153,9 @@ final class Fa06NotificationContract {
     if (deviceLimit < 0) {
       throw ArgumentError('FA06 deviceLimit must be nonnegative.');
     }
-    if (this.outputCurrentLimitA < Elv5Rational.zero ||
-        this.minimumTerminalVoltageV < Elv5Rational.zero ||
-        this.maximumTerminalVoltageV < this.minimumTerminalVoltageV) {
+    if (outputCurrentLimitA < Elv5Rational.zero ||
+        minimumTerminalVoltageV < Elv5Rational.zero ||
+        maximumTerminalVoltageV < minimumTerminalVoltageV) {
       throw ArgumentError('FA06 electrical limits are invalid.');
     }
     if (this.cases.isEmpty ||
@@ -233,23 +228,27 @@ final class Fa06NotificationContract {
     if (deviceLimit is! int || rawCases is! List || terminalMap is! Map) {
       throw const FormatException('FA06 contract field type mismatch.');
     }
+    final terminals = <String, String>{};
+    for (final entry in terminalMap.entries) {
+      if (entry.key is! String || entry.value is! String) {
+        throw const FormatException('FA06 terminal map must contain text pairs.');
+      }
+      terminals[_text(entry.key as String, 'deviceId')] =
+          _text(entry.value as String, 'terminalLoadId');
+    }
     return Fa06NotificationContract(
       circuitId: _mapText(map, 'circuitId'),
       deviceLimit: deviceLimit,
-      outputCurrentLimitA: _rationalText(map['outputCurrentLimitA'], 'outputCurrentLimitA'),
+      outputCurrentLimitA: _rational(map['outputCurrentLimitA'], 'outputCurrentLimitA'),
       minimumTerminalVoltageV:
-          _rationalText(map['minimumTerminalVoltageV'], 'minimumTerminalVoltageV'),
+          _rational(map['minimumTerminalVoltageV'], 'minimumTerminalVoltageV'),
       maximumTerminalVoltageV:
-          _rationalText(map['maximumTerminalVoltageV'], 'maximumTerminalVoltageV'),
+          _rational(map['maximumTerminalVoltageV'], 'maximumTerminalVoltageV'),
       cases: <Fa06CaseContract>[
         for (final raw in rawCases)
           Fa06CaseContract.fromMap(_object(raw, 'FA06 case')),
       ],
-      terminalLoadIdByDeviceId: <String, String>{
-        for (final entry in terminalMap.entries)
-          _text(entry.key.toString(), 'deviceId'):
-              _text(entry.value as String, 'terminalLoadId'),
-      },
+      terminalLoadIdByDeviceId: terminals,
       supervision: Fa06SupervisionContract.fromMap(
         _object(map['supervision'], 'supervision'),
       ),
@@ -307,16 +306,9 @@ Map<String, String> _terminalMap(Map<String, String> value) {
   return result;
 }
 
-Elv5Rational _decimal(String value, String field) {
-  final parsed = Elv5Rational.parseDecimal(_text(value, field));
-  return parsed;
-}
-
-String _rationalText(Object? raw, String field) {
+Elv5Rational _rational(Object? raw, String field) {
   if (raw is! Map) throw FormatException('$field must be a rational map.');
-  final value = Elv5Rational.fromMap(Map<String, Object?>.from(raw));
-  if (value.denominator == BigInt.one) return value.numerator.toString();
-  throw FormatException('$field cannot be restored as a decimal input exactly.');
+  return Elv5Rational.fromMap(Map<String, Object?>.from(raw));
 }
 
 Map<String, Object?> _object(Object? value, String field) {
@@ -330,8 +322,8 @@ String _mapText(Map<String, Object?> map, String field) {
   return _text(value, field);
 }
 
-String _nullableText(Object? value, String field) {
-  if (value == null) return null as dynamic;
+String? _nullableText(Object? value, String field) {
+  if (value == null) return null;
   if (value is! String) throw FormatException('$field must be text or null.');
   return _text(value, field);
 }
