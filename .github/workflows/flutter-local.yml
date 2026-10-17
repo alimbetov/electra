@@ -54,6 +54,10 @@ jobs:
         working-directory: .
         run: python3 -m unittest discover -s scripts/ci -p 'test_elv5_*.py'
 
+      - name: Reject ELV5 engineering silent defaults
+        working-directory: .
+        run: python3 scripts/ci/check-elv5-silent-defaults.py
+
       - name: Verify ELV5 engineering hardening
         working-directory: .
         run: python3 scripts/ci/check-elv5-engineering-hardening.py
