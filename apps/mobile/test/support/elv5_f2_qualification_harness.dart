@@ -61,56 +61,113 @@ final class Elv5F2QualificationHarness {
 
   Future<void> qualify(Elv5F2QualificationScenario scenario) async {
     final initial = await scenario.publishInitial();
-    _assertCurrentPublication(initial, minimumGeneration: 1);
+    assertQ6Initial(scenario.processCode, initial);
 
     final republished = await scenario.invalidateAndRepublish();
     final committed = republished ?? initial;
     if (republished != null) {
-      _assertCurrentPublication(
-        republished,
-        minimumGeneration: initial.generation + 1,
-      );
-      expect(
-        republished.evaluationId,
-        isNot(initial.evaluationId),
-        reason: '${scenario.processCode} Q6 must publish a new evaluation',
-      );
-      expect(
-        republished.inputFingerprint,
-        isNot(initial.inputFingerprint),
-        reason:
-            '${scenario.processCode} Q6 mutation must change captured input',
-      );
+      assertQ6Republished(scenario.processCode, initial, republished);
     }
 
     final restarted = await scenario.restartAndReplay();
-    _assertSameCommittedResult(
+    assertQ7Replay(scenario.processCode, committed, restarted);
+
+    await expectQ7StaleWriter(
       scenario.processCode,
+      scenario.attemptStaleWriter,
+    );
+
+    final frozenReplay = await scenario.freezeAndReplayCommitted();
+    assertQ8Replay(scenario.processCode, committed, frozenReplay);
+
+    await expectQ8ReadOnly(
+      scenario.processCode,
+      scenario.attemptNewCalculationAfterFreeze,
+      operation: 'new calculation',
+    );
+  }
+
+  /// Shared Q6 assertion used both by scenario-driven qualification and by
+  /// mature production E2E tests that retain richer process-specific checks.
+  void assertQ6Initial(String processCode, Elv5F2PublicationSnapshot snapshot) {
+    _assertCurrentPublication(snapshot, minimumGeneration: 1);
+    expect(
+      snapshot.evaluationId,
+      isNotEmpty,
+      reason: '$processCode Q6 must persist an evaluation identity',
+    );
+  }
+
+  /// Shared Q6 invalidation/republication contract.
+  void assertQ6Republished(
+    String processCode,
+    Elv5F2PublicationSnapshot initial,
+    Elv5F2PublicationSnapshot republished,
+  ) {
+    _assertCurrentPublication(
+      republished,
+      minimumGeneration: initial.generation + 1,
+    );
+    expect(
+      republished.evaluationId,
+      isNot(initial.evaluationId),
+      reason: '$processCode Q6 must publish a new evaluation',
+    );
+    expect(
+      republished.inputFingerprint,
+      isNot(initial.inputFingerprint),
+      reason: '$processCode Q6 mutation must change captured input',
+    );
+  }
+
+  /// Shared Q7 durable restart/replay contract.
+  void assertQ7Replay(
+    String processCode,
+    Elv5F2PublicationSnapshot committed,
+    Elv5F2PublicationSnapshot restarted,
+  ) {
+    _assertSameCommittedResult(
+      processCode,
       committed,
       restarted,
       gate: 'Q7',
     );
+  }
 
-    await _expectFailureCode(
-      scenario.attemptStaleWriter,
-      'ELV5_POINTER_GENERATION_CONFLICT',
-      '${scenario.processCode} Q7 stale writer',
-    );
+  /// Shared Q7 stale-writer CAS contract.
+  Future<void> expectQ7StaleWriter(
+    String processCode,
+    Future<void> Function() action,
+  ) => _expectFailureCode(
+    action,
+    'ELV5_POINTER_GENERATION_CONFLICT',
+    '$processCode Q7 stale writer',
+  );
 
-    final frozenReplay = await scenario.freezeAndReplayCommitted();
+  /// Shared Q8 frozen historical replay contract.
+  void assertQ8Replay(
+    String processCode,
+    Elv5F2PublicationSnapshot committed,
+    Elv5F2PublicationSnapshot frozenReplay,
+  ) {
     _assertSameCommittedResult(
-      scenario.processCode,
+      processCode,
       committed,
       frozenReplay,
       gate: 'Q8',
     );
-
-    await _expectFailureCode(
-      scenario.attemptNewCalculationAfterFreeze,
-      'ELV5_DESIGN_REVISION_READ_ONLY',
-      '${scenario.processCode} Q8 new calculation after freeze',
-    );
   }
+
+  /// Shared Q8 fail-closed read-only contract for new work after freeze.
+  Future<void> expectQ8ReadOnly(
+    String processCode,
+    Future<void> Function() action, {
+    String operation = 'operation',
+  }) => _expectFailureCode(
+    action,
+    'ELV5_DESIGN_REVISION_READ_ONLY',
+    '$processCode Q8 $operation after freeze',
+  );
 
   void _assertCurrentPublication(
     Elv5F2PublicationSnapshot snapshot, {
