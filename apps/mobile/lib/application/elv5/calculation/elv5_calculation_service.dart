@@ -8,6 +8,7 @@ import '../persistence/elv5_runtime_persistence.dart';
 import '../wire/elv5_wire_command.dart';
 import 'elv5_calculation_persistence.dart';
 import 'elv5_calculation_runtime.dart';
+import 'elv5_qualification_identity_source.dart';
 
 final class Elv5CalculationResult {
   const Elv5CalculationResult({
@@ -29,12 +30,14 @@ final class Elv5CalculationService {
     required this.registry,
     required this.publicationUnitOfWork,
     required this.originDeviceId,
+    this.qualificationIdentitySource,
     DateTime Function()? now,
   }) : _now = now ?? (() => DateTime.now().toUtc());
 
   final Elv5ProcessCalculationRegistry registry;
   final Elv5CalculationWriteUnitOfWork publicationUnitOfWork;
   final String originDeviceId;
+  final Elv5QualificationIdentitySource? qualificationIdentitySource;
   final DateTime Function() _now;
 
   Future<Elv5CalculationResult> execute(Elv5WireCommandEnvelope command) async {
@@ -67,12 +70,18 @@ final class Elv5CalculationService {
     final evaluations = <Elv5ProcessEvaluationCandidate>[];
     for (final input in captured) {
       final adapter = registry.require(input.request.processCode);
-      final result = await adapter.execute(input);
+      var result = await adapter.execute(input);
       if (_nodeHash(result.nodeKey) != _nodeHash(input.request.nodeKey)) {
         throw StateError('ELV5_CALCULATION_NODE_IDENTITY_CHANGED');
       }
       if (result.inputFingerprint != input.inputFingerprint) {
         throw StateError('ELV5_CALCULATION_INPUT_FINGERPRINT_CHANGED');
+      }
+      final identity = qualificationIdentitySource?.forProcess(
+        input.request.processCode,
+      );
+      if (identity != null) {
+        result = result.withQualificationIdentity(identity);
       }
       evaluations.add(result);
     }
@@ -124,12 +133,19 @@ final class Elv5CalculationService {
         logicalNodeKeySha256s: pointerKeys,
       );
       for (final evaluation in evaluations) {
-        final expected = _expectedPointerGeneration(command, evaluation.nodeKeySha256);
+        final expected = _expectedPointerGeneration(
+          command,
+          evaluation.nodeKeySha256,
+        );
         final actual = existingPointers[evaluation.nodeKeySha256]?.generation ?? 0;
         if (expected != actual) {
           throw Elv5ReplacementCommandException(
             'ELV5_POINTER_GENERATION_CONFLICT',
-            {'node': evaluation.nodeKeySha256, 'expected': expected, 'actual': actual},
+            {
+              'node': evaluation.nodeKeySha256,
+              'expected': expected,
+              'actual': actual,
+            },
           );
         }
       }
@@ -147,10 +163,11 @@ final class Elv5CalculationService {
       }
 
       for (final evaluation in evaluations) {
-        // Scenario/what-if evaluations are durable evidence, but only DESIGN/NONE
-        // results may advance the authoritative CURRENT pointer.
         if (evaluation.nodeKey.scope.scenarioKey != 'NONE') continue;
-        final expected = _expectedPointerGeneration(command, evaluation.nodeKeySha256);
+        final expected = _expectedPointerGeneration(
+          command,
+          evaluation.nodeKeySha256,
+        );
         final published = await session.pointers.compareAndSet(
           Elv5PointerWrite(
             projectId: command.projectId,
@@ -188,12 +205,17 @@ final class Elv5CalculationService {
           originDeviceId: originDeviceId,
         ),
       );
-      return Elv5CalculationResult(replayed: false, logicalResultJson: logical);
+      return Elv5CalculationResult(
+        replayed: false,
+        logicalResultJson: logical,
+      );
     });
   }
 
   List<Elv5CalculationRequest> _requests(Elv5WireCommandEnvelope command) {
-    final scopeMap = Map<String, Object?>.from(command.payload['scope']! as Map);
+    final scopeMap = Map<String, Object?>.from(
+      command.payload['scope']! as Map,
+    );
     final scopeKind = Elv5ScopeKind.values.byName(
       (scopeMap['kind']! as String).toLowerCase(),
     );
@@ -259,7 +281,9 @@ final class Elv5CalculationService {
     );
     final value = generations[nodeHash];
     if (value is! int || value < 0) {
-      throw FormatException('Missing expected pointer generation for $nodeHash.');
+      throw FormatException(
+        'Missing expected pointer generation for $nodeHash.',
+      );
     }
     return value;
   }
@@ -292,6 +316,9 @@ final class Elv5CalculationService {
             {
               'nodeKeySha256': evaluation.nodeKeySha256,
               'evaluationId': evaluation.evaluationId,
+              'evaluationIdentitySchema': evaluation.evaluationIdentitySchema,
+              'qualificationIdentitySha256':
+                  evaluation.qualificationIdentity?.canonicalSha256(),
               'outputSha256': evaluation.outputSha256,
               'assessment': evaluation.assessment.name.toUpperCase(),
               'completion': evaluation.completion.name.toUpperCase(),
