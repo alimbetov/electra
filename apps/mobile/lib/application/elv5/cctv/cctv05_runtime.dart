@@ -55,10 +55,18 @@ final class Cctv05PersistedInputResolver
         'actualDefinitionId':actualDefinitionId,'actualDefinitionVersion':actualDefinitionVersion,
       });
     }
-    final rawAssignments=_objects(payload['assignments'],'assignments');
+    final rawAssignments=_objects(payload['assignments'],'assignments')
+      ..sort(_compareAssignments);
     if(rawAssignments.isEmpty)_blocked(request,'CCTV05_ASSIGNMENTS_REQUIRED',basis,contractSnapshot.contentHash,dependencies,<String,Object?>{'recorderId':recorderId});
+    final assignmentIds=<String>{};
     final cameraIds=<String>{};final poolIds=<String>{};
-    for(final a in rawAssignments){cameraIds.add(_text(a,'cameraId'));poolIds.add(_text(a,'storagePoolId'));}
+    for(final a in rawAssignments){
+      final assignmentId=_text(a,'assignmentId');
+      if(!assignmentIds.add(assignmentId)){
+        _blocked(request,'CCTV05_DUPLICATE_ASSIGNMENT_ID',basis,contractSnapshot.contentHash,dependencies,<String,Object?>{'assignmentId':assignmentId});
+      }
+      cameraIds.add(_text(a,'cameraId'));poolIds.add(_text(a,'storagePoolId'));
+    }
     if(!_sameSet(cameraIds,contract.expectedCctv02InputFingerprintByCamera.keys.toSet())){
       _blocked(request,'CCTV05_CAMERA_SCOPE_MISMATCH',basis,contractSnapshot.contentHash,dependencies,<String,Object?>{'actual':cameraIds.toList()..sort(),'expected':contract.expectedCctv02InputFingerprintByCamera.keys.toList()..sort()});
     }
@@ -135,12 +143,15 @@ final class Cctv05PersistedInputResolver
       final value=>throw FormatException('Unsupported CCTV05 accountingBasis: $value'),
     };
     upstream.sort((a,b)=>(a['evaluationId']! as String).compareTo(b['evaluationId']! as String));
-    final assignmentScope=<String,Object?>{
-      'schema':'electra.elv5-cctv05-assignment-scope.v1','recorderId':recorderId,
-      'assignments':<Object?>[for(final a in rawAssignments)<String,Object?>{
+    final canonicalAssignments=<Object?>[
+      for(final a in rawAssignments)<String,Object?>{
         'assignmentId':_text(a,'assignmentId'),'cameraId':_text(a,'cameraId'),'encodedStreamId':_text(a,'encodedStreamId'),
         'licenseChannelId':_text(a,'licenseChannelId'),'storagePoolId':_text(a,'storagePoolId'),
-      }],
+      },
+    ];
+    final assignmentScope=<String,Object?>{
+      'schema':'electra.elv5-cctv05-assignment-scope.v1','recorderId':recorderId,
+      'assignments':canonicalAssignments,
     };
     final ingressScope=_encoder.sha256(<String,Object?>{'schema':'electra.elv5-cctv05-ingress-scope.v1','assignmentScope':assignmentScope,'cameras':cameraIds.toList()..sort()});
     final storageScope=_encoder.sha256(<String,Object?>{'schema':'electra.elv5-cctv05-storage-scope.v1','assignmentScope':assignmentScope,'pools':poolIds.toList()..sort()});
@@ -158,9 +169,13 @@ final class Cctv05PersistedInputResolver
       storageEvidence:Cctv05StorageEvidence(scopeFingerprint:storageScope,basis:storageBasis!,requiredUsable:ByteCapacity(requiredUsable)),
       requireGuaranteedStorage:contract.requireGuaranteedStorage,
     );
+    final canonicalRecorderPayload=<String,Object?>{
+      ...payload,
+      'assignments':canonicalAssignments,
+    };
     final inputFingerprint=_encoder.sha256(<String,Object?>{
-      'schema':'electra.elv5-cctv05-captured-input.v1','recorderAggregateId':recorder.aggregateId,
-      'recorderRevision':recorder.revision,'recorderPayload':payload,'contractContentHash':contractSnapshot.contentHash,'upstream':upstream,
+      'schema':'electra.elv5-cctv05-captured-input.v2','recorderAggregateId':recorder.aggregateId,
+      'recorderRevision':recorder.revision,'recorderPayload':canonicalRecorderPayload,'contractContentHash':contractSnapshot.contentHash,'upstream':upstream,
     });
     dependencies.add(_dependency(request,'SET','CCTV_RECORDER',recorderId,memberId:'${recorder.aggregateId}:${recorder.revision}'));
     return Elv5CapturedInput<Cctv05Input>(request:request,value:input,inputFingerprint:inputFingerprint,
@@ -195,6 +210,13 @@ Elv5PureKernelExecutor<Cctv05Input,Cctv05Result> buildCctv05Executor({DateTime F
     nowUtc:nowUtc,
   );
 
+int _compareAssignments(Map<String,Object?> a,Map<String,Object?> b){
+  for(final key in const <String>['assignmentId','cameraId','encodedStreamId','licenseChannelId','storagePoolId']){
+    final comparison=_text(a,key).compareTo(_text(b,key));
+    if(comparison!=0)return comparison;
+  }
+  return 0;
+}
 Map<String,Object?> _map(Object? value,String field){if(value is! Map)throw FormatException('$field must be object.');return Map<String,Object?>.from(value);}
 List<Map<String,Object?>> _objects(Object? value,String field){if(value is! List)throw FormatException('$field must be list.');return <Map<String,Object?>>[for(final raw in value)_map(raw,field)];}
 String _text(Map<String,Object?> map,String key){final value=map[key];if(value is! String||value.trim().isEmpty)throw FormatException('$key must be text.');return value.trim();}
