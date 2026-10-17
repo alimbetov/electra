@@ -1,0 +1,30 @@
+{
+  "schema": "electra.elv5-normative-requirements-amendment.v1",
+  "status": "AUTHORITATIVE_HARDENING_AMENDMENT",
+  "baseRegistry": "normative-requirements-registry.json",
+  "baseObligationCountDelta": 0,
+  "amendsObligations": [
+    {
+      "id": "ELV5-NORM-005",
+      "addRequirement": "Cable allowable continuous current Iz uses a separate exact ampacity contract. Cross-section, material, installation method, loaded-conductor count, ambient-temperature factor and grouping factor are explicit evidence-backed inputs; binary floating point and hidden defaults cannot decide Iz."
+    },
+    {
+      "id": "ELV5-NORM-006",
+      "addRequirement": "Ampacity reference row and every correction factor carry immutable evidenceRef/contentHash provenance. Missing factor applicability is unresolved, not factor 1.0."
+    },
+    {
+      "id": "ELV5-NORM-024",
+      "addRequirement": "FA-08 technical cable policy may consume shared AMPACITY_IZ_A evidence, but ampacity PASS remains distinct from connected-load current, voltage drop, short-circuit withstand and ELV7 verified compliance."
+    },
+    {
+      "id": "ELV5-NORM-026",
+      "addRequirement": "Grouping membership is selector-aware: insertion/removal/re-routing of another grouped cable invalidates affected Iz evaluations even when the evaluated cable itself is unchanged."
+    }
+  ],
+  "acceptance": [
+    "Elv5AmpacityKernel exact arithmetic test",
+    "FA-08 AMPACITY_IZ_A technical-policy test",
+    "missing ampacity driver fail-closed test",
+    "grouping membership invalidation test"
+  ]
+}
