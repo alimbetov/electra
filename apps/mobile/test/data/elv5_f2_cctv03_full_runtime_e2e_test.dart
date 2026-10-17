@@ -1,4 +1,5 @@
 import '../support/elv5_f2_execution_witness.dart';
+import '../support/elv5_f2_global_reliability.dart';
 import 'dart:io';
 
 import 'package:drift/drift.dart' show Value, Variable;
@@ -51,6 +52,7 @@ void main() {
         expectedPointerGeneration: 0,
         expectedDesignRevision: 2,
       );
+      await verifyF2GlobalPublication(db, firstCommand, 'CCTV-03');
       final first = await runtime.service.execute(firstCommand);
       expect(first.replayed, isFalse);
 
@@ -163,6 +165,12 @@ void main() {
 
       // Q8: committed historical result remains replayable after freeze while
       // both a new calculation and a new recording-pool mutation fail closed.
+      await verifyF2GlobalFreeze(
+        db,
+        secondCommand,
+        logicalBeforeRestart,
+        'CCTV-03',
+      );
       await db.customUpdate(
         "UPDATE project_design_revisions SET state = 'FROZEN', revision = 4 "
         "WHERE project_id = 'p' AND id = 'd'",

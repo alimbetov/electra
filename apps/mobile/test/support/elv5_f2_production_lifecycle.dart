@@ -12,6 +12,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'elv5_f2_qualification_harness.dart';
 import 'elv5_f2_execution_witness.dart';
+import 'elv5_f2_global_reliability.dart';
 
 /// File-backed production qualification. Callbacks supply authoritative source
 /// writes and domain assertions only; resolvers/executors are never injected.
@@ -151,9 +152,9 @@ final class Elv5F2ProductionLifecycle {
     });
     await seed(db);
     expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
-    final initial = await runtime(
-      db,
-    ).service.execute(command('initial', await revision(), 0));
+    final initialCommand = command('initial', await revision(), 0);
+    await verifyF2GlobalPublication(db, initialCommand, process.wireCode);
+    final initial = await runtime(db).service.execute(initialCommand);
     final first = await snapshot(
       initial.logicalResultJson,
       initialAssessment,
@@ -316,6 +317,12 @@ final class Elv5F2ProductionLifecycle {
       ),
     );
     expect((await evaluation()).data, identity);
+    await verifyF2GlobalFreeze(
+      db,
+      committedCommand,
+      committedLogical,
+      process.wireCode,
+    );
     await db.customStatement(
       "UPDATE project_design_revisions SET state = 'FROZEN', revision = revision + 1 WHERE id = 'd'",
     );

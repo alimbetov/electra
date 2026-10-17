@@ -133,7 +133,10 @@ final class DriftElv5LifecycleInvalidation {
     for (var i = 0; i < ids.length; i += 400) {
       final batch = ids.skip(i).take(400).toList();
       changed += await database.customUpdate(
-        'UPDATE discipline_evaluation_pointers SET freshness=\'STALE\',generation=generation+1,updated_at=?,origin_device_id=? WHERE project_id=? AND design_revision_id=? AND logical_node_key_sha256 IN (${List.filled(batch.length, '?').join(',')}) AND freshness<>\'STALE\'',
+        "UPDATE discipline_evaluation_pointers SET freshness = 'STALE', generation = generation + 1, "
+        'updated_at=?,origin_device_id=? WHERE project_id=? AND design_revision_id=? '
+        'AND logical_node_key_sha256 IN (${List.filled(batch.length, '?').join(',')}) '
+        "AND freshness <> 'STALE'",
         variables: [
           Variable<DateTime>(updatedAtUtc.toUtc()),
           Variable.withString(originDeviceId),

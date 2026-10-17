@@ -3,6 +3,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 INVALIDATOR = ROOT / 'apps/mobile/lib/data/repositories/elv5/drift_elv5_dependency_invalidator.dart'
+LIFECYCLE = ROOT / 'apps/mobile/lib/data/repositories/elv5/drift_elv5_lifecycle_invalidation.dart'
 COORDINATOR = ROOT / 'apps/mobile/lib/data/repositories/elv5/drift_fa08_invalidation_coordinator.dart'
 P1 = ROOT / 'apps/mobile/test/data/elv5_environment_ampacity_fa08_persistence_test.dart'
 P2 = ROOT / 'apps/mobile/test/data/elv5_fa08_invalidation_test.dart'
@@ -16,14 +17,17 @@ def require(condition: bool, message: str) -> None:
 
 def main() -> None:
     invalidator = INVALIDATOR.read_text(encoding='utf-8')
+    lifecycle = LIFECYCLE.read_text(encoding='utf-8')
     coordinator = COORDINATOR.read_text(encoding='utf-8')
     p1 = P1.read_text(encoding='utf-8')
     p2 = P2.read_text(encoding='utf-8')
     republish = REPUBLISH.read_text(encoding='utf-8')
 
-    require("freshness = 'STALE'" in invalidator, 'must stale pointers')
-    require('generation = generation + 1' in invalidator, 'must advance generation once')
-    require("freshness <> 'STALE'" in invalidator, 'repeated invalidation must be idempotent')
+    require('lifecycle.invalidateNodes(' in invalidator, 'must use shared lifecycle invalidation closure')
+    require('database.transaction' in lifecycle and 'requireWorking' in lifecycle, 'closure must be atomic and lifecycle guarded')
+    require("freshness = 'STALE'" in lifecycle, 'must stale pointers')
+    require('generation = generation + 1' in lifecycle, 'must advance generation once')
+    require("freshness <> 'STALE'" in lifecycle, 'repeated invalidation must be idempotent')
 
     for token in (
         'environmentEditionChanged',

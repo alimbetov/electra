@@ -1,4 +1,5 @@
 import '../support/elv5_f2_execution_witness.dart';
+import '../support/elv5_f2_global_reliability.dart';
 import 'package:electra_mobile/application/elv5/commands/elv5_replacement_command_runner.dart';
 import 'dart:convert';
 import 'dart:io';
@@ -49,6 +50,7 @@ void main() {
         expectedDesignRevision: 4,
         expectedPointerGeneration: 0,
       );
+      await verifyF2GlobalPublication(db, firstCommand, 'FA-08');
       final first = await runtime.service.execute(firstCommand);
       expect(first.replayed, isFalse);
       final firstSnapshot = await _snapshot(
@@ -259,6 +261,12 @@ void main() {
       );
       harness.assertQ7Replay('FA-08', committedSnapshot, restartedSnapshot);
 
+      await verifyF2GlobalFreeze(
+        db,
+        committedCommand,
+        replay.logicalResultJson,
+        'FA-08',
+      );
       await db.customUpdate(
         "UPDATE project_design_revisions SET state = 'FROZEN', revision = revision + 1 "
         "WHERE project_id = 'p' AND id = 'd'",

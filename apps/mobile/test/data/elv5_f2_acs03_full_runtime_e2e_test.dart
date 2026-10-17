@@ -1,4 +1,5 @@
 import '../support/elv5_f2_execution_witness.dart';
+import '../support/elv5_f2_global_reliability.dart';
 import 'dart:convert';
 import 'dart:io';
 
@@ -84,6 +85,7 @@ void main() {
         expectedPointerGeneration: 0,
         expectedDesignRevision: 2,
       );
+      await verifyF2GlobalPublication(db, command, 'ACS-03');
       final first = await runtime.service.execute(command);
       expect(first.replayed, isFalse);
 
@@ -184,6 +186,7 @@ void main() {
 
       // Q8: freeze preserves historical replay, while new calculations are
       // forbidden even when the caller supplies the latest pointer generation.
+      await verifyF2GlobalFreeze(db, command, logicalBeforeRestart, 'ACS-03');
       await db.customUpdate(
         "UPDATE project_design_revisions SET state = 'FROZEN', revision = 3 "
         "WHERE project_id = 'p' AND id = 'd'",

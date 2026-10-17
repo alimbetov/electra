@@ -1,4 +1,5 @@
 import '../support/elv5_f2_execution_witness.dart';
+import '../support/elv5_f2_global_reliability.dart';
 import 'dart:convert';
 import 'dart:io';
 
@@ -62,6 +63,7 @@ void main() {
         expectedPointerGeneration: 0,
         expectedDesignRevision: 2,
       );
+      await verifyF2GlobalPublication(db, firstCommand, 'LAN-05');
       final first = await runtime.service.execute(firstCommand);
       expect(first.replayed, isFalse);
 
@@ -205,6 +207,12 @@ void main() {
 
       // Q8: historical result/command replay remains available after freeze,
       // while both new calculation and optical evidence mutation fail closed.
+      await verifyF2GlobalFreeze(
+        db,
+        secondCommand,
+        secondLogicalResult,
+        'LAN-05',
+      );
       await db.customUpdate(
         "UPDATE project_design_revisions SET state = 'FROZEN', revision = 4 "
         "WHERE project_id = 'p' AND id = 'd'",
