@@ -35,6 +35,8 @@ import '../fire/fa08_runtime.dart';
 import '../lan/elv3_realized_link_facts.dart';
 import '../lan/elv5_lan_persistence.dart';
 import '../lan/lan01_runtime.dart';
+import '../lan/lan02_port_contract.dart';
+import '../lan/lan02_runtime.dart';
 import '../lan/lan05_optical_section_evidence.dart';
 import '../lan/lan05_runtime.dart';
 import '../power/elv4_current_evidence_source.dart';
@@ -50,6 +52,7 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
   required Elv5FireMutationStore fireStore,
   required Elv3RealizedLinkFactSource elv3LinkFacts,
   required Lan05OpticalSectionEvidenceSource opticalSectionEvidence,
+  required Lan02PortContractSource lan02Contracts,
   required Acs01RoleProfileContractSource acs01Contracts,
   required Acs02ResourceContractSource acs02Contracts,
   required Acs03ElectricalContractSource acs03Contracts,
@@ -87,6 +90,10 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
     blocked(
       Lan01PersistedInputResolver(lanStore: lanStore, elv3Facts: elv3LinkFacts, nowUtc: nowUtc),
       buildLan01Executor(nowUtc: nowUtc),
+    ),
+    blocked(
+      Lan02PersistedInputResolver(lanStore: lanStore, contractSource: lan02Contracts, nowUtc: nowUtc),
+      buildLan02Executor(nowUtc: nowUtc),
     ),
     blocked(
       Lan05PersistedInputResolver(
