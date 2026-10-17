@@ -1,5 +1,8 @@
+import '../../../application/elv4_wire_command_dispatcher.dart';
+import '../../../application/elv4_wire_power_payload.dart';
 import '../../../application/power_mutation_command.dart';
 import '../../database/app_database.dart';
+import '../drift_elv4_wire_aggregate_service.dart';
 import '../drift_power_command_service.dart';
 import 'drift_elv5_dependency_invalidator.dart';
 
@@ -20,6 +23,11 @@ final class DriftElv5PowerMutationCoordinator {
          originDeviceId: originDeviceId,
          now: nowUtc,
        ),
+       _aggregate = DriftElv4WireAggregateService(
+         database,
+         originDeviceId: originDeviceId,
+         now: nowUtc,
+       ),
        _invalidator = DriftElv5DependencyInvalidator(
          database,
          originDeviceId: originDeviceId,
@@ -28,6 +36,7 @@ final class DriftElv5PowerMutationCoordinator {
 
   final AppDatabase database;
   final DriftPowerCommandService _power;
+  final DriftElv4WireAggregateService _aggregate;
   final DriftElv5DependencyInvalidator _invalidator;
 
   Future<PowerMutationReceipt> execute(PowerMutationCommand command) =>
@@ -37,12 +46,10 @@ final class DriftElv5PowerMutationCoordinator {
 
         switch (command) {
           case SetPowerLoadCommand value:
-            await _invalidator.invalidateSubject(
+            await _invalidateComponentLoads(
               projectId: value.projectId,
               designRevisionId: value.designRevisionId,
-              relationKind: 'FACT',
-              domain: 'POWER_COMPONENT_STATE_LOADS',
-              subjectId: value.contribution.componentId,
+              componentId: value.contribution.componentId,
             );
           case ReplacePowerScenarioCommand value:
             await _invalidateScenario(
@@ -61,6 +68,44 @@ final class DriftElv5PowerMutationCoordinator {
         }
         return receipt;
       });
+
+  /// Public-wire aggregate load replacement keeps one stable [originId] across
+  /// multiple explicit device states. FA-02 consumes that exact state matrix.
+  Future<PowerMutationReceipt> replaceLoadProfile({
+    required Elv4WireCommandEnvelope envelope,
+    required Iterable<String> changedDependencyRefs,
+    required String componentId,
+    required Iterable<Elv4WireLoadEntry> loads,
+  }) => database.transaction(() async {
+    final receipt = await _aggregate.replaceLoadProfile(
+      envelope: envelope,
+      changedDependencyRefs: changedDependencyRefs,
+      componentId: componentId,
+      loads: loads,
+    );
+    if (!receipt.replayed) {
+      await _invalidateComponentLoads(
+        projectId: envelope.projectId,
+        designRevisionId: envelope.designRevisionId,
+        componentId: componentId,
+      );
+    }
+    return receipt;
+  });
+
+  Future<void> _invalidateComponentLoads({
+    required String projectId,
+    required String designRevisionId,
+    required String componentId,
+  }) async {
+    await _invalidator.invalidateSubject(
+      projectId: projectId,
+      designRevisionId: designRevisionId,
+      relationKind: 'FACT',
+      domain: 'POWER_COMPONENT_STATE_LOADS',
+      subjectId: componentId,
+    );
+  }
 
   Future<void> _invalidateScenario({
     required String projectId,
