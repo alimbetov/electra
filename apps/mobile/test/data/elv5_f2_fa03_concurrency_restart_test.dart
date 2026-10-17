@@ -9,10 +9,13 @@ import 'package:electra_mobile/data/repositories/elv5/drift_elv5_calculation_wri
 import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../support/elv5_f2_qualification_harness.dart';
+
 void main() {
   test(
     'F2 FA-03 Q6/Q7/Q8 qualifies publication CAS, restart and frozen replay',
     () async {
+      const harness = Elv5F2QualificationHarness();
       final db = AppDatabase(NativeDatabase.memory());
       addTearDown(db.close);
       await _seed(db);
@@ -41,22 +44,16 @@ void main() {
       expect(published.generation, 1);
       expect(published.evaluationId, isNotNull);
       expect(published.outputSha256, isNotNull);
+      final committedSnapshot = _snapshot(published, first.logicalResultJson);
 
       // Q7: another writer that captured generation 0 cannot overwrite CURRENT.
       final competing = _command(
         commandId: 'cmd-fa03-2',
         expectedGeneration: 0,
       );
-      await expectLater(
-        firstService.execute(competing),
-        throwsA(
-          isA<Elv5ReplacementCommandException>().having(
-            (value) => value.code,
-            'code',
-            'ELV5_POINTER_GENERATION_CONFLICT',
-          ),
-        ),
-      );
+      await harness.expectQ7StaleWriter('FA-03', () async {
+        await firstService.execute(competing);
+      });
 
       // Freeze the exact historical revision after the successful publication.
       await db.customUpdate(
@@ -72,29 +69,46 @@ void main() {
       expect(replay.replayed, isTrue);
       expect(replay.logicalResultJson, first.logicalResultJson);
       expect(restartedAdapter.captureCount, 0);
+      harness.assertQ7Replay(
+        'FA-03',
+        committedSnapshot,
+        _snapshot(published, replay.logicalResultJson),
+      );
+      harness.assertQ8Replay(
+        'FA-03',
+        committedSnapshot,
+        _snapshot(published, replay.logicalResultJson),
+      );
 
       // A new calculation on the frozen revision is forbidden even when it knows
       // the latest pointer generation. Historical replay and new mutation are kept
       // deliberately separate.
-      await expectLater(
-        restartedService.execute(
+      await harness.expectQ8ReadOnly('FA-03', () async {
+        await restartedService.execute(
           _command(
             commandId: 'cmd-fa03-after-freeze',
             expectedGeneration: 1,
             expectedDesignRowRevision: 2,
           ),
-        ),
-        throwsA(
-          isA<Elv5ReplacementCommandException>().having(
-            (value) => value.code,
-            'code',
-            'ELV5_DESIGN_REVISION_READ_ONLY',
-          ),
-        ),
-      );
+        );
+      }, operation: 'new calculation');
     },
   );
 }
+
+Elv5F2PublicationSnapshot _snapshot(
+  Elv5PersistedPointer pointer,
+  String logicalResultJson,
+) => Elv5F2PublicationSnapshot(
+  generation: pointer.generation,
+  evaluationId: pointer.evaluationId!,
+  freshness:
+      pointer.freshness == Elv5PointerFreshness.current ? 'CURRENT' : 'STALE',
+  execution: 'SUCCEEDED',
+  completion: 'COMPLETE',
+  inputFingerprint: _hash('1'),
+  logicalResultJson: logicalResultJson,
+);
 
 Elv5CalculationService _service(AppDatabase db, _Fa03FixtureAdapter adapter) =>
     Elv5CalculationService(
