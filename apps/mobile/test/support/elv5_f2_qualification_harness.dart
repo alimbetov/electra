@@ -126,12 +126,7 @@ final class Elv5F2QualificationHarness {
     Elv5F2PublicationSnapshot committed,
     Elv5F2PublicationSnapshot restarted,
   ) {
-    _assertSameCommittedResult(
-      processCode,
-      committed,
-      restarted,
-      gate: 'Q7',
-    );
+    _assertSameCommittedResult(processCode, committed, restarted, gate: 'Q7');
   }
 
   /// Shared Q7 stale-writer CAS contract.
