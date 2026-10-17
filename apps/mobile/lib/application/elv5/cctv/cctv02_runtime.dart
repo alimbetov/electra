@@ -5,21 +5,26 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import '../calculation/elv5_calculation_runtime.dart';
 import '../calculation/elv5_kernel_executor.dart';
 import '../persistence/elv5_runtime_persistence.dart';
+import 'cctv_recorder_assignment_source.dart';
 import 'elv5_cctv_persistence.dart';
 
 /// Captures the persisted CCTV camera-stream aggregate and converts it into the
 /// immutable typed input consumed by the pure CCTV-02 kernel.
 ///
-/// Important: the v1 camera-stream aggregate does not persist recorder-role
-/// evidence. The resolver therefore never infers recorder identity from
-/// receiverId; recorder ingress stays absent until an explicit persisted fact
-/// is introduced by the wire/domain contract.
+/// Recorder ingress is attributed only from explicit active recorder
+/// assignments. A subscription receiver is treated as a recorder only when its
+/// receiverId exactly equals the assigned recorderId for the same camera and
+/// encoded stream. No naming/role inference is allowed.
 final class Cctv02PersistedInputResolver
     implements Elv5ProcessInputResolver<Cctv02Input> {
-  Cctv02PersistedInputResolver({required this.store, DateTime Function()? nowUtc})
-    : _nowUtc = nowUtc ?? (() => DateTime.now().toUtc());
+  Cctv02PersistedInputResolver({
+    required this.store,
+    this.recorderAssignments,
+    DateTime Function()? nowUtc,
+  }) : _nowUtc = nowUtc ?? (() => DateTime.now().toUtc());
 
   final Elv5CctvMutationStore store;
+  final CctvRecorderAssignmentSource? recorderAssignments;
   final DateTime Function() _nowUtc;
 
   static const _encoder = Elv5CanonicalJsonV1();
@@ -77,11 +82,27 @@ final class Cctv02PersistedInputResolver
       );
     }
 
+    final explicitAssignments = recorderAssignments == null
+        ? const <CctvRecorderAssignmentRef>[]
+        : await recorderAssignments!.loadForCamera(
+            projectId: request.projectId,
+            designRevisionId: request.designRevisionId,
+            cameraId: cameraId,
+          );
+    final recorderIdsByStream = <String, Set<String>>{};
+    for (final assignment in explicitAssignments) {
+      (recorderIdsByStream[assignment.encodedStreamId] ??= <String>{})
+          .add(assignment.recorderId);
+    }
+
     final subscriptions = <Cctv02Subscription>[];
     final multicastTrees = <String, Cctv02MulticastTree>{};
     for (final raw in _requiredList(payload, 'subscriptions')) {
       final subscription = Map<String, Object?>.from(raw as Map);
       final streamId = _requiredText(subscription, 'encodedStreamId');
+      final receiverId = _requiredText(subscription, 'receiverId');
+      final assignedRecorders = recorderIdsByStream[streamId] ?? const <String>{};
+      final recorderId = assignedRecorders.contains(receiverId) ? receiverId : null;
       final modeText = _requiredText(subscription, 'deliveryMode');
       final mode = switch (modeText) {
         'UNICAST' => Cctv02DeliveryMode.unicast,
@@ -94,11 +115,11 @@ final class Cctv02PersistedInputResolver
         Cctv02Subscription(
           subscriptionId: _requiredText(subscription, 'subscriptionId'),
           streamId: streamId,
-          receiverId: _requiredText(subscription, 'receiverId'),
+          receiverId: receiverId,
           deliveryMode: mode,
           directedEdgePath: path,
           multicastGroupId: groupId,
-          recorderId: null,
+          recorderId: recorderId,
         ),
       );
 
@@ -123,17 +144,32 @@ final class Cctv02PersistedInputResolver
       }
     }
 
+    final assignmentBasis = <Object?>[
+      for (final assignment in explicitAssignments)
+        <String,Object?>{
+          'bindingId':assignment.bindingId,
+          'bindingRevision':assignment.bindingRevision,
+          'recorderId':assignment.recorderId,
+          'assignmentId':assignment.assignmentId,
+          'cameraId':assignment.cameraId,
+          'encodedStreamId':assignment.encodedStreamId,
+          'licenseChannelId':assignment.licenseChannelId,
+          'storagePoolId':assignment.storagePoolId,
+        },
+    ];
     final inputBasis = <String, Object?>{
-      'schema': 'electra.elv5-cctv02-captured-input.v1',
+      'schema': 'electra.elv5-cctv02-captured-input.v2',
       'aggregateKind': snapshot.aggregateKind,
       'aggregateId': snapshot.aggregateId,
       'aggregateRevision': snapshot.revision,
       'payload': payload,
+      'recorderAssignments': assignmentBasis,
     };
     final policyBasis = <String, Object?>{
       'schema': 'electra.elv5-cctv02-policy-basis.v1',
       'transportOverheadModelRef': payload['transportOverheadModelRef'],
       'edgeCapacityPolicy': 'NOT_CAPTURED_V1',
+      'recorderIngressIdentity': 'EXPLICIT_RECORDER_ASSIGNMENT_AND_RECEIVER_ID_V1',
     };
 
     final dependencies = <Elv5DependencyMarker>[
@@ -166,6 +202,15 @@ final class Cctv02PersistedInputResolver
           domain: 'CCTV_MULTICAST_TREE',
           subjectId: tree.streamId,
           memberId: tree.multicastGroupId,
+        ),
+      for (final assignment in explicitAssignments)
+        _dependency(
+          request,
+          relationKind: 'SET',
+          domain: 'CCTV_RECORDER_ASSIGNMENT',
+          subjectId: assignment.recorderId,
+          memberId:
+              '${assignment.bindingId}:${assignment.bindingRevision}:${assignment.assignmentId}',
         ),
     ];
 
@@ -218,14 +263,14 @@ Elv5PureKernelExecutor<Cctv02Input, Cctv02Result> buildCctv02Executor({
   calculate: const Cctv02BandwidthKernel().evaluate,
   encodeOutput: _encodeCctv02Output,
   encodeEvidence: (captured, output) => <String, Object?>{
-    'schema': 'electra.elv5-cctv02-evidence.v1',
-    'source': 'ELV5_PERSISTED_CAMERA_STREAMS',
+    'schema': 'electra.elv5-cctv02-evidence.v2',
+    'source': 'ELV5_PERSISTED_CAMERA_STREAMS_PLUS_EXPLICIT_RECORDER_ASSIGNMENTS',
     'captureRevision': captured.captureRevision,
     'dependencyKeySha256s': [
       for (final dependency in captured.dependencies)
         dependency.dependencyKeySha256,
     ]..sort(),
-    'recorderRoleEvidence': 'NOT_CAPTURED_V1',
+    'recorderRoleEvidence': 'EXPLICIT_ASSIGNMENT_AND_RECEIVER_ID_V1',
   },
   executionOf: (_) => Elv5Execution.succeeded,
   completionOf: (output) {
