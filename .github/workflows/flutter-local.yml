@@ -74,6 +74,10 @@ jobs:
         working-directory: .
         run: python3 scripts/ci/check-elv5-normative-requirements.py
 
+      - name: Verify ELV5 ampacity Iz contract
+        working-directory: .
+        run: python3 scripts/ci/check-elv5-ampacity-contract.py
+
       - name: Verify ELV5 market simulation P0-P9 bindings
         working-directory: .
         run: python3 scripts/ci/check-elv5-market-p0-p9-bindings.py
