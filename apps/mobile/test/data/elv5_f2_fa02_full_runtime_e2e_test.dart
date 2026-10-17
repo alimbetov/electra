@@ -101,8 +101,8 @@ void main() {
           'POWER_COMPONENT_STATE_LOADS',
           'POWER_OPERATING_SCENARIO',
         },
-        initialAssessment: 'NOT_ASSESSED',
-        changedAssessment: 'NOT_ASSESSED',
+        initialAssessment: 'NOTASSESSED',
+        changedAssessment: 'NOTASSESSED',
         initialOutput: (output) {
           expect(output['status'], 'complete');
           expect(output['governingCase'], 'startupInrush');
