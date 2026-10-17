@@ -152,7 +152,7 @@ def validate_matrix_v2(data: dict) -> tuple[int, int]:
         all_closed = all(q[key] in CLOSED_Q for key in MANDATORY_Q)
         exact_identity = all(
             isinstance(evidence.get(key), str)
-            and len(evidence[key]) == 64
+            and len(evidence[key]) in ({40, 64} if key == "sourceSha" else {64})
             and all(ch in "0123456789abcdef" for ch in evidence[key])
             for key in ("sourceSha", "authorityFingerprint")
         ) and all(

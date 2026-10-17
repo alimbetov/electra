@@ -1,8 +1,30 @@
+import 'package:electra_mobile/application/elv5/calculation/elv5_qualification_identity_source.dart';
 import 'package:electra_mobile/application/elv5/calculation/elv5_calculation_runtime.dart';
 import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  test('build source binds exact Git SHA1 across every process', () {
+    const source = '724d93919bc404bea9b133cf5b8ead7065b3d8df';
+    final provider = Elv5BuildQualificationIdentitySource(sourceSha: source);
+    for (final process in Elv5ProcessCode.values) {
+      final identity = provider.forProcess(process);
+      expect(identity.sourceSha, source);
+      expect(
+        identity.processVersion,
+        Elv5ProcessCatalog.require(process).versions.processVersion,
+      );
+      expect(
+        identity.authorityFingerprint,
+        Elv5FoundationAuthorityManifest.instance.fingerprint(),
+      );
+    }
+    expect(
+      () => Elv5BuildQualificationIdentitySource(sourceSha: '724d939'),
+      throwsArgumentError,
+    );
+  });
+
   test('qualification identity upgrades evaluation content address to v2', () {
     final descriptor = Elv5ProcessCatalog.require(Elv5ProcessCode.cctv01);
     final nodeKey = Elv5EngineeringNodeKeyV3(

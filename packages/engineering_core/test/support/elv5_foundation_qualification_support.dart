@@ -54,7 +54,7 @@ final class Elv5QualificationEvidencePin implements Elv5CanonicalValue {
     required String processVersion,
     required String rulesetVersion,
     required String testId,
-  })  : sourceSha = _sha(sourceSha, 'sourceSha'),
+  })  : sourceSha = _gitSha(sourceSha),
         authorityFingerprint =
             _sha(authorityFingerprint, 'authorityFingerprint'),
         processVersion = _text(processVersion, 'processVersion'),
@@ -217,6 +217,15 @@ String _sha(String value, String field) {
   final normalized = _text(value, field).toLowerCase();
   if (!RegExp(r'^[0-9a-f]{64}$').hasMatch(normalized)) {
     throw ArgumentError.value(value, field, 'Expected lowercase SHA-256.');
+  }
+  return normalized;
+}
+
+String _gitSha(String value) {
+  final normalized = _text(value, 'sourceSha').toLowerCase();
+  if (!RegExp(r'^(?:[0-9a-f]{40}|[0-9a-f]{64})$').hasMatch(normalized)) {
+    throw ArgumentError.value(
+        value, 'sourceSha', 'Expected full Git SHA-1 or SHA-256 object id.');
   }
   return normalized;
 }

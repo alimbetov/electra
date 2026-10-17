@@ -17,7 +17,7 @@ final class Elv5BuildQualificationIdentitySource
        _authorityFingerprint = authority.fingerprint();
 
   /// Build pipelines should pass:
-  /// `--dart-define=ELECTRA_SOURCE_SHA=<exact 64-hex git commit sha>`.
+  /// `--dart-define=ELECTRA_SOURCE_SHA=<exact full git commit sha>`.
   ///
   /// Absence does not invent identity; it produces an unqualified runtime.
   factory Elv5BuildQualificationIdentitySource.fromEnvironment() {
@@ -48,11 +48,11 @@ final class Elv5BuildQualificationIdentitySource
 
 String _sha(String value) {
   final normalized = value.trim().toLowerCase();
-  if (!RegExp(r'^[0-9a-f]{64}$').hasMatch(normalized)) {
+  if (!RegExp(r'^(?:[0-9a-f]{40}|[0-9a-f]{64})$').hasMatch(normalized)) {
     throw ArgumentError.value(
       value,
       'sourceSha',
-      'Qualification builds require exact lowercase 64-hex git source SHA.',
+      'Qualification builds require exact full 40- or 64-hex git source SHA.',
     );
   }
   return normalized;

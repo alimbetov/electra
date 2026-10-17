@@ -14,7 +14,7 @@ final class Elv5QualificationIdentity implements Elv5CanonicalValue {
     required String authorityFingerprint,
   })  : processVersion = _text(processVersion, 'processVersion'),
         rulesetVersion = _text(rulesetVersion, 'rulesetVersion'),
-        sourceSha = _sha256(sourceSha, 'sourceSha'),
+        sourceSha = _gitSha(sourceSha),
         authorityFingerprint =
             _sha256(authorityFingerprint, 'authorityFingerprint');
 
@@ -95,6 +95,15 @@ String _sha256(String value, String field) {
   final normalized = _text(value, field).toLowerCase();
   if (!RegExp(r'^[0-9a-f]{64}$').hasMatch(normalized)) {
     throw ArgumentError.value(value, field, 'Expected lowercase SHA-256.');
+  }
+  return normalized;
+}
+
+String _gitSha(String value) {
+  final normalized = _text(value, 'sourceSha').toLowerCase();
+  if (!RegExp(r'^(?:[0-9a-f]{40}|[0-9a-f]{64})$').hasMatch(normalized)) {
+    throw ArgumentError.value(
+        value, 'sourceSha', 'Expected full Git SHA-1 or SHA-256 object id.');
   }
   return normalized;
 }
