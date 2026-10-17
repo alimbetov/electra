@@ -281,9 +281,6 @@ final class Cctv01Result {
   final Elv5Rational? targetArea;
   final Elv5Rational? coverageRatio;
   final Elv5Rational? coverageMargin;
-
-  /// Exact tan(FOV/2). Angle conversion is display-only and must use the
-  /// separately versioned bounded pinhole-angle model.
   final Elv5Rational? horizontalHalfFovTangent;
   final Elv5Rational? verticalHalfFovTangent;
   final Cctv01GoverningDimension? governingDimension;
@@ -382,7 +379,7 @@ final class Cctv01GeometryKernel {
     final minimum = input.minimumCoverageRatio;
     if (minimum == null) {
       return Cctv01Result(
-        status: Cctv01AssessmentStatus.pass,
+        status: Cctv01AssessmentStatus.notAssessed,
         footprint: footprintPolygon,
         coveredArea: coveredArea,
         targetArea: targetArea,
@@ -392,7 +389,7 @@ final class Cctv01GeometryKernel {
         verticalHalfFovTangent: vHalfTangent,
         governingDimension: null,
         limitingCornerIndex: null,
-        reasonCode: null,
+        reasonCode: 'CCTV01_NO_EXPLICIT_COVERAGE_REQUIREMENT',
       );
     }
 
@@ -431,7 +428,6 @@ final class Cctv01GeometryKernel {
     );
   }
 
-  /// Deterministic ear clipping of an arbitrary simple target polygon.
   static List<List<Cctv01Point2>> _triangulate(Cctv01Polygon2 polygon) {
     final vertices = [...polygon.vertices];
     if (polygon.signedDoubleArea.isNegative) {
@@ -479,7 +475,6 @@ final class Cctv01GeometryKernel {
     return triangles;
   }
 
-  /// Clips a convex subject triangle against the convex camera footprint.
   static List<Cctv01Point2> _clipConvexPolygon(
     List<Cctv01Point2> subject,
     List<Cctv01Point2> rawClip,
