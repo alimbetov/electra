@@ -39,6 +39,44 @@ String fa01MembershipFingerprint({
   });
 }
 
+String fa01InputMembershipFingerprint(Fa01Input input) {
+  const encoder = Elv5CanonicalJsonV1();
+  final devices = <Map<String, Object?>>[
+    for (final device in input.devices)
+      <String, Object?>{
+        'deviceId': device.deviceId,
+        'physicalDeviceCountContribution':
+            device.physicalDeviceCountContribution,
+        'addresses': [
+          for (final key in (device.addresses.toList()
+            ..sort((a, b) {
+              final domain = a.domainId.compareTo(b.domainId);
+              return domain != 0 ? domain : a.address.compareTo(b.address);
+            })))
+            <String, Object?>{
+              'domainId': key.domainId,
+              'address': key.address,
+            },
+        ],
+      },
+  ]..sort((a, b) =>
+      (a['deviceId']! as String).compareTo(b['deviceId']! as String));
+  final reserved = [
+    for (final key in (input.reserved.toList()
+      ..sort((a, b) {
+        final domain = a.domainId.compareTo(b.domainId);
+        return domain != 0 ? domain : a.address.compareTo(b.address);
+      })))
+      <String, Object?>{'domainId': key.domainId, 'address': key.address},
+  ];
+  return encoder.sha256(<String, Object?>{
+    'schema': 'electra.elv5-fa01-kernel-membership.v1',
+    'loopId': input.loopId,
+    'devices': devices,
+    'reserved': reserved,
+  });
+}
+
 String _text(Object? value, String field) {
   if (value is! String || value.trim().isEmpty) {
     throw FormatException('$field must be non-empty text.');
