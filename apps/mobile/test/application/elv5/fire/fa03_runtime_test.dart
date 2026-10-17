@@ -30,6 +30,64 @@ void main() {
     expect(terminal['highMarginV'], Elv5Rational.parseDecimal('2.1').toMap());
   });
 
+  test('F2 Q6 captures exact upstream generation and changes identity after republish', () async {
+    final fingerprint = _hash('a');
+    final contractSource = _ContractSource(_contract(fingerprint));
+    final firstResolver = Fa03PersistedInputResolver(
+      contractSource: contractSource,
+      powerEvidence: _EvidenceSource(
+        _pwr03(fingerprint, evaluationId: 'pwr03-eval-g4', generation: 4),
+      ),
+      nowUtc: () => DateTime.utc(2026, 10, 17),
+    );
+    final secondResolver = Fa03PersistedInputResolver(
+      contractSource: contractSource,
+      powerEvidence: _EvidenceSource(
+        _pwr03(fingerprint, evaluationId: 'pwr03-eval-g5', generation: 5),
+      ),
+      nowUtc: () => DateTime.utc(2026, 10, 17),
+    );
+
+    final first = await firstResolver.capture(_request());
+    final replay = await firstResolver.capture(_request());
+    final republished = await secondResolver.capture(_request());
+    final upstreamNode = _pwr03(fingerprint).nodeKey.sha256;
+
+    expect(first.upstreamPointerGenerations[upstreamNode], 4);
+    expect(replay.upstreamPointerGenerations[upstreamNode], 4);
+    expect(republished.upstreamPointerGenerations[upstreamNode], 5);
+    expect(replay.inputFingerprint, first.inputFingerprint);
+    expect(republished.inputFingerprint, isNot(first.inputFingerprint));
+    expect(
+      first.dependencies.any(
+        (value) =>
+            value.relationKind == 'UPSTREAM_EVALUATION' &&
+            value.dependencyKey.contains('ELV4_PWR03_CURRENT'),
+      ),
+      isTrue,
+    );
+  });
+
+  test('F2 Q8 identical capture replay produces deterministic candidate hashes', () async {
+    final fingerprint = _hash('a');
+    final resolver = Fa03PersistedInputResolver(
+      contractSource: _ContractSource(_contract(fingerprint)),
+      powerEvidence: _EvidenceSource(_pwr03(fingerprint)),
+      nowUtc: () => DateTime.utc(2026, 10, 17),
+    );
+    final executor = buildFa03Executor(
+      nowUtc: () => DateTime.utc(2026, 10, 17),
+    );
+
+    final left = await executor.execute(await resolver.capture(_request()));
+    final right = await executor.execute(await resolver.capture(_request()));
+
+    expect(right.inputFingerprint, left.inputFingerprint);
+    expect(right.outputSha256, left.outputSha256);
+    expect(right.evidenceSha256, left.evidenceSha256);
+    expect(right.evaluationId, left.evaluationId);
+  });
+
   test('blocks stale PWR-03 input identity', () async {
     final resolver = Fa03PersistedInputResolver(
       contractSource: _ContractSource(_contract(_hash('a'))),
@@ -135,7 +193,11 @@ final class _EvidenceSource implements Elv4CurrentEvidenceSource {
   }) async => processCode == PowerProcessCode.pwr03 ? <Elv4CurrentEvaluationSnapshot>[value] : const [];
 }
 
-Elv4CurrentEvaluationSnapshot _pwr03(String inputFingerprint) {
+Elv4CurrentEvaluationSnapshot _pwr03(
+  String inputFingerprint, {
+  String evaluationId = 'pwr03-eval',
+  int generation = 4,
+}) {
   final dependency = PowerDependencyKey(
     projectId: 'p',
     revisionId: 'd',
@@ -153,10 +215,10 @@ Elv4CurrentEvaluationSnapshot _pwr03(String inputFingerprint) {
       subjectKind: 'DC_DOMAIN',
       subjectId: 'fire-domain-1',
     ),
-    evaluationId: 'pwr03-eval',
+    evaluationId: evaluationId,
     inputFingerprint: inputFingerprint,
     evidenceSha256: _hash('d'),
-    pointerGeneration: 4,
+    pointerGeneration: generation,
     evidence: <String, Object?>{
       'dependencyKeys': <String>[dependency],
       'output': <String, Object?>{
