@@ -77,9 +77,10 @@ final class Cctv01PersistedInputResolver
     }
 
     final room = await geometry.loadRoomGeometry(contract.roomId);
-    if (room.validate().isNotEmpty) {
+    final violations = room.validate();
+    if (violations.isNotEmpty) {
       _blocked(request,'CCTV01_ELV3_GEOMETRY_INVALID',basis,snapshot.contentHash,dependencies,
-        <String,Object?>{'roomId':contract.roomId,'violations':room.validate().map((v)=>v.code.name).toList()..sort()});
+        <String,Object?>{'roomId':contract.roomId,'violations':violations.map((v)=>v.code).toList()..sort()});
     }
     final host = _patch(room, camera.hostSurfacePatchId);
     final target = _patch(room, contract.targetSurfacePatchId);
