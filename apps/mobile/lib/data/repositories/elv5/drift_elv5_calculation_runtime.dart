@@ -32,6 +32,7 @@ import 'drift_lan03_poe_contract_store.dart';
 import 'drift_lan04_compatibility_contract_store.dart';
 import 'drift_lan05_optical_section_evidence_source.dart';
 import 'drift_lan06_rack_contract_store.dart';
+import 'drift_lan07_patch_contract_store.dart';
 
 final class DriftElv5CalculationRuntime {
   DriftElv5CalculationRuntime._({required this.registry, required this.service});
@@ -44,132 +45,39 @@ final class DriftElv5CalculationRuntime {
     String originDeviceId = 'local-device',
     DateTime Function()? nowUtc,
   }) {
-    final cctvFacts = DriftElv5CctvCalculationFactStore(
-      database,
-      originDeviceId: originDeviceId,
-    );
-    final lanFacts = DriftElv5LanCalculationFactStore(
-      database,
-      originDeviceId: originDeviceId,
-    );
-    final acsFacts = DriftElv5AcsCalculationFactStore(
-      database,
-      originDeviceId: originDeviceId,
-    );
-    final fireFacts = DriftElv5FireCalculationFactStore(
-      database,
-      originDeviceId: originDeviceId,
-    );
-    final cableRuns = DriftElvCableRunRepository(
-      database,
-      originDeviceId: originDeviceId,
-    );
+    final cctvFacts = DriftElv5CctvCalculationFactStore(database, originDeviceId: originDeviceId);
+    final lanFacts = DriftElv5LanCalculationFactStore(database, originDeviceId: originDeviceId);
+    final acsFacts = DriftElv5AcsCalculationFactStore(database, originDeviceId: originDeviceId);
+    final fireFacts = DriftElv5FireCalculationFactStore(database, originDeviceId: originDeviceId);
+    final cableRuns = DriftElvCableRunRepository(database, originDeviceId: originDeviceId);
 
-    final environmentProfiles = DriftElv5EnvironmentProfileStore(
-      database,
-      originDeviceId: originDeviceId,
-      nowUtc: nowUtc,
-    );
-    final environmentResolver = DriftElv5EnvironmentScopeResolver(
-      database: database,
-      profileSource: environmentProfiles,
-    );
-    final ampacitySections = DriftElv5AmpacitySectionContractStore(
-      database,
-      originDeviceId: originDeviceId,
-      nowUtc: nowUtc,
-    );
+    final environmentProfiles = DriftElv5EnvironmentProfileStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
+    final environmentResolver = DriftElv5EnvironmentScopeResolver(database: database, profileSource: environmentProfiles);
+    final ampacitySections = DriftElv5AmpacitySectionContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
     final ampacityRouteResolver = Elv5AmpacityRouteResolver(
       cableRuns: cableRuns,
       environments: environmentResolver,
       sectionEvidence: ampacitySections,
     );
 
-    final lan02Contracts = DriftLan02PortContractStore(
-      database,
-      originDeviceId: originDeviceId,
-      nowUtc: nowUtc,
-    );
-    final lan03Contracts = DriftLan03PoeProjectionContractStore(
-      database,
-      originDeviceId: originDeviceId,
-      nowUtc: nowUtc,
-    );
-    final lan04Contracts = DriftLan04CompatibilityContractStore(
-      database,
-      originDeviceId: originDeviceId,
-      nowUtc: nowUtc,
-    );
-    final lan06Contracts = DriftLan06RackBasisContractStore(
-      database,
-      originDeviceId: originDeviceId,
-      nowUtc: nowUtc,
-    );
-    final acs01Contracts = DriftAcs01RoleProfileContractStore(
-      database,
-      originDeviceId: originDeviceId,
-      nowUtc: nowUtc,
-    );
-    final acs02Contracts = DriftAcs02ResourceContractStore(
-      database,
-      originDeviceId: originDeviceId,
-      nowUtc: nowUtc,
-    );
-    final acs03Contracts = DriftAcs03ElectricalContractStore(
-      database,
-      originDeviceId: originDeviceId,
-      nowUtc: nowUtc,
-    );
-    final acs04Contracts = DriftAcs04SourceRequirementContractStore(
-      database,
-      originDeviceId: originDeviceId,
-      nowUtc: nowUtc,
-    );
-    final acs05Contracts = DriftAcs05AutonomyContractStore(
-      database,
-      originDeviceId: originDeviceId,
-      nowUtc: nowUtc,
-    );
-    final acs06Contracts = DriftAcs06TopologyContractStore(
-      database,
-      originDeviceId: originDeviceId,
-      nowUtc: nowUtc,
-    );
-    final fa01Contracts = DriftFa01AddressCapacityContractStore(
-      database,
-      originDeviceId: originDeviceId,
-      nowUtc: nowUtc,
-    );
-    final fa03Contracts = DriftFa03TerminalVoltageContractStore(
-      database,
-      originDeviceId: originDeviceId,
-      nowUtc: nowUtc,
-    );
-    final fa04Contracts = DriftFa04SourceRequirementContractStore(
-      database,
-      originDeviceId: originDeviceId,
-      nowUtc: nowUtc,
-    );
-    final fa05Contracts = DriftFa05AutonomyContractStore(
-      database,
-      originDeviceId: originDeviceId,
-      nowUtc: nowUtc,
-    );
-    final fa06Contracts = DriftFa06NotificationContractStore(
-      database,
-      originDeviceId: originDeviceId,
-      nowUtc: nowUtc,
-    );
-    final fa07Contracts = DriftFa07TopologyContractStore(
-      database,
-      originDeviceId: originDeviceId,
-      nowUtc: nowUtc,
-    );
-    final fa08Contracts = DriftFa08CablePolicyContractStore(
-      database,
-      originDeviceId: originDeviceId,
-      nowUtc: nowUtc,
-    );
+    final lan02Contracts = DriftLan02PortContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
+    final lan03Contracts = DriftLan03PoeProjectionContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
+    final lan04Contracts = DriftLan04CompatibilityContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
+    final lan06Contracts = DriftLan06RackBasisContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
+    final lan07Contracts = DriftLan07PatchPanelContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
+    final acs01Contracts = DriftAcs01RoleProfileContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
+    final acs02Contracts = DriftAcs02ResourceContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
+    final acs03Contracts = DriftAcs03ElectricalContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
+    final acs04Contracts = DriftAcs04SourceRequirementContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
+    final acs05Contracts = DriftAcs05AutonomyContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
+    final acs06Contracts = DriftAcs06TopologyContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
+    final fa01Contracts = DriftFa01AddressCapacityContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
+    final fa03Contracts = DriftFa03TerminalVoltageContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
+    final fa04Contracts = DriftFa04SourceRequirementContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
+    final fa05Contracts = DriftFa05AutonomyContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
+    final fa06Contracts = DriftFa06NotificationContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
+    final fa07Contracts = DriftFa07TopologyContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
+    final fa08Contracts = DriftFa08CablePolicyContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
 
     final currentPowerEvidence = DriftElv4CurrentEvidenceSource(database);
     final registry = buildElv5InitialVerticalRegistry(
@@ -183,6 +91,7 @@ final class DriftElv5CalculationRuntime {
       lan03Contracts: lan03Contracts,
       lan04Contracts: lan04Contracts,
       lan06Contracts: lan06Contracts,
+      lan07Contracts: lan07Contracts,
       acs01Contracts: acs01Contracts,
       acs02Contracts: acs02Contracts,
       acs03Contracts: acs03Contracts,
@@ -197,10 +106,7 @@ final class DriftElv5CalculationRuntime {
       fa07Contracts: fa07Contracts,
       fa08Contracts: fa08Contracts,
       ampacityRouteResolver: ampacityRouteResolver,
-      fa08RouteCableFacts: DriftFa08RouteCableFactSource(
-        database: database,
-        cableRuns: cableRuns,
-      ),
+      fa08RouteCableFacts: DriftFa08RouteCableFactSource(database: database, cableRuns: cableRuns),
       currentPowerEvidence: currentPowerEvidence,
       powerOperatingFacts: DriftElv4OperatingFactSource(database),
       captureRevisions: DriftElv5CaptureRevisionSource(database),
@@ -208,10 +114,7 @@ final class DriftElv5CalculationRuntime {
     );
     final service = Elv5CalculationService(
       registry: registry,
-      publicationUnitOfWork: DriftElv5CalculationWriteUnitOfWork(
-        database,
-        originDeviceId: originDeviceId,
-      ),
+      publicationUnitOfWork: DriftElv5CalculationWriteUnitOfWork(database, originDeviceId: originDeviceId),
       originDeviceId: originDeviceId,
       now: nowUtc,
     );
