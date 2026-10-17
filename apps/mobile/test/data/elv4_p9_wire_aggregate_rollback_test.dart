@@ -104,30 +104,28 @@ void main() {
       );
 
       expect(await _revisionToken(db), 2);
-      final active =
-          await db
-              .customSelect(
-                'SELECT id, origin_id FROM power_load_bindings '
-                'WHERE design_revision_id = ? AND deleted_at IS NULL ORDER BY id',
-                variables: [Variable.withString(builder.revisionId)],
-              )
-              .get();
+      final active = await db
+          .customSelect(
+            'SELECT id, origin_id FROM power_load_bindings '
+            'WHERE design_revision_id = ? AND deleted_at IS NULL ORDER BY id',
+            variables: [Variable.withString(builder.revisionId)],
+          )
+          .get();
       expect(active, hasLength(1));
       expect(active.single.read<String>('id'), 'load-original');
       expect(active.single.read<String>('origin_id'), 'origin-original');
 
-      final failedLedgerRow =
-          await db
-              .customSelect(
-                'SELECT status FROM power_operation_records '
-                'WHERE project_id = ? AND design_revision_id = ? AND operation_id = ?',
-                variables: [
-                  Variable.withString(builder.projectId),
-                  Variable.withString(builder.revisionId),
-                  Variable.withString(failingEnvelope.commandId),
-                ],
-              )
-              .getSingleOrNull();
+      final failedLedgerRow = await db
+          .customSelect(
+            'SELECT status FROM power_operation_records '
+            'WHERE project_id = ? AND design_revision_id = ? AND operation_id = ?',
+            variables: [
+              Variable.withString(builder.projectId),
+              Variable.withString(builder.revisionId),
+              Variable.withString(failingEnvelope.commandId),
+            ],
+          )
+          .getSingleOrNull();
       expect(failedLedgerRow, null);
       expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
     },

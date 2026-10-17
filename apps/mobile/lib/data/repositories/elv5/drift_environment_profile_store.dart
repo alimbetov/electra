@@ -29,18 +29,20 @@ final class DriftElv5EnvironmentProfileStore
     required String scopeId,
   }) async {
     final normalizedKind = _scopeKind(scopeKind);
-    final rows = await database.customSelect(
-      'SELECT id, revision, process_codes_json, definition_ref_json '
-      'FROM discipline_policy_bindings '
-      'WHERE project_id = ? AND design_revision_id = ? AND subject_kind = ? '
-      'AND subject_id = ? AND deleted_at IS NULL ORDER BY id',
-      variables: <Variable>[
-        Variable.withString(projectId),
-        Variable.withString(designRevisionId),
-        Variable.withString(normalizedKind),
-        Variable.withString(scopeId),
-      ],
-    ).get();
+    final rows = await database
+        .customSelect(
+          'SELECT id, revision, process_codes_json, definition_ref_json '
+          'FROM discipline_policy_bindings '
+          'WHERE project_id = ? AND design_revision_id = ? AND subject_kind = ? '
+          'AND subject_id = ? AND deleted_at IS NULL ORDER BY id',
+          variables: <Variable>[
+            Variable.withString(projectId),
+            Variable.withString(designRevisionId),
+            Variable.withString(normalizedKind),
+            Variable.withString(scopeId),
+          ],
+        )
+        .get();
 
     final matching = <QueryRow>[];
     for (final row in rows) {
@@ -53,7 +55,9 @@ final class DriftElv5EnvironmentProfileStore
     }
     if (matching.isEmpty) return null;
     if (matching.length != 1) {
-      throw StateError('ELV5_ENVIRONMENT_PROFILE_BINDING_AMBIGUOUS:$normalizedKind:$scopeId');
+      throw StateError(
+        'ELV5_ENVIRONMENT_PROFILE_BINDING_AMBIGUOUS:$normalizedKind:$scopeId',
+      );
     }
 
     final binding = matching.single;
@@ -65,24 +69,30 @@ final class DriftElv5EnvironmentProfileStore
     final evidenceRef = _text(definition, 'editionId');
     final contentHash = _text(definition, 'contentHash');
 
-    final evidence = await database.customSelect(
-      'SELECT canonical_payload_json, payload_sha256 '
-      'FROM elv_revision_aggregate_evidence_records '
-      'WHERE evidence_ref = ? AND project_id = ? AND design_revision_id = ? '
-      'AND aggregate_kind = ? AND aggregate_id = ?',
-      variables: <Variable>[
-        Variable.withString(evidenceRef),
-        Variable.withString(projectId),
-        Variable.withString(designRevisionId),
-        Variable.withString('ELV5_ENVIRONMENT_PROFILE'),
-        Variable.withString(scopeId),
-      ],
-    ).getSingleOrNull();
+    final evidence = await database
+        .customSelect(
+          'SELECT canonical_payload_json, payload_sha256 '
+          'FROM elv_revision_aggregate_evidence_records '
+          'WHERE evidence_ref = ? AND project_id = ? AND design_revision_id = ? '
+          'AND aggregate_kind = ? AND aggregate_id = ?',
+          variables: <Variable>[
+            Variable.withString(evidenceRef),
+            Variable.withString(projectId),
+            Variable.withString(designRevisionId),
+            Variable.withString('ELV5_ENVIRONMENT_PROFILE'),
+            Variable.withString(scopeId),
+          ],
+        )
+        .getSingleOrNull();
     if (evidence == null) {
-      throw StateError('ELV5_ENVIRONMENT_PROFILE_EVIDENCE_MISSING:$evidenceRef');
+      throw StateError(
+        'ELV5_ENVIRONMENT_PROFILE_EVIDENCE_MISSING:$evidenceRef',
+      );
     }
 
-    final payloadRaw = jsonDecode(evidence.read<String>('canonical_payload_json'));
+    final payloadRaw = jsonDecode(
+      evidence.read<String>('canonical_payload_json'),
+    );
     if (payloadRaw is! Map) {
       throw StateError('ELV5_ENVIRONMENT_PROFILE_PAYLOAD_INVALID:$evidenceRef');
     }
@@ -106,71 +116,76 @@ final class DriftElv5EnvironmentProfileStore
   }
 
   @override
-  Future<void> replace(ReplaceElv5EnvironmentProfileCommand command) =>
-      database.transaction(() async {
-        final now = _nowUtc().toUtc();
-        final revision = await database.customSelect(
+  Future<void> replace(
+    ReplaceElv5EnvironmentProfileCommand command,
+  ) => database.transaction(() async {
+    final now = _nowUtc().toUtc();
+    final revision = await database
+        .customSelect(
           'SELECT state, revision FROM project_design_revisions '
           'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
           variables: <Variable>[
             Variable.withString(command.projectId),
             Variable.withString(command.designRevisionId),
           ],
-        ).getSingleOrNull();
-        if (revision == null) {
-          throw StateError('ELV5_ENVIRONMENT_DESIGN_REVISION_NOT_FOUND');
-        }
-        if (revision.read<String>('state') != 'WORKING') {
-          throw StateError('ELV5_ENVIRONMENT_DESIGN_REVISION_READ_ONLY');
-        }
-        if (revision.read<int>('revision') != command.expectedDesignRevision) {
-          throw StateError('ELV5_ENVIRONMENT_DESIGN_REVISION_CONFLICT');
-        }
+        )
+        .getSingleOrNull();
+    if (revision == null) {
+      throw StateError('ELV5_ENVIRONMENT_DESIGN_REVISION_NOT_FOUND');
+    }
+    if (revision.read<String>('state') != 'WORKING') {
+      throw StateError('ELV5_ENVIRONMENT_DESIGN_REVISION_READ_ONLY');
+    }
+    if (revision.read<int>('revision') != command.expectedDesignRevision) {
+      throw StateError('ELV5_ENVIRONMENT_DESIGN_REVISION_CONFLICT');
+    }
 
-        final payload = command.profile.toCanonicalValue();
-        final hash = _encoder.sha256(payload);
-        final evidenceRef =
-            'ENV:${command.scopeKind}:${command.scopeId}:$hash';
-        final existing = await database.customSelect(
+    final payload = command.profile.toCanonicalValue();
+    final hash = _encoder.sha256(payload);
+    final evidenceRef = 'ENV:${command.scopeKind}:${command.scopeId}:$hash';
+    final existing = await database
+        .customSelect(
           'SELECT payload_sha256 FROM elv_revision_aggregate_evidence_records '
           'WHERE evidence_ref = ?',
           variables: <Variable>[Variable.withString(evidenceRef)],
-        ).getSingleOrNull();
-        if (existing == null) {
-          await runRawStatement(
-            database,
-            'INSERT INTO elv_revision_aggregate_evidence_records '
-            '(evidence_ref, project_id, design_revision_id, aggregate_kind, aggregate_id, '
-            'canonical_payload_json, payload_sha256, created_at, origin_device_id) '
-            'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            <Variable>[
-              Variable.withString(evidenceRef),
-              Variable.withString(command.projectId),
-              Variable.withString(command.designRevisionId),
-              Variable.withString('ELV5_ENVIRONMENT_PROFILE'),
-              Variable.withString(command.scopeId),
-              Variable.withString(_canonical(payload)),
-              Variable.withString(hash),
-              Variable<DateTime>(now),
-              Variable.withString(originDeviceId),
-            ],
-          );
-        } else if (existing.read<String>('payload_sha256') != hash) {
-          throw StateError('ELV5_ENVIRONMENT_EVIDENCE_REF_COLLISION:$evidenceRef');
-        }
+        )
+        .getSingleOrNull();
+    if (existing == null) {
+      await runRawStatement(
+        database,
+        'INSERT INTO elv_revision_aggregate_evidence_records '
+        '(evidence_ref, project_id, design_revision_id, aggregate_kind, aggregate_id, '
+        'canonical_payload_json, payload_sha256, created_at, origin_device_id) '
+        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        <Variable>[
+          Variable.withString(evidenceRef),
+          Variable.withString(command.projectId),
+          Variable.withString(command.designRevisionId),
+          Variable.withString('ELV5_ENVIRONMENT_PROFILE'),
+          Variable.withString(command.scopeId),
+          Variable.withString(_canonical(payload)),
+          Variable.withString(hash),
+          Variable<DateTime>(now),
+          Variable.withString(originDeviceId),
+        ],
+      );
+    } else if (existing.read<String>('payload_sha256') != hash) {
+      throw StateError('ELV5_ENVIRONMENT_EVIDENCE_REF_COLLISION:$evidenceRef');
+    }
 
-        final definition = <String, Object?>{
-          'policyCode': 'ELV5_ENVIRONMENT_PROFILE',
-          'editionId': evidenceRef,
-          'contentHash': hash,
-        };
-        final applicability = <String, Object?>{
-          'scopeKind': command.scopeKind,
-          'scopeId': command.scopeId,
-        };
+    final definition = <String, Object?>{
+      'policyCode': 'ELV5_ENVIRONMENT_PROFILE',
+      'editionId': evidenceRef,
+      'contentHash': hash,
+    };
+    final applicability = <String, Object?>{
+      'scopeKind': command.scopeKind,
+      'scopeId': command.scopeId,
+    };
 
-        if (command.expectedBindingRevision == null) {
-          final existingBindings = await database.customSelect(
+    if (command.expectedBindingRevision == null) {
+      final existingBindings = await database
+          .customSelect(
             'SELECT id, definition_ref_json FROM discipline_policy_bindings '
             'WHERE project_id = ? AND design_revision_id = ? AND subject_kind = ? '
             'AND subject_id = ? AND deleted_at IS NULL',
@@ -180,83 +195,84 @@ final class DriftElv5EnvironmentProfileStore
               Variable.withString(command.scopeKind),
               Variable.withString(command.scopeId),
             ],
-          ).get();
-          for (final row in existingBindings) {
-            final decoded = jsonDecode(row.read<String>('definition_ref_json'));
-            if (decoded is Map &&
-                decoded['policyCode'] == 'ELV5_ENVIRONMENT_PROFILE') {
-              throw StateError(
-                'ELV5_ENVIRONMENT_ACTIVE_BINDING_ALREADY_EXISTS:${row.read<String>('id')}',
-              );
-            }
-          }
-          await runRawStatement(
-            database,
-            'INSERT INTO discipline_policy_bindings '
-            '(project_id, design_revision_id, id, revision, created_at, updated_at, deleted_at, '
-            'origin_device_id, subject_kind, subject_id, process_codes_json, definition_ref_json, '
-            'definition_sha256, applicability_json, applicability_sha256) '
-            'VALUES (?, ?, ?, 1, ?, ?, NULL, ?, ?, ?, ?, ?, ?, ?, ?)',
-            <Variable>[
-              Variable.withString(command.projectId),
-              Variable.withString(command.designRevisionId),
-              Variable.withString(command.bindingId),
-              Variable<DateTime>(now),
-              Variable<DateTime>(now),
-              Variable.withString(originDeviceId),
-              Variable.withString(command.scopeKind),
-              Variable.withString(command.scopeId),
-              Variable.withString(_canonical(<String>['FA-08'])),
-              Variable.withString(_canonical(definition)),
-              Variable.withString(hash),
-              Variable.withString(_canonical(applicability)),
-              Variable.withString(_encoder.sha256(applicability)),
-            ],
+          )
+          .get();
+      for (final row in existingBindings) {
+        final decoded = jsonDecode(row.read<String>('definition_ref_json'));
+        if (decoded is Map &&
+            decoded['policyCode'] == 'ELV5_ENVIRONMENT_PROFILE') {
+          throw StateError(
+            'ELV5_ENVIRONMENT_ACTIVE_BINDING_ALREADY_EXISTS:${row.read<String>('id')}',
           );
-        } else {
-          final changed = await database.customUpdate(
-            'UPDATE discipline_policy_bindings SET revision = revision + 1, updated_at = ?, '
-            'origin_device_id = ?, definition_ref_json = ?, definition_sha256 = ?, '
-            'applicability_json = ?, applicability_sha256 = ? '
-            'WHERE project_id = ? AND design_revision_id = ? AND id = ? '
-            'AND subject_kind = ? AND subject_id = ? AND revision = ? AND deleted_at IS NULL',
-            variables: <Variable>[
-              Variable<DateTime>(now),
-              Variable.withString(originDeviceId),
-              Variable.withString(_canonical(definition)),
-              Variable.withString(hash),
-              Variable.withString(_canonical(applicability)),
-              Variable.withString(_encoder.sha256(applicability)),
-              Variable.withString(command.projectId),
-              Variable.withString(command.designRevisionId),
-              Variable.withString(command.bindingId),
-              Variable.withString(command.scopeKind),
-              Variable.withString(command.scopeId),
-              Variable<int>(command.expectedBindingRevision!),
-            ],
-          );
-          if (changed != 1) {
-            throw StateError('ELV5_ENVIRONMENT_BINDING_CAS_FAILED');
-          }
         }
+      }
+      await runRawStatement(
+        database,
+        'INSERT INTO discipline_policy_bindings '
+        '(project_id, design_revision_id, id, revision, created_at, updated_at, deleted_at, '
+        'origin_device_id, subject_kind, subject_id, process_codes_json, definition_ref_json, '
+        'definition_sha256, applicability_json, applicability_sha256) '
+        'VALUES (?, ?, ?, 1, ?, ?, NULL, ?, ?, ?, ?, ?, ?, ?, ?)',
+        <Variable>[
+          Variable.withString(command.projectId),
+          Variable.withString(command.designRevisionId),
+          Variable.withString(command.bindingId),
+          Variable<DateTime>(now),
+          Variable<DateTime>(now),
+          Variable.withString(originDeviceId),
+          Variable.withString(command.scopeKind),
+          Variable.withString(command.scopeId),
+          Variable.withString(_canonical(<String>['FA-08'])),
+          Variable.withString(_canonical(definition)),
+          Variable.withString(hash),
+          Variable.withString(_canonical(applicability)),
+          Variable.withString(_encoder.sha256(applicability)),
+        ],
+      );
+    } else {
+      final changed = await database.customUpdate(
+        'UPDATE discipline_policy_bindings SET revision = revision + 1, updated_at = ?, '
+        'origin_device_id = ?, definition_ref_json = ?, definition_sha256 = ?, '
+        'applicability_json = ?, applicability_sha256 = ? '
+        'WHERE project_id = ? AND design_revision_id = ? AND id = ? '
+        'AND subject_kind = ? AND subject_id = ? AND revision = ? AND deleted_at IS NULL',
+        variables: <Variable>[
+          Variable<DateTime>(now),
+          Variable.withString(originDeviceId),
+          Variable.withString(_canonical(definition)),
+          Variable.withString(hash),
+          Variable.withString(_canonical(applicability)),
+          Variable.withString(_encoder.sha256(applicability)),
+          Variable.withString(command.projectId),
+          Variable.withString(command.designRevisionId),
+          Variable.withString(command.bindingId),
+          Variable.withString(command.scopeKind),
+          Variable.withString(command.scopeId),
+          Variable<int>(command.expectedBindingRevision!),
+        ],
+      );
+      if (changed != 1) {
+        throw StateError('ELV5_ENVIRONMENT_BINDING_CAS_FAILED');
+      }
+    }
 
-        final designChanged = await database.customUpdate(
-          'UPDATE project_design_revisions SET revision = revision + 1, updated_at = ?, '
-          'origin_device_id = ? WHERE project_id = ? AND id = ? AND revision = ? '
-          'AND state = ? AND deleted_at IS NULL',
-          variables: <Variable>[
-            Variable<DateTime>(now),
-            Variable.withString(originDeviceId),
-            Variable.withString(command.projectId),
-            Variable.withString(command.designRevisionId),
-            Variable<int>(command.expectedDesignRevision),
-            Variable.withString('WORKING'),
-          ],
-        );
-        if (designChanged != 1) {
-          throw StateError('ELV5_ENVIRONMENT_DESIGN_REVISION_CAS_FAILED');
-        }
-      });
+    final designChanged = await database.customUpdate(
+      'UPDATE project_design_revisions SET revision = revision + 1, updated_at = ?, '
+      'origin_device_id = ? WHERE project_id = ? AND id = ? AND revision = ? '
+      'AND state = ? AND deleted_at IS NULL',
+      variables: <Variable>[
+        Variable<DateTime>(now),
+        Variable.withString(originDeviceId),
+        Variable.withString(command.projectId),
+        Variable.withString(command.designRevisionId),
+        Variable<int>(command.expectedDesignRevision),
+        Variable.withString('WORKING'),
+      ],
+    );
+    if (designChanged != 1) {
+      throw StateError('ELV5_ENVIRONMENT_DESIGN_REVISION_CAS_FAILED');
+    }
+  });
 
   String _canonical(Object? value) => utf8.decode(_encoder.encode(value));
 }
@@ -264,7 +280,11 @@ final class DriftElv5EnvironmentProfileStore
 String _scopeKind(String value) {
   final normalized = value.trim().toUpperCase();
   if (!const <String>{'ROOM', 'ROUTE_SECTION'}.contains(normalized)) {
-    throw ArgumentError.value(value, 'scopeKind', 'Expected ROOM or ROUTE_SECTION.');
+    throw ArgumentError.value(
+      value,
+      'scopeKind',
+      'Expected ROOM or ROUTE_SECTION.',
+    );
   }
   return normalized;
 }

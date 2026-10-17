@@ -45,13 +45,13 @@ class DriftManufacturerRepository implements ManufacturerRepository {
                 .get();
         final row =
             await (database.select(database.manufacturerPolicies)..where(
-              (r) => r.projectId.equals(projectId) & r.deletedAt.isNull(),
-            )).getSingleOrNull();
+                  (r) => r.projectId.equals(projectId) & r.deletedAt.isNull(),
+                ))
+                .getSingleOrNull();
         final ids = protection.circuits.map((c) => c.circuitId).toList();
-        final selections =
-            await (database.select(database.circuitProductSelections)..where(
-              (r) => r.circuitId.isIn(ids) & r.deletedAt.isNull(),
-            )).get();
+        final selections = await (database.select(
+          database.circuitProductSelections,
+        )..where((r) => r.circuitId.isIn(ids) & r.deletedAt.isNull())).get();
         return ProjectManufacturerSnapshot(
           protection: protection,
           catalogs: catalogs
@@ -61,12 +61,11 @@ class DriftManufacturerRepository implements ManufacturerRepository {
                 ),
               )
               .toList(growable: false),
-          policy:
-              row == null
-                  ? const ProjectManufacturerPolicy()
-                  : ManufacturerCatalogCodec.decodePolicy(
-                    jsonDecode(row.payloadJson) as Map<String, dynamic>,
-                  ),
+          policy: row == null
+              ? const ProjectManufacturerPolicy()
+              : ManufacturerCatalogCodec.decodePolicy(
+                  jsonDecode(row.payloadJson) as Map<String, dynamic>,
+                ),
           selections: {
             for (final s in selections)
               s.circuitId: ManufacturerSelection(
@@ -110,9 +109,9 @@ class DriftManufacturerRepository implements ManufacturerRepository {
     final payload = canonicalEngineeringJson(
       ManufacturerCatalogCodec.catalog(catalog),
     );
-    final old =
-        await (database.select(database.manufacturerCatalogs)
-          ..where((r) => r.id.equals(catalog.id!))).getSingleOrNull();
+    final old = await (database.select(
+      database.manufacturerCatalogs,
+    )..where((r) => r.id.equals(catalog.id!))).getSingleOrNull();
     if (old != null) {
       if (old.deletedAt != null)
         throw StateError('Catalog is archived; import a new version.');
@@ -133,9 +132,9 @@ class DriftManufacturerRepository implements ManufacturerRepository {
     )) {
       throw StateError('This manufacturer/version/region already exists.');
     }
-    final borrowed =
-        await (database.select(database.manufacturerProducts)
-          ..where((p) => p.id.isIn(ids))).get();
+    final borrowed = await (database.select(
+      database.manufacturerProducts,
+    )..where((p) => p.id.isIn(ids))).get();
     if (borrowed.isNotEmpty)
       throw StateError(
         'Product IDs cannot be reused from another catalog version.',
@@ -175,31 +174,30 @@ class DriftManufacturerRepository implements ManufacturerRepository {
     }
   });
   @override
-  Future<void> archiveCatalog(
-    String catalogId,
-  ) => database.transaction(() async {
-    final row =
-        await (database.select(database.manufacturerCatalogs)
-          ..where((r) => r.id.equals(catalogId))).getSingleOrNull();
-    if (row == null || row.deletedAt != null) return;
-    final now = DateTime.now().toUtc();
-    await (database.update(database.manufacturerCatalogs)
-      ..where((r) => r.id.equals(catalogId))).write(
-      ManufacturerCatalogsCompanion(
-        deletedAt: Value(now),
-        updatedAt: Value(now),
-        revision: Value(row.revision + 1),
-        originDeviceId: Value(originDeviceId),
-      ),
-    );
-    // Preserve original selection snapshots. Freshness and catalog availability are checked on read.
-  });
+  Future<void> archiveCatalog(String catalogId) =>
+      database.transaction(() async {
+        final row = await (database.select(
+          database.manufacturerCatalogs,
+        )..where((r) => r.id.equals(catalogId))).getSingleOrNull();
+        if (row == null || row.deletedAt != null) return;
+        final now = DateTime.now().toUtc();
+        await (database.update(
+          database.manufacturerCatalogs,
+        )..where((r) => r.id.equals(catalogId))).write(
+          ManufacturerCatalogsCompanion(
+            deletedAt: Value(now),
+            updatedAt: Value(now),
+            revision: Value(row.revision + 1),
+            originDeviceId: Value(originDeviceId),
+          ),
+        );
+        // Preserve original selection snapshots. Freshness and catalog availability are checked on read.
+      });
   @override
   Future<void> savePolicy(String projectId, ProjectManufacturerPolicy policy) =>
       database.transaction(() async {
-        final project = await DriftProjectHierarchyRepository(
-          database,
-        ).findProject(projectId);
+        final project = await DriftProjectHierarchyRepository(database)
+            .findProject(projectId);
         if (project == null) throw StateError('Project is unavailable.');
         for (final list in [
           policy.allowedManufacturers,
@@ -214,9 +212,9 @@ class DriftManufacturerRepository implements ManufacturerRepository {
         }
         if (policy.preferredSeriesByRole.values.any((v) => v.trim().isEmpty))
           throw ArgumentError('Preferred series must be nonempty.');
-        final old =
-            await (database.select(database.manufacturerPolicies)
-              ..where((r) => r.projectId.equals(projectId))).getSingleOrNull();
+        final old = await (database.select(
+          database.manufacturerPolicies,
+        )..where((r) => r.projectId.equals(projectId))).getSingleOrNull();
         final payload = canonicalEngineeringJson(
           ManufacturerCatalogCodec.policy(policy),
         );
@@ -248,10 +246,9 @@ class DriftManufacturerRepository implements ManufacturerRepository {
     required String expectedRequirementFingerprint,
   }) => database.transaction(() async {
     final snapshot = await load(projectId);
-    final circuit =
-        snapshot.protection.circuits
-            .where((c) => c.circuitId == circuitId)
-            .firstOrNull;
+    final circuit = snapshot.protection.circuits
+        .where((c) => c.circuitId == circuitId)
+        .firstOrNull;
     if (snapshot.protection.recalculation.project == null ||
         circuit == null ||
         circuit.fingerprint != expectedRequirementFingerprint ||
@@ -259,19 +256,18 @@ class DriftManufacturerRepository implements ManufacturerRepository {
       throw StateError(
         'Requirement changed. Recalculate and review the current proposal.',
       );
-    final candidate =
-        snapshot
-            .candidates(circuit)
-            .where((c) => c.product.id == productId)
-            .firstOrNull;
+    final candidate = snapshot
+        .candidates(circuit)
+        .where((c) => c.product.id == productId)
+        .firstOrNull;
     if (candidate == null)
       throw StateError(
         'Choose an active product with all required technical characteristics and project policy compatibility.',
       );
     final now = DateTime.now().toUtc();
-    final old =
-        await (database.select(database.circuitProductSelections)
-          ..where((r) => r.circuitId.equals(circuitId))).getSingleOrNull();
+    final old = await (database.select(
+      database.circuitProductSelections,
+    )..where((r) => r.circuitId.equals(circuitId))).getSingleOrNull();
     final productSnapshot = <String, Object?>{
       'catalogId': candidate.catalog.id,
       'manufacturer': candidate.catalog.manufacturer,
@@ -309,13 +305,14 @@ class DriftManufacturerRepository implements ManufacturerRepository {
         if (snapshot.protection.recalculation.project == null ||
             !snapshot.protection.circuits.any((c) => c.circuitId == circuitId))
           throw StateError('Circuit is unavailable.');
-        final row =
-            await (database.select(database.circuitProductSelections)
-              ..where((r) => r.circuitId.equals(circuitId))).getSingleOrNull();
+        final row = await (database.select(
+          database.circuitProductSelections,
+        )..where((r) => r.circuitId.equals(circuitId))).getSingleOrNull();
         if (row == null || row.deletedAt != null) return;
         final now = DateTime.now().toUtc();
-        await (database.update(database.circuitProductSelections)
-          ..where((r) => r.circuitId.equals(circuitId))).write(
+        await (database.update(
+          database.circuitProductSelections,
+        )..where((r) => r.circuitId.equals(circuitId))).write(
           CircuitProductSelectionsCompanion(
             deletedAt: Value(now),
             updatedAt: Value(now),

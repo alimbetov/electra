@@ -8,19 +8,31 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('uses persisted optical facts, exact ELV3 length, and attenuation evidence', () async {
-    final captured = await Lan05PersistedInputResolver(
-      lanStore: _LanStore(),
-      elv3Facts: _Elv3Facts(),
-      opticalEvidence: _OpticalEvidence(),
-    ).capture(_request());
-    final result = const Lan05OpticalBudgetKernel().evaluate(captured.value);
+  test(
+    'uses persisted optical facts, exact ELV3 length, and attenuation evidence',
+    () async {
+      final captured = await Lan05PersistedInputResolver(
+        lanStore: _LanStore(),
+        elv3Facts: _Elv3Facts(),
+        opticalEvidence: _OpticalEvidence(),
+      ).capture(_request());
+      final result = const Lan05OpticalBudgetKernel().evaluate(captured.value);
 
-    expect(result.aToB.physicalLoss.lower.value, Elv5Rational.parseDecimal('2.5'));
-    expect(result.aToB.sensitivity.margin!.value, Elv5Rational.parseDecimal('9.5'));
-    expect(result.aToB.overload.margin!.value, Elv5Rational.parseDecimal('3.5'));
-    expect(result.passes, isTrue);
-  });
+      expect(
+        result.aToB.physicalLoss.lower.value,
+        Elv5Rational.parseDecimal('2.5'),
+      );
+      expect(
+        result.aToB.sensitivity.margin!.value,
+        Elv5Rational.parseDecimal('9.5'),
+      );
+      expect(
+        result.aToB.overload.margin!.value,
+        Elv5Rational.parseDecimal('3.5'),
+      );
+      expect(result.passes, isTrue);
+    },
+  );
 
   test('missing section attenuation is durable blocked evidence', () async {
     final resolver = Lan05PersistedInputResolver(
@@ -112,7 +124,16 @@ final class _LanStore implements Elv5LanMutationStore {
   };
 
   @override
-  Future<void> replace({required String projectId, required String designRevisionId, required String operation, required String subjectId, required String bindingId, required int? expectedRootRevision, required Map<String, Object?> payload, required DateTime updatedAtUtc}) => throw UnimplementedError();
+  Future<void> replace({
+    required String projectId,
+    required String designRevisionId,
+    required String operation,
+    required String subjectId,
+    required String bindingId,
+    required int? expectedRootRevision,
+    required Map<String, Object?> payload,
+    required DateTime updatedAtUtc,
+  }) => throw UnimplementedError();
 }
 
 final class _Elv3Facts implements Elv3RealizedLinkFactSource {

@@ -18,7 +18,9 @@ final class ReplaceAcs06TopologyContractCommand {
       throw ArgumentError('expectedDesignRevision must be >= 1.');
     }
     if (expectedBindingRevision != null && expectedBindingRevision! < 1) {
-      throw ArgumentError('expectedBindingRevision must be >= 1 when supplied.');
+      throw ArgumentError(
+        'expectedBindingRevision must be >= 1 when supplied.',
+      );
     }
   }
 

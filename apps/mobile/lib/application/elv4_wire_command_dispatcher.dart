@@ -228,8 +228,9 @@ final class Elv4WireCommandKey {
   int get hashCode => Object.hash(schema, operation, payloadSchemaVersion);
 }
 
-typedef Elv4WireOperationHandler<T> =
-    Future<T> Function(Elv4WireCommandEnvelope envelope);
+typedef Elv4WireOperationHandler<T> = Future<T> Function(
+  Elv4WireCommandEnvelope envelope,
+);
 
 /// Exact schema/operation/version dispatcher. A structurally registered command
 /// with no installed operation codec fails closed instead of falling through to

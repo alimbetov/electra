@@ -5,7 +5,9 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   test('round-trips exact ACS-03 contract without floating point', () {
     final contract = _contract();
-    final decoded = Acs03ElectricalContract.fromMap(contract.toCanonicalValue());
+    final decoded = Acs03ElectricalContract.fromMap(
+      contract.toCanonicalValue(),
+    );
 
     expect(decoded.doorId, 'door-1');
     expect(decoded.lockId, 'lock-1');
@@ -14,10 +16,7 @@ void main() {
       decoded.events.last.lockCurrent.value,
       Elv5Rational(BigInt.from(3), BigInt.from(10)),
     );
-    expect(
-      decoded.minimumTerminalVoltage!.value,
-      Elv5Rational.integer(22),
-    );
+    expect(decoded.minimumTerminalVoltage!.value, Elv5Rational.integer(22));
   });
 
   test('requires holding active and startup states', () {

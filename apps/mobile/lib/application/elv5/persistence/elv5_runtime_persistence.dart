@@ -111,10 +111,13 @@ final class Elv5EvaluationPointer {
       throw ArgumentError.value(generation, 'generation', 'Must be >= 0.');
     }
     if (evaluationId != null) _text(evaluationId!, 'evaluationId');
-    if (inputFingerprint != null) _sha256(inputFingerprint!, 'inputFingerprint');
+    if (inputFingerprint != null)
+      _sha256(inputFingerprint!, 'inputFingerprint');
     if (outputSha256 != null) _sha256(outputSha256!, 'outputSha256');
     if (freshness == Elv5PointerFreshness.current &&
-        (evaluationId == null || inputFingerprint == null || outputSha256 == null)) {
+        (evaluationId == null ||
+            inputFingerprint == null ||
+            outputSha256 == null)) {
       throw ArgumentError(
         'CURRENT pointer requires evaluationId, inputFingerprint and outputSha256.',
       );
@@ -151,13 +154,20 @@ final class Elv5PointerWrite {
     _text(logicalNodeKeyJson, 'logicalNodeKeyJson');
     _sha256(logicalNodeKeySha256, 'logicalNodeKeySha256');
     if (expectedGeneration < 0) {
-      throw ArgumentError.value(expectedGeneration, 'expectedGeneration', 'Must be >= 0.');
+      throw ArgumentError.value(
+        expectedGeneration,
+        'expectedGeneration',
+        'Must be >= 0.',
+      );
     }
     if (evaluationId != null) _text(evaluationId!, 'evaluationId');
-    if (inputFingerprint != null) _sha256(inputFingerprint!, 'inputFingerprint');
+    if (inputFingerprint != null)
+      _sha256(inputFingerprint!, 'inputFingerprint');
     if (outputSha256 != null) _sha256(outputSha256!, 'outputSha256');
     if (freshness == Elv5PointerFreshness.current &&
-        (evaluationId == null || inputFingerprint == null || outputSha256 == null)) {
+        (evaluationId == null ||
+            inputFingerprint == null ||
+            outputSha256 == null)) {
       throw ArgumentError(
         'CURRENT pointer requires evaluationId, inputFingerprint and outputSha256.',
       );
@@ -255,12 +265,20 @@ abstract interface class Elv5RuntimeWriteSession extends ElvWriteSession {
   Elv5DependencyStore get dependencies;
 }
 
-typedef Elv5RuntimeWriteUnitOfWork = ElvWriteUnitOfWork<Elv5RuntimeWriteSession>;
+typedef Elv5RuntimeWriteUnitOfWork =
+    ElvWriteUnitOfWork<Elv5RuntimeWriteSession>;
 
 String _canonicalRelationKind(String value) {
   final kind = _text(value, 'relationKind').toUpperCase();
   if (kind == 'UPSTREAM_EVALUATION') return 'EVAL';
-  if (!const {'FACT', 'SET', 'POLICY', 'EVAL', 'POINTER', 'MISSING'}.contains(kind)) {
+  if (!const {
+    'FACT',
+    'SET',
+    'POLICY',
+    'EVAL',
+    'POINTER',
+    'MISSING',
+  }.contains(kind)) {
     throw ArgumentError.value(value, 'relationKind', 'Unsupported kind.');
   }
   return kind;

@@ -120,34 +120,38 @@ final class DriftElectricalCircuitRepository
     await database.transaction(() async {
       final room =
           await (database.select(database.rooms)..where(
-            (row) => row.id.equals(circuit.roomId) & row.deletedAt.isNull(),
-          )).getSingleOrNull();
+                (row) => row.id.equals(circuit.roomId) & row.deletedAt.isNull(),
+              ))
+              .getSingleOrNull();
       if (room == null) throw StateError('Circuit room is not active.');
-      final existing =
-          await (database.select(database.electricalCircuits)
-            ..where((row) => row.id.equals(circuit.id))).getSingleOrNull();
+      final existing = await (database.select(
+        database.electricalCircuits,
+      )..where((row) => row.id.equals(circuit.id))).getSingleOrNull();
       if (existing != null && existing.roomId != circuit.roomId)
         throw StateError('Cannot move a circuit between rooms.');
       if (circuit.sourceGroupId != null) {
         final group =
             await (database.select(database.consumptionGroups)..where(
-              (row) =>
-                  row.id.equals(circuit.sourceGroupId!) &
-                  row.deletedAt.isNull(),
-            )).getSingleOrNull();
+                  (row) =>
+                      row.id.equals(circuit.sourceGroupId!) &
+                      row.deletedAt.isNull(),
+                ))
+                .getSingleOrNull();
         if (group == null || group.roomId != circuit.roomId)
           throw StateError('Source group must belong to the circuit room.');
       }
       for (final id in circuit.loadIds) {
         final component =
-            await (database.select(database.componentInstances)..where(
-              (row) => row.id.equals(id) & row.deletedAt.isNull(),
-            )).getSingleOrNull();
+            await (database.select(database.componentInstances)
+                  ..where((row) => row.id.equals(id) & row.deletedAt.isNull()))
+                .getSingleOrNull();
         final load =
             await (database.select(database.equipmentElectricalLoads)..where(
-              (row) =>
-                  row.componentInstanceId.equals(id) & row.deletedAt.isNull(),
-            )).getSingleOrNull();
+                  (row) =>
+                      row.componentInstanceId.equals(id) &
+                      row.deletedAt.isNull(),
+                ))
+                .getSingleOrNull();
         if (component == null ||
             component.roomId != circuit.roomId ||
             load == null)
@@ -155,9 +159,9 @@ final class DriftElectricalCircuitRepository
             'Assigned load must be active in the circuit room: $id',
           );
         final assignment =
-            await (database.select(database.circuitLoadAssignments)..where(
-              (row) => row.componentInstanceId.equals(id),
-            )).getSingleOrNull();
+            await (database.select(database.circuitLoadAssignments)
+                  ..where((row) => row.componentInstanceId.equals(id)))
+                .getSingleOrNull();
         if (assignment != null && assignment.circuitId != circuit.id)
           throw StateError(
             'Load $id is already assigned to another circuit. Remove that assignment first.',
@@ -184,8 +188,9 @@ final class DriftElectricalCircuitRepository
               originDeviceId: Value(originDeviceId),
             ),
           );
-      await (database.delete(database.circuitLoadAssignments)
-        ..where((row) => row.circuitId.equals(circuit.id))).go();
+      await (database.delete(
+        database.circuitLoadAssignments,
+      )..where((row) => row.circuitId.equals(circuit.id))).go();
       for (final id in circuit.loadIds) {
         await database
             .into(database.circuitLoadAssignments)
@@ -209,16 +214,17 @@ final class DriftElectricalCircuitRepository
     await database.transaction(() async {
       final group =
           await (database.select(database.consumptionGroups)..where(
-            (row) => row.id.equals(groupId) & row.deletedAt.isNull(),
-          )).getSingleOrNull();
+                (row) => row.id.equals(groupId) & row.deletedAt.isNull(),
+              ))
+              .getSingleOrNull();
       if (group == null) throw StateError('Consumption group is not active.');
       final loads =
           (await DriftElectricalLoadRepository(
-            database,
-            originDeviceId: originDeviceId,
-          ).loadRoomLoads(
-            group.roomId,
-          )).where((load) => load.consumptionGroupId == groupId).toList();
+                database,
+                originDeviceId: originDeviceId,
+              ).loadRoomLoads(group.roomId))
+              .where((load) => load.consumptionGroupId == groupId)
+              .toList();
       if (loads.isEmpty)
         throw StateError('Configure at least one active load in this group.');
       final profile = loads.first.profile;
@@ -245,23 +251,25 @@ final class DriftElectricalCircuitRepository
     await database.transaction(() async {
       final row =
           await (database.select(database.electricalCircuits)..where(
-            (row) => row.id.equals(circuitId) & row.deletedAt.isNull(),
-          )).getSingleOrNull();
+                (row) => row.id.equals(circuitId) & row.deletedAt.isNull(),
+              ))
+              .getSingleOrNull();
       if (row == null) throw StateError('Circuit is not active.');
       final room =
           await (database.select(database.rooms)..where(
-            (item) => item.id.equals(row.roomId) & item.deletedAt.isNull(),
-          )).getSingleOrNull();
+                (item) => item.id.equals(row.roomId) & item.deletedAt.isNull(),
+              ))
+              .getSingleOrNull();
       if (room == null) throw StateError('Circuit room is not active.');
-      final snapshot = (await loadRoomCircuits(
-        row.roomId,
-      )).firstWhere((item) => item.circuit.id == circuitId);
+      final snapshot = (await loadRoomCircuits(row.roomId))
+          .firstWhere((item) => item.circuit.id == circuitId);
       if (!snapshot.calculation.ready)
         throw StateError(
           'Resolve all calculation issues before confirming the proposal.',
         );
-      await (database.update(database.electricalCircuits)
-        ..where((item) => item.id.equals(circuitId))).write(
+      await (database.update(
+        database.electricalCircuits,
+      )..where((item) => item.id.equals(circuitId))).write(
         ElectricalCircuitsCompanion(
           reviewedInputSignature: Value(snapshot.calculation.inputSignature),
           revision: Value(row.revision + 1),

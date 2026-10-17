@@ -76,7 +76,9 @@ final class Elv5PolicyMutationService {
 
   Future<Elv5ReplacementRunResult> execute(Elv5WireCommandEnvelope command) {
     if (!_operations.contains(command.operation)) {
-      throw FormatException('Unsupported policy operation: ${command.operation}.');
+      throw FormatException(
+        'Unsupported policy operation: ${command.operation}.',
+      );
     }
     return _runner.run(
       command,
@@ -226,7 +228,8 @@ final class Elv5PolicyMutationService {
           designRevisionId: command.designRevisionId,
           bindingId: bindingId,
         );
-        if (previous == null) throw StateError('Policy disappeared before adopt.');
+        if (previous == null)
+          throw StateError('Policy disappeared before adopt.');
         await session.policies.adopt(
           projectId: command.projectId,
           designRevisionId: command.designRevisionId,
@@ -312,8 +315,6 @@ final class Elv5PolicyMutationService {
     );
   }
 
-  static String _canonicalJson(Object? value) => utf8.decode(
-    _encoder.encode(value),
-    allowMalformed: false,
-  );
+  static String _canonicalJson(Object? value) =>
+      utf8.decode(_encoder.encode(value), allowMalformed: false);
 }

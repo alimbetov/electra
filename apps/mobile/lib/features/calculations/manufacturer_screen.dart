@@ -18,9 +18,8 @@ class ManufacturerScreen extends ConsumerWidget {
         .watch(projectManufacturerProvider(projectId))
         .when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error:
-              (error, _) =>
-                  Center(child: Text('Unable to load catalogs: $error')),
+          error: (error, _) =>
+              Center(child: Text('Unable to load catalogs: $error')),
           data: (snapshot) {
             if (snapshot.protection.recalculation.project == null)
               return const Center(child: Text('Project is unavailable.'));
@@ -31,20 +30,18 @@ class ManufacturerScreen extends ConsumerWidget {
               onImport: repo.importCatalog,
               onArchive: repo.archiveCatalog,
               onPolicy: (policy) => repo.savePolicy(projectId, policy),
-              onSelect:
-                  (circuit, product, fingerprint) => repo.selectProduct(
-                    projectId: projectId,
-                    circuitId: circuit,
-                    productId: product,
-                    expectedRequirementFingerprint: fingerprint,
-                  ),
+              onSelect: (circuit, product, fingerprint) => repo.selectProduct(
+                projectId: projectId,
+                circuitId: circuit,
+                productId: product,
+                expectedRequirementFingerprint: fingerprint,
+              ),
               onClear: (id) => repo.clearSelection(projectId, id),
-              onRequirements:
-                  () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => ProtectionScreen(projectId: projectId),
-                    ),
-                  ),
+              onRequirements: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => ProtectionScreen(projectId: projectId),
+                ),
+              ),
             );
           },
         ),
@@ -117,30 +114,26 @@ class _ManufacturerWorkspaceState extends State<ManufacturerWorkspace> {
                       spacing: 8,
                       children: [
                         FilledButton(
-                          onPressed:
-                              () => Navigator.of(context).push(
-                                MaterialPageRoute<void>(
-                                  builder:
-                                      (_) => ManufacturerCatalogEditor(
-                                        id: widget.nextId(),
-                                        nextId: widget.nextId,
-                                        onSave: widget.onImport,
-                                      ),
-                                ),
+                          onPressed: () => Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => ManufacturerCatalogEditor(
+                                id: widget.nextId(),
+                                nextId: widget.nextId,
+                                onSave: widget.onImport,
                               ),
+                            ),
+                          ),
                           child: const Text('New catalog version'),
                         ),
                         OutlinedButton(
-                          onPressed:
-                              () => showDialog<void>(
-                                context: context,
-                                builder:
-                                    (_) => ManufacturerDataDialog(
-                                      policy: false,
-                                      onCatalog: widget.onImport,
-                                      onPolicy: widget.onPolicy,
-                                    ),
-                              ),
+                          onPressed: () => showDialog<void>(
+                            context: context,
+                            builder: (_) => ManufacturerDataDialog(
+                              policy: false,
+                              onCatalog: widget.onImport,
+                              onPolicy: widget.onPolicy,
+                            ),
+                          ),
                           child: const Text('Import catalog JSON'),
                         ),
                       ],
@@ -170,12 +163,11 @@ class _ManufacturerWorkspaceState extends State<ManufacturerWorkspace> {
                                 ),
                               ),
                             TextButton(
-                              onPressed:
-                                  busy
-                                      ? null
-                                      : () => work(
-                                        () => widget.onArchive(catalog.id!),
-                                      ),
+                              onPressed: busy
+                                  ? null
+                                  : () => work(
+                                      () => widget.onArchive(catalog.id!),
+                                    ),
                               child: const Text('Archive catalog version'),
                             ),
                           ],
@@ -203,15 +195,13 @@ class _ManufacturerWorkspaceState extends State<ManufacturerWorkspace> {
                       'Preferred series: ${snapshot.policy.preferredSeriesByRole.entries.map((e) => "${e.key.name}: ${e.value}").join(", ")}',
                     ),
                     FilledButton(
-                      onPressed:
-                          () => showDialog<void>(
-                            context: context,
-                            builder:
-                                (_) => ManufacturerPolicyDialog(
-                                  initial: snapshot.policy,
-                                  onSave: widget.onPolicy,
-                                ),
-                          ),
+                      onPressed: () => showDialog<void>(
+                        context: context,
+                        builder: (_) => ManufacturerPolicyDialog(
+                          initial: snapshot.policy,
+                          onSave: widget.onPolicy,
+                        ),
+                      ),
                       child: const Text('Edit manufacturer policy'),
                     ),
                   ],
@@ -258,12 +248,11 @@ class _ManufacturerWorkspaceState extends State<ManufacturerWorkspace> {
                                 selected.snapshot['sourceReference'] as String,
                               ),
                               TextButton(
-                                onPressed:
-                                    busy
-                                        ? null
-                                        : () => work(
-                                          () => widget.onClear(c.circuitId),
-                                        ),
+                                onPressed: busy
+                                    ? null
+                                    : () => work(
+                                        () => widget.onClear(c.circuitId),
+                                      ),
                                 child: const Text('Clear selection'),
                               ),
                             ],
@@ -282,22 +271,20 @@ class _ManufacturerWorkspaceState extends State<ManufacturerWorkspace> {
                                 subtitle: Text(
                                   '${candidate.product.series} · version ${candidate.catalog.catalogVersion}\n${candidate.match.compatible ? "Compatible with declared requirement" : candidate.match.issues.join(" ")}',
                                 ),
-                                trailing:
-                                    candidate.match.compatible
-                                        ? TextButton(
-                                          onPressed:
-                                              busy
-                                                  ? null
-                                                  : () => work(
-                                                    () => widget.onSelect(
-                                                      c.circuitId,
-                                                      candidate.product.id,
-                                                      c.fingerprint,
-                                                    ),
-                                                  ),
-                                          child: const Text('Select'),
-                                        )
-                                        : const Icon(Icons.block),
+                                trailing: candidate.match.compatible
+                                    ? TextButton(
+                                        onPressed: busy
+                                            ? null
+                                            : () => work(
+                                                () => widget.onSelect(
+                                                  c.circuitId,
+                                                  candidate.product.id,
+                                                  c.fingerprint,
+                                                ),
+                                              ),
+                                        child: const Text('Select'),
+                                      )
+                                    : const Icon(Icons.block),
                               ),
                             if (snapshot.candidates(c).isEmpty)
                               const Text(
@@ -356,11 +343,10 @@ class _ManufacturerCatalogEditorState extends State<ManufacturerCatalogEditor> {
     }
     final product = await showDialog<ManufacturerProductVariant>(
       context: context,
-      builder:
-          (_) => ManufacturerProductDialog(
-            id: widget.nextId(),
-            manufacturer: brand.text.trim(),
-          ),
+      builder: (_) => ManufacturerProductDialog(
+        id: widget.nextId(),
+        manufacturer: brand.text.trim(),
+      ),
     );
     if (product != null && mounted) setState(() => products.add(product));
   }
@@ -507,23 +493,23 @@ class _ManufacturerProductDialogState extends State<ManufacturerProductDialog> {
         ratedVoltageV: number('Rated voltage V'),
         breakingCapacityKa: number('Breaking capacity kA'),
         poles: integer('Poles'),
-        tripCurve:
-            text('Trip characteristic').isEmpty
-                ? null
-                : text('Trip characteristic'),
+        tripCurve: text('Trip characteristic').isEmpty
+            ? null
+            : text('Trip characteristic'),
         residualCurrentMa: number('Residual trip mA'),
-        residualCurrentType:
-            text('Residual type').isEmpty ? null : text('Residual type'),
+        residualCurrentType: text('Residual type').isEmpty
+            ? null
+            : text('Residual type'),
         moduleWidthUnits: integer('Module width'),
         widthMm: number('Width mm'),
         heightMm: number('Height mm'),
         depthMm: number('Depth mm'),
-        mountingType:
-            text('Mounting type').isEmpty ? null : text('Mounting type'),
-        metadata:
-            text('Product datasheet source').isEmpty
-                ? {}
-                : {'sourceReference': text('Product datasheet source')},
+        mountingType: text('Mounting type').isEmpty
+            ? null
+            : text('Mounting type'),
+        metadata: text('Product datasheet source').isEmpty
+            ? {}
+            : {'sourceReference': text('Product datasheet source')},
       );
       final issues = ManufacturerProductMatcher.validateProduct(product);
       if (issues.isNotEmpty) throw ArgumentError(issues.join(' '));
@@ -545,35 +531,26 @@ class _ManufacturerProductDialogState extends State<ManufacturerProductDialog> {
             DropdownButtonFormField<FunctionalDeviceRole>(
               initialValue: role,
               isExpanded: true,
-              items:
-                  FunctionalDeviceRole.values
-                      .map(
-                        (v) => DropdownMenuItem(value: v, child: Text(v.name)),
-                      )
-                      .toList(),
+              items: FunctionalDeviceRole.values
+                  .map((v) => DropdownMenuItem(value: v, child: Text(v.name)))
+                  .toList(),
               onChanged: (v) => setState(() => role = v!),
             ),
             DropdownButtonFormField<ProductCurrentKind>(
               isExpanded: true,
               decoration: const InputDecoration(labelText: 'AC/DC declaration'),
-              items:
-                  ProductCurrentKind.values
-                      .map(
-                        (v) => DropdownMenuItem(value: v, child: Text(v.name)),
-                      )
-                      .toList(),
+              items: ProductCurrentKind.values
+                  .map((v) => DropdownMenuItem(value: v, child: Text(v.name)))
+                  .toList(),
               onChanged: (v) => setState(() => kind = v),
             ),
             DropdownButtonFormField<ProductLifecycleStatus>(
               initialValue: lifecycle,
               isExpanded: true,
               decoration: const InputDecoration(labelText: 'Lifecycle'),
-              items:
-                  ProductLifecycleStatus.values
-                      .map(
-                        (v) => DropdownMenuItem(value: v, child: Text(v.name)),
-                      )
-                      .toList(),
+              items: ProductLifecycleStatus.values
+                  .map((v) => DropdownMenuItem(value: v, child: Text(v.name)))
+                  .toList(),
               onChanged: (v) => setState(() => lifecycle = v!),
             ),
             for (final field in [
@@ -662,12 +639,11 @@ class _ManufacturerPolicyDialogState extends State<ManufacturerPolicyDialog> {
     super.dispose();
   }
 
-  List<String> list(TextEditingController c) =>
-      c.text
-          .split(',')
-          .map((v) => v.trim())
-          .where((v) => v.isNotEmpty)
-          .toList();
+  List<String> list(TextEditingController c) => c.text
+      .split(',')
+      .map((v) => v.trim())
+      .where((v) => v.isNotEmpty)
+      .toList();
   Future<void> save() async {
     setState(() => busy = true);
     try {

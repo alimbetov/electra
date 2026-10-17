@@ -20,21 +20,18 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: Builder(
-              builder:
-                  (context) => TextButton(
-                    onPressed:
-                        () => showDialog<void>(
-                          context: context,
-                          builder:
-                              (_) => ElectricalLoadDialog(
-                                component: component,
-                                title: 'Motor',
-                                groups: const [],
-                                onSave: (load) async => saved.add(load),
-                              ),
-                        ),
-                    child: const Text('Configure load'),
+              builder: (context) => TextButton(
+                onPressed: () => showDialog<void>(
+                  context: context,
+                  builder: (_) => ElectricalLoadDialog(
+                    component: component,
+                    title: 'Motor',
+                    groups: const [],
+                    onSave: (load) async => saved.add(load),
                   ),
+                ),
+                child: const Text('Configure load'),
+              ),
             ),
           ),
         ),

@@ -44,10 +44,9 @@ class FloorRoutingSnapshot {
     panels: panels ?? this.panels,
     handoffs: handoffs ?? this.handoffs,
     junctions: routing.values.expand((s) => s.junctions),
-    junctionIssues:
-        (j) =>
-            routing[j.roomId]?.junctionIssues(j) ??
-            ['Junction room is unavailable.'],
+    junctionIssues: (j) =>
+        routing[j.roomId]?.junctionIssues(j) ??
+        ['Junction room is unavailable.'],
   );
 }
 

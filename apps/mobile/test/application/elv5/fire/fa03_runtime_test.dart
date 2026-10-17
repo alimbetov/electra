@@ -8,27 +8,33 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('projects exact CURRENT PWR-03 terminal range without local voltage solve', () async {
-    final fingerprint = _hash('a');
-    final resolver = Fa03PersistedInputResolver(
-      contractSource: _ContractSource(_contract(fingerprint)),
-      powerEvidence: _EvidenceSource(_pwr03(fingerprint)),
-      nowUtc: () => DateTime.utc(2026, 10, 17),
-    );
+  test(
+    'projects exact CURRENT PWR-03 terminal range without local voltage solve',
+    () async {
+      final fingerprint = _hash('a');
+      final resolver = Fa03PersistedInputResolver(
+        contractSource: _ContractSource(_contract(fingerprint)),
+        powerEvidence: _EvidenceSource(_pwr03(fingerprint)),
+        nowUtc: () => DateTime.utc(2026, 10, 17),
+      );
 
-    final captured = await resolver.capture(_request());
-    final candidate = await buildFa03Executor(
-      nowUtc: () => DateTime.utc(2026, 10, 17),
-    ).execute(captured);
+      final captured = await resolver.capture(_request());
+      final candidate = await buildFa03Executor(
+        nowUtc: () => DateTime.utc(2026, 10, 17),
+      ).execute(captured);
 
-    expect(candidate.assessment, Elv5Assessment.pass);
-    final terminals = candidate.output['terminals']! as List<Object?>;
-    final terminal = terminals.single as Map<String, Object?>;
-    expect(terminal['terminalId'], 'last-device');
-    expect(terminal['voltageLowerV'], Elv5Rational.parseDecimal('23.9').toMap());
-    expect(terminal['lowMarginV'], Elv5Rational.parseDecimal('1.9').toMap());
-    expect(terminal['highMarginV'], Elv5Rational.parseDecimal('2.1').toMap());
-  });
+      expect(candidate.assessment, Elv5Assessment.pass);
+      final terminals = candidate.output['terminals']! as List<Object?>;
+      final terminal = terminals.single as Map<String, Object?>;
+      expect(terminal['terminalId'], 'last-device');
+      expect(
+        terminal['voltageLowerV'],
+        Elv5Rational.parseDecimal('23.9').toMap(),
+      );
+      expect(terminal['lowMarginV'], Elv5Rational.parseDecimal('1.9').toMap());
+      expect(terminal['highMarginV'], Elv5Rational.parseDecimal('2.1').toMap());
+    },
+  );
 
   test('F2 Q6 captures exact upstream generation and changes identity after republish', () async {
     final fingerprint = _hash('a');
@@ -68,25 +74,28 @@ void main() {
     );
   });
 
-  test('F2 Q8 identical capture replay produces deterministic candidate hashes', () async {
-    final fingerprint = _hash('a');
-    final resolver = Fa03PersistedInputResolver(
-      contractSource: _ContractSource(_contract(fingerprint)),
-      powerEvidence: _EvidenceSource(_pwr03(fingerprint)),
-      nowUtc: () => DateTime.utc(2026, 10, 17),
-    );
-    final executor = buildFa03Executor(
-      nowUtc: () => DateTime.utc(2026, 10, 17),
-    );
+  test(
+    'F2 Q8 identical capture replay produces deterministic candidate hashes',
+    () async {
+      final fingerprint = _hash('a');
+      final resolver = Fa03PersistedInputResolver(
+        contractSource: _ContractSource(_contract(fingerprint)),
+        powerEvidence: _EvidenceSource(_pwr03(fingerprint)),
+        nowUtc: () => DateTime.utc(2026, 10, 17),
+      );
+      final executor = buildFa03Executor(
+        nowUtc: () => DateTime.utc(2026, 10, 17),
+      );
 
-    final left = await executor.execute(await resolver.capture(_request()));
-    final right = await executor.execute(await resolver.capture(_request()));
+      final left = await executor.execute(await resolver.capture(_request()));
+      final right = await executor.execute(await resolver.capture(_request()));
 
-    expect(right.inputFingerprint, left.inputFingerprint);
-    expect(right.outputSha256, left.outputSha256);
-    expect(right.evidenceSha256, left.evidenceSha256);
-    expect(right.evaluationId, left.evaluationId);
-  });
+      expect(right.inputFingerprint, left.inputFingerprint);
+      expect(right.outputSha256, left.outputSha256);
+      expect(right.evidenceSha256, left.evidenceSha256);
+      expect(right.evaluationId, left.evaluationId);
+    },
+  );
 
   test('blocks stale PWR-03 input identity', () async {
     final resolver = Fa03PersistedInputResolver(
@@ -109,7 +118,9 @@ void main() {
   test('blocks missing mapped terminal as engineering evidence gap', () async {
     final fingerprint = _hash('a');
     final resolver = Fa03PersistedInputResolver(
-      contractSource: _ContractSource(_contract(fingerprint, loadId: 'missing-load')),
+      contractSource: _ContractSource(
+        _contract(fingerprint, loadId: 'missing-load'),
+      ),
       powerEvidence: _EvidenceSource(_pwr03(fingerprint)),
     );
 
@@ -127,36 +138,38 @@ void main() {
 }
 
 Elv5CalculationRequest _request() => Elv5CalculationRequest(
-      projectId: 'p',
-      designRevisionId: 'd',
-      scope: Elv5ScopeRef(
-        kind: Elv5ScopeKind.design,
-        scopeId: 'd',
-        scenarioKey: 'NONE',
-      ),
-      processCode: Elv5ProcessCode.fa03,
-      subject: Elv5SubjectRef(kind: 'FIRE_CIRCUIT', id: 'fire-circuit-1'),
-      expectedPointerGeneration: 0,
-    );
+  projectId: 'p',
+  designRevisionId: 'd',
+  scope: Elv5ScopeRef(
+    kind: Elv5ScopeKind.design,
+    scopeId: 'd',
+    scenarioKey: 'NONE',
+  ),
+  processCode: Elv5ProcessCode.fa03,
+  subject: Elv5SubjectRef(kind: 'FIRE_CIRCUIT', id: 'fire-circuit-1'),
+  expectedPointerGeneration: 0,
+);
 
-Fa03TerminalVoltageContract _contract(String fingerprint, {String loadId = 'load-3'}) =>
-    Fa03TerminalVoltageContract(
-      circuitId: 'fire-circuit-1',
-      model: Fa03ContractModel.radialDc,
-      minimumTerminalVoltageV: Elv5Rational.integer(22),
-      maximumTerminalVoltageV: Elv5Rational.integer(26),
-      cases: <Fa03CaseContract>[
-        Fa03CaseContract(
-          caseId: 'alarm',
-          scenarioId: 'FIRE_ALARM',
-          segmentId: 'FIRE_SEGMENT',
-          pwr03SubjectKind: 'DC_DOMAIN',
-          pwr03SubjectId: 'fire-domain-1',
-          expectedPwr03InputFingerprint: fingerprint,
-          terminalLoadIdByTerminalId: <String, String>{'last-device': loadId},
-        ),
-      ],
-    );
+Fa03TerminalVoltageContract _contract(
+  String fingerprint, {
+  String loadId = 'load-3',
+}) => Fa03TerminalVoltageContract(
+  circuitId: 'fire-circuit-1',
+  model: Fa03ContractModel.radialDc,
+  minimumTerminalVoltageV: Elv5Rational.integer(22),
+  maximumTerminalVoltageV: Elv5Rational.integer(26),
+  cases: <Fa03CaseContract>[
+    Fa03CaseContract(
+      caseId: 'alarm',
+      scenarioId: 'FIRE_ALARM',
+      segmentId: 'FIRE_SEGMENT',
+      pwr03SubjectKind: 'DC_DOMAIN',
+      pwr03SubjectId: 'fire-domain-1',
+      expectedPwr03InputFingerprint: fingerprint,
+      terminalLoadIdByTerminalId: <String, String>{'last-device': loadId},
+    ),
+  ],
+);
 
 final class _ContractSource implements Fa03TerminalVoltageContractSource {
   const _ContractSource(this.contract);
@@ -168,12 +181,12 @@ final class _ContractSource implements Fa03TerminalVoltageContractSource {
     required String designRevisionId,
     required String circuitId,
   }) async => Fa03TerminalVoltageContractSnapshot(
-        bindingId: 'fa03-binding-1',
-        bindingRevision: 2,
-        evidenceRef: 'FA03:fire-circuit-1:${_hash('c')}',
-        contentHash: _hash('c'),
-        contract: contract,
-      );
+    bindingId: 'fa03-binding-1',
+    bindingRevision: 2,
+    evidenceRef: 'FA03:fire-circuit-1:${_hash('c')}',
+    contentHash: _hash('c'),
+    contract: contract,
+  );
 }
 
 final class _EvidenceSource implements Elv4CurrentEvidenceSource {
@@ -190,7 +203,9 @@ final class _EvidenceSource implements Elv4CurrentEvidenceSource {
     String? scopeId,
     String? subjectKind,
     String? subjectId,
-  }) async => processCode == PowerProcessCode.pwr03 ? <Elv4CurrentEvaluationSnapshot>[value] : const [];
+  }) async => processCode == PowerProcessCode.pwr03
+      ? <Elv4CurrentEvaluationSnapshot>[value]
+      : const [];
 }
 
 Elv4CurrentEvaluationSnapshot _pwr03(

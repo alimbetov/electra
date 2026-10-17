@@ -29,23 +29,27 @@ final class DriftAcs03ElectricalContractStore
     required String designRevisionId,
     required String doorId,
   }) async {
-    final rows = await database.customSelect(
-      'SELECT id, revision, process_codes_json, definition_ref_json '
-      'FROM discipline_policy_bindings WHERE project_id = ? '
-      'AND design_revision_id = ? AND subject_kind = ? AND subject_id = ? '
-      'AND deleted_at IS NULL ORDER BY id',
-      variables: <Variable>[
-        Variable.withString(projectId),
-        Variable.withString(designRevisionId),
-        Variable.withString('DOOR'),
-        Variable.withString(doorId),
-      ],
-    ).get();
+    final rows = await database
+        .customSelect(
+          'SELECT id, revision, process_codes_json, definition_ref_json '
+          'FROM discipline_policy_bindings WHERE project_id = ? '
+          'AND design_revision_id = ? AND subject_kind = ? AND subject_id = ? '
+          'AND deleted_at IS NULL ORDER BY id',
+          variables: <Variable>[
+            Variable.withString(projectId),
+            Variable.withString(designRevisionId),
+            Variable.withString('DOOR'),
+            Variable.withString(doorId),
+          ],
+        )
+        .get();
     final matching = <QueryRow>[];
     for (final row in rows) {
       final rawCodes = jsonDecode(row.read<String>('process_codes_json'));
       if (rawCodes is! List) {
-        throw StateError('ACS03_POLICY_PROCESS_CODES_INVALID:${row.read<String>('id')}');
+        throw StateError(
+          'ACS03_POLICY_PROCESS_CODES_INVALID:${row.read<String>('id')}',
+        );
       }
       if (rawCodes.contains('ACS-03')) matching.add(row);
     }
@@ -55,7 +59,9 @@ final class DriftAcs03ElectricalContractStore
     }
 
     final binding = matching.single;
-    final definitionRaw = jsonDecode(binding.read<String>('definition_ref_json'));
+    final definitionRaw = jsonDecode(
+      binding.read<String>('definition_ref_json'),
+    );
     if (definitionRaw is! Map) {
       throw StateError('ACS03_DEFINITION_REF_INVALID:$doorId');
     }
@@ -69,19 +75,21 @@ final class DriftAcs03ElectricalContractStore
       throw StateError('ACS03_DEFINITION_HASH_INVALID:$doorId');
     }
 
-    final evidence = await database.customSelect(
-      'SELECT canonical_payload_json, payload_sha256 FROM '
-      'elv_revision_aggregate_evidence_records WHERE evidence_ref = ? '
-      'AND project_id = ? AND design_revision_id = ? AND aggregate_kind = ? '
-      'AND aggregate_id = ?',
-      variables: <Variable>[
-        Variable.withString(evidenceRef),
-        Variable.withString(projectId),
-        Variable.withString(designRevisionId),
-        Variable.withString('ACS03_ELECTRICAL_CONTRACT'),
-        Variable.withString(doorId),
-      ],
-    ).getSingleOrNull();
+    final evidence = await database
+        .customSelect(
+          'SELECT canonical_payload_json, payload_sha256 FROM '
+          'elv_revision_aggregate_evidence_records WHERE evidence_ref = ? '
+          'AND project_id = ? AND design_revision_id = ? AND aggregate_kind = ? '
+          'AND aggregate_id = ?',
+          variables: <Variable>[
+            Variable.withString(evidenceRef),
+            Variable.withString(projectId),
+            Variable.withString(designRevisionId),
+            Variable.withString('ACS03_ELECTRICAL_CONTRACT'),
+            Variable.withString(doorId),
+          ],
+        )
+        .getSingleOrNull();
     if (evidence == null) {
       throw StateError('ACS03_CONTRACT_EVIDENCE_MISSING:$evidenceRef');
     }
@@ -98,7 +106,9 @@ final class DriftAcs03ElectricalContractStore
     }
     final contract = Acs03ElectricalContract.fromMap(payload);
     if (contract.doorId != doorId) {
-      throw StateError('ACS03_CONTRACT_DOOR_MISMATCH:$doorId:${contract.doorId}');
+      throw StateError(
+        'ACS03_CONTRACT_DOOR_MISMATCH:$doorId:${contract.doorId}',
+      );
     }
     return Acs03ElectricalContractSnapshot(
       bindingId: binding.read<String>('id'),
@@ -110,28 +120,34 @@ final class DriftAcs03ElectricalContractStore
   }
 
   @override
-  Future<void> replace(ReplaceAcs03ElectricalContractCommand command) =>
-      database.transaction(() async {
-        final now = _nowUtc().toUtc();
-        final revision = await database.customSelect(
+  Future<void> replace(
+    ReplaceAcs03ElectricalContractCommand command,
+  ) => database.transaction(() async {
+    final now = _nowUtc().toUtc();
+    final revision = await database
+        .customSelect(
           'SELECT state, revision FROM project_design_revisions '
           'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
           variables: <Variable>[
             Variable.withString(command.projectId),
             Variable.withString(command.designRevisionId),
           ],
-        ).getSingleOrNull();
-        if (revision == null) {
-          throw StateError('ACS03_DESIGN_REVISION_NOT_FOUND:${command.designRevisionId}');
-        }
-        if (revision.read<String>('state') != 'WORKING') {
-          throw StateError('ACS03_DESIGN_REVISION_READ_ONLY');
-        }
-        if (revision.read<int>('revision') != command.expectedDesignRevision) {
-          throw StateError('ACS03_DESIGN_REVISION_CONFLICT');
-        }
+        )
+        .getSingleOrNull();
+    if (revision == null) {
+      throw StateError(
+        'ACS03_DESIGN_REVISION_NOT_FOUND:${command.designRevisionId}',
+      );
+    }
+    if (revision.read<String>('state') != 'WORKING') {
+      throw StateError('ACS03_DESIGN_REVISION_READ_ONLY');
+    }
+    if (revision.read<int>('revision') != command.expectedDesignRevision) {
+      throw StateError('ACS03_DESIGN_REVISION_CONFLICT');
+    }
 
-        final door = await database.customSelect(
+    final door = await database
+        .customSelect(
           'SELECT id FROM door_calculation_bindings WHERE project_id = ? '
           'AND design_revision_id = ? AND door_assembly_id = ? AND deleted_at IS NULL',
           variables: <Variable>[
@@ -139,12 +155,16 @@ final class DriftAcs03ElectricalContractStore
             Variable.withString(command.designRevisionId),
             Variable.withString(command.contract.doorId),
           ],
-        ).getSingleOrNull();
-        if (door == null) {
-          throw StateError('ACS03_DOOR_CALCULATION_NOT_FOUND:${command.contract.doorId}');
-        }
-        final doorBindingId = door.read<String>('id');
-        final lockRows = await database.customSelect(
+        )
+        .getSingleOrNull();
+    if (door == null) {
+      throw StateError(
+        'ACS03_DOOR_CALCULATION_NOT_FOUND:${command.contract.doorId}',
+      );
+    }
+    final doorBindingId = door.read<String>('id');
+    final lockRows = await database
+        .customSelect(
           'SELECT component_id FROM door_role_assignments WHERE project_id = ? '
           'AND design_revision_id = ? AND binding_id = ? AND UPPER(role_code) = ? '
           'ORDER BY component_id',
@@ -154,61 +174,67 @@ final class DriftAcs03ElectricalContractStore
             Variable.withString(doorBindingId),
             Variable.withString('LOCK'),
           ],
-        ).get();
-        if (lockRows.length != 1 ||
-            lockRows.single.read<String>('component_id') != command.contract.lockId) {
-          throw StateError('ACS03_LOCK_ROLE_CONTRACT_MISMATCH:${command.contract.doorId}');
-        }
+        )
+        .get();
+    if (lockRows.length != 1 ||
+        lockRows.single.read<String>('component_id') !=
+            command.contract.lockId) {
+      throw StateError(
+        'ACS03_LOCK_ROLE_CONTRACT_MISMATCH:${command.contract.doorId}',
+      );
+    }
 
-        final payload = command.contract.toCanonicalValue();
-        final contentHash = _encoder.sha256(payload);
-        final evidenceRef =
-            'ACS03:${command.contract.doorId}:$contentHash';
-        final canonicalPayload = utf8.decode(
-          _encoder.encode(payload),
-          allowMalformed: false,
-        );
-        final existingEvidence = await database.customSelect(
+    final payload = command.contract.toCanonicalValue();
+    final contentHash = _encoder.sha256(payload);
+    final evidenceRef = 'ACS03:${command.contract.doorId}:$contentHash';
+    final canonicalPayload = utf8.decode(
+      _encoder.encode(payload),
+      allowMalformed: false,
+    );
+    final existingEvidence = await database
+        .customSelect(
           'SELECT payload_sha256 FROM elv_revision_aggregate_evidence_records '
           'WHERE evidence_ref = ?',
           variables: <Variable>[Variable.withString(evidenceRef)],
-        ).getSingleOrNull();
-        if (existingEvidence == null) {
-          await runRawStatement(
-            database,
-            'INSERT INTO elv_revision_aggregate_evidence_records '
-            '(evidence_ref, project_id, design_revision_id, aggregate_kind, '
-            'aggregate_id, canonical_payload_json, payload_sha256, created_at, '
-            'origin_device_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            <Variable>[
-              Variable.withString(evidenceRef),
-              Variable.withString(command.projectId),
-              Variable.withString(command.designRevisionId),
-              Variable.withString('ACS03_ELECTRICAL_CONTRACT'),
-              Variable.withString(command.contract.doorId),
-              Variable.withString(canonicalPayload),
-              Variable.withString(contentHash),
-              Variable<DateTime>(now),
-              Variable.withString(originDeviceId),
-            ],
-          );
-        } else if (existingEvidence.read<String>('payload_sha256') != contentHash) {
-          throw StateError('ACS03_EVIDENCE_REF_COLLISION:$evidenceRef');
-        }
+        )
+        .getSingleOrNull();
+    if (existingEvidence == null) {
+      await runRawStatement(
+        database,
+        'INSERT INTO elv_revision_aggregate_evidence_records '
+        '(evidence_ref, project_id, design_revision_id, aggregate_kind, '
+        'aggregate_id, canonical_payload_json, payload_sha256, created_at, '
+        'origin_device_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        <Variable>[
+          Variable.withString(evidenceRef),
+          Variable.withString(command.projectId),
+          Variable.withString(command.designRevisionId),
+          Variable.withString('ACS03_ELECTRICAL_CONTRACT'),
+          Variable.withString(command.contract.doorId),
+          Variable.withString(canonicalPayload),
+          Variable.withString(contentHash),
+          Variable<DateTime>(now),
+          Variable.withString(originDeviceId),
+        ],
+      );
+    } else if (existingEvidence.read<String>('payload_sha256') != contentHash) {
+      throw StateError('ACS03_EVIDENCE_REF_COLLISION:$evidenceRef');
+    }
 
-        final definitionRef = <String, Object?>{
-          'policyCode': 'ACS03_ELECTRICAL_CONTRACT',
-          'editionId': evidenceRef,
-          'contentHash': contentHash,
-        };
-        final applicability = <String, Object?>{
-          'scopeKinds': <String>['DESIGN', 'SCENARIO'],
-          'scenarioIds': <String>[],
-        };
-        final processCodes = <String>['ACS-03'];
+    final definitionRef = <String, Object?>{
+      'policyCode': 'ACS03_ELECTRICAL_CONTRACT',
+      'editionId': evidenceRef,
+      'contentHash': contentHash,
+    };
+    final applicability = <String, Object?>{
+      'scopeKinds': <String>['DESIGN', 'SCENARIO'],
+      'scenarioIds': <String>[],
+    };
+    final processCodes = <String>['ACS-03'];
 
-        if (command.expectedBindingRevision == null) {
-          final currentRows = await database.customSelect(
+    if (command.expectedBindingRevision == null) {
+      final currentRows = await database
+          .customSelect(
             'SELECT id, process_codes_json FROM discipline_policy_bindings '
             'WHERE project_id = ? AND design_revision_id = ? '
             'AND subject_kind = ? AND subject_id = ? AND deleted_at IS NULL',
@@ -218,88 +244,89 @@ final class DriftAcs03ElectricalContractStore
               Variable.withString('DOOR'),
               Variable.withString(command.contract.doorId),
             ],
-          ).get();
-          for (final row in currentRows) {
-            final codes = jsonDecode(row.read<String>('process_codes_json'));
-            if (codes is List && codes.contains('ACS-03')) {
-              throw StateError('ACS03_ACTIVE_CONTRACT_ALREADY_EXISTS:${row.read<String>('id')}');
-            }
-          }
-          await runRawStatement(
-            database,
-            'INSERT INTO discipline_policy_bindings '
-            '(project_id, design_revision_id, id, revision, created_at, updated_at, '
-            'deleted_at, origin_device_id, subject_kind, subject_id, '
-            'process_codes_json, definition_ref_json, definition_sha256, '
-            'applicability_json, applicability_sha256) '
-            'VALUES (?, ?, ?, 1, ?, ?, NULL, ?, ?, ?, ?, ?, ?, ?, ?)',
-            <Variable>[
-              Variable.withString(command.projectId),
-              Variable.withString(command.designRevisionId),
-              Variable.withString(command.bindingId),
-              Variable<DateTime>(now),
-              Variable<DateTime>(now),
-              Variable.withString(originDeviceId),
-              Variable.withString('DOOR'),
-              Variable.withString(command.contract.doorId),
-              Variable.withString(_canonical(processCodes)),
-              Variable.withString(_canonical(definitionRef)),
-              Variable.withString(contentHash),
-              Variable.withString(_canonical(applicability)),
-              Variable.withString(_encoder.sha256(applicability)),
-            ],
+          )
+          .get();
+      for (final row in currentRows) {
+        final codes = jsonDecode(row.read<String>('process_codes_json'));
+        if (codes is List && codes.contains('ACS-03')) {
+          throw StateError(
+            'ACS03_ACTIVE_CONTRACT_ALREADY_EXISTS:${row.read<String>('id')}',
           );
-        } else {
-          final changedBinding = await database.customUpdate(
-            'UPDATE discipline_policy_bindings SET revision = revision + 1, '
-            'updated_at = ?, origin_device_id = ?, process_codes_json = ?, '
-            'definition_ref_json = ?, definition_sha256 = ?, applicability_json = ?, '
-            'applicability_sha256 = ? WHERE project_id = ? AND design_revision_id = ? '
-            'AND id = ? AND subject_kind = ? AND subject_id = ? AND revision = ? '
-            'AND deleted_at IS NULL',
-            variables: <Variable>[
-              Variable<DateTime>(now),
-              Variable.withString(originDeviceId),
-              Variable.withString(_canonical(processCodes)),
-              Variable.withString(_canonical(definitionRef)),
-              Variable.withString(contentHash),
-              Variable.withString(_canonical(applicability)),
-              Variable.withString(_encoder.sha256(applicability)),
-              Variable.withString(command.projectId),
-              Variable.withString(command.designRevisionId),
-              Variable.withString(command.bindingId),
-              Variable.withString('DOOR'),
-              Variable.withString(command.contract.doorId),
-              Variable<int>(command.expectedBindingRevision!),
-            ],
-          );
-          if (changedBinding != 1) {
-            throw StateError('ACS03_CONTRACT_BINDING_CAS_FAILED');
-          }
         }
-
-        final changedDesign = await database.customUpdate(
-          'UPDATE project_design_revisions SET revision = revision + 1, '
-          'updated_at = ?, origin_device_id = ? WHERE project_id = ? AND id = ? '
-          'AND revision = ? AND state = ? AND deleted_at IS NULL',
-          variables: <Variable>[
-            Variable<DateTime>(now),
-            Variable.withString(originDeviceId),
-            Variable.withString(command.projectId),
-            Variable.withString(command.designRevisionId),
-            Variable<int>(command.expectedDesignRevision),
-            Variable.withString('WORKING'),
-          ],
-        );
-        if (changedDesign != 1) {
-          throw StateError('ACS03_DESIGN_REVISION_CAS_FAILED');
-        }
-      });
-
-  String _canonical(Object? value) => utf8.decode(
-        _encoder.encode(value),
-        allowMalformed: false,
+      }
+      await runRawStatement(
+        database,
+        'INSERT INTO discipline_policy_bindings '
+        '(project_id, design_revision_id, id, revision, created_at, updated_at, '
+        'deleted_at, origin_device_id, subject_kind, subject_id, '
+        'process_codes_json, definition_ref_json, definition_sha256, '
+        'applicability_json, applicability_sha256) '
+        'VALUES (?, ?, ?, 1, ?, ?, NULL, ?, ?, ?, ?, ?, ?, ?, ?)',
+        <Variable>[
+          Variable.withString(command.projectId),
+          Variable.withString(command.designRevisionId),
+          Variable.withString(command.bindingId),
+          Variable<DateTime>(now),
+          Variable<DateTime>(now),
+          Variable.withString(originDeviceId),
+          Variable.withString('DOOR'),
+          Variable.withString(command.contract.doorId),
+          Variable.withString(_canonical(processCodes)),
+          Variable.withString(_canonical(definitionRef)),
+          Variable.withString(contentHash),
+          Variable.withString(_canonical(applicability)),
+          Variable.withString(_encoder.sha256(applicability)),
+        ],
       );
+    } else {
+      final changedBinding = await database.customUpdate(
+        'UPDATE discipline_policy_bindings SET revision = revision + 1, '
+        'updated_at = ?, origin_device_id = ?, process_codes_json = ?, '
+        'definition_ref_json = ?, definition_sha256 = ?, applicability_json = ?, '
+        'applicability_sha256 = ? WHERE project_id = ? AND design_revision_id = ? '
+        'AND id = ? AND subject_kind = ? AND subject_id = ? AND revision = ? '
+        'AND deleted_at IS NULL',
+        variables: <Variable>[
+          Variable<DateTime>(now),
+          Variable.withString(originDeviceId),
+          Variable.withString(_canonical(processCodes)),
+          Variable.withString(_canonical(definitionRef)),
+          Variable.withString(contentHash),
+          Variable.withString(_canonical(applicability)),
+          Variable.withString(_encoder.sha256(applicability)),
+          Variable.withString(command.projectId),
+          Variable.withString(command.designRevisionId),
+          Variable.withString(command.bindingId),
+          Variable.withString('DOOR'),
+          Variable.withString(command.contract.doorId),
+          Variable<int>(command.expectedBindingRevision!),
+        ],
+      );
+      if (changedBinding != 1) {
+        throw StateError('ACS03_CONTRACT_BINDING_CAS_FAILED');
+      }
+    }
+
+    final changedDesign = await database.customUpdate(
+      'UPDATE project_design_revisions SET revision = revision + 1, '
+      'updated_at = ?, origin_device_id = ? WHERE project_id = ? AND id = ? '
+      'AND revision = ? AND state = ? AND deleted_at IS NULL',
+      variables: <Variable>[
+        Variable<DateTime>(now),
+        Variable.withString(originDeviceId),
+        Variable.withString(command.projectId),
+        Variable.withString(command.designRevisionId),
+        Variable<int>(command.expectedDesignRevision),
+        Variable.withString('WORKING'),
+      ],
+    );
+    if (changedDesign != 1) {
+      throw StateError('ACS03_DESIGN_REVISION_CAS_FAILED');
+    }
+  });
+
+  String _canonical(Object? value) =>
+      utf8.decode(_encoder.encode(value), allowMalformed: false);
 }
 
 String _requiredText(Map<String, Object?> map, String key) {

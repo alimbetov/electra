@@ -6,67 +6,77 @@ import 'package:electra_mobile/data/repositories/elv5/drift_acs04_source_require
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('keeps ACS-04 requirement-set editions immutable and CAS-switches selector', () async {
-    final db = AppDatabase(NativeDatabase.memory());
-    addTearDown(db.close);
-    await _seed(db);
-    final store = DriftAcs04SourceRequirementContractStore(
-      db,
-      originDeviceId: 'test',
-      nowUtc: () => DateTime.utc(2026, 10, 17, 12),
-    );
+  test(
+    'keeps ACS-04 requirement-set editions immutable and CAS-switches selector',
+    () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      await _seed(db);
+      final store = DriftAcs04SourceRequirementContractStore(
+        db,
+        originDeviceId: 'test',
+        nowUtc: () => DateTime.utc(2026, 10, 17, 12),
+      );
 
-    await store.replace(
-      ReplaceAcs04SourceRequirementContractCommand(
+      await store.replace(
+        ReplaceAcs04SourceRequirementContractCommand(
+          projectId: 'p',
+          designRevisionId: 'd',
+          bindingId: 'acs04-binding-1',
+          expectedBindingRevision: null,
+          expectedDesignRevision: 1,
+          contract: _contract(_hash('a')),
+        ),
+      );
+      final first = await store.loadActiveForSource(
         projectId: 'p',
         designRevisionId: 'd',
-        bindingId: 'acs04-binding-1',
-        expectedBindingRevision: null,
-        expectedDesignRevision: 1,
-        contract: _contract(_hash('a')),
-      ),
-    );
-    final first = await store.loadActiveForSource(
-      projectId: 'p',
-      designRevisionId: 'd',
-      sourceId: 'psu-1',
-    );
-    expect(first, isNotNull);
-    expect(first!.bindingRevision, 1);
-    final firstEvidenceRef = first.evidenceRef;
-    final firstRequirementSet = first.contract.requirementSetFingerprint;
+        sourceId: 'psu-1',
+      );
+      expect(first, isNotNull);
+      expect(first!.bindingRevision, 1);
+      final firstEvidenceRef = first.evidenceRef;
+      final firstRequirementSet = first.contract.requirementSetFingerprint;
 
-    await store.replace(
-      ReplaceAcs04SourceRequirementContractCommand(
+      await store.replace(
+        ReplaceAcs04SourceRequirementContractCommand(
+          projectId: 'p',
+          designRevisionId: 'd',
+          bindingId: 'acs04-binding-1',
+          expectedBindingRevision: 1,
+          expectedDesignRevision: 2,
+          contract: _contract(_hash('e')),
+        ),
+      );
+      final second = await store.loadActiveForSource(
         projectId: 'p',
         designRevisionId: 'd',
-        bindingId: 'acs04-binding-1',
-        expectedBindingRevision: 1,
-        expectedDesignRevision: 2,
-        contract: _contract(_hash('e')),
-      ),
-    );
-    final second = await store.loadActiveForSource(
-      projectId: 'p',
-      designRevisionId: 'd',
-      sourceId: 'psu-1',
-    );
-    expect(second, isNotNull);
-    expect(second!.bindingRevision, 2);
-    expect(second.evidenceRef, isNot(firstEvidenceRef));
-    expect(second.contract.requirementSetFingerprint, isNot(firstRequirementSet));
+        sourceId: 'psu-1',
+      );
+      expect(second, isNotNull);
+      expect(second!.bindingRevision, 2);
+      expect(second.evidenceRef, isNot(firstEvidenceRef));
+      expect(
+        second.contract.requirementSetFingerprint,
+        isNot(firstRequirementSet),
+      );
 
-    final evidence = await db.customSelect(
-      "SELECT evidence_ref FROM elv_revision_aggregate_evidence_records "
-      "WHERE aggregate_kind = 'ACS04_SOURCE_REQUIREMENT_SET' ORDER BY evidence_ref",
-    ).get();
-    expect(evidence, hasLength(2));
+      final evidence = await db
+          .customSelect(
+            "SELECT evidence_ref FROM elv_revision_aggregate_evidence_records "
+            "WHERE aggregate_kind = 'ACS04_SOURCE_REQUIREMENT_SET' ORDER BY evidence_ref",
+          )
+          .get();
+      expect(evidence, hasLength(2));
 
-    final revision = await db.customSelect(
-      "SELECT revision FROM project_design_revisions WHERE id = 'd'",
-    ).getSingle();
-    expect(revision.read<int>('revision'), 3);
-  });
+      final revision = await db
+          .customSelect(
+            "SELECT revision FROM project_design_revisions WHERE id = 'd'",
+          )
+          .getSingle();
+      expect(revision.read<int>('revision'), 3);
+    },
+  );
 }
 
 Acs04SourceRequirementContract _contract(String pwr02InputHash) =>

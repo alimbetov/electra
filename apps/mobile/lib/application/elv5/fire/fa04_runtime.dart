@@ -60,14 +60,16 @@ final class Fa04PersistedInputResolver
       );
     }
     final contract = snapshot!.contract;
-    dependencies.add(_dependency(
-      request,
-      'POLICY',
-      'FA04_SOURCE_REQUIREMENT_SET',
-      snapshot.evidenceRef,
-      memberId:
-          '${snapshot.bindingId}:${snapshot.bindingRevision}:${snapshot.contentHash}',
-    ));
+    dependencies.add(
+      _dependency(
+        request,
+        'POLICY',
+        'FA04_SOURCE_REQUIREMENT_SET',
+        snapshot.evidenceRef,
+        memberId:
+            '${snapshot.bindingId}:${snapshot.bindingRevision}:${snapshot.contentHash}',
+      ),
+    );
 
     final powerCases = <Fa04PowerCaseEvidence>[];
     final currentCases = <Fa04CurrentCaseEvidence>[];
@@ -109,7 +111,8 @@ final class Fa04PersistedInputResolver
           dependencies,
           <String, Object?>{
             'caseId': sourceCase.caseId,
-            'expectedInputFingerprint': sourceCase.expectedPwr02InputFingerprint,
+            'expectedInputFingerprint':
+                sourceCase.expectedPwr02InputFingerprint,
             'actualInputFingerprint': pwr02.inputFingerprint,
           },
         );
@@ -147,9 +150,9 @@ final class Fa04PersistedInputResolver
       }
 
       final pwr01Demand = _powerRational(
-        pwr01Output[
-          sourceCase.dimension == Fa04SourceDimension.watt ? 'knownW' : 'knownA'
-        ],
+        pwr01Output[sourceCase.dimension == Fa04SourceDimension.watt
+            ? 'knownW'
+            : 'knownA'],
         'PWR01 demand',
       );
       final pwr02Demand = _powerRational(pwr02Inputs['demand'], 'PWR02 demand');
@@ -168,9 +171,14 @@ final class Fa04PersistedInputResolver
         );
       }
 
-      final required = _powerRational(pwr02Output['required'], 'PWR02 required');
-      final available =
-          _powerRational(pwr02Output['available'], 'PWR02 available');
+      final required = _powerRational(
+        pwr02Output['required'],
+        'PWR02 required',
+      );
+      final available = _powerRational(
+        pwr02Output['available'],
+        'PWR02 available',
+      );
       final dimensionStatus = pwr02Output['dimensionStatus'];
       if (dimensionStatus != 'PASS' && dimensionStatus != 'FAIL') {
         _blocked(
@@ -184,19 +192,23 @@ final class Fa04PersistedInputResolver
       }
 
       if (sourceCase.dimension == Fa04SourceDimension.watt) {
-        powerCases.add(Fa04PowerCaseEvidence(
-          caseId: sourceCase.caseId,
-          globalDemand: Power(_elv5(pwr01Demand)),
-          requiredCapability: Power(_elv5(required)),
-          availableCapability: Power(_elv5(available)),
-        ));
+        powerCases.add(
+          Fa04PowerCaseEvidence(
+            caseId: sourceCase.caseId,
+            globalDemand: Power(_elv5(pwr01Demand)),
+            requiredCapability: Power(_elv5(required)),
+            availableCapability: Power(_elv5(available)),
+          ),
+        );
       } else {
-        currentCases.add(Fa04CurrentCaseEvidence(
-          caseId: sourceCase.caseId,
-          globalDemand: Current(_elv5(pwr01Demand)),
-          requiredCapability: Current(_elv5(required)),
-          availableCapability: Current(_elv5(available)),
-        ));
+        currentCases.add(
+          Fa04CurrentCaseEvidence(
+            caseId: sourceCase.caseId,
+            globalDemand: Current(_elv5(pwr01Demand)),
+            requiredCapability: Current(_elv5(required)),
+            availableCapability: Current(_elv5(available)),
+          ),
+        );
       }
 
       pwr01DemandBasis.add(<String, Object?>{
@@ -211,16 +223,18 @@ final class Fa04PersistedInputResolver
       });
       for (final item in <Elv4CurrentEvaluationSnapshot>[pwr01, pwr02]) {
         generations[item.nodeKey.sha256] = item.pointerGeneration;
-        dependencies.add(_dependency(
-          request,
-          'UPSTREAM_EVALUATION',
-          item.nodeKey.processCode == PowerProcessCode.pwr01
-              ? 'ELV4_PWR01_CURRENT'
-              : 'ELV4_PWR02_CURRENT',
-          item.evaluationId,
-          memberId:
-              '${item.nodeKey.sha256}:${item.pointerGeneration}:${item.evidenceSha256}',
-        ));
+        dependencies.add(
+          _dependency(
+            request,
+            'UPSTREAM_EVALUATION',
+            item.nodeKey.processCode == PowerProcessCode.pwr01
+                ? 'ELV4_PWR01_CURRENT'
+                : 'ELV4_PWR02_CURRENT',
+            item.evaluationId,
+            memberId:
+                '${item.nodeKey.sha256}:${item.pointerGeneration}:${item.evidenceSha256}',
+          ),
+        );
         upstream.add(<String, Object?>{
           'evaluationId': item.evaluationId,
           'nodeKeySha256': item.nodeKey.sha256,
@@ -241,7 +255,8 @@ final class Fa04PersistedInputResolver
       expectedRequirementSetFingerprint: requirementSetFingerprint,
       pwr02RequirementSetFingerprint: requirementSetFingerprint,
       requirementContributors: <String>[
-        for (final contributor in contract.contributors) contributor.contributorId,
+        for (final contributor in contract.contributors)
+          contributor.contributorId,
       ],
       powerCases: powerCases,
       currentCases: currentCases,
@@ -255,8 +270,11 @@ final class Fa04PersistedInputResolver
         'contractContentHash': snapshot.contentHash,
         'requirementSetFingerprint': requirementSetFingerprint,
         'upstream': upstream
-          ..sort((a, b) => (a['evaluationId']! as String)
-              .compareTo(b['evaluationId']! as String)),
+          ..sort(
+            (a, b) => (a['evaluationId']! as String).compareTo(
+              b['evaluationId']! as String,
+            ),
+          ),
       }),
       policyFingerprint: snapshot.contentHash,
       dependencies: dependencies,
@@ -304,8 +322,9 @@ final class Fa04PersistedInputResolver
 
   String _demandFingerprint(List<Map<String, Object?>> values) {
     final canonical = [...values]
-      ..sort((a, b) =>
-          (a['caseId']! as String).compareTo(b['caseId']! as String));
+      ..sort(
+        (a, b) => (a['caseId']! as String).compareTo(b['caseId']! as String),
+      );
     return _encoder.sha256(<String, Object?>{
       'schema': 'electra.elv5-shared-global-demand-closure.v1',
       'cases': canonical,

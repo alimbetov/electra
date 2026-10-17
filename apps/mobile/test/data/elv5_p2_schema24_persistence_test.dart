@@ -6,7 +6,9 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('schema 24 exposes ELV5 persistence and survives reopen', () async {
-    final directory = await Directory.systemTemp.createTemp('elv5-p2-schema24-');
+    final directory = await Directory.systemTemp.createTemp(
+      'elv5-p2-schema24-',
+    );
     addTearDown(() => directory.delete(recursive: true));
     final file = File('${directory.path}/electra.sqlite');
 
@@ -88,11 +90,7 @@ void main() {
     final db = AppDatabase(NativeDatabase.memory());
     addTearDown(db.close);
     await _seedProjectAndRevision(db);
-    await _seedProject(
-      db,
-      id: 'project-b',
-      name: 'Other project',
-    );
+    await _seedProject(db, id: 'project-b', name: 'Other project');
 
     await _insertRecordingPool(
       db,
@@ -175,7 +173,9 @@ INSERT INTO discipline_evaluation_pointers (
   });
 
   test('schema 23 shaped database migrates additively to schema 24', () async {
-    final directory = await Directory.systemTemp.createTemp('elv5-p2-migration-');
+    final directory = await Directory.systemTemp.createTemp(
+      'elv5-p2-migration-',
+    );
     addTearDown(() => directory.delete(recursive: true));
     final file = File('${directory.path}/electra.sqlite');
 
@@ -255,9 +255,7 @@ final _now = DateTime.utc(2026, 10, 16, 15);
 
 Future<Set<String>> _tableNames(AppDatabase db) async =>
     (await db
-            .customSelect(
-              "SELECT name FROM sqlite_master WHERE type = 'table'",
-            )
+            .customSelect("SELECT name FROM sqlite_master WHERE type = 'table'")
             .get())
         .map((row) => row.read<String>('name'))
         .toSet();
@@ -282,18 +280,20 @@ Future<void> _seedProject(
   AppDatabase db, {
   required String id,
   required String name,
-}) => db.into(db.projects).insert(
-  ProjectsCompanion.insert(
-    id: id,
-    name: name,
-    measurementSystem: 'metric',
-    defaultStructuralHeightMm: 3000,
-    defaultFinishedCeilingHeightMm: 2700,
-    createdAt: _now,
-    updatedAt: _now,
-    originDeviceId: 'test',
-  ),
-);
+}) => db
+    .into(db.projects)
+    .insert(
+      ProjectsCompanion.insert(
+        id: id,
+        name: name,
+        measurementSystem: 'metric',
+        defaultStructuralHeightMm: 3000,
+        defaultFinishedCeilingHeightMm: 2700,
+        createdAt: _now,
+        updatedAt: _now,
+        originDeviceId: 'test',
+      ),
+    );
 
 Future<void> _seedRevision(
   AppDatabase db, {
@@ -301,18 +301,20 @@ Future<void> _seedRevision(
   required String projectId,
   required String code,
   required int sequence,
-}) => db.into(db.projectDesignRevisions).insert(
-  ProjectDesignRevisionsCompanion.insert(
-    id: id,
-    projectId: projectId,
-    code: code,
-    sequence: sequence,
-    state: 'WORKING',
-    createdAt: _now,
-    updatedAt: _now,
-    originDeviceId: 'test',
-  ),
-);
+}) => db
+    .into(db.projectDesignRevisions)
+    .insert(
+      ProjectDesignRevisionsCompanion.insert(
+        id: id,
+        projectId: projectId,
+        code: code,
+        sequence: sequence,
+        state: 'WORKING',
+        createdAt: _now,
+        updatedAt: _now,
+        originDeviceId: 'test',
+      ),
+    );
 
 Future<void> _insertRecordingPool(
   AppDatabase db, {

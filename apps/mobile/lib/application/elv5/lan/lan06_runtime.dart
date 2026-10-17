@@ -130,7 +130,10 @@ final class Lan06PersistedInputResolver
       );
     }
 
-    final equipmentIds = _stringList(aggregate.payload['equipmentIds'], 'equipmentIds');
+    final equipmentIds = _stringList(
+      aggregate.payload['equipmentIds'],
+      'equipmentIds',
+    );
     final actualSet = equipmentIds.toSet();
     if (actualSet.length != equipmentIds.length) {
       _blocked(
@@ -161,11 +164,15 @@ final class Lan06PersistedInputResolver
     final capacityBasis = switch (capacityBasisWire) {
       'GROSS_WITH_EXCLUSIONS' => Lan06CapacityBasis.grossWithExclusions,
       'NET_USABLE' => Lan06CapacityBasis.netUsable,
-      _ => throw StateError('LAN06_CAPACITY_BASIS_UNSUPPORTED:$capacityBasisWire'),
+      _ => throw StateError(
+        'LAN06_CAPACITY_BASIS_UNSUPPORTED:$capacityBasisWire',
+      ),
     };
 
-    final excludedCapacity =
-        _map(aggregate.payload['excludedCapacity'], 'excludedCapacity');
+    final excludedCapacity = _map(
+      aggregate.payload['excludedCapacity'],
+      'excludedCapacity',
+    );
     final reservedRu = _wholeNonnegativeRu(
       _text(excludedCapacity, 'reservedRu'),
       'reservedRu',

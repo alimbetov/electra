@@ -41,15 +41,25 @@ void main() {
       ),
     );
 
-    final restored = Fa06NotificationContract.fromMap(contract.toCanonicalValue());
+    final restored = Fa06NotificationContract.fromMap(
+      contract.toCanonicalValue(),
+    );
     expect(restored.circuitId, 'nac-1');
     expect(restored.outputCurrentLimitA, Elv5Rational.parseDecimal('0.5'));
     expect(restored.cases.single.stateCode, 'ALARM');
     expect(restored.supervision.passed, isTrue);
     expect(restored.supervision.faultResults, hasLength(3));
     expect(
-      restored.membershipFingerprint(const <String>['horn-3', 'horn-1', 'horn-2']),
-      contract.membershipFingerprint(const <String>['horn-1', 'horn-2', 'horn-3']),
+      restored.membershipFingerprint(const <String>[
+        'horn-3',
+        'horn-1',
+        'horn-2',
+      ]),
+      contract.membershipFingerprint(const <String>[
+        'horn-1',
+        'horn-2',
+        'horn-3',
+      ]),
     );
   });
 

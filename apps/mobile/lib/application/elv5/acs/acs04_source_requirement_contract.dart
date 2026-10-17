@@ -9,11 +9,11 @@ final class Acs04RequirementContributorRef {
     required String policyCode,
     required String editionId,
     required String contentHash,
-  })  : contributorId = _text(contributorId, 'contributorId'),
-        disciplineCode = _text(disciplineCode, 'disciplineCode'),
-        policyCode = _text(policyCode, 'policyCode'),
-        editionId = _text(editionId, 'editionId'),
-        contentHash = _sha(contentHash, 'contentHash');
+  }) : contributorId = _text(contributorId, 'contributorId'),
+       disciplineCode = _text(disciplineCode, 'disciplineCode'),
+       policyCode = _text(policyCode, 'policyCode'),
+       editionId = _text(editionId, 'editionId'),
+       contentHash = _sha(contentHash, 'contentHash');
 
   final String contributorId;
   final String disciplineCode;
@@ -22,12 +22,12 @@ final class Acs04RequirementContributorRef {
   final String contentHash;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'contributorId': contributorId,
-        'disciplineCode': disciplineCode,
-        'policyCode': policyCode,
-        'editionId': editionId,
-        'contentHash': contentHash,
-      };
+    'contributorId': contributorId,
+    'disciplineCode': disciplineCode,
+    'policyCode': policyCode,
+    'editionId': editionId,
+    'contentHash': contentHash,
+  };
 
   factory Acs04RequirementContributorRef.fromMap(Map<String, Object?> map) {
     _exact(map, const <String>{
@@ -58,17 +58,17 @@ final class Acs04SourceCaseContract {
     required String pwr02SubjectKind,
     required String pwr02SubjectId,
     required String expectedPwr02InputFingerprint,
-  })  : caseId = _text(caseId, 'caseId'),
-        scenarioId = _text(scenarioId, 'scenarioId'),
-        segmentId = _text(segmentId, 'segmentId'),
-        pwr01SubjectKind = _text(pwr01SubjectKind, 'pwr01SubjectKind'),
-        pwr01SubjectId = _text(pwr01SubjectId, 'pwr01SubjectId'),
-        pwr02SubjectKind = _text(pwr02SubjectKind, 'pwr02SubjectKind'),
-        pwr02SubjectId = _text(pwr02SubjectId, 'pwr02SubjectId'),
-        expectedPwr02InputFingerprint = _sha(
-          expectedPwr02InputFingerprint,
-          'expectedPwr02InputFingerprint',
-        );
+  }) : caseId = _text(caseId, 'caseId'),
+       scenarioId = _text(scenarioId, 'scenarioId'),
+       segmentId = _text(segmentId, 'segmentId'),
+       pwr01SubjectKind = _text(pwr01SubjectKind, 'pwr01SubjectKind'),
+       pwr01SubjectId = _text(pwr01SubjectId, 'pwr01SubjectId'),
+       pwr02SubjectKind = _text(pwr02SubjectKind, 'pwr02SubjectKind'),
+       pwr02SubjectId = _text(pwr02SubjectId, 'pwr02SubjectId'),
+       expectedPwr02InputFingerprint = _sha(
+         expectedPwr02InputFingerprint,
+         'expectedPwr02InputFingerprint',
+       );
 
   final String caseId;
   final String scenarioId;
@@ -81,16 +81,16 @@ final class Acs04SourceCaseContract {
   final String expectedPwr02InputFingerprint;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'caseId': caseId,
-        'scenarioId': scenarioId,
-        'segmentId': segmentId,
-        'dimension': dimension == Acs04SourceDimension.watt ? 'WATT' : 'CURRENT',
-        'pwr01SubjectKind': pwr01SubjectKind,
-        'pwr01SubjectId': pwr01SubjectId,
-        'pwr02SubjectKind': pwr02SubjectKind,
-        'pwr02SubjectId': pwr02SubjectId,
-        'expectedPwr02InputFingerprint': expectedPwr02InputFingerprint,
-      };
+    'caseId': caseId,
+    'scenarioId': scenarioId,
+    'segmentId': segmentId,
+    'dimension': dimension == Acs04SourceDimension.watt ? 'WATT' : 'CURRENT',
+    'pwr01SubjectKind': pwr01SubjectKind,
+    'pwr01SubjectId': pwr01SubjectId,
+    'pwr02SubjectKind': pwr02SubjectKind,
+    'pwr02SubjectId': pwr02SubjectId,
+    'expectedPwr02InputFingerprint': expectedPwr02InputFingerprint,
+  };
 
   factory Acs04SourceCaseContract.fromMap(Map<String, Object?> map) {
     _exact(map, const <String>{
@@ -107,7 +107,9 @@ final class Acs04SourceCaseContract {
     final dimension = switch (_mapText(map, 'dimension')) {
       'WATT' => Acs04SourceDimension.watt,
       'CURRENT' => Acs04SourceDimension.current,
-      final value => throw FormatException('Unsupported ACS04 dimension: $value'),
+      final value => throw FormatException(
+        'Unsupported ACS04 dimension: $value',
+      ),
     };
     return Acs04SourceCaseContract(
       caseId: _mapText(map, 'caseId'),
@@ -132,18 +134,22 @@ final class Acs04SourceRequirementContract {
     required String sourceDefinitionContentHash,
     required Iterable<Acs04RequirementContributorRef> contributors,
     required Iterable<Acs04SourceCaseContract> cases,
-  })  : sourceId = _text(sourceId, 'sourceId'),
-        sourceDefinitionContentHash = _sha(
-          sourceDefinitionContentHash,
-          'sourceDefinitionContentHash',
-        ),
-        contributors = List.unmodifiable(_contributors(contributors)),
-        cases = List.unmodifiable(_cases(cases)) {
+  }) : sourceId = _text(sourceId, 'sourceId'),
+       sourceDefinitionContentHash = _sha(
+         sourceDefinitionContentHash,
+         'sourceDefinitionContentHash',
+       ),
+       contributors = List.unmodifiable(_contributors(contributors)),
+       cases = List.unmodifiable(_cases(cases)) {
     if (this.contributors.isEmpty) {
-      throw ArgumentError('ACS04 requires participating requirement contributors.');
+      throw ArgumentError(
+        'ACS04 requires participating requirement contributors.',
+      );
     }
     if (!this.contributors.any((value) => value.disciplineCode == 'ACS')) {
-      throw ArgumentError('ACS04 requirement set must contain an ACS contributor.');
+      throw ArgumentError(
+        'ACS04 requirement set must contain an ACS contributor.',
+      );
     }
     if (this.cases.isEmpty) {
       throw ArgumentError('ACS04 requires at least one source operating case.');
@@ -159,24 +165,24 @@ final class Acs04SourceRequirementContract {
   final List<Acs04SourceCaseContract> cases;
 
   String get requirementSetFingerprint => _encoder.sha256(<String, Object?>{
-        'schema': 'electra.elv5-source-requirement-set-fingerprint.v1',
-        'sourceId': sourceId,
-        'sourceDefinitionContentHash': sourceDefinitionContentHash,
-        'contributors': [
-          for (final value in contributors) value.toCanonicalValue(),
-        ],
-        'cases': [for (final value in cases) value.toCanonicalValue()],
-      });
+    'schema': 'electra.elv5-source-requirement-set-fingerprint.v1',
+    'sourceId': sourceId,
+    'sourceDefinitionContentHash': sourceDefinitionContentHash,
+    'contributors': [
+      for (final value in contributors) value.toCanonicalValue(),
+    ],
+    'cases': [for (final value in cases) value.toCanonicalValue()],
+  });
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'schema': schema,
-        'sourceId': sourceId,
-        'sourceDefinitionContentHash': sourceDefinitionContentHash,
-        'contributors': [
-          for (final value in contributors) value.toCanonicalValue(),
-        ],
-        'cases': [for (final value in cases) value.toCanonicalValue()],
-      };
+    'schema': schema,
+    'sourceId': sourceId,
+    'sourceDefinitionContentHash': sourceDefinitionContentHash,
+    'contributors': [
+      for (final value in contributors) value.toCanonicalValue(),
+    ],
+    'cases': [for (final value in cases) value.toCanonicalValue()],
+  };
 
   factory Acs04SourceRequirementContract.fromMap(Map<String, Object?> map) {
     _exact(map, const <String>{
@@ -199,7 +205,9 @@ final class Acs04SourceRequirementContract {
       sourceDefinitionContentHash: _mapText(map, 'sourceDefinitionContentHash'),
       contributors: <Acs04RequirementContributorRef>[
         for (final raw in contributors)
-          Acs04RequirementContributorRef.fromMap(_object(raw, 'ACS04 contributor')),
+          Acs04RequirementContributorRef.fromMap(
+            _object(raw, 'ACS04 contributor'),
+          ),
       ],
       cases: <Acs04SourceCaseContract>[
         for (final raw in cases)
@@ -241,7 +249,9 @@ List<Acs04RequirementContributorRef> _contributors(
   final ids = <String>{};
   for (final value in result) {
     if (!ids.add(value.contributorId)) {
-      throw ArgumentError('ACS04 duplicate contributorId: ${value.contributorId}');
+      throw ArgumentError(
+        'ACS04 duplicate contributorId: ${value.contributorId}',
+      );
     }
   }
   return result;

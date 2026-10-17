@@ -51,7 +51,8 @@ final class Elv4CurrentEvaluationSnapshot {
         throw StateError('ELV4_CURRENT_DEPENDENCY_KEY_INVALID:$evaluationId');
       }
       final key = PowerDependencyKey.decode(value);
-      if (key.scenarioId == null && key.segmentId == null) stable.add(key.encode());
+      if (key.scenarioId == null && key.segmentId == null)
+        stable.add(key.encode());
     }
     if (stable.isEmpty) {
       throw StateError('ELV4_CURRENT_PHYSICAL_MEMBERSHIP_EMPTY:$evaluationId');

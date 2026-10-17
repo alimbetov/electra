@@ -6,87 +6,93 @@ import 'package:electra_mobile/data/repositories/elv5/drift_acs05_autonomy_contr
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('keeps ACS-05 autonomy editions immutable and CAS-switches selector', () async {
-    final db = AppDatabase(NativeDatabase.memory());
-    addTearDown(db.close);
-    await _seed(db);
-    final store = DriftAcs05AutonomyContractStore(
-      db,
-      originDeviceId: 'test',
-      nowUtc: () => DateTime.utc(2026, 10, 17, 12),
-    );
+  test(
+    'keeps ACS-05 autonomy editions immutable and CAS-switches selector',
+    () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      await _seed(db);
+      final store = DriftAcs05AutonomyContractStore(
+        db,
+        originDeviceId: 'test',
+        nowUtc: () => DateTime.utc(2026, 10, 17, 12),
+      );
 
-    await store.replace(
-      ReplaceAcs05AutonomyContractCommand(
+      await store.replace(
+        ReplaceAcs05AutonomyContractCommand(
+          projectId: 'p',
+          designRevisionId: 'd',
+          bindingId: 'acs05-binding-1',
+          expectedBindingRevision: null,
+          expectedDesignRevision: 1,
+          contract: _contract(_hash('a'), duration: 3600000000),
+        ),
+      );
+      final first = await store.loadActiveForBank(
         projectId: 'p',
         designRevisionId: 'd',
-        bindingId: 'acs05-binding-1',
-        expectedBindingRevision: null,
-        expectedDesignRevision: 1,
-        contract: _contract(_hash('a'), duration: 3600000000),
-      ),
-    );
-    final first = await store.loadActiveForBank(
-      projectId: 'p',
-      designRevisionId: 'd',
-      bankId: 'bank-1',
-    );
-    expect(first, isNotNull);
-    expect(first!.bindingRevision, 1);
-    final firstEvidenceRef = first.evidenceRef;
-    final firstSequence = first.contract.sequenceFingerprint;
+        bankId: 'bank-1',
+      );
+      expect(first, isNotNull);
+      expect(first!.bindingRevision, 1);
+      final firstEvidenceRef = first.evidenceRef;
+      final firstSequence = first.contract.sequenceFingerprint;
 
-    await store.replace(
-      ReplaceAcs05AutonomyContractCommand(
+      await store.replace(
+        ReplaceAcs05AutonomyContractCommand(
+          projectId: 'p',
+          designRevisionId: 'd',
+          bindingId: 'acs05-binding-1',
+          expectedBindingRevision: 1,
+          expectedDesignRevision: 2,
+          contract: _contract(_hash('b'), duration: 7200000000),
+        ),
+      );
+      final second = await store.loadActiveForBank(
         projectId: 'p',
         designRevisionId: 'd',
-        bindingId: 'acs05-binding-1',
-        expectedBindingRevision: 1,
-        expectedDesignRevision: 2,
-        contract: _contract(_hash('b'), duration: 7200000000),
-      ),
-    );
-    final second = await store.loadActiveForBank(
-      projectId: 'p',
-      designRevisionId: 'd',
-      bankId: 'bank-1',
-    );
-    expect(second, isNotNull);
-    expect(second!.bindingRevision, 2);
-    expect(second.evidenceRef, isNot(firstEvidenceRef));
-    expect(second.contract.sequenceFingerprint, isNot(firstSequence));
+        bankId: 'bank-1',
+      );
+      expect(second, isNotNull);
+      expect(second!.bindingRevision, 2);
+      expect(second.evidenceRef, isNot(firstEvidenceRef));
+      expect(second.contract.sequenceFingerprint, isNot(firstSequence));
 
-    final evidence = await db.customSelect(
-      "SELECT evidence_ref FROM elv_revision_aggregate_evidence_records "
-      "WHERE aggregate_kind = 'ACS05_AUTONOMY_CONTRACT' ORDER BY evidence_ref",
-    ).get();
-    expect(evidence, hasLength(2));
+      final evidence = await db
+          .customSelect(
+            "SELECT evidence_ref FROM elv_revision_aggregate_evidence_records "
+            "WHERE aggregate_kind = 'ACS05_AUTONOMY_CONTRACT' ORDER BY evidence_ref",
+          )
+          .get();
+      expect(evidence, hasLength(2));
 
-    final revision = await db.customSelect(
-      "SELECT revision FROM project_design_revisions WHERE id = 'd'",
-    ).getSingle();
-    expect(revision.read<int>('revision'), 3);
-  });
+      final revision = await db
+          .customSelect(
+            "SELECT revision FROM project_design_revisions WHERE id = 'd'",
+          )
+          .getSingle();
+      expect(revision.read<int>('revision'), 3);
+    },
+  );
 }
 
 Acs05AutonomyContract _contract(
   String pwr04InputHash, {
   required int duration,
-}) =>
-    Acs05AutonomyContract(
-      bankId: 'bank-1',
-      scenarioId: 'BACKUP',
-      sequenceId: 'sequence-1',
-      expectedPwr04InputFingerprint: pwr04InputHash,
-      segments: <Acs05SequenceSegmentContract>[
-        Acs05SequenceSegmentContract(
-          segmentId: 'standby',
-          durationMicroseconds: BigInt.from(duration),
-        ),
-      ],
-      globalProtectedLoadIds: const <String>{'acs-lock', 'fire-loop'},
-      acsProtectedLoadIds: const <String>{'acs-lock'},
-    );
+}) => Acs05AutonomyContract(
+  bankId: 'bank-1',
+  scenarioId: 'BACKUP',
+  sequenceId: 'sequence-1',
+  expectedPwr04InputFingerprint: pwr04InputHash,
+  segments: <Acs05SequenceSegmentContract>[
+    Acs05SequenceSegmentContract(
+      segmentId: 'standby',
+      durationMicroseconds: BigInt.from(duration),
+    ),
+  ],
+  globalProtectedLoadIds: const <String>{'acs-lock', 'fire-loop'},
+  acsProtectedLoadIds: const <String>{'acs-lock'},
+);
 
 Future<void> _seed(AppDatabase db) async {
   await db.customStatement('PRAGMA foreign_keys = OFF');

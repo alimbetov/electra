@@ -55,42 +55,45 @@ void main() {
     );
   });
 
-  test('FA-08 missing explicit environment remains durable capture BLOCKED', () async {
-    final resolver = Fa08PersistedInputResolver(
-      policySource: _PolicySource(),
-      ampacityResolver: Elv5AmpacityRouteResolver(
-        cableRuns: _Runs(),
-        environments: const _Environments(null),
-        sectionEvidence: const _NoAmpacityEvidence(),
-      ),
-      routeCableFacts: _CableFacts(),
-    );
-
-    await expectLater(
-      resolver.capture(_request()),
-      throwsA(
-        isA<Elv5CaptureBlockedException>().having(
-          (e) => e.reasonCode,
-          'reasonCode',
-          'ELV5_AMPACITY_ENVIRONMENT_PROFILE_REQUIRED',
+  test(
+    'FA-08 missing explicit environment remains durable capture BLOCKED',
+    () async {
+      final resolver = Fa08PersistedInputResolver(
+        policySource: _PolicySource(),
+        ampacityResolver: Elv5AmpacityRouteResolver(
+          cableRuns: _Runs(),
+          environments: const _Environments(null),
+          sectionEvidence: const _NoAmpacityEvidence(),
         ),
-      ),
-    );
-  });
+        routeCableFacts: _CableFacts(),
+      );
+
+      await expectLater(
+        resolver.capture(_request()),
+        throwsA(
+          isA<Elv5CaptureBlockedException>().having(
+            (e) => e.reasonCode,
+            'reasonCode',
+            'ELV5_AMPACITY_ENVIRONMENT_PROFILE_REQUIRED',
+          ),
+        ),
+      );
+    },
+  );
 }
 
 Elv5CalculationRequest _request() => Elv5CalculationRequest(
-      projectId: 'p',
-      designRevisionId: 'd',
-      scope: Elv5ScopeRef(
-        kind: Elv5ScopeKind.design,
-        scopeId: 'd',
-        scenarioKey: 'NONE',
-      ),
-      processCode: Elv5ProcessCode.fa08,
-      subject: Elv5SubjectRef(kind: 'CABLE_RUN', id: 'run-1'),
-      expectedPointerGeneration: 0,
-    );
+  projectId: 'p',
+  designRevisionId: 'd',
+  scope: Elv5ScopeRef(
+    kind: Elv5ScopeKind.design,
+    scopeId: 'd',
+    scenarioKey: 'NONE',
+  ),
+  processCode: Elv5ProcessCode.fa08,
+  subject: Elv5SubjectRef(kind: 'CABLE_RUN', id: 'run-1'),
+  expectedPointerGeneration: 0,
+);
 
 Elv5ResolvedEnvironment _resolvedEnvironment() {
   final profile = Elv5EnvironmentProfile(
@@ -133,38 +136,38 @@ final class _PolicySource implements Fa08CablePolicyContractSource {
     required String designRevisionId,
     required String cableRunId,
   }) async => Fa08CablePolicyContractSnapshot(
-        bindingId: 'fa08-policy',
-        bindingRevision: 1,
-        evidenceRef: 'FA08:run-1:${_hash('f')}',
-        contentHash: _hash('f'),
-        contract: Fa08CablePolicyContract(
-          cableRunId: 'run-1',
-          policyId: 'policy-1',
-          requirements: <Fa08Requirement>[
-            Fa08Requirement.numeric(
-              code: 'MIN_IZ',
-              kind: Fa08RequirementKind.numericMinimum,
-              propertyCode: Fa08RouteSection.ampacityIzPropertyCode,
-              unitCode: 'A',
-              threshold: Elv5Rational.parseDecimal('20'),
-            ),
-            Fa08Requirement.numeric(
-              code: 'MAX_TEMP',
-              kind: Fa08RequirementKind.numericMaximum,
-              propertyCode: Fa08PersistedInputResolver.environmentTempMaxCode,
-              unitCode: 'C',
-              threshold: Elv5Rational.parseDecimal('50'),
-            ),
-            Fa08Requirement.numeric(
-              code: 'MAX_RH',
-              kind: Fa08RequirementKind.numericMaximum,
-              propertyCode: Fa08PersistedInputResolver.environmentRhMaxCode,
-              unitCode: 'PCT',
-              threshold: Elv5Rational.parseDecimal('90'),
-            ),
-          ],
+    bindingId: 'fa08-policy',
+    bindingRevision: 1,
+    evidenceRef: 'FA08:run-1:${_hash('f')}',
+    contentHash: _hash('f'),
+    contract: Fa08CablePolicyContract(
+      cableRunId: 'run-1',
+      policyId: 'policy-1',
+      requirements: <Fa08Requirement>[
+        Fa08Requirement.numeric(
+          code: 'MIN_IZ',
+          kind: Fa08RequirementKind.numericMinimum,
+          propertyCode: Fa08RouteSection.ampacityIzPropertyCode,
+          unitCode: 'A',
+          threshold: Elv5Rational.parseDecimal('20'),
         ),
-      );
+        Fa08Requirement.numeric(
+          code: 'MAX_TEMP',
+          kind: Fa08RequirementKind.numericMaximum,
+          propertyCode: Fa08PersistedInputResolver.environmentTempMaxCode,
+          unitCode: 'C',
+          threshold: Elv5Rational.parseDecimal('50'),
+        ),
+        Fa08Requirement.numeric(
+          code: 'MAX_RH',
+          kind: Fa08RequirementKind.numericMaximum,
+          propertyCode: Fa08PersistedInputResolver.environmentRhMaxCode,
+          unitCode: 'PCT',
+          threshold: Elv5Rational.parseDecimal('90'),
+        ),
+      ],
+    ),
+  );
 }
 
 final class _CableFacts implements Fa08RouteCableFactSource {
@@ -174,14 +177,14 @@ final class _CableFacts implements Fa08RouteCableFactSource {
     required String designRevisionId,
     required String cableRunId,
   }) async => const <Fa08RouteCableFact>[
-        Fa08RouteCableFact(
-          sectionId: 'section-1',
-          cableId: 'cable-1',
-          cableEditionId: 'catalog:v1:CABLE-A:hash',
-          cableClass: 'TEST_CLASS_A',
-          numericFacts: <Fa08NumericFact>[],
-        ),
-      ];
+    Fa08RouteCableFact(
+      sectionId: 'section-1',
+      cableId: 'cable-1',
+      cableEditionId: 'catalog:v1:CABLE-A:hash',
+      cableClass: 'TEST_CLASS_A',
+      numericFacts: <Fa08NumericFact>[],
+    ),
+  ];
 }
 
 final class _Runs implements ElvCableRunRepository {
@@ -191,15 +194,15 @@ final class _Runs implements ElvCableRunRepository {
     String designRevisionId,
     String cableRunId,
   ) async => CanonicalCableRun(
-        id: 'run-1',
-        projectId: 'p',
-        cableId: 'cable-1',
-        designRevisionId: 'd',
-        state: CanonicalCableRunState.active,
-        reservePercent: 0,
-        terminationAllowanceMm: 0,
-        revision: 1,
-      );
+    id: 'run-1',
+    projectId: 'p',
+    cableId: 'cable-1',
+    designRevisionId: 'd',
+    state: CanonicalCableRunState.active,
+    reservePercent: 0,
+    terminationAllowanceMm: 0,
+    revision: 1,
+  );
 
   @override
   Future<List<CableRunTraversal>> loadTraversals(String cableRunId) async =>
@@ -239,33 +242,33 @@ final class _AmpacityEvidence implements Elv5AmpacitySectionEvidenceSource {
     required CableRunTraversal traversal,
     required Elv5ResolvedEnvironment environment,
   }) async => Elv5AmpacitySectionEvidence(
-        referenceRow: Elv5AmpacityReferenceRow(
-          conductorCrossSectionMm2: Elv5Rational.parseDecimal('2.5'),
-          conductorMaterialCode: 'CU',
-          insulationSystemCode: 'PVC70',
-          referenceAmbientTemperatureC: Elv5Rational.parseDecimal('30'),
-          installationMethodCode: 'B2',
-          loadedConductors: 3,
-          baseAllowableCurrentA: Elv5Rational.parseDecimal('30'),
-          evidenceRef: 'AMPACITY:ROW',
-          evidenceContentHash: _hash('b'),
-        ),
-        temperatureCorrection: Elv5AmpacityTemperatureCorrection(
-          actualAmbientTemperatureC:
-              this.environment.binding.profile.temperatureC.maximum,
-          factor: Elv5Rational.parseDecimal('0.8'),
-          evidenceRef: 'TEMP:45',
-          evidenceContentHash: _hash('c'),
-        ),
-        groupingCorrection: Elv5AmpacityGroupingCorrection(
-          groupedCableOrCircuitCount: 1,
-          arrangementCode: 'SINGLE',
-          factor: Elv5Rational.one,
-          evidenceRef: 'GROUP:1',
-          evidenceContentHash: _hash('d'),
-        ),
-        additionalCorrections: const <Elv5AmpacityAdditionalCorrection>[],
-      );
+    referenceRow: Elv5AmpacityReferenceRow(
+      conductorCrossSectionMm2: Elv5Rational.parseDecimal('2.5'),
+      conductorMaterialCode: 'CU',
+      insulationSystemCode: 'PVC70',
+      referenceAmbientTemperatureC: Elv5Rational.parseDecimal('30'),
+      installationMethodCode: 'B2',
+      loadedConductors: 3,
+      baseAllowableCurrentA: Elv5Rational.parseDecimal('30'),
+      evidenceRef: 'AMPACITY:ROW',
+      evidenceContentHash: _hash('b'),
+    ),
+    temperatureCorrection: Elv5AmpacityTemperatureCorrection(
+      actualAmbientTemperatureC:
+          this.environment.binding.profile.temperatureC.maximum,
+      factor: Elv5Rational.parseDecimal('0.8'),
+      evidenceRef: 'TEMP:45',
+      evidenceContentHash: _hash('c'),
+    ),
+    groupingCorrection: Elv5AmpacityGroupingCorrection(
+      groupedCableOrCircuitCount: 1,
+      arrangementCode: 'SINGLE',
+      factor: Elv5Rational.one,
+      evidenceRef: 'GROUP:1',
+      evidenceContentHash: _hash('d'),
+    ),
+    additionalCorrections: const <Elv5AmpacityAdditionalCorrection>[],
+  );
 }
 
 final class _NoAmpacityEvidence implements Elv5AmpacitySectionEvidenceSource {

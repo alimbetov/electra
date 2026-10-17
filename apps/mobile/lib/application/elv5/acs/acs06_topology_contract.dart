@@ -5,22 +5,26 @@ final class Acs06TopologyProfileIdentity {
     required String profileCode,
     required String editionId,
     required String contentHash,
-  })  : profileCode = _text(profileCode, 'profileCode'),
-        editionId = _text(editionId, 'editionId'),
-        contentHash = _sha(contentHash, 'contentHash');
+  }) : profileCode = _text(profileCode, 'profileCode'),
+       editionId = _text(editionId, 'editionId'),
+       contentHash = _sha(contentHash, 'contentHash');
 
   final String profileCode;
   final String editionId;
   final String contentHash;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'profileCode': profileCode,
-        'editionId': editionId,
-        'contentHash': contentHash,
-      };
+    'profileCode': profileCode,
+    'editionId': editionId,
+    'contentHash': contentHash,
+  };
 
   factory Acs06TopologyProfileIdentity.fromMap(Map<String, Object?> map) {
-    _exact(map, const {'profileCode', 'editionId', 'contentHash'}, 'topologyProfile');
+    _exact(map, const {
+      'profileCode',
+      'editionId',
+      'contentHash',
+    }, 'topologyProfile');
     return Acs06TopologyProfileIdentity(
       profileCode: _mapText(map, 'profileCode'),
       editionId: _mapText(map, 'editionId'),
@@ -35,10 +39,10 @@ final class Acs06TopologyEdgeContract {
     required String fromNodeId,
     required String toNodeId,
     required String kindCode,
-  })  : edgeId = _text(edgeId, 'edgeId'),
-        fromNodeId = _text(fromNodeId, 'fromNodeId'),
-        toNodeId = _text(toNodeId, 'toNodeId'),
-        kindCode = _edgeKind(kindCode);
+  }) : edgeId = _text(edgeId, 'edgeId'),
+       fromNodeId = _text(fromNodeId, 'fromNodeId'),
+       toNodeId = _text(toNodeId, 'toNodeId'),
+       kindCode = _edgeKind(kindCode);
 
   final String edgeId;
   final String fromNodeId;
@@ -46,11 +50,11 @@ final class Acs06TopologyEdgeContract {
   final String kindCode;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'edgeId': edgeId,
-        'fromNodeId': fromNodeId,
-        'toNodeId': toNodeId,
-        'kindCode': kindCode,
-      };
+    'edgeId': edgeId,
+    'fromNodeId': fromNodeId,
+    'toNodeId': toNodeId,
+    'kindCode': kindCode,
+  };
 
   factory Acs06TopologyEdgeContract.fromMap(Map<String, Object?> map) {
     _exact(map, const {'edgeId', 'fromNodeId', 'toNodeId', 'kindCode'}, 'edge');
@@ -69,12 +73,14 @@ final class Acs06PathRequirementContract {
     required String fromNodeId,
     required String toNodeId,
     required Iterable<String> allowedKindCodes,
-  })  : requirementId = _text(requirementId, 'requirementId'),
-        fromNodeId = _text(fromNodeId, 'fromNodeId'),
-        toNodeId = _text(toNodeId, 'toNodeId'),
-        allowedKindCodes = Set.unmodifiable(allowedKindCodes.map(_edgeKind)) {
+  }) : requirementId = _text(requirementId, 'requirementId'),
+       fromNodeId = _text(fromNodeId, 'fromNodeId'),
+       toNodeId = _text(toNodeId, 'toNodeId'),
+       allowedKindCodes = Set.unmodifiable(allowedKindCodes.map(_edgeKind)) {
     if (this.allowedKindCodes.isEmpty) {
-      throw ArgumentError('ACS06 path requirement must allow at least one edge kind.');
+      throw ArgumentError(
+        'ACS06 path requirement must allow at least one edge kind.',
+      );
     }
   }
 
@@ -84,18 +90,19 @@ final class Acs06PathRequirementContract {
   final Set<String> allowedKindCodes;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'requirementId': requirementId,
-        'fromNodeId': fromNodeId,
-        'toNodeId': toNodeId,
-        'allowedKindCodes': allowedKindCodes.toList()..sort(),
-      };
+    'requirementId': requirementId,
+    'fromNodeId': fromNodeId,
+    'toNodeId': toNodeId,
+    'allowedKindCodes': allowedKindCodes.toList()..sort(),
+  };
 
   factory Acs06PathRequirementContract.fromMap(Map<String, Object?> map) {
-    _exact(
-      map,
-      const {'requirementId', 'fromNodeId', 'toNodeId', 'allowedKindCodes'},
-      'pathRequirement',
-    );
+    _exact(map, const {
+      'requirementId',
+      'fromNodeId',
+      'toNodeId',
+      'allowedKindCodes',
+    }, 'pathRequirement');
     return Acs06PathRequirementContract(
       requirementId: _mapText(map, 'requirementId'),
       fromNodeId: _mapText(map, 'fromNodeId'),
@@ -112,9 +119,9 @@ final class Acs06CauseProfileContract {
     required String outcomeWhenSatisfiedCode,
     required this.requiresConductiveFeed,
     required this.requiresSupervision,
-  })  : causeCode = _cause(causeCode),
-        requiredPaths = List.unmodifiable(_paths(requiredPaths)),
-        outcomeWhenSatisfiedCode = _outcome(outcomeWhenSatisfiedCode);
+  }) : causeCode = _cause(causeCode),
+       requiredPaths = List.unmodifiable(_paths(requiredPaths)),
+       outcomeWhenSatisfiedCode = _outcome(outcomeWhenSatisfiedCode);
 
   final String causeCode;
   final List<Acs06PathRequirementContract> requiredPaths;
@@ -123,29 +130,27 @@ final class Acs06CauseProfileContract {
   final bool requiresSupervision;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'causeCode': causeCode,
-        'requiredPaths': <Object?>[
-          for (final value in requiredPaths) value.toCanonicalValue(),
-        ],
-        'outcomeWhenSatisfiedCode': outcomeWhenSatisfiedCode,
-        'requiresConductiveFeed': requiresConductiveFeed,
-        'requiresSupervision': requiresSupervision,
-      };
+    'causeCode': causeCode,
+    'requiredPaths': <Object?>[
+      for (final value in requiredPaths) value.toCanonicalValue(),
+    ],
+    'outcomeWhenSatisfiedCode': outcomeWhenSatisfiedCode,
+    'requiresConductiveFeed': requiresConductiveFeed,
+    'requiresSupervision': requiresSupervision,
+  };
 
   factory Acs06CauseProfileContract.fromMap(Map<String, Object?> map) {
-    _exact(
-      map,
-      const {
-        'causeCode',
-        'requiredPaths',
-        'outcomeWhenSatisfiedCode',
-        'requiresConductiveFeed',
-        'requiresSupervision',
-      },
-      'causeProfile',
-    );
+    _exact(map, const {
+      'causeCode',
+      'requiredPaths',
+      'outcomeWhenSatisfiedCode',
+      'requiresConductiveFeed',
+      'requiresSupervision',
+    }, 'causeProfile');
     final paths = map['requiredPaths'];
-    if (paths is! List || map['requiresConductiveFeed'] is! bool || map['requiresSupervision'] is! bool) {
+    if (paths is! List ||
+        map['requiresConductiveFeed'] is! bool ||
+        map['requiresSupervision'] is! bool) {
       throw const FormatException('ACS06 cause profile field type mismatch.');
     }
     return Acs06CauseProfileContract(
@@ -170,20 +175,20 @@ final class Acs06TopologyContract {
     required Iterable<Acs06TopologyEdgeContract> edges,
     required Iterable<Acs06CauseProfileContract> causeProfiles,
     String? projectDefinedPowerFailureOutcomeCode,
-  })  : doorId = _text(doorId, 'doorId'),
-        expectedDoorAggregateFingerprint = _sha(
-          expectedDoorAggregateFingerprint,
-          'expectedDoorAggregateFingerprint',
-        ),
-        componentNodeIdByComponentId = Map.unmodifiable(
-          _componentNodes(componentNodeIdByComponentId),
-        ),
-        edges = List.unmodifiable(_edges(edges)),
-        causeProfiles = List.unmodifiable(_causes(causeProfiles)),
-        projectDefinedPowerFailureOutcomeCode =
-            projectDefinedPowerFailureOutcomeCode == null
-                ? null
-                : _outcome(projectDefinedPowerFailureOutcomeCode) {
+  }) : doorId = _text(doorId, 'doorId'),
+       expectedDoorAggregateFingerprint = _sha(
+         expectedDoorAggregateFingerprint,
+         'expectedDoorAggregateFingerprint',
+       ),
+       componentNodeIdByComponentId = Map.unmodifiable(
+         _componentNodes(componentNodeIdByComponentId),
+       ),
+       edges = List.unmodifiable(_edges(edges)),
+       causeProfiles = List.unmodifiable(_causes(causeProfiles)),
+       projectDefinedPowerFailureOutcomeCode =
+           projectDefinedPowerFailureOutcomeCode == null
+           ? null
+           : _outcome(projectDefinedPowerFailureOutcomeCode) {
     final graphNodes = <String>{
       for (final edge in this.edges) edge.fromNodeId,
       for (final edge in this.edges) edge.toNodeId,
@@ -215,57 +220,68 @@ final class Acs06TopologyContract {
   final String? projectDefinedPowerFailureOutcomeCode;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'schema': schema,
-        'doorId': doorId,
-        'expectedDoorAggregateFingerprint': expectedDoorAggregateFingerprint,
-        'topologyProfile': topologyProfile.toCanonicalValue(),
-        'componentNodeIdByComponentId': <String, Object?>{
-          for (final key in componentNodeIdByComponentId.keys.toList()..sort())
-            key: componentNodeIdByComponentId[key],
-        },
-        'edges': <Object?>[for (final edge in edges) edge.toCanonicalValue()],
-        'causeProfiles': <Object?>[
-          for (final profile in causeProfiles) profile.toCanonicalValue(),
-        ],
-        'projectDefinedPowerFailureOutcomeCode': projectDefinedPowerFailureOutcomeCode,
-      };
+    'schema': schema,
+    'doorId': doorId,
+    'expectedDoorAggregateFingerprint': expectedDoorAggregateFingerprint,
+    'topologyProfile': topologyProfile.toCanonicalValue(),
+    'componentNodeIdByComponentId': <String, Object?>{
+      for (final key in componentNodeIdByComponentId.keys.toList()..sort())
+        key: componentNodeIdByComponentId[key],
+    },
+    'edges': <Object?>[for (final edge in edges) edge.toCanonicalValue()],
+    'causeProfiles': <Object?>[
+      for (final profile in causeProfiles) profile.toCanonicalValue(),
+    ],
+    'projectDefinedPowerFailureOutcomeCode':
+        projectDefinedPowerFailureOutcomeCode,
+  };
 
   factory Acs06TopologyContract.fromMap(Map<String, Object?> map) {
-    _exact(
-      map,
-      const {
-        'schema',
-        'doorId',
-        'expectedDoorAggregateFingerprint',
-        'topologyProfile',
-        'componentNodeIdByComponentId',
-        'edges',
-        'causeProfiles',
-        'projectDefinedPowerFailureOutcomeCode',
-      },
-      'ACS06 contract',
+    _exact(map, const {
+      'schema',
+      'doorId',
+      'expectedDoorAggregateFingerprint',
+      'topologyProfile',
+      'componentNodeIdByComponentId',
+      'edges',
+      'causeProfiles',
+      'projectDefinedPowerFailureOutcomeCode',
+    }, 'ACS06 contract');
+    if (map['schema'] != schema)
+      throw const FormatException('Unsupported ACS06 contract schema.');
+    final componentNodes = _map(
+      map['componentNodeIdByComponentId'],
+      'componentNodeIdByComponentId',
     );
-    if (map['schema'] != schema) throw const FormatException('Unsupported ACS06 contract schema.');
-    final componentNodes = _map(map['componentNodeIdByComponentId'], 'componentNodeIdByComponentId');
     final edges = map['edges'];
     final causes = map['causeProfiles'];
-    if (edges is! List || causes is! List) throw const FormatException('ACS06 edges/causeProfiles must be arrays.');
+    if (edges is! List || causes is! List)
+      throw const FormatException('ACS06 edges/causeProfiles must be arrays.');
     return Acs06TopologyContract(
       doorId: _mapText(map, 'doorId'),
-      expectedDoorAggregateFingerprint: _mapText(map, 'expectedDoorAggregateFingerprint'),
-      topologyProfile: Acs06TopologyProfileIdentity.fromMap(_map(map['topologyProfile'], 'topologyProfile')),
+      expectedDoorAggregateFingerprint: _mapText(
+        map,
+        'expectedDoorAggregateFingerprint',
+      ),
+      topologyProfile: Acs06TopologyProfileIdentity.fromMap(
+        _map(map['topologyProfile'], 'topologyProfile'),
+      ),
       componentNodeIdByComponentId: <String, String>{
         for (final entry in componentNodes.entries)
           _text(entry.key, 'componentId'): _string(entry.value, 'nodeId'),
       },
       edges: <Acs06TopologyEdgeContract>[
-        for (final raw in edges) Acs06TopologyEdgeContract.fromMap(_map(raw, 'edge')),
+        for (final raw in edges)
+          Acs06TopologyEdgeContract.fromMap(_map(raw, 'edge')),
       ],
       causeProfiles: <Acs06CauseProfileContract>[
-        for (final raw in causes) Acs06CauseProfileContract.fromMap(_map(raw, 'causeProfile')),
+        for (final raw in causes)
+          Acs06CauseProfileContract.fromMap(_map(raw, 'causeProfile')),
       ],
-      projectDefinedPowerFailureOutcomeCode:
-          _nullableText(map['projectDefinedPowerFailureOutcomeCode'], 'projectDefinedPowerFailureOutcomeCode'),
+      projectDefinedPowerFailureOutcomeCode: _nullableText(
+        map['projectDefinedPowerFailureOutcomeCode'],
+        'projectDefinedPowerFailureOutcomeCode',
+      ),
     );
   }
 }
@@ -299,18 +315,23 @@ Map<String, String> _componentNodes(Map<String, String> input) {
   for (final entry in input.entries) {
     final component = _text(entry.key, 'componentId');
     final node = _text(entry.value, 'nodeId');
-    if (!nodes.add(node)) throw ArgumentError('ACS06 duplicate component node: $node');
+    if (!nodes.add(node))
+      throw ArgumentError('ACS06 duplicate component node: $node');
     out[component] = node;
   }
-  if (out.isEmpty) throw ArgumentError('ACS06 component-node map must not be empty.');
+  if (out.isEmpty)
+    throw ArgumentError('ACS06 component-node map must not be empty.');
   return out;
 }
 
-List<Acs06TopologyEdgeContract> _edges(Iterable<Acs06TopologyEdgeContract> values) {
+List<Acs06TopologyEdgeContract> _edges(
+  Iterable<Acs06TopologyEdgeContract> values,
+) {
   final out = values.toList()..sort((a, b) => a.edgeId.compareTo(b.edgeId));
   final ids = <String>{};
   for (final edge in out) {
-    if (!ids.add(edge.edgeId)) throw ArgumentError('ACS06 duplicate edgeId: ${edge.edgeId}');
+    if (!ids.add(edge.edgeId))
+      throw ArgumentError('ACS06 duplicate edgeId: ${edge.edgeId}');
   }
   if (out.isEmpty) throw ArgumentError('ACS06 edge set must not be empty.');
   return out;
@@ -332,8 +353,11 @@ List<Acs06PathRequirementContract> _paths(
   return out;
 }
 
-List<Acs06CauseProfileContract> _causes(Iterable<Acs06CauseProfileContract> values) {
-  final out = values.toList()..sort((a, b) => a.causeCode.compareTo(b.causeCode));
+List<Acs06CauseProfileContract> _causes(
+  Iterable<Acs06CauseProfileContract> values,
+) {
+  final out = values.toList()
+    ..sort((a, b) => a.causeCode.compareTo(b.causeCode));
   final actual = out.map((e) => e.causeCode).toSet();
   const expected = {
     'NORMAL_ACCESS',
@@ -343,14 +367,22 @@ List<Acs06CauseProfileContract> _causes(Iterable<Acs06CauseProfileContract> valu
     'POWER_FAILURE',
   };
   if (actual.length != expected.length || !actual.containsAll(expected)) {
-    throw ArgumentError('ACS06 requires exactly five canonical cause profiles.');
+    throw ArgumentError(
+      'ACS06 requires exactly five canonical cause profiles.',
+    );
   }
   return out;
 }
 
 String _edgeKind(String value) {
   final code = _text(value, 'edgeKind').toUpperCase();
-  if (!const {'DATA', 'CONTROL', 'POWER_FEED', 'MONITOR', 'RELEASE'}.contains(code)) {
+  if (!const {
+    'DATA',
+    'CONTROL',
+    'POWER_FEED',
+    'MONITOR',
+    'RELEASE',
+  }.contains(code)) {
     throw ArgumentError('Unsupported ACS06 edge kind: $code');
   }
   return code;
@@ -403,7 +435,8 @@ String? _nullableText(Object? value, String field) {
 
 String _text(String value, String field) {
   final normalized = value.trim();
-  if (normalized.isEmpty) throw ArgumentError.value(value, field, 'Must not be empty.');
+  if (normalized.isEmpty)
+    throw ArgumentError.value(value, field, 'Must not be empty.');
   return normalized;
 }
 

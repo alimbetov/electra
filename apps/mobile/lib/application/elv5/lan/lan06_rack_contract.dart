@@ -5,19 +5,19 @@ final class Lan06PolicyRef {
     required String policyCode,
     required String editionId,
     required String contentHash,
-  })  : policyCode = _text(policyCode, 'policyCode'),
-        editionId = _text(editionId, 'editionId'),
-        contentHash = _sha(contentHash, 'contentHash');
+  }) : policyCode = _text(policyCode, 'policyCode'),
+       editionId = _text(editionId, 'editionId'),
+       contentHash = _sha(contentHash, 'contentHash');
 
   final String policyCode;
   final String editionId;
   final String contentHash;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'policyCode': policyCode,
-        'editionId': editionId,
-        'contentHash': contentHash,
-      };
+    'policyCode': policyCode,
+    'editionId': editionId,
+    'contentHash': contentHash,
+  };
 
   factory Lan06PolicyRef.fromMap(Map<String, Object?> map) {
     _exact(map, const {'policyCode', 'editionId', 'contentHash'}, 'policyRef');
@@ -37,9 +37,9 @@ final class Lan06EquipmentBasisContract {
     required this.depthM,
     required String evidenceRef,
     required String evidenceContentHash,
-  })  : equipmentId = _text(equipmentId, 'equipmentId'),
-        evidenceRef = _text(evidenceRef, 'evidenceRef'),
-        evidenceContentHash = _sha(evidenceContentHash, 'evidenceContentHash') {
+  }) : equipmentId = _text(equipmentId, 'equipmentId'),
+       evidenceRef = _text(evidenceRef, 'evidenceRef'),
+       evidenceContentHash = _sha(evidenceContentHash, 'evidenceContentHash') {
     if (ru < 0) throw ArgumentError('LAN06 equipment RU must be nonnegative.');
     if (weightKg != null && weightKg! < Elv5Rational.zero) {
       throw ArgumentError('LAN06 equipment weight must be nonnegative.');
@@ -57,29 +57,26 @@ final class Lan06EquipmentBasisContract {
   final String evidenceContentHash;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'equipmentId': equipmentId,
-        'ru': ru,
-        'weightKg': weightKg?.toMap(),
-        'depthM': depthM?.toMap(),
-        'evidenceRef': evidenceRef,
-        'evidenceContentHash': evidenceContentHash,
-      };
+    'equipmentId': equipmentId,
+    'ru': ru,
+    'weightKg': weightKg?.toMap(),
+    'depthM': depthM?.toMap(),
+    'evidenceRef': evidenceRef,
+    'evidenceContentHash': evidenceContentHash,
+  };
 
   factory Lan06EquipmentBasisContract.fromMap(Map<String, Object?> map) {
-    _exact(
-      map,
-      const {
-        'equipmentId',
-        'ru',
-        'weightKg',
-        'depthM',
-        'evidenceRef',
-        'evidenceContentHash',
-      },
-      'equipment',
-    );
+    _exact(map, const {
+      'equipmentId',
+      'ru',
+      'weightKg',
+      'depthM',
+      'evidenceRef',
+      'evidenceContentHash',
+    }, 'equipment');
     final ru = map['ru'];
-    if (ru is! int) throw const FormatException('LAN06 equipment ru must be integer.');
+    if (ru is! int)
+      throw const FormatException('LAN06 equipment ru must be integer.');
     return Lan06EquipmentBasisContract(
       equipmentId: _mapText(map, 'equipmentId'),
       ru: ru,
@@ -103,14 +100,18 @@ final class Lan06RackBasisContract {
     required Iterable<Lan06EquipmentBasisContract> equipment,
     required String rackEvidenceRef,
     required String rackEvidenceContentHash,
-  })  : rackId = _text(rackId, 'rackId'),
-        expectedAggregateFingerprint =
-            _sha(expectedAggregateFingerprint, 'expectedAggregateFingerprint'),
-        policyRef = policyRef,
-        equipment = List.unmodifiable(_equipment(equipment)),
-        rackEvidenceRef = _text(rackEvidenceRef, 'rackEvidenceRef'),
-        rackEvidenceContentHash =
-            _sha(rackEvidenceContentHash, 'rackEvidenceContentHash') {
+  }) : rackId = _text(rackId, 'rackId'),
+       expectedAggregateFingerprint = _sha(
+         expectedAggregateFingerprint,
+         'expectedAggregateFingerprint',
+       ),
+       policyRef = policyRef,
+       equipment = List.unmodifiable(_equipment(equipment)),
+       rackEvidenceRef = _text(rackEvidenceRef, 'rackEvidenceRef'),
+       rackEvidenceContentHash = _sha(
+         rackEvidenceContentHash,
+         'rackEvidenceContentHash',
+       ) {
     if (ruCapacity < 0 || explicitSpareRu < 0) {
       throw ArgumentError('LAN06 rack capacity/spare must be nonnegative.');
     }
@@ -136,37 +137,33 @@ final class Lan06RackBasisContract {
   final String rackEvidenceContentHash;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'schema': schema,
-        'rackId': rackId,
-        'expectedAggregateFingerprint': expectedAggregateFingerprint,
-        'policyRef': policyRef.toCanonicalValue(),
-        'ruCapacity': ruCapacity,
-        'weightCapacityKg': weightCapacityKg?.toMap(),
-        'depthCapacityM': depthCapacityM?.toMap(),
-        'explicitSpareRu': explicitSpareRu,
-        'equipment': [for (final item in equipment) item.toCanonicalValue()],
-        'rackEvidenceRef': rackEvidenceRef,
-        'rackEvidenceContentHash': rackEvidenceContentHash,
-      };
+    'schema': schema,
+    'rackId': rackId,
+    'expectedAggregateFingerprint': expectedAggregateFingerprint,
+    'policyRef': policyRef.toCanonicalValue(),
+    'ruCapacity': ruCapacity,
+    'weightCapacityKg': weightCapacityKg?.toMap(),
+    'depthCapacityM': depthCapacityM?.toMap(),
+    'explicitSpareRu': explicitSpareRu,
+    'equipment': [for (final item in equipment) item.toCanonicalValue()],
+    'rackEvidenceRef': rackEvidenceRef,
+    'rackEvidenceContentHash': rackEvidenceContentHash,
+  };
 
   factory Lan06RackBasisContract.fromMap(Map<String, Object?> map) {
-    _exact(
-      map,
-      const {
-        'schema',
-        'rackId',
-        'expectedAggregateFingerprint',
-        'policyRef',
-        'ruCapacity',
-        'weightCapacityKg',
-        'depthCapacityM',
-        'explicitSpareRu',
-        'equipment',
-        'rackEvidenceRef',
-        'rackEvidenceContentHash',
-      },
-      'LAN06 contract',
-    );
+    _exact(map, const {
+      'schema',
+      'rackId',
+      'expectedAggregateFingerprint',
+      'policyRef',
+      'ruCapacity',
+      'weightCapacityKg',
+      'depthCapacityM',
+      'explicitSpareRu',
+      'equipment',
+      'rackEvidenceRef',
+      'rackEvidenceContentHash',
+    }, 'LAN06 contract');
     if (map['schema'] != schema) {
       throw const FormatException('Unsupported LAN06 contract schema.');
     }
@@ -178,11 +175,20 @@ final class Lan06RackBasisContract {
     }
     return Lan06RackBasisContract(
       rackId: _mapText(map, 'rackId'),
-      expectedAggregateFingerprint: _mapText(map, 'expectedAggregateFingerprint'),
+      expectedAggregateFingerprint: _mapText(
+        map,
+        'expectedAggregateFingerprint',
+      ),
       policyRef: Lan06PolicyRef.fromMap(_map(map['policyRef'], 'policyRef')),
       ruCapacity: ruCapacity,
-      weightCapacityKg: _nullableRational(map['weightCapacityKg'], 'weightCapacityKg'),
-      depthCapacityM: _nullableRational(map['depthCapacityM'], 'depthCapacityM'),
+      weightCapacityKg: _nullableRational(
+        map['weightCapacityKg'],
+        'weightCapacityKg',
+      ),
+      depthCapacityM: _nullableRational(
+        map['depthCapacityM'],
+        'depthCapacityM',
+      ),
       explicitSpareRu: explicitSpareRu,
       equipment: [
         for (final raw in equipment)

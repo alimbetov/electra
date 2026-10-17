@@ -5,19 +5,19 @@ final class Acs02PolicyIdentity {
     required String policyCode,
     required String editionId,
     required String contentHash,
-  })  : policyCode = _text(policyCode, 'policyCode'),
-        editionId = _text(editionId, 'editionId'),
-        contentHash = _sha(contentHash, 'contentHash');
+  }) : policyCode = _text(policyCode, 'policyCode'),
+       editionId = _text(editionId, 'editionId'),
+       contentHash = _sha(contentHash, 'contentHash');
 
   final String policyCode;
   final String editionId;
   final String contentHash;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'policyCode': policyCode,
-        'editionId': editionId,
-        'contentHash': contentHash,
-      };
+    'policyCode': policyCode,
+    'editionId': editionId,
+    'contentHash': contentHash,
+  };
 
   factory Acs02PolicyIdentity.fromMap(Map<String, Object?> map) {
     _exact(map, const {'policyCode', 'editionId', 'contentHash'}, 'policy');
@@ -33,16 +33,16 @@ final class Acs02ResourceContractItem {
   Acs02ResourceContractItem({
     required String resourceId,
     required String resourceKindCode,
-  })  : resourceId = _text(resourceId, 'resourceId'),
-        resourceKindCode = _kind(resourceKindCode);
+  }) : resourceId = _text(resourceId, 'resourceId'),
+       resourceKindCode = _kind(resourceKindCode);
 
   final String resourceId;
   final String resourceKindCode;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'resourceId': resourceId,
-        'resourceKindCode': resourceKindCode,
-      };
+    'resourceId': resourceId,
+    'resourceKindCode': resourceKindCode,
+  };
 
   factory Acs02ResourceContractItem.fromMap(Map<String, Object?> map) {
     _exact(map, const {'resourceId', 'resourceKindCode'}, 'resource');
@@ -69,17 +69,17 @@ final class Acs02SpareRuleContract {
   final Elv5Rational ratio;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'resourceKindCode': resourceKindCode,
-        'absoluteMinimum': absoluteMinimum,
-        'ratio': ratio.toMap(),
-      };
+    'resourceKindCode': resourceKindCode,
+    'absoluteMinimum': absoluteMinimum,
+    'ratio': ratio.toMap(),
+  };
 
   factory Acs02SpareRuleContract.fromMap(Map<String, Object?> map) {
-    _exact(
-      map,
-      const {'resourceKindCode', 'absoluteMinimum', 'ratio'},
-      'spareRule',
-    );
+    _exact(map, const {
+      'resourceKindCode',
+      'absoluteMinimum',
+      'ratio',
+    }, 'spareRule');
     final minimum = map['absoluteMinimum'];
     if (minimum is! int) {
       throw const FormatException('absoluteMinimum must be integer.');
@@ -100,19 +100,21 @@ final class Acs02ResourceContract {
     required Iterable<Acs02ResourceContractItem> resources,
     Iterable<String> unavailableResourceIds = const [],
     required Iterable<Acs02SpareRuleContract> spareRules,
-  })  : controllerId = _text(controllerId, 'controllerId'),
-        expectedControllerAggregateFingerprint = _sha(
-          expectedControllerAggregateFingerprint,
-          'expectedControllerAggregateFingerprint',
-        ),
-        resources = List.unmodifiable(_resources(resources)),
-        unavailableResourceIds = Set.unmodifiable(
-          unavailableResourceIds.map((e) => _text(e, 'unavailableResourceId')),
-        ),
-        spareRules = List.unmodifiable(_spareRules(spareRules)) {
+  }) : controllerId = _text(controllerId, 'controllerId'),
+       expectedControllerAggregateFingerprint = _sha(
+         expectedControllerAggregateFingerprint,
+         'expectedControllerAggregateFingerprint',
+       ),
+       resources = List.unmodifiable(_resources(resources)),
+       unavailableResourceIds = Set.unmodifiable(
+         unavailableResourceIds.map((e) => _text(e, 'unavailableResourceId')),
+       ),
+       spareRules = List.unmodifiable(_spareRules(spareRules)) {
     final resourceIds = this.resources.map((e) => e.resourceId).toSet();
     if (!resourceIds.containsAll(this.unavailableResourceIds)) {
-      throw ArgumentError('ACS02 unavailable resource must exist in inventory.');
+      throw ArgumentError(
+        'ACS02 unavailable resource must exist in inventory.',
+      );
     }
   }
 
@@ -126,34 +128,30 @@ final class Acs02ResourceContract {
   final List<Acs02SpareRuleContract> spareRules;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'schema': schema,
-        'controllerId': controllerId,
-        'expectedControllerAggregateFingerprint':
-            expectedControllerAggregateFingerprint,
-        'reservePolicy': reservePolicy.toCanonicalValue(),
-        'resources': <Object?>[
-          for (final value in resources) value.toCanonicalValue(),
-        ],
-        'unavailableResourceIds': unavailableResourceIds.toList()..sort(),
-        'spareRules': <Object?>[
-          for (final value in spareRules) value.toCanonicalValue(),
-        ],
-      };
+    'schema': schema,
+    'controllerId': controllerId,
+    'expectedControllerAggregateFingerprint':
+        expectedControllerAggregateFingerprint,
+    'reservePolicy': reservePolicy.toCanonicalValue(),
+    'resources': <Object?>[
+      for (final value in resources) value.toCanonicalValue(),
+    ],
+    'unavailableResourceIds': unavailableResourceIds.toList()..sort(),
+    'spareRules': <Object?>[
+      for (final value in spareRules) value.toCanonicalValue(),
+    ],
+  };
 
   factory Acs02ResourceContract.fromMap(Map<String, Object?> map) {
-    _exact(
-      map,
-      const {
-        'schema',
-        'controllerId',
-        'expectedControllerAggregateFingerprint',
-        'reservePolicy',
-        'resources',
-        'unavailableResourceIds',
-        'spareRules',
-      },
-      'ACS02 contract',
-    );
+    _exact(map, const {
+      'schema',
+      'controllerId',
+      'expectedControllerAggregateFingerprint',
+      'reservePolicy',
+      'resources',
+      'unavailableResourceIds',
+      'spareRules',
+    }, 'ACS02 contract');
     if (map['schema'] != schema) {
       throw const FormatException('Unsupported ACS02 contract schema.');
     }
@@ -165,8 +163,10 @@ final class Acs02ResourceContract {
     }
     return Acs02ResourceContract(
       controllerId: _mapText(map, 'controllerId'),
-      expectedControllerAggregateFingerprint:
-          _mapText(map, 'expectedControllerAggregateFingerprint'),
+      expectedControllerAggregateFingerprint: _mapText(
+        map,
+        'expectedControllerAggregateFingerprint',
+      ),
       reservePolicy: Acs02PolicyIdentity.fromMap(
         _map(map['reservePolicy'], 'reservePolicy'),
       ),
@@ -218,7 +218,9 @@ final class ReplaceAcs02ResourceContractCommand {
     required this.expectedBindingRevision,
     required this.contract,
   }) {
-    if (projectId.trim().isEmpty || designRevisionId.trim().isEmpty || bindingId.trim().isEmpty) {
+    if (projectId.trim().isEmpty ||
+        designRevisionId.trim().isEmpty ||
+        bindingId.trim().isEmpty) {
       throw ArgumentError('ACS02 command identity is required.');
     }
     if (expectedDesignRevision < 1 ||
@@ -242,14 +244,16 @@ abstract interface class Acs02ResourceContractWriter {
 List<Acs02ResourceContractItem> _resources(
   Iterable<Acs02ResourceContractItem> values,
 ) {
-  final out = values.toList()..sort((a, b) => a.resourceId.compareTo(b.resourceId));
+  final out = values.toList()
+    ..sort((a, b) => a.resourceId.compareTo(b.resourceId));
   final ids = <String>{};
   for (final value in out) {
     if (!ids.add(value.resourceId)) {
       throw ArgumentError('ACS02 duplicate resourceId: ${value.resourceId}');
     }
   }
-  if (out.isEmpty) throw ArgumentError('ACS02 resource inventory must not be empty.');
+  if (out.isEmpty)
+    throw ArgumentError('ACS02 resource inventory must not be empty.');
   return out;
 }
 
@@ -261,20 +265,33 @@ List<Acs02SpareRuleContract> _spareRules(
   final kinds = <String>{};
   for (final value in out) {
     if (!kinds.add(value.resourceKindCode)) {
-      throw ArgumentError('ACS02 duplicate spare rule: ${value.resourceKindCode}');
+      throw ArgumentError(
+        'ACS02 duplicate spare rule: ${value.resourceKindCode}',
+      );
     }
   }
-  const required = {'READER_CHANNEL', 'RELAY_OUTPUT', 'SUPERVISED_INPUT', 'OTHER'};
+  const required = {
+    'READER_CHANNEL',
+    'RELAY_OUTPUT',
+    'SUPERVISED_INPUT',
+    'OTHER',
+  };
   if (kinds.length != required.length || !kinds.containsAll(required)) {
-    throw ArgumentError('ACS02 requires explicit spare rules for all resource kinds.');
+    throw ArgumentError(
+      'ACS02 requires explicit spare rules for all resource kinds.',
+    );
   }
   return out;
 }
 
 String _kind(String value) {
   final code = _text(value, 'resourceKindCode').toUpperCase();
-  if (!const {'READER_CHANNEL', 'RELAY_OUTPUT', 'SUPERVISED_INPUT', 'OTHER'}
-      .contains(code)) {
+  if (!const {
+    'READER_CHANNEL',
+    'RELAY_OUTPUT',
+    'SUPERVISED_INPUT',
+    'OTHER',
+  }.contains(code)) {
     throw ArgumentError('Unsupported ACS02 resource kind: $code');
   }
   return code;
@@ -294,7 +311,8 @@ String _string(Object? value, String field) {
 
 String _text(String value, String field) {
   final normalized = value.trim();
-  if (normalized.isEmpty) throw ArgumentError.value(value, field, 'Must not be empty.');
+  if (normalized.isEmpty)
+    throw ArgumentError.value(value, field, 'Must not be empty.');
   return normalized;
 }
 

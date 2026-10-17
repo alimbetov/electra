@@ -61,7 +61,9 @@ final class Elv5HistoryAppend {
     required this.after,
     required Iterable<String> affectedIds,
     required this.createdAtUtc,
-  }) : affectedIds = List.unmodifiable(affectedIds.toSet()..removeWhere((e) => e.isEmpty)) {
+  }) : affectedIds = List.unmodifiable(
+         affectedIds.toSet()..removeWhere((e) => e.isEmpty),
+       ) {
     if (this.affectedIds.isEmpty) {
       throw ArgumentError('History append requires at least one affected id.');
     }

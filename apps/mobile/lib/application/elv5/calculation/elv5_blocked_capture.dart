@@ -83,9 +83,12 @@ final class Elv5BlockedAwareTypedProcessCalculationAdapter<I>
         captureRevision: captured.captureRevision,
       );
     } on Elv5CaptureBlockedException catch (blocked) {
-      final blockedNodeHash =
-          _encoder.sha256(blocked.request.nodeKey.toCanonicalValue());
-      final requestedNodeHash = _encoder.sha256(request.nodeKey.toCanonicalValue());
+      final blockedNodeHash = _encoder.sha256(
+        blocked.request.nodeKey.toCanonicalValue(),
+      );
+      final requestedNodeHash = _encoder.sha256(
+        request.nodeKey.toCanonicalValue(),
+      );
       if (blockedNodeHash != requestedNodeHash) {
         throw StateError('ELV5_BLOCKED_CAPTURE_NODE_IDENTITY_CHANGED');
       }

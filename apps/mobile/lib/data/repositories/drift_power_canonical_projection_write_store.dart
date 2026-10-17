@@ -291,17 +291,16 @@ final class DriftPowerCanonicalProjectionWriteStore {
     String projectId,
     String designRevisionId,
   ) async {
-    final row =
-        await database
-            .customSelect(
-              'SELECT revision, state FROM project_design_revisions '
-              'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
-              variables: [
-                Variable.withString(projectId),
-                Variable.withString(designRevisionId),
-              ],
-            )
-            .getSingleOrNull();
+    final row = await database
+        .customSelect(
+          'SELECT revision, state FROM project_design_revisions '
+          'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
+          variables: [
+            Variable.withString(projectId),
+            Variable.withString(designRevisionId),
+          ],
+        )
+        .getSingleOrNull();
     if (row == null) {
       throw const PowerRuntimeStorageException('ELV4_REVISION_NOT_FOUND');
     }
@@ -312,18 +311,17 @@ final class DriftPowerCanonicalProjectionWriteStore {
   }
 
   Future<QueryRow> _portRow(String projectId, String portId) async {
-    final row =
-        await database
-            .customSelect(
-              'SELECT revision, payload_json FROM engineering_port_instances '
-              'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
-              variables: [
-                Variable.withString(projectId),
-                Variable.withString(portId),
-              ],
-              readsFrom: database.allTables.toSet(),
-            )
-            .getSingleOrNull();
+    final row = await database
+        .customSelect(
+          'SELECT revision, payload_json FROM engineering_port_instances '
+          'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
+          variables: [
+            Variable.withString(projectId),
+            Variable.withString(portId),
+          ],
+          readsFrom: database.allTables.toSet(),
+        )
+        .getSingleOrNull();
     if (row == null) {
       throw const PowerRuntimeStorageException(
         'ELV4_POWER_PROJECTION_PORT_NOT_FOUND',
@@ -337,14 +335,12 @@ final class DriftPowerCanonicalProjectionWriteStore {
     EngineeringPort candidate,
     PowerPortBinding binding,
   ) {
-    final beforeMap =
-        Map<String, Object?>.from(before.toMap())
-          ..remove('voltage')
-          ..remove('powerDirection');
-    final candidateMap =
-        Map<String, Object?>.from(candidate.toMap())
-          ..remove('voltage')
-          ..remove('powerDirection');
+    final beforeMap = Map<String, Object?>.from(before.toMap())
+      ..remove('voltage')
+      ..remove('powerDirection');
+    final candidateMap = Map<String, Object?>.from(candidate.toMap())
+      ..remove('voltage')
+      ..remove('powerDirection');
     if (canonicalEngineeringJson(beforeMap) !=
         canonicalEngineeringJson(candidateMap)) {
       throw const PowerRuntimeStorageException(

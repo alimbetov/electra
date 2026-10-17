@@ -9,11 +9,11 @@ final class Fa04RequirementContributorRef {
     required String policyCode,
     required String editionId,
     required String contentHash,
-  })  : contributorId = _text(contributorId, 'contributorId'),
-        disciplineCode = _text(disciplineCode, 'disciplineCode'),
-        policyCode = _text(policyCode, 'policyCode'),
-        editionId = _text(editionId, 'editionId'),
-        contentHash = _sha(contentHash, 'contentHash');
+  }) : contributorId = _text(contributorId, 'contributorId'),
+       disciplineCode = _text(disciplineCode, 'disciplineCode'),
+       policyCode = _text(policyCode, 'policyCode'),
+       editionId = _text(editionId, 'editionId'),
+       contentHash = _sha(contentHash, 'contentHash');
 
   final String contributorId;
   final String disciplineCode;
@@ -22,12 +22,12 @@ final class Fa04RequirementContributorRef {
   final String contentHash;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'contributorId': contributorId,
-        'disciplineCode': disciplineCode,
-        'policyCode': policyCode,
-        'editionId': editionId,
-        'contentHash': contentHash,
-      };
+    'contributorId': contributorId,
+    'disciplineCode': disciplineCode,
+    'policyCode': policyCode,
+    'editionId': editionId,
+    'contentHash': contentHash,
+  };
 
   factory Fa04RequirementContributorRef.fromMap(Map<String, Object?> map) {
     _exact(map, const <String>{
@@ -58,15 +58,17 @@ final class Fa04SourceCaseContract {
     required String pwr02SubjectKind,
     required String pwr02SubjectId,
     required String expectedPwr02InputFingerprint,
-  })  : caseId = _text(caseId, 'caseId'),
-        scenarioId = _text(scenarioId, 'scenarioId'),
-        segmentId = _text(segmentId, 'segmentId'),
-        pwr01SubjectKind = _text(pwr01SubjectKind, 'pwr01SubjectKind'),
-        pwr01SubjectId = _text(pwr01SubjectId, 'pwr01SubjectId'),
-        pwr02SubjectKind = _text(pwr02SubjectKind, 'pwr02SubjectKind'),
-        pwr02SubjectId = _text(pwr02SubjectId, 'pwr02SubjectId'),
-        expectedPwr02InputFingerprint =
-            _sha(expectedPwr02InputFingerprint, 'expectedPwr02InputFingerprint');
+  }) : caseId = _text(caseId, 'caseId'),
+       scenarioId = _text(scenarioId, 'scenarioId'),
+       segmentId = _text(segmentId, 'segmentId'),
+       pwr01SubjectKind = _text(pwr01SubjectKind, 'pwr01SubjectKind'),
+       pwr01SubjectId = _text(pwr01SubjectId, 'pwr01SubjectId'),
+       pwr02SubjectKind = _text(pwr02SubjectKind, 'pwr02SubjectKind'),
+       pwr02SubjectId = _text(pwr02SubjectId, 'pwr02SubjectId'),
+       expectedPwr02InputFingerprint = _sha(
+         expectedPwr02InputFingerprint,
+         'expectedPwr02InputFingerprint',
+       );
 
   final String caseId;
   final String scenarioId;
@@ -79,16 +81,16 @@ final class Fa04SourceCaseContract {
   final String expectedPwr02InputFingerprint;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'caseId': caseId,
-        'scenarioId': scenarioId,
-        'segmentId': segmentId,
-        'dimension': dimension == Fa04SourceDimension.watt ? 'WATT' : 'CURRENT',
-        'pwr01SubjectKind': pwr01SubjectKind,
-        'pwr01SubjectId': pwr01SubjectId,
-        'pwr02SubjectKind': pwr02SubjectKind,
-        'pwr02SubjectId': pwr02SubjectId,
-        'expectedPwr02InputFingerprint': expectedPwr02InputFingerprint,
-      };
+    'caseId': caseId,
+    'scenarioId': scenarioId,
+    'segmentId': segmentId,
+    'dimension': dimension == Fa04SourceDimension.watt ? 'WATT' : 'CURRENT',
+    'pwr01SubjectKind': pwr01SubjectKind,
+    'pwr01SubjectId': pwr01SubjectId,
+    'pwr02SubjectKind': pwr02SubjectKind,
+    'pwr02SubjectId': pwr02SubjectId,
+    'expectedPwr02InputFingerprint': expectedPwr02InputFingerprint,
+  };
 
   factory Fa04SourceCaseContract.fromMap(Map<String, Object?> map) {
     _exact(map, const <String>{
@@ -105,7 +107,9 @@ final class Fa04SourceCaseContract {
     final dimension = switch (_mapText(map, 'dimension')) {
       'WATT' => Fa04SourceDimension.watt,
       'CURRENT' => Fa04SourceDimension.current,
-      final value => throw FormatException('Unsupported FA04 dimension: $value'),
+      final value => throw FormatException(
+        'Unsupported FA04 dimension: $value',
+      ),
     };
     return Fa04SourceCaseContract(
       caseId: _mapText(map, 'caseId'),
@@ -116,8 +120,10 @@ final class Fa04SourceCaseContract {
       pwr01SubjectId: _mapText(map, 'pwr01SubjectId'),
       pwr02SubjectKind: _mapText(map, 'pwr02SubjectKind'),
       pwr02SubjectId: _mapText(map, 'pwr02SubjectId'),
-      expectedPwr02InputFingerprint:
-          _mapText(map, 'expectedPwr02InputFingerprint'),
+      expectedPwr02InputFingerprint: _mapText(
+        map,
+        'expectedPwr02InputFingerprint',
+      ),
     );
   }
 }
@@ -128,16 +134,22 @@ final class Fa04SourceRequirementContract {
     required String sourceDefinitionContentHash,
     required Iterable<Fa04RequirementContributorRef> contributors,
     required Iterable<Fa04SourceCaseContract> cases,
-  })  : sourceId = _text(sourceId, 'sourceId'),
-        sourceDefinitionContentHash =
-            _sha(sourceDefinitionContentHash, 'sourceDefinitionContentHash'),
-        contributors = List.unmodifiable(_contributors(contributors)),
-        cases = List.unmodifiable(_cases(cases)) {
+  }) : sourceId = _text(sourceId, 'sourceId'),
+       sourceDefinitionContentHash = _sha(
+         sourceDefinitionContentHash,
+         'sourceDefinitionContentHash',
+       ),
+       contributors = List.unmodifiable(_contributors(contributors)),
+       cases = List.unmodifiable(_cases(cases)) {
     if (this.contributors.isEmpty) {
-      throw ArgumentError('FA04 requires participating requirement contributors.');
+      throw ArgumentError(
+        'FA04 requires participating requirement contributors.',
+      );
     }
     if (!this.contributors.any((value) => value.disciplineCode == 'FIRE')) {
-      throw ArgumentError('FA04 requirement set must contain a FIRE contributor.');
+      throw ArgumentError(
+        'FA04 requirement set must contain a FIRE contributor.',
+      );
     }
     if (this.cases.isEmpty) {
       throw ArgumentError('FA04 requires at least one source operating case.');
@@ -153,20 +165,24 @@ final class Fa04SourceRequirementContract {
   final List<Fa04SourceCaseContract> cases;
 
   String get requirementSetFingerprint => _encoder.sha256(<String, Object?>{
-        'schema': 'electra.elv5-source-requirement-set-fingerprint.v1',
-        'sourceId': sourceId,
-        'sourceDefinitionContentHash': sourceDefinitionContentHash,
-        'contributors': [for (final value in contributors) value.toCanonicalValue()],
-        'cases': [for (final value in cases) value.toCanonicalValue()],
-      });
+    'schema': 'electra.elv5-source-requirement-set-fingerprint.v1',
+    'sourceId': sourceId,
+    'sourceDefinitionContentHash': sourceDefinitionContentHash,
+    'contributors': [
+      for (final value in contributors) value.toCanonicalValue(),
+    ],
+    'cases': [for (final value in cases) value.toCanonicalValue()],
+  });
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'schema': schema,
-        'sourceId': sourceId,
-        'sourceDefinitionContentHash': sourceDefinitionContentHash,
-        'contributors': [for (final value in contributors) value.toCanonicalValue()],
-        'cases': [for (final value in cases) value.toCanonicalValue()],
-      };
+    'schema': schema,
+    'sourceId': sourceId,
+    'sourceDefinitionContentHash': sourceDefinitionContentHash,
+    'contributors': [
+      for (final value in contributors) value.toCanonicalValue(),
+    ],
+    'cases': [for (final value in cases) value.toCanonicalValue()],
+  };
 
   factory Fa04SourceRequirementContract.fromMap(Map<String, Object?> map) {
     _exact(map, const <String>{
@@ -189,7 +205,9 @@ final class Fa04SourceRequirementContract {
       sourceDefinitionContentHash: _mapText(map, 'sourceDefinitionContentHash'),
       contributors: <Fa04RequirementContributorRef>[
         for (final raw in contributors)
-          Fa04RequirementContributorRef.fromMap(_object(raw, 'FA04 contributor')),
+          Fa04RequirementContributorRef.fromMap(
+            _object(raw, 'FA04 contributor'),
+          ),
       ],
       cases: <Fa04SourceCaseContract>[
         for (final raw in cases)
@@ -231,7 +249,9 @@ List<Fa04RequirementContributorRef> _contributors(
   final ids = <String>{};
   for (final value in result) {
     if (!ids.add(value.contributorId)) {
-      throw ArgumentError('FA04 duplicate contributorId: ${value.contributorId}');
+      throw ArgumentError(
+        'FA04 duplicate contributorId: ${value.contributorId}',
+      );
     }
   }
   return result;

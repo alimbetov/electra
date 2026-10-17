@@ -30,209 +30,197 @@ QueryExecutor _native(File file, {bool configureWal = false}) =>
     );
 
 void main() {
-  test(
-    'P8 CCTV LAN ACS FIRE verticals persist through public commands with exact shared ownership',
-    () async {
-      final dir = await Directory.systemTemp.createTemp(
-        'electra-elv4-p8-verticals-',
-      );
-      addTearDown(() => dir.delete(recursive: true));
-      final file = File('${dir.path}/electra.sqlite');
-      var db = AppDatabase(_native(file, configureWal: true));
-      final builder = Elv4QualificationBuilder(db);
-      await builder.createStructuralBaseline();
-      final built = await _buildFourVerticals(builder);
+  test('P8 CCTV LAN ACS FIRE verticals persist through public commands with exact shared ownership', () async {
+    final dir = await Directory.systemTemp.createTemp(
+      'electra-elv4-p8-verticals-',
+    );
+    addTearDown(() => dir.delete(recursive: true));
+    final file = File('${dir.path}/electra.sqlite');
+    var db = AppDatabase(_native(file, configureWal: true));
+    final builder = Elv4QualificationBuilder(db);
+    await builder.createStructuralBaseline();
+    final built = await _buildFourVerticals(builder);
 
-      final fk = await db.customSelect('PRAGMA foreign_key_check').get();
-      expect(fk, isEmpty);
-      expect(await _count(db, 'power_operation_records'), greaterThan(20));
-      expect(await _count(db, 'power_component_bindings'), 10);
-      expect(await _count(db, 'power_load_bindings'), 4);
-      expect(await _count(db, 'poe_delivery_bindings'), 2);
-      expect(await _count(db, 'poe_delivery_path_members'), 2);
-      expect(await _count(db, 'backup_assemblies'), 2);
-      expect(await _count(db, 'battery_bank_bindings'), 2);
+    final fk = await db.customSelect('PRAGMA foreign_key_check').get();
+    expect(fk, isEmpty);
+    expect(await _count(db, 'power_operation_records'), greaterThan(20));
+    expect(await _count(db, 'power_component_bindings'), 10);
+    expect(await _count(db, 'power_load_bindings'), 4);
+    expect(await _count(db, 'poe_delivery_bindings'), 2);
+    expect(await _count(db, 'poe_delivery_path_members'), 2);
+    expect(await _count(db, 'backup_assemblies'), 2);
+    expect(await _count(db, 'battery_bank_bindings'), 2);
 
-      // CCTV + LAN share one PSE and one explicit group. Their loads are still
-      // separate contributions, so group usage cannot multiply the PSE own load.
-      expect(
-        await _countWhere(
-          db,
-          'power_capacity_groups',
-          "id = 'SHARED_PSE_GROUP'",
-        ),
-        1,
-      );
-      expect(
-        await _countWhere(
-          db,
-          'power_capacity_group_members',
-          "group_id = 'SHARED_PSE_GROUP'",
-        ),
-        2,
-      );
-      expect(
-        await _countWhere(
-          db,
-          'power_load_bindings',
-          "id IN ('CCTV_CAMERA_LOAD', 'LAN_PD_LOAD')",
-        ),
-        2,
-      );
-
-      // ACS bank direction is explicit, not inferred from scenario name.
-      final acsState =
-          await db
-              .customSelect(
-                "SELECT state_code FROM power_scenario_states "
-                "WHERE scenario_id = 'ACS_BACKUP' AND component_id = 'acs-bank'",
-              )
-              .getSingle();
-      expect(acsState.read<String>('state_code'), 'DISCHARGING');
-
-      // Fire semantics are explicit two-segment state data with no hidden
-      // policy attachment.
-      expect(
-        await _countWhere(
-          db,
-          'power_scenario_segments',
-          "scenario_id = 'FIRE_SEQUENCE'",
-        ),
-        2,
-      );
-      final fire =
-          await db
-              .customSelect(
-                "SELECT policy_refs_json FROM power_operating_scenarios "
-                "WHERE id = 'FIRE_SEQUENCE'",
-              )
-              .getSingle();
-      expect(fire.read<String>('policy_refs_json'), '[]');
-
-      // LAN fiber is never silently treated as a powered copper channel.
-      await builder.addComponent(
-        'lan-fiber-endpoint',
-        xMm: 9000,
-        ports: [
-          EngineeringPort(
-            id: 'lan-fiber-endpoint-fiber',
-            componentId: 'lan-fiber-endpoint',
-            code: 'FIBER',
-            kind: EngineeringPortKind.fiber,
-            direction: PortDirection.input,
-            capacity: 1,
-            connector: 'LC',
-          ),
-        ],
-      );
-      await expectLater(
-        builder.connectDataPower(
-          familyCode: 'LAN',
-          connectionId: 'lan-invalid-fiber-power',
-          fromPortId: 'shared-pse-lan-out',
-          toPortId: 'lan-fiber-endpoint-fiber',
-        ),
-        throwsA(isA<StateError>()),
-      );
-      expect(
-        await _countWhere(
-          db,
-          'engineering_port_connections',
-          "id = 'lan-invalid-fiber-power'",
-        ),
-        0,
-      );
-
-      // Domain guard: declared PoE loss cannot make guaranteed PD delivery
-      // exceed the PSE port budget.
-      expect(
-        () => PoeDeliveryDefinition(
-          definitionRef: builder.definition(PowerDefinitionKind.poe, 'POE-BAD'),
-          guaranteedPdPowerW: PowerRational.integer(29),
-          psePortLimitW: PowerRational.integer(30),
-          maxChannelLossW: PowerRational.integer(2),
-          compatibleResourceKinds: const ['COPPER'],
-          supportsMidspan: false,
-        ),
-        throwsArgumentError,
-      );
-
-      await _publishPersistedLoadEvidence(builder, db);
-      expect(
-        await _countWhere(db, 'power_evaluation_pointers', "state = 'CURRENT'"),
-        4,
-      );
-
-      final frozen = await builder.revisions.freeze(
-        FreezeProjectDesignRevisionCommand(
-          commandId: 'p8-freeze-four-verticals',
-          projectId: builder.projectId,
-          designRevisionId: builder.revisionId,
-          expectedRevision: built.revision,
-        ),
-      );
-      expect(frozen, isA<ElvCommandSuccess<ProjectDesignRevision>>());
-      final frozenValue =
-          (frozen as ElvCommandSuccess<ProjectDesignRevision>).value;
-      expect(frozenValue.state, ProjectDesignRevisionState.frozen);
-
-      final powerSnapshot =
-          await db
-              .customSelect(
-                'SELECT power_sha256, physical_sha256 FROM design_revision_power_snapshots '
-                'WHERE design_revision_id = ?',
-                variables: [Variable.withString(builder.revisionId)],
-              )
-              .getSingle();
-      final manifest =
-          await db
-              .customSelect(
-                'SELECT manifest_sha256, power_sha256, physical_sha256 '
-                'FROM design_revision_snapshot_manifests WHERE design_revision_id = ?',
-                variables: [Variable.withString(builder.revisionId)],
-              )
-              .getSingle();
-      final powerSha = powerSnapshot.read<String>('power_sha256');
-      final physicalSha = powerSnapshot.read<String>('physical_sha256');
-      expect(manifest.read<String>('power_sha256'), powerSha);
-      expect(manifest.read<String>('physical_sha256'), physicalSha);
-      final manifestSha = manifest.read<String>('manifest_sha256');
-
-      await db.close();
-      db = AppDatabase(_native(file));
-      addTearDown(db.close);
-
-      final powerView = await DriftPowerPublicationRuntime(
+    // CCTV + LAN share one PSE and one explicit group. Their loads are still
+    // separate contributions, so group usage cannot multiply the PSE own load.
+    expect(
+      await _countWhere(db, 'power_capacity_groups', "id = 'SHARED_PSE_GROUP'"),
+      1,
+    );
+    expect(
+      await _countWhere(
         db,
-        originDeviceId: 'qualification',
-      ).readRevision(
+        'power_capacity_group_members',
+        "group_id = 'SHARED_PSE_GROUP'",
+      ),
+      2,
+    );
+    expect(
+      await _countWhere(
+        db,
+        'power_load_bindings',
+        "id IN ('CCTV_CAMERA_LOAD', 'LAN_PD_LOAD')",
+      ),
+      2,
+    );
+
+    // ACS bank direction is explicit, not inferred from scenario name.
+    final acsState = await db
+        .customSelect(
+          "SELECT state_code FROM power_scenario_states "
+          "WHERE scenario_id = 'ACS_BACKUP' AND component_id = 'acs-bank'",
+        )
+        .getSingle();
+    expect(acsState.read<String>('state_code'), 'DISCHARGING');
+
+    // Fire semantics are explicit two-segment state data with no hidden
+    // policy attachment.
+    expect(
+      await _countWhere(
+        db,
+        'power_scenario_segments',
+        "scenario_id = 'FIRE_SEQUENCE'",
+      ),
+      2,
+    );
+    final fire = await db
+        .customSelect(
+          "SELECT policy_refs_json FROM power_operating_scenarios "
+          "WHERE id = 'FIRE_SEQUENCE'",
+        )
+        .getSingle();
+    expect(fire.read<String>('policy_refs_json'), '[]');
+
+    // LAN fiber is never silently treated as a powered copper channel.
+    await builder.addComponent(
+      'lan-fiber-endpoint',
+      xMm: 9000,
+      ports: [
+        EngineeringPort(
+          id: 'lan-fiber-endpoint-fiber',
+          componentId: 'lan-fiber-endpoint',
+          code: 'FIBER',
+          kind: EngineeringPortKind.fiber,
+          direction: PortDirection.input,
+          capacity: 1,
+          connector: 'LC',
+        ),
+      ],
+    );
+    await expectLater(
+      builder.connectDataPower(
+        familyCode: 'LAN',
+        connectionId: 'lan-invalid-fiber-power',
+        fromPortId: 'shared-pse-lan-out',
+        toPortId: 'lan-fiber-endpoint-fiber',
+      ),
+      throwsA(isA<StateError>()),
+    );
+    expect(
+      await _countWhere(
+        db,
+        'engineering_port_connections',
+        "id = 'lan-invalid-fiber-power'",
+      ),
+      0,
+    );
+
+    // Domain guard: declared PoE loss cannot make guaranteed PD delivery
+    // exceed the PSE port budget.
+    expect(
+      () => PoeDeliveryDefinition(
+        definitionRef: builder.definition(PowerDefinitionKind.poe, 'POE-BAD'),
+        guaranteedPdPowerW: PowerRational.integer(29),
+        psePortLimitW: PowerRational.integer(30),
+        maxChannelLossW: PowerRational.integer(2),
+        compatibleResourceKinds: const ['COPPER'],
+        supportsMidspan: false,
+      ),
+      throwsArgumentError,
+    );
+
+    await _publishPersistedLoadEvidence(builder, db);
+    expect(
+      await _countWhere(db, 'power_evaluation_pointers', "state = 'CURRENT'"),
+      4,
+    );
+
+    final frozen = await builder.revisions.freeze(
+      FreezeProjectDesignRevisionCommand(
+        commandId: 'p8-freeze-four-verticals',
         projectId: builder.projectId,
         designRevisionId: builder.revisionId,
-      );
-      expect(powerView.kind, PowerRevisionReadKind.captured);
-      expect(powerView.mutationAllowed, isFalse);
-      final reopenedSnapshot =
-          await db
-              .customSelect(
-                'SELECT power_sha256, physical_sha256 FROM design_revision_power_snapshots '
-                'WHERE design_revision_id = ?',
-                variables: [Variable.withString(builder.revisionId)],
-              )
-              .getSingle();
-      final reopenedManifest =
-          await db
-              .customSelect(
-                'SELECT manifest_sha256 FROM design_revision_snapshot_manifests '
-                'WHERE design_revision_id = ?',
-                variables: [Variable.withString(builder.revisionId)],
-              )
-              .getSingle();
-      expect(reopenedSnapshot.read<String>('power_sha256'), powerSha);
-      expect(reopenedSnapshot.read<String>('physical_sha256'), physicalSha);
-      expect(reopenedManifest.read<String>('manifest_sha256'), manifestSha);
-      expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
-    },
-  );
+        expectedRevision: built.revision,
+      ),
+    );
+    expect(frozen, isA<ElvCommandSuccess<ProjectDesignRevision>>());
+    final frozenValue =
+        (frozen as ElvCommandSuccess<ProjectDesignRevision>).value;
+    expect(frozenValue.state, ProjectDesignRevisionState.frozen);
+
+    final powerSnapshot = await db
+        .customSelect(
+          'SELECT power_sha256, physical_sha256 FROM design_revision_power_snapshots '
+          'WHERE design_revision_id = ?',
+          variables: [Variable.withString(builder.revisionId)],
+        )
+        .getSingle();
+    final manifest = await db
+        .customSelect(
+          'SELECT manifest_sha256, power_sha256, physical_sha256 '
+          'FROM design_revision_snapshot_manifests WHERE design_revision_id = ?',
+          variables: [Variable.withString(builder.revisionId)],
+        )
+        .getSingle();
+    final powerSha = powerSnapshot.read<String>('power_sha256');
+    final physicalSha = powerSnapshot.read<String>('physical_sha256');
+    expect(manifest.read<String>('power_sha256'), powerSha);
+    expect(manifest.read<String>('physical_sha256'), physicalSha);
+    final manifestSha = manifest.read<String>('manifest_sha256');
+
+    await db.close();
+    db = AppDatabase(_native(file));
+    addTearDown(db.close);
+
+    final powerView =
+        await DriftPowerPublicationRuntime(
+          db,
+          originDeviceId: 'qualification',
+        ).readRevision(
+          projectId: builder.projectId,
+          designRevisionId: builder.revisionId,
+        );
+    expect(powerView.kind, PowerRevisionReadKind.captured);
+    expect(powerView.mutationAllowed, isFalse);
+    final reopenedSnapshot = await db
+        .customSelect(
+          'SELECT power_sha256, physical_sha256 FROM design_revision_power_snapshots '
+          'WHERE design_revision_id = ?',
+          variables: [Variable.withString(builder.revisionId)],
+        )
+        .getSingle();
+    final reopenedManifest = await db
+        .customSelect(
+          'SELECT manifest_sha256 FROM design_revision_snapshot_manifests '
+          'WHERE design_revision_id = ?',
+          variables: [Variable.withString(builder.revisionId)],
+        )
+        .getSingle();
+    expect(reopenedSnapshot.read<String>('power_sha256'), powerSha);
+    expect(reopenedSnapshot.read<String>('physical_sha256'), physicalSha);
+    expect(reopenedManifest.read<String>('manifest_sha256'), manifestSha);
+    expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
+  });
 }
 
 Future<_BuiltVerticals> _buildFourVerticals(
@@ -302,13 +290,12 @@ Future<_BuiltVerticals> _buildFourVerticals(
     List<PowerComponentCapability> capabilities, {
     List<String> ownLoads = const [],
   }) async {
-    revision =
-        (await builder.bindComponent(
-          id,
-          capabilities,
-          expectedRevision: revision,
-          ownLoadContributionIds: ownLoads,
-        )).currentRevision;
+    revision = (await builder.bindComponent(
+      id,
+      capabilities,
+      expectedRevision: revision,
+      ownLoadContributionIds: ownLoads,
+    )).currentRevision;
   }
 
   await bindComponent('shared-ups', [
@@ -367,93 +354,82 @@ Future<_BuiltVerticals> _buildFourVerticals(
     ('fire-panel-dc-in', PowerPortRole.consumer),
   ];
   for (final entry in ports) {
-    revision =
-        (await builder.bindPort(
-          entry.$1,
-          entry.$2,
-          expectedRevision: revision,
-          currentKind:
-              entry.$1 == 'shared-ups-ac-in'
-                  ? PowerCurrentKind.ac
-                  : PowerCurrentKind.dc,
-        )).currentRevision;
+    revision = (await builder.bindPort(
+      entry.$1,
+      entry.$2,
+      expectedRevision: revision,
+      currentKind: entry.$1 == 'shared-ups-ac-in'
+          ? PowerCurrentKind.ac
+          : PowerCurrentKind.dc,
+    )).currentRevision;
   }
 
-  revision =
-      (await builder.power.execute(
-        ReplacePowerTransferCommand(
-          operationId: 'transfer-shared-ups',
-          projectId: builder.projectId,
-          designRevisionId: builder.revisionId,
-          expectedRevision: revision,
-          changedDependencies: [builder.dependency('TRANSFER-SHARED-UPS')],
-          transfer: PowerTransferBinding(
-            id: 'SHARED_UPS',
-            componentId: 'shared-ups',
-            definitionRef: builder.definition(
-              PowerDefinitionKind.transfer,
-              'UPS',
-            ),
-            kind: PowerTransferKind.ups,
-            inputPortIds: const ['shared-ups-ac-in'],
-            outputPortIds: const ['shared-ups-dc-out'],
-            enabledStateCodes: const ['NORMAL', 'BACKUP'],
-            inputAccountingOrigin: 'UPS_INPUT',
-            lossDefinition: builder.efficientLoss,
-          ),
-        ),
-      )).currentRevision;
+  revision = (await builder.power.execute(
+    ReplacePowerTransferCommand(
+      operationId: 'transfer-shared-ups',
+      projectId: builder.projectId,
+      designRevisionId: builder.revisionId,
+      expectedRevision: revision,
+      changedDependencies: [builder.dependency('TRANSFER-SHARED-UPS')],
+      transfer: PowerTransferBinding(
+        id: 'SHARED_UPS',
+        componentId: 'shared-ups',
+        definitionRef: builder.definition(PowerDefinitionKind.transfer, 'UPS'),
+        kind: PowerTransferKind.ups,
+        inputPortIds: const ['shared-ups-ac-in'],
+        outputPortIds: const ['shared-ups-dc-out'],
+        enabledStateCodes: const ['NORMAL', 'BACKUP'],
+        inputAccountingOrigin: 'UPS_INPUT',
+        lossDefinition: builder.efficientLoss,
+      ),
+    ),
+  )).currentRevision;
 
-  revision =
-      (await builder.power.execute(
-        ReplacePowerTransferCommand(
-          operationId: 'transfer-shared-pse',
-          projectId: builder.projectId,
-          designRevisionId: builder.revisionId,
-          expectedRevision: revision,
-          changedDependencies: [builder.dependency('TRANSFER-SHARED-PSE')],
-          transfer: PowerTransferBinding(
-            id: 'SHARED_PSE',
-            componentId: 'shared-pse',
-            definitionRef: builder.definition(
-              PowerDefinitionKind.transfer,
-              'PSE',
-            ),
-            kind: PowerTransferKind.pse,
-            inputPortIds: const ['shared-pse-dc-in'],
-            outputPortIds: const ['shared-pse-cctv-out', 'shared-pse-lan-out'],
-            enabledStateCodes: const ['NORMAL', 'BACKUP'],
-            inputAccountingOrigin: 'PSE_INPUT',
-            lossDefinition: builder.efficientLoss,
-          ),
-        ),
-      )).currentRevision;
+  revision = (await builder.power.execute(
+    ReplacePowerTransferCommand(
+      operationId: 'transfer-shared-pse',
+      projectId: builder.projectId,
+      designRevisionId: builder.revisionId,
+      expectedRevision: revision,
+      changedDependencies: [builder.dependency('TRANSFER-SHARED-PSE')],
+      transfer: PowerTransferBinding(
+        id: 'SHARED_PSE',
+        componentId: 'shared-pse',
+        definitionRef: builder.definition(PowerDefinitionKind.transfer, 'PSE'),
+        kind: PowerTransferKind.pse,
+        inputPortIds: const ['shared-pse-dc-in'],
+        outputPortIds: const ['shared-pse-cctv-out', 'shared-pse-lan-out'],
+        enabledStateCodes: const ['NORMAL', 'BACKUP'],
+        inputAccountingOrigin: 'PSE_INPUT',
+        lossDefinition: builder.efficientLoss,
+      ),
+    ),
+  )).currentRevision;
 
-  revision =
-      (await builder.power.execute(
-        ReplacePowerCapacityGroupCommand(
-          operationId: 'shared-pse-capacity',
-          projectId: builder.projectId,
-          designRevisionId: builder.revisionId,
-          expectedRevision: revision,
-          changedDependencies: [builder.dependency('GROUP-SHARED-PSE')],
-          group: PowerCapacityGroup(
-            id: 'SHARED_PSE_GROUP',
-            ownerComponentId: 'shared-pse',
-            memberOutputPortIds: const [
-              'shared-pse-cctv-out',
-              'shared-pse-lan-out',
-            ],
-            limits: [
-              PowerCapacityLimit(
-                dimension: PowerCapacityDimension.watt,
-                limit: PowerRational.integer(120),
-              ),
-            ],
-            applicabilityStateCodes: const ['NORMAL', 'BACKUP'],
+  revision = (await builder.power.execute(
+    ReplacePowerCapacityGroupCommand(
+      operationId: 'shared-pse-capacity',
+      projectId: builder.projectId,
+      designRevisionId: builder.revisionId,
+      expectedRevision: revision,
+      changedDependencies: [builder.dependency('GROUP-SHARED-PSE')],
+      group: PowerCapacityGroup(
+        id: 'SHARED_PSE_GROUP',
+        ownerComponentId: 'shared-pse',
+        memberOutputPortIds: const [
+          'shared-pse-cctv-out',
+          'shared-pse-lan-out',
+        ],
+        limits: [
+          PowerCapacityLimit(
+            dimension: PowerCapacityDimension.watt,
+            limit: PowerRational.integer(120),
           ),
-        ),
-      )).currentRevision;
+        ],
+        applicabilityStateCodes: const ['NORMAL', 'BACKUP'],
+      ),
+    ),
+  )).currentRevision;
 
   for (final load in [
     PowerOwnLoadContribution(
@@ -489,17 +465,16 @@ Future<_BuiltVerticals> _buildFourVerticals(
       demand: DcConstantPowerDemand(PowerRational.integer(8)),
     ),
   ]) {
-    revision =
-        (await builder.power.execute(
-          SetPowerLoadCommand(
-            operationId: 'load-${load.id.toLowerCase()}',
-            projectId: builder.projectId,
-            designRevisionId: builder.revisionId,
-            expectedRevision: revision,
-            changedDependencies: [builder.dependency('LOAD-${load.id}')],
-            contribution: load,
-          ),
-        )).currentRevision;
+    revision = (await builder.power.execute(
+      SetPowerLoadCommand(
+        operationId: 'load-${load.id.toLowerCase()}',
+        projectId: builder.projectId,
+        designRevisionId: builder.revisionId,
+        expectedRevision: revision,
+        changedDependencies: [builder.dependency('LOAD-${load.id}')],
+        contribution: load,
+      ),
+    )).currentRevision;
   }
 
   final poeDefinition = PoeDeliveryDefinition(
@@ -514,59 +489,55 @@ Future<_BuiltVerticals> _buildFourVerticals(
     ('CCTV_POE', 'shared-pse-cctv-out', 'cctv-camera-poe-in', 'cctv-poe-link'),
     ('LAN_POE', 'shared-pse-lan-out', 'lan-pd-poe-in', 'lan-poe-link'),
   ]) {
-    revision =
-        (await builder.power.execute(
-          BindPoeDeliveryCommand(
-            operationId: 'poe-${delivery.$1.toLowerCase()}',
-            projectId: builder.projectId,
-            designRevisionId: builder.revisionId,
-            expectedRevision: revision,
-            changedDependencies: [builder.dependency('POE-${delivery.$1}')],
-            deliveryId: delivery.$1,
-            psePortId: delivery.$2,
-            pdPortId: delivery.$3,
-            accountingMode: 'PD_OUTPUT',
-            definition: poeDefinition,
-            path: [
-              PowerPoePathMemberInput(
-                connectionId: delivery.$4,
-                evidence: const {'resourceKind': 'COPPER'},
-              ),
-            ],
+    revision = (await builder.power.execute(
+      BindPoeDeliveryCommand(
+        operationId: 'poe-${delivery.$1.toLowerCase()}',
+        projectId: builder.projectId,
+        designRevisionId: builder.revisionId,
+        expectedRevision: revision,
+        changedDependencies: [builder.dependency('POE-${delivery.$1}')],
+        deliveryId: delivery.$1,
+        psePortId: delivery.$2,
+        pdPortId: delivery.$3,
+        accountingMode: 'PD_OUTPUT',
+        definition: poeDefinition,
+        path: [
+          PowerPoePathMemberInput(
+            connectionId: delivery.$4,
+            evidence: const {'resourceKind': 'COPPER'},
           ),
-        )).currentRevision;
+        ],
+      ),
+    )).currentRevision;
   }
 
   for (final transfer in [
     ('ACS_PSU', 'acs-psu', 'acs-psu-dc-in', 'acs-psu-dc-out'),
     ('FIRE_PSU', 'fire-psu', 'fire-psu-dc-in', 'fire-psu-dc-out'),
   ]) {
-    revision =
-        (await builder.power.execute(
-          ReplacePowerTransferCommand(
-            operationId: 'transfer-${transfer.$1.toLowerCase()}',
-            projectId: builder.projectId,
-            designRevisionId: builder.revisionId,
-            expectedRevision: revision,
-            changedDependencies: [
-              builder.dependency('TRANSFER-${transfer.$1}'),
-            ],
-            transfer: PowerTransferBinding(
-              id: transfer.$1,
-              componentId: transfer.$2,
-              definitionRef: builder.definition(
-                PowerDefinitionKind.transfer,
-                'PSU',
-              ),
-              kind: PowerTransferKind.psu,
-              inputPortIds: [transfer.$3],
-              outputPortIds: [transfer.$4],
-              enabledStateCodes: const ['NORMAL', 'STANDBY', 'ALARM', 'BACKUP'],
-              inputAccountingOrigin: '${transfer.$1}_INPUT',
-              lossDefinition: builder.efficientLoss,
-            ),
+    revision = (await builder.power.execute(
+      ReplacePowerTransferCommand(
+        operationId: 'transfer-${transfer.$1.toLowerCase()}',
+        projectId: builder.projectId,
+        designRevisionId: builder.revisionId,
+        expectedRevision: revision,
+        changedDependencies: [builder.dependency('TRANSFER-${transfer.$1}')],
+        transfer: PowerTransferBinding(
+          id: transfer.$1,
+          componentId: transfer.$2,
+          definitionRef: builder.definition(
+            PowerDefinitionKind.transfer,
+            'PSU',
           ),
-        )).currentRevision;
+          kind: PowerTransferKind.psu,
+          inputPortIds: [transfer.$3],
+          outputPortIds: [transfer.$4],
+          enabledStateCodes: const ['NORMAL', 'STANDBY', 'ALARM', 'BACKUP'],
+          inputAccountingOrigin: '${transfer.$1}_INPUT',
+          lossDefinition: builder.efficientLoss,
+        ),
+      ),
+    )).currentRevision;
   }
 
   for (final bank in [('ACS_BANK', 'acs-bank'), ('FIRE_BANK', 'fire-bank')]) {
@@ -593,94 +564,88 @@ Future<_BuiltVerticals> _buildFourVerticals(
       socMax: PowerRational.one,
       endOfDischargeVoltagePerUnit: PowerRational.integer(10),
     );
-    revision =
-        (await builder.power.execute(
-          ReplaceBatteryBankCommand(
-            operationId: 'battery-${bank.$1.toLowerCase()}',
-            projectId: builder.projectId,
-            designRevisionId: builder.revisionId,
-            expectedRevision: revision,
-            changedDependencies: [builder.dependency('BATTERY-${bank.$1}')],
-            bindingId: bank.$1,
-            binding: binding,
-          ),
-        )).currentRevision;
+    revision = (await builder.power.execute(
+      ReplaceBatteryBankCommand(
+        operationId: 'battery-${bank.$1.toLowerCase()}',
+        projectId: builder.projectId,
+        designRevisionId: builder.revisionId,
+        expectedRevision: revision,
+        changedDependencies: [builder.dependency('BATTERY-${bank.$1}')],
+        bindingId: bank.$1,
+        binding: binding,
+      ),
+    )).currentRevision;
   }
 
   for (final backup in [
     ('ACS_BACKUP_ASSEMBLY', 'acs-bank', 'acs-psu-dc-out'),
     ('FIRE_BACKUP_ASSEMBLY', 'fire-bank', 'fire-psu-dc-out'),
   ]) {
-    revision =
-        (await builder.power.execute(
-          ConfigureBackupAssemblyCommand(
-            operationId: 'backup-${backup.$1.toLowerCase()}',
-            projectId: builder.projectId,
-            designRevisionId: builder.revisionId,
-            expectedRevision: revision,
-            changedDependencies: [builder.dependency('BACKUP-${backup.$1}')],
-            assemblyId: backup.$1,
-            bankComponentId: backup.$2,
-            protectedOutputPortIds: [backup.$3],
-            policy: const {'sourceSelection': 'EXPLICIT'},
-          ),
-        )).currentRevision;
+    revision = (await builder.power.execute(
+      ConfigureBackupAssemblyCommand(
+        operationId: 'backup-${backup.$1.toLowerCase()}',
+        projectId: builder.projectId,
+        designRevisionId: builder.revisionId,
+        expectedRevision: revision,
+        changedDependencies: [builder.dependency('BACKUP-${backup.$1}')],
+        assemblyId: backup.$1,
+        bankComponentId: backup.$2,
+        protectedOutputPortIds: [backup.$3],
+        policy: const {'sourceSelection': 'EXPLICIT'},
+      ),
+    )).currentRevision;
   }
 
-  revision =
-      (await builder.power.execute(
-        ReplacePowerScenarioCommand(
-          operationId: 'scenario-acs-backup',
-          projectId: builder.projectId,
-          designRevisionId: builder.revisionId,
-          expectedRevision: revision,
-          changedDependencies: [builder.dependency('SCENARIO-ACS-BACKUP')],
-          scenario: PowerOperatingScenario(
-            scenarioId: 'ACS_BACKUP',
-            role: PowerScenarioRole.backup,
-            rowRevision: 1,
-            segments: [
-              PowerScenarioSegment(
-                segmentId: 'BACKUP',
-                ordinal: 1,
-                componentStates: const {
-                  'acs-controller': PowerDeviceState.normal,
-                },
-                dischargingBankIds: const ['acs-bank'],
-              ),
-            ],
+  revision = (await builder.power.execute(
+    ReplacePowerScenarioCommand(
+      operationId: 'scenario-acs-backup',
+      projectId: builder.projectId,
+      designRevisionId: builder.revisionId,
+      expectedRevision: revision,
+      changedDependencies: [builder.dependency('SCENARIO-ACS-BACKUP')],
+      scenario: PowerOperatingScenario(
+        scenarioId: 'ACS_BACKUP',
+        role: PowerScenarioRole.backup,
+        rowRevision: 1,
+        segments: [
+          PowerScenarioSegment(
+            segmentId: 'BACKUP',
+            ordinal: 1,
+            componentStates: const {'acs-controller': PowerDeviceState.normal},
+            dischargingBankIds: const ['acs-bank'],
           ),
-        ),
-      )).currentRevision;
+        ],
+      ),
+    ),
+  )).currentRevision;
 
-  revision =
-      (await builder.power.execute(
-        ReplacePowerScenarioCommand(
-          operationId: 'scenario-fire-sequence',
-          projectId: builder.projectId,
-          designRevisionId: builder.revisionId,
-          expectedRevision: revision,
-          changedDependencies: [builder.dependency('SCENARIO-FIRE-SEQUENCE')],
-          scenario: PowerOperatingScenario(
-            scenarioId: 'FIRE_SEQUENCE',
-            role: PowerScenarioRole.custom,
-            rowRevision: 1,
-            segments: [
-              PowerScenarioSegment(
-                segmentId: 'STANDBY',
-                ordinal: 1,
-                componentStates: const {'fire-panel': PowerDeviceState.standby},
-              ),
-              PowerScenarioSegment(
-                segmentId: 'ALARM',
-                ordinal: 2,
-                componentStates: const {'fire-panel': PowerDeviceState.alarm},
-              ),
-            ],
-            policyRefs: const [],
+  revision = (await builder.power.execute(
+    ReplacePowerScenarioCommand(
+      operationId: 'scenario-fire-sequence',
+      projectId: builder.projectId,
+      designRevisionId: builder.revisionId,
+      expectedRevision: revision,
+      changedDependencies: [builder.dependency('SCENARIO-FIRE-SEQUENCE')],
+      scenario: PowerOperatingScenario(
+        scenarioId: 'FIRE_SEQUENCE',
+        role: PowerScenarioRole.custom,
+        rowRevision: 1,
+        segments: [
+          PowerScenarioSegment(
+            segmentId: 'STANDBY',
+            ordinal: 1,
+            componentStates: const {'fire-panel': PowerDeviceState.standby},
           ),
-        ),
-      )).currentRevision;
+          PowerScenarioSegment(
+            segmentId: 'ALARM',
+            ordinal: 2,
+            componentStates: const {'fire-panel': PowerDeviceState.alarm},
+          ),
+        ],
+        policyRefs: const [],
+      ),
+    ),
+  )).currentRevision;
 
   return _BuiltVerticals(revision);
 }
@@ -737,22 +702,21 @@ Future<void> _publishPersistedLoadEvidence(
   ];
   for (final item in cases) {
     Future<PowerDemandContribution> readContribution() async {
-      final row =
-          await db
-              .customSelect(
-                'SELECT l.origin_id, l.input_port_id, l.state_code, l.typed_demand_json, '
-                'p.component_id FROM power_load_bindings l '
-                'JOIN engineering_port_instances p ON p.id = l.input_port_id '
-                'AND p.project_id = l.project_id '
-                'WHERE l.project_id = ? AND l.design_revision_id = ? '
-                'AND l.id = ? AND l.deleted_at IS NULL',
-                variables: [
-                  Variable.withString(builder.projectId),
-                  Variable.withString(builder.revisionId),
-                  Variable.withString(item.$4),
-                ],
-              )
-              .getSingle();
+      final row = await db
+          .customSelect(
+            'SELECT l.origin_id, l.input_port_id, l.state_code, l.typed_demand_json, '
+            'p.component_id FROM power_load_bindings l '
+            'JOIN engineering_port_instances p ON p.id = l.input_port_id '
+            'AND p.project_id = l.project_id '
+            'WHERE l.project_id = ? AND l.design_revision_id = ? '
+            'AND l.id = ? AND l.deleted_at IS NULL',
+            variables: [
+              Variable.withString(builder.projectId),
+              Variable.withString(builder.revisionId),
+              Variable.withString(item.$4),
+            ],
+          )
+          .getSingle();
       return PowerDemandContribution(
         originId: row.read<String>('origin_id'),
         componentId: row.read<String>('component_id'),

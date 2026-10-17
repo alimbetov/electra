@@ -18,7 +18,10 @@ void main() {
     final captured = await resolver.capture(_request());
     final result = const Fa04SourceRequirementKernel().evaluate(captured.value);
     expect(result.status, Fa04AssessmentStatus.pass);
-    expect(result.powerCases.single.globalDemand.value, Elv5Rational.integer(30));
+    expect(
+      result.powerCases.single.globalDemand.value,
+      Elv5Rational.integer(30),
+    );
     expect(result.powerCases.single.margin.value, Elv5Rational.integer(4));
   });
 
@@ -42,17 +45,17 @@ void main() {
 }
 
 Elv5CalculationRequest _request() => Elv5CalculationRequest(
-      projectId: 'p',
-      designRevisionId: 'd',
-      scope: Elv5ScopeRef(
-        kind: Elv5ScopeKind.design,
-        scopeId: 'd',
-        scenarioKey: 'NONE',
-      ),
-      processCode: Elv5ProcessCode.fa04,
-      subject: Elv5SubjectRef(kind: 'POWER_SOURCE', id: 'psu-1'),
-      expectedPointerGeneration: 0,
-    );
+  projectId: 'p',
+  designRevisionId: 'd',
+  scope: Elv5ScopeRef(
+    kind: Elv5ScopeKind.design,
+    scopeId: 'd',
+    scenarioKey: 'NONE',
+  ),
+  processCode: Elv5ProcessCode.fa04,
+  subject: Elv5SubjectRef(kind: 'POWER_SOURCE', id: 'psu-1'),
+  expectedPointerGeneration: 0,
+);
 
 Fa04SourceRequirementContract _contract(String fingerprint) =>
     Fa04SourceRequirementContract(
@@ -99,12 +102,12 @@ final class _ContractSource implements Fa04SourceRequirementContractSource {
     required String designRevisionId,
     required String sourceId,
   }) async => Fa04SourceRequirementContractSnapshot(
-        bindingId: 'binding-1',
-        bindingRevision: 2,
-        evidenceRef: 'evidence-1',
-        contentHash: _hash('f'),
-        contract: contract,
-      );
+    bindingId: 'binding-1',
+    bindingRevision: 2,
+    evidenceRef: 'evidence-1',
+    contentHash: _hash('f'),
+    contract: contract,
+  );
 }
 
 final class _PowerEvidence implements Elv4CurrentEvidenceSource {
@@ -123,36 +126,37 @@ final class _PowerEvidence implements Elv4CurrentEvidenceSource {
     String? subjectId,
   }) async {
     if (processCode == PowerProcessCode.pwr01) return [_pwr01()];
-    if (processCode == PowerProcessCode.pwr02) return [_pwr02(pwr02Fingerprint)];
+    if (processCode == PowerProcessCode.pwr02)
+      return [_pwr02(pwr02Fingerprint)];
     return const [];
   }
 }
 
 Elv4CurrentEvaluationSnapshot _pwr01() => Elv4CurrentEvaluationSnapshot(
-      nodeKey: PowerNodeKeyV2(
-        revisionId: 'd',
-        scenarioId: 'NORMAL',
-        scopeKind: PowerEvaluationScopeKind.segment,
-        scopeId: 'S1',
-        processCode: PowerProcessCode.pwr01,
-        subjectKind: 'SOURCE_AGGREGATE',
-        subjectId: 'psu-1',
-      ),
-      evaluationId: 'pwr01-eval',
-      inputFingerprint: _hash('1'),
-      evidenceSha256: _hash('2'),
-      pointerGeneration: 3,
-      evidence: <String, Object?>{
-        'output': <String, Object?>{
-          'knownW': PowerRational.integer(30).toMap(),
-          'knownA': PowerRational.zero.toMap(),
-          'knownVa': PowerRational.zero.toMap(),
-          'completeW': true,
-          'completeA': false,
-          'completeVa': false,
-        },
-      },
-    );
+  nodeKey: PowerNodeKeyV2(
+    revisionId: 'd',
+    scenarioId: 'NORMAL',
+    scopeKind: PowerEvaluationScopeKind.segment,
+    scopeId: 'S1',
+    processCode: PowerProcessCode.pwr01,
+    subjectKind: 'SOURCE_AGGREGATE',
+    subjectId: 'psu-1',
+  ),
+  evaluationId: 'pwr01-eval',
+  inputFingerprint: _hash('1'),
+  evidenceSha256: _hash('2'),
+  pointerGeneration: 3,
+  evidence: <String, Object?>{
+    'output': <String, Object?>{
+      'knownW': PowerRational.integer(30).toMap(),
+      'knownA': PowerRational.zero.toMap(),
+      'knownVa': PowerRational.zero.toMap(),
+      'completeW': true,
+      'completeA': false,
+      'completeVa': false,
+    },
+  },
+);
 
 Elv4CurrentEvaluationSnapshot _pwr02(String fingerprint) =>
     Elv4CurrentEvaluationSnapshot(

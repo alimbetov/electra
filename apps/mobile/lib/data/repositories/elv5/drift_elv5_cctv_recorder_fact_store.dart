@@ -8,9 +8,9 @@ final class DriftElv5CctvRecorderFactStore
     AppDatabase database, {
     required String originDeviceId,
   }) : _uow = DriftElv5CctvRecorderWriteUnitOfWork(
-          database,
-          originDeviceId: originDeviceId,
-        );
+         database,
+         originDeviceId: originDeviceId,
+       );
 
   final DriftElv5CctvRecorderWriteUnitOfWork _uow;
 

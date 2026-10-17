@@ -9,11 +9,21 @@ final class CctvRecorderAssignmentRef {
     required this.licenseChannelId,
     required this.storagePoolId,
   }) {
-    if (<String>[bindingId,recorderId,assignmentId,cameraId,encodedStreamId,licenseChannelId,storagePoolId]
-        .any((value)=>value.trim().isEmpty)) {
-      throw ArgumentError('CCTV recorder assignment identities must not be empty.');
+    if (<String>[
+      bindingId,
+      recorderId,
+      assignmentId,
+      cameraId,
+      encodedStreamId,
+      licenseChannelId,
+      storagePoolId,
+    ].any((value) => value.trim().isEmpty)) {
+      throw ArgumentError(
+        'CCTV recorder assignment identities must not be empty.',
+      );
     }
-    if (bindingRevision < 1) throw ArgumentError('Recorder binding revision must be >= 1.');
+    if (bindingRevision < 1)
+      throw ArgumentError('Recorder binding revision must be >= 1.');
   }
 
   final String bindingId;

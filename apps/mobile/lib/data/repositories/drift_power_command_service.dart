@@ -166,20 +166,19 @@ final class DriftPowerCommandService {
     PowerMutationCommand command,
     String fingerprint,
   ) async {
-    final row =
-        await database
-            .customSelect(
-              'SELECT command_type, payload_schema, command_fingerprint, '
-              'status, result_json FROM power_operation_records '
-              'WHERE project_id = ? AND design_revision_id = ? '
-              'AND operation_id = ?',
-              variables: [
-                Variable.withString(command.projectId),
-                Variable.withString(command.designRevisionId),
-                Variable.withString(command.operationId),
-              ],
-            )
-            .getSingleOrNull();
+    final row = await database
+        .customSelect(
+          'SELECT command_type, payload_schema, command_fingerprint, '
+          'status, result_json FROM power_operation_records '
+          'WHERE project_id = ? AND design_revision_id = ? '
+          'AND operation_id = ?',
+          variables: [
+            Variable.withString(command.projectId),
+            Variable.withString(command.designRevisionId),
+            Variable.withString(command.operationId),
+          ],
+        )
+        .getSingleOrNull();
     if (row == null) return null;
     if (row.read<String>('command_type') != command.commandType ||
         row.read<String>('payload_schema') != command.payloadSchema ||
@@ -202,17 +201,16 @@ final class DriftPowerCommandService {
   }
 
   Future<int> _requireWorkingRevision(PowerMutationCommand command) async {
-    final row =
-        await database
-            .customSelect(
-              'SELECT revision, state FROM project_design_revisions '
-              'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
-              variables: [
-                Variable.withString(command.projectId),
-                Variable.withString(command.designRevisionId),
-              ],
-            )
-            .getSingleOrNull();
+    final row = await database
+        .customSelect(
+          'SELECT revision, state FROM project_design_revisions '
+          'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
+          variables: [
+            Variable.withString(command.projectId),
+            Variable.withString(command.designRevisionId),
+          ],
+        )
+        .getSingleOrNull();
     if (row == null) {
       throw const PowerRuntimeStorageException('ELV4_REVISION_NOT_FOUND');
     }
@@ -294,8 +292,9 @@ final class DriftPowerCommandService {
 
   Future<void> _bindComponent(BindPowerComponentCommand command) async {
     await _requireComponent(command.projectId, command.binding.componentId);
-    final refs =
-        command.binding.definitionRefs.map((value) => value.toMap()).toList();
+    final refs = command.binding.definitionRefs
+        .map((value) => value.toMap())
+        .toList();
     final refsJson = canonicalEngineeringJsonV1(refs);
     await runRawStatement(
       database,
@@ -624,8 +623,8 @@ final class DriftPowerCommandService {
           segment.durationSeconds == null
               ? null
               : canonicalEngineeringJsonV1({
-                'seconds': segment.durationSeconds!.toWireDecimal(),
-              }),
+                  'seconds': segment.durationSeconds!.toWireDecimal(),
+                }),
         ],
       );
       final states = <String, String>{
@@ -872,20 +871,19 @@ final class DriftPowerCommandService {
 
     Future<void> discover(String type, String encodedRef) async {
       final sha = sha256HexUtf8(encodedRef);
-      final rows =
-          await database
-              .customSelect(
-                'SELECT logical_node_key_json FROM power_dependency_index_records '
-                'WHERE project_id = ? AND design_revision_id = ? '
-                'AND dependency_ref_type = ? AND dependency_ref_sha256 = ?',
-                variables: [
-                  Variable.withString(command.projectId),
-                  Variable.withString(command.designRevisionId),
-                  Variable.withString(type),
-                  Variable.withString(sha),
-                ],
-              )
-              .get();
+      final rows = await database
+          .customSelect(
+            'SELECT logical_node_key_json FROM power_dependency_index_records '
+            'WHERE project_id = ? AND design_revision_id = ? '
+            'AND dependency_ref_type = ? AND dependency_ref_sha256 = ?',
+            variables: [
+              Variable.withString(command.projectId),
+              Variable.withString(command.designRevisionId),
+              Variable.withString(type),
+              Variable.withString(sha),
+            ],
+          )
+          .get();
       for (final row in rows) {
         final key = PowerNodeKeyV2.decode(
           row.read<String>('logical_node_key_json'),
@@ -960,18 +958,16 @@ final class DriftPowerCommandService {
     'ELV4_PORT_SCOPE_MISMATCH',
   );
 
-  Future<void> _requireComponent(
-    String projectId,
-    String componentId,
-  ) => _requireExists(
-    'SELECT 1 FROM component_instances c '
-        'JOIN rooms r ON r.id = c.room_id '
-        'JOIN floors f ON f.id = r.floor_id '
-        'WHERE f.project_id = ? AND c.id = ? '
-        'AND c.deleted_at IS NULL AND r.deleted_at IS NULL AND f.deleted_at IS NULL',
-    [Variable.withString(projectId), Variable.withString(componentId)],
-    'ELV4_COMPONENT_SCOPE_MISMATCH',
-  );
+  Future<void> _requireComponent(String projectId, String componentId) =>
+      _requireExists(
+        'SELECT 1 FROM component_instances c '
+            'JOIN rooms r ON r.id = c.room_id '
+            'JOIN floors f ON f.id = r.floor_id '
+            'WHERE f.project_id = ? AND c.id = ? '
+            'AND c.deleted_at IS NULL AND r.deleted_at IS NULL AND f.deleted_at IS NULL',
+        [Variable.withString(projectId), Variable.withString(componentId)],
+        'ELV4_COMPONENT_SCOPE_MISMATCH',
+      );
 
   Future<void> _requireConnection(String projectId, String connectionId) =>
       _requireExists(
@@ -994,10 +990,9 @@ final class DriftPowerCommandService {
     List<Variable<Object>> variables,
     String code,
   ) async {
-    final row =
-        await database
-            .customSelect(sql, variables: variables)
-            .getSingleOrNull();
+    final row = await database
+        .customSelect(sql, variables: variables)
+        .getSingleOrNull();
     if (row == null) throw PowerRuntimeStorageException(code);
   }
 
@@ -1017,9 +1012,8 @@ final class DriftPowerCommandService {
     BindPoeDeliveryCommand value => [value.deliveryId],
     ConfigureBackupAssemblyCommand value => [value.assemblyId],
     ReplaceBatteryBankCommand value => [value.bindingId],
-    _ =>
-      throw const PowerRuntimeStorageException(
-        'ELV4_UNSUPPORTED_MUTATION_COMMAND',
-      ),
+    _ => throw const PowerRuntimeStorageException(
+      'ELV4_UNSUPPORTED_MUTATION_COMMAND',
+    ),
   };
 }

@@ -13,19 +13,25 @@ void main() {
     expect(restored.model, Fa03ContractModel.radialDc);
     expect(restored.minimumTerminalVoltageV, Elv5Rational.integer(22));
     expect(restored.maximumTerminalVoltageV, Elv5Rational.integer(26));
-    expect(restored.cases.single.terminalLoadIdByTerminalId['last-device'], 'load-3');
+    expect(
+      restored.cases.single.terminalLoadIdByTerminalId['last-device'],
+      'load-3',
+    );
     expect(restored.scopeFingerprint, contract.scopeFingerprint);
   });
 
-  test('PWR-03 input identity participates independently from scope fingerprint', () {
-    final a = _contract(_hash('a'));
-    final b = _contract(_hash('b'));
-    expect(a.scopeFingerprint, b.scopeFingerprint);
-    expect(
-      a.cases.single.expectedPwr03InputFingerprint,
-      isNot(b.cases.single.expectedPwr03InputFingerprint),
-    );
-  });
+  test(
+    'PWR-03 input identity participates independently from scope fingerprint',
+    () {
+      final a = _contract(_hash('a'));
+      final b = _contract(_hash('b'));
+      expect(a.scopeFingerprint, b.scopeFingerprint);
+      expect(
+        a.cases.single.expectedPwr03InputFingerprint,
+        isNot(b.cases.single.expectedPwr03InputFingerprint),
+      );
+    },
+  );
 }
 
 Fa03TerminalVoltageContract _contract(String pwr03Input) =>

@@ -25,21 +25,24 @@ void main() {
     expect(captured.inputFingerprint, matches(RegExp(r'^[0-9a-f]{64}$')));
   });
 
-  test('legacy frame outside declared compatibility tolerance blocks capture', () async {
-    final resolver = Cctv01PersistedInputResolver(
-      contractSource: _ContractSource(_contract()),
-      components: const _Components(),
-      geometry: _Geometry(hostSkew: 0.001),
-      nowUtc: () => DateTime.utc(2026, 10, 17),
-    );
+  test(
+    'legacy frame outside declared compatibility tolerance blocks capture',
+    () async {
+      final resolver = Cctv01PersistedInputResolver(
+        contractSource: _ContractSource(_contract()),
+        components: const _Components(),
+        geometry: _Geometry(hostSkew: 0.001),
+        nowUtc: () => DateTime.utc(2026, 10, 17),
+      );
 
-    try {
-      await resolver.capture(_request());
-      fail('Expected CCTV01_HOST_FRAME_COMPATIBILITY_MISMATCH.');
-    } on Elv5CaptureBlockedException catch (error) {
-      expect(error.reasonCode, 'CCTV01_HOST_FRAME_COMPATIBILITY_MISMATCH');
-    }
-  });
+      try {
+        await resolver.capture(_request());
+        fail('Expected CCTV01_HOST_FRAME_COMPATIBILITY_MISMATCH.');
+      } on Elv5CaptureBlockedException catch (error) {
+        expect(error.reasonCode, 'CCTV01_HOST_FRAME_COMPATIBILITY_MISMATCH');
+      }
+    },
+  );
 }
 
 Elv5CalculationRequest _request() => Elv5CalculationRequest(
@@ -56,12 +59,11 @@ Elv5CalculationRequest _request() => Elv5CalculationRequest(
 );
 
 Cctv01GeometryContract _contract() {
-  Cctv01ExactVec3Contract v(int x, int y, int z) =>
-      Cctv01ExactVec3Contract(
-        x: Elv5Rational.integer(x),
-        y: Elv5Rational.integer(y),
-        z: Elv5Rational.integer(z),
-      );
+  Cctv01ExactVec3Contract v(int x, int y, int z) => Cctv01ExactVec3Contract(
+    x: Elv5Rational.integer(x),
+    y: Elv5Rational.integer(y),
+    z: Elv5Rational.integer(z),
+  );
   return Cctv01GeometryContract(
     cameraId: 'cam-1',
     roomId: 'room-1',
@@ -87,10 +89,7 @@ Cctv01GeometryContract _contract() {
       uAxis: v(0, 1, 0),
       vAxis: v(0, 0, 1),
     ),
-    legacyFrameAxisTolerance: Elv5Rational(
-      BigInt.one,
-      BigInt.from(1000000),
-    ),
+    legacyFrameAxisTolerance: Elv5Rational(BigInt.one, BigInt.from(1000000)),
   );
 }
 
@@ -162,8 +161,10 @@ final class _Geometry implements GeometryRepository {
               vAxis: const Vector3D(0, 0, 1),
             ),
             boundary: Polygon2Mm(const <Point2Mm>[
-              Point2Mm(0, 0),Point2Mm(1000, 0),
-              Point2Mm(1000, 1000),Point2Mm(0, 1000),
+              Point2Mm(0, 0),
+              Point2Mm(1000, 0),
+              Point2Mm(1000, 1000),
+              Point2Mm(0, 1000),
             ]),
             orientation: SurfaceOrientation.vertical,
           ),
@@ -177,8 +178,10 @@ final class _Geometry implements GeometryRepository {
               vAxis: const Vector3D(0, 0, 1),
             ),
             boundary: Polygon2Mm(const <Point2Mm>[
-              Point2Mm(0, 0),Point2Mm(1000, 0),
-              Point2Mm(1000, 1000),Point2Mm(0, 1000),
+              Point2Mm(0, 0),
+              Point2Mm(1000, 0),
+              Point2Mm(1000, 1000),
+              Point2Mm(0, 1000),
             ]),
             orientation: SurfaceOrientation.vertical,
           ),

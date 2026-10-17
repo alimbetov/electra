@@ -48,13 +48,12 @@ class EngineeringTopologyScreen extends ConsumerWidget {
               nextId: ref.read(idGeneratorProvider).next,
               onSave: save,
               onArchive: (kind, id) => repo.archive(projectId, kind, id),
-              onSystems:
-                  () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder:
-                          (_) => EngineeringSystemsScreen(projectId: projectId),
-                    ),
-                  ),
+              onSystems: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) =>
+                      EngineeringSystemsScreen(projectId: projectId),
+                ),
+              ),
             );
           },
         ),
@@ -102,14 +101,13 @@ class _EngineeringTopologyWorkspaceState
 
   void edit(TopologyFormKind kind, [Object? value]) => showDialog<void>(
     context: context,
-    builder:
-        (_) => EngineeringTopologyDialog(
-          kind: kind,
-          snapshot: widget.snapshot,
-          id: _id(value) ?? widget.nextId(),
-          initial: value,
-          onSave: widget.onSave,
-        ),
+    builder: (_) => EngineeringTopologyDialog(
+      kind: kind,
+      snapshot: widget.snapshot,
+      id: _id(value) ?? widget.nextId(),
+      initial: value,
+      onSave: widget.onSave,
+    ),
   );
   String? _id(Object? value) => switch (value) {
     EngineeringPort v => v.id,
@@ -121,10 +119,9 @@ class _EngineeringTopologyWorkspaceState
   };
   String portName(String id) {
     final p = widget.snapshot.ports.where((p) => p.id == id).firstOrNull;
-    final c =
-        widget.snapshot.systems.components
-            .where((c) => c.id == p?.componentId)
-            .firstOrNull;
+    final c = widget.snapshot.systems.components
+        .where((c) => c.id == p?.componentId)
+        .firstOrNull;
     return p == null
         ? 'Unavailable port $id'
         : '${c?.name ?? p.componentId}.${p.code}';
@@ -141,8 +138,9 @@ class _EngineeringTopologyWorkspaceState
         child: const Text('Edit'),
       ),
       TextButton(
-        onPressed:
-            busy ? null : () => work(() => widget.onArchive(kind, _id(value)!)),
+        onPressed: busy
+            ? null
+            : () => work(() => widget.onArchive(kind, _id(value)!)),
         child: const Text('Retire'),
       ),
     ],
@@ -199,18 +197,15 @@ class _EngineeringTopologyWorkspaceState
                       spacing: 8,
                       children: [
                         FilledButton(
-                          onPressed:
-                              busy || s.systems.components.isEmpty
-                                  ? null
-                                  : () => edit(TopologyFormKind.port),
+                          onPressed: busy || s.systems.components.isEmpty
+                              ? null
+                              : () => edit(TopologyFormKind.port),
                           child: const Text('New port'),
                         ),
                         OutlinedButton(
-                          onPressed:
-                              busy || s.ports.length < 2
-                                  ? null
-                                  : () =>
-                                      edit(TopologyFormKind.internalMapping),
+                          onPressed: busy || s.ports.length < 2
+                              ? null
+                              : () => edit(TopologyFormKind.internalMapping),
                           child: const Text('Internal passive mapping'),
                         ),
                         TextButton(
@@ -296,11 +291,11 @@ class _EngineeringTopologyWorkspaceState
                     FilledButton(
                       onPressed:
                           busy ||
-                                  s.ports.length < 2 ||
-                                  s.connectionProfiles.isEmpty ||
-                                  s.systems.systems.isEmpty
-                              ? null
-                              : () => edit(TopologyFormKind.connection),
+                              s.ports.length < 2 ||
+                              s.connectionProfiles.isEmpty ||
+                              s.systems.systems.isEmpty
+                          ? null
+                          : () => edit(TopologyFormKind.connection),
                       child: const Text('New connection'),
                     ),
                     const Text(
@@ -323,9 +318,8 @@ class _EngineeringTopologyWorkspaceState
                             child: Text(sys.code),
                           ),
                       ],
-                      onChanged:
-                          (v) =>
-                              setState(() => systemFilter = v == '' ? null : v),
+                      onChanged: (v) =>
+                          setState(() => systemFilter = v == '' ? null : v),
                     ),
                     DropdownButtonFormField<String>(
                       initialValue: tracePort ?? '',
@@ -347,8 +341,8 @@ class _EngineeringTopologyWorkspaceState
                             ),
                           ),
                       ],
-                      onChanged:
-                          (v) => setState(() => tracePort = v == '' ? null : v),
+                      onChanged: (v) =>
+                          setState(() => tracePort = v == '' ? null : v),
                     ),
                     Wrap(
                       spacing: 8,
@@ -429,11 +423,11 @@ class _EngineeringTopologyWorkspaceState
                     FilledButton(
                       onPressed:
                           busy ||
-                                  s.ports.isEmpty ||
-                                  s.topologyProfiles.isEmpty ||
-                                  s.systems.systems.isEmpty
-                              ? null
-                              : () => edit(TopologyFormKind.group),
+                              s.ports.isEmpty ||
+                              s.topologyProfiles.isEmpty ||
+                              s.systems.systems.isEmpty
+                          ? null
+                          : () => edit(TopologyFormKind.group),
                       child: const Text('New topology group'),
                     ),
                     for (final g in s.groups)
@@ -473,10 +467,9 @@ class _EngineeringTopologyWorkspaceState
                   padding: const EdgeInsets.all(16),
                   children: [
                     FilledButton(
-                      onPressed:
-                          busy || s.assemblyProfiles.isEmpty
-                              ? null
-                              : () => edit(TopologyFormKind.assembly),
+                      onPressed: busy || s.assemblyProfiles.isEmpty
+                          ? null
+                          : () => edit(TopologyFormKind.assembly),
                       child: const Text('New functional assembly'),
                     ),
                     const Text(
@@ -517,28 +510,22 @@ class _EngineeringTopologyWorkspaceState
                       spacing: 8,
                       children: [
                         FilledButton(
-                          onPressed:
-                              busy
-                                  ? null
-                                  : () => edit(
-                                    TopologyFormKind.compatibilityProfile,
-                                  ),
+                          onPressed: busy
+                              ? null
+                              : () =>
+                                    edit(TopologyFormKind.compatibilityProfile),
                           child: const Text('Connection profile'),
                         ),
                         OutlinedButton(
-                          onPressed:
-                              busy
-                                  ? null
-                                  : () =>
-                                      edit(TopologyFormKind.topologyProfile),
+                          onPressed: busy
+                              ? null
+                              : () => edit(TopologyFormKind.topologyProfile),
                           child: const Text('Topology profile'),
                         ),
                         OutlinedButton(
-                          onPressed:
-                              busy
-                                  ? null
-                                  : () =>
-                                      edit(TopologyFormKind.assemblyProfile),
+                          onPressed: busy
+                              ? null
+                              : () => edit(TopologyFormKind.assemblyProfile),
                           child: const Text('Assembly profile'),
                         ),
                       ],
@@ -715,8 +702,8 @@ class _EngineeringTopologyDialogState extends State<EngineeringTopologyDialog> {
       text(label).isEmpty ? null : double.parse(text(label));
   EngineeringProfileReference? reference(String id, String edition) =>
       text(id).isEmpty && text(edition).isEmpty
-          ? null
-          : EngineeringProfileReference(id: text(id), version: text(edition));
+      ? null
+      : EngineeringProfileReference(id: text(id), version: text(edition));
   ProfileIdentity identity() => ProfileIdentity(
     id: widget.id,
     projectId: widget.snapshot.systems.project!.id,
@@ -743,18 +730,16 @@ class _EngineeringTopologyDialogState extends State<EngineeringTopologyDialog> {
           capacity: int.parse(text('External capacity')),
           connector: text('Connector').isEmpty ? null : text('Connector'),
           protocol: reference('Protocol ID', 'Protocol edition'),
-          voltage:
-              minimum == null
-                  ? null
-                  : PortVoltageDomain(
-                    currentKind: PortCurrentKind.values.byName(pick('AC / DC')),
-                    minimumV: minimum,
-                    maximumV: maximum!,
-                  ),
-          powerDirection:
-              pick('Power direction').isEmpty
-                  ? null
-                  : PortDirection.values.byName(pick('Power direction')),
+          voltage: minimum == null
+              ? null
+              : PortVoltageDomain(
+                  currentKind: PortCurrentKind.values.byName(pick('AC / DC')),
+                  minimumV: minimum,
+                  maximumV: maximum!,
+                ),
+          powerDirection: pick('Power direction').isEmpty
+              ? null
+              : PortDirection.values.byName(pick('Power direction')),
           powerLimitW: optionalNumber('Source port rating W'),
           powerDemandW: optionalNumber('Endpoint demand W'),
           templateProvenance: reference('Template ID', 'Template edition'),
@@ -769,10 +754,9 @@ class _EngineeringTopologyDialogState extends State<EngineeringTopologyDialog> {
           toPortId: pick('To port'),
           profileId: pick('Compatibility profile'),
           medium: ConnectionMedium.values.byName(pick('Medium')),
-          groupId:
-              pick('Group (optional)').isEmpty
-                  ? null
-                  : pick('Group (optional)'),
+          groupId: pick('Group (optional)').isEmpty
+              ? null
+              : pick('Group (optional)'),
         );
       case TopologyFormKind.internalMapping:
         return InternalConnectivity(
@@ -791,10 +775,9 @@ class _EngineeringTopologyDialogState extends State<EngineeringTopologyDialog> {
           systemId: pick('System'),
           profileId: pick('Topology profile'),
           startPortId: pick('Source port'),
-          endPortId:
-              pick('End / return port').isEmpty
-                  ? null
-                  : pick('End / return port'),
+          endPortId: pick('End / return port').isEmpty
+              ? null
+              : pick('End / return port'),
         );
       case TopologyFormKind.assembly:
         return ComponentAssembly(
@@ -910,13 +893,12 @@ class _EngineeringTopologyDialogState extends State<EngineeringTopologyDialog> {
             child: Text(e.value, overflow: TextOverflow.ellipsis),
           ),
       ],
-      onChanged:
-          busy
-              ? null
-              : (v) => setState(() {
-                selected[label] = v!;
-                changed?.call();
-              }),
+      onChanged: busy
+          ? null
+          : (v) => setState(() {
+              selected[label] = v!;
+              changed?.call();
+            }),
     );
   }
 
@@ -1064,10 +1046,9 @@ class _EngineeringTopologyDialogState extends State<EngineeringTopologyDialog> {
           choose('End / return port', allPorts),
         ]);
       case TopologyFormKind.assembly:
-        final profile =
-            s.assemblyProfiles
-                .where((p) => p.id == selected['Assembly profile'])
-                .firstOrNull;
+        final profile = s.assemblyProfiles
+            .where((p) => p.id == selected['Assembly profile'])
+            .firstOrNull;
         controls.addAll([
           input('Code'),
           choose('Assembly profile', {
@@ -1090,8 +1071,9 @@ class _EngineeringTopologyDialogState extends State<EngineeringTopologyDialog> {
               ),
               trailing: IconButton(
                 tooltip: 'Remove member',
-                onPressed:
-                    busy ? null : () => setState(() => members.remove(m)),
+                onPressed: busy
+                    ? null
+                    : () => setState(() => members.remove(m)),
                 icon: const Icon(Icons.remove_circle_outline),
               ),
             ),
@@ -1110,16 +1092,15 @@ class _EngineeringTopologyDialogState extends State<EngineeringTopologyDialog> {
                 FilterChip(
                   label: Text(code),
                   selected: familyCodes.contains(code),
-                  onSelected:
-                      busy
-                          ? null
-                          : (v) => setState(() {
-                            if (v) {
-                              familyCodes.add(code);
-                            } else {
-                              familyCodes.remove(code);
-                            }
-                          }),
+                  onSelected: busy
+                      ? null
+                      : (v) => setState(() {
+                          if (v) {
+                            familyCodes.add(code);
+                          } else {
+                            familyCodes.remove(code);
+                          }
+                        }),
                 ),
             ],
           ),

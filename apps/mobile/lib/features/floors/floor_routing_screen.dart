@@ -20,15 +20,12 @@ class FloorRoutingScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => ref
       .watch(floorRoutingProvider(floorId))
       .when(
-        loading:
-            () => const Scaffold(
-              body: Center(child: CircularProgressIndicator()),
-            ),
-        error:
-            (error, _) => Scaffold(
-              appBar: AppBar(title: const Text('Floor routing')),
-              body: Center(child: Text('Unable to load floor routing: $error')),
-            ),
+        loading: () =>
+            const Scaffold(body: Center(child: CircularProgressIndicator())),
+        error: (error, _) => Scaffold(
+          appBar: AppBar(title: const Text('Floor routing')),
+          body: Center(child: Text('Unable to load floor routing: $error')),
+        ),
         data: (snapshot) {
           if (snapshot.floor == null || snapshot.project?.id != projectId) {
             return Scaffold(
@@ -43,12 +40,11 @@ class FloorRoutingScreen extends ConsumerWidget {
             final room = snapshot.rooms.firstWhere((r) => r.id == run.roomId);
             Navigator.of(context).push(
               MaterialPageRoute<void>(
-                builder:
-                    (_) => RoomRoutingScreen(
-                      roomId: room.id,
-                      roomName: '$contextName · ${room.name}',
-                      initialRunId: run.id,
-                    ),
+                builder: (_) => RoomRoutingScreen(
+                  roomId: room.id,
+                  roomName: '$contextName · ${room.name}',
+                  initialRunId: run.id,
+                ),
               ),
             );
           }
@@ -66,20 +62,18 @@ class FloorRoutingScreen extends ConsumerWidget {
               onOpenJunction: (junction) {
                 Navigator.of(context).push(
                   MaterialPageRoute<void>(
-                    builder:
-                        (detailContext) => JunctionEditor(
-                          snapshot: snapshot.routing[junction.roomId]!,
-                          id: junction.id,
-                          junction: junction,
-                          onSave:
-                              ref
-                                  .read(cableRoutingRepositoryProvider)
-                                  .saveJunction,
-                          onOpenRun: (run) {
-                            Navigator.of(detailContext).pop();
-                            openRun(run);
-                          },
-                        ),
+                    builder: (detailContext) => JunctionEditor(
+                      snapshot: snapshot.routing[junction.roomId]!,
+                      id: junction.id,
+                      junction: junction,
+                      onSave: ref
+                          .read(cableRoutingRepositoryProvider)
+                          .saveJunction,
+                      onOpenRun: (run) {
+                        Navigator.of(detailContext).pop();
+                        openRun(run);
+                      },
+                    ),
                   ),
                 );
               },
@@ -119,25 +113,23 @@ class _FloorRoutingWorkspaceState extends State<FloorRoutingWorkspace> {
   Future<void> panel([FloorRoutingPanel? existing]) =>
       Navigator.of(context).push(
         MaterialPageRoute<void>(
-          builder:
-              (_) => _PanelEditor(
-                snapshot: widget.snapshot,
-                id: existing?.id ?? widget.nextId(),
-                panel: existing,
-                onSave: widget.onSavePanel,
-              ),
+          builder: (_) => _PanelEditor(
+            snapshot: widget.snapshot,
+            id: existing?.id ?? widget.nextId(),
+            panel: existing,
+            onSave: widget.onSavePanel,
+          ),
         ),
       );
   Future<void> handoff([FloorRoutingHandoff? existing]) =>
       Navigator.of(context).push(
         MaterialPageRoute<void>(
-          builder:
-              (_) => _HandoffEditor(
-                snapshot: widget.snapshot,
-                id: existing?.id ?? widget.nextId(),
-                handoff: existing,
-                onSave: widget.onSaveHandoff,
-              ),
+          builder: (_) => _HandoffEditor(
+            snapshot: widget.snapshot,
+            id: existing?.id ?? widget.nextId(),
+            handoff: existing,
+            onSave: widget.onSaveHandoff,
+          ),
         ),
       );
   Future<void> remove(Future<void> Function(String) action, String id) async {
@@ -145,9 +137,8 @@ class _FloorRoutingWorkspaceState extends State<FloorRoutingWorkspace> {
       await action(id);
     } catch (error) {
       if (mounted)
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('$error')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('$error')));
     }
   }
 
@@ -157,26 +148,25 @@ class _FloorRoutingWorkspaceState extends State<FloorRoutingWorkspace> {
     final traces = <FloorRoutingTrace>[];
     if (selectedRunId != null)
       traces.add(graph.trace(selectedRunId!, direction));
-    final source =
-        graph.panels.where((p) => p.id == selectedPanelId).firstOrNull;
+    final source = graph.panels
+        .where((p) => p.id == selectedPanelId)
+        .firstOrNull;
     if (source != null) {
       for (final feed in source.feeds)
         traces.add(graph.trace(feed.runId, FloorTraceDirection.downstream));
     }
     final highlighted = traces.expand((t) => t.runIds).toSet();
-    var visible =
-        mode == FloorGraphMode.branch && source != null
-            ? highlighted
-            : graph.visibleRuns(mode, selectedRunId: selectedRunId);
+    var visible = mode == FloorGraphMode.branch && source != null
+        ? highlighted
+        : graph.visibleRuns(mode, selectedRunId: selectedRunId);
     if (channelId != null) {
-      visible =
-          visible
-              .where(
-                (id) => graph.runs[id]!.route.segments.any(
-                  (s) => s.physicalChannelId == channelId,
-                ),
-              )
-              .toSet();
+      visible = visible
+          .where(
+            (id) => graph.runs[id]!.route.segments.any(
+              (s) => s.physicalChannelId == channelId,
+            ),
+          )
+          .toSet();
     }
     final selected = graph.runs[selectedRunId];
     return ListView(
@@ -205,10 +195,9 @@ class _FloorRoutingWorkspaceState extends State<FloorRoutingWorkspace> {
           initialValue: mode,
           isExpanded: true,
           decoration: const InputDecoration(labelText: 'Display mode'),
-          items:
-              FloorGraphMode.values
-                  .map((m) => DropdownMenuItem(value: m, child: Text(m.name)))
-                  .toList(),
+          items: FloorGraphMode.values
+              .map((m) => DropdownMenuItem(value: m, child: Text(m.name)))
+              .toList(),
           onChanged: (value) => setState(() => mode = value!),
         ),
         Wrap(
@@ -218,20 +207,18 @@ class _FloorRoutingWorkspaceState extends State<FloorRoutingWorkspace> {
               ChoiceChip(
                 label: Text(d.name),
                 selected: direction == d,
-                onSelected:
-                    (_) => setState(() {
-                      direction = d;
-                      selectedPanelId = null;
-                    }),
+                onSelected: (_) => setState(() {
+                  direction = d;
+                  selectedPanelId = null;
+                }),
               ),
             TextButton(
-              onPressed:
-                  () => setState(() {
-                    selectedRunId = null;
-                    selectedPanelId = null;
-                    channelId = null;
-                    mode = FloorGraphMode.overview;
-                  }),
+              onPressed: () => setState(() {
+                selectedRunId = null;
+                selectedPanelId = null;
+                channelId = null;
+                mode = FloorGraphMode.overview;
+              }),
               child: const Text('Clear selection'),
             ),
           ],
@@ -246,9 +233,8 @@ class _FloorRoutingWorkspaceState extends State<FloorRoutingWorkspace> {
                     '${graph.roomNames[channel.roomId]} · ${channel.name}',
                   ),
                   selected: channelId == channel.id,
-                  onSelected:
-                      (value) =>
-                          setState(() => channelId = value ? channel.id : null),
+                  onSelected: (value) =>
+                      setState(() => channelId = value ? channel.id : null),
                 ),
           ],
         ),
@@ -269,17 +255,15 @@ class _FloorRoutingWorkspaceState extends State<FloorRoutingWorkspace> {
             graph: graph,
             visible: visible,
             highlighted: highlighted,
-            onRun:
-                (id) => setState(() {
-                  selectedRunId = id;
-                  selectedPanelId = null;
-                }),
-            onPanel:
-                (id) => setState(() {
-                  selectedPanelId = id;
-                  selectedRunId = null;
-                  direction = FloorTraceDirection.downstream;
-                }),
+            onRun: (id) => setState(() {
+              selectedRunId = id;
+              selectedPanelId = null;
+            }),
+            onPanel: (id) => setState(() {
+              selectedPanelId = id;
+              selectedRunId = null;
+              direction = FloorTraceDirection.downstream;
+            }),
           ),
         ),
         if (selectedRunId != null && selected == null)
@@ -319,12 +303,11 @@ class _FloorRoutingWorkspaceState extends State<FloorRoutingWorkspace> {
           ListTile(
             title: Text('${p.code} · ${p.name}'),
             subtitle: Text('${p.feeds.length} outgoing feeds'),
-            onTap:
-                () => setState(() {
-                  selectedPanelId = p.id;
-                  selectedRunId = null;
-                  direction = FloorTraceDirection.downstream;
-                }),
+            onTap: () => setState(() {
+              selectedPanelId = p.id;
+              selectedRunId = null;
+              direction = FloorTraceDirection.downstream;
+            }),
             trailing: Wrap(
               children: [
                 IconButton(
@@ -366,11 +349,10 @@ class _FloorRoutingWorkspaceState extends State<FloorRoutingWorkspace> {
                     '${r.route.name} · ${r.ready ? "Ready" : "Review required"}',
                   ),
                   selected: highlighted.contains(r.run.id),
-                  onTap:
-                      () => setState(() {
-                        selectedRunId = r.run.id;
-                        selectedPanelId = null;
-                      }),
+                  onTap: () => setState(() {
+                    selectedRunId = r.run.id;
+                    selectedPanelId = null;
+                  }),
                   trailing: IconButton(
                     tooltip: 'Open room route',
                     onPressed: () => widget.onOpenRun(r.run),
@@ -482,10 +464,9 @@ class _FloorTopologyPainter extends CustomPainter {
   }
 
   void arrow(Canvas canvas, Offset a, Offset b, bool physical) {
-    final paint =
-        Paint()
-          ..color = physical ? Colors.blueGrey : Colors.indigo
-          ..strokeWidth = 2;
+    final paint = Paint()
+      ..color = physical ? Colors.blueGrey : Colors.indigo
+      ..strokeWidth = 2;
     canvas.drawLine(a, b, paint);
     final angle = math.atan2(b.dy - a.dy, b.dx - a.dx);
     for (final offset in [-0.5, 0.5]) {
@@ -535,10 +516,9 @@ class _FloorTopologyPainter extends CustomPainter {
       }
     }
     for (final entry in positions.entries) {
-      final run =
-          entry.key.startsWith('run:')
-              ? graph.runs[entry.key.substring(4)]
-              : null;
+      final run = entry.key.startsWith('run:')
+          ? graph.runs[entry.key.substring(4)]
+          : null;
       final invalid = graph.issues.containsKey(entry.key);
       canvas.drawRRect(
         RRect.fromRectAndRadius(
@@ -546,12 +526,11 @@ class _FloorTopologyPainter extends CustomPainter {
           const Radius.circular(5),
         ),
         Paint()
-          ..color =
-              invalid
-                  ? Colors.red.shade100
-                  : run != null && highlighted.contains(run.run.id)
-                  ? Colors.lightBlue.shade100
-                  : Colors.grey.shade100,
+          ..color = invalid
+              ? Colors.red.shade100
+              : run != null && highlighted.contains(run.run.id)
+              ? Colors.lightBlue.shade100
+              : Colors.grey.shade100,
       );
       canvas.drawRRect(
         RRect.fromRectAndRadius(
@@ -562,12 +541,9 @@ class _FloorTopologyPainter extends CustomPainter {
           ..color = Colors.blueGrey
           ..style = PaintingStyle.stroke,
       );
-      final label =
-          run == null
-              ? graph.panels
-                  .firstWhere((p) => entry.key == 'panel:${p.id}')
-                  .code
-              : '${graph.roomNames[run.run.roomId]} · ${run.run.name}\n${run.run.circuitId} · ${run.ready ? "Ready" : "Review"}';
+      final label = run == null
+          ? graph.panels.firstWhere((p) => entry.key == 'panel:${p.id}').code
+          : '${graph.roomNames[run.run.roomId]} · ${run.run.name}\n${run.run.circuitId} · ${run.ready ? "Ready" : "Review"}';
       text(canvas, label, entry.value - const Offset(98, 24), width: 195);
     }
   }
@@ -623,15 +599,14 @@ class _PanelEditorState extends State<_PanelEditor> {
         floorId: widget.snapshot.floor!.id,
         code: code.text.trim(),
         name: name.text.trim(),
-        feeds:
-            feeds.map((id) {
-              final run = graph.runs[id];
-              if (run == null) throw StateError('Remove unavailable feeds.');
-              return FloorPanelFeed(
-                runId: id,
-                endpointSignature: run.endpointSignature(start: true),
-              );
-            }).toList(),
+        feeds: feeds.map((id) {
+          final run = graph.runs[id];
+          if (run == null) throw StateError('Remove unavailable feeds.');
+          return FloorPanelFeed(
+            runId: id,
+            endpointSignature: run.endpointSignature(start: true),
+          );
+        }).toList(),
       );
       await widget.onSave(panel);
       if (mounted) Navigator.pop(context);
@@ -667,8 +642,9 @@ class _PanelEditorState extends State<_PanelEditor> {
             ListTile(
               title: Text('Unavailable: $id'),
               trailing: IconButton(
-                onPressed:
-                    saving ? null : () => setState(() => feeds.remove(id)),
+                onPressed: saving
+                    ? null
+                    : () => setState(() => feeds.remove(id)),
                 icon: const Icon(Icons.link_off),
               ),
             ),
@@ -677,15 +653,14 @@ class _PanelEditorState extends State<_PanelEditor> {
               title: Text('${graph.roomNames[r.run.roomId]} · ${r.run.name}'),
               subtitle: Text('Circuit ${r.run.circuitId}'),
               value: feeds.contains(r.run.id),
-              onChanged:
-                  saving
-                      ? null
-                      : (value) => setState(() {
-                        if (value!)
-                          feeds.add(r.run.id);
-                        else
-                          feeds.remove(r.run.id);
-                      }),
+              onChanged: saving
+                  ? null
+                  : (value) => setState(() {
+                      if (value!)
+                        feeds.add(r.run.id);
+                      else
+                        feeds.remove(r.run.id);
+                    }),
             ),
           if (error != null)
             Text(error!, style: const TextStyle(color: Colors.red)),
@@ -780,37 +755,34 @@ class _HandoffEditorState extends State<_HandoffEditor> {
           ),
           for (final incoming in [true, false])
             DropdownButtonFormField<String>(
-              initialValue:
-                  graph.runs.containsKey(incoming ? fromId : toId)
-                      ? incoming
-                          ? fromId
-                          : toId
-                      : null,
+              initialValue: graph.runs.containsKey(incoming ? fromId : toId)
+                  ? incoming
+                        ? fromId
+                        : toId
+                  : null,
               isExpanded: true,
               decoration: InputDecoration(
                 labelText: incoming ? 'From run end' : 'To run start',
               ),
-              items:
-                  graph.runs.values
-                      .map(
-                        (r) => DropdownMenuItem(
-                          value: r.run.id,
-                          child: Text(
-                            '${graph.roomNames[r.run.roomId]} · ${r.run.name}',
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      )
-                      .toList(),
-              onChanged:
-                  saving
-                      ? null
-                      : (value) => setState(() {
-                        if (incoming)
-                          fromId = value;
-                        else
-                          toId = value;
-                      }),
+              items: graph.runs.values
+                  .map(
+                    (r) => DropdownMenuItem(
+                      value: r.run.id,
+                      child: Text(
+                        '${graph.roomNames[r.run.roomId]} · ${r.run.name}',
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  )
+                  .toList(),
+              onChanged: saving
+                  ? null
+                  : (value) => setState(() {
+                      if (incoming)
+                        fromId = value;
+                      else
+                        toId = value;
+                    }),
             ),
           if (error != null)
             Text(error!, style: const TextStyle(color: Colors.red)),

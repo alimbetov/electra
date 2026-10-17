@@ -69,14 +69,16 @@ final class Fa05PersistedInputResolver
       );
     }
     final contract = snapshot!.contract;
-    dependencies.add(_dependency(
-      request,
-      'POLICY',
-      'FA05_AUTONOMY_CONTRACT',
-      snapshot.evidenceRef,
-      memberId:
-          '${snapshot.bindingId}:${snapshot.bindingRevision}:${snapshot.contentHash}',
-    ));
+    dependencies.add(
+      _dependency(
+        request,
+        'POLICY',
+        'FA05_AUTONOMY_CONTRACT',
+        snapshot.evidenceRef,
+        memberId:
+            '${snapshot.bindingId}:${snapshot.bindingRevision}:${snapshot.contentHash}',
+      ),
+    );
 
     if (contract.requirePeakCurrentEvidence ||
         contract.requireEndOfDischargeEvidence) {
@@ -89,7 +91,8 @@ final class Fa05PersistedInputResolver
         <String, Object?>{
           'bankId': contract.bankId,
           'requirePeakCurrentEvidence': contract.requirePeakCurrentEvidence,
-          'requireEndOfDischargeEvidence': contract.requireEndOfDischargeEvidence,
+          'requireEndOfDischargeEvidence':
+              contract.requireEndOfDischargeEvidence,
           'supportedPwr04Model': 'ELV4_SIMPLE_WH_ENERGY_ONLY',
         },
       );
@@ -137,19 +140,30 @@ final class Fa05PersistedInputResolver
         _text(pwr04Inputs, 'bankId') != contract.bankId) {
       throw StateError('FA05_PWR04_CONTRACT_IDENTITY_MISMATCH');
     }
-    _verifyConsumedSequence(request, contract, pwr04, snapshot.contentHash, dependencies);
+    _verifyConsumedSequence(
+      request,
+      contract,
+      pwr04,
+      snapshot.contentHash,
+      dependencies,
+    );
 
     final pwr04Output = pwr04.output;
     final requiredWh = _powerRational(pwr04Output['requiredWh'], 'requiredWh');
-    final availableWh = _powerRational(pwr04Output['availableWh'], 'availableWh');
-    dependencies.add(_dependency(
-      request,
-      'UPSTREAM_EVALUATION',
-      'ELV4_PWR04_CURRENT',
-      pwr04.evaluationId,
-      memberId:
-          '${pwr04.nodeKey.sha256}:${pwr04.pointerGeneration}:${pwr04.evidenceSha256}',
-    ));
+    final availableWh = _powerRational(
+      pwr04Output['availableWh'],
+      'availableWh',
+    );
+    dependencies.add(
+      _dependency(
+        request,
+        'UPSTREAM_EVALUATION',
+        'ELV4_PWR04_CURRENT',
+        pwr04.evaluationId,
+        memberId:
+            '${pwr04.nodeKey.sha256}:${pwr04.pointerGeneration}:${pwr04.evidenceSha256}',
+      ),
+    );
     final generations = <String, int>{
       pwr04.nodeKey.sha256: pwr04.pointerGeneration,
     };
@@ -246,7 +260,9 @@ final class Fa05PersistedInputResolver
       final inputs = _map(pwr01.evidence['inputs'], 'PWR01 inputs');
       final rawContributions = inputs['contributions'];
       if (rawContributions is! List) {
-        throw StateError('FA05_PWR01_CONTRIBUTIONS_MISSING:${pwr01.evaluationId}');
+        throw StateError(
+          'FA05_PWR01_CONTRIBUTIONS_MISSING:${pwr01.evaluationId}',
+        );
       }
       final durationSeconds = PowerRational(
         segment.durationMicroseconds,
@@ -262,8 +278,7 @@ final class Fa05PersistedInputResolver
         final watt = _resolvedContributionW(contribution);
         segmentKnownW += watt;
         if (contract.fireProtectedLoadIds.contains(originId)) {
-          final energyWh =
-              watt * durationSeconds / PowerRational.integer(3600);
+          final energyWh = watt * durationSeconds / PowerRational.integer(3600);
           fireEnergyByLoad[originId] = fireEnergyByLoad[originId]! + energyWh;
         }
       }
@@ -295,14 +310,16 @@ final class Fa05PersistedInputResolver
 
       coveredSegments.add(segment.segmentId);
       generations[pwr01.nodeKey.sha256] = pwr01.pointerGeneration;
-      dependencies.add(_dependency(
-        request,
-        'UPSTREAM_EVALUATION',
-        'ELV4_PWR01_CURRENT',
-        pwr01.evaluationId,
-        memberId:
-            '${pwr01.nodeKey.sha256}:${pwr01.pointerGeneration}:${pwr01.evidenceSha256}',
-      ));
+      dependencies.add(
+        _dependency(
+          request,
+          'UPSTREAM_EVALUATION',
+          'ELV4_PWR01_CURRENT',
+          pwr01.evaluationId,
+          memberId:
+              '${pwr01.nodeKey.sha256}:${pwr01.pointerGeneration}:${pwr01.evidenceSha256}',
+        ),
+      );
       segmentBasis.add(<String, Object?>{
         'segmentId': segment.segmentId,
         'durationMicroseconds': segment.durationMicroseconds.toString(),
@@ -422,11 +439,15 @@ final class Fa05PersistedInputResolver
     final persisted = <String, PowerRational>{};
     for (final raw in rawSegments) {
       final row = _map(raw, 'PWR04 sequence segment');
-      persisted[_text(row, 'segmentId')] =
-          _powerRational(row['durationSeconds'], 'durationSeconds');
+      persisted[_text(row, 'segmentId')] = _powerRational(
+        row['durationSeconds'],
+        'durationSeconds',
+      );
     }
     if (persisted.length != contract.segments.length ||
-        !contract.segments.every((segment) => persisted.containsKey(segment.segmentId))) {
+        !contract.segments.every(
+          (segment) => persisted.containsKey(segment.segmentId),
+        )) {
       _blocked(
         request,
         'FA05_SEQUENCE_SEGMENT_SET_MISMATCH',
@@ -565,11 +586,12 @@ PowerRational _resolvedContributionW(Map<String, Object?> contribution) {
   return switch (demand) {
     DcConstantPowerDemand(:final powerW) => powerW,
     AcPowerDemand(:final powerW) => powerW,
-    DcConstantCurrentDemand(:final currentA) => currentA *
-        _powerRational(
-          contribution['solvedTerminalVoltageV'],
-          'solvedTerminalVoltageV',
-        ),
+    DcConstantCurrentDemand(:final currentA) =>
+      currentA *
+          _powerRational(
+            contribution['solvedTerminalVoltageV'],
+            'solvedTerminalVoltageV',
+          ),
   };
 }
 

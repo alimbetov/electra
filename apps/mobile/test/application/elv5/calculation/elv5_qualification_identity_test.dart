@@ -37,12 +37,19 @@ void main() {
       processVersion: descriptor.versions.processVersion,
       rulesetVersion: Elv5FoundationAuthorityManifest.rulesetVersion,
       sourceSha: List<String>.filled(64, 'b').join(),
-      authorityFingerprint: Elv5FoundationAuthorityManifest.instance.fingerprint(),
+      authorityFingerprint: Elv5FoundationAuthorityManifest.instance
+          .fingerprint(),
     );
     final qualified = base.withQualificationIdentity(identity);
 
-    expect(base.evaluationIdentitySchema, 'electra.elv5-evaluation-identity.v1');
-    expect(qualified.evaluationIdentitySchema, 'electra.elv5-evaluation-identity.v2');
+    expect(
+      base.evaluationIdentitySchema,
+      'electra.elv5-evaluation-identity.v1',
+    );
+    expect(
+      qualified.evaluationIdentitySchema,
+      'electra.elv5-evaluation-identity.v2',
+    );
     expect(qualified.isQualificationAddressed, isTrue);
     expect(qualified.evaluationId, isNot(base.evaluationId));
     expect(
@@ -97,52 +104,57 @@ void main() {
           processVersion: lan.versions.processVersion,
           rulesetVersion: Elv5FoundationAuthorityManifest.rulesetVersion,
           sourceSha: List<String>.filled(64, 'd').join(),
-          authorityFingerprint: Elv5FoundationAuthorityManifest.instance.fingerprint(),
+          authorityFingerprint: Elv5FoundationAuthorityManifest.instance
+              .fingerprint(),
         ),
       ),
       throwsStateError,
     );
   });
 
-  test('qualification identity cannot exist without matching persisted evidence', () {
-    final descriptor = Elv5ProcessCatalog.require(Elv5ProcessCode.cctv01);
-    final fingerprint = List<String>.filled(64, 'e').join();
-    final identity = Elv5QualificationIdentity(
-      processVersion: descriptor.versions.processVersion,
-      rulesetVersion: Elv5FoundationAuthorityManifest.rulesetVersion,
-      sourceSha: List<String>.filled(64, 'f').join(),
-      authorityFingerprint: Elv5FoundationAuthorityManifest.instance.fingerprint(),
-    );
+  test(
+    'qualification identity cannot exist without matching persisted evidence',
+    () {
+      final descriptor = Elv5ProcessCatalog.require(Elv5ProcessCode.cctv01);
+      final fingerprint = List<String>.filled(64, 'e').join();
+      final identity = Elv5QualificationIdentity(
+        processVersion: descriptor.versions.processVersion,
+        rulesetVersion: Elv5FoundationAuthorityManifest.rulesetVersion,
+        sourceSha: List<String>.filled(64, 'f').join(),
+        authorityFingerprint: Elv5FoundationAuthorityManifest.instance
+            .fingerprint(),
+      );
 
-    expect(
-      () => Elv5ProcessEvaluationCandidate(
-        nodeKey: Elv5EngineeringNodeKeyV3(
-          designRevisionId: 'design-1',
-          scope: Elv5ScopeRef(
-            kind: Elv5ScopeKind.design,
-            scopeId: 'design-1',
-            scenarioKey: 'NONE',
+      expect(
+        () => Elv5ProcessEvaluationCandidate(
+          nodeKey: Elv5EngineeringNodeKeyV3(
+            designRevisionId: 'design-1',
+            scope: Elv5ScopeRef(
+              kind: Elv5ScopeKind.design,
+              scopeId: 'design-1',
+              scenarioKey: 'NONE',
+            ),
+            processCode: Elv5ProcessCode.cctv01,
+            subject: Elv5SubjectRef(kind: 'CAMERA', id: 'cam-1'),
           ),
-          processCode: Elv5ProcessCode.cctv01,
-          subject: Elv5SubjectRef(kind: 'CAMERA', id: 'cam-1'),
+          algorithmVersion: descriptor.versions.algorithmVersion,
+          inputSchemaVersion: descriptor.versions.inputSchemaVersion,
+          outputSchemaVersion: descriptor.versions.outputSchemaVersion,
+          numericBackendVersion: descriptor.versions.numericBackendVersion,
+          canonicalEncoderVersion: Elv5RuntimeContract.canonicalEncoderVersion,
+          inputFingerprint: fingerprint,
+          policyFingerprint: fingerprint,
+          execution: Elv5Execution.succeeded,
+          completion: Elv5Completion.complete,
+          assessment: Elv5Assessment.pass,
+          output: const <String, Object?>{},
+          evidence: const <String, Object?>{},
+          dependencies: const <Never>[],
+          completedAtUtc: DateTime.utc(2026, 10, 17),
+          qualificationIdentity: identity,
         ),
-        algorithmVersion: descriptor.versions.algorithmVersion,
-        inputSchemaVersion: descriptor.versions.inputSchemaVersion,
-        outputSchemaVersion: descriptor.versions.outputSchemaVersion,
-        numericBackendVersion: descriptor.versions.numericBackendVersion,
-        canonicalEncoderVersion: Elv5RuntimeContract.canonicalEncoderVersion,
-        inputFingerprint: fingerprint,
-        policyFingerprint: fingerprint,
-        execution: Elv5Execution.succeeded,
-        completion: Elv5Completion.complete,
-        assessment: Elv5Assessment.pass,
-        output: const <String,Object?>{},
-        evidence: const <String,Object?>{},
-        dependencies: const <Never>[],
-        completedAtUtc: DateTime.utc(2026, 10, 17),
-        qualificationIdentity: identity,
-      ),
-      throwsStateError,
-    );
-  });
+        throwsStateError,
+      );
+    },
+  );
 }

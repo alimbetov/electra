@@ -22,10 +22,11 @@ Future<ElvCommandResult<T>?> replayElvRuntimeCommand<T>({
 }) async {
   final row =
       await (database.select(database.commandExecutionRecords)..where(
-        (candidate) =>
-            candidate.projectId.equals(projectId) &
-            candidate.commandId.equals(commandId),
-      )).getSingleOrNull();
+            (candidate) =>
+                candidate.projectId.equals(projectId) &
+                candidate.commandId.equals(commandId),
+          ))
+          .getSingleOrNull();
   if (row == null) return null;
   final expected = elvRuntimeFingerprint(schema, payload);
   if (row.commandType != commandType ||

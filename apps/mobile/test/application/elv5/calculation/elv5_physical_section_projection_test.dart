@@ -42,23 +42,26 @@ void main() {
     expect(lanProjection.shieldContinuity, isTrue);
   });
 
-  test('process-specific interface semantics do not leak into shared projection', () {
-    final contentHash = List<String>.filled(64, 'b').join();
-    final lan = Lan04SectionCapabilityContract(
-      sectionId: 'section-1',
-      mediumCode: 'FIBER',
-      supportedInterfaceKinds: const <String>['1000BASE-LX', '10GBASE-LR'],
-      supportedSpeedModes: const <String>['1G', '10G'],
-      supportedConnectorKinds: const <String>['LC'],
-      shieldContinuityKnown: false,
-      shieldContinuity: false,
-      evidenceRef: 'SECTION:section-1:v2',
-      evidenceContentHash: contentHash,
-    );
+  test(
+    'process-specific interface semantics do not leak into shared projection',
+    () {
+      final contentHash = List<String>.filled(64, 'b').join();
+      final lan = Lan04SectionCapabilityContract(
+        sectionId: 'section-1',
+        mediumCode: 'FIBER',
+        supportedInterfaceKinds: const <String>['1000BASE-LX', '10GBASE-LR'],
+        supportedSpeedModes: const <String>['1G', '10G'],
+        supportedConnectorKinds: const <String>['LC'],
+        shieldContinuityKnown: false,
+        shieldContinuity: false,
+        evidenceRef: 'SECTION:section-1:v2',
+        evidenceContentHash: contentHash,
+      );
 
-    final projection = lan.physicalSectionEvidence.toCanonicalValue();
-    expect(projection.containsKey('supportedInterfaceKinds'), isFalse);
-    expect(projection.containsKey('supportedSpeedModes'), isFalse);
-    expect(projection.containsKey('categoryToken'), isFalse);
-  });
+      final projection = lan.physicalSectionEvidence.toCanonicalValue();
+      expect(projection.containsKey('supportedInterfaceKinds'), isFalse);
+      expect(projection.containsKey('supportedSpeedModes'), isFalse);
+      expect(projection.containsKey('categoryToken'), isFalse);
+    },
+  );
 }

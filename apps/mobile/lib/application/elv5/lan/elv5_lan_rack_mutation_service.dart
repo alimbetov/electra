@@ -33,7 +33,10 @@ final class Elv5LanRackMutationService {
     required String designRevisionId,
     required Map<String, Object?> payload,
   }) {
-    Elv5WireCommandRegistry.validatePayload('REPLACE_RACK_CAPACITY_BASIS', payload);
+    Elv5WireCommandRegistry.validatePayload(
+      'REPLACE_RACK_CAPACITY_BASIS',
+      payload,
+    );
     return unitOfWork.run((session) async {
       final revision = await session.revisions.load(
         projectId: projectId,
@@ -61,7 +64,9 @@ final class Elv5LanRackMutationService {
 
   Future<Elv5ReplacementRunResult> execute(Elv5WireCommandEnvelope command) {
     if (command.operation != 'REPLACE_RACK_CAPACITY_BASIS') {
-      throw FormatException('Unsupported LAN rack operation: ${command.operation}.');
+      throw FormatException(
+        'Unsupported LAN rack operation: ${command.operation}.',
+      );
     }
     return _runner.run(
       command,
@@ -87,8 +92,11 @@ final class Elv5LanRackMutationService {
       designRevisionId: designRevisionId,
       rackId: rackId,
     );
-    final aggregateId = previous?.aggregateId ?? 'ELV5:LAN_RACK_CAPACITY:$rackId';
-    final oldDeps = previous == null ? const <Map<String,Object?>>[] : _dependencies(previous.payload);
+    final aggregateId =
+        previous?.aggregateId ?? 'ELV5:LAN_RACK_CAPACITY:$rackId';
+    final oldDeps = previous == null
+        ? const <Map<String, Object?>>[]
+        : _dependencies(previous.payload);
     final newDeps = _dependencies(payload);
     final keyHashes = <String>{
       for (final value in oldDeps) _encoder.sha256(value),
@@ -127,10 +135,16 @@ final class Elv5LanRackMutationService {
       'capturedRackProfile': previous?.capturedRackProfile,
     };
     return Elv5PreparedReplacement(
-      actualRowRevisions: previous == null ? const {} : {aggregateId: previous.revision},
+      actualRowRevisions: previous == null
+          ? const {}
+          : {aggregateId: previous.revision},
       reviewedImpactFingerprint: fingerprint,
       staleNodeKeySha256s: stale,
-      affectedIds: {rackId, aggregateId, ...(payload['equipmentIds']! as List).cast<String>()},
+      affectedIds: {
+        rackId,
+        aggregateId,
+        ...(payload['equipmentIds']! as List).cast<String>(),
+      },
       beforeAggregate: before,
       inverseCommandType: 'ELV5_RESTORE_LAN_AGGREGATE',
       inverseCommandSchema: _historySchema,
@@ -181,7 +195,7 @@ final class Elv5LanRackMutationService {
     );
   }
 
-  List<Map<String,Object?>> _dependencies(Map<String,Object?> payload) => [
+  List<Map<String, Object?>> _dependencies(Map<String, Object?> payload) => [
     _dep('SET', 'LAN_RACK_CAPACITY', payload['rackId']! as String),
     _dep('FACT', 'COMPONENT_REFERENCE_BINDING', payload['rackId']! as String),
     for (final id in (payload['equipmentIds']! as List).cast<String>())
@@ -189,7 +203,11 @@ final class Elv5LanRackMutationService {
     _dep('POLICY', 'LAN_RACK_POLICY', payload['rackId']! as String),
   ];
 
-  Map<String,Object?> _dep(String relationKind, String domain, String subjectId) => {
+  Map<String, Object?> _dep(
+    String relationKind,
+    String domain,
+    String subjectId,
+  ) => {
     'schema': 'electra.elv5-dependency-key.v1',
     'relationKind': relationKind,
     'domain': domain,
@@ -199,8 +217,8 @@ final class Elv5LanRackMutationService {
   Elv5AggregateEvidenceDraft _evidence({
     required String aggregateId,
     required String rackId,
-    required Map<String,Object?>? payload,
-    required Map<String,Object?>? capturedRackProfile,
+    required Map<String, Object?>? payload,
+    required Map<String, Object?>? capturedRackProfile,
   }) {
     final value = {
       'schema': 'electra.elv5-lan-rack-aggregate.v1',
@@ -219,8 +237,6 @@ final class Elv5LanRackMutationService {
     );
   }
 
-  static String _canonical(Object? value) => utf8.decode(
-    _encoder.encode(value),
-    allowMalformed: false,
-  );
+  static String _canonical(Object? value) =>
+      utf8.decode(_encoder.encode(value), allowMalformed: false);
 }

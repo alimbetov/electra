@@ -10,14 +10,16 @@ final class Cctv06SectionEvidenceContract {
     required this.shieldContinuity,
     required String evidenceRef,
     required String evidenceContentHash,
-  })  : sectionId = _text(sectionId, 'sectionId'),
-        mediumCode = _medium(mediumCode),
-        interfaceKind = _token(interfaceKind, 'interfaceKind'),
-        categoryToken = _token(categoryToken, 'categoryToken'),
-        evidenceRef = _text(evidenceRef, 'evidenceRef'),
-        evidenceContentHash = _sha(evidenceContentHash, 'evidenceContentHash') {
+  }) : sectionId = _text(sectionId, 'sectionId'),
+       mediumCode = _medium(mediumCode),
+       interfaceKind = _token(interfaceKind, 'interfaceKind'),
+       categoryToken = _token(categoryToken, 'categoryToken'),
+       evidenceRef = _text(evidenceRef, 'evidenceRef'),
+       evidenceContentHash = _sha(evidenceContentHash, 'evidenceContentHash') {
     if (!shieldContinuityKnown && shieldContinuity) {
-      throw ArgumentError('CCTV06 unknown shield continuity cannot assert true.');
+      throw ArgumentError(
+        'CCTV06 unknown shield continuity cannot assert true.',
+      );
     }
   }
 
@@ -42,20 +44,16 @@ final class Cctv06SectionEvidenceContract {
   };
 
   factory Cctv06SectionEvidenceContract.fromMap(Map<String, Object?> map) {
-    _exact(
-      map,
-      const <String>{
-        'sectionId',
-        'mediumCode',
-        'interfaceKind',
-        'categoryToken',
-        'shieldContinuityKnown',
-        'shieldContinuity',
-        'evidenceRef',
-        'evidenceContentHash',
-      },
-      'CCTV06 section evidence',
-    );
+    _exact(map, const <String>{
+      'sectionId',
+      'mediumCode',
+      'interfaceKind',
+      'categoryToken',
+      'shieldContinuityKnown',
+      'shieldContinuity',
+      'evidenceRef',
+      'evidenceContentHash',
+    }, 'CCTV06 section evidence');
     return Cctv06SectionEvidenceContract(
       sectionId: _mapText(map, 'sectionId'),
       mediumCode: _mapText(map, 'mediumCode'),
@@ -85,27 +83,29 @@ final class Cctv06LinkContract {
     this.segmentId,
     Map<String, String> expectedPwr06InputFingerprintByDeliveryId = const {},
     Map<String, String> poweredSectionToDeliveryId = const {},
-  })  : linkId = _text(linkId, 'linkId'),
-        expectedCompositionFingerprint = _sha(
-          expectedCompositionFingerprint,
-          'expectedCompositionFingerprint',
-        ),
-        allowedMediaCodes = Set.unmodifiable(allowedMediaCodes.map(_medium)),
-        allowedInterfaceKinds = Set.unmodifiable(
-          allowedInterfaceKinds.map((e) => _token(e, 'allowedInterfaceKind')),
-        ),
-        allowedCategoryTokens = Set.unmodifiable(
-          allowedCategoryTokens.map((e) => _token(e, 'allowedCategoryToken')),
-        ),
-        sections = List.unmodifiable(sections),
-        expectedPwr06InputFingerprintByDeliveryId = Map.unmodifiable(
-          _fingerprints(expectedPwr06InputFingerprintByDeliveryId),
-        ),
-        poweredSectionToDeliveryId = Map.unmodifiable(<String, String>{
-          for (final entry in poweredSectionToDeliveryId.entries)
-            _text(entry.key, 'poweredSectionId'):
-                _text(entry.value, 'deliveryId'),
-        }) {
+  }) : linkId = _text(linkId, 'linkId'),
+       expectedCompositionFingerprint = _sha(
+         expectedCompositionFingerprint,
+         'expectedCompositionFingerprint',
+       ),
+       allowedMediaCodes = Set.unmodifiable(allowedMediaCodes.map(_medium)),
+       allowedInterfaceKinds = Set.unmodifiable(
+         allowedInterfaceKinds.map((e) => _token(e, 'allowedInterfaceKind')),
+       ),
+       allowedCategoryTokens = Set.unmodifiable(
+         allowedCategoryTokens.map((e) => _token(e, 'allowedCategoryToken')),
+       ),
+       sections = List.unmodifiable(sections),
+       expectedPwr06InputFingerprintByDeliveryId = Map.unmodifiable(
+         _fingerprints(expectedPwr06InputFingerprintByDeliveryId),
+       ),
+       poweredSectionToDeliveryId = Map.unmodifiable(<String, String>{
+         for (final entry in poweredSectionToDeliveryId.entries)
+           _text(entry.key, 'poweredSectionId'): _text(
+             entry.value,
+             'deliveryId',
+           ),
+       }) {
     if (this.sections.isEmpty) {
       throw ArgumentError('CCTV06 sections must not be empty.');
     }
@@ -135,8 +135,9 @@ final class Cctv06LinkContract {
       }
       for (final entry in this.poweredSectionToDeliveryId.entries) {
         if (!sectionIds.contains(entry.key) ||
-            !this.expectedPwr06InputFingerprintByDeliveryId
-                .containsKey(entry.value)) {
+            !this.expectedPwr06InputFingerprintByDeliveryId.containsKey(
+              entry.value,
+            )) {
           throw ArgumentError(
             'CCTV06 powered section mapping is outside section/delivery closure.',
           );
@@ -198,27 +199,23 @@ final class Cctv06LinkContract {
   };
 
   factory Cctv06LinkContract.fromMap(Map<String, Object?> map) {
-    _exact(
-      map,
-      const <String>{
-        'schema',
-        'linkId',
-        'expectedCompositionFingerprint',
-        'allowedMediaCodes',
-        'allowedInterfaceKinds',
-        'allowedCategoryTokens',
-        'shieldingRequired',
-        'maximumLengthM',
-        'sections',
-        'powered',
-        'pseId',
-        'scenarioId',
-        'segmentId',
-        'expectedPwr06InputFingerprintByDeliveryId',
-        'poweredSectionToDeliveryId',
-      },
-      'CCTV06 link contract',
-    );
+    _exact(map, const <String>{
+      'schema',
+      'linkId',
+      'expectedCompositionFingerprint',
+      'allowedMediaCodes',
+      'allowedInterfaceKinds',
+      'allowedCategoryTokens',
+      'shieldingRequired',
+      'maximumLengthM',
+      'sections',
+      'powered',
+      'pseId',
+      'scenarioId',
+      'segmentId',
+      'expectedPwr06InputFingerprintByDeliveryId',
+      'poweredSectionToDeliveryId',
+    }, 'CCTV06 link contract');
     if (map['schema'] != schema) {
       throw const FormatException('Unsupported CCTV06 link contract schema.');
     }
@@ -228,13 +225,22 @@ final class Cctv06LinkContract {
     }
     return Cctv06LinkContract(
       linkId: _mapText(map, 'linkId'),
-      expectedCompositionFingerprint:
-          _mapText(map, 'expectedCompositionFingerprint'),
-      allowedMediaCodes: _strings(map['allowedMediaCodes'], 'allowedMediaCodes'),
-      allowedInterfaceKinds:
-          _strings(map['allowedInterfaceKinds'], 'allowedInterfaceKinds'),
-      allowedCategoryTokens:
-          _strings(map['allowedCategoryTokens'], 'allowedCategoryTokens'),
+      expectedCompositionFingerprint: _mapText(
+        map,
+        'expectedCompositionFingerprint',
+      ),
+      allowedMediaCodes: _strings(
+        map['allowedMediaCodes'],
+        'allowedMediaCodes',
+      ),
+      allowedInterfaceKinds: _strings(
+        map['allowedInterfaceKinds'],
+        'allowedInterfaceKinds',
+      ),
+      allowedCategoryTokens: _strings(
+        map['allowedCategoryTokens'],
+        'allowedCategoryTokens',
+      ),
       shieldingRequired: _bool(map, 'shieldingRequired'),
       maximumLengthM: map['maximumLengthM'] == null
           ? null
@@ -316,8 +322,7 @@ abstract interface class Cctv06LinkContractWriter {
 Map<String, String> _fingerprints(Map<String, String> values) =>
     <String, String>{
       for (final entry in values.entries)
-        _text(entry.key, 'deliveryId'):
-            _sha(entry.value, 'inputFingerprint'),
+        _text(entry.key, 'deliveryId'): _sha(entry.value, 'inputFingerprint'),
     };
 
 String _medium(String value) {

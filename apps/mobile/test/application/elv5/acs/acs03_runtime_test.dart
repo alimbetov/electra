@@ -10,53 +10,55 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('blocks when exact ACS-03 event/feed/control contract is not persisted', () async {
-    final resolver = Acs03PersistedInputResolver(
-      acsStore: _AcsStore(),
-      contractSource: const _NoContractSource(),
-      powerEvidence: const _NoPowerEvidence(),
-    );
+  test(
+    'blocks when exact ACS-03 event/feed/control contract is not persisted',
+    () async {
+      final resolver = Acs03PersistedInputResolver(
+        acsStore: _AcsStore(),
+        contractSource: const _NoContractSource(),
+        powerEvidence: const _NoPowerEvidence(),
+      );
 
-    await expectLater(
-      resolver.capture(_request()),
-      throwsA(
-        isA<Elv5CaptureBlockedException>()
-            .having(
-              (value) => value.reasonCode,
-              'reasonCode',
-              'ACS03_EXACT_ELECTRICAL_EVENT_CONTRACT_REQUIRED',
-            )
-            .having(
-              (value) => value.evidence['lockId'],
-              'lockId',
-              'lock-1',
+      await expectLater(
+        resolver.capture(_request()),
+        throwsA(
+          isA<Elv5CaptureBlockedException>()
+              .having(
+                (value) => value.reasonCode,
+                'reasonCode',
+                'ACS03_EXACT_ELECTRICAL_EVENT_CONTRACT_REQUIRED',
+              )
+              .having((value) => value.evidence['lockId'], 'lockId', 'lock-1'),
+        ),
+      );
+    },
+  );
+
+  test(
+    'kernel blocks a resolved feed when control path evidence is absent',
+    () {
+      final result = const Acs03ElectricalKernel().evaluate(
+        Acs03Input(
+          doorId: 'door-1',
+          lockId: 'lock-1',
+          conductiveFeedPathId: 'feed-1',
+          controlPathId: null,
+          requiredMembershipFingerprint: 'membership-1',
+          events: <Acs03OperatingEvent>[
+            Acs03OperatingEvent(
+              eventId: 'holding',
+              state: Acs03StateCode.holding,
+              durationMicroseconds: BigInt.from(1000000),
             ),
-      ),
-    );
-  });
+          ],
+          evidence: const <Acs03PwrEvidence>[],
+        ),
+      );
 
-  test('kernel blocks a resolved feed when control path evidence is absent', () {
-    final result = const Acs03ElectricalKernel().evaluate(
-      Acs03Input(
-        doorId: 'door-1',
-        lockId: 'lock-1',
-        conductiveFeedPathId: 'feed-1',
-        controlPathId: null,
-        requiredMembershipFingerprint: 'membership-1',
-        events: <Acs03OperatingEvent>[
-          Acs03OperatingEvent(
-            eventId: 'holding',
-            state: Acs03StateCode.holding,
-            durationMicroseconds: BigInt.from(1000000),
-          ),
-        ],
-        evidence: const <Acs03PwrEvidence>[],
-      ),
-    );
-
-    expect(result.status, Acs03AssessmentStatus.blocked);
-    expect(result.limitingReason, 'ACS03_REQUIRED_CONTROL_PATH_MISSING');
-  });
+      expect(result.status, Acs03AssessmentStatus.blocked);
+      expect(result.limitingReason, 'ACS03_REQUIRED_CONTROL_PATH_MISSING');
+    },
+  );
 }
 
 Elv5CalculationRequest _request() => Elv5CalculationRequest(
@@ -100,7 +102,16 @@ final class _AcsStore implements Elv5AcsMutationStore {
   );
 
   @override
-  Future<void> replace({required String projectId, required String designRevisionId, required String operation, required String subjectId, required String bindingId, required int? expectedRootRevision, required Map<String, Object?> payload, required DateTime updatedAtUtc}) => throw UnimplementedError();
+  Future<void> replace({
+    required String projectId,
+    required String designRevisionId,
+    required String operation,
+    required String subjectId,
+    required String bindingId,
+    required int? expectedRootRevision,
+    required Map<String, Object?> payload,
+    required DateTime updatedAtUtc,
+  }) => throw UnimplementedError();
 }
 
 final class _NoContractSource implements Acs03ElectricalContractSource {

@@ -10,11 +10,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 EngineeringReferenceCatalog _fixture() => EngineeringReferenceCatalog.fromMap(
   jsonDecode(
-        File(
-          '../../docs/examples/elv2-reference-catalog.json',
-        ).readAsStringSync(),
-      )
-      as Map<String, dynamic>,
+    File('../../docs/examples/elv2-reference-catalog.json').readAsStringSync(),
+  ) as Map<String, dynamic>,
 );
 
 void main() {

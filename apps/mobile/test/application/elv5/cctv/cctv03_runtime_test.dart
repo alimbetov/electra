@@ -6,41 +6,46 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('captures absolute UTC recording facts and sizes storage exactly', () async {
-    final store = _FakeCctvStore(pool: _pool(recurrence: false));
-    final captured = await Cctv03PersistedInputResolver(store: store).capture(
-      _request(),
-    );
-    final result = const Cctv03StorageKernel().evaluate(captured.value);
+  test(
+    'captures absolute UTC recording facts and sizes storage exactly',
+    () async {
+      final store = _FakeCctvStore(pool: _pool(recurrence: false));
+      final captured = await Cctv03PersistedInputResolver(store: store)
+          .capture(_request());
+      final result = const Cctv03StorageKernel().evaluate(captured.value);
 
-    expect(captured.captureRevision, 3);
-    expect(result.exactBaseBytes, Elv5Rational.integer(3600000000));
-    expect(result.usable.required.value, Elv5Rational.integer(3960000000));
-    expect(captured.dependencies.length, 3);
-  });
+      expect(captured.captureRevision, 3);
+      expect(result.exactBaseBytes, Elv5Rational.integer(3600000000));
+      expect(result.usable.required.value, Elv5Rational.integer(3960000000));
+      expect(captured.dependencies.length, 3);
+    },
+  );
 
-  test('recurrence becomes durable blocked capture until pinned tzdb exists', () async {
-    final resolver = Cctv03PersistedInputResolver(
-      store: _FakeCctvStore(pool: _pool(recurrence: true)),
-    );
+  test(
+    'recurrence becomes durable blocked capture until pinned tzdb exists',
+    () async {
+      final resolver = Cctv03PersistedInputResolver(
+        store: _FakeCctvStore(pool: _pool(recurrence: true)),
+      );
 
-    await expectLater(
-      resolver.capture(_request()),
-      throwsA(
-        isA<Elv5CaptureBlockedException>()
-            .having(
-              (e) => e.reasonCode,
-              'reasonCode',
-              'CCTV03_RECURRENCE_EXPANDER_REQUIRED',
-            )
-            .having(
-              (e) => e.evidence['tzdbVersion'],
-              'tzdbVersion',
-              'fixture-1',
-            ),
-      ),
-    );
-  });
+      await expectLater(
+        resolver.capture(_request()),
+        throwsA(
+          isA<Elv5CaptureBlockedException>()
+              .having(
+                (e) => e.reasonCode,
+                'reasonCode',
+                'CCTV03_RECURRENCE_EXPANDER_REQUIRED',
+              )
+              .having(
+                (e) => e.evidence['tzdbVersion'],
+                'tzdbVersion',
+                'fixture-1',
+              ),
+        ),
+      );
+    },
+  );
 }
 
 Elv5CalculationRequest _request() => Elv5CalculationRequest(
@@ -95,10 +100,7 @@ Elv5CctvAggregateSnapshot _pool({required bool recurrence}) =>
                     'endUtc': '2026-01-01T01:00:00.000Z',
                   },
             'recurrence': recurrence
-                ? <String, Object?>{
-                    'rule': 'FREQ=DAILY',
-                    'timeZoneLocal': true,
-                  }
+                ? <String, Object?>{'rule': 'FREQ=DAILY', 'timeZoneLocal': true}
                 : null,
           },
         ],
@@ -128,8 +130,24 @@ final class _FakeCctvStore implements Elv5CctvMutationStore {
   }) async => null;
 
   @override
-  Future<void> replaceCameraStreams({required String projectId, required String designRevisionId, required String cameraId, required String bindingId, required int? expectedRootRevision, required Map<String, Object?> payload, required DateTime updatedAtUtc}) => throw UnimplementedError();
+  Future<void> replaceCameraStreams({
+    required String projectId,
+    required String designRevisionId,
+    required String cameraId,
+    required String bindingId,
+    required int? expectedRootRevision,
+    required Map<String, Object?> payload,
+    required DateTime updatedAtUtc,
+  }) => throw UnimplementedError();
 
   @override
-  Future<void> replaceRecordingPool({required String projectId, required String designRevisionId, required String poolId, required String bindingId, required int? expectedRootRevision, required Map<String, Object?> payload, required DateTime updatedAtUtc}) => throw UnimplementedError();
+  Future<void> replaceRecordingPool({
+    required String projectId,
+    required String designRevisionId,
+    required String poolId,
+    required String bindingId,
+    required int? expectedRootRevision,
+    required Map<String, Object?> payload,
+    required DateTime updatedAtUtc,
+  }) => throw UnimplementedError();
 }

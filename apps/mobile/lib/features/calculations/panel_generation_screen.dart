@@ -26,14 +26,13 @@ class PanelGenerationScreen extends ConsumerWidget {
               nextId: ref.read(idGeneratorProvider).next,
               onSave: repo.save,
               onRecalculate: () => repo.recalculate(projectId),
-              onConfirm:
-                  (id, fingerprint) => repo.confirm(projectId, id, fingerprint),
-              onRules:
-                  () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => ProtectionScreen(projectId: projectId),
-                    ),
-                  ),
+              onConfirm: (id, fingerprint) =>
+                  repo.confirm(projectId, id, fingerprint),
+              onRules: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => ProtectionScreen(projectId: projectId),
+                ),
+              ),
             );
           },
         ),
@@ -80,13 +79,12 @@ class _PanelGenerationWorkspaceState extends State<PanelGenerationWorkspace> {
 
   void edit([PanelGenerationPolicy? policy]) => showDialog<void>(
     context: context,
-    builder:
-        (_) => PanelPolicyDialog(
-          snapshot: widget.snapshot,
-          id: policy?.id ?? widget.nextId(),
-          initial: policy,
-          onSave: widget.onSave,
-        ),
+    builder: (_) => PanelPolicyDialog(
+      snapshot: widget.snapshot,
+      id: policy?.id ?? widget.nextId(),
+      initial: policy,
+      onSave: widget.onSave,
+    ),
   );
   @override
   Widget build(BuildContext context) {
@@ -100,8 +98,8 @@ class _PanelGenerationWorkspaceState extends State<PanelGenerationWorkspace> {
             FilledButton(
               onPressed:
                   busy || s.floors.isEmpty || s.protection.rulesets.isEmpty
-                      ? null
-                      : () => edit(),
+                  ? null
+                  : () => edit(),
               child: const Text('New panel policy'),
             ),
             OutlinedButton(
@@ -148,17 +146,17 @@ class _PanelGenerationWorkspaceState extends State<PanelGenerationWorkspace> {
                       OutlinedButton(
                         onPressed:
                             busy ||
-                                    ![
-                                      'Proposed',
-                                      'Review required',
-                                    ].contains(s.status(p))
-                                ? null
-                                : () => work(
-                                  () => widget.onConfirm(
-                                    p.policy.id,
-                                    session.fingerprints[p.key]!,
-                                  ),
+                                ![
+                                  'Proposed',
+                                  'Review required',
+                                ].contains(s.status(p))
+                            ? null
+                            : () => work(
+                                () => widget.onConfirm(
+                                  p.policy.id,
+                                  session.fingerprints[p.key]!,
                                 ),
+                              ),
                         child: const Text('Confirm proposal'),
                       ),
                     ],
@@ -321,10 +319,10 @@ class _PanelPolicyDialogState extends State<PanelPolicyDialog> {
       'Incoming evidence': p?.incoming.evidence,
       'Incoming residual trip mA': p?.incoming.residualCurrentMa,
       'Incoming residual type': p?.incoming.residualType,
-      'Outgoing module width':
-          p?.moduleWidths['${p.outgoing.residualPolicy == ResidualProtectionPolicy.required ? 'rcbo' : 'mcb'}:${p.outgoing.poles}'],
-      'Incoming module width':
-          p?.moduleWidths['${p.incoming.residualPolicy == ResidualProtectionPolicy.required ? 'rcbo' : 'mcb'}:${p.incoming.poles}'],
+      'Outgoing module width': p
+          ?.moduleWidths['${p.outgoing.residualPolicy == ResidualProtectionPolicy.required ? 'rcbo' : 'mcb'}:${p.outgoing.poles}'],
+      'Incoming module width': p
+          ?.moduleWidths['${p.incoming.residualPolicy == ResidualProtectionPolicy.required ? 'rcbo' : 'mcb'}:${p.incoming.poles}'],
     };
     for (final e in initial.entries) {
       fields[e.key] = TextEditingController(text: e.value?.toString() ?? '');
@@ -359,22 +357,22 @@ class _PanelPolicyDialogState extends State<PanelPolicyDialog> {
             residualPolicy: prefix == 'Outgoing' ? residual : incomingResidual,
             residualCurrentMa:
                 (prefix == 'Outgoing' ? residual : incomingResidual) ==
-                        ResidualProtectionPolicy.required
-                    ? number(
-                      prefix == 'Outgoing'
-                          ? 'Residual trip mA'
-                          : 'Incoming residual trip mA',
-                    )
-                    : null,
+                    ResidualProtectionPolicy.required
+                ? number(
+                    prefix == 'Outgoing'
+                        ? 'Residual trip mA'
+                        : 'Incoming residual trip mA',
+                  )
+                : null,
             residualType:
                 (prefix == 'Outgoing' ? residual : incomingResidual) ==
-                        ResidualProtectionPolicy.required
-                    ? value(
-                      prefix == 'Outgoing'
-                          ? 'Residual type'
-                          : 'Incoming residual type',
-                    )
-                    : null,
+                    ResidualProtectionPolicy.required
+                ? value(
+                    prefix == 'Outgoing'
+                        ? 'Residual type'
+                        : 'Incoming residual type',
+                  )
+                : null,
             evidence: value('$prefix evidence'),
           );
       final outgoing = settings('Outgoing'), incoming = settings('Incoming');
@@ -443,10 +441,9 @@ class _PanelPolicyDialogState extends State<PanelPolicyDialog> {
                 for (final f in widget.snapshot.floors)
                   DropdownMenuItem(value: f.id, child: Text(f.name)),
               ],
-              onChanged:
-                  widget.initial != null || busy
-                      ? null
-                      : (v) => setState(() => floorId = v!),
+              onChanged: widget.initial != null || busy
+                  ? null
+                  : (v) => setState(() => floorId = v!),
             ),
             DropdownButtonFormField<String>(
               initialValue: ruleId,
@@ -493,8 +490,9 @@ class _PanelPolicyDialogState extends State<PanelPolicyDialog> {
                 for (final p in ResidualProtectionPolicy.values)
                   DropdownMenuItem(value: p, child: Text(p.name)),
               ],
-              onChanged:
-                  busy ? null : (v) => setState(() => incomingResidual = v!),
+              onChanged: busy
+                  ? null
+                  : (v) => setState(() => incomingResidual = v!),
             ),
             for (final e in fields.entries)
               TextField(

@@ -10,8 +10,8 @@ void main() {
       '../../docs/product/elv4-implementation/qualification.json',
     );
     expect(file.existsSync(), isTrue);
-    final manifest =
-        (jsonDecode(file.readAsStringSync()) as Map).cast<String, Object?>();
+    final manifest = (jsonDecode(file.readAsStringSync()) as Map)
+        .cast<String, Object?>();
     return Elv4QualificationMatrixContract.fromManifest(manifest);
   }
 
@@ -63,21 +63,20 @@ void main() {
 
   test('missing, duplicate, extra and failed evidence are rejected', () {
     final contract = loadContract();
-    final complete =
-        contract.expectedRows
-            .map(
-              (row) => Elv4QualificationEvidenceRow(
-                caseId: row.caseId,
-                processCode: row.processCode,
-                context: row.context,
-                dimension: row.dimension,
-                completion: row.completion,
-                assessment: row.assessment,
-                execution: row.execution,
-                evaluationId: 'evaluation:${row.key}',
-              ),
-            )
-            .toList();
+    final complete = contract.expectedRows
+        .map(
+          (row) => Elv4QualificationEvidenceRow(
+            caseId: row.caseId,
+            processCode: row.processCode,
+            context: row.context,
+            dimension: row.dimension,
+            completion: row.completion,
+            assessment: row.assessment,
+            execution: row.execution,
+            evaluationId: 'evaluation:${row.key}',
+          ),
+        )
+        .toList();
 
     expect(
       () => contract.validateEvidence(complete.sublist(1)),

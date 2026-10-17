@@ -8,16 +8,18 @@ Future<void> guardComponentElvPorts(
 ) async {
   final bindings =
       await (database.select(database.componentReferenceBindings)..where(
-        (r) => r.componentId.isIn(componentIds) & r.deletedAt.isNull(),
-      )).get();
+            (r) => r.componentId.isIn(componentIds) & r.deletedAt.isNull(),
+          ))
+          .get();
   if (bindings.isNotEmpty)
     throw StateError(
       "Release engineering profile bindings before deleting equipment.",
     );
   final rows =
       await (database.select(database.engineeringPortInstances)..where(
-        (r) => r.componentId.isIn(componentIds) & r.deletedAt.isNull(),
-      )).get();
+            (r) => r.componentId.isIn(componentIds) & r.deletedAt.isNull(),
+          ))
+          .get();
   if (rows.isNotEmpty)
     throw StateError(
       'Retire engineering ports and resolve their links before deleting placed equipment.',
@@ -29,10 +31,9 @@ Future<void> guardMutableEngineeringPortAgainstPowerOwnership(
   String projectId,
   String portId,
 ) async {
-  final owned =
-      await database
-          .customSelect(
-            '''
+  final owned = await database
+      .customSelect(
+        '''
 SELECT 1
 WHERE
   EXISTS (
@@ -71,13 +72,13 @@ WHERE
   )
 LIMIT 1
 ''',
-            variables: [
-              Variable.withString(projectId),
-              Variable.withString(portId),
-            ],
-            readsFrom: database.allTables.toSet(),
-          )
-          .getSingleOrNull();
+        variables: [
+          Variable.withString(projectId),
+          Variable.withString(portId),
+        ],
+        readsFrom: database.allTables.toSet(),
+      )
+      .getSingleOrNull();
   if (owned != null) {
     throw StateError(
       'ELV4_POWER_PORT_OWNED: Release or replace revision-scoped power '
@@ -94,39 +95,42 @@ Future<void> guardSystemElvTopology(
   if (componentId != null) {
     final binding =
         await (database.select(database.componentReferenceBindings)..where(
-          (r) => r.componentId.equals(componentId) & r.deletedAt.isNull(),
-        )).getSingleOrNull();
+              (r) => r.componentId.equals(componentId) & r.deletedAt.isNull(),
+            ))
+            .getSingleOrNull();
     if (binding != null)
       throw StateError(
         'Release the profile binding before changing system participation.',
       );
     await guardSystemPowerOwnedMembership(database, systemId, componentId);
   }
-  final ports =
-      componentId == null
-          ? <String>[]
-          : (await (database.select(database.engineeringPortInstances)
-                ..where((r) => r.componentId.equals(componentId))).get())
-              .map((p) => p.id)
-              .toList();
+  final ports = componentId == null
+      ? <String>[]
+      : (await (database.select(
+              database.engineeringPortInstances,
+            )..where((r) => r.componentId.equals(componentId))).get())
+            .map((p) => p.id)
+            .toList();
   final links =
       await (database.select(database.engineeringPortConnections)..where(
-        (r) =>
-            r.systemId.equals(systemId) &
-            r.deletedAt.isNull() &
-            (componentId == null
-                ? const Constant(true)
-                : (r.fromPortId.isIn(ports) | r.toPortId.isIn(ports))),
-      )).get();
+            (r) =>
+                r.systemId.equals(systemId) &
+                r.deletedAt.isNull() &
+                (componentId == null
+                    ? const Constant(true)
+                    : (r.fromPortId.isIn(ports) | r.toPortId.isIn(ports))),
+          ))
+          .get();
   final groups =
       await (database.select(database.engineeringTopologyGroups)..where(
-        (r) =>
-            r.systemId.equals(systemId) &
-            r.deletedAt.isNull() &
-            (componentId == null
-                ? const Constant(true)
-                : (r.startPortId.isIn(ports) | r.endPortId.isIn(ports))),
-      )).get();
+            (r) =>
+                r.systemId.equals(systemId) &
+                r.deletedAt.isNull() &
+                (componentId == null
+                    ? const Constant(true)
+                    : (r.startPortId.isIn(ports) | r.endPortId.isIn(ports))),
+          ))
+          .get();
   if (links.isNotEmpty || groups.isNotEmpty)
     throw StateError(
       'Resolve engineering connections and topology groups before changing system participation or ownership.',
@@ -138,10 +142,9 @@ Future<void> guardSystemPowerOwnedMembership(
   String systemId,
   String componentId,
 ) async {
-  final row =
-      await database
-          .customSelect(
-            '''
+  final row = await database
+      .customSelect(
+        '''
 SELECT 1
 FROM project_engineering_systems s
 WHERE s.id = ?
@@ -213,13 +216,13 @@ WHERE s.id = ?
   )
 LIMIT 1
 ''',
-            variables: [
-              Variable.withString(systemId),
-              for (var i = 0; i < 11; i++) Variable.withString(componentId),
-            ],
-            readsFrom: database.allTables.toSet(),
-          )
-          .getSingleOrNull();
+        variables: [
+          Variable.withString(systemId),
+          for (var i = 0; i < 11; i++) Variable.withString(componentId),
+        ],
+        readsFrom: database.allTables.toSet(),
+      )
+      .getSingleOrNull();
   if (row != null) {
     throw StateError(
       'ELV4_POWER_MEMBERSHIP_OWNED: Release or replace revision-scoped power '
@@ -240,26 +243,24 @@ Future<void> guardHierarchyElvPorts(
     HierarchyElvScope.floor => 'f.id',
     HierarchyElvScope.room => 'r.id',
   };
-  final binding =
-      await database
-          .customSelect(
-            'SELECT b.component_id FROM component_reference_bindings b JOIN component_instances ci ON ci.id=b.component_id JOIN rooms r ON ci.room_id=r.id JOIN floors f ON r.floor_id=f.id WHERE b.deleted_at IS NULL AND $column = ? LIMIT 1',
-            variables: [Variable.withString(id)],
-            readsFrom: database.allTables.toSet(),
-          )
-          .getSingleOrNull();
+  final binding = await database
+      .customSelect(
+        'SELECT b.component_id FROM component_reference_bindings b JOIN component_instances ci ON ci.id=b.component_id JOIN rooms r ON ci.room_id=r.id JOIN floors f ON r.floor_id=f.id WHERE b.deleted_at IS NULL AND $column = ? LIMIT 1',
+        variables: [Variable.withString(id)],
+        readsFrom: database.allTables.toSet(),
+      )
+      .getSingleOrNull();
   if (binding != null)
     throw StateError(
       'Release engineering profile bindings before deleting their hierarchy.',
     );
-  final row =
-      await database
-          .customSelect(
-            'SELECT ep.id FROM engineering_port_instances ep JOIN component_instances ci ON ci.id = ep.component_id JOIN rooms r ON r.id = ci.room_id JOIN floors f ON f.id = r.floor_id WHERE ep.deleted_at IS NULL AND $column = ? LIMIT 1',
-            variables: [Variable.withString(id)],
-            readsFrom: database.allTables.toSet(),
-          )
-          .getSingleOrNull();
+  final row = await database
+      .customSelect(
+        'SELECT ep.id FROM engineering_port_instances ep JOIN component_instances ci ON ci.id = ep.component_id JOIN rooms r ON r.id = ci.room_id JOIN floors f ON f.id = r.floor_id WHERE ep.deleted_at IS NULL AND $column = ? LIMIT 1',
+        variables: [Variable.withString(id)],
+        readsFrom: database.allTables.toSet(),
+      )
+      .getSingleOrNull();
   if (row != null)
     throw StateError(
       'Resolve engineering ports before deleting their project/floor/room.',

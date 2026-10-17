@@ -7,20 +7,23 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('projects exact expanded addresses and profile resource contributions', () async {
-    final resolver = Fa01PersistedInputResolver(
-      fireStore: _FireStore(reserved: const <int>[]),
-      contractSource: _ContractSource(_contract()),
-      nowUtc: () => DateTime.utc(2026, 10, 17),
-    );
-    final captured = await resolver.capture(_request());
-    final candidate = await buildFa01Executor().execute(captured);
-    expect(candidate.assessment, Elv5Assessment.pass);
-    expect(candidate.output['deviceCount'], 3);
-    expect(candidate.output['addressCount'], 4);
-    expect(candidate.output['deviceHeadroom'], 1);
-    expect(candidate.output['addressHeadroom'], 1);
-  });
+  test(
+    'projects exact expanded addresses and profile resource contributions',
+    () async {
+      final resolver = Fa01PersistedInputResolver(
+        fireStore: _FireStore(reserved: const <int>[]),
+        contractSource: _ContractSource(_contract()),
+        nowUtc: () => DateTime.utc(2026, 10, 17),
+      );
+      final captured = await resolver.capture(_request());
+      final candidate = await buildFa01Executor().execute(captured);
+      expect(candidate.assessment, Elv5Assessment.pass);
+      expect(candidate.output['deviceCount'], 3);
+      expect(candidate.output['addressCount'], 4);
+      expect(candidate.output['deviceHeadroom'], 1);
+      expect(candidate.output['addressHeadroom'], 1);
+    },
+  );
 
   test('reserved address collision is an engineering FAIL', () async {
     final resolver = Fa01PersistedInputResolver(
@@ -41,8 +44,8 @@ void main() {
       addressLimit: 5,
       requiredDeviceSpare: 0,
       requiredAddressSpare: 0,
-      profileAddressConsumption: const <String,int>{'single': 1},
-      profileDeviceCountContribution: const <String,int>{'single': 1},
+      profileAddressConsumption: const <String, int>{'single': 1},
+      profileDeviceCountContribution: const <String, int>{'single': 1},
     );
     final resolver = Fa01PersistedInputResolver(
       fireStore: _FireStore(reserved: const <int>[]),
@@ -50,11 +53,13 @@ void main() {
     );
     await expectLater(
       resolver.capture(_request()),
-      throwsA(isA<Elv5CaptureBlockedException>().having(
-        (value) => value.reasonCode,
-        'reasonCode',
-        'FA01_PROFILE_RESOURCE_EVIDENCE_MISSING',
-      )),
+      throwsA(
+        isA<Elv5CaptureBlockedException>().having(
+          (value) => value.reasonCode,
+          'reasonCode',
+          'FA01_PROFILE_RESOURCE_EVIDENCE_MISSING',
+        ),
+      ),
     );
   });
 }
@@ -65,14 +70,18 @@ Fa01AddressCapacityContract _contract() => Fa01AddressCapacityContract(
   addressLimit: 5,
   requiredDeviceSpare: 0,
   requiredAddressSpare: 0,
-  profileAddressConsumption: const <String,int>{'single': 1, 'dual': 2},
-  profileDeviceCountContribution: const <String,int>{'single': 1, 'dual': 1},
+  profileAddressConsumption: const <String, int>{'single': 1, 'dual': 2},
+  profileDeviceCountContribution: const <String, int>{'single': 1, 'dual': 1},
 );
 
 Elv5CalculationRequest _request() => Elv5CalculationRequest(
   projectId: 'p',
   designRevisionId: 'd',
-  scope: Elv5ScopeRef(kind: Elv5ScopeKind.design, scopeId: 'd', scenarioKey: 'NONE'),
+  scope: Elv5ScopeRef(
+    kind: Elv5ScopeKind.design,
+    scopeId: 'd',
+    scenarioKey: 'NONE',
+  ),
   processCode: Elv5ProcessCode.fa01,
   subject: Elv5SubjectRef(kind: 'FIRE_LOOP', id: 'loop-1'),
   expectedPointerGeneration: 0,
@@ -92,17 +101,36 @@ final class _FireStore implements Elv5FireFactStore {
     aggregateId: 'ELV5:FIRE_LOOP:loop-1',
     subjectId: 'loop-1',
     revision: 2,
-    payload: <String,Object?>{
-      'loopId':'loop-1',
-      'topologyProfileRef':<String,Object?>{'profileCode':'CLASS-A','editionId':'v1','contentHash':_hash('a')},
-      'addressDomain':<String,Object?>{
-        'panelId':'panel-1','loopId':'loop-1','minAddress':10,'maxAddress':14,
-        'reservedAddresses':reserved,
+    payload: <String, Object?>{
+      'loopId': 'loop-1',
+      'topologyProfileRef': <String, Object?>{
+        'profileCode': 'CLASS-A',
+        'editionId': 'v1',
+        'contentHash': _hash('a'),
       },
-      'deviceAssignments':<Object?>[
-        <String,Object?>{'deviceId':'d1','profileRef':'single','expandedAddresses':<int>[10]},
-        <String,Object?>{'deviceId':'d2','profileRef':'single','expandedAddresses':<int>[11]},
-        <String,Object?>{'deviceId':'d3','profileRef':'dual','expandedAddresses':<int>[12,13]},
+      'addressDomain': <String, Object?>{
+        'panelId': 'panel-1',
+        'loopId': 'loop-1',
+        'minAddress': 10,
+        'maxAddress': 14,
+        'reservedAddresses': reserved,
+      },
+      'deviceAssignments': <Object?>[
+        <String, Object?>{
+          'deviceId': 'd1',
+          'profileRef': 'single',
+          'expandedAddresses': <int>[10],
+        },
+        <String, Object?>{
+          'deviceId': 'd2',
+          'profileRef': 'single',
+          'expandedAddresses': <int>[11],
+        },
+        <String, Object?>{
+          'deviceId': 'd3',
+          'profileRef': 'dual',
+          'expandedAddresses': <int>[12, 13],
+        },
       ],
     },
   );
@@ -117,8 +145,11 @@ final class _ContractSource implements Fa01AddressCapacityContractSource {
     required String designRevisionId,
     required String loopId,
   }) async => Fa01AddressCapacityContractSnapshot(
-    bindingId:'fa01-binding',bindingRevision:1,
-    evidenceRef:'FA01:loop-1:${_hash('b')}',contentHash:_hash('b'),contract:contract,
+    bindingId: 'fa01-binding',
+    bindingRevision: 1,
+    evidenceRef: 'FA01:loop-1:${_hash('b')}',
+    contentHash: _hash('b'),
+    contract: contract,
   );
 }
 

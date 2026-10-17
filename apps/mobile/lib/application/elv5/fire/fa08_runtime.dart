@@ -148,7 +148,9 @@ final class Fa08PersistedInputResolver
         );
       }
     }
-    final ampacityIds = ampacity.orderedSections.map((e) => e.sectionId).toSet();
+    final ampacityIds = ampacity.orderedSections
+        .map((e) => e.sectionId)
+        .toSet();
     final factIds = factBySection.keys.toSet();
     if (ampacityIds.length != factIds.length ||
         !ampacityIds.containsAll(factIds)) {
@@ -237,7 +239,8 @@ final class Fa08PersistedInputResolver
         <String, String>{
           'domain': 'AMPACITY_TEMPERATURE_CORRECTION',
           'ref': section.ampacityInput.temperatureCorrection.evidenceRef,
-          'hash': section.ampacityInput.temperatureCorrection.evidenceContentHash,
+          'hash':
+              section.ampacityInput.temperatureCorrection.evidenceContentHash,
         },
         <String, String>{
           'domain': 'AMPACITY_GROUPING_CORRECTION',
@@ -375,19 +378,18 @@ Elv5PureKernelExecutor<Fa08Input, Fa08Result> buildFa08Executor({
   },
   encodeEvidence: (captured, _) => <String, Object?>{
     'schema': 'electra.elv5-fa08-evidence.v2',
-    'source':
-        'PINNED_CABLE_EDITION_PLUS_VERSIONED_ENVIRONMENT_PLUS_EXACT_ROUTE_AMPACITY',
+    'source': 'PINNED_CABLE_EDITION_PLUS_VERSIONED_ENVIRONMENT_PLUS_EXACT_ROUTE_AMPACITY',
     'captureRevision': captured.captureRevision,
     'verifiedComplianceOwner': 'ELV7',
   },
   executionOf: (result) =>
       result.technicalPolicyMatch == Fa08AssessmentStatus.blocked
-          ? Elv5Execution.blocked
-          : Elv5Execution.succeeded,
+      ? Elv5Execution.blocked
+      : Elv5Execution.succeeded,
   completionOf: (result) =>
       result.technicalPolicyMatch == Fa08AssessmentStatus.blocked
-          ? Elv5Completion.incomplete
-          : Elv5Completion.complete,
+      ? Elv5Completion.incomplete
+      : Elv5Completion.complete,
   assessmentOf: (result) => switch (result.technicalPolicyMatch) {
     Fa08AssessmentStatus.pass => Elv5Assessment.pass,
     Fa08AssessmentStatus.fail => Elv5Assessment.fail,

@@ -51,13 +51,17 @@ final class Cctv02PersistedInputResolver
       cameraId: request.subject.id,
     );
     if (snapshot == null) {
-      throw StateError('CCTV02_CAMERA_STREAM_FACTS_MISSING:${request.subject.id}');
+      throw StateError(
+        'CCTV02_CAMERA_STREAM_FACTS_MISSING:${request.subject.id}',
+      );
     }
 
     final payload = snapshot.payload;
     final cameraId = _requiredText(payload, 'cameraId');
     if (cameraId != request.subject.id) {
-      throw StateError('CCTV02_CAMERA_ID_MISMATCH:$cameraId:${request.subject.id}');
+      throw StateError(
+        'CCTV02_CAMERA_ID_MISMATCH:$cameraId:${request.subject.id}',
+      );
     }
 
     final streams = <Cctv02Stream>[];
@@ -91,8 +95,9 @@ final class Cctv02PersistedInputResolver
           );
     final recorderIdsByStream = <String, Set<String>>{};
     for (final assignment in explicitAssignments) {
-      (recorderIdsByStream[assignment.encodedStreamId] ??= <String>{})
-          .add(assignment.recorderId);
+      (recorderIdsByStream[assignment.encodedStreamId] ??= <String>{}).add(
+        assignment.recorderId,
+      );
     }
 
     final subscriptions = <Cctv02Subscription>[];
@@ -101,13 +106,18 @@ final class Cctv02PersistedInputResolver
       final subscription = Map<String, Object?>.from(raw as Map);
       final streamId = _requiredText(subscription, 'encodedStreamId');
       final receiverId = _requiredText(subscription, 'receiverId');
-      final assignedRecorders = recorderIdsByStream[streamId] ?? const <String>{};
-      final recorderId = assignedRecorders.contains(receiverId) ? receiverId : null;
+      final assignedRecorders =
+          recorderIdsByStream[streamId] ?? const <String>{};
+      final recorderId = assignedRecorders.contains(receiverId)
+          ? receiverId
+          : null;
       final modeText = _requiredText(subscription, 'deliveryMode');
       final mode = switch (modeText) {
         'UNICAST' => Cctv02DeliveryMode.unicast,
         'MULTICAST' => Cctv02DeliveryMode.multicast,
-        _ => throw FormatException('Unsupported CCTV-02 deliveryMode: $modeText'),
+        _ => throw FormatException(
+          'Unsupported CCTV-02 deliveryMode: $modeText',
+        ),
       };
       final groupId = subscription['multicastGroupId'] as String?;
       final path = _requiredStringList(subscription, 'orderedNetworkEdgeIds');
@@ -146,15 +156,15 @@ final class Cctv02PersistedInputResolver
 
     final assignmentBasis = <Object?>[
       for (final assignment in explicitAssignments)
-        <String,Object?>{
-          'bindingId':assignment.bindingId,
-          'bindingRevision':assignment.bindingRevision,
-          'recorderId':assignment.recorderId,
-          'assignmentId':assignment.assignmentId,
-          'cameraId':assignment.cameraId,
-          'encodedStreamId':assignment.encodedStreamId,
-          'licenseChannelId':assignment.licenseChannelId,
-          'storagePoolId':assignment.storagePoolId,
+        <String, Object?>{
+          'bindingId': assignment.bindingId,
+          'bindingRevision': assignment.bindingRevision,
+          'recorderId': assignment.recorderId,
+          'assignmentId': assignment.assignmentId,
+          'cameraId': assignment.cameraId,
+          'encodedStreamId': assignment.encodedStreamId,
+          'licenseChannelId': assignment.licenseChannelId,
+          'storagePoolId': assignment.storagePoolId,
         },
     ];
     final inputBasis = <String, Object?>{
@@ -169,7 +179,8 @@ final class Cctv02PersistedInputResolver
       'schema': 'electra.elv5-cctv02-policy-basis.v1',
       'transportOverheadModelRef': payload['transportOverheadModelRef'],
       'edgeCapacityPolicy': 'NOT_CAPTURED_V1',
-      'recorderIngressIdentity': 'EXPLICIT_RECORDER_ASSIGNMENT_AND_RECEIVER_ID_V1',
+      'recorderIngressIdentity':
+          'EXPLICIT_RECORDER_ASSIGNMENT_AND_RECEIVER_ID_V1',
     };
 
     final dependencies = <Elv5DependencyMarker>[
@@ -264,7 +275,8 @@ Elv5PureKernelExecutor<Cctv02Input, Cctv02Result> buildCctv02Executor({
   encodeOutput: _encodeCctv02Output,
   encodeEvidence: (captured, output) => <String, Object?>{
     'schema': 'electra.elv5-cctv02-evidence.v2',
-    'source': 'ELV5_PERSISTED_CAMERA_STREAMS_PLUS_EXPLICIT_RECORDER_ASSIGNMENTS',
+    'source':
+        'ELV5_PERSISTED_CAMERA_STREAMS_PLUS_EXPLICIT_RECORDER_ASSIGNMENTS',
     'captureRevision': captured.captureRevision,
     'dependencyKeySha256s': [
       for (final dependency in captured.dependencies)
@@ -274,7 +286,8 @@ Elv5PureKernelExecutor<Cctv02Input, Cctv02Result> buildCctv02Executor({
   },
   executionOf: (_) => Elv5Execution.succeeded,
   completionOf: (output) {
-    final peakComplete = output.edges.values.every((edge) => edge.peak.complete) &&
+    final peakComplete =
+        output.edges.values.every((edge) => edge.peak.complete) &&
         output.recorderIngress.values.every((value) => value.peak.complete);
     return peakComplete ? Elv5Completion.complete : Elv5Completion.incomplete;
   },
@@ -282,25 +295,24 @@ Elv5PureKernelExecutor<Cctv02Input, Cctv02Result> buildCctv02Executor({
   nowUtc: nowUtc,
 );
 
-Map<String, Object?> _encodeCctv02Output(Cctv02Result output) =>
-    <String, Object?>{
-      'schema': 'electra.elv5-cctv02-output.v1',
-      'edges': <String, Object?>{
-        for (final edgeId in output.edges.keys.toList()..sort())
-          edgeId: _encodeTraffic(output.edges[edgeId]!),
+Map<String, Object?> _encodeCctv02Output(
+  Cctv02Result output,
+) => <String, Object?>{
+  'schema': 'electra.elv5-cctv02-output.v1',
+  'edges': <String, Object?>{
+    for (final edgeId in output.edges.keys.toList()..sort())
+      edgeId: _encodeTraffic(output.edges[edgeId]!),
+  },
+  'recorderIngress': <String, Object?>{
+    for (final recorderId in output.recorderIngress.keys.toList()..sort())
+      recorderId: <String, Object?>{
+        'expected': _encodeTrafficValue(
+          output.recorderIngress[recorderId]!.expected,
+        ),
+        'peak': _encodeTrafficValue(output.recorderIngress[recorderId]!.peak),
       },
-      'recorderIngress': <String, Object?>{
-        for (final recorderId in output.recorderIngress.keys.toList()..sort())
-          recorderId: <String, Object?>{
-            'expected': _encodeTrafficValue(
-              output.recorderIngress[recorderId]!.expected,
-            ),
-            'peak': _encodeTrafficValue(
-              output.recorderIngress[recorderId]!.peak,
-            ),
-          },
-      },
-    };
+  },
+};
 
 Map<String, Object?> _encodeTraffic(Cctv02EdgeTraffic traffic) =>
     <String, Object?>{

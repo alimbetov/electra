@@ -7,73 +7,86 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('keeps ACS-03 contract editions immutable and CAS-switches selector', () async {
-    final db = AppDatabase(NativeDatabase.memory());
-    addTearDown(db.close);
-    await _seed(db);
-    final store = DriftAcs03ElectricalContractStore(
-      db,
-      originDeviceId: 'test',
-      nowUtc: () => DateTime.utc(2026, 10, 17, 12),
-    );
+  test(
+    'keeps ACS-03 contract editions immutable and CAS-switches selector',
+    () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      await _seed(db);
+      final store = DriftAcs03ElectricalContractStore(
+        db,
+        originDeviceId: 'test',
+        nowUtc: () => DateTime.utc(2026, 10, 17, 12),
+      );
 
-    await store.replace(
-      ReplaceAcs03ElectricalContractCommand(
+      await store.replace(
+        ReplaceAcs03ElectricalContractCommand(
+          projectId: 'p',
+          designRevisionId: 'd',
+          bindingId: 'acs03-binding-1',
+          expectedBindingRevision: null,
+          expectedDesignRevision: 1,
+          contract: _contract(startupCurrent: '0.30'),
+        ),
+      );
+
+      final first = await store.loadActiveForDoor(
         projectId: 'p',
         designRevisionId: 'd',
-        bindingId: 'acs03-binding-1',
-        expectedBindingRevision: null,
-        expectedDesignRevision: 1,
-        contract: _contract(startupCurrent: '0.30'),
-      ),
-    );
+        doorId: 'door-1',
+      );
+      expect(first, isNotNull);
+      expect(first!.bindingRevision, 1);
+      expect(
+        first.contract.events.last.lockCurrent.value,
+        Elv5Rational.parseDecimal('0.30'),
+      );
+      final firstEvidenceRef = first.evidenceRef;
 
-    final first = await store.loadActiveForDoor(
-      projectId: 'p',
-      designRevisionId: 'd',
-      doorId: 'door-1',
-    );
-    expect(first, isNotNull);
-    expect(first!.bindingRevision, 1);
-    expect(first.contract.events.last.lockCurrent.value, Elv5Rational.parseDecimal('0.30'));
-    final firstEvidenceRef = first.evidenceRef;
+      await store.replace(
+        ReplaceAcs03ElectricalContractCommand(
+          projectId: 'p',
+          designRevisionId: 'd',
+          bindingId: 'acs03-binding-1',
+          expectedBindingRevision: 1,
+          expectedDesignRevision: 2,
+          contract: _contract(startupCurrent: '0.35'),
+        ),
+      );
 
-    await store.replace(
-      ReplaceAcs03ElectricalContractCommand(
+      final second = await store.loadActiveForDoor(
         projectId: 'p',
         designRevisionId: 'd',
-        bindingId: 'acs03-binding-1',
-        expectedBindingRevision: 1,
-        expectedDesignRevision: 2,
-        contract: _contract(startupCurrent: '0.35'),
-      ),
-    );
+        doorId: 'door-1',
+      );
+      expect(second, isNotNull);
+      expect(second!.bindingRevision, 2);
+      expect(second.evidenceRef, isNot(firstEvidenceRef));
+      expect(
+        second.contract.events.last.lockCurrent.value,
+        Elv5Rational.parseDecimal('0.35'),
+      );
 
-    final second = await store.loadActiveForDoor(
-      projectId: 'p',
-      designRevisionId: 'd',
-      doorId: 'door-1',
-    );
-    expect(second, isNotNull);
-    expect(second!.bindingRevision, 2);
-    expect(second.evidenceRef, isNot(firstEvidenceRef));
-    expect(second.contract.events.last.lockCurrent.value, Elv5Rational.parseDecimal('0.35'));
+      final evidenceRows = await db
+          .customSelect(
+            "SELECT evidence_ref, payload_sha256 FROM elv_revision_aggregate_evidence_records "
+            "WHERE aggregate_kind = 'ACS03_ELECTRICAL_CONTRACT' ORDER BY evidence_ref",
+          )
+          .get();
+      expect(evidenceRows, hasLength(2));
+      expect(
+        evidenceRows.map((row) => row.read<String>('evidence_ref')),
+        contains(firstEvidenceRef),
+      );
 
-    final evidenceRows = await db.customSelect(
-      "SELECT evidence_ref, payload_sha256 FROM elv_revision_aggregate_evidence_records "
-      "WHERE aggregate_kind = 'ACS03_ELECTRICAL_CONTRACT' ORDER BY evidence_ref",
-    ).get();
-    expect(evidenceRows, hasLength(2));
-    expect(
-      evidenceRows.map((row) => row.read<String>('evidence_ref')),
-      contains(firstEvidenceRef),
-    );
-
-    final revision = await db.customSelect(
-      "SELECT revision FROM project_design_revisions WHERE id = 'd'",
-    ).getSingle();
-    expect(revision.read<int>('revision'), 3);
-  });
+      final revision = await db
+          .customSelect(
+            "SELECT revision FROM project_design_revisions WHERE id = 'd'",
+          )
+          .getSingle();
+      expect(revision.read<int>('revision'), 3);
+    },
+  );
 }
 
 Acs03ElectricalContract _contract({required String startupCurrent}) =>
@@ -96,16 +109,16 @@ Acs03ElectricalEventContract _event(
   Acs03StateCode state,
   String current,
 ) => Acs03ElectricalEventContract(
-      eventId: id,
-      state: state,
-      durationMicroseconds: BigInt.from(1000000),
-      scenarioId: 'scenario-${state.name}',
-      segmentId: 'segment-${state.name}',
-      domainId: 'domain-1',
-      lockLoadOriginId: 'lock-origin-1',
-      sharedTrunkSectionId: 'trunk-1',
-      lockCurrent: Current(Elv5Rational.parseDecimal(current)),
-    );
+  eventId: id,
+  state: state,
+  durationMicroseconds: BigInt.from(1000000),
+  scenarioId: 'scenario-${state.name}',
+  segmentId: 'segment-${state.name}',
+  domainId: 'domain-1',
+  lockLoadOriginId: 'lock-origin-1',
+  sharedTrunkSectionId: 'trunk-1',
+  lockCurrent: Current(Elv5Rational.parseDecimal(current)),
+);
 
 Future<void> _seed(AppDatabase db) async {
   await db.customStatement('PRAGMA foreign_keys = OFF');

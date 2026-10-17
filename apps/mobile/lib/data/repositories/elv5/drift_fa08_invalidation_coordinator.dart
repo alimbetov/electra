@@ -14,7 +14,8 @@ final class DriftFa08InvalidationCoordinator {
   final String originDeviceId;
   final DateTime Function()? _nowUtc;
 
-  DriftElv5DependencyInvalidator get _invalidator => DriftElv5DependencyInvalidator(
+  DriftElv5DependencyInvalidator get _invalidator =>
+      DriftElv5DependencyInvalidator(
         database,
         originDeviceId: originDeviceId,
         nowUtc: _nowUtc,
@@ -25,64 +26,66 @@ final class DriftFa08InvalidationCoordinator {
     required String designRevisionId,
     required String oldEvidenceRef,
   }) => _invalidator.invalidate(
-        projectId: projectId,
-        designRevisionId: designRevisionId,
-        dependencies: <Elv5InvalidationDependency>[
-          Elv5InvalidationDependency(
-            relationKind: 'POLICY',
-            domain: 'ELV5_ENVIRONMENT_PROFILE',
-            subjectId: oldEvidenceRef,
-          ),
-        ],
-      );
+    projectId: projectId,
+    designRevisionId: designRevisionId,
+    dependencies: <Elv5InvalidationDependency>[
+      Elv5InvalidationDependency(
+        relationKind: 'POLICY',
+        domain: 'ELV5_ENVIRONMENT_PROFILE',
+        subjectId: oldEvidenceRef,
+      ),
+    ],
+  );
 
   Future<int> groupingEvidenceChanged({
     required String projectId,
     required String designRevisionId,
     required String oldEvidenceRef,
   }) => _invalidator.invalidate(
-        projectId: projectId,
-        designRevisionId: designRevisionId,
-        dependencies: <Elv5InvalidationDependency>[
-          Elv5InvalidationDependency(
-            relationKind: 'POLICY',
-            domain: 'AMPACITY_GROUPING_CORRECTION',
-            subjectId: oldEvidenceRef,
-          ),
-        ],
-      );
+    projectId: projectId,
+    designRevisionId: designRevisionId,
+    dependencies: <Elv5InvalidationDependency>[
+      Elv5InvalidationDependency(
+        relationKind: 'POLICY',
+        domain: 'AMPACITY_GROUPING_CORRECTION',
+        subjectId: oldEvidenceRef,
+      ),
+    ],
+  );
 
   Future<int> routeChanged({
     required String projectId,
     required String designRevisionId,
     required String cableRunId,
   }) => _invalidator.invalidate(
-        projectId: projectId,
-        designRevisionId: designRevisionId,
-        dependencies: <Elv5InvalidationDependency>[
-          Elv5InvalidationDependency(
-            relationKind: 'SET',
-            domain: 'CABLE_RUN_ROUTE',
-            subjectId: cableRunId,
-          ),
-        ],
-      );
+    projectId: projectId,
+    designRevisionId: designRevisionId,
+    dependencies: <Elv5InvalidationDependency>[
+      Elv5InvalidationDependency(
+        relationKind: 'SET',
+        domain: 'CABLE_RUN_ROUTE',
+        subjectId: cableRunId,
+      ),
+    ],
+  );
 
   Future<int> cableDefinitionChanged({
     required String projectId,
     required String designRevisionId,
     required String cableId,
   }) async {
-    final rows = await database.customSelect(
-      'SELECT id FROM canonical_cable_runs '
-      'WHERE project_id = ? AND design_revision_id = ? AND cable_id = ? '
-      "AND lifecycle_state = 'ACTIVE' AND deleted_at IS NULL ORDER BY id",
-      variables: <Variable>[
-        Variable.withString(projectId),
-        Variable.withString(designRevisionId),
-        Variable.withString(cableId),
-      ],
-    ).get();
+    final rows = await database
+        .customSelect(
+          'SELECT id FROM canonical_cable_runs '
+          'WHERE project_id = ? AND design_revision_id = ? AND cable_id = ? '
+          "AND lifecycle_state = 'ACTIVE' AND deleted_at IS NULL ORDER BY id",
+          variables: <Variable>[
+            Variable.withString(projectId),
+            Variable.withString(designRevisionId),
+            Variable.withString(cableId),
+          ],
+        )
+        .get();
     if (rows.isEmpty) return 0;
     return _invalidator.invalidate(
       projectId: projectId,

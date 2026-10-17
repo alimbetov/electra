@@ -28,10 +28,7 @@ final class Cctv01ExactVec3Contract {
 }
 
 final class Cctv01ExactSurfaceFrameContract {
-  Cctv01ExactSurfaceFrameContract({
-    required this.uAxis,
-    required this.vAxis,
-  }) {
+  Cctv01ExactSurfaceFrameContract({required this.uAxis, required this.vAxis}) {
     if (_norm2(uAxis) != Elv5Rational.one ||
         _norm2(vAxis) != Elv5Rational.one ||
         !_dot(uAxis, vAxis).isZero) {
@@ -80,21 +77,27 @@ final class Cctv01GeometryContract {
     this.hostSurfaceFrame,
     this.targetSurfaceFrame,
     this.legacyFrameAxisTolerance,
-  })  : cameraId = _text(cameraId, 'cameraId'),
-        roomId = _text(roomId, 'roomId'),
-        expectedDefinitionId = _text(expectedDefinitionId, 'expectedDefinitionId'),
-        targetSurfacePatchId = _text(targetSurfacePatchId, 'targetSurfacePatchId'),
-        geometryModelEditionId = _text(
-          geometryModelEditionId,
-          'geometryModelEditionId',
-        ),
-        geometryModelContentHash = _sha(
-          geometryModelContentHash,
-          'geometryModelContentHash',
-        ),
-        expectedHostSurfacePatchId = expectedHostSurfacePatchId == null
-            ? null
-            : _text(expectedHostSurfacePatchId, 'expectedHostSurfacePatchId') {
+  }) : cameraId = _text(cameraId, 'cameraId'),
+       roomId = _text(roomId, 'roomId'),
+       expectedDefinitionId = _text(
+         expectedDefinitionId,
+         'expectedDefinitionId',
+       ),
+       targetSurfacePatchId = _text(
+         targetSurfacePatchId,
+         'targetSurfacePatchId',
+       ),
+       geometryModelEditionId = _text(
+         geometryModelEditionId,
+         'geometryModelEditionId',
+       ),
+       geometryModelContentHash = _sha(
+         geometryModelContentHash,
+         'geometryModelContentHash',
+       ),
+       expectedHostSurfacePatchId = expectedHostSurfacePatchId == null
+           ? null
+           : _text(expectedHostSurfacePatchId, 'expectedHostSurfacePatchId') {
     if (expectedDefinitionVersion < 1) {
       throw ArgumentError.value(
         expectedDefinitionVersion,
@@ -123,12 +126,16 @@ final class Cctv01GeometryContract {
     if (_norm2(forward) != Elv5Rational.one ||
         _norm2(right) != Elv5Rational.one ||
         _norm2(up) != Elv5Rational.one) {
-      throw ArgumentError('CCTV01 orientation vectors must be exact unit vectors.');
+      throw ArgumentError(
+        'CCTV01 orientation vectors must be exact unit vectors.',
+      );
     }
     if (!_dot(forward, right).isZero ||
         !_dot(forward, up).isZero ||
         !_dot(right, up).isZero) {
-      throw ArgumentError('CCTV01 orientation vectors must be exactly orthogonal.');
+      throw ArgumentError(
+        'CCTV01 orientation vectors must be exactly orthogonal.',
+      );
     }
 
     final exactFrameFields = <Object?>[
@@ -253,7 +260,9 @@ final class Cctv01GeometryContract {
     final pinhole = map['rectilinearPinholeSupported'];
     final planar = map['targetIsPlanar'];
     if (pinhole is! bool || planar is! bool) {
-      throw const FormatException('CCTV01 applicability flags must be boolean.');
+      throw const FormatException(
+        'CCTV01 applicability flags must be boolean.',
+      );
     }
     return Cctv01GeometryContract(
       cameraId: _mapText(map, 'cameraId'),
@@ -373,8 +382,35 @@ abstract interface class Cctv01GeometryContractWriter {
 Elv5Rational _dot(Cctv01ExactVec3Contract a, Cctv01ExactVec3Contract b) =>
     a.x * b.x + a.y * b.y + a.z * b.z;
 Elv5Rational _norm2(Cctv01ExactVec3Contract a) => _dot(a, a);
-Map<String,Object?> _map(Object? value,String field){if(value is! Map)throw FormatException('$field must be object.');return Map<String,Object?>.from(value);}
-String _mapText(Map<String,Object?> map,String field){final value=map[field];if(value is! String)throw FormatException('$field must be text.');return _text(value,field);}
-String _text(String value,String field){final normalized=value.trim();if(normalized.isEmpty)throw ArgumentError.value(value,field,'Must not be empty.');return normalized;}
-String _sha(String value,String field){final normalized=_text(value,field).toLowerCase();if(!RegExp(r'^[0-9a-f]{64}$').hasMatch(normalized))throw ArgumentError.value(value,field,'Expected lowercase SHA-256.');return normalized;}
-void _exact(Map<String,Object?> map,Set<String> expected,String field){final actual=map.keys.toSet();if(actual.length!=expected.length||actual.difference(expected).isNotEmpty||expected.difference(actual).isNotEmpty)throw FormatException('$field has missing or unknown fields.');}
+Map<String, Object?> _map(Object? value, String field) {
+  if (value is! Map) throw FormatException('$field must be object.');
+  return Map<String, Object?>.from(value);
+}
+
+String _mapText(Map<String, Object?> map, String field) {
+  final value = map[field];
+  if (value is! String) throw FormatException('$field must be text.');
+  return _text(value, field);
+}
+
+String _text(String value, String field) {
+  final normalized = value.trim();
+  if (normalized.isEmpty)
+    throw ArgumentError.value(value, field, 'Must not be empty.');
+  return normalized;
+}
+
+String _sha(String value, String field) {
+  final normalized = _text(value, field).toLowerCase();
+  if (!RegExp(r'^[0-9a-f]{64}$').hasMatch(normalized))
+    throw ArgumentError.value(value, field, 'Expected lowercase SHA-256.');
+  return normalized;
+}
+
+void _exact(Map<String, Object?> map, Set<String> expected, String field) {
+  final actual = map.keys.toSet();
+  if (actual.length != expected.length ||
+      actual.difference(expected).isNotEmpty ||
+      expected.difference(actual).isNotEmpty)
+    throw FormatException('$field has missing or unknown fields.');
+}

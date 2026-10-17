@@ -79,23 +79,26 @@ Future<void> _bootstrap(AppDatabase db) async {
 
 Future<void> _expectNoFreezeArtifacts(AppDatabase db) async {
   expect(
-    await (db.select(db.designRevisionPhysicalSnapshots)
-      ..where((row) => row.designRevisionId.equals(_revisionId))).get(),
+    await (db.select(
+      db.designRevisionPhysicalSnapshots,
+    )..where((row) => row.designRevisionId.equals(_revisionId))).get(),
     isEmpty,
   );
   expect(
-    await (db.select(db.designRevisionPowerSnapshots)
-      ..where((row) => row.designRevisionId.equals(_revisionId))).get(),
+    await (db.select(
+      db.designRevisionPowerSnapshots,
+    )..where((row) => row.designRevisionId.equals(_revisionId))).get(),
     isEmpty,
   );
   expect(
-    await (db.select(db.designRevisionSnapshotManifests)
-      ..where((row) => row.designRevisionId.equals(_revisionId))).get(),
+    await (db.select(
+      db.designRevisionSnapshotManifests,
+    )..where((row) => row.designRevisionId.equals(_revisionId))).get(),
     isEmpty,
   );
-  final revision =
-      await (db.select(db.projectDesignRevisions)
-        ..where((row) => row.id.equals(_revisionId))).getSingle();
+  final revision = await (db.select(
+    db.projectDesignRevisions,
+  )..where((row) => row.id.equals(_revisionId))).getSingle();
   expect(revision.state, 'WORKING');
   expect(revision.revision, 1);
 }
@@ -139,44 +142,39 @@ void main() {
     },
   );
 
-  test(
-    'P8 injected freeze failure atomically rolls back physical, power and manifest',
-    () async {
-      final dir = await Directory.systemTemp.createTemp(
-        'electra-elv4-p8-fault-',
-      );
-      addTearDown(() => dir.delete(recursive: true));
-      final file = File('${dir.path}/electra.sqlite');
+  test('P8 injected freeze failure atomically rolls back physical, power and manifest', () async {
+    final dir = await Directory.systemTemp.createTemp('electra-elv4-p8-fault-');
+    addTearDown(() => dir.delete(recursive: true));
+    final file = File('${dir.path}/electra.sqlite');
 
-      var db = AppDatabase(_native(file, configureWal: true));
-      await _seedProject(db);
-      await _bootstrap(db);
+    var db = AppDatabase(_native(file, configureWal: true));
+    await _seedProject(db);
+    await _bootstrap(db);
 
-      final repository = _repository(
-        db,
-        failureProbe: const _ThrowAt(
-          ElvFailurePoints.p3FreezeAfterSnapshotInsert,
+    final repository = _repository(
+      db,
+      failureProbe: const _ThrowAt(
+        ElvFailurePoints.p3FreezeAfterSnapshotInsert,
+      ),
+    );
+    await expectLater(
+      repository.freeze(
+        const FreezeProjectDesignRevisionCommand(
+          commandId: 'freeze-fault',
+          projectId: _projectId,
+          designRevisionId: _revisionId,
+          expectedRevision: 1,
         ),
-      );
-      await expectLater(
-        repository.freeze(
-          const FreezeProjectDesignRevisionCommand(
-            commandId: 'freeze-fault',
-            projectId: _projectId,
-            designRevisionId: _revisionId,
-            expectedRevision: 1,
-          ),
-        ),
-        throwsA(isA<StateError>()),
-      );
-      await _expectNoFreezeArtifacts(db);
+      ),
+      throwsA(isA<StateError>()),
+    );
+    await _expectNoFreezeArtifacts(db);
 
-      await db.close();
-      db = AppDatabase(_native(file));
-      addTearDown(db.close);
-      await _expectNoFreezeArtifacts(db);
-    },
-  );
+    await db.close();
+    db = AppDatabase(_native(file));
+    addTearDown(db.close);
+    await _expectNoFreezeArtifacts(db);
+  });
 
   test(
     'P8 concurrent freeze/create-next has only serializable revision outcomes',
@@ -221,24 +219,27 @@ void main() {
       final createResult = await createFuture;
       expect(freezeResult, isA<ElvCommandSuccess<ProjectDesignRevision>>());
 
-      final revisionR1 =
-          await (dbA.select(dbA.projectDesignRevisions)
-            ..where((row) => row.id.equals(_revisionId))).getSingle();
+      final revisionR1 = await (dbA.select(
+        dbA.projectDesignRevisions,
+      )..where((row) => row.id.equals(_revisionId))).getSingle();
       expect(revisionR1.state, 'FROZEN');
       expect(revisionR1.revision, 2);
       expect(
-        await (dbA.select(dbA.designRevisionPhysicalSnapshots)
-          ..where((row) => row.designRevisionId.equals(_revisionId))).get(),
+        await (dbA.select(
+          dbA.designRevisionPhysicalSnapshots,
+        )..where((row) => row.designRevisionId.equals(_revisionId))).get(),
         hasLength(1),
       );
       expect(
-        await (dbA.select(dbA.designRevisionPowerSnapshots)
-          ..where((row) => row.designRevisionId.equals(_revisionId))).get(),
+        await (dbA.select(
+          dbA.designRevisionPowerSnapshots,
+        )..where((row) => row.designRevisionId.equals(_revisionId))).get(),
         hasLength(1),
       );
       expect(
-        await (dbA.select(dbA.designRevisionSnapshotManifests)
-          ..where((row) => row.designRevisionId.equals(_revisionId))).get(),
+        await (dbA.select(
+          dbA.designRevisionSnapshotManifests,
+        )..where((row) => row.designRevisionId.equals(_revisionId))).get(),
         hasLength(1),
       );
 
@@ -271,9 +272,9 @@ void main() {
       final context = await _repository(reopened).context(_projectId);
       expect(context.latestFrozenRevisionId, _revisionId);
       expect(context.workingDesignRevisionId, 'REV-2');
-      final r2Rows =
-          await (reopened.select(reopened.projectDesignRevisions)
-            ..where((row) => row.id.equals('REV-2'))).get();
+      final r2Rows = await (reopened.select(
+        reopened.projectDesignRevisions,
+      )..where((row) => row.id.equals('REV-2'))).get();
       expect(r2Rows, hasLength(1));
     },
   );

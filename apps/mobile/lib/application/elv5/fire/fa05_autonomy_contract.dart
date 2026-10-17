@@ -14,12 +14,15 @@ final class Fa05SequenceSegmentContract {
   final BigInt durationMicroseconds;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'segmentId': segmentId,
-        'durationMicroseconds': durationMicroseconds.toString(),
-      };
+    'segmentId': segmentId,
+    'durationMicroseconds': durationMicroseconds.toString(),
+  };
 
   factory Fa05SequenceSegmentContract.fromMap(Map<String, Object?> map) {
-    _exact(map, const <String>{'segmentId', 'durationMicroseconds'}, 'FA05 segment');
+    _exact(map, const <String>{
+      'segmentId',
+      'durationMicroseconds',
+    }, 'FA05 segment');
     final duration = map['durationMicroseconds'];
     if (duration is! String) {
       throw const FormatException('FA05 durationMicroseconds must be text.');
@@ -42,18 +45,24 @@ final class Fa05AutonomyContract {
     required Iterable<String> fireProtectedLoadIds,
     this.requirePeakCurrentEvidence = false,
     this.requireEndOfDischargeEvidence = false,
-  })  : bankId = _text(bankId, 'bankId'),
-        scenarioId = _text(scenarioId, 'scenarioId'),
-        sequenceId = _text(sequenceId, 'sequenceId'),
-        expectedPwr04InputFingerprint =
-            _sha(expectedPwr04InputFingerprint, 'expectedPwr04InputFingerprint'),
-        segments = List.unmodifiable(_segments(segments)),
-        globalProtectedLoadIds =
-            Set.unmodifiable(_ids(globalProtectedLoadIds, 'globalProtectedLoadIds')),
-        fireProtectedLoadIds =
-            Set.unmodifiable(_ids(fireProtectedLoadIds, 'fireProtectedLoadIds')) {
+  }) : bankId = _text(bankId, 'bankId'),
+       scenarioId = _text(scenarioId, 'scenarioId'),
+       sequenceId = _text(sequenceId, 'sequenceId'),
+       expectedPwr04InputFingerprint = _sha(
+         expectedPwr04InputFingerprint,
+         'expectedPwr04InputFingerprint',
+       ),
+       segments = List.unmodifiable(_segments(segments)),
+       globalProtectedLoadIds = Set.unmodifiable(
+         _ids(globalProtectedLoadIds, 'globalProtectedLoadIds'),
+       ),
+       fireProtectedLoadIds = Set.unmodifiable(
+         _ids(fireProtectedLoadIds, 'fireProtectedLoadIds'),
+       ) {
     if (this.segments.isEmpty) {
-      throw ArgumentError('FA05 requires at least one protected sequence segment.');
+      throw ArgumentError(
+        'FA05 requires at least one protected sequence segment.',
+      );
     }
     if (this.globalProtectedLoadIds.isEmpty) {
       throw ArgumentError('FA05 global protected-load set must not be empty.');
@@ -62,7 +71,9 @@ final class Fa05AutonomyContract {
       throw ArgumentError('FA05 Fire protected-load set must not be empty.');
     }
     if (!this.globalProtectedLoadIds.containsAll(this.fireProtectedLoadIds)) {
-      throw ArgumentError('FA05 Fire protected loads must be a subset of global protected loads.');
+      throw ArgumentError(
+        'FA05 Fire protected loads must be a subset of global protected loads.',
+      );
     }
   }
 
@@ -80,29 +91,29 @@ final class Fa05AutonomyContract {
   final bool requireEndOfDischargeEvidence;
 
   String get sequenceFingerprint => _encoder.sha256(<String, Object?>{
-        'schema': 'electra.elv5-protected-sequence-fingerprint.v1',
-        'scenarioId': scenarioId,
-        'sequenceId': sequenceId,
-        'segments': [for (final value in segments) value.toCanonicalValue()],
-      });
+    'schema': 'electra.elv5-protected-sequence-fingerprint.v1',
+    'scenarioId': scenarioId,
+    'sequenceId': sequenceId,
+    'segments': [for (final value in segments) value.toCanonicalValue()],
+  });
 
   String get protectedLoadSetFingerprint => _encoder.sha256(<String, Object?>{
-        'schema': 'electra.elv5-protected-load-set-fingerprint.v1',
-        'loadIds': globalProtectedLoadIds.toList()..sort(),
-      });
+    'schema': 'electra.elv5-protected-load-set-fingerprint.v1',
+    'loadIds': globalProtectedLoadIds.toList()..sort(),
+  });
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'schema': schema,
-        'bankId': bankId,
-        'scenarioId': scenarioId,
-        'sequenceId': sequenceId,
-        'expectedPwr04InputFingerprint': expectedPwr04InputFingerprint,
-        'segments': [for (final value in segments) value.toCanonicalValue()],
-        'globalProtectedLoadIds': globalProtectedLoadIds.toList()..sort(),
-        'fireProtectedLoadIds': fireProtectedLoadIds.toList()..sort(),
-        'requirePeakCurrentEvidence': requirePeakCurrentEvidence,
-        'requireEndOfDischargeEvidence': requireEndOfDischargeEvidence,
-      };
+    'schema': schema,
+    'bankId': bankId,
+    'scenarioId': scenarioId,
+    'sequenceId': sequenceId,
+    'expectedPwr04InputFingerprint': expectedPwr04InputFingerprint,
+    'segments': [for (final value in segments) value.toCanonicalValue()],
+    'globalProtectedLoadIds': globalProtectedLoadIds.toList()..sort(),
+    'fireProtectedLoadIds': fireProtectedLoadIds.toList()..sort(),
+    'requirePeakCurrentEvidence': requirePeakCurrentEvidence,
+    'requireEndOfDischargeEvidence': requireEndOfDischargeEvidence,
+  };
 
   factory Fa05AutonomyContract.fromMap(Map<String, Object?> map) {
     _exact(map, const <String>{
@@ -125,15 +136,21 @@ final class Fa05AutonomyContract {
     final fire = map['fireProtectedLoadIds'];
     final peak = map['requirePeakCurrentEvidence'];
     final eod = map['requireEndOfDischargeEvidence'];
-    if (rawSegments is! List || global is! List || fire is! List ||
-        peak is! bool || eod is! bool) {
+    if (rawSegments is! List ||
+        global is! List ||
+        fire is! List ||
+        peak is! bool ||
+        eod is! bool) {
       throw const FormatException('FA05 contract field type mismatch.');
     }
     return Fa05AutonomyContract(
       bankId: _mapText(map, 'bankId'),
       scenarioId: _mapText(map, 'scenarioId'),
       sequenceId: _mapText(map, 'sequenceId'),
-      expectedPwr04InputFingerprint: _mapText(map, 'expectedPwr04InputFingerprint'),
+      expectedPwr04InputFingerprint: _mapText(
+        map,
+        'expectedPwr04InputFingerprint',
+      ),
       segments: <Fa05SequenceSegmentContract>[
         for (final raw in rawSegments)
           Fa05SequenceSegmentContract.fromMap(_object(raw, 'FA05 segment')),
@@ -195,12 +212,12 @@ Set<String> _ids(Iterable<String> values, String field) {
 }
 
 List<String> _strings(List raw, String field) => <String>[
-      for (final value in raw)
-        if (value is String)
-          _text(value, field)
-        else
-          throw FormatException('$field must contain text entries.'),
-    ];
+  for (final value in raw)
+    if (value is String)
+      _text(value, field)
+    else
+      throw FormatException('$field must contain text entries.'),
+];
 
 Map<String, Object?> _object(Object? value, String field) {
   if (value is! Map) throw FormatException('$field must be an object.');
@@ -215,7 +232,8 @@ String _mapText(Map<String, Object?> map, String field) {
 
 String _text(String value, String field) {
   final normalized = value.trim();
-  if (normalized.isEmpty) throw ArgumentError.value(value, field, 'Must not be empty.');
+  if (normalized.isEmpty)
+    throw ArgumentError.value(value, field, 'Must not be empty.');
   return normalized;
 }
 

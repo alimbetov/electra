@@ -167,7 +167,9 @@ final class _Fa03FixtureAdapter implements Elv5ProcessCalculationAdapter {
   }
 
   @override
-  Future<Elv5ProcessEvaluationCandidate> execute(Elv5CapturedProcess input) async {
+  Future<Elv5ProcessEvaluationCandidate> execute(
+    Elv5CapturedProcess input,
+  ) async {
     final descriptor = Elv5ProcessCatalog.require(processCode);
     return Elv5ProcessEvaluationCandidate(
       nodeKey: input.request.nodeKey,
@@ -197,7 +199,9 @@ final class _Fa03FixtureAdapter implements Elv5ProcessCalculationAdapter {
 
 Future<void> _seed(AppDatabase db) async {
   final now = DateTime.utc(2026, 10, 17, 11);
-  await db.into(db.projects).insert(
+  await db
+      .into(db.projects)
+      .insert(
         ProjectsCompanion.insert(
           id: 'project-1',
           name: 'F2 FA-03 concurrency fixture',
@@ -209,7 +213,9 @@ Future<void> _seed(AppDatabase db) async {
           originDeviceId: 'f2-fa03-q7',
         ),
       );
-  await db.into(db.projectDesignRevisions).insert(
+  await db
+      .into(db.projectDesignRevisions)
+      .insert(
         ProjectDesignRevisionsCompanion.insert(
           id: 'rev-1',
           projectId: 'project-1',

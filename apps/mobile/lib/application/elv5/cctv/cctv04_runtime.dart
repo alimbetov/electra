@@ -91,8 +91,10 @@ final class Cctv04PersistedInputResolver
     final actualDeliveries = <String>{
       for (final value in group) value.nodeKey.subjectId,
     };
-    final expectedDeliveries =
-        contract.expectedInputFingerprintByDeliveryId.keys.toSet();
+    final expectedDeliveries = contract
+        .expectedInputFingerprintByDeliveryId
+        .keys
+        .toSet();
     if (actualDeliveries.length != expectedDeliveries.length ||
         !actualDeliveries.containsAll(expectedDeliveries)) {
       _blocked(
@@ -140,7 +142,8 @@ final class Cctv04PersistedInputResolver
           dependencies,
           <String, Object?>{
             'deliveryId': deliveryId,
-            'expected': contract.expectedInputFingerprintByDeliveryId[deliveryId],
+            'expected':
+                contract.expectedInputFingerprintByDeliveryId[deliveryId],
             'actual': snapshot.inputFingerprint,
           },
         );
@@ -254,8 +257,9 @@ final class Cctv04PersistedInputResolver
       ),
     );
     upstream.sort(
-      (a, b) => (a['evaluationId']! as String)
-          .compareTo(b['evaluationId']! as String),
+      (a, b) => (a['evaluationId']! as String).compareTo(
+        b['evaluationId']! as String,
+      ),
     );
 
     return Elv5CapturedInput<Cctv04Input>(
@@ -337,15 +341,14 @@ final class Cctv04PersistedInputResolver
     String policy,
     List<Elv5DependencyMarker> dependencies,
     Map<String, Object?> evidence,
-  ) =>
-      throw Elv5CaptureBlockedException(
-        request: request,
-        reasonCode: reason,
-        inputFingerprint: input,
-        policyFingerprint: policy,
-        dependencies: dependencies,
-        evidence: evidence,
-      );
+  ) => throw Elv5CaptureBlockedException(
+    request: request,
+    reasonCode: reason,
+    inputFingerprint: input,
+    policyFingerprint: policy,
+    dependencies: dependencies,
+    evidence: evidence,
+  );
 
   Elv5DependencyMarker _dependency(
     Elv5CalculationRequest request,
@@ -375,38 +378,37 @@ final class Cctv04PersistedInputResolver
 
 Elv5PureKernelExecutor<Cctv04Input, Cctv04Result> buildCctv04Executor({
   DateTime Function()? nowUtc,
-}) =>
-    Elv5PureKernelExecutor<Cctv04Input, Cctv04Result>(
-      processCode: Elv5ProcessCode.cctv04,
-      calculate: const Cctv04PseProjectionKernel().evaluate,
-      encodeOutput: (result) => <String, Object?>{
-        'schema': 'electra.elv5-cctv04-output.v1',
-        'status': result.status.name,
-        'globalDemandW': result.globalDemand.value.toMap(),
-        'availableCapabilityW': result.availableCapability.value.toMap(),
-        'globalMarginW': result.globalMargin.value.toMap(),
-        'cctvContributionW': result.cctvContribution.value.toMap(),
-        'governingCaseId': result.governingCaseId,
-        'blockingReason': result.blockingReason,
-      },
-      encodeEvidence: (captured, _) => <String, Object?>{
-        'schema': 'electra.elv5-cctv04-evidence.v1',
-        'source': 'VERIFIED_CURRENT_PWR06_GROUP_CLOSURE',
-        'upstreamPointerGenerations': captured.upstreamPointerGenerations,
-      },
-      executionOf: (result) => result.status == Cctv04AssessmentStatus.blocked
-          ? Elv5Execution.blocked
-          : Elv5Execution.succeeded,
-      completionOf: (result) => result.status == Cctv04AssessmentStatus.blocked
-          ? Elv5Completion.incomplete
-          : Elv5Completion.complete,
-      assessmentOf: (result) => switch (result.status) {
-        Cctv04AssessmentStatus.pass => Elv5Assessment.pass,
-        Cctv04AssessmentStatus.fail => Elv5Assessment.fail,
-        Cctv04AssessmentStatus.blocked => Elv5Assessment.unresolved,
-      },
-      nowUtc: nowUtc,
-    );
+}) => Elv5PureKernelExecutor<Cctv04Input, Cctv04Result>(
+  processCode: Elv5ProcessCode.cctv04,
+  calculate: const Cctv04PseProjectionKernel().evaluate,
+  encodeOutput: (result) => <String, Object?>{
+    'schema': 'electra.elv5-cctv04-output.v1',
+    'status': result.status.name,
+    'globalDemandW': result.globalDemand.value.toMap(),
+    'availableCapabilityW': result.availableCapability.value.toMap(),
+    'globalMarginW': result.globalMargin.value.toMap(),
+    'cctvContributionW': result.cctvContribution.value.toMap(),
+    'governingCaseId': result.governingCaseId,
+    'blockingReason': result.blockingReason,
+  },
+  encodeEvidence: (captured, _) => <String, Object?>{
+    'schema': 'electra.elv5-cctv04-evidence.v1',
+    'source': 'VERIFIED_CURRENT_PWR06_GROUP_CLOSURE',
+    'upstreamPointerGenerations': captured.upstreamPointerGenerations,
+  },
+  executionOf: (result) => result.status == Cctv04AssessmentStatus.blocked
+      ? Elv5Execution.blocked
+      : Elv5Execution.succeeded,
+  completionOf: (result) => result.status == Cctv04AssessmentStatus.blocked
+      ? Elv5Completion.incomplete
+      : Elv5Completion.complete,
+  assessmentOf: (result) => switch (result.status) {
+    Cctv04AssessmentStatus.pass => Elv5Assessment.pass,
+    Cctv04AssessmentStatus.fail => Elv5Assessment.fail,
+    Cctv04AssessmentStatus.blocked => Elv5Assessment.unresolved,
+  },
+  nowUtc: nowUtc,
+);
 
 Elv5Rational _rational(Object? value, String field) =>
     Elv5Rational.fromMap(_map(value, field));

@@ -86,8 +86,7 @@ void main() {
               definitionCatalogId: 'catalog-poe-allocation',
               definitionCatalogVersion: '1',
               definitionCode: 'CAT6',
-              definitionContentHash:
-                  'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+              definitionContentHash: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
               lifecycleState: 'ACTIVE',
               createdAt: now,
               updatedAt: now,
@@ -167,9 +166,9 @@ void main() {
         ),
       );
 
-      final durable =
-          await (db.select(db.cableAllocations)
-            ..where((row) => row.id.equals('allocation-poe'))).getSingle();
+      final durable = await (db.select(
+        db.cableAllocations,
+      )..where((row) => row.id.equals('allocation-poe'))).getSingle();
       expect(durable.lifecycleState, 'ACTIVE');
       expect(durable.revision, 4);
       expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);

@@ -154,12 +154,11 @@ void main() {
       await tester.pumpWidget(const SizedBox());
       await tester.pumpAndSettle();
       await database.close();
-      database =
-          (await tester.runAsync(() async {
-            final reopened = openDatabase();
-            await reopened.customSelect('SELECT 1').get();
-            return reopened;
-          }))!;
+      database = (await tester.runAsync(() async {
+        final reopened = openDatabase();
+        await reopened.customSelect('SELECT 1').get();
+        return reopened;
+      }))!;
       await tester.pumpWidget(application());
       await tester.pumpAndSettle();
       final restored = await DriftComponentInstanceRepository(

@@ -265,8 +265,6 @@ final class Elv5CctvRecorderMutationService {
   static String _bindingId(String recorderId) =>
       'ELV5:CCTV:RECORDER:$recorderId';
 
-  static String _canonicalJson(Object? value) => utf8.decode(
-    _encoder.encode(value),
-    allowMalformed: false,
-  );
+  static String _canonicalJson(Object? value) =>
+      utf8.decode(_encoder.encode(value), allowMalformed: false);
 }

@@ -106,7 +106,7 @@ final class Elv5AcsMutationService {
         : 'ACS_CONTROLLER_RESOURCES';
     final aggregateId = previous?.aggregateId ?? 'ELV5:$kind:$subjectId';
     final oldDeps = previous == null
-        ? const <Map<String,Object?>>[]
+        ? const <Map<String, Object?>>[]
         : _dependencies(operation, previous.payload);
     final newDeps = _dependencies(operation, payload);
     final hashes = <String>{
@@ -139,11 +139,18 @@ final class Elv5AcsMutationService {
       'payload': previous?.payload,
     };
     return Elv5PreparedReplacement(
-      actualRowRevisions: previous == null ? const {} : {aggregateId: previous.revision},
+      actualRowRevisions: previous == null
+          ? const {}
+          : {aggregateId: previous.revision},
       reviewedImpactFingerprint: fingerprint,
       staleNodeKeySha256s: stale,
       affectedIds: {subjectId, aggregateId},
-      beforeAggregate: _evidence(kind, aggregateId, subjectId, previous?.payload),
+      beforeAggregate: _evidence(
+        kind,
+        aggregateId,
+        subjectId,
+        previous?.payload,
+      ),
       inverseCommandType: 'ELV5_RESTORE_ACS_AGGREGATE',
       inverseCommandSchema: _historySchema,
       inverseCanonicalPayloadJson: _canonical(inverse),
@@ -190,21 +197,37 @@ final class Elv5AcsMutationService {
         'aggregateRevision': after.revision,
         'staleNodeCount': prepared.staleNodeKeySha256s.length,
       }),
-      afterAggregate: _evidence(kind, after.aggregateId, subjectId, after.payload),
+      afterAggregate: _evidence(
+        kind,
+        after.aggregateId,
+        subjectId,
+        after.payload,
+      ),
     );
   }
 
-  List<Map<String,Object?>> _dependencies(String operation, Map<String,Object?> payload) {
+  List<Map<String, Object?>> _dependencies(
+    String operation,
+    Map<String, Object?> payload,
+  ) {
     if (operation == 'REPLACE_DOOR_ROLE_ASSIGNMENTS') {
       final doorId = payload['doorAssemblyId']! as String;
       return [
         _dep('SET', 'ACS_DOOR_CALCULATION', doorId),
         for (final raw in payload['roleAssignments']! as List)
-          _dep('FACT', 'COMPONENT_REFERENCE_BINDING',
-            Map<String,Object?>.from(raw as Map)['componentId']! as String),
+          _dep(
+            'FACT',
+            'COMPONENT_REFERENCE_BINDING',
+            Map<String, Object?>.from(raw as Map)['componentId']! as String,
+          ),
         for (final raw in payload['releaseTruthTable']! as List)
-          _dep('SET', 'ACS_RELEASE_CAUSE', doorId,
-            memberId: Map<String,Object?>.from(raw as Map)['causeCode']! as String),
+          _dep(
+            'SET',
+            'ACS_RELEASE_CAUSE',
+            doorId,
+            memberId:
+                Map<String, Object?>.from(raw as Map)['causeCode']! as String,
+          ),
       ];
     }
     final controllerId = payload['controllerId']! as String;
@@ -212,13 +235,23 @@ final class Elv5AcsMutationService {
       _dep('SET', 'ACS_CONTROLLER_RESOURCES', controllerId),
       _dep('FACT', 'COMPONENT_REFERENCE_BINDING', controllerId),
       for (final raw in payload['resourceAssignments']! as List)
-        _dep('SET', 'ACS_CONTROLLER_RESOURCE', controllerId,
-          memberId: Map<String,Object?>.from(raw as Map)['resourceId']! as String),
+        _dep(
+          'SET',
+          'ACS_CONTROLLER_RESOURCE',
+          controllerId,
+          memberId:
+              Map<String, Object?>.from(raw as Map)['resourceId']! as String,
+        ),
       _dep('POLICY', 'ACS_CONTROLLER_RESERVE_POLICY', controllerId),
     ];
   }
 
-  Map<String,Object?> _dep(String relationKind, String domain, String subjectId, {String? memberId}) => {
+  Map<String, Object?> _dep(
+    String relationKind,
+    String domain,
+    String subjectId, {
+    String? memberId,
+  }) => {
     'schema': 'electra.elv5-dependency-key.v1',
     'relationKind': relationKind,
     'domain': domain,
@@ -227,7 +260,10 @@ final class Elv5AcsMutationService {
   };
 
   Elv5AggregateEvidenceDraft _evidence(
-    String kind, String aggregateId, String subjectId, Map<String,Object?>? payload,
+    String kind,
+    String aggregateId,
+    String subjectId,
+    Map<String, Object?>? payload,
   ) {
     final value = {
       'schema': 'electra.elv5-acs-aggregate.v1',
@@ -245,5 +281,6 @@ final class Elv5AcsMutationService {
     );
   }
 
-  static String _canonical(Object? value) => utf8.decode(_encoder.encode(value), allowMalformed: false);
+  static String _canonical(Object? value) =>
+      utf8.decode(_encoder.encode(value), allowMalformed: false);
 }

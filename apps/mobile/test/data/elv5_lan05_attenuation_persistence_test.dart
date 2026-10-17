@@ -8,54 +8,76 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('persists exact attenuation and bumps link/design revisions atomically', () async {
-    final db = AppDatabase(NativeDatabase.memory());
-    addTearDown(db.close);
-    await _seed(db);
+  test(
+    'persists exact attenuation and bumps link/design revisions atomically',
+    () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      await _seed(db);
 
-    final writer = DriftLan05OpticalSectionEvidenceWriter(
-      db,
-      originDeviceId: 'test',
-      nowUtc: () => DateTime.utc(2026, 10, 17, 12),
-    );
-    await writer.replace(
-      ReplaceLan05SectionEvidenceCommand(
-        projectId: 'p',
-        designRevisionId: 'd',
-        linkId: 'link-1',
-        realizedSectionId: 'section-1',
-        expectedLinkRevision: 1,
-        expectedDesignRevision: 1,
-        profiles: <Lan05AttenuationProfileDraft>[
-          Lan05AttenuationProfileDraft(
-            wavelengthNm: Elv5Rational.integer(1310),
-            minimumDbPerKm: Elv5Rational.parseDecimal('0.32'),
-            maximumDbPerKm: Elv5Rational.parseDecimal('0.35'),
-            evidenceRef: 'catalog:fiber-a:edition-1',
-          ),
-        ],
-      ),
-    );
+      final writer = DriftLan05OpticalSectionEvidenceWriter(
+        db,
+        originDeviceId: 'test',
+        nowUtc: () => DateTime.utc(2026, 10, 17, 12),
+      );
+      await writer.replace(
+        ReplaceLan05SectionEvidenceCommand(
+          projectId: 'p',
+          designRevisionId: 'd',
+          linkId: 'link-1',
+          realizedSectionId: 'section-1',
+          expectedLinkRevision: 1,
+          expectedDesignRevision: 1,
+          profiles: <Lan05AttenuationProfileDraft>[
+            Lan05AttenuationProfileDraft(
+              wavelengthNm: Elv5Rational.integer(1310),
+              minimumDbPerKm: Elv5Rational.parseDecimal('0.32'),
+              maximumDbPerKm: Elv5Rational.parseDecimal('0.35'),
+              evidenceRef: 'catalog:fiber-a:edition-1',
+            ),
+          ],
+        ),
+      );
 
-    final section = await db.customSelect(
-      "SELECT evidence_json FROM link_section_assignments WHERE binding_id = 'link-binding-1'",
-    ).getSingle();
-    final evidence = jsonDecode(section.read<String>('evidence_json')) as Map<String, dynamic>;
-    expect(evidence['schema'], 'electra.elv5-optical-fiber-evidence.v1');
-    final profile = (evidence['attenuationProfiles'] as List).single as Map<String, dynamic>;
-    expect(profile['wavelengthNm'], <String, dynamic>{'denominator': '1', 'numerator': '1310'});
-    expect(profile['minDbPerKm'], <String, dynamic>{'denominator': '25', 'numerator': '8'});
-    expect(profile['maxDbPerKm'], <String, dynamic>{'denominator': '20', 'numerator': '7'});
+      final section = await db
+          .customSelect(
+            "SELECT evidence_json FROM link_section_assignments WHERE binding_id = 'link-binding-1'",
+          )
+          .getSingle();
+      final evidence = jsonDecode(
+        section.read<String>('evidence_json'),
+      ) as Map<String, dynamic>;
+      expect(evidence['schema'], 'electra.elv5-optical-fiber-evidence.v1');
+      final profile =
+          (evidence['attenuationProfiles'] as List).single
+              as Map<String, dynamic>;
+      expect(profile['wavelengthNm'], <String, dynamic>{
+        'denominator': '1',
+        'numerator': '1310',
+      });
+      expect(profile['minDbPerKm'], <String, dynamic>{
+        'denominator': '25',
+        'numerator': '8',
+      });
+      expect(profile['maxDbPerKm'], <String, dynamic>{
+        'denominator': '20',
+        'numerator': '7',
+      });
 
-    final link = await db.customSelect(
-      "SELECT revision FROM link_composition_bindings WHERE id = 'link-binding-1'",
-    ).getSingle();
-    final revision = await db.customSelect(
-      "SELECT revision FROM project_design_revisions WHERE id = 'd'",
-    ).getSingle();
-    expect(link.read<int>('revision'), 2);
-    expect(revision.read<int>('revision'), 2);
-  });
+      final link = await db
+          .customSelect(
+            "SELECT revision FROM link_composition_bindings WHERE id = 'link-binding-1'",
+          )
+          .getSingle();
+      final revision = await db
+          .customSelect(
+            "SELECT revision FROM project_design_revisions WHERE id = 'd'",
+          )
+          .getSingle();
+      expect(link.read<int>('revision'), 2);
+      expect(revision.read<int>('revision'), 2);
+    },
+  );
 
   test('stale link revision rejects before evidence mutation', () async {
     final db = AppDatabase(NativeDatabase.memory());
@@ -88,9 +110,11 @@ void main() {
       throwsStateError,
     );
 
-    final section = await db.customSelect(
-      "SELECT evidence_json FROM link_section_assignments WHERE binding_id = 'link-binding-1'",
-    ).getSingle();
+    final section = await db
+        .customSelect(
+          "SELECT evidence_json FROM link_section_assignments WHERE binding_id = 'link-binding-1'",
+        )
+        .getSingle();
     expect(section.read<String>('evidence_json'), '{}');
   });
 }

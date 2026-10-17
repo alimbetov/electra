@@ -111,12 +111,14 @@ void main() {
       expect(current!.bindingRevision, 2);
       expect(current.evidenceRef, isNot(firstEvidenceRef));
 
-      final evidenceCount = await restartedDb.customSelect(
-        "SELECT COUNT(*) AS c FROM elv_revision_aggregate_evidence_records "
-        "WHERE project_id = 'p' AND design_revision_id = 'd' "
-        "AND aggregate_kind = 'ACS03_ELECTRICAL_CONTRACT' "
-        "AND aggregate_id = 'door-1'",
-      ).getSingle();
+      final evidenceCount = await restartedDb
+          .customSelect(
+            "SELECT COUNT(*) AS c FROM elv_revision_aggregate_evidence_records "
+            "WHERE project_id = 'p' AND design_revision_id = 'd' "
+            "AND aggregate_kind = 'ACS03_ELECTRICAL_CONTRACT' "
+            "AND aggregate_id = 'door-1'",
+          )
+          .getSingle();
       expect(evidenceCount.read<int>('c'), 2);
 
       // Q8: freeze preserves the current edition as historical evidence and
@@ -127,7 +129,8 @@ void main() {
       );
       final frozenEvidenceRef = current.evidenceRef;
       final frozenContentHash = current.contentHash;
-      final frozenStartupCurrent = current.contract.events.last.lockCurrent.value;
+      final frozenStartupCurrent =
+          current.contract.events.last.lockCurrent.value;
       await restartedDb.close();
 
       final frozenDb = AppDatabase(NativeDatabase(file));
@@ -167,12 +170,11 @@ void main() {
 DriftAcs03ElectricalContractStore _store(
   AppDatabase db,
   String originDeviceId,
-) =>
-    DriftAcs03ElectricalContractStore(
-      db,
-      originDeviceId: originDeviceId,
-      nowUtc: () => DateTime.utc(2026, 10, 17, 12),
-    );
+) => DriftAcs03ElectricalContractStore(
+  db,
+  originDeviceId: originDeviceId,
+  nowUtc: () => DateTime.utc(2026, 10, 17, 12),
+);
 
 Future<_WriteOutcome> _attempt(
   DriftAcs03ElectricalContractStore store,
@@ -187,9 +189,7 @@ Future<_WriteOutcome> _attempt(
 }
 
 final class _WriteOutcome {
-  const _WriteOutcome.success()
-      : succeeded = true,
-        error = null;
+  const _WriteOutcome.success() : succeeded = true, error = null;
 
   const _WriteOutcome.failure(this.error) : succeeded = false;
 
@@ -216,18 +216,17 @@ Acs03ElectricalEventContract _event(
   String id,
   Acs03StateCode state,
   String current,
-) =>
-    Acs03ElectricalEventContract(
-      eventId: id,
-      state: state,
-      durationMicroseconds: BigInt.from(1000000),
-      scenarioId: 'scenario-${state.name}',
-      segmentId: 'segment-${state.name}',
-      domainId: 'domain-1',
-      lockLoadOriginId: 'lock-origin-1',
-      sharedTrunkSectionId: 'trunk-1',
-      lockCurrent: Current(Elv5Rational.parseDecimal(current)),
-    );
+) => Acs03ElectricalEventContract(
+  eventId: id,
+  state: state,
+  durationMicroseconds: BigInt.from(1000000),
+  scenarioId: 'scenario-${state.name}',
+  segmentId: 'segment-${state.name}',
+  domainId: 'domain-1',
+  lockLoadOriginId: 'lock-origin-1',
+  sharedTrunkSectionId: 'trunk-1',
+  lockCurrent: Current(Elv5Rational.parseDecimal(current)),
+);
 
 Future<void> _seed(AppDatabase db) async {
   await db.customStatement('PRAGMA foreign_keys = OFF');

@@ -6,41 +6,44 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('design revision guard turns engineering block into durable candidate', () async {
-    final request = _request();
-    final dependency = Elv5DependencyMarker(
-      projectId: 'p',
-      designRevisionId: 'd',
-      dependencyKey: '{"domain":"fixture"}',
-      dependencyKeySha256: List.filled(64, 'a').join(),
-      logicalNodeKeySha256: List.filled(64, 'b').join(),
-      relationKind: 'FACT',
-      updatedAtUtc: DateTime.utc(2026, 10, 16),
-    );
-    final inner = _BlockedResolver(
-      request: request,
-      dependency: dependency,
-    );
-    final guarded = Elv5RevisionGuardedInputResolver<String>(
-      inner: inner,
-      revisions: _RevisionSource(41),
-    );
-    final adapter = Elv5BlockedAwareTypedProcessCalculationAdapter<String>(
-      resolver: guarded,
-      executor: _NeverExecutor(),
-      nowUtc: () => DateTime.utc(2026, 10, 16),
-    );
+  test(
+    'design revision guard turns engineering block into durable candidate',
+    () async {
+      final request = _request();
+      final dependency = Elv5DependencyMarker(
+        projectId: 'p',
+        designRevisionId: 'd',
+        dependencyKey: '{"domain":"fixture"}',
+        dependencyKeySha256: List.filled(64, 'a').join(),
+        logicalNodeKeySha256: List.filled(64, 'b').join(),
+        relationKind: 'FACT',
+        updatedAtUtc: DateTime.utc(2026, 10, 16),
+      );
+      final inner = _BlockedResolver(request: request, dependency: dependency);
+      final guarded = Elv5RevisionGuardedInputResolver<String>(
+        inner: inner,
+        revisions: _RevisionSource(41),
+      );
+      final adapter = Elv5BlockedAwareTypedProcessCalculationAdapter<String>(
+        resolver: guarded,
+        executor: _NeverExecutor(),
+        nowUtc: () => DateTime.utc(2026, 10, 16),
+      );
 
-    final captured = await adapter.capture(request);
-    final candidate = await adapter.execute(captured);
+      final captured = await adapter.capture(request);
+      final candidate = await adapter.execute(captured);
 
-    expect(captured.captureRevision, 41);
-    expect(candidate.execution, Elv5Execution.blocked);
-    expect(candidate.completion, Elv5Completion.incomplete);
-    expect(candidate.assessment, Elv5Assessment.unresolved);
-    expect(candidate.output['reasonCode'], 'FIXTURE_EVIDENCE_MISSING');
-    expect(candidate.dependencies.single.dependencyKeySha256, dependency.dependencyKeySha256);
-  });
+      expect(captured.captureRevision, 41);
+      expect(candidate.execution, Elv5Execution.blocked);
+      expect(candidate.completion, Elv5Completion.incomplete);
+      expect(candidate.assessment, Elv5Assessment.unresolved);
+      expect(candidate.output['reasonCode'], 'FIXTURE_EVIDENCE_MISSING');
+      expect(
+        candidate.dependencies.single.dependencyKeySha256,
+        dependency.dependencyKeySha256,
+      );
+    },
+  );
 }
 
 Elv5CalculationRequest _request() => Elv5CalculationRequest(
@@ -66,7 +69,9 @@ final class _BlockedResolver implements Elv5ProcessInputResolver<String> {
   Elv5ProcessCode get processCode => Elv5ProcessCode.lan05;
 
   @override
-  Future<Elv5CapturedInput<String>> capture(Elv5CalculationRequest request) async {
+  Future<Elv5CapturedInput<String>> capture(
+    Elv5CalculationRequest request,
+  ) async {
     throw Elv5CaptureBlockedException(
       request: this.request,
       reasonCode: 'FIXTURE_EVIDENCE_MISSING',

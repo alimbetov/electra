@@ -101,7 +101,8 @@ final class Elv5LanMutationService {
       operation: operation,
       subjectId: subjectId,
     );
-    final aggregateId = previous?.aggregateId ?? _bindingId(operation, subjectId);
+    final aggregateId =
+        previous?.aggregateId ?? _bindingId(operation, subjectId);
     final oldDependencies = previous == null
         ? const <Map<String, Object?>>[]
         : _dependencies(operation, previous.payload);
@@ -143,7 +144,12 @@ final class Elv5LanMutationService {
       reviewedImpactFingerprint: fingerprint,
       staleNodeKeySha256s: stale,
       affectedIds: {subjectId, aggregateId},
-      beforeAggregate: _evidence(kind, aggregateId, subjectId, previous?.payload),
+      beforeAggregate: _evidence(
+        kind,
+        aggregateId,
+        subjectId,
+        previous?.payload,
+      ),
       inverseCommandType: 'ELV5_RESTORE_LAN_AGGREGATE',
       inverseCommandSchema: _historySchema,
       inverseCanonicalPayloadJson: _canonicalJson(inverse),
@@ -194,13 +200,14 @@ final class Elv5LanMutationService {
     );
   }
 
-  String _subject(String operation, Map<String, Object?> payload) => switch (operation) {
-    'REPLACE_LINK_COMPOSITION' || 'REPLACE_OPTICAL_LINK_ASSIGNMENTS' =>
-      payload['linkId']! as String,
-    'REPLACE_PORT_CAPACITY_ASSIGNMENTS' => payload['switchId']! as String,
-    'REPLACE_PATCH_PANEL_ASSIGNMENTS' => payload['panelId']! as String,
-    _ => throw FormatException('Unsupported LAN mutation: $operation.'),
-  };
+  String _subject(String operation, Map<String, Object?> payload) =>
+      switch (operation) {
+        'REPLACE_LINK_COMPOSITION' ||
+        'REPLACE_OPTICAL_LINK_ASSIGNMENTS' => payload['linkId']! as String,
+        'REPLACE_PORT_CAPACITY_ASSIGNMENTS' => payload['switchId']! as String,
+        'REPLACE_PATCH_PANEL_ASSIGNMENTS' => payload['panelId']! as String,
+        _ => throw FormatException('Unsupported LAN mutation: $operation.'),
+      };
 
   String _aggregateKind(String operation) => switch (operation) {
     'REPLACE_LINK_COMPOSITION' => 'LAN_LINK_COMPOSITION',
@@ -226,35 +233,62 @@ final class Elv5LanMutationService {
         for (final raw in payload['orderedSections']! as List) {
           final row = Map<String, Object?>.from(raw as Map);
           result.add(
-            _dep('FACT', 'ELV3_REALIZED_LINK_SECTION', row['realizedSectionId']! as String),
+            _dep(
+              'FACT',
+              'ELV3_REALIZED_LINK_SECTION',
+              row['realizedSectionId']! as String,
+            ),
           );
         }
-        result.add(_dep('POLICY', 'LAN_LINK_POLICY', payload['policyBindingId']! as String));
+        result.add(
+          _dep(
+            'POLICY',
+            'LAN_LINK_POLICY',
+            payload['policyBindingId']! as String,
+          ),
+        );
       case 'REPLACE_PORT_CAPACITY_ASSIGNMENTS':
         for (final raw in payload['assignments']! as List) {
           final row = Map<String, Object?>.from(raw as Map);
-          result.add(_dep('FACT', 'ENGINEERING_PORT', row['portId']! as String));
+          result.add(
+            _dep('FACT', 'ENGINEERING_PORT', row['portId']! as String),
+          );
         }
         result.add(_dep('POLICY', 'LAN_PORT_SPARE_POLICY', subjectId));
       case 'REPLACE_OPTICAL_LINK_ASSIGNMENTS':
         for (final field in const ['forwardOptics', 'reverseOptics']) {
           final optics = Map<String, Object?>.from(payload[field]! as Map);
           result
-            ..add(_dep('FACT', 'ENGINEERING_PORT', optics['txPortId']! as String))
-            ..add(_dep('FACT', 'ENGINEERING_PORT', optics['rxPortId']! as String));
+            ..add(
+              _dep('FACT', 'ENGINEERING_PORT', optics['txPortId']! as String),
+            )
+            ..add(
+              _dep('FACT', 'ENGINEERING_PORT', optics['rxPortId']! as String),
+            );
         }
         for (final field in const ['connectorEvents', 'spliceEvents']) {
           for (final raw in payload[field]! as List) {
             final row = Map<String, Object?>.from(raw as Map);
-            result.add(_dep('SET', 'LAN_OPTICAL_LOSS_EVENT', subjectId, memberId: row['eventId']! as String));
+            result.add(
+              _dep(
+                'SET',
+                'LAN_OPTICAL_LOSS_EVENT',
+                subjectId,
+                memberId: row['eventId']! as String,
+              ),
+            );
           }
         }
       case 'REPLACE_PATCH_PANEL_ASSIGNMENTS':
         for (final raw in payload['assignments']! as List) {
           final row = Map<String, Object?>.from(raw as Map);
           result
-            ..add(_dep('FACT', 'ENGINEERING_PORT', row['panelPortId']! as String))
-            ..add(_dep('SET', 'LAN_LINK_COMPOSITION', row['linkId']! as String));
+            ..add(
+              _dep('FACT', 'ENGINEERING_PORT', row['panelPortId']! as String),
+            )
+            ..add(
+              _dep('SET', 'LAN_LINK_COMPOSITION', row['linkId']! as String),
+            );
         }
         result.add(_dep('POLICY', 'LAN_PATCH_SPARE_POLICY', subjectId));
     }
@@ -296,8 +330,6 @@ final class Elv5LanMutationService {
     );
   }
 
-  static String _canonicalJson(Object? value) => utf8.decode(
-    _encoder.encode(value),
-    allowMalformed: false,
-  );
+  static String _canonicalJson(Object? value) =>
+      utf8.decode(_encoder.encode(value), allowMalformed: false);
 }

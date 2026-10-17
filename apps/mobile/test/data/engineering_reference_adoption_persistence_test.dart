@@ -51,13 +51,9 @@ PlaceEngineeringProfileCommand placementFor(String code, {String? operation}) {
 }
 
 EngineeringReferenceCatalog sourceCatalog() {
-  final map =
-      jsonDecode(
-            File(
-              '../../docs/examples/elv2-interface-catalog.json',
-            ).readAsStringSync(),
-          )
-          as Map<String, dynamic>;
+  final map = jsonDecode(
+    File('../../docs/examples/elv2-interface-catalog.json').readAsStringSync(),
+  ) as Map<String, dynamic>;
   return EngineeringReferenceCatalog.fromMap({
     ...map,
     'id': 'catalog-1',
@@ -85,10 +81,9 @@ EngineeringReferenceCatalog placementChangeCandidate(
                 ...profile.constraints!.mounting.toMap(),
                 'minimumClearanceMm':
                     profile.constraints!.mounting.minimumClearanceMm == 50
-                        ? 49
-                        : (profile.constraints!.mounting.minimumClearanceMm ??
-                                0) +
-                            1,
+                    ? 49
+                    : (profile.constraints!.mounting.minimumClearanceMm ?? 0) +
+                          1,
               },
             },
           }
@@ -156,9 +151,9 @@ Future<ComponentReferenceBinding> bindingFor(
   String componentId,
 ) async {
   final row =
-      await (db.select(db.componentReferenceBindings)..where(
-        (candidate) => candidate.componentId.equals(componentId),
-      )).getSingle();
+      await (db.select(db.componentReferenceBindings)
+            ..where((candidate) => candidate.componentId.equals(componentId)))
+          .getSingle();
   return ComponentReferenceBinding.fromMap(
     jsonDecode(row.payloadJson) as Map<String, dynamic>,
   );
@@ -207,28 +202,27 @@ Future<EngineeringReferenceAdoptionCommand> reviewedCommand({
   );
 }
 
-Future<String> adoptionState(AppDatabase db, String componentId) async =>
-    canonicalEngineeringJson({
-      'binding': [
-        for (final row
-            in await (db.select(db.componentReferenceBindings)..where(
-              (candidate) => candidate.componentId.equals(componentId),
-            )).get())
-          row.toJson(),
-      ],
-      'ports': [
-        for (final row
-            in await (db.select(db.engineeringPortInstances)..where(
-              (candidate) => candidate.componentId.equals(componentId),
-            )).get())
-          row.toJson(),
-      ],
-      'operations': [
-        for (final row
-            in await db.select(db.engineeringPlacementOperations).get())
-          row.toJson(),
-      ],
-    });
+Future<String> adoptionState(
+  AppDatabase db,
+  String componentId,
+) async => canonicalEngineeringJson({
+  'binding': [
+    for (final row in await (db.select(
+      db.componentReferenceBindings,
+    )..where((candidate) => candidate.componentId.equals(componentId))).get())
+      row.toJson(),
+  ],
+  'ports': [
+    for (final row in await (db.select(
+      db.engineeringPortInstances,
+    )..where((candidate) => candidate.componentId.equals(componentId))).get())
+      row.toJson(),
+  ],
+  'operations': [
+    for (final row in await db.select(db.engineeringPlacementOperations).get())
+      row.toJson(),
+  ],
+});
 
 void main() {
   late AppDatabase db;
@@ -478,10 +472,9 @@ void main() {
         expect(binding.profileCode, entry.key);
         expect(binding.portIds, entry.value.portIds);
         for (final portId in binding.portIds) {
-          final row =
-              await (db.select(
-                db.engineeringPortInstances,
-              )..where((candidate) => candidate.id.equals(portId))).getSingle();
+          final row = await (db.select(
+            db.engineeringPortInstances,
+          )..where((candidate) => candidate.id.equals(portId))).getSingle();
           final port = EngineeringPort.fromMap(
             jsonDecode(row.payloadJson) as Map<String, dynamic>,
           );
@@ -489,8 +482,10 @@ void main() {
         }
         final operation =
             await (db.select(db.engineeringPlacementOperations)..where(
-              (row) => row.operationId.equals('adopt:p7-adopt-${entry.key}'),
-            )).getSingle();
+                  (row) =>
+                      row.operationId.equals('adopt:p7-adopt-${entry.key}'),
+                ))
+                .getSingle();
         expect(operation.status, engineeringReferenceAdoptionCompletedStatus);
       }
       await db.close();

@@ -63,8 +63,11 @@ void main() {
     expect(v2!.bindingRevision, 2);
     expect(v2.profile.temperatureC.maximum, Elv5Rational.integer(40));
     expect(
-      await _count(db, 'elv_revision_aggregate_evidence_records',
-          "aggregate_kind = 'ELV5_ENVIRONMENT_PROFILE'"),
+      await _count(
+        db,
+        'elv_revision_aggregate_evidence_records',
+        "aggregate_kind = 'ELV5_ENVIRONMENT_PROFILE'",
+      ),
       2,
     );
 
@@ -116,7 +119,10 @@ void main() {
       routeSectionId: 'section-1',
     );
     expect(inherited!.usedSectionOverride, isFalse);
-    expect(inherited.binding.profile.temperatureC.maximum, Elv5Rational.integer(30));
+    expect(
+      inherited.binding.profile.temperatureC.maximum,
+      Elv5Rational.integer(30),
+    );
 
     await store.replace(
       ReplaceElv5EnvironmentProfileCommand(
@@ -137,72 +143,84 @@ void main() {
     );
     expect(overridden!.usedSectionOverride, isTrue);
     expect(overridden.binding.scopeKind, 'ROUTE_SECTION');
-    expect(overridden.binding.profile.temperatureC.maximum, Elv5Rational.integer(45));
+    expect(
+      overridden.binding.profile.temperatureC.maximum,
+      Elv5Rational.integer(45),
+    );
   });
 
-  test('ampacity section editions are immutable and binding CAS guarded', () async {
-    final db = await _database();
-    addTearDown(db.close);
-    final store = DriftElv5AmpacitySectionContractStore(
-      db,
-      originDeviceId: 'test',
-      nowUtc: _now,
-    );
+  test(
+    'ampacity section editions are immutable and binding CAS guarded',
+    () async {
+      final db = await _database();
+      addTearDown(db.close);
+      final store = DriftElv5AmpacitySectionContractStore(
+        db,
+        originDeviceId: 'test',
+        nowUtc: _now,
+      );
 
-    await store.replace(
-      ReplaceElv5AmpacitySectionContractCommand(
-        projectId: 'p',
-        designRevisionId: 'd',
-        expectedDesignRevision: 1,
-        bindingId: 'ampacity-section',
-        expectedBindingRevision: null,
-        contract: _ampacity('env-hash-1', '1.0'),
-      ),
-    );
-    final v1 = await store.loadActiveForSection(
-      projectId: 'p',
-      designRevisionId: 'd',
-      routeSectionId: 'section-1',
-    );
-    expect(v1!.bindingRevision, 1);
-
-    await store.replace(
-      ReplaceElv5AmpacitySectionContractCommand(
-        projectId: 'p',
-        designRevisionId: 'd',
-        expectedDesignRevision: 2,
-        bindingId: 'ampacity-section',
-        expectedBindingRevision: 1,
-        contract: _ampacity('env-hash-2', '0.8'),
-      ),
-    );
-    final v2 = await store.loadActiveForSection(
-      projectId: 'p',
-      designRevisionId: 'd',
-      routeSectionId: 'section-1',
-    );
-    expect(v2!.bindingRevision, 2);
-    expect(v2.contract.temperatureCorrection.factor, Elv5Rational.parseDecimal('0.8'));
-    expect(
-      await _count(db, 'elv_revision_aggregate_evidence_records',
-          "aggregate_kind = 'ELV5_AMPACITY_SECTION_CONTRACT'"),
-      2,
-    );
-
-    await expectLater(
-      store.replace(
+      await store.replace(
         ReplaceElv5AmpacitySectionContractCommand(
           projectId: 'p',
           designRevisionId: 'd',
-          expectedDesignRevision: 3,
+          expectedDesignRevision: 1,
+          bindingId: 'ampacity-section',
+          expectedBindingRevision: null,
+          contract: _ampacity('env-hash-1', '1.0'),
+        ),
+      );
+      final v1 = await store.loadActiveForSection(
+        projectId: 'p',
+        designRevisionId: 'd',
+        routeSectionId: 'section-1',
+      );
+      expect(v1!.bindingRevision, 1);
+
+      await store.replace(
+        ReplaceElv5AmpacitySectionContractCommand(
+          projectId: 'p',
+          designRevisionId: 'd',
+          expectedDesignRevision: 2,
           bindingId: 'ampacity-section',
           expectedBindingRevision: 1,
-          contract: _ampacity('env-hash-3', '0.7'),
+          contract: _ampacity('env-hash-2', '0.8'),
         ),
-      ),
-      throwsA(isA<StateError>()),
-    );
-  });
+      );
+      final v2 = await store.loadActiveForSection(
+        projectId: 'p',
+        designRevisionId: 'd',
+        routeSectionId: 'section-1',
+      );
+      expect(v2!.bindingRevision, 2);
+      expect(
+        v2.contract.temperatureCorrection.factor,
+        Elv5Rational.parseDecimal('0.8'),
+      );
+      expect(
+        await _count(
+          db,
+          'elv_revision_aggregate_evidence_records',
+          "aggregate_kind = 'ELV5_AMPACITY_SECTION_CONTRACT'",
+        ),
+        2,
+      );
+
+      await expectLater(
+        store.replace(
+          ReplaceElv5AmpacitySectionContractCommand(
+            projectId: 'p',
+            designRevisionId: 'd',
+            expectedDesignRevision: 3,
+            bindingId: 'ampacity-section',
+            expectedBindingRevision: 1,
+            contract: _ampacity('env-hash-3', '0.7'),
+          ),
+        ),
+        throwsA(isA<StateError>()),
+      );
+    },
+  );
 
   test('FA-08 policy editions are immutable and CAS guarded', () async {
     final db = await _database();
@@ -246,11 +264,16 @@ void main() {
       cableRunId: 'run-1',
     );
     expect(v2!.bindingRevision, 2);
-    expect(v2.contract.policy.requirements.single.threshold,
-        Elv5Rational.integer(25));
     expect(
-      await _count(db, 'elv_revision_aggregate_evidence_records',
-          "aggregate_kind = 'FA08_CABLE_POLICY_CONTRACT'"),
+      v2.contract.policy.requirements.single.threshold,
+      Elv5Rational.integer(25),
+    );
+    expect(
+      await _count(
+        db,
+        'elv_revision_aggregate_evidence_records',
+        "aggregate_kind = 'FA08_CABLE_POLICY_CONTRACT'",
+      ),
       2,
     );
 
@@ -320,7 +343,9 @@ Elv5AmpacitySectionContract _ampacity(String environmentSeed, String factor) =>
       cableId: 'cable-1',
       expectedEnvironmentProfileId: 'ENV',
       expectedEnvironmentEditionId: environmentSeed,
-      expectedEnvironmentContentHash: _hash(environmentSeed.codeUnitAt(0).isEven ? 'e' : 'f'),
+      expectedEnvironmentContentHash: _hash(
+        environmentSeed.codeUnitAt(0).isEven ? 'e' : 'f',
+      ),
       referenceRow: Elv5AmpacityReferenceRow(
         conductorCrossSectionMm2: Elv5Rational.parseDecimal('2.5'),
         conductorMaterialCode: 'CU',
@@ -348,21 +373,23 @@ Elv5AmpacitySectionContract _ampacity(String environmentSeed, String factor) =>
     );
 
 Fa08CablePolicyContract _policy(String minimumIz) => Fa08CablePolicyContract(
-      cableRunId: 'run-1',
-      policyId: 'fire-cable-policy',
-      requirements: <Fa08Requirement>[
-        Fa08Requirement.numeric(
-          code: 'MIN_IZ',
-          kind: Fa08RequirementKind.numericMinimum,
-          propertyCode: Fa08RouteSection.ampacityIzPropertyCode,
-          unitCode: 'A',
-          threshold: Elv5Rational.parseDecimal(minimumIz),
-        ),
-      ],
-    );
+  cableRunId: 'run-1',
+  policyId: 'fire-cable-policy',
+  requirements: <Fa08Requirement>[
+    Fa08Requirement.numeric(
+      code: 'MIN_IZ',
+      kind: Fa08RequirementKind.numericMinimum,
+      propertyCode: Fa08RouteSection.ampacityIzPropertyCode,
+      unitCode: 'A',
+      threshold: Elv5Rational.parseDecimal(minimumIz),
+    ),
+  ],
+);
 
 Future<int> _count(AppDatabase db, String table, String where) async {
-  final row = await db.customSelect('SELECT COUNT(*) AS c FROM $table WHERE $where').getSingle();
+  final row = await db
+      .customSelect('SELECT COUNT(*) AS c FROM $table WHERE $where')
+      .getSingle();
   return row.read<int>('c');
 }
 

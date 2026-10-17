@@ -24,20 +24,21 @@ final class DriftElv5CctvRecorderWriteUnitOfWork
   @override
   Future<T> run<T>(
     Future<T> Function(Elv5CctvRecorderWriteSession session) action,
-  ) => DriftElv5ReplacementWriteUnitOfWork(
-    database,
-    originDeviceId: originDeviceId,
-  ).run((replacement) async {
-    return action(
-      _DriftElv5CctvRecorderWriteSession(
-        replacement,
-        recorder: _DriftElv5CctvRecorderMutationStore(
-          database,
-          originDeviceId: originDeviceId,
-        ),
-      ),
-    );
-  });
+  ) =>
+      DriftElv5ReplacementWriteUnitOfWork(
+        database,
+        originDeviceId: originDeviceId,
+      ).run((replacement) async {
+        return action(
+          _DriftElv5CctvRecorderWriteSession(
+            replacement,
+            recorder: _DriftElv5CctvRecorderMutationStore(
+              database,
+              originDeviceId: originDeviceId,
+            ),
+          ),
+        );
+      });
 }
 
 final class _DriftElv5CctvRecorderWriteSession
@@ -104,16 +105,18 @@ final class _DriftElv5CctvRecorderMutationStore
         .getSingleOrNull();
     if (root == null) return null;
     final bindingId = root.read<String>('id');
-    final rows = await database.customSelect(
-      'SELECT assignment_id, camera_id, encoded_stream_id, license_channel_id, '
-      'storage_pool_id FROM recorder_assignments WHERE project_id = ? '
-      'AND design_revision_id = ? AND binding_id = ? ORDER BY ordinal, assignment_id',
-      variables: [
-        Variable.withString(projectId),
-        Variable.withString(designRevisionId),
-        Variable.withString(bindingId),
-      ],
-    ).get();
+    final rows = await database
+        .customSelect(
+          'SELECT assignment_id, camera_id, encoded_stream_id, license_channel_id, '
+          'storage_pool_id FROM recorder_assignments WHERE project_id = ? '
+          'AND design_revision_id = ? AND binding_id = ? ORDER BY ordinal, assignment_id',
+          variables: [
+            Variable.withString(projectId),
+            Variable.withString(designRevisionId),
+            Variable.withString(bindingId),
+          ],
+        )
+        .get();
     return Elv5CctvRecorderSnapshot(
       aggregateId: bindingId,
       recorderId: recorderId,
@@ -121,10 +124,12 @@ final class _DriftElv5CctvRecorderMutationStore
       payload: {
         'recorderId': recorderId,
         'accountingBasis': root.read<String>('accounting_basis'),
-        'recorderDefinitionRef':
-            jsonDecode(root.read<String>('recorder_definition_ref_json')),
-        'recorderDefinitionSha256':
-            root.read<String>('recorder_definition_sha256'),
+        'recorderDefinitionRef': jsonDecode(
+          root.read<String>('recorder_definition_ref_json'),
+        ),
+        'recorderDefinitionSha256': root.read<String>(
+          'recorder_definition_sha256',
+        ),
         'assignments': [
           for (final row in rows)
             {
@@ -244,8 +249,6 @@ final class _DriftElv5CctvRecorderMutationStore
     }
   }
 
-  String _canonicalJson(Object? value) => utf8.decode(
-    _encoder.encode(value),
-    allowMalformed: false,
-  );
+  String _canonicalJson(Object? value) =>
+      utf8.decode(_encoder.encode(value), allowMalformed: false);
 }

@@ -15,8 +15,10 @@ import 'elv5_cctv_persistence.dart';
 /// expander; host timezone/tzdb state is never used implicitly.
 final class Cctv03PersistedInputResolver
     implements Elv5ProcessInputResolver<Cctv03Input> {
-  Cctv03PersistedInputResolver({required this.store, DateTime Function()? nowUtc})
-    : _nowUtc = nowUtc ?? (() => DateTime.now().toUtc());
+  Cctv03PersistedInputResolver({
+    required this.store,
+    DateTime Function()? nowUtc,
+  }) : _nowUtc = nowUtc ?? (() => DateTime.now().toUtc());
 
   final Elv5CctvMutationStore store;
   final DateTime Function() _nowUtc;
@@ -41,7 +43,9 @@ final class Cctv03PersistedInputResolver
       poolId: request.subject.id,
     );
     if (snapshot == null) {
-      throw StateError('CCTV03_RECORDING_POOL_FACTS_MISSING:${request.subject.id}');
+      throw StateError(
+        'CCTV03_RECORDING_POOL_FACTS_MISSING:${request.subject.id}',
+      );
     }
     final payload = snapshot.payload;
     final poolId = _text(payload, 'poolId');
@@ -71,7 +75,10 @@ final class Cctv03PersistedInputResolver
     });
 
     final intervalsByProfile = <String, List<Cctv03UtcInterval>>{};
-    final scheduleSegments = _objectList(payload['scheduleSegments'], 'scheduleSegments');
+    final scheduleSegments = _objectList(
+      payload['scheduleSegments'],
+      'scheduleSegments',
+    );
     for (final segment in scheduleSegments) {
       final profileId = _text(segment, 'scheduleProfileId');
       if (segment['recurrence'] != null) {
@@ -116,7 +123,10 @@ final class Cctv03PersistedInputResolver
 
     final rates = <String, Cctv03StreamRate>{};
     final assignments = <Cctv03RecordingAssignment>[];
-    for (final assignment in _objectList(payload['assignments'], 'assignments')) {
+    for (final assignment in _objectList(
+      payload['assignments'],
+      'assignments',
+    )) {
       final streamId = _text(assignment, 'encodedStreamId');
       final expected = BitRate(
         Elv5Rational.parseDecimal(_decimal(assignment, 'expectedBitrateBps')),
@@ -162,13 +172,18 @@ final class Cctv03PersistedInputResolver
         ? null
         : Cctv03RedundancyModel(
             usableFraction: Elv5Rational.parseDecimal(
-              _decimal(_map(redundancyRaw, 'redundancyModel'), 'usableFraction'),
+              _decimal(
+                _map(redundancyRaw, 'redundancyModel'),
+                'usableFraction',
+              ),
             ),
           );
     final sizingBasis = switch (_text(payload, 'sizingBasis')) {
       'EXPECTED_ESTIMATE' => Cctv03SizingBasis.expectedEstimate,
       'GUARANTEED_UPPER_BOUND' => Cctv03SizingBasis.guaranteedUpperBound,
-      final value => throw FormatException('Unsupported CCTV03 sizingBasis: $value'),
+      final value => throw FormatException(
+        'Unsupported CCTV03 sizingBasis: $value',
+      ),
     };
 
     final input = Cctv03Input(
@@ -283,12 +298,13 @@ Elv5PureKernelExecutor<Cctv03Input, Cctv03Result> buildCctv03Executor({
   nowUtc: nowUtc,
 );
 
-Map<String, Object?> _capacity(Cctv03CapacityAssessment value) => <String, Object?>{
-  'requiredBytes': value.required.value.toMap(),
-  'availableBytes': value.available?.value.toMap(),
-  'marginBytes': value.margin?.value.toMap(),
-  'withinCapacity': value.withinCapacity,
-};
+Map<String, Object?> _capacity(Cctv03CapacityAssessment value) =>
+    <String, Object?>{
+      'requiredBytes': value.required.value.toMap(),
+      'availableBytes': value.available?.value.toMap(),
+      'marginBytes': value.margin?.value.toMap(),
+      'withinCapacity': value.withinCapacity,
+    };
 
 Map<String, Object?> _map(Object? value, String field) {
   if (value is! Map) throw FormatException('$field must be an object.');
@@ -302,7 +318,8 @@ List<Map<String, Object?>> _objectList(Object? value, String field) {
 
 String _text(Map<String, Object?> value, String key) {
   final raw = value[key];
-  if (raw is! String || raw.isEmpty) throw FormatException('$key must be text.');
+  if (raw is! String || raw.isEmpty)
+    throw FormatException('$key must be text.');
   return raw;
 }
 

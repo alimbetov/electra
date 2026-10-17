@@ -13,7 +13,9 @@ void main() {
       powerFacts: _PowerFacts(),
     ).capture(_request());
 
-    final result = const Fa02CurrentAggregationKernel().evaluate(captured.value);
+    final result = const Fa02CurrentAggregationKernel().evaluate(
+      captured.value,
+    );
 
     expect(result.status, Fa02AssessmentStatus.complete);
     expect(
@@ -31,7 +33,9 @@ void main() {
       fireStore: _FireStore(includeSecondDevice: true),
       powerFacts: _PowerFacts(),
     ).capture(_request());
-    final result = const Fa02CurrentAggregationKernel().evaluate(captured.value);
+    final result = const Fa02CurrentAggregationKernel().evaluate(
+      captured.value,
+    );
 
     expect(result.status, Fa02AssessmentStatus.unresolved);
     expect(
@@ -84,7 +88,16 @@ final class _FireStore implements Elv5FireMutationStore {
   );
 
   @override
-  Future<void> replace({required String projectId, required String designRevisionId, required String operation, required String subjectId, required String bindingId, required int? expectedRootRevision, required Map<String, Object?> payload, required DateTime updatedAtUtc}) => throw UnimplementedError();
+  Future<void> replace({
+    required String projectId,
+    required String designRevisionId,
+    required String operation,
+    required String subjectId,
+    required String bindingId,
+    required int? expectedRootRevision,
+    required Map<String, Object?> payload,
+    required DateTime updatedAtUtc,
+  }) => throw UnimplementedError();
 }
 
 final class _PowerFacts implements Elv4OperatingFactSource {
@@ -110,7 +123,9 @@ final class _PowerFacts implements Elv4OperatingFactSource {
       _segment(PowerScenarioRole.standby, PowerDeviceState.standby),
       _segment(PowerScenarioRole.alarm, PowerDeviceState.alarm),
     ];
-    return values.where((value) => roles == null || roles.contains(value.role)).toList();
+    return values
+        .where((value) => roles == null || roles.contains(value.role))
+        .toList();
   }
 
   Elv4ExactDcLoadFact _load(

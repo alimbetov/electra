@@ -147,7 +147,9 @@ final class Acs05PersistedInputResolver
     }
 
     final persistedDurations = _pwr04SequenceDurations(pwr04.evidence);
-    final contractSegmentIds = contract.segments.map((value) => value.segmentId).toSet();
+    final contractSegmentIds = contract.segments
+        .map((value) => value.segmentId)
+        .toSet();
     if (!_sameSet(persistedDurations.keys.toSet(), contractSegmentIds)) {
       _blocked(
         request,
@@ -185,7 +187,10 @@ final class Acs05PersistedInputResolver
 
     final pwr04Output = pwr04.output;
     final requiredWh = _powerRational(pwr04Output['requiredWh'], 'requiredWh');
-    final availableWh = _powerRational(pwr04Output['availableWh'], 'availableWh');
+    final availableWh = _powerRational(
+      pwr04Output['availableWh'],
+      'availableWh',
+    );
 
     dependencies.add(
       _dependency(
@@ -301,7 +306,9 @@ final class Acs05PersistedInputResolver
       final inputs = _map(pwr01.evidence['inputs'], 'PWR01 inputs');
       final rawContributions = inputs['contributions'];
       if (rawContributions is! List) {
-        throw StateError('ACS05_PWR01_CONTRIBUTIONS_MISSING:${pwr01.evaluationId}');
+        throw StateError(
+          'ACS05_PWR01_CONTRIBUTIONS_MISSING:${pwr01.evaluationId}',
+        );
       }
       final durationSeconds = PowerRational(
         segment.durationMicroseconds,
@@ -317,8 +324,7 @@ final class Acs05PersistedInputResolver
         segmentLoads.add(originId);
         actualGlobalLoads.add(originId);
         if (!contract.acsProtectedLoadIds.contains(originId)) continue;
-        final energyWh =
-            watt * durationSeconds / PowerRational.integer(3600);
+        final energyWh = watt * durationSeconds / PowerRational.integer(3600);
         acsEnergyByLoad[originId] = acsEnergyByLoad[originId]! + energyWh;
       }
       if (!_sameSet(segmentLoads, contract.globalProtectedLoadIds)) {
@@ -589,11 +595,12 @@ PowerRational _resolvedContributionW(Map<String, Object?> contribution) {
   return switch (demand) {
     DcConstantPowerDemand(:final powerW) => powerW,
     AcPowerDemand(:final powerW) => powerW,
-    DcConstantCurrentDemand(:final currentA) => currentA *
-        _powerRational(
-          contribution['solvedTerminalVoltageV'],
-          'solvedTerminalVoltageV',
-        ),
+    DcConstantCurrentDemand(:final currentA) =>
+      currentA *
+          _powerRational(
+            contribution['solvedTerminalVoltageV'],
+            'solvedTerminalVoltageV',
+          ),
   };
 }
 

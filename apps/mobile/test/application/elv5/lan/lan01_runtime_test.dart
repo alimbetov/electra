@@ -67,7 +67,16 @@ final class _LanStore implements Elv5LanMutationStore {
   );
 
   @override
-  Future<void> replace({required String projectId, required String designRevisionId, required String operation, required String subjectId, required String bindingId, required int? expectedRootRevision, required Map<String, Object?> payload, required DateTime updatedAtUtc}) => throw UnimplementedError();
+  Future<void> replace({
+    required String projectId,
+    required String designRevisionId,
+    required String operation,
+    required String subjectId,
+    required String bindingId,
+    required int? expectedRootRevision,
+    required Map<String, Object?> payload,
+    required DateTime updatedAtUtc,
+  }) => throw UnimplementedError();
 }
 
 final class _Elv3Facts implements Elv3RealizedLinkFactSource {
@@ -88,7 +97,10 @@ final class _Elv3Facts implements Elv3RealizedLinkFactSource {
       ),
       includesRunReserve: true,
       includesTerminationAllowance: true,
-      sourceFingerprint: List.filled(64, realizedSectionId == 't1' ? 'a' : 'b').join(),
+      sourceFingerprint: List.filled(
+        64,
+        realizedSectionId == 't1' ? 'a' : 'b',
+      ).join(),
     );
   }
 }

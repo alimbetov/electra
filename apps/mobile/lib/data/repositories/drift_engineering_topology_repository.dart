@@ -35,54 +35,46 @@ class DriftEngineeringTopologyRepository
     ).load(projectId);
     Future<List<Map<String, dynamic>>> rows(String table) async =>
         systems.project == null
-            ? []
-            : (await database
-                    .customSelect(
-                      'SELECT payload_json FROM $table WHERE project_id = ? AND deleted_at IS NULL ORDER BY id',
-                      variables: [Variable.withString(projectId)],
-                      readsFrom: database.allTables.toSet(),
-                    )
-                    .get())
-                .map(
-                  (r) =>
-                      jsonDecode(r.read<String>('payload_json'))
-                          as Map<String, dynamic>,
-                )
-                .toList();
+        ? []
+        : (await database
+                  .customSelect(
+                    'SELECT payload_json FROM $table WHERE project_id = ? AND deleted_at IS NULL ORDER BY id',
+                    variables: [Variable.withString(projectId)],
+                    readsFrom: database.allTables.toSet(),
+                  )
+                  .get())
+              .map(
+                (r) =>
+                    jsonDecode(r.read<String>('payload_json'))
+                        as Map<String, dynamic>,
+              )
+              .toList();
     return ProjectEngineeringTopologySnapshot(
       systems: systems,
-      ports:
-          (await rows(
-            'engineering_port_instances',
-          )).map(EngineeringPort.fromMap).toList(),
-      connectionProfiles:
-          (await rows(
-            'engineering_compatibility_profiles',
-          )).map(ConnectionCompatibilityProfile.fromMap).toList(),
-      topologyProfiles:
-          (await rows(
-            'engineering_topology_profiles',
-          )).map(TopologyProfile.fromMap).toList(),
-      assemblyProfiles:
-          (await rows(
-            'engineering_assembly_profiles',
-          )).map(AssemblyProfile.fromMap).toList(),
-      connections:
-          (await rows(
-            'engineering_port_connections',
-          )).map(EngineeringConnection.fromMap).toList(),
-      groups:
-          (await rows(
-            'engineering_topology_groups',
-          )).map(TopologyGroup.fromMap).toList(),
-      internalLinks:
-          (await rows(
-            'engineering_internal_mappings',
-          )).map(InternalConnectivity.fromMap).toList(),
-      assemblies:
-          (await rows(
-            'engineering_component_assemblies',
-          )).map(ComponentAssembly.fromMap).toList(),
+      ports: (await rows('engineering_port_instances'))
+          .map(EngineeringPort.fromMap)
+          .toList(),
+      connectionProfiles: (await rows('engineering_compatibility_profiles'))
+          .map(ConnectionCompatibilityProfile.fromMap)
+          .toList(),
+      topologyProfiles: (await rows('engineering_topology_profiles'))
+          .map(TopologyProfile.fromMap)
+          .toList(),
+      assemblyProfiles: (await rows('engineering_assembly_profiles'))
+          .map(AssemblyProfile.fromMap)
+          .toList(),
+      connections: (await rows('engineering_port_connections'))
+          .map(EngineeringConnection.fromMap)
+          .toList(),
+      groups: (await rows('engineering_topology_groups'))
+          .map(TopologyGroup.fromMap)
+          .toList(),
+      internalLinks: (await rows('engineering_internal_mappings'))
+          .map(InternalConnectivity.fromMap)
+          .toList(),
+      assemblies: (await rows('engineering_component_assemblies'))
+          .map(ComponentAssembly.fromMap)
+          .toList(),
     );
   });
   Future<ProjectEngineeringTopologySnapshot> _active(String projectId) async {
@@ -93,14 +85,13 @@ class DriftEngineeringTopologyRepository
   }
 
   Future<QueryRow?> _old(String table, String id, String projectId) async {
-    final old =
-        await database
-            .customSelect(
-              'SELECT * FROM $table WHERE id = ?',
-              variables: [Variable.withString(id)],
-              readsFrom: database.allTables.toSet(),
-            )
-            .getSingleOrNull();
+    final old = await database
+        .customSelect(
+          'SELECT * FROM $table WHERE id = ?',
+          variables: [Variable.withString(id)],
+          readsFrom: database.allTables.toSet(),
+        )
+        .getSingleOrNull();
     if (old != null && old.read<String>('project_id') != projectId)
       throw StateError('Topology identity cannot move between projects.');
     return old;
@@ -129,18 +120,17 @@ class DriftEngineeringTopologyRepository
     String projectId,
     String connectionId,
   ) async {
-    final owned =
-        await database
-            .customSelect(
-              'SELECT 1 FROM poe_delivery_path_members '
-              'WHERE project_id = ? AND connection_id = ? LIMIT 1',
-              variables: [
-                Variable.withString(projectId),
-                Variable.withString(connectionId),
-              ],
-              readsFrom: database.allTables.toSet(),
-            )
-            .getSingleOrNull();
+    final owned = await database
+        .customSelect(
+          'SELECT 1 FROM poe_delivery_path_members '
+          'WHERE project_id = ? AND connection_id = ? LIMIT 1',
+          variables: [
+            Variable.withString(projectId),
+            Variable.withString(connectionId),
+          ],
+          readsFrom: database.allTables.toSet(),
+        )
+        .getSingleOrNull();
     if (owned != null) {
       throw StateError(
         'ELV4_POWER_CONNECTION_OWNED: Replace the revision-scoped PoE '
@@ -156,17 +146,13 @@ class DriftEngineeringTopologyRepository
     String code,
     String id,
   ) async {
-    final rows =
-        await database
-            .customSelect(
-              'SELECT id FROM $table WHERE $scopeColumn = ? AND code = ?',
-              variables: [
-                Variable.withString(scope),
-                Variable.withString(code),
-              ],
-              readsFrom: database.allTables.toSet(),
-            )
-            .get();
+    final rows = await database
+        .customSelect(
+          'SELECT id FROM $table WHERE $scopeColumn = ? AND code = ?',
+          variables: [Variable.withString(scope), Variable.withString(code)],
+          readsFrom: database.allTables.toSet(),
+        )
+        .get();
     if (rows.any((r) => r.read<String>('id') != id))
       throw StateError(
         'Code is reserved by another identity. Restore its original record or use a new code.',
@@ -187,18 +173,17 @@ class DriftEngineeringTopologyRepository
         );
       return false;
     }
-    final duplicate =
-        await database
-            .customSelect(
-              'SELECT id FROM $table WHERE project_id = ? AND code = ? AND profile_version = ?',
-              variables: [
-                Variable.withString(identity.projectId),
-                Variable.withString(identity.code),
-                Variable.withString(identity.version),
-              ],
-              readsFrom: database.allTables.toSet(),
-            )
-            .get();
+    final duplicate = await database
+        .customSelect(
+          'SELECT id FROM $table WHERE project_id = ? AND code = ? AND profile_version = ?',
+          variables: [
+            Variable.withString(identity.projectId),
+            Variable.withString(identity.code),
+            Variable.withString(identity.version),
+          ],
+          readsFrom: database.allTables.toSet(),
+        )
+        .get();
     if (duplicate.isNotEmpty)
       throw StateError('Profile code and edition already exist.');
     return true;
@@ -217,8 +202,9 @@ class DriftEngineeringTopologyRepository
         final p = ConnectionCompatibilityProfile.fromMap({
           ...profile.toMap(),
           'identity': _identity(profile.identity).toMap(),
-          'familyCodes':
-              profile.familyCodes.map((s) => s.trim().toUpperCase()).toList(),
+          'familyCodes': profile.familyCodes
+              .map((s) => s.trim().toUpperCase())
+              .toList(),
         });
         if (p.validate().isNotEmpty)
           throw ArgumentError(p.validate().join(' '));
@@ -316,74 +302,75 @@ class DriftEngineeringTopologyRepository
             );
       });
   @override
-  Future<void> savePort(
-    String projectId,
-    EngineeringPort port,
-  ) => database.transaction(() async {
-    final snapshot = await _active(projectId);
-    final p = EngineeringPort.fromMap({
-      ...port.toMap(),
-      'code': port.code.trim().toUpperCase(),
-    });
-    final old = await _old('engineering_port_instances', p.id, projectId);
-    if (old != null && _payload(old)['componentId'] != p.componentId)
-      throw StateError('Port identity cannot move between components.');
-    if (_same(old, p.toMap())) return;
-    await guardMutableEngineeringPortAgainstPowerOwnership(
-      database,
-      projectId,
-      p.id,
-    );
-    final binding =
-        await (database.select(database.componentReferenceBindings)..where(
-          (r) => r.componentId.equals(p.componentId) & r.deletedAt.isNull(),
-        )).getSingleOrNull();
-    if (binding != null &&
-        old != null &&
-        canonicalEngineeringJson(_payload(old)) !=
-            canonicalEngineeringJson(p.toMap()))
-      throw StateError(
-        'Profile-instantiated ports are frozen. Release the binding before changing their characteristics.',
-      );
-
-    if (snapshot.connections.any(
-          (c) => c.fromPortId == p.id || c.toPortId == p.id,
-        ) ||
-        snapshot.internalLinks.any(
-          (m) => m.fromPortId == p.id || m.toPortId == p.id,
-        ) ||
-        snapshot.groups.any(
-          (g) => g.startPortId == p.id || g.endPortId == p.id,
-        ))
-      throw StateError(
-        'Resolve external/internal links and group attachments before changing a port.',
-      );
-    _check(snapshot.graph(port: p).portFindings(p));
-    await _uniqueCode(
-      'engineering_port_instances',
-      'component_id',
-      p.componentId,
-      p.code,
-      p.id,
-    );
-    final now = DateTime.now().toUtc();
-    await database
-        .into(database.engineeringPortInstances)
-        .insertOnConflictUpdate(
-          EngineeringPortInstancesCompanion(
-            id: Value(p.id),
-            projectId: Value(projectId),
-            componentId: Value(p.componentId),
-            code: Value(p.code),
-            payloadJson: Value(canonicalEngineeringJson(p.toMap())),
-            revision: Value(_revision(old)),
-            createdAt: Value(_created(old, now)),
-            updatedAt: Value(now),
-            deletedAt: const Value(null),
-            originDeviceId: Value(originDeviceId),
-          ),
+  Future<void> savePort(String projectId, EngineeringPort port) =>
+      database.transaction(() async {
+        final snapshot = await _active(projectId);
+        final p = EngineeringPort.fromMap({
+          ...port.toMap(),
+          'code': port.code.trim().toUpperCase(),
+        });
+        final old = await _old('engineering_port_instances', p.id, projectId);
+        if (old != null && _payload(old)['componentId'] != p.componentId)
+          throw StateError('Port identity cannot move between components.');
+        if (_same(old, p.toMap())) return;
+        await guardMutableEngineeringPortAgainstPowerOwnership(
+          database,
+          projectId,
+          p.id,
         );
-  });
+        final binding =
+            await (database.select(database.componentReferenceBindings)..where(
+                  (r) =>
+                      r.componentId.equals(p.componentId) &
+                      r.deletedAt.isNull(),
+                ))
+                .getSingleOrNull();
+        if (binding != null &&
+            old != null &&
+            canonicalEngineeringJson(_payload(old)) !=
+                canonicalEngineeringJson(p.toMap()))
+          throw StateError(
+            'Profile-instantiated ports are frozen. Release the binding before changing their characteristics.',
+          );
+
+        if (snapshot.connections.any(
+              (c) => c.fromPortId == p.id || c.toPortId == p.id,
+            ) ||
+            snapshot.internalLinks.any(
+              (m) => m.fromPortId == p.id || m.toPortId == p.id,
+            ) ||
+            snapshot.groups.any(
+              (g) => g.startPortId == p.id || g.endPortId == p.id,
+            ))
+          throw StateError(
+            'Resolve external/internal links and group attachments before changing a port.',
+          );
+        _check(snapshot.graph(port: p).portFindings(p));
+        await _uniqueCode(
+          'engineering_port_instances',
+          'component_id',
+          p.componentId,
+          p.code,
+          p.id,
+        );
+        final now = DateTime.now().toUtc();
+        await database
+            .into(database.engineeringPortInstances)
+            .insertOnConflictUpdate(
+              EngineeringPortInstancesCompanion(
+                id: Value(p.id),
+                projectId: Value(projectId),
+                componentId: Value(p.componentId),
+                code: Value(p.code),
+                payloadJson: Value(canonicalEngineeringJson(p.toMap())),
+                revision: Value(_revision(old)),
+                createdAt: Value(_created(old, now)),
+                updatedAt: Value(now),
+                deletedAt: const Value(null),
+                originDeviceId: Value(originDeviceId),
+              ),
+            );
+      });
   @override
   Future<void> saveConnection(String projectId, EngineeringConnection c) =>
       database.transaction(() async {
@@ -587,8 +574,9 @@ class DriftEngineeringTopologyRepository
     // Each typed write notifies Drift observers; no anonymous raw SQL mutation.
     switch (kind) {
       case TopologyObjectKind.port:
-        await (database.update(database.engineeringPortInstances)
-          ..where((r) => r.id.equals(id))).write(
+        await (database.update(
+          database.engineeringPortInstances,
+        )..where((r) => r.id.equals(id))).write(
           EngineeringPortInstancesCompanion(
             revision: Value(_revision(old)),
             updatedAt: Value(now),
@@ -597,8 +585,9 @@ class DriftEngineeringTopologyRepository
           ),
         );
       case TopologyObjectKind.connection:
-        await (database.update(database.engineeringPortConnections)
-          ..where((r) => r.id.equals(id))).write(
+        await (database.update(
+          database.engineeringPortConnections,
+        )..where((r) => r.id.equals(id))).write(
           EngineeringPortConnectionsCompanion(
             revision: Value(_revision(old)),
             updatedAt: Value(now),
@@ -607,8 +596,9 @@ class DriftEngineeringTopologyRepository
           ),
         );
       case TopologyObjectKind.internalMapping:
-        await (database.update(database.engineeringInternalMappings)
-          ..where((r) => r.id.equals(id))).write(
+        await (database.update(
+          database.engineeringInternalMappings,
+        )..where((r) => r.id.equals(id))).write(
           EngineeringInternalMappingsCompanion(
             revision: Value(_revision(old)),
             updatedAt: Value(now),
@@ -617,8 +607,9 @@ class DriftEngineeringTopologyRepository
           ),
         );
       case TopologyObjectKind.group:
-        await (database.update(database.engineeringTopologyGroups)
-          ..where((r) => r.id.equals(id))).write(
+        await (database.update(
+          database.engineeringTopologyGroups,
+        )..where((r) => r.id.equals(id))).write(
           EngineeringTopologyGroupsCompanion(
             revision: Value(_revision(old)),
             updatedAt: Value(now),
@@ -627,8 +618,9 @@ class DriftEngineeringTopologyRepository
           ),
         );
       case TopologyObjectKind.assembly:
-        await (database.update(database.engineeringComponentAssemblies)
-          ..where((r) => r.id.equals(id))).write(
+        await (database.update(
+          database.engineeringComponentAssemblies,
+        )..where((r) => r.id.equals(id))).write(
           EngineeringComponentAssembliesCompanion(
             revision: Value(_revision(old)),
             updatedAt: Value(now),

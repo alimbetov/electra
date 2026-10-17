@@ -106,7 +106,7 @@ final class Elv5FireMutationService {
         : 'FIRE_NOTIFICATION_CIRCUIT';
     final aggregateId = previous?.aggregateId ?? 'ELV5:$kind:$subjectId';
     final oldDeps = previous == null
-        ? const <Map<String,Object?>>[]
+        ? const <Map<String, Object?>>[]
         : _dependencies(operation, previous.payload);
     final newDeps = _dependencies(operation, payload);
     final hashes = <String>{
@@ -139,11 +139,18 @@ final class Elv5FireMutationService {
       'payload': previous?.payload,
     };
     return Elv5PreparedReplacement(
-      actualRowRevisions: previous == null ? const {} : {aggregateId: previous.revision},
+      actualRowRevisions: previous == null
+          ? const {}
+          : {aggregateId: previous.revision},
       reviewedImpactFingerprint: fingerprint,
       staleNodeKeySha256s: stale,
       affectedIds: {subjectId, aggregateId},
-      beforeAggregate: _evidence(kind, aggregateId, subjectId, previous?.payload),
+      beforeAggregate: _evidence(
+        kind,
+        aggregateId,
+        subjectId,
+        previous?.payload,
+      ),
       inverseCommandType: 'ELV5_RESTORE_FIRE_AGGREGATE',
       inverseCommandSchema: _historySchema,
       inverseCanonicalPayloadJson: _canonical(inverse),
@@ -190,49 +197,72 @@ final class Elv5FireMutationService {
         'aggregateRevision': after.revision,
         'staleNodeCount': prepared.staleNodeKeySha256s.length,
       }),
-      afterAggregate: _evidence(kind, after.aggregateId, subjectId, after.payload),
+      afterAggregate: _evidence(
+        kind,
+        after.aggregateId,
+        subjectId,
+        after.payload,
+      ),
     );
   }
 
-  List<Map<String,Object?>> _dependencies(String operation, Map<String,Object?> payload) {
+  List<Map<String, Object?>> _dependencies(
+    String operation,
+    Map<String, Object?> payload,
+  ) {
     if (operation == 'REPLACE_FIRE_LOOP_ASSIGNMENTS') {
       final loopId = payload['loopId']! as String;
-      final domain = Map<String,Object?>.from(payload['addressDomain']! as Map);
+      final domain = Map<String, Object?>.from(
+        payload['addressDomain']! as Map,
+      );
       return [
         _dep('SET', 'FIRE_LOOP', loopId),
         _dep('SET', 'FIRE_ADDRESS_DOMAIN', _domainIdentity(domain)),
         for (final raw in payload['deviceAssignments']! as List)
-          _dep('FACT', 'COMPONENT_REFERENCE_BINDING',
-            Map<String,Object?>.from(raw as Map)['deviceId']! as String),
+          _dep(
+            'FACT',
+            'COMPONENT_REFERENCE_BINDING',
+            Map<String, Object?>.from(raw as Map)['deviceId']! as String,
+          ),
       ];
     }
     final circuitId = payload['circuitId']! as String;
-    final output = Map<String,Object?>.from(payload['outputRef']! as Map);
+    final output = Map<String, Object?>.from(payload['outputRef']! as Map);
     return [
       _dep('SET', 'FIRE_NOTIFICATION_CIRCUIT', circuitId),
       _dep('FACT', 'ENGINEERING_PORT', output['portId']! as String),
       for (final raw in payload['deviceAssignments']! as List)
-        _dep('FACT', 'COMPONENT_REFERENCE_BINDING',
-          Map<String,Object?>.from(raw as Map)['deviceId']! as String),
+        _dep(
+          'FACT',
+          'COMPONENT_REFERENCE_BINDING',
+          Map<String, Object?>.from(raw as Map)['deviceId']! as String,
+        ),
       _dep('POLICY', 'FIRE_NOTIFICATION_POLICY', circuitId),
     ];
   }
 
-  Map<String,Object?> _dep(String relationKind, String domain, String subjectId) => {
+  Map<String, Object?> _dep(
+    String relationKind,
+    String domain,
+    String subjectId,
+  ) => {
     'schema': 'electra.elv5-dependency-key.v1',
     'relationKind': relationKind,
     'domain': domain,
     'subjectId': subjectId,
   };
 
-  String _domainIdentity(Map<String,Object?> domain) => _encoder.sha256({
+  String _domainIdentity(Map<String, Object?> domain) => _encoder.sha256({
     'schema': 'electra.elv5-fire-address-domain-id.v1',
     'panelId': domain['panelId'],
     'loopId': domain['loopId'],
   });
 
   Elv5AggregateEvidenceDraft _evidence(
-    String kind, String aggregateId, String subjectId, Map<String,Object?>? payload,
+    String kind,
+    String aggregateId,
+    String subjectId,
+    Map<String, Object?>? payload,
   ) {
     final value = {
       'schema': 'electra.elv5-fire-aggregate.v1',
@@ -250,5 +280,6 @@ final class Elv5FireMutationService {
     );
   }
 
-  static String _canonical(Object? value) => utf8.decode(_encoder.encode(value), allowMalformed: false);
+  static String _canonical(Object? value) =>
+      utf8.decode(_encoder.encode(value), allowMalformed: false);
 }

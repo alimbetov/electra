@@ -95,8 +95,9 @@ EngineeringReferenceAdoptionPlan planEngineeringReferenceAdoption({
   }
 
   final boundIds = binding.portIds.toSet();
-  final activePorts =
-      currentPorts.where((port) => boundIds.contains(port.id)).toList();
+  final activePorts = currentPorts
+      .where((port) => boundIds.contains(port.id))
+      .toList();
   if (activePorts.length != boundIds.length) {
     blockers.add(
       'Current active ports do not match the frozen binding port set.',

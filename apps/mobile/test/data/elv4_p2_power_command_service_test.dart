@@ -12,121 +12,124 @@ import 'package:flutter_test/flutter_test.dart';
 final _now = DateTime.utc(2026, 10, 15, 20);
 
 void main() {
-  test('P2 public power commands persist, advance token and replay once', () async {
-    final db = AppDatabase(NativeDatabase.memory());
-    addTearDown(db.close);
-    await _seed(db);
-    final service = DriftPowerCommandService(
-      db,
-      originDeviceId: 'test',
-      now: () => _now,
-    );
+  test(
+    'P2 public power commands persist, advance token and replay once',
+    () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      await _seed(db);
+      final service = DriftPowerCommandService(
+        db,
+        originDeviceId: 'test',
+        now: () => _now,
+      );
 
-    final component = BindPowerComponentCommand(
-      operationId: 'bind-component',
-      projectId: 'project',
-      designRevisionId: 'rev-1',
-      expectedRevision: 1,
-      changedDependencies: [_dep('COMP-LOAD')],
-      bindingId: 'component-binding',
-      binding: PowerComponentBinding(
-        componentId: 'comp-load',
-        capabilities: const [PowerComponentCapability.consumer],
-        definitionRefs: [_ref(PowerDefinitionKind.component, 'LOAD')],
-      ),
-    );
-    final r1 = await service.execute(component);
-    expect(r1.currentRevision, 2);
-    expect(r1.replayed, isFalse);
-
-    final port = BindPowerPortCommand(
-      operationId: 'bind-port',
-      projectId: 'project',
-      designRevisionId: 'rev-1',
-      expectedRevision: 2,
-      changedDependencies: [_dep('PORT-LOAD')],
-      bindingId: 'port-binding',
-      binding: _portBinding('p-load'),
-    );
-    expect((await service.execute(port)).currentRevision, 3);
-
-    final load = SetPowerLoadCommand(
-      operationId: 'set-load',
-      projectId: 'project',
-      designRevisionId: 'rev-1',
-      expectedRevision: 3,
-      changedDependencies: [_dep('LOAD-1')],
-      contribution: PowerOwnLoadContribution(
-        id: 'LOAD-1',
-        componentId: 'comp-load',
-        inputPortId: 'p-load',
-        accountingKind: PowerAccountingKind.consumerInput,
-        stateCode: 'NORMAL',
-        demand: DcConstantPowerDemand(PowerRational.integer(12)),
-      ),
-    );
-    final firstLoad = await service.execute(load);
-    final replayLoad = await service.execute(load);
-    expect(firstLoad.currentRevision, 4);
-    expect(replayLoad.currentRevision, 4);
-    expect(replayLoad.replayed, isTrue);
-    expect(await _revision(db), 4);
-
-    expect(
-      await db
-          .customSelect(
-            "SELECT COUNT(*) AS c FROM power_component_bindings WHERE design_revision_id = 'rev-1'",
-          )
-          .getSingle()
-          .then((row) => row.read<int>('c')),
-      1,
-    );
-    expect(
-      await db
-          .customSelect(
-            "SELECT COUNT(*) AS c FROM power_port_bindings WHERE design_revision_id = 'rev-1'",
-          )
-          .getSingle()
-          .then((row) => row.read<int>('c')),
-      1,
-    );
-    expect(
-      await db
-          .customSelect(
-            "SELECT COUNT(*) AS c FROM power_load_bindings WHERE design_revision_id = 'rev-1'",
-          )
-          .getSingle()
-          .then((row) => row.read<int>('c')),
-      1,
-    );
-
-    final conflicting = SetPowerLoadCommand(
-      operationId: 'set-load',
-      projectId: 'project',
-      designRevisionId: 'rev-1',
-      expectedRevision: 3,
-      changedDependencies: [_dep('LOAD-1')],
-      contribution: PowerOwnLoadContribution(
-        id: 'LOAD-1',
-        componentId: 'comp-load',
-        inputPortId: 'p-load',
-        accountingKind: PowerAccountingKind.consumerInput,
-        stateCode: 'NORMAL',
-        demand: DcConstantPowerDemand(PowerRational.integer(13)),
-      ),
-    );
-    await expectLater(
-      service.execute(conflicting),
-      throwsA(
-        isA<PowerRuntimeStorageException>().having(
-          (error) => error.code,
-          'code',
-          'ELV4_OPERATION_FINGERPRINT_CONFLICT',
+      final component = BindPowerComponentCommand(
+        operationId: 'bind-component',
+        projectId: 'project',
+        designRevisionId: 'rev-1',
+        expectedRevision: 1,
+        changedDependencies: [_dep('COMP-LOAD')],
+        bindingId: 'component-binding',
+        binding: PowerComponentBinding(
+          componentId: 'comp-load',
+          capabilities: const [PowerComponentCapability.consumer],
+          definitionRefs: [_ref(PowerDefinitionKind.component, 'LOAD')],
         ),
-      ),
-    );
-    expect(await _revision(db), 4);
-  });
+      );
+      final r1 = await service.execute(component);
+      expect(r1.currentRevision, 2);
+      expect(r1.replayed, isFalse);
+
+      final port = BindPowerPortCommand(
+        operationId: 'bind-port',
+        projectId: 'project',
+        designRevisionId: 'rev-1',
+        expectedRevision: 2,
+        changedDependencies: [_dep('PORT-LOAD')],
+        bindingId: 'port-binding',
+        binding: _portBinding('p-load'),
+      );
+      expect((await service.execute(port)).currentRevision, 3);
+
+      final load = SetPowerLoadCommand(
+        operationId: 'set-load',
+        projectId: 'project',
+        designRevisionId: 'rev-1',
+        expectedRevision: 3,
+        changedDependencies: [_dep('LOAD-1')],
+        contribution: PowerOwnLoadContribution(
+          id: 'LOAD-1',
+          componentId: 'comp-load',
+          inputPortId: 'p-load',
+          accountingKind: PowerAccountingKind.consumerInput,
+          stateCode: 'NORMAL',
+          demand: DcConstantPowerDemand(PowerRational.integer(12)),
+        ),
+      );
+      final firstLoad = await service.execute(load);
+      final replayLoad = await service.execute(load);
+      expect(firstLoad.currentRevision, 4);
+      expect(replayLoad.currentRevision, 4);
+      expect(replayLoad.replayed, isTrue);
+      expect(await _revision(db), 4);
+
+      expect(
+        await db
+            .customSelect(
+              "SELECT COUNT(*) AS c FROM power_component_bindings WHERE design_revision_id = 'rev-1'",
+            )
+            .getSingle()
+            .then((row) => row.read<int>('c')),
+        1,
+      );
+      expect(
+        await db
+            .customSelect(
+              "SELECT COUNT(*) AS c FROM power_port_bindings WHERE design_revision_id = 'rev-1'",
+            )
+            .getSingle()
+            .then((row) => row.read<int>('c')),
+        1,
+      );
+      expect(
+        await db
+            .customSelect(
+              "SELECT COUNT(*) AS c FROM power_load_bindings WHERE design_revision_id = 'rev-1'",
+            )
+            .getSingle()
+            .then((row) => row.read<int>('c')),
+        1,
+      );
+
+      final conflicting = SetPowerLoadCommand(
+        operationId: 'set-load',
+        projectId: 'project',
+        designRevisionId: 'rev-1',
+        expectedRevision: 3,
+        changedDependencies: [_dep('LOAD-1')],
+        contribution: PowerOwnLoadContribution(
+          id: 'LOAD-1',
+          componentId: 'comp-load',
+          inputPortId: 'p-load',
+          accountingKind: PowerAccountingKind.consumerInput,
+          stateCode: 'NORMAL',
+          demand: DcConstantPowerDemand(PowerRational.integer(13)),
+        ),
+      );
+      await expectLater(
+        service.execute(conflicting),
+        throwsA(
+          isA<PowerRuntimeStorageException>().having(
+            (error) => error.code,
+            'code',
+            'ELV4_OPERATION_FINGERPRINT_CONFLICT',
+          ),
+        ),
+      );
+      expect(await _revision(db), 4);
+    },
+  );
 
   test(
     'same-project foreign port cannot be charged to another component',
@@ -476,13 +479,12 @@ Future<void> _seed(AppDatabase db) async {
       ],
     );
   }
-  for (final entry
-      in const {
-        'p-load': 'comp-load',
-        'p-source': 'comp-source',
-        'p-out': 'comp-source',
-        'p-bank': 'comp-bank',
-      }.entries) {
+  for (final entry in const {
+    'p-load': 'comp-load',
+    'p-source': 'comp-source',
+    'p-out': 'comp-source',
+    'p-bank': 'comp-bank',
+  }.entries) {
     await runRawStatement(
       db,
       'INSERT INTO engineering_port_instances '

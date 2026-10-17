@@ -76,13 +76,12 @@ void main() {
       await tester.scrollUntilVisible(
         buttons.last,
         100,
-        scrollable:
-            find
-                .descendant(
-                  of: find.byKey(const ValueKey('manufacturer-selection')),
-                  matching: find.byType(Scrollable),
-                )
-                .first,
+        scrollable: find
+            .descendant(
+              of: find.byKey(const ValueKey('manufacturer-selection')),
+              matching: find.byType(Scrollable),
+            )
+            .first,
       );
       await Scrollable.ensureVisible(
         tester.element(buttons.last),

@@ -6,99 +6,111 @@ import 'package:electra_mobile/data/repositories/elv5/drift_fa08_invalidation_co
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('environment edition change marks dependent FA08 pointer stale once', () async {
-    final db = await _db();
-    addTearDown(db.close);
-    final dependency = Elv5InvalidationDependency(
-      relationKind: 'POLICY',
-      domain: 'ELV5_ENVIRONMENT_PROFILE',
-      subjectId: 'ENV:ROOM:room-1:old-hash',
-    );
-    await _seedDependency(db, dependency);
-    final coordinator = _coordinator(db);
+  test(
+    'environment edition change marks dependent FA08 pointer stale once',
+    () async {
+      final db = await _db();
+      addTearDown(db.close);
+      final dependency = Elv5InvalidationDependency(
+        relationKind: 'POLICY',
+        domain: 'ELV5_ENVIRONMENT_PROFILE',
+        subjectId: 'ENV:ROOM:room-1:old-hash',
+      );
+      await _seedDependency(db, dependency);
+      final coordinator = _coordinator(db);
 
-    expect(
-      await coordinator.environmentEditionChanged(
-        projectId: 'p',
-        designRevisionId: 'd',
-        oldEvidenceRef: 'ENV:ROOM:room-1:old-hash',
-      ),
-      1,
-    );
-    await _expectPointer(db, freshness: 'STALE', generation: 2);
-    expect(
-      await coordinator.environmentEditionChanged(
-        projectId: 'p',
-        designRevisionId: 'd',
-        oldEvidenceRef: 'ENV:ROOM:room-1:old-hash',
-      ),
-      0,
-    );
-    await _expectPointer(db, freshness: 'STALE', generation: 2);
-  });
+      expect(
+        await coordinator.environmentEditionChanged(
+          projectId: 'p',
+          designRevisionId: 'd',
+          oldEvidenceRef: 'ENV:ROOM:room-1:old-hash',
+        ),
+        1,
+      );
+      await _expectPointer(db, freshness: 'STALE', generation: 2);
+      expect(
+        await coordinator.environmentEditionChanged(
+          projectId: 'p',
+          designRevisionId: 'd',
+          oldEvidenceRef: 'ENV:ROOM:room-1:old-hash',
+        ),
+        0,
+      );
+      await _expectPointer(db, freshness: 'STALE', generation: 2);
+    },
+  );
 
-  test('grouping 1 to N invalidates old grouping evidence dependency', () async {
-    final db = await _db();
-    addTearDown(db.close);
-    final dependency = Elv5InvalidationDependency(
-      relationKind: 'POLICY',
-      domain: 'AMPACITY_GROUPING_CORRECTION',
-      subjectId: 'GROUPING:section-1:single',
-    );
-    await _seedDependency(db, dependency);
+  test(
+    'grouping 1 to N invalidates old grouping evidence dependency',
+    () async {
+      final db = await _db();
+      addTearDown(db.close);
+      final dependency = Elv5InvalidationDependency(
+        relationKind: 'POLICY',
+        domain: 'AMPACITY_GROUPING_CORRECTION',
+        subjectId: 'GROUPING:section-1:single',
+      );
+      await _seedDependency(db, dependency);
 
-    expect(
-      await _coordinator(db).groupingEvidenceChanged(
-        projectId: 'p',
-        designRevisionId: 'd',
-        oldEvidenceRef: 'GROUPING:section-1:single',
-      ),
-      1,
-    );
-    await _expectPointer(db, freshness: 'STALE', generation: 2);
-  });
+      expect(
+        await _coordinator(db).groupingEvidenceChanged(
+          projectId: 'p',
+          designRevisionId: 'd',
+          oldEvidenceRef: 'GROUPING:section-1:single',
+        ),
+        1,
+      );
+      await _expectPointer(db, freshness: 'STALE', generation: 2);
+    },
+  );
 
-  test('route section add or remove invalidates cable-run route dependency', () async {
-    final db = await _db();
-    addTearDown(db.close);
-    final dependency = Elv5InvalidationDependency(
-      relationKind: 'SET',
-      domain: 'CABLE_RUN_ROUTE',
-      subjectId: 'run-1',
-    );
-    await _seedDependency(db, dependency);
+  test(
+    'route section add or remove invalidates cable-run route dependency',
+    () async {
+      final db = await _db();
+      addTearDown(db.close);
+      final dependency = Elv5InvalidationDependency(
+        relationKind: 'SET',
+        domain: 'CABLE_RUN_ROUTE',
+        subjectId: 'run-1',
+      );
+      await _seedDependency(db, dependency);
 
-    expect(
-      await _coordinator(db).routeChanged(
-        projectId: 'p',
-        designRevisionId: 'd',
-        cableRunId: 'run-1',
-      ),
-      1,
-    );
-    await _expectPointer(db, freshness: 'STALE', generation: 2);
-  });
+      expect(
+        await _coordinator(db).routeChanged(
+          projectId: 'p',
+          designRevisionId: 'd',
+          cableRunId: 'run-1',
+        ),
+        1,
+      );
+      await _expectPointer(db, freshness: 'STALE', generation: 2);
+    },
+  );
 
-  test('cable definition change invalidates every active run using cable', () async {
-    final db = await _db(withRun: true);
-    addTearDown(db.close);
-    final dependency = Elv5InvalidationDependency(
-      relationKind: 'SET',
-      domain: 'CABLE_RUN_ROUTE',
-      subjectId: 'run-1',
-    );
-    await _seedDependency(db, dependency);
+  test(
+    'cable definition change invalidates every active run using cable',
+    () async {
+      final db = await _db(withRun: true);
+      addTearDown(db.close);
+      final dependency = Elv5InvalidationDependency(
+        relationKind: 'SET',
+        domain: 'CABLE_RUN_ROUTE',
+        subjectId: 'run-1',
+      );
+      await _seedDependency(db, dependency);
 
-    expect(
-      await _coordinator(db).cableDefinitionChanged(
-        projectId: 'p',
-        designRevisionId: 'd',
-        cableId: 'cable-1',
-      ),
-      1,
-    );
-    await _expectPointer(db, freshness: 'STALE', generation: 2);
-  });
+      expect(
+        await _coordinator(db).cableDefinitionChanged(
+          projectId: 'p',
+          designRevisionId: 'd',
+          cableId: 'cable-1',
+        ),
+        1,
+      );
+      await _expectPointer(db, freshness: 'STALE', generation: 2);
+    },
+  );
 }
 
 DriftFa08InvalidationCoordinator _coordinator(AppDatabase db) =>
@@ -112,7 +124,9 @@ Future<AppDatabase> _db({bool withRun = false}) async {
   final db = AppDatabase(NativeDatabase.memory());
   await db.customStatement('PRAGMA foreign_keys = OFF');
   final now = DateTime.utc(2026, 10, 17, 12);
-  await db.into(db.projects).insert(
+  await db
+      .into(db.projects)
+      .insert(
         ProjectsCompanion.insert(
           id: 'p',
           name: 'P',
@@ -124,7 +138,9 @@ Future<AppDatabase> _db({bool withRun = false}) async {
           originDeviceId: 'seed',
         ),
       );
-  await db.into(db.projectDesignRevisions).insert(
+  await db
+      .into(db.projectDesignRevisions)
+      .insert(
         ProjectDesignRevisionsCompanion.insert(
           id: 'd',
           projectId: 'p',
@@ -137,7 +153,9 @@ Future<AppDatabase> _db({bool withRun = false}) async {
         ),
       );
   if (withRun) {
-    await db.into(db.canonicalCableRuns).insert(
+    await db
+        .into(db.canonicalCableRuns)
+        .insert(
           CanonicalCableRunsCompanion.insert(
             id: 'run-1',
             projectId: 'p',
@@ -174,9 +192,11 @@ Future<void> _expectPointer(
   required String freshness,
   required int generation,
 }) async {
-  final row = await db.customSelect(
-    "SELECT freshness, generation FROM discipline_evaluation_pointers WHERE project_id = 'p' AND design_revision_id = 'd'",
-  ).getSingle();
+  final row = await db
+      .customSelect(
+        "SELECT freshness, generation FROM discipline_evaluation_pointers WHERE project_id = 'p' AND design_revision_id = 'd'",
+      )
+      .getSingle();
   expect(row.read<String>('freshness'), freshness);
   expect(row.read<int>('generation'), generation);
 }

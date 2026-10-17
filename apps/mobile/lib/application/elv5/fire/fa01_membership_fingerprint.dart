@@ -9,22 +9,29 @@ String fa01MembershipFingerprint({
   final panelId = _text(addressDomain['panelId'], 'panelId');
   final domainLoopId = _text(addressDomain['loopId'], 'domain.loopId');
   if (domainLoopId != loopId) {
-    throw StateError('FA01_MEMBERSHIP_DOMAIN_LOOP_MISMATCH:$domainLoopId:$loopId');
+    throw StateError(
+      'FA01_MEMBERSHIP_DOMAIN_LOOP_MISMATCH:$domainLoopId:$loopId',
+    );
   }
-  final reserved = _ints(addressDomain['reservedAddresses'], 'reservedAddresses')
-    ..sort();
+  final reserved = _ints(
+    addressDomain['reservedAddresses'],
+    'reservedAddresses',
+  )..sort();
   final devices = <Map<String, Object?>>[];
   for (final assignment in deviceAssignments) {
-    final addresses = _ints(assignment['expandedAddresses'], 'expandedAddresses')
-      ..sort();
+    final addresses = _ints(
+      assignment['expandedAddresses'],
+      'expandedAddresses',
+    )..sort();
     devices.add(<String, Object?>{
       'deviceId': _text(assignment['deviceId'], 'deviceId'),
       'profileRef': _text(assignment['profileRef'], 'profileRef'),
       'expandedAddresses': addresses,
     });
   }
-  devices.sort((a, b) =>
-      (a['deviceId']! as String).compareTo(b['deviceId']! as String));
+  devices.sort(
+    (a, b) => (a['deviceId']! as String).compareTo(b['deviceId']! as String),
+  );
   return encoder.sha256(<String, Object?>{
     'schema': 'electra.elv5-fa01-address-membership.v1',
     'loopId': loopId,
@@ -41,32 +48,37 @@ String fa01MembershipFingerprint({
 
 String fa01InputMembershipFingerprint(Fa01Input input) {
   const encoder = Elv5CanonicalJsonV1();
-  final devices = <Map<String, Object?>>[
-    for (final device in input.devices)
-      <String, Object?>{
-        'deviceId': device.deviceId,
-        'physicalDeviceCountContribution':
-            device.physicalDeviceCountContribution,
-        'addresses': [
-          for (final key in (device.addresses.toList()
-            ..sort((a, b) {
-              final domain = a.domainId.compareTo(b.domainId);
-              return domain != 0 ? domain : a.address.compareTo(b.address);
-            })))
-            <String, Object?>{
-              'domainId': key.domainId,
-              'address': key.address,
-            },
-        ],
-      },
-  ]..sort((a, b) =>
-      (a['deviceId']! as String).compareTo(b['deviceId']! as String));
+  final devices =
+      <Map<String, Object?>>[
+        for (final device in input.devices)
+          <String, Object?>{
+            'deviceId': device.deviceId,
+            'physicalDeviceCountContribution':
+                device.physicalDeviceCountContribution,
+            'addresses': [
+              for (final key
+                  in (device.addresses.toList()..sort((a, b) {
+                    final domain = a.domainId.compareTo(b.domainId);
+                    return domain != 0
+                        ? domain
+                        : a.address.compareTo(b.address);
+                  })))
+                <String, Object?>{
+                  'domainId': key.domainId,
+                  'address': key.address,
+                },
+            ],
+          },
+      ]..sort(
+        (a, b) =>
+            (a['deviceId']! as String).compareTo(b['deviceId']! as String),
+      );
   final reserved = [
-    for (final key in (input.reserved.toList()
-      ..sort((a, b) {
-        final domain = a.domainId.compareTo(b.domainId);
-        return domain != 0 ? domain : a.address.compareTo(b.address);
-      })))
+    for (final key
+        in (input.reserved.toList()..sort((a, b) {
+          final domain = a.domainId.compareTo(b.domainId);
+          return domain != 0 ? domain : a.address.compareTo(b.address);
+        })))
       <String, Object?>{'domainId': key.domainId, 'address': key.address},
   ];
   return encoder.sha256(<String, Object?>{

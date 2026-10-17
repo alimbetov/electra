@@ -150,7 +150,8 @@ final class Fa03PersistedInputResolver
         'inputFingerprint': pwr03.inputFingerprint,
       });
 
-      if (pwr03.inputFingerprint != caseContract.expectedPwr03InputFingerprint) {
+      if (pwr03.inputFingerprint !=
+          caseContract.expectedPwr03InputFingerprint) {
         _blocked(
           request,
           'FA03_PWR03_INPUT_FINGERPRINT_MISMATCH',
@@ -279,8 +280,7 @@ final class Fa03PersistedInputResolver
       'physicalScopeFingerprint': physicalScopeFingerprint,
       'upstream': upstreamBasis
         ..sort(
-          (a, b) => (a['caseId']! as String)
-              .compareTo(b['caseId']! as String),
+          (a, b) => (a['caseId']! as String).compareTo(b['caseId']! as String),
         ),
     });
     return Elv5CapturedInput<Fa03Input>(
@@ -385,9 +385,7 @@ Elv5PureKernelExecutor<Fa03Input, Fa03Result> buildFa03Executor({
 
 List<Map<String, Object?>> _objects(Object? raw, String field) {
   if (raw is! List) throw FormatException('$field must be an array.');
-  return <Map<String, Object?>>[
-    for (final value in raw) _object(value, field),
-  ];
+  return <Map<String, Object?>>[for (final value in raw) _object(value, field)];
 }
 
 Map<String, Object?> _object(Object? raw, String field) {

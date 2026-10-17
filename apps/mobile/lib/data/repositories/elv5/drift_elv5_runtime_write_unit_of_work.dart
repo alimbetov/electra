@@ -19,14 +19,15 @@ final class DriftElv5RuntimeWriteUnitOfWork
   final String originDeviceId;
 
   @override
-  Future<T> run<T>(Future<T> Function(Elv5RuntimeWriteSession session) action) =>
-      database.transaction(() async {
-        final session = _DriftElv5RuntimeWriteSession(
-          database,
-          originDeviceId: originDeviceId,
-        );
-        return action(session);
-      });
+  Future<T> run<T>(
+    Future<T> Function(Elv5RuntimeWriteSession session) action,
+  ) => database.transaction(() async {
+    final session = _DriftElv5RuntimeWriteSession(
+      database,
+      originDeviceId: originDeviceId,
+    );
+    return action(session);
+  });
 }
 
 final class _DriftElv5RuntimeWriteSession implements Elv5RuntimeWriteSession {
@@ -153,14 +154,16 @@ final class _DriftElv5EvaluationStore implements Elv5EvaluationStore {
     if (evaluationIds.isEmpty) return const {};
     final ids = evaluationIds.toList(growable: false)..sort();
     final placeholders = List.filled(ids.length, '?').join(',');
-    final rows = await database.customSelect(
-      'SELECT * FROM discipline_evaluation_records '
-      'WHERE project_id = ? AND evaluation_id IN ($placeholders)',
-      variables: [
-        Variable.withString(projectId),
-        ...ids.map(Variable.withString),
-      ],
-    ).get();
+    final rows = await database
+        .customSelect(
+          'SELECT * FROM discipline_evaluation_records '
+          'WHERE project_id = ? AND evaluation_id IN ($placeholders)',
+          variables: [
+            Variable.withString(projectId),
+            ...ids.map(Variable.withString),
+          ],
+        )
+        .get();
     return {
       for (final row in rows)
         row.read<String>('evaluation_id'): _evaluation(row),
@@ -261,10 +264,7 @@ final class _DriftElv5EvaluationStore implements Elv5EvaluationStore {
 }
 
 final class _DriftElv5PointerStore implements Elv5PointerStore {
-  const _DriftElv5PointerStore(
-    this.database, {
-    required this.originDeviceId,
-  });
+  const _DriftElv5PointerStore(this.database, {required this.originDeviceId});
 
   final AppDatabase database;
   final String originDeviceId;
@@ -278,16 +278,18 @@ final class _DriftElv5PointerStore implements Elv5PointerStore {
     if (logicalNodeKeySha256s.isEmpty) return const {};
     final keys = logicalNodeKeySha256s.toList(growable: false)..sort();
     final placeholders = List.filled(keys.length, '?').join(',');
-    final rows = await database.customSelect(
-      'SELECT * FROM discipline_evaluation_pointers '
-      'WHERE project_id = ? AND design_revision_id = ? '
-      'AND logical_node_key_sha256 IN ($placeholders)',
-      variables: [
-        Variable.withString(projectId),
-        Variable.withString(designRevisionId),
-        ...keys.map(Variable.withString),
-      ],
-    ).get();
+    final rows = await database
+        .customSelect(
+          'SELECT * FROM discipline_evaluation_pointers '
+          'WHERE project_id = ? AND design_revision_id = ? '
+          'AND logical_node_key_sha256 IN ($placeholders)',
+          variables: [
+            Variable.withString(projectId),
+            Variable.withString(designRevisionId),
+            ...keys.map(Variable.withString),
+          ],
+        )
+        .get();
     return {
       for (final row in rows)
         row.read<String>('logical_node_key_sha256'): _pointer(row),
@@ -407,17 +409,19 @@ final class _DriftElv5DependencyStore implements Elv5DependencyStore {
     if (dependencyKeySha256s.isEmpty) return const {};
     final keys = dependencyKeySha256s.toList(growable: false)..sort();
     final placeholders = List.filled(keys.length, '?').join(',');
-    final rows = await database.customSelect(
-      'SELECT * FROM discipline_dependency_index '
-      'WHERE project_id = ? AND design_revision_id = ? '
-      'AND dependency_key_sha256 IN ($placeholders) '
-      'ORDER BY dependency_key_sha256, logical_node_key_sha256',
-      variables: [
-        Variable.withString(projectId),
-        Variable.withString(designRevisionId),
-        ...keys.map(Variable.withString),
-      ],
-    ).get();
+    final rows = await database
+        .customSelect(
+          'SELECT * FROM discipline_dependency_index '
+          'WHERE project_id = ? AND design_revision_id = ? '
+          'AND dependency_key_sha256 IN ($placeholders) '
+          'ORDER BY dependency_key_sha256, logical_node_key_sha256',
+          variables: [
+            Variable.withString(projectId),
+            Variable.withString(designRevisionId),
+            ...keys.map(Variable.withString),
+          ],
+        )
+        .get();
     final result = <String, List<Elv5DependencyMarker>>{};
     for (final row in rows) {
       final marker = _marker(row);

@@ -6,10 +6,10 @@ final class Acs01RoleRequirementContract {
     required String kindCode,
     required String roleCode,
     required this.count,
-  })  : nodeId = _text(nodeId, 'nodeId'),
-        kindCode = _countKind(kindCode),
-        roleCode = _role(roleCode),
-        children = const <Acs01RoleRequirementContract>[] {
+  }) : nodeId = _text(nodeId, 'nodeId'),
+       kindCode = _countKind(kindCode),
+       roleCode = _role(roleCode),
+       children = const <Acs01RoleRequirementContract>[] {
     if (count == null || count! < 0) {
       throw ArgumentError('ACS01 requirement count must be nonnegative.');
     }
@@ -19,11 +19,11 @@ final class Acs01RoleRequirementContract {
     required String nodeId,
     required String kindCode,
     required Iterable<Acs01RoleRequirementContract> children,
-  })  : nodeId = _text(nodeId, 'nodeId'),
-        kindCode = _groupKind(kindCode),
-        roleCode = null,
-        count = null,
-        children = List.unmodifiable(_children(children));
+  }) : nodeId = _text(nodeId, 'nodeId'),
+       kindCode = _groupKind(kindCode),
+       roleCode = null,
+       count = null,
+       children = List.unmodifiable(_children(children));
 
   final String nodeId;
   final String kindCode;
@@ -32,23 +32,31 @@ final class Acs01RoleRequirementContract {
   final List<Acs01RoleRequirementContract> children;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'nodeId': nodeId,
-        'kindCode': kindCode,
-        'roleCode': roleCode,
-        'count': count,
-        'children': <Object?>[
-          for (final child in children) child.toCanonicalValue(),
-        ],
-      };
+    'nodeId': nodeId,
+    'kindCode': kindCode,
+    'roleCode': roleCode,
+    'count': count,
+    'children': <Object?>[
+      for (final child in children) child.toCanonicalValue(),
+    ],
+  };
 
   factory Acs01RoleRequirementContract.fromMap(Map<String, Object?> map) {
-    _exact(map, const {'nodeId','kindCode','roleCode','count','children'}, 'ACS01 requirement');
+    _exact(map, const {
+      'nodeId',
+      'kindCode',
+      'roleCode',
+      'count',
+      'children',
+    }, 'ACS01 requirement');
     final kind = _mapText(map, 'kindCode').toUpperCase();
     final children = map['children'];
-    if (children is! List) throw const FormatException('ACS01 children must be array.');
+    if (children is! List)
+      throw const FormatException('ACS01 children must be array.');
     if (kind == 'AT_LEAST' || kind == 'EXACTLY') {
       final count = map['count'];
-      if (count is! int) throw const FormatException('ACS01 count must be integer.');
+      if (count is! int)
+        throw const FormatException('ACS01 count must be integer.');
       return Acs01RoleRequirementContract.roleCount(
         nodeId: _mapText(map, 'nodeId'),
         kindCode: kind,
@@ -74,10 +82,10 @@ final class Acs01ComponentCapabilityContract {
     required this.allowRoleSharing,
     required String evidenceRef,
     required String evidenceContentHash,
-  })  : componentId = _text(componentId, 'componentId'),
-        allowedRoleCodes = Set.unmodifiable(allowedRoleCodes.map(_role)),
-        evidenceRef = _text(evidenceRef, 'evidenceRef'),
-        evidenceContentHash = _sha(evidenceContentHash, 'evidenceContentHash') {
+  }) : componentId = _text(componentId, 'componentId'),
+       allowedRoleCodes = Set.unmodifiable(allowedRoleCodes.map(_role)),
+       evidenceRef = _text(evidenceRef, 'evidenceRef'),
+       evidenceContentHash = _sha(evidenceContentHash, 'evidenceContentHash') {
     if (this.allowedRoleCodes.isEmpty) {
       throw ArgumentError('ACS01 component capability must allow a role.');
     }
@@ -90,15 +98,21 @@ final class Acs01ComponentCapabilityContract {
   final String evidenceContentHash;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'componentId': componentId,
-        'allowedRoleCodes': allowedRoleCodes.toList()..sort(),
-        'allowRoleSharing': allowRoleSharing,
-        'evidenceRef': evidenceRef,
-        'evidenceContentHash': evidenceContentHash,
-      };
+    'componentId': componentId,
+    'allowedRoleCodes': allowedRoleCodes.toList()..sort(),
+    'allowRoleSharing': allowRoleSharing,
+    'evidenceRef': evidenceRef,
+    'evidenceContentHash': evidenceContentHash,
+  };
 
   factory Acs01ComponentCapabilityContract.fromMap(Map<String, Object?> map) {
-    _exact(map, const {'componentId','allowedRoleCodes','allowRoleSharing','evidenceRef','evidenceContentHash'}, 'ACS01 capability');
+    _exact(map, const {
+      'componentId',
+      'allowedRoleCodes',
+      'allowRoleSharing',
+      'evidenceRef',
+      'evidenceContentHash',
+    }, 'ACS01 capability');
     if (map['allowRoleSharing'] is! bool) {
       throw const FormatException('allowRoleSharing must be boolean.');
     }
@@ -120,10 +134,13 @@ final class Acs01RoleProfileContract {
     required this.rootRequirement,
     required Iterable<Acs01ComponentCapabilityContract> capabilities,
     required this.assignmentClosureComplete,
-  })  : doorId = _text(doorId, 'doorId'),
-        profileId = _text(profileId, 'profileId'),
-        expectedDoorAggregateFingerprint = _sha(expectedDoorAggregateFingerprint, 'expectedDoorAggregateFingerprint'),
-        capabilities = List.unmodifiable(_capabilities(capabilities));
+  }) : doorId = _text(doorId, 'doorId'),
+       profileId = _text(profileId, 'profileId'),
+       expectedDoorAggregateFingerprint = _sha(
+         expectedDoorAggregateFingerprint,
+         'expectedDoorAggregateFingerprint',
+       ),
+       capabilities = List.unmodifiable(_capabilities(capabilities));
 
   static const schema = 'electra.elv5-acs01-role-profile-contract.v1';
 
@@ -135,29 +152,45 @@ final class Acs01RoleProfileContract {
   final bool assignmentClosureComplete;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'schema': schema,
-        'doorId': doorId,
-        'profileId': profileId,
-        'expectedDoorAggregateFingerprint': expectedDoorAggregateFingerprint,
-        'rootRequirement': rootRequirement.toCanonicalValue(),
-        'capabilities': <Object?>[
-          for (final capability in capabilities) capability.toCanonicalValue(),
-        ],
-        'assignmentClosureComplete': assignmentClosureComplete,
-      };
+    'schema': schema,
+    'doorId': doorId,
+    'profileId': profileId,
+    'expectedDoorAggregateFingerprint': expectedDoorAggregateFingerprint,
+    'rootRequirement': rootRequirement.toCanonicalValue(),
+    'capabilities': <Object?>[
+      for (final capability in capabilities) capability.toCanonicalValue(),
+    ],
+    'assignmentClosureComplete': assignmentClosureComplete,
+  };
 
   factory Acs01RoleProfileContract.fromMap(Map<String, Object?> map) {
-    _exact(map, const {'schema','doorId','profileId','expectedDoorAggregateFingerprint','rootRequirement','capabilities','assignmentClosureComplete'}, 'ACS01 contract');
+    _exact(map, const {
+      'schema',
+      'doorId',
+      'profileId',
+      'expectedDoorAggregateFingerprint',
+      'rootRequirement',
+      'capabilities',
+      'assignmentClosureComplete',
+    }, 'ACS01 contract');
     if (map['schema'] != schema || map['assignmentClosureComplete'] is! bool) {
-      throw const FormatException('Unsupported ACS01 contract schema or field type.');
+      throw const FormatException(
+        'Unsupported ACS01 contract schema or field type.',
+      );
     }
     final caps = map['capabilities'];
-    if (caps is! List) throw const FormatException('ACS01 capabilities must be array.');
+    if (caps is! List)
+      throw const FormatException('ACS01 capabilities must be array.');
     return Acs01RoleProfileContract(
       doorId: _mapText(map, 'doorId'),
       profileId: _mapText(map, 'profileId'),
-      expectedDoorAggregateFingerprint: _mapText(map, 'expectedDoorAggregateFingerprint'),
-      rootRequirement: Acs01RoleRequirementContract.fromMap(_map(map['rootRequirement'], 'rootRequirement')),
+      expectedDoorAggregateFingerprint: _mapText(
+        map,
+        'expectedDoorAggregateFingerprint',
+      ),
+      rootRequirement: Acs01RoleRequirementContract.fromMap(
+        _map(map['rootRequirement'], 'rootRequirement'),
+      ),
       capabilities: <Acs01ComponentCapabilityContract>[
         for (final raw in caps)
           Acs01ComponentCapabilityContract.fromMap(_map(raw, 'capability')),
@@ -193,7 +226,8 @@ abstract interface class Acs01RoleProfileContractSource {
 List<Acs01ComponentCapabilityContract> _capabilities(
   Iterable<Acs01ComponentCapabilityContract> values,
 ) {
-  final out = values.toList()..sort((a,b) => a.componentId.compareTo(b.componentId));
+  final out = values.toList()
+    ..sort((a, b) => a.componentId.compareTo(b.componentId));
   final ids = <String>{};
   for (final value in out) {
     if (!ids.add(value.componentId)) {
@@ -206,7 +240,7 @@ List<Acs01ComponentCapabilityContract> _capabilities(
 List<Acs01RoleRequirementContract> _children(
   Iterable<Acs01RoleRequirementContract> values,
 ) {
-  final out = values.toList()..sort((a,b) => a.nodeId.compareTo(b.nodeId));
+  final out = values.toList()..sort((a, b) => a.nodeId.compareTo(b.nodeId));
   if (out.isEmpty) throw ArgumentError('ACS01 group must have children.');
   return out;
 }
@@ -214,16 +248,24 @@ List<Acs01RoleRequirementContract> _children(
 String _role(String value) {
   final code = _text(value, 'roleCode').toUpperCase();
   const supported = {
-    'READER_ENTRY','READER_EXIT','REQUEST_TO_EXIT','EXIT_BUTTON','LOCK',
-    'DOOR_CONTACT','EMERGENCY_RELEASE','FIRE_RELEASE_INPUT','OTHER'
+    'READER_ENTRY',
+    'READER_EXIT',
+    'REQUEST_TO_EXIT',
+    'EXIT_BUTTON',
+    'LOCK',
+    'DOOR_CONTACT',
+    'EMERGENCY_RELEASE',
+    'FIRE_RELEASE_INPUT',
+    'OTHER',
   };
-  if (!supported.contains(code)) throw ArgumentError('Unsupported ACS01 role: $code');
+  if (!supported.contains(code))
+    throw ArgumentError('Unsupported ACS01 role: $code');
   return code;
 }
 
 String _countKind(String value) {
   final code = _text(value, 'kindCode').toUpperCase();
-  if (!const {'AT_LEAST','EXACTLY'}.contains(code)) {
+  if (!const {'AT_LEAST', 'EXACTLY'}.contains(code)) {
     throw ArgumentError('Unsupported ACS01 count kind: $code');
   }
   return code;
@@ -231,36 +273,42 @@ String _countKind(String value) {
 
 String _groupKind(String value) {
   final code = _text(value, 'kindCode').toUpperCase();
-  if (!const {'ALL_OF','ANY_OF','EXACTLY_ONE_OF'}.contains(code)) {
+  if (!const {'ALL_OF', 'ANY_OF', 'EXACTLY_ONE_OF'}.contains(code)) {
     throw ArgumentError('Unsupported ACS01 group kind: $code');
   }
   return code;
 }
 
-Map<String,Object?> _map(Object? value, String field) {
+Map<String, Object?> _map(Object? value, String field) {
   if (value is! Map) throw FormatException('$field must be object.');
-  return Map<String,Object?>.from(value);
+  return Map<String, Object?>.from(value);
 }
+
 List<String> _strings(Object? value, String field) {
   if (value is! List || value.any((e) => e is! String)) {
     throw FormatException('$field must be string array.');
   }
   return value.cast<String>();
 }
-String _mapText(Map<String,Object?> map, String key) => _string(map[key], key);
+
+String _mapText(Map<String, Object?> map, String key) => _string(map[key], key);
 String _string(Object? value, String field) {
   if (value is! String) throw FormatException('$field must be text.');
   return _text(value, field);
 }
+
 String? _nullableText(Object? value, String field) {
   if (value == null) return null;
   return _string(value, field);
 }
+
 String _text(String value, String field) {
   final normalized = value.trim();
-  if (normalized.isEmpty) throw ArgumentError.value(value, field, 'Must not be empty.');
+  if (normalized.isEmpty)
+    throw ArgumentError.value(value, field, 'Must not be empty.');
   return normalized;
 }
+
 String _sha(String value, String field) {
   final normalized = _text(value, field).toLowerCase();
   if (!RegExp(r'^[0-9a-f]{64}$').hasMatch(normalized)) {
@@ -268,9 +316,12 @@ String _sha(String value, String field) {
   }
   return normalized;
 }
-void _exact(Map<String,Object?> map, Set<String> expected, String field) {
+
+void _exact(Map<String, Object?> map, Set<String> expected, String field) {
   final actual = map.keys.toSet();
-  if (actual.length != expected.length || actual.difference(expected).isNotEmpty || expected.difference(actual).isNotEmpty) {
+  if (actual.length != expected.length ||
+      actual.difference(expected).isNotEmpty ||
+      expected.difference(actual).isNotEmpty) {
     throw FormatException('$field has missing or unknown fields.');
   }
 }

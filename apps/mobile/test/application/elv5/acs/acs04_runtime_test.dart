@@ -8,23 +8,35 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('captures exact global demand and PWR-02 capability without local sizing', () async {
-    final pwr02Fingerprint = _hash('a');
-    final resolver = Acs04PersistedInputResolver(
-      contractSource: _ContractSource(_contract(pwr02Fingerprint)),
-      powerEvidence: _PowerEvidence(pwr02Fingerprint),
-    );
+  test(
+    'captures exact global demand and PWR-02 capability without local sizing',
+    () async {
+      final pwr02Fingerprint = _hash('a');
+      final resolver = Acs04PersistedInputResolver(
+        contractSource: _ContractSource(_contract(pwr02Fingerprint)),
+        powerEvidence: _PowerEvidence(pwr02Fingerprint),
+      );
 
-    final captured = await resolver.capture(_request());
-    final input = captured.value;
-    expect(input.powerCases, hasLength(1));
-    expect(input.powerCases.single.globalDemand.value, Elv5Rational.integer(30));
-    expect(input.powerCases.single.requiredCapability.value, Elv5Rational.integer(36));
-    expect(input.powerCases.single.availableCapability.value, Elv5Rational.integer(40));
-    final result = const Acs04SourceRequirementKernel().evaluate(input);
-    expect(result.status, Acs04AssessmentStatus.pass);
-    expect(result.powerCases.single.margin.value, Elv5Rational.integer(4));
-  });
+      final captured = await resolver.capture(_request());
+      final input = captured.value;
+      expect(input.powerCases, hasLength(1));
+      expect(
+        input.powerCases.single.globalDemand.value,
+        Elv5Rational.integer(30),
+      );
+      expect(
+        input.powerCases.single.requiredCapability.value,
+        Elv5Rational.integer(36),
+      );
+      expect(
+        input.powerCases.single.availableCapability.value,
+        Elv5Rational.integer(40),
+      );
+      final result = const Acs04SourceRequirementKernel().evaluate(input);
+      expect(result.status, Acs04AssessmentStatus.pass);
+      expect(result.powerCases.single.margin.value, Elv5Rational.integer(4));
+    },
+  );
 
   test('blocks when CURRENT PWR-02 was produced from another requirement set input', () async {
     final resolver = Acs04PersistedInputResolver(
@@ -46,17 +58,17 @@ void main() {
 }
 
 Elv5CalculationRequest _request() => Elv5CalculationRequest(
-      projectId: 'p',
-      designRevisionId: 'd',
-      scope: Elv5ScopeRef(
-        kind: Elv5ScopeKind.design,
-        scopeId: 'd',
-        scenarioKey: 'NONE',
-      ),
-      processCode: Elv5ProcessCode.acs04,
-      subject: Elv5SubjectRef(kind: 'POWER_SOURCE', id: 'psu-1'),
-      expectedPointerGeneration: 0,
-    );
+  projectId: 'p',
+  designRevisionId: 'd',
+  scope: Elv5ScopeRef(
+    kind: Elv5ScopeKind.design,
+    scopeId: 'd',
+    scenarioKey: 'NONE',
+  ),
+  processCode: Elv5ProcessCode.acs04,
+  subject: Elv5SubjectRef(kind: 'POWER_SOURCE', id: 'psu-1'),
+  expectedPointerGeneration: 0,
+);
 
 Acs04SourceRequirementContract _contract(String fingerprint) =>
     Acs04SourceRequirementContract(
@@ -96,12 +108,12 @@ final class _ContractSource implements Acs04SourceRequirementContractSource {
     required String designRevisionId,
     required String sourceId,
   }) async => Acs04SourceRequirementContractSnapshot(
-        bindingId: 'binding-1',
-        bindingRevision: 2,
-        evidenceRef: 'evidence-1',
-        contentHash: _hash('f'),
-        contract: contract,
-      );
+    bindingId: 'binding-1',
+    bindingRevision: 2,
+    evidenceRef: 'evidence-1',
+    contentHash: _hash('f'),
+    contract: contract,
+  );
 }
 
 final class _PowerEvidence implements Elv4CurrentEvidenceSource {
@@ -130,30 +142,30 @@ final class _PowerEvidence implements Elv4CurrentEvidenceSource {
 }
 
 Elv4CurrentEvaluationSnapshot _pwr01() => Elv4CurrentEvaluationSnapshot(
-      nodeKey: PowerNodeKeyV2(
-        revisionId: 'd',
-        scenarioId: 'NORMAL',
-        scopeKind: PowerEvaluationScopeKind.segment,
-        scopeId: 'S1',
-        processCode: PowerProcessCode.pwr01,
-        subjectKind: 'SOURCE_AGGREGATE',
-        subjectId: 'psu-1',
-      ),
-      evaluationId: 'pwr01-eval',
-      inputFingerprint: _hash('1'),
-      evidenceSha256: _hash('2'),
-      pointerGeneration: 3,
-      evidence: <String, Object?>{
-        'output': <String, Object?>{
-          'knownW': PowerRational.integer(30).toMap(),
-          'knownA': PowerRational.zero.toMap(),
-          'knownVa': PowerRational.zero.toMap(),
-          'completeW': true,
-          'completeA': false,
-          'completeVa': false,
-        },
-      },
-    );
+  nodeKey: PowerNodeKeyV2(
+    revisionId: 'd',
+    scenarioId: 'NORMAL',
+    scopeKind: PowerEvaluationScopeKind.segment,
+    scopeId: 'S1',
+    processCode: PowerProcessCode.pwr01,
+    subjectKind: 'SOURCE_AGGREGATE',
+    subjectId: 'psu-1',
+  ),
+  evaluationId: 'pwr01-eval',
+  inputFingerprint: _hash('1'),
+  evidenceSha256: _hash('2'),
+  pointerGeneration: 3,
+  evidence: <String, Object?>{
+    'output': <String, Object?>{
+      'knownW': PowerRational.integer(30).toMap(),
+      'knownA': PowerRational.zero.toMap(),
+      'knownVa': PowerRational.zero.toMap(),
+      'completeW': true,
+      'completeA': false,
+      'completeVa': false,
+    },
+  },
+);
 
 Elv4CurrentEvaluationSnapshot _pwr02(String fingerprint) =>
     Elv4CurrentEvaluationSnapshot(
@@ -175,8 +187,14 @@ Elv4CurrentEvaluationSnapshot _pwr02(String fingerprint) =>
           'dimension': 'WATT',
           'demand': PowerRational.integer(30).toMap(),
           'nameplate': PowerRational.integer(50).toMap(),
-          'reserveMultiplier': PowerRational(BigInt.from(6), BigInt.from(5)).toMap(),
-          'deratingFactor': PowerRational(BigInt.from(4), BigInt.from(5)).toMap(),
+          'reserveMultiplier': PowerRational(
+            BigInt.from(6),
+            BigInt.from(5),
+          ).toMap(),
+          'deratingFactor': PowerRational(
+            BigInt.from(4),
+            BigInt.from(5),
+          ).toMap(),
         },
         'output': <String, Object?>{
           'required': PowerRational.integer(36).toMap(),

@@ -7,31 +7,34 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('ACS02 evaluates independent resource pools with exact spare rules', () async {
-    final payload = _payload();
-    final resolver = Acs02PersistedInputResolver(
-      acsStore: _Store(payload),
-      contractSource: _Contracts(_contract(payload)),
-      nowUtc: () => DateTime.utc(2026, 10, 17),
-    );
+  test(
+    'ACS02 evaluates independent resource pools with exact spare rules',
+    () async {
+      final payload = _payload();
+      final resolver = Acs02PersistedInputResolver(
+        acsStore: _Store(payload),
+        contractSource: _Contracts(_contract(payload)),
+        nowUtc: () => DateTime.utc(2026, 10, 17),
+      );
 
-    final captured = await resolver.capture(_request());
-    final result = await buildAcs02Executor().execute(captured);
+      final captured = await resolver.capture(_request());
+      final result = await buildAcs02Executor().execute(captured);
 
-    expect(result.assessment, Elv5Assessment.pass);
-    expect(result.output['status'], 'pass');
-    final pools = <Map<String, Object?>>[
-      for (final raw in result.output['pools']! as List)
-        Map<String, Object?>.from(raw as Map),
-    ];
-    final byKind = <String, Map<String, Object?>>{
-      for (final row in pools) row['resourceKind']! as String: row,
-    };
-    expect(byKind['reader']!['headroom'], 0);
-    expect(byKind['relay']!['headroom'], 0);
-    expect(byKind['supervisedInput']!['headroom'], 0);
-    expect(byKind['other']!['headroom'], 1);
-  });
+      expect(result.assessment, Elv5Assessment.pass);
+      expect(result.output['status'], 'pass');
+      final pools = <Map<String, Object?>>[
+        for (final raw in result.output['pools']! as List)
+          Map<String, Object?>.from(raw as Map),
+      ];
+      final byKind = <String, Map<String, Object?>>{
+        for (final row in pools) row['resourceKind']! as String: row,
+      };
+      expect(byKind['reader']!['headroom'], 0);
+      expect(byKind['relay']!['headroom'], 0);
+      expect(byKind['supervisedInput']!['headroom'], 0);
+      expect(byKind['other']!['headroom'], 1);
+    },
+  );
 
   test('ACS02 duplicate physical relay assignment fails without borrowing reader capacity', () async {
     final payload = _payload(duplicateRelay: true);
@@ -70,19 +73,20 @@ void main() {
 }
 
 Elv5CalculationRequest _request() => Elv5CalculationRequest(
-      projectId: 'project',
-      designRevisionId: 'revision',
-      scope: Elv5ScopeRef(
-        kind: Elv5ScopeKind.design,
-        scopeId: 'revision',
-        scenarioKey: 'NONE',
-      ),
-      processCode: Elv5ProcessCode.acs02,
-      subject: Elv5SubjectRef(kind: 'CONTROLLER', id: 'controller-1'),
-      expectedPointerGeneration: 0,
-    );
+  projectId: 'project',
+  designRevisionId: 'revision',
+  scope: Elv5ScopeRef(
+    kind: Elv5ScopeKind.design,
+    scopeId: 'revision',
+    scenarioKey: 'NONE',
+  ),
+  processCode: Elv5ProcessCode.acs02,
+  subject: Elv5SubjectRef(kind: 'CONTROLLER', id: 'controller-1'),
+  expectedPointerGeneration: 0,
+);
 
-Map<String, Object?> _payload({bool duplicateRelay = false}) => <String, Object?>{
+Map<String, Object?> _payload({bool duplicateRelay = false}) =>
+    <String, Object?>{
       'controllerId': 'controller-1',
       'resourceAssignments': <Object?>[
         <String, Object?>{
@@ -139,60 +143,57 @@ Map<String, Object?> _payload({bool duplicateRelay = false}) => <String, Object?
 Acs02ResourceContract _contract(
   Map<String, Object?> payload, {
   String policyEdition = 'spare-v1',
-}) =>
-    Acs02ResourceContract(
-      controllerId: 'controller-1',
-      expectedControllerAggregateFingerprint:
-          const Elv5CanonicalJsonV1().sha256(payload),
-      reservePolicy: Acs02PolicyIdentity(
-        policyCode: 'ACS-CONTROLLER-SPARE',
-        editionId: policyEdition,
-        contentHash: _hash('b'),
+}) => Acs02ResourceContract(
+  controllerId: 'controller-1',
+  expectedControllerAggregateFingerprint: const Elv5CanonicalJsonV1().sha256(
+    payload,
+  ),
+  reservePolicy: Acs02PolicyIdentity(
+    policyCode: 'ACS-CONTROLLER-SPARE',
+    editionId: policyEdition,
+    contentHash: _hash('b'),
+  ),
+  resources: <Acs02ResourceContractItem>[
+    for (final id in const ['reader-1', 'reader-2', 'reader-3', 'reader-4'])
+      Acs02ResourceContractItem(
+        resourceId: id,
+        resourceKindCode: 'READER_CHANNEL',
       ),
-      resources: <Acs02ResourceContractItem>[
-        for (final id in const ['reader-1', 'reader-2', 'reader-3', 'reader-4'])
-          Acs02ResourceContractItem(
-            resourceId: id,
-            resourceKindCode: 'READER_CHANNEL',
-          ),
-        for (final id in const ['relay-1', 'relay-2'])
-          Acs02ResourceContractItem(
-            resourceId: id,
-            resourceKindCode: 'RELAY_OUTPUT',
-          ),
-        for (final id in const ['input-1', 'input-2'])
-          Acs02ResourceContractItem(
-            resourceId: id,
-            resourceKindCode: 'SUPERVISED_INPUT',
-          ),
-        Acs02ResourceContractItem(
-          resourceId: 'other-1',
-          resourceKindCode: 'OTHER',
-        ),
-      ],
-      spareRules: <Acs02SpareRuleContract>[
-        Acs02SpareRuleContract(
-          resourceKindCode: 'READER_CHANNEL',
-          absoluteMinimum: 1,
-          ratio: Elv5Rational.zero,
-        ),
-        Acs02SpareRuleContract(
-          resourceKindCode: 'RELAY_OUTPUT',
-          absoluteMinimum: 0,
-          ratio: Elv5Rational.zero,
-        ),
-        Acs02SpareRuleContract(
-          resourceKindCode: 'SUPERVISED_INPUT',
-          absoluteMinimum: 1,
-          ratio: Elv5Rational.zero,
-        ),
-        Acs02SpareRuleContract(
-          resourceKindCode: 'OTHER',
-          absoluteMinimum: 0,
-          ratio: Elv5Rational.zero,
-        ),
-      ],
-    );
+    for (final id in const ['relay-1', 'relay-2'])
+      Acs02ResourceContractItem(
+        resourceId: id,
+        resourceKindCode: 'RELAY_OUTPUT',
+      ),
+    for (final id in const ['input-1', 'input-2'])
+      Acs02ResourceContractItem(
+        resourceId: id,
+        resourceKindCode: 'SUPERVISED_INPUT',
+      ),
+    Acs02ResourceContractItem(resourceId: 'other-1', resourceKindCode: 'OTHER'),
+  ],
+  spareRules: <Acs02SpareRuleContract>[
+    Acs02SpareRuleContract(
+      resourceKindCode: 'READER_CHANNEL',
+      absoluteMinimum: 1,
+      ratio: Elv5Rational.zero,
+    ),
+    Acs02SpareRuleContract(
+      resourceKindCode: 'RELAY_OUTPUT',
+      absoluteMinimum: 0,
+      ratio: Elv5Rational.zero,
+    ),
+    Acs02SpareRuleContract(
+      resourceKindCode: 'SUPERVISED_INPUT',
+      absoluteMinimum: 1,
+      ratio: Elv5Rational.zero,
+    ),
+    Acs02SpareRuleContract(
+      resourceKindCode: 'OTHER',
+      absoluteMinimum: 0,
+      ratio: Elv5Rational.zero,
+    ),
+  ],
+);
 
 final class _Store implements Elv5AcsFactStore {
   const _Store(this.payload);
@@ -205,12 +206,12 @@ final class _Store implements Elv5AcsFactStore {
     required String operation,
     required String subjectId,
   }) async => Elv5AcsAggregateSnapshot(
-        aggregateKind: 'ACS_CONTROLLER_RESOURCES',
-        aggregateId: 'ELV5:ACS_CONTROLLER_RESOURCES:controller-1',
-        subjectId: 'controller-1',
-        revision: 7,
-        payload: payload,
-      );
+    aggregateKind: 'ACS_CONTROLLER_RESOURCES',
+    aggregateId: 'ELV5:ACS_CONTROLLER_RESOURCES:controller-1',
+    subjectId: 'controller-1',
+    revision: 7,
+    payload: payload,
+  );
 }
 
 final class _Contracts implements Acs02ResourceContractSource {
@@ -223,12 +224,12 @@ final class _Contracts implements Acs02ResourceContractSource {
     required String designRevisionId,
     required String controllerId,
   }) async => Acs02ResourceContractSnapshot(
-        bindingId: 'acs02-binding',
-        bindingRevision: 2,
-        evidenceRef: 'ACS02:controller-1:${_hash('c')}',
-        contentHash: _hash('c'),
-        contract: contract,
-      );
+    bindingId: 'acs02-binding',
+    bindingRevision: 2,
+    evidenceRef: 'ACS02:controller-1:${_hash('c')}',
+    contentHash: _hash('c'),
+    contract: contract,
+  );
 }
 
 String _hash(String char) => List<String>.filled(64, char).join();

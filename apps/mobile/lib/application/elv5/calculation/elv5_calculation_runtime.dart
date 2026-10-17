@@ -40,7 +40,9 @@ final class Elv5CapturedInput<I> {
     required Map<String, int> upstreamPointerGenerations,
     required this.captureRevision,
   }) : dependencies = List.unmodifiable(dependencies),
-       upstreamPointerGenerations = Map.unmodifiable(upstreamPointerGenerations);
+       upstreamPointerGenerations = Map.unmodifiable(
+         upstreamPointerGenerations,
+       );
 
   final Elv5CalculationRequest request;
   final I value;
@@ -210,13 +212,15 @@ final class Elv5ProcessEvaluationCandidate {
 
   static const _encoder = Elv5CanonicalJsonV1();
 
-  static bool _sameCanonicalMap(Map<Object?, Object?> left, Map<String, Object?> right) =>
-      _encoder.sha256(Map<String, Object?>.from(left)) == _encoder.sha256(right);
+  static bool _sameCanonicalMap(
+    Map<Object?, Object?> left,
+    Map<String, Object?> right,
+  ) =>
+      _encoder.sha256(Map<String, Object?>.from(left)) ==
+      _encoder.sha256(right);
 
-  static String _canonicalJson(Object? value) => utf8.decode(
-    _encoder.encode(value),
-    allowMalformed: false,
-  );
+  static String _canonicalJson(Object? value) =>
+      utf8.decode(_encoder.encode(value), allowMalformed: false);
 }
 
 abstract interface class Elv5ProcessInputResolver<I> {
@@ -289,14 +293,15 @@ final class Elv5TypedProcessCalculationAdapter<I>
   }
 
   @override
-  Future<Elv5ProcessEvaluationCandidate> execute(
-    Elv5CapturedProcess input,
-  ) => executor.execute(input.opaqueInput as Elv5CapturedInput<I>);
+  Future<Elv5ProcessEvaluationCandidate> execute(Elv5CapturedProcess input) =>
+      executor.execute(input.opaqueInput as Elv5CapturedInput<I>);
 }
 
 final class Elv5ProcessCalculationRegistry {
   Elv5ProcessCalculationRegistry(Iterable<Elv5ProcessCalculationAdapter> values)
-    : _byCode = Map.unmodifiable({for (final value in values) value.processCode: value}) {
+    : _byCode = Map.unmodifiable({
+        for (final value in values) value.processCode: value,
+      }) {
     if (_byCode.length != values.length) {
       throw ArgumentError('Duplicate ELV5 calculation adapter.');
     }
@@ -305,9 +310,13 @@ final class Elv5ProcessCalculationRegistry {
   final Map<Elv5ProcessCode, Elv5ProcessCalculationAdapter> _byCode;
 
   Elv5ProcessCalculationAdapter require(Elv5ProcessCode code) =>
-      _byCode[code] ?? (throw StateError('ELV5_PROCESS_RUNTIME_NOT_IMPLEMENTED:${code.wireCode}'));
+      _byCode[code] ??
+      (throw StateError(
+        'ELV5_PROCESS_RUNTIME_NOT_IMPLEMENTED:${code.wireCode}',
+      ));
 
-  Set<Elv5ProcessCode> get registeredCodes => Set.unmodifiable(_byCode.keys.toSet());
+  Set<Elv5ProcessCode> get registeredCodes =>
+      Set.unmodifiable(_byCode.keys.toSet());
 }
 
 final class Elv5CalculationBatch {
@@ -325,7 +334,5 @@ final class Elv5CalculationBatch {
 
 const _encoder = Elv5CanonicalJsonV1();
 
-String _canonicalJson(Object? value) => utf8.decode(
-  _encoder.encode(value),
-  allowMalformed: false,
-);
+String _canonicalJson(Object? value) =>
+    utf8.decode(_encoder.encode(value), allowMalformed: false);

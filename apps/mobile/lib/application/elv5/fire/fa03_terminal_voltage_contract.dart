@@ -11,18 +11,18 @@ final class Fa03CaseContract {
     required String pwr03SubjectId,
     required String expectedPwr03InputFingerprint,
     required Map<String, String> terminalLoadIdByTerminalId,
-  })  : caseId = _text(caseId, 'caseId'),
-        scenarioId = _text(scenarioId, 'scenarioId'),
-        segmentId = _text(segmentId, 'segmentId'),
-        pwr03SubjectKind = _text(pwr03SubjectKind, 'pwr03SubjectKind'),
-        pwr03SubjectId = _text(pwr03SubjectId, 'pwr03SubjectId'),
-        expectedPwr03InputFingerprint = _sha(
-          expectedPwr03InputFingerprint,
-          'expectedPwr03InputFingerprint',
-        ),
-        terminalLoadIdByTerminalId = Map.unmodifiable(
-          _terminalMap(terminalLoadIdByTerminalId),
-        );
+  }) : caseId = _text(caseId, 'caseId'),
+       scenarioId = _text(scenarioId, 'scenarioId'),
+       segmentId = _text(segmentId, 'segmentId'),
+       pwr03SubjectKind = _text(pwr03SubjectKind, 'pwr03SubjectKind'),
+       pwr03SubjectId = _text(pwr03SubjectId, 'pwr03SubjectId'),
+       expectedPwr03InputFingerprint = _sha(
+         expectedPwr03InputFingerprint,
+         'expectedPwr03InputFingerprint',
+       ),
+       terminalLoadIdByTerminalId = Map.unmodifiable(
+         _terminalMap(terminalLoadIdByTerminalId),
+       );
 
   final String caseId;
   final String scenarioId;
@@ -46,19 +46,15 @@ final class Fa03CaseContract {
   };
 
   factory Fa03CaseContract.fromMap(Map<String, Object?> map) {
-    _exact(
-      map,
-      const <String>{
-        'caseId',
-        'scenarioId',
-        'segmentId',
-        'pwr03SubjectKind',
-        'pwr03SubjectId',
-        'expectedPwr03InputFingerprint',
-        'terminalLoadIdByTerminalId',
-      },
-      'FA03 case',
-    );
+    _exact(map, const <String>{
+      'caseId',
+      'scenarioId',
+      'segmentId',
+      'pwr03SubjectKind',
+      'pwr03SubjectId',
+      'expectedPwr03InputFingerprint',
+      'terminalLoadIdByTerminalId',
+    }, 'FA03 case');
     final rawTerminals = _object(
       map['terminalLoadIdByTerminalId'],
       'terminalLoadIdByTerminalId',
@@ -70,8 +66,10 @@ final class Fa03CaseContract {
           'FA03 terminalLoadIdByTerminalId values must be text.',
         );
       }
-      terminals[_text(entry.key, 'terminalId')] =
-          _text(entry.value! as String, 'terminalLoadId');
+      terminals[_text(entry.key, 'terminalId')] = _text(
+        entry.value! as String,
+        'terminalLoadId',
+      );
     }
     return Fa03CaseContract(
       caseId: _mapText(map, 'caseId'),
@@ -79,8 +77,10 @@ final class Fa03CaseContract {
       segmentId: _mapText(map, 'segmentId'),
       pwr03SubjectKind: _mapText(map, 'pwr03SubjectKind'),
       pwr03SubjectId: _mapText(map, 'pwr03SubjectId'),
-      expectedPwr03InputFingerprint:
-          _mapText(map, 'expectedPwr03InputFingerprint'),
+      expectedPwr03InputFingerprint: _mapText(
+        map,
+        'expectedPwr03InputFingerprint',
+      ),
       terminalLoadIdByTerminalId: terminals,
     );
   }
@@ -93,8 +93,8 @@ final class Fa03TerminalVoltageContract {
     required this.minimumTerminalVoltageV,
     required this.maximumTerminalVoltageV,
     required Iterable<Fa03CaseContract> cases,
-  })  : circuitId = _text(circuitId, 'circuitId'),
-        cases = List.unmodifiable(_cases(cases)) {
+  }) : circuitId = _text(circuitId, 'circuitId'),
+       cases = List.unmodifiable(_cases(cases)) {
     if (minimumTerminalVoltageV < Elv5Rational.zero ||
         maximumTerminalVoltageV < minimumTerminalVoltageV) {
       throw ArgumentError('FA03 voltage limits are invalid.');
@@ -128,8 +128,8 @@ final class Fa03TerminalVoltageContract {
           'segmentId': c.segmentId,
           'pwr03SubjectKind': c.pwr03SubjectKind,
           'pwr03SubjectId': c.pwr03SubjectId,
-          'terminalLoadIdByTerminalId':
-              c.toCanonicalValue()['terminalLoadIdByTerminalId'],
+          'terminalLoadIdByTerminalId': c
+              .toCanonicalValue()['terminalLoadIdByTerminalId'],
         },
     ],
   });
@@ -144,18 +144,14 @@ final class Fa03TerminalVoltageContract {
   };
 
   factory Fa03TerminalVoltageContract.fromMap(Map<String, Object?> map) {
-    _exact(
-      map,
-      const <String>{
-        'schema',
-        'circuitId',
-        'model',
-        'minimumTerminalVoltageV',
-        'maximumTerminalVoltageV',
-        'cases',
-      },
-      'FA03 terminal voltage contract',
-    );
+    _exact(map, const <String>{
+      'schema',
+      'circuitId',
+      'model',
+      'minimumTerminalVoltageV',
+      'maximumTerminalVoltageV',
+      'cases',
+    }, 'FA03 terminal voltage contract');
     if (map['schema'] != schema) {
       throw const FormatException('Unsupported FA03 contract schema.');
     }

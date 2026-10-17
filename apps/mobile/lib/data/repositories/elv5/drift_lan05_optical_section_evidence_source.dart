@@ -20,16 +20,18 @@ final class DriftLan05OpticalSectionEvidenceSource
     required String realizedSectionId,
     required Elv5Rational wavelengthNm,
   }) async {
-    final rows = await database.customSelect(
-      'SELECT evidence_json FROM link_section_assignments '
-      'WHERE project_id = ? AND design_revision_id = ? '
-      'AND realized_section_id = ? ORDER BY binding_id, ordinal',
-      variables: <Variable>[
-        Variable.withString(projectId),
-        Variable.withString(designRevisionId),
-        Variable.withString(realizedSectionId),
-      ],
-    ).get();
+    final rows = await database
+        .customSelect(
+          'SELECT evidence_json FROM link_section_assignments '
+          'WHERE project_id = ? AND design_revision_id = ? '
+          'AND realized_section_id = ? ORDER BY binding_id, ordinal',
+          variables: <Variable>[
+            Variable.withString(projectId),
+            Variable.withString(designRevisionId),
+            Variable.withString(realizedSectionId),
+          ],
+        )
+        .get();
     if (rows.isEmpty) return null;
 
     Lan05OpticalSectionEvidence? resolved;
@@ -41,11 +43,15 @@ final class DriftLan05OpticalSectionEvidenceSource
       if (map['schema'] != 'electra.elv5-optical-fiber-evidence.v1') continue;
       final profilesRaw = map['attenuationProfiles'];
       if (profilesRaw is! List) {
-        throw StateError('LAN05_ATTENUATION_PROFILES_INVALID:$realizedSectionId');
+        throw StateError(
+          'LAN05_ATTENUATION_PROFILES_INVALID:$realizedSectionId',
+        );
       }
       for (final raw in profilesRaw) {
         if (raw is! Map) {
-          throw StateError('LAN05_ATTENUATION_PROFILE_INVALID:$realizedSectionId');
+          throw StateError(
+            'LAN05_ATTENUATION_PROFILE_INVALID:$realizedSectionId',
+          );
         }
         final profile = Map<String, Object?>.from(raw);
         final wave = _exact(profile, 'wavelengthNm');
@@ -53,11 +59,15 @@ final class DriftLan05OpticalSectionEvidenceSource
         final minimum = _exact(profile, 'minDbPerKm');
         final maximum = _exact(profile, 'maxDbPerKm');
         if (minimum < Elv5Rational.zero || maximum < minimum) {
-          throw StateError('LAN05_ATTENUATION_INTERVAL_INVALID:$realizedSectionId');
+          throw StateError(
+            'LAN05_ATTENUATION_INTERVAL_INVALID:$realizedSectionId',
+          );
         }
         final evidenceRef = profile['evidenceRef'];
         if (evidenceRef is! String || evidenceRef.trim().isEmpty) {
-          throw StateError('LAN05_ATTENUATION_EVIDENCE_REF_MISSING:$realizedSectionId');
+          throw StateError(
+            'LAN05_ATTENUATION_EVIDENCE_REF_MISSING:$realizedSectionId',
+          );
         }
         final candidate = Lan05OpticalSectionEvidence(
           realizedSectionId: realizedSectionId,
@@ -77,7 +87,9 @@ final class DriftLan05OpticalSectionEvidenceSource
             (resolved.attenuationDbPerKm.lower.value != minimum ||
                 resolved.attenuationDbPerKm.upper.value != maximum ||
                 resolved.evidenceRef != candidate.evidenceRef)) {
-          throw StateError('LAN05_ATTENUATION_EVIDENCE_CONFLICT:$realizedSectionId');
+          throw StateError(
+            'LAN05_ATTENUATION_EVIDENCE_CONFLICT:$realizedSectionId',
+          );
         }
         resolved = candidate;
       }
@@ -92,5 +104,7 @@ Elv5Rational _exact(Map<String, Object?> value, String key) {
   if (raw is Map) {
     return Elv5Rational.fromMap(Map<String, Object?>.from(raw));
   }
-  throw FormatException('$key must be an exact decimal string or rational map.');
+  throw FormatException(
+    '$key must be an exact decimal string or rational map.',
+  );
 }

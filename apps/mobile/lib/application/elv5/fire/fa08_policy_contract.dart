@@ -5,11 +5,11 @@ final class Fa08CablePolicyContract {
     required String cableRunId,
     required String policyId,
     required Iterable<Fa08Requirement> requirements,
-  })  : cableRunId = _text(cableRunId, 'cableRunId'),
-        policy = Fa08Policy(
-          policyId: _text(policyId, 'policyId'),
-          requirements: List.unmodifiable(requirements),
-        );
+  }) : cableRunId = _text(cableRunId, 'cableRunId'),
+       policy = Fa08Policy(
+         policyId: _text(policyId, 'policyId'),
+         requirements: List.unmodifiable(requirements),
+       );
 
   static const schema = 'electra.elv5-fa08-cable-policy-contract.v1';
 
@@ -17,32 +17,36 @@ final class Fa08CablePolicyContract {
   final Fa08Policy policy;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'schema': schema,
-        'cableRunId': cableRunId,
-        'policyId': policy.policyId,
-        'requirements': <Object?>[
-          for (final item in [...policy.requirements]
-            ..sort((a, b) => a.code.compareTo(b.code)))
-            _requirementToMap(item),
-        ],
-      };
+    'schema': schema,
+    'cableRunId': cableRunId,
+    'policyId': policy.policyId,
+    'requirements': <Object?>[
+      for (final item in [
+        ...policy.requirements,
+      ]..sort((a, b) => a.code.compareTo(b.code)))
+        _requirementToMap(item),
+    ],
+  };
 
   factory Fa08CablePolicyContract.fromMap(Map<String, Object?> map) {
-    _exact(
-      map,
-      const <String>{'schema', 'cableRunId', 'policyId', 'requirements'},
-      'FA08 policy contract',
-    );
+    _exact(map, const <String>{
+      'schema',
+      'cableRunId',
+      'policyId',
+      'requirements',
+    }, 'FA08 policy contract');
     if (map['schema'] != schema) {
       throw const FormatException('Unsupported FA08 policy contract schema.');
     }
     final raw = map['requirements'];
-    if (raw is! List) throw const FormatException('requirements must be array.');
+    if (raw is! List)
+      throw const FormatException('requirements must be array.');
     return Fa08CablePolicyContract(
       cableRunId: _mapText(map, 'cableRunId'),
       policyId: _mapText(map, 'policyId'),
       requirements: <Fa08Requirement>[
-        for (final value in raw) _requirementFromMap(_map(value, 'requirement')),
+        for (final value in raw)
+          _requirementFromMap(_map(value, 'requirement')),
       ],
     );
   }
@@ -90,7 +94,9 @@ final class ReplaceFa08CablePolicyContractCommand {
       throw ArgumentError('expectedDesignRevision must be >= 1.');
     }
     if (expectedBindingRevision != null && expectedBindingRevision! < 1) {
-      throw ArgumentError('expectedBindingRevision must be >= 1 when supplied.');
+      throw ArgumentError(
+        'expectedBindingRevision must be >= 1 when supplied.',
+      );
     }
   }
 
@@ -117,22 +123,19 @@ Map<String, Object?> _requirementToMap(Fa08Requirement item) =>
     };
 
 Fa08Requirement _requirementFromMap(Map<String, Object?> map) {
-  _exact(
-    map,
-    const <String>{
-      'code',
-      'kind',
-      'expectedToken',
-      'propertyCode',
-      'unitCode',
-      'threshold',
-    },
-    'FA08 requirement',
-  );
+  _exact(map, const <String>{
+    'code',
+    'kind',
+    'expectedToken',
+    'propertyCode',
+    'unitCode',
+    'threshold',
+  }, 'FA08 requirement');
   final kindName = _mapText(map, 'kind');
   final kind = Fa08RequirementKind.values.firstWhere(
     (value) => value.name == kindName,
-    orElse: () => throw FormatException('Unsupported FA08 requirement kind: $kindName'),
+    orElse: () =>
+        throw FormatException('Unsupported FA08 requirement kind: $kindName'),
   );
   final code = _mapText(map, 'code');
   switch (kind) {

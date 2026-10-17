@@ -14,16 +14,15 @@ final class Acs05SequenceSegmentContract {
   final BigInt durationMicroseconds;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'segmentId': segmentId,
-        'durationMicroseconds': durationMicroseconds.toString(),
-      };
+    'segmentId': segmentId,
+    'durationMicroseconds': durationMicroseconds.toString(),
+  };
 
   factory Acs05SequenceSegmentContract.fromMap(Map<String, Object?> map) {
-    _exact(
-      map,
-      const <String>{'segmentId', 'durationMicroseconds'},
-      'ACS05 sequence segment',
-    );
+    _exact(map, const <String>{
+      'segmentId',
+      'durationMicroseconds',
+    }, 'ACS05 sequence segment');
     final duration = map['durationMicroseconds'];
     if (duration is! String) {
       throw const FormatException('ACS05 durationMicroseconds must be text.');
@@ -46,22 +45,24 @@ final class Acs05AutonomyContract {
     required Iterable<String> acsProtectedLoadIds,
     this.requirePeakCurrentEvidence = false,
     this.requireEndOfDischargeEvidence = false,
-  })  : bankId = _text(bankId, 'bankId'),
-        scenarioId = _text(scenarioId, 'scenarioId'),
-        sequenceId = _text(sequenceId, 'sequenceId'),
-        expectedPwr04InputFingerprint = _sha(
-          expectedPwr04InputFingerprint,
-          'expectedPwr04InputFingerprint',
-        ),
-        segments = List.unmodifiable(_segments(segments)),
-        globalProtectedLoadIds = Set.unmodifiable(
-          _ids(globalProtectedLoadIds, 'globalProtectedLoadIds'),
-        ),
-        acsProtectedLoadIds = Set.unmodifiable(
-          _ids(acsProtectedLoadIds, 'acsProtectedLoadIds'),
-        ) {
+  }) : bankId = _text(bankId, 'bankId'),
+       scenarioId = _text(scenarioId, 'scenarioId'),
+       sequenceId = _text(sequenceId, 'sequenceId'),
+       expectedPwr04InputFingerprint = _sha(
+         expectedPwr04InputFingerprint,
+         'expectedPwr04InputFingerprint',
+       ),
+       segments = List.unmodifiable(_segments(segments)),
+       globalProtectedLoadIds = Set.unmodifiable(
+         _ids(globalProtectedLoadIds, 'globalProtectedLoadIds'),
+       ),
+       acsProtectedLoadIds = Set.unmodifiable(
+         _ids(acsProtectedLoadIds, 'acsProtectedLoadIds'),
+       ) {
     if (this.segments.isEmpty) {
-      throw ArgumentError('ACS05 requires at least one protected sequence segment.');
+      throw ArgumentError(
+        'ACS05 requires at least one protected sequence segment.',
+      );
     }
     if (this.globalProtectedLoadIds.isEmpty) {
       throw ArgumentError('ACS05 global protected-load set must not be empty.');
@@ -70,7 +71,9 @@ final class Acs05AutonomyContract {
       throw ArgumentError('ACS05 ACS protected-load set must not be empty.');
     }
     if (!this.globalProtectedLoadIds.containsAll(this.acsProtectedLoadIds)) {
-      throw ArgumentError('ACS05 ACS protected loads must be a subset of the global protected set.');
+      throw ArgumentError(
+        'ACS05 ACS protected loads must be a subset of the global protected set.',
+      );
     }
   }
 
@@ -88,63 +91,68 @@ final class Acs05AutonomyContract {
   final bool requireEndOfDischargeEvidence;
 
   String get sequenceFingerprint => _encoder.sha256(<String, Object?>{
-        'schema': 'electra.elv5-protected-sequence-fingerprint.v1',
-        'scenarioId': scenarioId,
-        'sequenceId': sequenceId,
-        'segments': [for (final value in segments) value.toCanonicalValue()],
-      });
+    'schema': 'electra.elv5-protected-sequence-fingerprint.v1',
+    'scenarioId': scenarioId,
+    'sequenceId': sequenceId,
+    'segments': [for (final value in segments) value.toCanonicalValue()],
+  });
 
   String get protectedLoadSetFingerprint => _encoder.sha256(<String, Object?>{
-        'schema': 'electra.elv5-protected-load-set-fingerprint.v1',
-        'loadIds': globalProtectedLoadIds.toList()..sort(),
-      });
+    'schema': 'electra.elv5-protected-load-set-fingerprint.v1',
+    'loadIds': globalProtectedLoadIds.toList()..sort(),
+  });
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'schema': schema,
-        'bankId': bankId,
-        'scenarioId': scenarioId,
-        'sequenceId': sequenceId,
-        'expectedPwr04InputFingerprint': expectedPwr04InputFingerprint,
-        'segments': [for (final value in segments) value.toCanonicalValue()],
-        'globalProtectedLoadIds': globalProtectedLoadIds.toList()..sort(),
-        'acsProtectedLoadIds': acsProtectedLoadIds.toList()..sort(),
-        'requirePeakCurrentEvidence': requirePeakCurrentEvidence,
-        'requireEndOfDischargeEvidence': requireEndOfDischargeEvidence,
-      };
+    'schema': schema,
+    'bankId': bankId,
+    'scenarioId': scenarioId,
+    'sequenceId': sequenceId,
+    'expectedPwr04InputFingerprint': expectedPwr04InputFingerprint,
+    'segments': [for (final value in segments) value.toCanonicalValue()],
+    'globalProtectedLoadIds': globalProtectedLoadIds.toList()..sort(),
+    'acsProtectedLoadIds': acsProtectedLoadIds.toList()..sort(),
+    'requirePeakCurrentEvidence': requirePeakCurrentEvidence,
+    'requireEndOfDischargeEvidence': requireEndOfDischargeEvidence,
+  };
 
   factory Acs05AutonomyContract.fromMap(Map<String, Object?> map) {
-    _exact(
-      map,
-      const <String>{
-        'schema',
-        'bankId',
-        'scenarioId',
-        'sequenceId',
-        'expectedPwr04InputFingerprint',
-        'segments',
-        'globalProtectedLoadIds',
-        'acsProtectedLoadIds',
-        'requirePeakCurrentEvidence',
-        'requireEndOfDischargeEvidence',
-      },
-      'ACS05 autonomy contract',
-    );
+    _exact(map, const <String>{
+      'schema',
+      'bankId',
+      'scenarioId',
+      'sequenceId',
+      'expectedPwr04InputFingerprint',
+      'segments',
+      'globalProtectedLoadIds',
+      'acsProtectedLoadIds',
+      'requirePeakCurrentEvidence',
+      'requireEndOfDischargeEvidence',
+    }, 'ACS05 autonomy contract');
     if (map['schema'] != schema) {
-      throw const FormatException('Unsupported ACS05 autonomy contract schema.');
+      throw const FormatException(
+        'Unsupported ACS05 autonomy contract schema.',
+      );
     }
     final rawSegments = map['segments'];
     final global = map['globalProtectedLoadIds'];
     final acs = map['acsProtectedLoadIds'];
     final peak = map['requirePeakCurrentEvidence'];
     final eod = map['requireEndOfDischargeEvidence'];
-    if (rawSegments is! List || global is! List || acs is! List || peak is! bool || eod is! bool) {
+    if (rawSegments is! List ||
+        global is! List ||
+        acs is! List ||
+        peak is! bool ||
+        eod is! bool) {
       throw const FormatException('ACS05 contract field type mismatch.');
     }
     return Acs05AutonomyContract(
       bankId: _mapText(map, 'bankId'),
       scenarioId: _mapText(map, 'scenarioId'),
       sequenceId: _mapText(map, 'sequenceId'),
-      expectedPwr04InputFingerprint: _mapText(map, 'expectedPwr04InputFingerprint'),
+      expectedPwr04InputFingerprint: _mapText(
+        map,
+        'expectedPwr04InputFingerprint',
+      ),
       segments: <Acs05SequenceSegmentContract>[
         for (final raw in rawSegments)
           Acs05SequenceSegmentContract.fromMap(_object(raw, 'ACS05 segment')),
@@ -206,12 +214,12 @@ Set<String> _ids(Iterable<String> values, String field) {
 }
 
 List<String> _strings(List raw, String field) => <String>[
-      for (final value in raw)
-        if (value is String)
-          _text(value, field)
-        else
-          throw FormatException('$field must contain text entries.'),
-    ];
+  for (final value in raw)
+    if (value is String)
+      _text(value, field)
+    else
+      throw FormatException('$field must contain text entries.'),
+];
 
 Map<String, Object?> _object(Object? value, String field) {
   if (value is! Map) throw FormatException('$field must be an object.');
@@ -226,7 +234,8 @@ String _mapText(Map<String, Object?> map, String field) {
 
 String _text(String value, String field) {
   final normalized = value.trim();
-  if (normalized.isEmpty) throw ArgumentError.value(value, field, 'Must not be empty.');
+  if (normalized.isEmpty)
+    throw ArgumentError.value(value, field, 'Must not be empty.');
   return normalized;
 }
 

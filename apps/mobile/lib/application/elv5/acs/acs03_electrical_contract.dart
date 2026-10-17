@@ -11,13 +11,15 @@ final class Acs03ElectricalEventContract {
     required String lockLoadOriginId,
     required String sharedTrunkSectionId,
     required this.lockCurrent,
-  })  : eventId = _text(eventId, 'eventId'),
-        scenarioId = _text(scenarioId, 'scenarioId'),
-        segmentId = _text(segmentId, 'segmentId'),
-        domainId = _text(domainId, 'domainId'),
-        lockLoadOriginId = _text(lockLoadOriginId, 'lockLoadOriginId'),
-        sharedTrunkSectionId =
-            _text(sharedTrunkSectionId, 'sharedTrunkSectionId') {
+  }) : eventId = _text(eventId, 'eventId'),
+       scenarioId = _text(scenarioId, 'scenarioId'),
+       segmentId = _text(segmentId, 'segmentId'),
+       domainId = _text(domainId, 'domainId'),
+       lockLoadOriginId = _text(lockLoadOriginId, 'lockLoadOriginId'),
+       sharedTrunkSectionId = _text(
+         sharedTrunkSectionId,
+         'sharedTrunkSectionId',
+       ) {
     if (durationMicroseconds <= BigInt.zero) {
       throw ArgumentError('ACS03 event duration must be positive.');
     }
@@ -37,16 +39,16 @@ final class Acs03ElectricalEventContract {
   final Current lockCurrent;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'eventId': eventId,
-        'state': _stateWire(state),
-        'durationMicroseconds': durationMicroseconds.toString(),
-        'scenarioId': scenarioId,
-        'segmentId': segmentId,
-        'domainId': domainId,
-        'lockLoadOriginId': lockLoadOriginId,
-        'sharedTrunkSectionId': sharedTrunkSectionId,
-        'lockCurrentA': lockCurrent.value.toMap(),
-      };
+    'eventId': eventId,
+    'state': _stateWire(state),
+    'durationMicroseconds': durationMicroseconds.toString(),
+    'scenarioId': scenarioId,
+    'segmentId': segmentId,
+    'domainId': domainId,
+    'lockLoadOriginId': lockLoadOriginId,
+    'sharedTrunkSectionId': sharedTrunkSectionId,
+    'lockCurrentA': lockCurrent.value.toMap(),
+  };
 
   factory Acs03ElectricalEventContract.fromMap(Map<String, Object?> map) {
     _exact(map, const <String>{
@@ -87,13 +89,16 @@ final class Acs03ElectricalContract {
     required Iterable<Acs03ElectricalEventContract> events,
     this.minimumTerminalVoltage,
     this.maximumTerminalVoltage,
-  })  : doorId = _text(doorId, 'doorId'),
-        lockId = _text(lockId, 'lockId'),
-        conductiveFeedPathId =
-            _text(conductiveFeedPathId, 'conductiveFeedPathId'),
-        controlPathId = _text(controlPathId, 'controlPathId'),
-        events = List.unmodifiable(_normalizeEvents(events)) {
-    if (minimumTerminalVoltage != null && maximumTerminalVoltage != null &&
+  }) : doorId = _text(doorId, 'doorId'),
+       lockId = _text(lockId, 'lockId'),
+       conductiveFeedPathId = _text(
+         conductiveFeedPathId,
+         'conductiveFeedPathId',
+       ),
+       controlPathId = _text(controlPathId, 'controlPathId'),
+       events = List.unmodifiable(_normalizeEvents(events)) {
+    if (minimumTerminalVoltage != null &&
+        maximumTerminalVoltage != null &&
         minimumTerminalVoltage! > maximumTerminalVoltage!) {
       throw ArgumentError('ACS03 voltage requirements are reversed.');
     }
@@ -104,7 +109,9 @@ final class Acs03ElectricalContract {
       Acs03StateCode.startupInrush,
     }) {
       if (!states.contains(requiredState)) {
-        throw ArgumentError('ACS03 missing mandatory state: ${requiredState.name}.');
+        throw ArgumentError(
+          'ACS03 missing mandatory state: ${requiredState.name}.',
+        );
       }
     }
   }
@@ -120,15 +127,15 @@ final class Acs03ElectricalContract {
   final Voltage? maximumTerminalVoltage;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'schema': schema,
-        'doorId': doorId,
-        'lockId': lockId,
-        'conductiveFeedPathId': conductiveFeedPathId,
-        'controlPathId': controlPathId,
-        'minimumTerminalVoltageV': minimumTerminalVoltage?.value.toMap(),
-        'maximumTerminalVoltageV': maximumTerminalVoltage?.value.toMap(),
-        'events': [for (final event in events) event.toCanonicalValue()],
-      };
+    'schema': schema,
+    'doorId': doorId,
+    'lockId': lockId,
+    'conductiveFeedPathId': conductiveFeedPathId,
+    'controlPathId': controlPathId,
+    'minimumTerminalVoltageV': minimumTerminalVoltage?.value.toMap(),
+    'maximumTerminalVoltageV': maximumTerminalVoltage?.value.toMap(),
+    'events': [for (final event in events) event.toCanonicalValue()],
+  };
 
   factory Acs03ElectricalContract.fromMap(Map<String, Object?> map) {
     _exact(map, const <String>{
@@ -142,7 +149,9 @@ final class Acs03ElectricalContract {
       'events',
     }, 'ACS03 electrical contract');
     if (map['schema'] != schema) {
-      throw const FormatException('Unsupported ACS03 electrical contract schema.');
+      throw const FormatException(
+        'Unsupported ACS03 electrical contract schema.',
+      );
     }
     final rawEvents = map['events'];
     if (rawEvents is! List) {
@@ -155,16 +164,20 @@ final class Acs03ElectricalContract {
       controlPathId: _mapText(map, 'controlPathId'),
       minimumTerminalVoltage: map['minimumTerminalVoltageV'] == null
           ? null
-          : Voltage(_rational(
-              map['minimumTerminalVoltageV'],
-              'minimumTerminalVoltageV',
-            )),
+          : Voltage(
+              _rational(
+                map['minimumTerminalVoltageV'],
+                'minimumTerminalVoltageV',
+              ),
+            ),
       maximumTerminalVoltage: map['maximumTerminalVoltageV'] == null
           ? null
-          : Voltage(_rational(
-              map['maximumTerminalVoltageV'],
-              'maximumTerminalVoltageV',
-            )),
+          : Voltage(
+              _rational(
+                map['maximumTerminalVoltageV'],
+                'maximumTerminalVoltageV',
+              ),
+            ),
       events: <Acs03ElectricalEventContract>[
         for (final raw in rawEvents)
           Acs03ElectricalEventContract.fromMap(_object(raw, 'ACS03 event')),
@@ -200,7 +213,8 @@ abstract interface class Acs03ElectricalContractSource {
 List<Acs03ElectricalEventContract> _normalizeEvents(
   Iterable<Acs03ElectricalEventContract> values,
 ) {
-  final result = values.toList()..sort((a, b) => a.eventId.compareTo(b.eventId));
+  final result = values.toList()
+    ..sort((a, b) => a.eventId.compareTo(b.eventId));
   if (result.isEmpty) throw ArgumentError('ACS03 requires operating events.');
   final ids = <String>{};
   for (final event in result) {
@@ -212,21 +226,21 @@ List<Acs03ElectricalEventContract> _normalizeEvents(
 }
 
 String _stateWire(Acs03StateCode value) => switch (value) {
-      Acs03StateCode.holding => 'HOLDING',
-      Acs03StateCode.activeRelease => 'ACTIVE_RELEASE',
-      Acs03StateCode.startupInrush => 'STARTUP_INRUSH',
-      Acs03StateCode.fireRelease => 'FIRE_RELEASE',
-      Acs03StateCode.powerFailure => 'POWER_FAILURE',
-    };
+  Acs03StateCode.holding => 'HOLDING',
+  Acs03StateCode.activeRelease => 'ACTIVE_RELEASE',
+  Acs03StateCode.startupInrush => 'STARTUP_INRUSH',
+  Acs03StateCode.fireRelease => 'FIRE_RELEASE',
+  Acs03StateCode.powerFailure => 'POWER_FAILURE',
+};
 
 Acs03StateCode _stateFromWire(String value) => switch (value) {
-      'HOLDING' => Acs03StateCode.holding,
-      'ACTIVE_RELEASE' => Acs03StateCode.activeRelease,
-      'STARTUP_INRUSH' => Acs03StateCode.startupInrush,
-      'FIRE_RELEASE' => Acs03StateCode.fireRelease,
-      'POWER_FAILURE' => Acs03StateCode.powerFailure,
-      _ => throw FormatException('Unsupported ACS03 state: $value'),
-    };
+  'HOLDING' => Acs03StateCode.holding,
+  'ACTIVE_RELEASE' => Acs03StateCode.activeRelease,
+  'STARTUP_INRUSH' => Acs03StateCode.startupInrush,
+  'FIRE_RELEASE' => Acs03StateCode.fireRelease,
+  'POWER_FAILURE' => Acs03StateCode.powerFailure,
+  _ => throw FormatException('Unsupported ACS03 state: $value'),
+};
 
 Elv5Rational _rational(Object? value, String field) {
   if (value is! Map) throw FormatException('$field must be a rational map.');

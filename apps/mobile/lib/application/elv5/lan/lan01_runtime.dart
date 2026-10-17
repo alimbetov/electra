@@ -81,7 +81,9 @@ final class Lan01PersistedInputResolver
         );
       } on StateError catch (error) {
         final message = error.message.toString();
-        if (message.startsWith('ELV3_REALIZED_SECTION_EXACT_RESERVE_REQUIRED') ||
+        if (message.startsWith(
+              'ELV3_REALIZED_SECTION_EXACT_RESERVE_REQUIRED',
+            ) ||
             message.startsWith(
               'ELV3_REALIZED_SECTION_ALLOWANCE_PROVENANCE_REQUIRED',
             )) {
@@ -106,8 +108,8 @@ final class Lan01PersistedInputResolver
               'compositionAggregateId': composition.aggregateId,
               'compositionRevision': composition.revision,
               'realizedSectionId': id,
-              'requiredCapability': reasonCode ==
-                      'ELV3_REALIZED_SECTION_EXACT_RESERVE_REQUIRED'
+              'requiredCapability':
+                  reasonCode == 'ELV3_REALIZED_SECTION_EXACT_RESERVE_REQUIRED'
                   ? 'EXACT_RESERVE_EVIDENCE'
                   : 'SECTION_ALLOWANCE_PROVENANCE',
             },
@@ -120,7 +122,9 @@ final class Lan01PersistedInputResolver
         'PERMANENT' => Lan01SectionClass.permanent,
         'PATCH' => Lan01SectionClass.patch,
         'OTHER_EXPLICIT' => Lan01SectionClass.otherExplicit,
-        final value => throw StateError('LAN01_SECTION_CLASS_UNSUPPORTED:$value'),
+        final value => throw StateError(
+          'LAN01_SECTION_CLASS_UNSUPPORTED:$value',
+        ),
       };
       sections.add(
         Lan01RealizedSection(
@@ -226,7 +230,8 @@ Elv5PureKernelExecutor<Lan01Input, Lan01Result> buildLan01Executor({
   assessmentOf: (result) {
     final statuses = <bool?>[result.permanent.passes, result.channel.passes];
     if (statuses.any((value) => value == false)) return Elv5Assessment.fail;
-    if (statuses.any((value) => value == null)) return Elv5Assessment.notAssessed;
+    if (statuses.any((value) => value == null))
+      return Elv5Assessment.notAssessed;
     return Elv5Assessment.pass;
   },
   nowUtc: nowUtc,

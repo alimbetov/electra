@@ -39,8 +39,8 @@ final class ReplaceElv5EnvironmentProfileCommand {
     required String scopeKind,
     required String scopeId,
     required this.profile,
-  })  : scopeKind = _scopeKind(scopeKind),
-        scopeId = _text(scopeId, 'scopeId') {
+  }) : scopeKind = _scopeKind(scopeKind),
+       scopeId = _text(scopeId, 'scopeId') {
     if (projectId.trim().isEmpty ||
         designRevisionId.trim().isEmpty ||
         bindingId.trim().isEmpty) {
@@ -50,7 +50,9 @@ final class ReplaceElv5EnvironmentProfileCommand {
       throw ArgumentError('expectedDesignRevision must be >= 1.');
     }
     if (expectedBindingRevision != null && expectedBindingRevision! < 1) {
-      throw ArgumentError('expectedBindingRevision must be >= 1 when supplied.');
+      throw ArgumentError(
+        'expectedBindingRevision must be >= 1 when supplied.',
+      );
     }
   }
 
@@ -71,7 +73,11 @@ abstract interface class Elv5EnvironmentProfileWriter {
 String _scopeKind(String value) {
   final normalized = _text(value, 'scopeKind').toUpperCase();
   if (!const <String>{'ROOM', 'ROUTE_SECTION'}.contains(normalized)) {
-    throw ArgumentError.value(value, 'scopeKind', 'Expected ROOM or ROUTE_SECTION.');
+    throw ArgumentError.value(
+      value,
+      'scopeKind',
+      'Expected ROOM or ROUTE_SECTION.',
+    );
   }
   return normalized;
 }

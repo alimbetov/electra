@@ -12,24 +12,24 @@ final class Elv5AmpacitySectionContract {
     required this.temperatureCorrection,
     required this.groupingCorrection,
     Iterable<Elv5AmpacityAdditionalCorrection> additionalCorrections = const [],
-  })  : routeSectionId = _text(routeSectionId, 'routeSectionId'),
-        cableRunId = _text(cableRunId, 'cableRunId'),
-        cableId = _text(cableId, 'cableId'),
-        expectedEnvironmentProfileId = _text(
-          expectedEnvironmentProfileId,
-          'expectedEnvironmentProfileId',
-        ),
-        expectedEnvironmentEditionId = _text(
-          expectedEnvironmentEditionId,
-          'expectedEnvironmentEditionId',
-        ),
-        expectedEnvironmentContentHash = _sha(
-          expectedEnvironmentContentHash,
-          'expectedEnvironmentContentHash',
-        ),
-        additionalCorrections = List.unmodifiable(
-          _sortedAdditional(additionalCorrections),
-        );
+  }) : routeSectionId = _text(routeSectionId, 'routeSectionId'),
+       cableRunId = _text(cableRunId, 'cableRunId'),
+       cableId = _text(cableId, 'cableId'),
+       expectedEnvironmentProfileId = _text(
+         expectedEnvironmentProfileId,
+         'expectedEnvironmentProfileId',
+       ),
+       expectedEnvironmentEditionId = _text(
+         expectedEnvironmentEditionId,
+         'expectedEnvironmentEditionId',
+       ),
+       expectedEnvironmentContentHash = _sha(
+         expectedEnvironmentContentHash,
+         'expectedEnvironmentContentHash',
+       ),
+       additionalCorrections = List.unmodifiable(
+         _sortedAdditional(additionalCorrections),
+       );
 
   static const schema = 'electra.elv5-ampacity-section-contract.v1';
 
@@ -45,42 +45,40 @@ final class Elv5AmpacitySectionContract {
   final List<Elv5AmpacityAdditionalCorrection> additionalCorrections;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'schema': schema,
-        'routeSectionId': routeSectionId,
-        'cableRunId': cableRunId,
-        'cableId': cableId,
-        'expectedEnvironmentProfileId': expectedEnvironmentProfileId,
-        'expectedEnvironmentEditionId': expectedEnvironmentEditionId,
-        'expectedEnvironmentContentHash': expectedEnvironmentContentHash,
-        'referenceRow': referenceRow.toCanonicalValue(),
-        'temperatureCorrection': temperatureCorrection.toCanonicalValue(),
-        'groupingCorrection': groupingCorrection.toCanonicalValue(),
-        'additionalCorrections': <Object?>[
-          for (final correction in additionalCorrections)
-            correction.toCanonicalValue(),
-        ],
-      };
+    'schema': schema,
+    'routeSectionId': routeSectionId,
+    'cableRunId': cableRunId,
+    'cableId': cableId,
+    'expectedEnvironmentProfileId': expectedEnvironmentProfileId,
+    'expectedEnvironmentEditionId': expectedEnvironmentEditionId,
+    'expectedEnvironmentContentHash': expectedEnvironmentContentHash,
+    'referenceRow': referenceRow.toCanonicalValue(),
+    'temperatureCorrection': temperatureCorrection.toCanonicalValue(),
+    'groupingCorrection': groupingCorrection.toCanonicalValue(),
+    'additionalCorrections': <Object?>[
+      for (final correction in additionalCorrections)
+        correction.toCanonicalValue(),
+    ],
+  };
 
   factory Elv5AmpacitySectionContract.fromMap(Map<String, Object?> map) {
-    _exact(
-      map,
-      const <String>{
-        'schema',
-        'routeSectionId',
-        'cableRunId',
-        'cableId',
-        'expectedEnvironmentProfileId',
-        'expectedEnvironmentEditionId',
-        'expectedEnvironmentContentHash',
-        'referenceRow',
-        'temperatureCorrection',
-        'groupingCorrection',
-        'additionalCorrections',
-      },
-      'ampacity section contract',
-    );
+    _exact(map, const <String>{
+      'schema',
+      'routeSectionId',
+      'cableRunId',
+      'cableId',
+      'expectedEnvironmentProfileId',
+      'expectedEnvironmentEditionId',
+      'expectedEnvironmentContentHash',
+      'referenceRow',
+      'temperatureCorrection',
+      'groupingCorrection',
+      'additionalCorrections',
+    }, 'ampacity section contract');
     if (map['schema'] != schema) {
-      throw const FormatException('Unsupported ampacity section contract schema.');
+      throw const FormatException(
+        'Unsupported ampacity section contract schema.',
+      );
     }
     final additional = map['additionalCorrections'];
     if (additional is! List) {
@@ -90,9 +88,18 @@ final class Elv5AmpacitySectionContract {
       routeSectionId: _mapText(map, 'routeSectionId'),
       cableRunId: _mapText(map, 'cableRunId'),
       cableId: _mapText(map, 'cableId'),
-      expectedEnvironmentProfileId: _mapText(map, 'expectedEnvironmentProfileId'),
-      expectedEnvironmentEditionId: _mapText(map, 'expectedEnvironmentEditionId'),
-      expectedEnvironmentContentHash: _mapText(map, 'expectedEnvironmentContentHash'),
+      expectedEnvironmentProfileId: _mapText(
+        map,
+        'expectedEnvironmentProfileId',
+      ),
+      expectedEnvironmentEditionId: _mapText(
+        map,
+        'expectedEnvironmentEditionId',
+      ),
+      expectedEnvironmentContentHash: _mapText(
+        map,
+        'expectedEnvironmentContentHash',
+      ),
       referenceRow: _referenceRow(_map(map['referenceRow'], 'referenceRow')),
       temperatureCorrection: _temperature(
         _map(map['temperatureCorrection'], 'temperatureCorrection'),
@@ -150,7 +157,9 @@ final class ReplaceElv5AmpacitySectionContractCommand {
       throw ArgumentError('expectedDesignRevision must be >= 1.');
     }
     if (expectedBindingRevision != null && expectedBindingRevision! < 1) {
-      throw ArgumentError('expectedBindingRevision must be >= 1 when supplied.');
+      throw ArgumentError(
+        'expectedBindingRevision must be >= 1 when supplied.',
+      );
     }
   }
 
@@ -167,23 +176,20 @@ abstract interface class Elv5AmpacitySectionContractWriter {
 }
 
 Elv5AmpacityReferenceRow _referenceRow(Map<String, Object?> map) {
-  _exact(
-    map,
-    const <String>{
-      'conductorCrossSectionMm2',
-      'conductorMaterialCode',
-      'insulationSystemCode',
-      'referenceAmbientTemperatureC',
-      'installationMethodCode',
-      'loadedConductors',
-      'baseAllowableCurrentA',
-      'evidenceRef',
-      'evidenceContentHash',
-    },
-    'ampacity reference row',
-  );
+  _exact(map, const <String>{
+    'conductorCrossSectionMm2',
+    'conductorMaterialCode',
+    'insulationSystemCode',
+    'referenceAmbientTemperatureC',
+    'installationMethodCode',
+    'loadedConductors',
+    'baseAllowableCurrentA',
+    'evidenceRef',
+    'evidenceContentHash',
+  }, 'ampacity reference row');
   final loaded = map['loadedConductors'];
-  if (loaded is! int) throw const FormatException('loadedConductors must be integer.');
+  if (loaded is! int)
+    throw const FormatException('loadedConductors must be integer.');
   return Elv5AmpacityReferenceRow(
     conductorCrossSectionMm2: Elv5Rational.fromMap(
       _map(map['conductorCrossSectionMm2'], 'conductorCrossSectionMm2'),
@@ -204,16 +210,12 @@ Elv5AmpacityReferenceRow _referenceRow(Map<String, Object?> map) {
 }
 
 Elv5AmpacityTemperatureCorrection _temperature(Map<String, Object?> map) {
-  _exact(
-    map,
-    const <String>{
-      'actualAmbientTemperatureC',
-      'factor',
-      'evidenceRef',
-      'evidenceContentHash',
-    },
-    'temperature correction',
-  );
+  _exact(map, const <String>{
+    'actualAmbientTemperatureC',
+    'factor',
+    'evidenceRef',
+    'evidenceContentHash',
+  }, 'temperature correction');
   return Elv5AmpacityTemperatureCorrection(
     actualAmbientTemperatureC: Elv5Rational.fromMap(
       _map(map['actualAmbientTemperatureC'], 'actualAmbientTemperatureC'),
@@ -225,17 +227,13 @@ Elv5AmpacityTemperatureCorrection _temperature(Map<String, Object?> map) {
 }
 
 Elv5AmpacityGroupingCorrection _grouping(Map<String, Object?> map) {
-  _exact(
-    map,
-    const <String>{
-      'groupedCableOrCircuitCount',
-      'arrangementCode',
-      'factor',
-      'evidenceRef',
-      'evidenceContentHash',
-    },
-    'grouping correction',
-  );
+  _exact(map, const <String>{
+    'groupedCableOrCircuitCount',
+    'arrangementCode',
+    'factor',
+    'evidenceRef',
+    'evidenceContentHash',
+  }, 'grouping correction');
   final count = map['groupedCableOrCircuitCount'];
   if (count is! int) {
     throw const FormatException('groupedCableOrCircuitCount must be integer.');
@@ -250,11 +248,12 @@ Elv5AmpacityGroupingCorrection _grouping(Map<String, Object?> map) {
 }
 
 Elv5AmpacityAdditionalCorrection _additional(Map<String, Object?> map) {
-  _exact(
-    map,
-    const <String>{'code', 'factor', 'evidenceRef', 'evidenceContentHash'},
-    'additional correction',
-  );
+  _exact(map, const <String>{
+    'code',
+    'factor',
+    'evidenceRef',
+    'evidenceContentHash',
+  }, 'additional correction');
   return Elv5AmpacityAdditionalCorrection(
     code: _mapText(map, 'code'),
     factor: Elv5Rational.fromMap(_map(map['factor'], 'factor')),
@@ -270,7 +269,9 @@ List<Elv5AmpacityAdditionalCorrection> _sortedAdditional(
   final seen = <String>{};
   for (final item in result) {
     if (!seen.add(item.code)) {
-      throw ArgumentError('Duplicate ampacity additional correction: ${item.code}');
+      throw ArgumentError(
+        'Duplicate ampacity additional correction: ${item.code}',
+      );
     }
   }
   return result;

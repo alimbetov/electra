@@ -12,174 +12,168 @@ import 'package:flutter_test/flutter_test.dart';
 import '../support/elv_database_reopen.dart';
 
 void main() {
-  test(
-    'P7 T06 reviewed reroute survives restart undo and redo with durable evidence',
-    () async {
-      final directory = await Directory.systemTemp.createTemp(
-        'electra-p7-t06-',
-      );
-      final file = File('${directory.path}/history.sqlite');
-      final harness = ElvDatabaseReopenHarness(file);
-      addTearDown(() async {
-        if (await directory.exists()) await directory.delete(recursive: true);
-      });
+  test('P7 T06 reviewed reroute survives restart undo and redo with durable evidence', () async {
+    final directory = await Directory.systemTemp.createTemp('electra-p7-t06-');
+    final file = File('${directory.path}/history.sqlite');
+    final harness = ElvDatabaseReopenHarness(file);
+    addTearDown(() async {
+      if (await directory.exists()) await directory.delete(recursive: true);
+    });
 
-      var db = harness.open();
-      await _seed(db);
-      final reviewed = ReviewedRerouteCableRunWorkspaceCommand(
-        commandId: 'reroute-original',
-        projectId: 'project',
-        designRevisionId: 'rev-1',
-        cableRunId: 'run-1',
-        expectedRevision: 1,
-        traversals: const [
-          CableRunTraversal(
-            id: 'tr-1',
-            cableRunId: 'run-1',
-            sequence: 1,
-            routeSegmentId: 'seg-new',
-            direction: CableTraversalDirection.forward,
-          ),
-        ],
-      );
-      final firstRuntime = DriftElvReviewedRoutingRuntime(
-        db,
-        originDeviceId: 'test',
-        idGenerator: FixedSequenceIdGenerator(const [
-          'branch-1',
-          'evidence-before-1',
-          'evidence-after-1',
-          'inverse-template-1',
-        ]),
-        now: _clock,
-      );
-
-      final committed = await firstRuntime.execute(reviewed);
-      expect(committed, isA<ElvCommandSuccess<Object?>>());
-      await _expectRoute(db, 'seg-new', revision: 2);
-      await _expectHistory(
-        db,
-        state: 'APPLIED',
-        headSequence: 1,
-        generation: 1,
-        executionKinds: const {'ORIGINAL'},
-      );
-      final evidence =
-          await db.select(db.elvRevisionAggregateEvidenceRecords).get();
-      expect(evidence, hasLength(2));
-      expect(evidence.map((row) => row.payloadSha256).toSet(), hasLength(2));
-      expect(
-        evidence.every(
-          (row) => row.canonicalPayloadJson.contains('traversals'),
+    var db = harness.open();
+    await _seed(db);
+    final reviewed = ReviewedRerouteCableRunWorkspaceCommand(
+      commandId: 'reroute-original',
+      projectId: 'project',
+      designRevisionId: 'rev-1',
+      cableRunId: 'run-1',
+      expectedRevision: 1,
+      traversals: const [
+        CableRunTraversal(
+          id: 'tr-1',
+          cableRunId: 'run-1',
+          sequence: 1,
+          routeSegmentId: 'seg-new',
+          direction: CableTraversalDirection.forward,
         ),
-        isTrue,
-      );
+      ],
+    );
+    final firstRuntime = DriftElvReviewedRoutingRuntime(
+      db,
+      originDeviceId: 'test',
+      idGenerator: FixedSequenceIdGenerator(const [
+        'branch-1',
+        'evidence-before-1',
+        'evidence-after-1',
+        'inverse-template-1',
+      ]),
+      now: _clock,
+    );
 
-      db = await harness.reopen(db);
-      final undoRuntime = DriftElvReviewedRoutingRuntime(
-        db,
-        originDeviceId: 'test-reopen-undo',
-        idGenerator: FixedSequenceIdGenerator(const []),
-        now: _clock,
-      );
-      expect(
-        await undoRuntime.canUndo(
-          projectId: 'project',
-          designRevisionId: 'rev-1',
-        ),
-        isTrue,
-      );
-      final undone = await undoRuntime.undo(
+    final committed = await firstRuntime.execute(reviewed);
+    expect(committed, isA<ElvCommandSuccess<Object?>>());
+    await _expectRoute(db, 'seg-new', revision: 2);
+    await _expectHistory(
+      db,
+      state: 'APPLIED',
+      headSequence: 1,
+      generation: 1,
+      executionKinds: const {'ORIGINAL'},
+    );
+    final evidence = await db
+        .select(db.elvRevisionAggregateEvidenceRecords)
+        .get();
+    expect(evidence, hasLength(2));
+    expect(evidence.map((row) => row.payloadSha256).toSet(), hasLength(2));
+    expect(
+      evidence.every((row) => row.canonicalPayloadJson.contains('traversals')),
+      isTrue,
+    );
+
+    db = await harness.reopen(db);
+    final undoRuntime = DriftElvReviewedRoutingRuntime(
+      db,
+      originDeviceId: 'test-reopen-undo',
+      idGenerator: FixedSequenceIdGenerator(const []),
+      now: _clock,
+    );
+    expect(
+      await undoRuntime.canUndo(
         projectId: 'project',
         designRevisionId: 'rev-1',
-        executionCommandId: 'undo-execution-1',
-      );
-      expect(undone, isA<ElvCommandSuccess<Object?>>());
-      await _expectRoute(db, 'seg-old', revision: 3);
-      await _expectHistory(
-        db,
-        state: 'UNDONE',
-        headSequence: 0,
-        generation: 2,
-        executionKinds: const {'ORIGINAL', 'UNDO'},
-      );
+      ),
+      isTrue,
+    );
+    final undone = await undoRuntime.undo(
+      projectId: 'project',
+      designRevisionId: 'rev-1',
+      executionCommandId: 'undo-execution-1',
+    );
+    expect(undone, isA<ElvCommandSuccess<Object?>>());
+    await _expectRoute(db, 'seg-old', revision: 3);
+    await _expectHistory(
+      db,
+      state: 'UNDONE',
+      headSequence: 0,
+      generation: 2,
+      executionKinds: const {'ORIGINAL', 'UNDO'},
+    );
 
-      db = await harness.reopen(db);
-      final undoReplayRuntime = DriftElvReviewedRoutingRuntime(
-        db,
-        originDeviceId: 'test-reopen-undo-replay',
-        idGenerator: FixedSequenceIdGenerator(const []),
-        now: _clock,
-      );
-      final undoReplay = await undoReplayRuntime.undo(
+    db = await harness.reopen(db);
+    final undoReplayRuntime = DriftElvReviewedRoutingRuntime(
+      db,
+      originDeviceId: 'test-reopen-undo-replay',
+      idGenerator: FixedSequenceIdGenerator(const []),
+      now: _clock,
+    );
+    final undoReplay = await undoReplayRuntime.undo(
+      projectId: 'project',
+      designRevisionId: 'rev-1',
+      executionCommandId: 'undo-execution-1',
+    );
+    expect(undoReplay, isA<ElvCommandSuccess<Object?>>());
+    await _expectRoute(db, 'seg-old', revision: 3);
+    await _expectHistory(
+      db,
+      state: 'UNDONE',
+      headSequence: 0,
+      generation: 2,
+      executionKinds: const {'ORIGINAL', 'UNDO'},
+    );
+
+    db = await harness.reopen(db);
+    final redoRuntime = DriftElvReviewedRoutingRuntime(
+      db,
+      originDeviceId: 'test-reopen-redo',
+      idGenerator: FixedSequenceIdGenerator(const []),
+      now: _clock,
+    );
+    expect(
+      await redoRuntime.canRedo(
         projectId: 'project',
         designRevisionId: 'rev-1',
-        executionCommandId: 'undo-execution-1',
-      );
-      expect(undoReplay, isA<ElvCommandSuccess<Object?>>());
-      await _expectRoute(db, 'seg-old', revision: 3);
-      await _expectHistory(
-        db,
-        state: 'UNDONE',
-        headSequence: 0,
-        generation: 2,
-        executionKinds: const {'ORIGINAL', 'UNDO'},
-      );
+      ),
+      isTrue,
+    );
+    final redone = await redoRuntime.redo(
+      projectId: 'project',
+      designRevisionId: 'rev-1',
+      executionCommandId: 'redo-execution-1',
+    );
+    expect(redone, isA<ElvCommandSuccess<Object?>>());
+    await _expectRoute(db, 'seg-new', revision: 4);
+    await _expectHistory(
+      db,
+      state: 'APPLIED',
+      headSequence: 1,
+      generation: 3,
+      executionKinds: const {'ORIGINAL', 'UNDO', 'REDO'},
+    );
 
-      db = await harness.reopen(db);
-      final redoRuntime = DriftElvReviewedRoutingRuntime(
-        db,
-        originDeviceId: 'test-reopen-redo',
-        idGenerator: FixedSequenceIdGenerator(const []),
-        now: _clock,
-      );
-      expect(
-        await redoRuntime.canRedo(
-          projectId: 'project',
-          designRevisionId: 'rev-1',
-        ),
-        isTrue,
-      );
-      final redone = await redoRuntime.redo(
-        projectId: 'project',
-        designRevisionId: 'rev-1',
-        executionCommandId: 'redo-execution-1',
-      );
-      expect(redone, isA<ElvCommandSuccess<Object?>>());
-      await _expectRoute(db, 'seg-new', revision: 4);
-      await _expectHistory(
-        db,
-        state: 'APPLIED',
-        headSequence: 1,
-        generation: 3,
-        executionKinds: const {'ORIGINAL', 'UNDO', 'REDO'},
-      );
+    db = await harness.reopen(db);
+    final redoReplayRuntime = DriftElvReviewedRoutingRuntime(
+      db,
+      originDeviceId: 'test-reopen-redo-replay',
+      idGenerator: FixedSequenceIdGenerator(const []),
+      now: _clock,
+    );
+    final redoReplay = await redoReplayRuntime.redo(
+      projectId: 'project',
+      designRevisionId: 'rev-1',
+      executionCommandId: 'redo-execution-1',
+    );
+    expect(redoReplay, isA<ElvCommandSuccess<Object?>>());
+    await _expectRoute(db, 'seg-new', revision: 4);
+    await _expectHistory(
+      db,
+      state: 'APPLIED',
+      headSequence: 1,
+      generation: 3,
+      executionKinds: const {'ORIGINAL', 'UNDO', 'REDO'},
+    );
 
-      db = await harness.reopen(db);
-      final redoReplayRuntime = DriftElvReviewedRoutingRuntime(
-        db,
-        originDeviceId: 'test-reopen-redo-replay',
-        idGenerator: FixedSequenceIdGenerator(const []),
-        now: _clock,
-      );
-      final redoReplay = await redoReplayRuntime.redo(
-        projectId: 'project',
-        designRevisionId: 'rev-1',
-        executionCommandId: 'redo-execution-1',
-      );
-      expect(redoReplay, isA<ElvCommandSuccess<Object?>>());
-      await _expectRoute(db, 'seg-new', revision: 4);
-      await _expectHistory(
-        db,
-        state: 'APPLIED',
-        headSequence: 1,
-        generation: 3,
-        executionKinds: const {'ORIGINAL', 'UNDO', 'REDO'},
-      );
-
-      await db.close();
-    },
-  );
+    await db.close();
+  });
 }
 
 DateTime _clock() => DateTime.utc(2026, 10, 15, 13, 45);
@@ -403,12 +397,12 @@ Future<void> _expectRoute(
   String routeSegmentId, {
   required int revision,
 }) async {
-  final run =
-      await (db.select(db.canonicalCableRuns)
-        ..where((row) => row.id.equals('run-1'))).getSingle();
-  final traversal =
-      await (db.select(db.cableRunTraversals)
-        ..where((row) => row.cableRunId.equals('run-1'))).getSingle();
+  final run = await (db.select(
+    db.canonicalCableRuns,
+  )..where((row) => row.id.equals('run-1'))).getSingle();
+  final traversal = await (db.select(
+    db.cableRunTraversals,
+  )..where((row) => row.cableRunId.equals('run-1'))).getSingle();
   expect(run.revision, revision);
   expect(traversal.routeSegmentId, routeSegmentId);
 }
@@ -420,12 +414,15 @@ Future<void> _expectHistory(
   required int generation,
   required Set<String> executionKinds,
 }) async {
-  final operation =
-      await db.select(db.elvRevisionCommandHistoryOperations).getSingle();
-  final cursor =
-      await db.select(db.elvRevisionCommandHistoryCursors).getSingle();
-  final executions =
-      await db.select(db.elvRevisionCommandHistoryExecutions).get();
+  final operation = await db
+      .select(db.elvRevisionCommandHistoryOperations)
+      .getSingle();
+  final cursor = await db
+      .select(db.elvRevisionCommandHistoryCursors)
+      .getSingle();
+  final executions = await db
+      .select(db.elvRevisionCommandHistoryExecutions)
+      .get();
   expect(operation.state, state);
   expect(cursor.headSequence, headSequence);
   expect(cursor.generation, generation);

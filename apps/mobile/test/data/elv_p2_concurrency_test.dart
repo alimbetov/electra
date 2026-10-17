@@ -309,8 +309,8 @@ void _expectSingleOverlapFailure(
   List<ElvCommandResult<CableAllocation>> results,
 ) {
   expect(results.whereType<ElvCommandSuccess<CableAllocation>>(), hasLength(1));
-  final failures =
-      results.whereType<ElvCommandFailureResult<CableAllocation>>();
+  final failures = results
+      .whereType<ElvCommandFailureResult<CableAllocation>>();
   expect(failures, hasLength(1));
   expect(failures.single.failure.code, 'ELV_ALLOC_RESOURCE_OVERLAP');
 }
@@ -353,9 +353,9 @@ void main() {
     _expectSingleOverlapFailure(results);
 
     final verifier = AppDatabase(_native(file));
-    final claims =
-        await (verifier.select(verifier.cableResourceClaims)
-          ..where((row) => row.resourceAtom.equals('COND-1'))).get();
+    final claims = await (verifier.select(
+      verifier.cableResourceClaims,
+    )..where((row) => row.resourceAtom.equals('COND-1'))).get();
     expect(claims, hasLength(1));
     await verifier.close();
   });

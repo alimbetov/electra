@@ -241,10 +241,11 @@ final floorRoutingRepositoryProvider = Provider<FloorRoutingRepository>(
     originDeviceId: 'local-device',
   ),
 );
-final floorRoutingProvider = StreamProvider.family<
-  FloorRoutingSnapshot,
-  String
->((ref, floorId) => ref.watch(floorRoutingRepositoryProvider).watch(floorId));
+final floorRoutingProvider =
+    StreamProvider.family<FloorRoutingSnapshot, String>(
+      (ref, floorId) =>
+          ref.watch(floorRoutingRepositoryProvider).watch(floorId),
+    );
 
 final dependencyRecalculationRepositoryProvider =
     Provider<DependencyRecalculationRepository>(
@@ -265,10 +266,11 @@ final protectionRepositoryProvider = Provider<ProtectionRepository>(
     originDeviceId: 'local-device',
   ),
 );
-final projectProtectionProvider = StreamProvider.family<
-  ProjectProtectionSnapshot,
-  String
->((ref, projectId) => ref.watch(protectionRepositoryProvider).watch(projectId));
+final projectProtectionProvider =
+    StreamProvider.family<ProjectProtectionSnapshot, String>(
+      (ref, projectId) =>
+          ref.watch(protectionRepositoryProvider).watch(projectId),
+    );
 
 final manufacturerRepositoryProvider = Provider<ManufacturerRepository>(
   (ref) => DriftManufacturerRepository(

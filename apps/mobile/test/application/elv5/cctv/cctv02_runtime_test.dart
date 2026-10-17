@@ -5,70 +5,74 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('captures persisted camera streams and evaluates directed edge load', () async {
-    final store = _FakeCctvStore(
-      camera: Elv5CctvAggregateSnapshot(
-        aggregateKind: 'CCTV_CAMERA_STREAMS',
-        aggregateId: 'ELV5:CCTV:CAMERA_STREAMS:cam-1',
-        subjectId: 'cam-1',
-        revision: 7,
-        payload: <String, Object?>{
-          'cameraId': 'cam-1',
-          'streams': <Object?>[
-            <String, Object?>{
-              'encodedStreamId': 'main',
-              'codecProfileRef': 'codec:v1',
-              'expectedBitrateBps': '8000000',
-              'peakBitrateBps': '12000000',
-              'expectedRateEvidence': <String, Object?>{},
-              'peakRateEvidence': <String, Object?>{},
-            },
-          ],
-          'subscriptions': <Object?>[
-            <String, Object?>{
-              'subscriptionId': 'sub-1',
-              'encodedStreamId': 'main',
-              'receiverId': 'viewer-1',
-              'deliveryMode': 'UNICAST',
-              'orderedNetworkEdgeIds': <String>['edge-a', 'edge-b'],
-              'multicastGroupId': null,
-              'multicastTree': null,
-            },
-          ],
-          'transportOverheadModelRef': null,
-        },
-      ),
-    );
-    final request = Elv5CalculationRequest(
-      projectId: 'project-1',
-      designRevisionId: 'design-1',
-      scope: Elv5ScopeRef(
-        kind: Elv5ScopeKind.design,
-        scopeId: 'design-1',
-        scenarioKey: 'NONE',
-      ),
-      processCode: Elv5ProcessCode.cctv02,
-      subject: Elv5SubjectRef(kind: 'CAMERA', id: 'cam-1'),
-      expectedPointerGeneration: 0,
-    );
+  test(
+    'captures persisted camera streams and evaluates directed edge load',
+    () async {
+      final store = _FakeCctvStore(
+        camera: Elv5CctvAggregateSnapshot(
+          aggregateKind: 'CCTV_CAMERA_STREAMS',
+          aggregateId: 'ELV5:CCTV:CAMERA_STREAMS:cam-1',
+          subjectId: 'cam-1',
+          revision: 7,
+          payload: <String, Object?>{
+            'cameraId': 'cam-1',
+            'streams': <Object?>[
+              <String, Object?>{
+                'encodedStreamId': 'main',
+                'codecProfileRef': 'codec:v1',
+                'expectedBitrateBps': '8000000',
+                'peakBitrateBps': '12000000',
+                'expectedRateEvidence': <String, Object?>{},
+                'peakRateEvidence': <String, Object?>{},
+              },
+            ],
+            'subscriptions': <Object?>[
+              <String, Object?>{
+                'subscriptionId': 'sub-1',
+                'encodedStreamId': 'main',
+                'receiverId': 'viewer-1',
+                'deliveryMode': 'UNICAST',
+                'orderedNetworkEdgeIds': <String>['edge-a', 'edge-b'],
+                'multicastGroupId': null,
+                'multicastTree': null,
+              },
+            ],
+            'transportOverheadModelRef': null,
+          },
+        ),
+      );
+      final request = Elv5CalculationRequest(
+        projectId: 'project-1',
+        designRevisionId: 'design-1',
+        scope: Elv5ScopeRef(
+          kind: Elv5ScopeKind.design,
+          scopeId: 'design-1',
+          scenarioKey: 'NONE',
+        ),
+        processCode: Elv5ProcessCode.cctv02,
+        subject: Elv5SubjectRef(kind: 'CAMERA', id: 'cam-1'),
+        expectedPointerGeneration: 0,
+      );
 
-    final captured = await Cctv02PersistedInputResolver(store: store).capture(request);
-    final candidate = await buildCctv02Executor(
-      nowUtc: () => DateTime.utc(2026, 10, 16),
-    ).execute(captured);
+      final captured = await Cctv02PersistedInputResolver(store: store)
+          .capture(request);
+      final candidate = await buildCctv02Executor(
+        nowUtc: () => DateTime.utc(2026, 10, 16),
+      ).execute(captured);
 
-    expect(captured.captureRevision, 7);
-    expect(captured.dependencies, hasLength(3));
-    expect(candidate.completion, Elv5Completion.complete);
-    expect(candidate.assessment, Elv5Assessment.notAssessed);
-    expect(candidate.output['schema'], 'electra.elv5-cctv02-output.v1');
-    final output = const Cctv02BandwidthKernel().evaluate(captured.value);
-    expect(
-      output.edges['edge-a']!.expected.load.value,
-      Elv5Rational.integer(8000000),
-    );
-    expect(output.recorderIngress, isEmpty);
-  });
+      expect(captured.captureRevision, 7);
+      expect(captured.dependencies, hasLength(3));
+      expect(candidate.completion, Elv5Completion.complete);
+      expect(candidate.assessment, Elv5Assessment.notAssessed);
+      expect(candidate.output['schema'], 'electra.elv5-cctv02-output.v1');
+      final output = const Cctv02BandwidthKernel().evaluate(captured.value);
+      expect(
+        output.edges['edge-a']!.expected.load.value,
+        Elv5Rational.integer(8000000),
+      );
+      expect(output.recorderIngress, isEmpty);
+    },
+  );
 
   test('never infers recorder identity from receiver id', () async {
     final store = _FakeCctvStore(
@@ -119,7 +123,10 @@ void main() {
       ),
     );
 
-    expect(const Cctv02BandwidthKernel().evaluate(captured.value).recorderIngress, isEmpty);
+    expect(
+      const Cctv02BandwidthKernel().evaluate(captured.value).recorderIngress,
+      isEmpty,
+    );
   });
 }
 

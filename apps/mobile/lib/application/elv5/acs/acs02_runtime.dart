@@ -92,7 +92,8 @@ final class Acs02PersistedInputResolver
       ),
     );
     if (contract.controllerId != controllerId ||
-        contract.expectedControllerAggregateFingerprint != aggregateFingerprint) {
+        contract.expectedControllerAggregateFingerprint !=
+            aggregateFingerprint) {
       _blocked(
         request,
         'ACS02_CONTROLLER_AGGREGATE_FINGERPRINT_MISMATCH',
@@ -136,14 +137,17 @@ final class Acs02PersistedInputResolver
     final resourcesById = <String, Acs02ResourceContractItem>{
       for (final value in contract.resources) value.resourceId: value,
     };
-    final assignmentRows = _objects(
-      payload['resourceAssignments'],
-      'resourceAssignments',
-    )..sort((a, b) {
-        final left = '${_text(a, 'resourceId')}:${_text(a, 'assignmentRole')}:${_text(a, 'subjectId')}';
-        final right = '${_text(b, 'resourceId')}:${_text(b, 'assignmentRole')}:${_text(b, 'subjectId')}';
-        return left.compareTo(right);
-      });
+    final assignmentRows =
+        _objects(payload['resourceAssignments'], 'resourceAssignments')..sort((
+          a,
+          b,
+        ) {
+          final left =
+              '${_text(a, 'resourceId')}:${_text(a, 'assignmentRole')}:${_text(a, 'subjectId')}';
+          final right =
+              '${_text(b, 'resourceId')}:${_text(b, 'assignmentRole')}:${_text(b, 'subjectId')}';
+          return left.compareTo(right);
+        });
     final assignments = <Acs02Assignment>[];
     for (var i = 0; i < assignmentRows.length; i++) {
       final row = assignmentRows[i];
@@ -227,15 +231,14 @@ final class Acs02PersistedInputResolver
     String policy,
     List<Elv5DependencyMarker> dependencies,
     Map<String, Object?> evidence,
-  ) =>
-      throw Elv5CaptureBlockedException(
-        request: request,
-        reasonCode: reason,
-        inputFingerprint: input,
-        policyFingerprint: policy,
-        dependencies: dependencies,
-        evidence: evidence,
-      );
+  ) => throw Elv5CaptureBlockedException(
+    request: request,
+    reasonCode: reason,
+    inputFingerprint: input,
+    policyFingerprint: policy,
+    dependencies: dependencies,
+    evidence: evidence,
+  );
 
   Elv5DependencyMarker _dependency(
     Elv5CalculationRequest request,
@@ -265,54 +268,51 @@ final class Acs02PersistedInputResolver
 
 Elv5PureKernelExecutor<Acs02Input, Acs02Result> buildAcs02Executor({
   DateTime Function()? nowUtc,
-}) =>
-    Elv5PureKernelExecutor<Acs02Input, Acs02Result>(
-      processCode: Elv5ProcessCode.acs02,
-      calculate: const Acs02ResourceCapacityKernel().evaluate,
-      encodeOutput: (result) => <String, Object?>{
-        'schema': 'electra.elv5-acs02-output.v1',
-        'status': result.status.name,
-        'conflictingAssignmentIds': result.conflictingAssignmentIds,
-        'pools': <Object?>[
-          for (final entry in result.pools.entries.toList()
+}) => Elv5PureKernelExecutor<Acs02Input, Acs02Result>(
+  processCode: Elv5ProcessCode.acs02,
+  calculate: const Acs02ResourceCapacityKernel().evaluate,
+  encodeOutput: (result) => <String, Object?>{
+    'schema': 'electra.elv5-acs02-output.v1',
+    'status': result.status.name,
+    'conflictingAssignmentIds': result.conflictingAssignmentIds,
+    'pools': <Object?>[
+      for (final entry
+          in result.pools.entries.toList()
             ..sort((a, b) => a.key.name.compareTo(b.key.name)))
-            <String, Object?>{
-              'resourceKind': entry.key.name,
-              'available': entry.value.available,
-              'occupied': entry.value.occupied,
-              'requiredSpare': entry.value.requiredSpare,
-              'headroom': entry.value.headroom,
-              'status': entry.value.status.name,
-            },
-        ],
-      },
-      encodeEvidence: (captured, _) => <String, Object?>{
-        'schema': 'electra.elv5-acs02-evidence.v1',
-        'source':
-            'PERSISTED_CONTROLLER_ASSIGNMENTS_PLUS_IMMUTABLE_RESOURCE_INVENTORY_AND_SPARE_POLICY',
-        'captureRevision': captured.captureRevision,
-      },
-      executionOf: (_) => Elv5Execution.succeeded,
-      completionOf: (_) => Elv5Completion.complete,
-      assessmentOf: (result) => result.status == Acs02AssessmentStatus.pass
-          ? Elv5Assessment.pass
-          : Elv5Assessment.fail,
-      nowUtc: nowUtc,
-    );
+        <String, Object?>{
+          'resourceKind': entry.key.name,
+          'available': entry.value.available,
+          'occupied': entry.value.occupied,
+          'requiredSpare': entry.value.requiredSpare,
+          'headroom': entry.value.headroom,
+          'status': entry.value.status.name,
+        },
+    ],
+  },
+  encodeEvidence: (captured, _) => <String, Object?>{
+    'schema': 'electra.elv5-acs02-evidence.v1',
+    'source': 'PERSISTED_CONTROLLER_ASSIGNMENTS_PLUS_IMMUTABLE_RESOURCE_INVENTORY_AND_SPARE_POLICY',
+    'captureRevision': captured.captureRevision,
+  },
+  executionOf: (_) => Elv5Execution.succeeded,
+  completionOf: (_) => Elv5Completion.complete,
+  assessmentOf: (result) => result.status == Acs02AssessmentStatus.pass
+      ? Elv5Assessment.pass
+      : Elv5Assessment.fail,
+  nowUtc: nowUtc,
+);
 
 Acs02ResourceKind _kind(String code) => switch (code.trim().toUpperCase()) {
-      'READER_CHANNEL' => Acs02ResourceKind.reader,
-      'RELAY_OUTPUT' => Acs02ResourceKind.relay,
-      'SUPERVISED_INPUT' => Acs02ResourceKind.supervisedInput,
-      'OTHER' => Acs02ResourceKind.other,
-      _ => throw StateError('ACS02_UNSUPPORTED_RESOURCE_KIND:$code'),
-    };
+  'READER_CHANNEL' => Acs02ResourceKind.reader,
+  'RELAY_OUTPUT' => Acs02ResourceKind.relay,
+  'SUPERVISED_INPUT' => Acs02ResourceKind.supervisedInput,
+  'OTHER' => Acs02ResourceKind.other,
+  _ => throw StateError('ACS02_UNSUPPORTED_RESOURCE_KIND:$code'),
+};
 
 List<Map<String, Object?>> _objects(Object? value, String field) {
   if (value is! List) throw FormatException('$field must be array.');
-  return <Map<String, Object?>>[
-    for (final raw in value) _map(raw, field),
-  ];
+  return <Map<String, Object?>>[for (final raw in value) _map(raw, field)];
 }
 
 Map<String, Object?> _map(Object? value, String field) {

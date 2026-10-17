@@ -31,9 +31,8 @@ void main() {
         if (temp.existsSync()) temp.deleteSync(recursive: true);
       });
 
-      final cases =
-          (manifest['positiveCases'] as List<Object?>)
-              .cast<Map<Object?, Object?>>();
+      final cases = (manifest['positiveCases'] as List<Object?>)
+          .cast<Map<Object?, Object?>>();
       for (final rawCase in cases) {
         final caseMap = rawCase.cast<String, Object?>();
         final caseId = caseMap['id']! as String;
@@ -107,8 +106,9 @@ void main() {
                 ),
           );
           allEvidence.addAll(persisted);
-          final fkViolations =
-              await db.customSelect('PRAGMA foreign_key_check').get();
+          final fkViolations = await db
+              .customSelect('PRAGMA foreign_key_check')
+              .get();
           expect(fkViolations, isEmpty, reason: '$caseId has FK violations');
           caseReports.add({
             'id': caseId,
@@ -135,21 +135,21 @@ void main() {
         final requirements = _readJson(
           '../../docs/product/elv4-implementation/requirements.json',
         );
-        final requirementResults = (requirements['requirements']
-                as List<Object?>)
-            .cast<Map<Object?, Object?>>()
-            .map((raw) {
-              final requirementId = raw['requirementId']! as String;
-              return <String, Object?>{
-                'requirementId': requirementId,
-                'status': 'PASS',
-                'evidenceRefs': [
-                  'exact-head:full-regression:$sourceSha',
-                  'qualification:seven-case-matrix:$sourceSha',
-                ],
-              };
-            })
-            .toList(growable: false);
+        final requirementResults =
+            (requirements['requirements'] as List<Object?>)
+                .cast<Map<Object?, Object?>>()
+                .map((raw) {
+                  final requirementId = raw['requirementId']! as String;
+                  return <String, Object?>{
+                    'requirementId': requirementId,
+                    'status': 'PASS',
+                    'evidenceRefs': [
+                      'exact-head:full-regression:$sourceSha',
+                      'qualification:seven-case-matrix:$sourceSha',
+                    ],
+                  };
+                })
+                .toList(growable: false);
         final report = <String, Object?>{
           'schema': 'electra.elv4-runtime-qualification-report.v1',
           'sourceSha': sourceSha,
@@ -365,10 +365,12 @@ PowerEvaluationEvidence _pwr03(
     'sourceDemandIntervalW': evaluated.sourceDemandIntervalW?.toMap(),
     'treeSourceCurrentA': evaluated.treeResult?.sourceCurrentA.toMap(),
     'treeTotalLossW': evaluated.treeResult?.totalLossW.toMap(),
-    'treeConservationResidualW':
-        evaluated.treeResult?.conservationResidualW.toMap(),
-    'constantPowerTerminalVoltage':
-        evaluated.constantPowerResult?.terminalVoltage?.toMap(),
+    'treeConservationResidualW': evaluated.treeResult?.conservationResidualW
+        .toMap(),
+    'constantPowerTerminalVoltage': evaluated
+        .constantPowerResult
+        ?.terminalVoltage
+        ?.toMap(),
     'constantPowerCurrent': evaluated.constantPowerResult?.current?.toMap(),
     'constantPowerLossW': evaluated.constantPowerResult?.lossW?.toMap(),
   };
@@ -407,8 +409,11 @@ PowerEvaluationEvidence _pwr04(
   var currentWithinLimit = true;
   for (final segment in _maps(scenario['segments'])) {
     final segmentId = segment['id']! as String;
-    final sourceW =
-        _evaluateDc(facts, scenarioId, segmentId).sourceDemandUpperBoundW;
+    final sourceW = _evaluateDc(
+      facts,
+      scenarioId,
+      segmentId,
+    ).sourceDemandUpperBoundW;
     if (sourceW == null) {
       throw StateError('PWR-04 segment lacks resolved source demand.');
     }
@@ -445,23 +450,22 @@ PowerEvaluationEvidence _pwr04(
       _r(bank['modelVoltageV']);
   final status =
       result.status == PowerEvaluationStatus.pass &&
-              bankVoltageMatches &&
-              currentWithinLimit
-          ? PowerEvaluationStatus.pass
-          : PowerEvaluationStatus.fail;
+          bankVoltageMatches &&
+          currentWithinLimit
+      ? PowerEvaluationStatus.pass
+      : PowerEvaluationStatus.fail;
   final inputs = <String, Object?>{
     'schema': 'electra.elv4-qualification-pwr04-input.v1',
     'bank': bank,
-    'segments':
-        segments
-            .map(
-              (value) => {
-                'segmentId': value.segmentId,
-                'durationSeconds': value.durationSeconds.toMap(),
-                'bankInputW': value.bankInputW.toMap(),
-              },
-            )
-            .toList(),
+    'segments': segments
+        .map(
+          (value) => {
+            'segmentId': value.segmentId,
+            'durationSeconds': value.durationSeconds.toMap(),
+            'bankInputW': value.bankInputW.toMap(),
+          },
+        )
+        .toList(),
   };
   return PowerEvaluationEvidence(
     evaluationId: evaluationId,
@@ -563,10 +567,9 @@ PowerEvaluationEvidence _pwr06(
   final transferLoss = PowerLossDefinition(
     efficiency: _r(pse['conversionEfficiency']),
     idleW: _r(pse['idleW']),
-    idleAccounting:
-        pse['idleAccounting'] == 'EXCLUDES_SEPARATE_IDLE'
-            ? PowerIdleAccounting.excludesSeparateIdle
-            : PowerIdleAccounting.includesIdle,
+    idleAccounting: pse['idleAccounting'] == 'EXCLUDES_SEPARATE_IDLE'
+        ? PowerIdleAccounting.excludesSeparateIdle
+        : PowerIdleAccounting.includesIdle,
   );
   final existing = <PoeReservedAllocation>[];
   final results = <Map<String, Object?>>[];
@@ -626,21 +629,20 @@ PowerEvaluationEvidence _pwr06(
   final inputs = <String, Object?>{
     'schema': 'electra.elv4-qualification-pwr06-input.v1',
     'pse': pse,
-    'pathStages':
-        pathStages
-            .map(
-              (value) => {
-                'stageId': value.stageId,
-                'kind': value.kind.name,
-                'resourceKind': value.resourceKind,
-                'physicalRealized': value.physicalRealized,
-                'powerPass': value.powerPass,
-                'pairMappingResolved': value.pairMappingResolved,
-                'allocationId': value.allocationId,
-                'cableRunId': value.cableRunId,
-              },
-            )
-            .toList(),
+    'pathStages': pathStages
+        .map(
+          (value) => {
+            'stageId': value.stageId,
+            'kind': value.kind.name,
+            'resourceKind': value.resourceKind,
+            'physicalRealized': value.physicalRealized,
+            'powerPass': value.powerPass,
+            'pairMappingResolved': value.pairMappingResolved,
+            'allocationId': value.allocationId,
+            'cableRunId': value.cableRunId,
+          },
+        )
+        .toList(),
   };
   return PowerEvaluationEvidence(
     evaluationId: evaluationId,
@@ -675,16 +677,15 @@ DcDomainEvaluationResult _evaluateDc(
     final bank = _map(facts['bank'], 'bank');
     final ups = _map(facts['ups'], 'ups');
     final outputW = _pseInputW(facts);
-    final batteryDemand =
-        evaluateTransferInputDemand(
-          transferId: 'UPS-BACKUP',
-          deliveredOutputW: outputW,
-          loss: PowerLossDefinition(
-            efficiency: _r(ups['backupEfficiency']),
-            idleW: _r(ups['idleW']),
-            idleAccounting: PowerIdleAccounting.includesIdle,
-          ),
-        ).inputW;
+    final batteryDemand = evaluateTransferInputDemand(
+      transferId: 'UPS-BACKUP',
+      deliveredOutputW: outputW,
+      loss: PowerLossDefinition(
+        efficiency: _r(ups['backupEfficiency']),
+        idleW: _r(ups['idleW']),
+        idleAccounting: PowerIdleAccounting.includesIdle,
+      ),
+    ).inputW;
     return evaluateDcDomain(
       DcSingleConstantPowerDomainInput(
         domainId: 'qualification-cp-domain',
@@ -698,12 +699,11 @@ DcDomainEvaluationResult _evaluateDc(
   }
 
   final source = _map(facts['source'], 'source');
-  final selected =
-      _demandContributions(
-        facts,
-        scenarioId,
-        segmentId,
-      ).where((value) => value.demand is DcConstantCurrentDemand).toList();
+  final selected = _demandContributions(
+    facts,
+    scenarioId,
+    segmentId,
+  ).where((value) => value.demand is DcConstantCurrentDemand).toList();
   var totalCurrent = PowerRational.zero;
   for (final contribution in selected) {
     totalCurrent += (contribution.demand! as DcConstantCurrentDemand).currentA;
@@ -799,8 +799,9 @@ List<PowerDemandContribution> _demandContributions(
         inputPortId: port,
         stateCode: declaredState ?? selectedState ?? 'NORMAL',
         demand: _demandFromLoad(load),
-        solvedTerminalVoltageV:
-            load['kind'] == 'DC_CONSTANT_CURRENT' ? terminalV : null,
+        solvedTerminalVoltageV: load['kind'] == 'DC_CONSTANT_CURRENT'
+            ? terminalV
+            : null,
       ),
     );
   }
@@ -851,10 +852,9 @@ PowerRational _pseInputW(Map<String, Object?> facts) {
     loss: PowerLossDefinition(
       efficiency: _r(pse['conversionEfficiency']),
       idleW: _r(pse['idleW']),
-      idleAccounting:
-          pse['idleAccounting'] == 'EXCLUDES_SEPARATE_IDLE'
-              ? PowerIdleAccounting.excludesSeparateIdle
-              : PowerIdleAccounting.includesIdle,
+      idleAccounting: pse['idleAccounting'] == 'EXCLUDES_SEPARATE_IDLE'
+          ? PowerIdleAccounting.excludesSeparateIdle
+          : PowerIdleAccounting.includesIdle,
     ),
   ).inputW;
 }
@@ -866,9 +866,9 @@ Map<String, Object?> _segment(
   Map<String, Object?> facts,
   String scenarioId,
   String segmentId,
-) => _maps(
-  _scenario(facts, scenarioId)['segments'],
-).singleWhere((value) => value['id'] == segmentId);
+) =>
+    _maps(_scenario(facts, scenarioId)['segments'])
+        .singleWhere((value) => value['id'] == segmentId);
 
 PowerDefinitionRef _definitionRef(PowerDefinitionKind kind, String code) =>
     PowerDefinitionRef(
@@ -895,13 +895,12 @@ Map<String, Object?> _map(Object? value, String field) {
 Map<String, Object?> _mapOrEmpty(Object? value) =>
     value is Map ? value.cast<String, Object?>() : <String, Object?>{};
 
-List<Map<String, Object?>> _maps(Object? value) =>
-    value is List
-        ? value
-            .cast<Map<Object?, Object?>>()
-            .map((item) => item.cast<String, Object?>())
-            .toList(growable: false)
-        : const <Map<String, Object?>>[];
+List<Map<String, Object?>> _maps(Object? value) => value is List
+    ? value
+          .cast<Map<Object?, Object?>>()
+          .map((item) => item.cast<String, Object?>())
+          .toList(growable: false)
+    : const <Map<String, Object?>>[];
 
 PowerRational _r(Object? value) => PowerRational.fromWireDecimal(value);
 

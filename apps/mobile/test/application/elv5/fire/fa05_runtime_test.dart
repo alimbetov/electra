@@ -11,53 +11,64 @@ import 'package:flutter_test/flutter_test.dart';
 String _hash(String ch) => List<String>.filled(64, ch).join();
 
 void main() {
-  test('projects Fire contribution from the same global PWR-04/PWR-01 chain', () async {
-    final pwr01 = _pwr01();
-    final pwr04 = _pwr04(pwr01);
-    final resolver = Fa05PersistedInputResolver(
-      contractSource: _ContractSource(_contract()),
-      powerEvidence: _EvidenceSource([pwr01, pwr04]),
-      nowUtc: () => DateTime.utc(2026, 10, 17),
-    );
+  test(
+    'projects Fire contribution from the same global PWR-04/PWR-01 chain',
+    () async {
+      final pwr01 = _pwr01();
+      final pwr04 = _pwr04(pwr01);
+      final resolver = Fa05PersistedInputResolver(
+        contractSource: _ContractSource(_contract()),
+        powerEvidence: _EvidenceSource([pwr01, pwr04]),
+        nowUtc: () => DateTime.utc(2026, 10, 17),
+      );
 
-    final captured = await resolver.capture(_request());
-    final result = const Fa05AutonomyProjectionKernel().evaluate(captured.value);
-    expect(result.status, Fa05AssessmentStatus.pass);
-    expect(result.globalRequiredEnergy.value, Elv5Rational.parseDecimal('19.2'));
-    expect(result.availableEnergy.value, Elv5Rational.parseDecimal('134.4'));
-    expect(result.energyMargin.value, Elv5Rational.parseDecimal('115.2'));
-    expect(result.fireContributionEnergy.value, Elv5Rational.parseDecimal('9.2'));
-    expect(result.governingSegmentId, isNull);
-  });
+      final captured = await resolver.capture(_request());
+      final result = const Fa05AutonomyProjectionKernel().evaluate(
+        captured.value,
+      );
+      expect(result.status, Fa05AssessmentStatus.pass);
+      expect(
+        result.globalRequiredEnergy.value,
+        Elv5Rational.parseDecimal('19.2'),
+      );
+      expect(result.availableEnergy.value, Elv5Rational.parseDecimal('134.4'));
+      expect(result.energyMargin.value, Elv5Rational.parseDecimal('115.2'));
+      expect(
+        result.fireContributionEnergy.value,
+        Elv5Rational.parseDecimal('9.2'),
+      );
+      expect(result.governingSegmentId, isNull);
+    },
+  );
 }
 
 Fa05AutonomyContract _contract() => Fa05AutonomyContract(
-      bankId: 'bank-1',
-      scenarioId: 'BACKUP',
-      sequenceId: 'sequence-1',
-      expectedPwr04InputFingerprint: _hash('a'),
-      segments: [
-        Fa05SequenceSegmentContract(
-          segmentId: 'standby',
-          durationMicroseconds: BigInt.from(3600000000),
-        ),
-      ],
-      globalProtectedLoadIds: const {'acs-lock', 'fire-loop'},
-      fireProtectedLoadIds: const {'fire-loop'},
-    );
+  bankId: 'bank-1',
+  scenarioId: 'BACKUP',
+  sequenceId: 'sequence-1',
+  expectedPwr04InputFingerprint: _hash('a'),
+  segments: [
+    Fa05SequenceSegmentContract(
+      segmentId: 'standby',
+      durationMicroseconds: BigInt.from(3600000000),
+    ),
+  ],
+  globalProtectedLoadIds: const {'acs-lock', 'fire-loop'},
+  fireProtectedLoadIds: const {'fire-loop'},
+);
 
 Elv5CalculationRequest _request() => Elv5CalculationRequest(
-      projectId: 'p',
-      designRevisionId: 'd',
-      scope: Elv5ScopeRef(
-        kind: Elv5ScopeKind.design,
-        scopeId: 'd',
-        scenarioKey: 'BACKUP',
-      ),
-      processCode: Elv5ProcessCode.fa05,
-      subject: Elv5SubjectRef(kind: 'POWER_BANK', id: 'bank-1'),
-      expectedPointerGeneration: 0,
-    );
+  projectId: 'p',
+  designRevisionId: 'd',
+  scope: Elv5ScopeRef(
+    kind: Elv5ScopeKind.design,
+    scopeId: 'd',
+    scenarioKey: 'BACKUP',
+  ),
+  processCode: Elv5ProcessCode.fa05,
+  subject: Elv5SubjectRef(kind: 'POWER_BANK', id: 'bank-1'),
+  expectedPointerGeneration: 0,
+);
 
 final class _ContractSource implements Fa05AutonomyContractSource {
   const _ContractSource(this.contract);
@@ -69,12 +80,12 @@ final class _ContractSource implements Fa05AutonomyContractSource {
     required String designRevisionId,
     required String bankId,
   }) async => Fa05AutonomyContractSnapshot(
-        bindingId: 'fa05-binding',
-        bindingRevision: 1,
-        evidenceRef: 'FA05:bank-1:${_hash('9')}',
-        contentHash: _hash('9'),
-        contract: contract,
-      );
+    bindingId: 'fa05-binding',
+    bindingRevision: 1,
+    evidenceRef: 'FA05:bank-1:${_hash('9')}',
+    contentHash: _hash('9'),
+    contract: contract,
+  );
 }
 
 final class _EvidenceSource implements Elv4CurrentEvidenceSource {
@@ -92,67 +103,67 @@ final class _EvidenceSource implements Elv4CurrentEvidenceSource {
     String? subjectKind,
     String? subjectId,
   }) async => values.where((value) {
-        final key = value.nodeKey;
-        return key.processCode == processCode &&
-            (scenarioId == null || key.scenarioId == scenarioId) &&
-            (scopeKind == null || key.scopeKind == scopeKind) &&
-            (scopeId == null || key.scopeId == scopeId) &&
-            (subjectKind == null || key.subjectKind == subjectKind) &&
-            (subjectId == null || key.subjectId == subjectId);
-      }).toList();
+    final key = value.nodeKey;
+    return key.processCode == processCode &&
+        (scenarioId == null || key.scenarioId == scenarioId) &&
+        (scopeKind == null || key.scopeKind == scopeKind) &&
+        (scopeId == null || key.scopeId == scopeId) &&
+        (subjectKind == null || key.subjectKind == subjectKind) &&
+        (subjectId == null || key.subjectId == subjectId);
+  }).toList();
 }
 
 Elv4CurrentEvaluationSnapshot _pwr01() => Elv4CurrentEvaluationSnapshot(
-      nodeKey: PowerNodeKeyV2(
-        revisionId: 'd',
-        scenarioId: 'BACKUP',
-        scopeKind: PowerEvaluationScopeKind.segment,
-        scopeId: 'standby',
-        processCode: PowerProcessCode.pwr01,
-        subjectKind: 'BACKUP_SEGMENT',
-        subjectId: 'standby-demand',
-      ),
-      evaluationId: 'pwr01-eval',
-      inputFingerprint: _hash('1'),
-      evidenceSha256: _hash('2'),
-      pointerGeneration: 3,
-      evidence: <String, Object?>{
-        'inputs': <String, Object?>{
-          'contributions': <Object?>[
-            <String, Object?>{
-              'originId': 'acs-lock',
-              'componentId': 'lock-1',
-              'inputPortId': 'lock-in',
-              'stateCode': 'STANDBY',
-              'demand': <String, Object?>{
-                'kind': 'DC_CONSTANT_POWER',
-                'powerW': '10',
-              },
-              'solvedTerminalVoltageV': null,
-            },
-            <String, Object?>{
-              'originId': 'fire-loop',
-              'componentId': 'fire-1',
-              'inputPortId': 'fire-in',
-              'stateCode': 'STANDBY',
-              'demand': <String, Object?>{
-                'kind': 'DC_CONSTANT_POWER',
-                'powerW': '9.2',
-              },
-              'solvedTerminalVoltageV': null,
-            },
-          ],
+  nodeKey: PowerNodeKeyV2(
+    revisionId: 'd',
+    scenarioId: 'BACKUP',
+    scopeKind: PowerEvaluationScopeKind.segment,
+    scopeId: 'standby',
+    processCode: PowerProcessCode.pwr01,
+    subjectKind: 'BACKUP_SEGMENT',
+    subjectId: 'standby-demand',
+  ),
+  evaluationId: 'pwr01-eval',
+  inputFingerprint: _hash('1'),
+  evidenceSha256: _hash('2'),
+  pointerGeneration: 3,
+  evidence: <String, Object?>{
+    'inputs': <String, Object?>{
+      'contributions': <Object?>[
+        <String, Object?>{
+          'originId': 'acs-lock',
+          'componentId': 'lock-1',
+          'inputPortId': 'lock-in',
+          'stateCode': 'STANDBY',
+          'demand': <String, Object?>{
+            'kind': 'DC_CONSTANT_POWER',
+            'powerW': '10',
+          },
+          'solvedTerminalVoltageV': null,
         },
-        'output': <String, Object?>{
-          'knownW': PowerRational.parseDecimal('19.2').toMap(),
-          'knownA': PowerRational.zero.toMap(),
-          'knownVa': PowerRational.zero.toMap(),
-          'completeW': true,
-          'completeA': false,
-          'completeVa': false,
+        <String, Object?>{
+          'originId': 'fire-loop',
+          'componentId': 'fire-1',
+          'inputPortId': 'fire-in',
+          'stateCode': 'STANDBY',
+          'demand': <String, Object?>{
+            'kind': 'DC_CONSTANT_POWER',
+            'powerW': '9.2',
+          },
+          'solvedTerminalVoltageV': null,
         },
-      },
-    );
+      ],
+    },
+    'output': <String, Object?>{
+      'knownW': PowerRational.parseDecimal('19.2').toMap(),
+      'knownA': PowerRational.zero.toMap(),
+      'knownVa': PowerRational.zero.toMap(),
+      'completeW': true,
+      'completeA': false,
+      'completeVa': false,
+    },
+  },
+);
 
 Elv4CurrentEvaluationSnapshot _pwr04(Elv4CurrentEvaluationSnapshot pwr01) {
   final sequenceValue = <String, Object?>{

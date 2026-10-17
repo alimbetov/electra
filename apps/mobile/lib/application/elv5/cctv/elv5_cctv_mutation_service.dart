@@ -231,7 +231,8 @@ final class Elv5CctvMutationService {
       designRevisionId: command.designRevisionId,
       cameraId: cameraId,
     );
-    if (after == null) throw StateError('CCTV camera stream replace disappeared.');
+    if (after == null)
+      throw StateError('CCTV camera stream replace disappeared.');
     return _applied(command.operation, after, prepared);
   }
 
@@ -403,8 +404,6 @@ final class Elv5CctvMutationService {
   static String _recordingBindingId(String poolId) =>
       'ELV5:CCTV:RECORDING_POOL:$poolId';
 
-  static String _canonicalJson(Object? value) => utf8.decode(
-    _encoder.encode(value),
-    allowMalformed: false,
-  );
+  static String _canonicalJson(Object? value) =>
+      utf8.decode(_encoder.encode(value), allowMalformed: false);
 }

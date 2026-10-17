@@ -39,10 +39,7 @@ void main() {
       1,
     );
 
-    final uow = DriftElv5RuntimeWriteUnitOfWork(
-      db,
-      originDeviceId: 'test',
-    );
+    final uow = DriftElv5RuntimeWriteUnitOfWork(db, originDeviceId: 'test');
     final staleGenerationRejected = await uow.run(
       (session) => session.pointers.compareAndSet(
         Elv5PointerWrite(
@@ -79,9 +76,11 @@ void main() {
     );
     expect(republished, isTrue);
 
-    final row = await db.customSelect(
-      "SELECT freshness,generation,evaluation_id FROM discipline_evaluation_pointers WHERE project_id='p' AND design_revision_id='d' AND logical_node_key_sha256='$node'",
-    ).getSingle();
+    final row = await db
+        .customSelect(
+          "SELECT freshness,generation,evaluation_id FROM discipline_evaluation_pointers WHERE project_id='p' AND design_revision_id='d' AND logical_node_key_sha256='$node'",
+        )
+        .getSingle();
     expect(row.read<String>('freshness'), 'CURRENT');
     expect(row.read<int>('generation'), 3);
     expect(row.read<String>('evaluation_id'), 'eval-new');

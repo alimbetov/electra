@@ -29,16 +29,18 @@ final class DriftElv5DependencyInvalidator {
     if (hashes.isEmpty) return 0;
     final ordered = hashes.toList()..sort();
     final placeholders = List.filled(ordered.length, '?').join(',');
-    final rows = await database.customSelect(
-      'SELECT DISTINCT logical_node_key_sha256 FROM discipline_dependency_index '
-      'WHERE project_id = ? AND design_revision_id = ? '
-      'AND dependency_key_sha256 IN ($placeholders)',
-      variables: <Variable>[
-        Variable.withString(projectId),
-        Variable.withString(designRevisionId),
-        ...ordered.map(Variable.withString),
-      ],
-    ).get();
+    final rows = await database
+        .customSelect(
+          'SELECT DISTINCT logical_node_key_sha256 FROM discipline_dependency_index '
+          'WHERE project_id = ? AND design_revision_id = ? '
+          'AND dependency_key_sha256 IN ($placeholders)',
+          variables: <Variable>[
+            Variable.withString(projectId),
+            Variable.withString(designRevisionId),
+            ...ordered.map(Variable.withString),
+          ],
+        )
+        .get();
     final nodeHashes = <String>{
       for (final row in rows) row.read<String>('logical_node_key_sha256'),
     };
@@ -68,11 +70,13 @@ final class Elv5InvalidationDependency {
     required String domain,
     required String subjectId,
     String? memberId,
-  })  : relationKind = relationKind.trim().toUpperCase(),
-        domain = domain.trim(),
-        subjectId = subjectId.trim(),
-        memberId = memberId?.trim() {
-    if (this.relationKind.isEmpty || this.domain.isEmpty || this.subjectId.isEmpty) {
+  }) : relationKind = relationKind.trim().toUpperCase(),
+       domain = domain.trim(),
+       subjectId = subjectId.trim(),
+       memberId = memberId?.trim() {
+    if (this.relationKind.isEmpty ||
+        this.domain.isEmpty ||
+        this.subjectId.isEmpty) {
       throw ArgumentError('Invalid ELV5 invalidation dependency identity.');
     }
   }
@@ -85,12 +89,12 @@ final class Elv5InvalidationDependency {
   static const _encoder = Elv5CanonicalJsonV1();
 
   Map<String, Object?> get canonicalValue => <String, Object?>{
-        'schema': 'electra.elv5-dependency-key.v1',
-        'relationKind': relationKind,
-        'domain': domain,
-        'subjectId': subjectId,
-        if (memberId != null && memberId!.isNotEmpty) 'memberId': memberId,
-      };
+    'schema': 'electra.elv5-dependency-key.v1',
+    'relationKind': relationKind,
+    'domain': domain,
+    'subjectId': subjectId,
+    if (memberId != null && memberId!.isNotEmpty) 'memberId': memberId,
+  };
 
   String get json => utf8.decode(_encoder.encode(canonicalValue));
   String get sha256 => _encoder.sha256(canonicalValue);

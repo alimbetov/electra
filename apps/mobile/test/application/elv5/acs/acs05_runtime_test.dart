@@ -15,7 +15,10 @@ void main() {
     final pwr04 = _pwr04(pwr01: pwr01, inputFingerprint: _hash('a'));
     final resolver = Acs05PersistedInputResolver(
       contractSource: _ContractSource(_contract(_hash('a'))),
-      powerEvidence: _EvidenceSource(<Elv4CurrentEvaluationSnapshot>[pwr01, pwr04]),
+      powerEvidence: _EvidenceSource(<Elv4CurrentEvaluationSnapshot>[
+        pwr01,
+        pwr04,
+      ]),
       nowUtc: () => DateTime.utc(2026, 10, 17),
     );
 
@@ -49,7 +52,10 @@ void main() {
     final pwr04 = _pwr04(pwr01: pwr01, inputFingerprint: _hash('b'));
     final resolver = Acs05PersistedInputResolver(
       contractSource: _ContractSource(_contract(_hash('a'))),
-      powerEvidence: _EvidenceSource(<Elv4CurrentEvaluationSnapshot>[pwr01, pwr04]),
+      powerEvidence: _EvidenceSource(<Elv4CurrentEvaluationSnapshot>[
+        pwr01,
+        pwr04,
+      ]),
     );
 
     await expectLater(
@@ -73,7 +79,10 @@ void main() {
     );
     final resolver = Acs05PersistedInputResolver(
       contractSource: _ContractSource(_contract(_hash('a'))),
-      powerEvidence: _EvidenceSource(<Elv4CurrentEvaluationSnapshot>[pwr01, pwr04]),
+      powerEvidence: _EvidenceSource(<Elv4CurrentEvaluationSnapshot>[
+        pwr01,
+        pwr04,
+      ]),
     );
 
     await expectLater(
@@ -104,7 +113,10 @@ void main() {
     );
     final resolver = Acs05PersistedInputResolver(
       contractSource: _ContractSource(strict),
-      powerEvidence: _EvidenceSource(<Elv4CurrentEvaluationSnapshot>[pwr01, pwr04]),
+      powerEvidence: _EvidenceSource(<Elv4CurrentEvaluationSnapshot>[
+        pwr01,
+        pwr04,
+      ]),
     );
 
     await expectLater(
@@ -253,17 +265,17 @@ Elv4CurrentEvaluationSnapshot _pwr04({
 }
 
 Elv5CalculationRequest _request() => Elv5CalculationRequest(
-      projectId: 'p',
-      designRevisionId: 'd',
-      scope: Elv5ScopeRef(
-        kind: Elv5ScopeKind.design,
-        scopeId: 'd',
-        scenarioKey: 'BACKUP',
-      ),
-      processCode: Elv5ProcessCode.acs05,
-      subject: Elv5SubjectRef(kind: 'POWER_BANK', id: 'bank-1'),
-      expectedPointerGeneration: 0,
-    );
+  projectId: 'p',
+  designRevisionId: 'd',
+  scope: Elv5ScopeRef(
+    kind: Elv5ScopeKind.design,
+    scopeId: 'd',
+    scenarioKey: 'BACKUP',
+  ),
+  processCode: Elv5ProcessCode.acs05,
+  subject: Elv5SubjectRef(kind: 'POWER_BANK', id: 'bank-1'),
+  expectedPointerGeneration: 0,
+);
 
 final class _ContractSource implements Acs05AutonomyContractSource {
   _ContractSource(this.contract);
@@ -276,12 +288,12 @@ final class _ContractSource implements Acs05AutonomyContractSource {
     required String designRevisionId,
     required String bankId,
   }) async => Acs05AutonomyContractSnapshot(
-        bindingId: 'binding-1',
-        bindingRevision: 2,
-        evidenceRef: 'ACS05:bank-1:${_hash('9')}',
-        contentHash: _hash('9'),
-        contract: contract,
-      );
+    bindingId: 'binding-1',
+    bindingRevision: 2,
+    evidenceRef: 'ACS05:bank-1:${_hash('9')}',
+    contentHash: _hash('9'),
+    contract: contract,
+  );
 }
 
 final class _EvidenceSource implements Elv4CurrentEvidenceSource {
@@ -300,12 +312,12 @@ final class _EvidenceSource implements Elv4CurrentEvidenceSource {
     String? subjectKind,
     String? subjectId,
   }) async => values.where((value) {
-        final key = value.nodeKey;
-        return key.processCode == processCode &&
-            (scenarioId == null || key.scenarioId == scenarioId) &&
-            (scopeKind == null || key.scopeKind == scopeKind) &&
-            (scopeId == null || key.scopeId == scopeId) &&
-            (subjectKind == null || key.subjectKind == subjectKind) &&
-            (subjectId == null || key.subjectId == subjectId);
-      }).toList();
+    final key = value.nodeKey;
+    return key.processCode == processCode &&
+        (scenarioId == null || key.scenarioId == scenarioId) &&
+        (scopeKind == null || key.scopeKind == scopeKind) &&
+        (scopeId == null || key.scopeId == scopeId) &&
+        (subjectKind == null || key.subjectKind == subjectKind) &&
+        (subjectId == null || key.subjectId == subjectId);
+  }).toList();
 }

@@ -3,8 +3,7 @@ import '../power/pwr06_shared_projection.dart';
 String cctv04Pwr06ClosureFingerprint({
   required String pseId,
   required Iterable<Map<String, Object?>> members,
-}) =>
-    elv5Pwr06SharedClosureFingerprint(pseId: pseId, members: members);
+}) => elv5Pwr06SharedClosureFingerprint(pseId: pseId, members: members);
 
 final class Cctv04PseProjectionContract {
   Cctv04PseProjectionContract({
@@ -14,17 +13,19 @@ final class Cctv04PseProjectionContract {
     required String expectedClosureFingerprint,
     required Map<String, String> expectedInputFingerprintByDeliveryId,
     required Iterable<String> cctvLoadIds,
-  })  : pseId = _text(pseId, 'pseId'),
-        scenarioId = _text(scenarioId, 'scenarioId'),
-        segmentId = _text(segmentId, 'segmentId'),
-        expectedClosureFingerprint =
-            _sha(expectedClosureFingerprint, 'expectedClosureFingerprint'),
-        expectedInputFingerprintByDeliveryId = Map.unmodifiable(
-          _fingerprints(expectedInputFingerprintByDeliveryId),
-        ),
-        cctvLoadIds = Set.unmodifiable(
-          cctvLoadIds.map((value) => _text(value, 'cctvLoadId')),
-        ) {
+  }) : pseId = _text(pseId, 'pseId'),
+       scenarioId = _text(scenarioId, 'scenarioId'),
+       segmentId = _text(segmentId, 'segmentId'),
+       expectedClosureFingerprint = _sha(
+         expectedClosureFingerprint,
+         'expectedClosureFingerprint',
+       ),
+       expectedInputFingerprintByDeliveryId = Map.unmodifiable(
+         _fingerprints(expectedInputFingerprintByDeliveryId),
+       ),
+       cctvLoadIds = Set.unmodifiable(
+         cctvLoadIds.map((value) => _text(value, 'cctvLoadId')),
+       ) {
     if (this.cctvLoadIds.isEmpty) {
       throw ArgumentError('CCTV04 CCTV load membership must not be empty.');
     }
@@ -40,33 +41,29 @@ final class Cctv04PseProjectionContract {
   final Set<String> cctvLoadIds;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'schema': schema,
-        'pseId': pseId,
-        'scenarioId': scenarioId,
-        'segmentId': segmentId,
-        'expectedClosureFingerprint': expectedClosureFingerprint,
-        'expectedInputFingerprintByDeliveryId': <String, Object?>{
-          for (final key
-              in expectedInputFingerprintByDeliveryId.keys.toList()..sort())
-            key: expectedInputFingerprintByDeliveryId[key],
-        },
-        'cctvLoadIds': cctvLoadIds.toList()..sort(),
-      };
+    'schema': schema,
+    'pseId': pseId,
+    'scenarioId': scenarioId,
+    'segmentId': segmentId,
+    'expectedClosureFingerprint': expectedClosureFingerprint,
+    'expectedInputFingerprintByDeliveryId': <String, Object?>{
+      for (final key
+          in expectedInputFingerprintByDeliveryId.keys.toList()..sort())
+        key: expectedInputFingerprintByDeliveryId[key],
+    },
+    'cctvLoadIds': cctvLoadIds.toList()..sort(),
+  };
 
   factory Cctv04PseProjectionContract.fromMap(Map<String, Object?> map) {
-    _exact(
-      map,
-      const <String>{
-        'schema',
-        'pseId',
-        'scenarioId',
-        'segmentId',
-        'expectedClosureFingerprint',
-        'expectedInputFingerprintByDeliveryId',
-        'cctvLoadIds',
-      },
-      'CCTV04 contract',
-    );
+    _exact(map, const <String>{
+      'schema',
+      'pseId',
+      'scenarioId',
+      'segmentId',
+      'expectedClosureFingerprint',
+      'expectedInputFingerprintByDeliveryId',
+      'cctvLoadIds',
+    }, 'CCTV04 contract');
     if (map['schema'] != schema) {
       throw const FormatException('Unsupported CCTV04 contract schema.');
     }
@@ -155,7 +152,9 @@ abstract interface class Cctv04PseProjectionContractWriter {
 
 Map<String, String> _fingerprints(Map<String, String> input) {
   if (input.isEmpty) {
-    throw ArgumentError('CCTV04 expected PWR06 delivery set must not be empty.');
+    throw ArgumentError(
+      'CCTV04 expected PWR06 delivery set must not be empty.',
+    );
   }
   return <String, String>{
     for (final entry in input.entries)

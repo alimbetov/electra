@@ -17,9 +17,10 @@ final class Elv5CurrentEvaluationSnapshot {
     required this.execution,
     required this.completion,
     required this.assessment,
-    required Map<String,Object?> output,
-    required Map<String,Object?> evidence,
-  }) : output = Map.unmodifiable(output), evidence = Map.unmodifiable(evidence) {
+    required Map<String, Object?> output,
+    required Map<String, Object?> evidence,
+  }) : output = Map.unmodifiable(output),
+       evidence = Map.unmodifiable(evidence) {
     if (pointerGeneration < 1) {
       throw ArgumentError('CURRENT ELV5 pointer generation must be >= 1.');
     }
@@ -43,8 +44,8 @@ final class Elv5CurrentEvaluationSnapshot {
   final String execution;
   final String completion;
   final String assessment;
-  final Map<String,Object?> output;
-  final Map<String,Object?> evidence;
+  final Map<String, Object?> output;
+  final Map<String, Object?> evidence;
 
   /// Qualification/read-model projection. Persisted replay vocabulary remains
   /// unchanged; Foundation consumers see the reconciled independent axes.

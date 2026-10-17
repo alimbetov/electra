@@ -49,10 +49,12 @@ class _ProjectCreateScreenState extends ConsumerState<ProjectCreateScreen> {
               name: nameController.text,
               reference: referenceController.text,
               measurementSystem: measurementSystem,
-              defaultStructuralHeightMm:
-                  parsePositiveMm(structuralController.text)!,
-              defaultFinishedCeilingHeightMm:
-                  parsePositiveMm(ceilingController.text)!,
+              defaultStructuralHeightMm: parsePositiveMm(
+                structuralController.text,
+              )!,
+              defaultFinishedCeilingHeightMm: parsePositiveMm(
+                ceilingController.text,
+              )!,
             ),
           );
       if (!mounted) return;
@@ -82,11 +84,9 @@ class _ProjectCreateScreenState extends ConsumerState<ProjectCreateScreen> {
                 TextFormField(
                   controller: nameController,
                   decoration: const InputDecoration(labelText: 'Project name'),
-                  validator:
-                      (value) =>
-                          value == null || value.trim().isEmpty
-                              ? 'Project name is required'
-                              : null,
+                  validator: (value) => value == null || value.trim().isEmpty
+                      ? 'Project name is required'
+                      : null,
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
@@ -101,22 +101,19 @@ class _ProjectCreateScreenState extends ConsumerState<ProjectCreateScreen> {
                   decoration: const InputDecoration(
                     labelText: 'Measurement system',
                   ),
-                  items:
-                      MeasurementSystem.values
-                          .map(
-                            (value) => DropdownMenuItem(
-                              value: value,
-                              child: Text(value.name.toUpperCase()),
-                            ),
-                          )
-                          .toList(),
-                  onChanged:
-                      saving
-                          ? null
-                          : (value) => setState(() {
-                            measurementSystem =
-                                value ?? MeasurementSystem.metric;
-                          }),
+                  items: MeasurementSystem.values
+                      .map(
+                        (value) => DropdownMenuItem(
+                          value: value,
+                          child: Text(value.name.toUpperCase()),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: saving
+                      ? null
+                      : (value) => setState(() {
+                          measurementSystem = value ?? MeasurementSystem.metric;
+                        }),
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
@@ -126,11 +123,9 @@ class _ProjectCreateScreenState extends ConsumerState<ProjectCreateScreen> {
                     labelText: 'Default structural height',
                     suffixText: 'mm',
                   ),
-                  validator:
-                      (value) =>
-                          parsePositiveMm(value ?? '') == null
-                              ? 'Enter a positive millimetre value'
-                              : null,
+                  validator: (value) => parsePositiveMm(value ?? '') == null
+                      ? 'Enter a positive millimetre value'
+                      : null,
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
@@ -140,22 +135,19 @@ class _ProjectCreateScreenState extends ConsumerState<ProjectCreateScreen> {
                     labelText: 'Default finished ceiling height',
                     suffixText: 'mm',
                   ),
-                  validator:
-                      (value) =>
-                          parsePositiveMm(value ?? '') == null
-                              ? 'Enter a positive millimetre value'
-                              : null,
+                  validator: (value) => parsePositiveMm(value ?? '') == null
+                      ? 'Enter a positive millimetre value'
+                      : null,
                 ),
                 const SizedBox(height: 24),
                 FilledButton.icon(
                   onPressed: saving ? null : save,
-                  icon:
-                      saving
-                          ? const SizedBox.square(
-                            dimension: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                          : const Icon(Icons.save_outlined),
+                  icon: saving
+                      ? const SizedBox.square(
+                          dimension: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.save_outlined),
                   label: Text(saving ? 'Saving…' : 'Create project'),
                 ),
               ],

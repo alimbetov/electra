@@ -8,28 +8,226 @@ import '../../../application/elv5/fire/fa07_topology_contract_write.dart';
 import '../../database/app_database.dart';
 import '../../database/drift_raw_statement.dart';
 
-final class DriftFa07TopologyContractStore implements Fa07TopologyContractSource, Fa07TopologyContractWriter {
-  const DriftFa07TopologyContractStore(this.database,{required this.originDeviceId,DateTime Function()? nowUtc}):_nowUtc=nowUtc??_defaultNow;
-  final AppDatabase database; final String originDeviceId; final DateTime Function() _nowUtc; static const _encoder=Elv5CanonicalJsonV1(); static DateTime _defaultNow()=>DateTime.now().toUtc();
+final class DriftFa07TopologyContractStore
+    implements Fa07TopologyContractSource, Fa07TopologyContractWriter {
+  const DriftFa07TopologyContractStore(
+    this.database, {
+    required this.originDeviceId,
+    DateTime Function()? nowUtc,
+  }) : _nowUtc = nowUtc ?? _defaultNow;
+  final AppDatabase database;
+  final String originDeviceId;
+  final DateTime Function() _nowUtc;
+  static const _encoder = Elv5CanonicalJsonV1();
+  static DateTime _defaultNow() => DateTime.now().toUtc();
 
   @override
-  Future<Fa07TopologyContractSnapshot?> loadActiveForLoop({required String projectId,required String designRevisionId,required String loopId}) async {
-    final rows=await database.customSelect('SELECT id, revision, process_codes_json, definition_ref_json FROM discipline_policy_bindings WHERE project_id = ? AND design_revision_id = ? AND subject_kind = ? AND subject_id = ? AND deleted_at IS NULL ORDER BY id',variables:<Variable>[Variable.withString(projectId),Variable.withString(designRevisionId),Variable.withString('FIRE_LOOP'),Variable.withString(loopId)]).get();
-    final matching=<QueryRow>[];for(final row in rows){final codes=jsonDecode(row.read<String>('process_codes_json'));if(codes is! List)throw StateError('FA07_POLICY_PROCESS_CODES_INVALID:${row.read<String>('id')}');if(codes.contains('FA-07'))matching.add(row);}if(matching.isEmpty)return null;if(matching.length!=1)throw StateError('FA07_ACTIVE_CONTRACT_BINDING_AMBIGUOUS:$loopId');
-    final binding=matching.single;final raw=jsonDecode(binding.read<String>('definition_ref_json'));if(raw is! Map)throw StateError('FA07_DEFINITION_REF_INVALID:$loopId');final def=Map<String,Object?>.from(raw);if(def['policyCode']!='FA07_TOPOLOGY_CONTRACT')throw StateError('FA07_DEFINITION_POLICY_CODE_INVALID:$loopId');final ref=_text(def,'editionId');final hash=_text(def,'contentHash');
-    final evidence=await database.customSelect('SELECT canonical_payload_json, payload_sha256 FROM elv_revision_aggregate_evidence_records WHERE evidence_ref = ? AND project_id = ? AND design_revision_id = ? AND aggregate_kind = ? AND aggregate_id = ?',variables:<Variable>[Variable.withString(ref),Variable.withString(projectId),Variable.withString(designRevisionId),Variable.withString('FA07_TOPOLOGY_CONTRACT'),Variable.withString(loopId)]).getSingleOrNull();
-    if(evidence==null)throw StateError('FA07_CONTRACT_EVIDENCE_MISSING:$ref');final decoded=jsonDecode(evidence.read<String>('canonical_payload_json'));if(decoded is! Map)throw StateError('FA07_CONTRACT_PAYLOAD_INVALID:$ref');final payload=Map<String,Object?>.from(decoded);if(_encoder.sha256(payload)!=hash||evidence.read<String>('payload_sha256')!=hash)throw StateError('FA07_CONTRACT_HASH_MISMATCH:$ref');final contract=Fa07TopologyContract.fromMap(payload);if(contract.loopId!=loopId)throw StateError('FA07_CONTRACT_LOOP_MISMATCH:$loopId:${contract.loopId}');
-    return Fa07TopologyContractSnapshot(bindingId:binding.read<String>('id'),bindingRevision:binding.read<int>('revision'),evidenceRef:ref,contentHash:hash,contract:contract);
+  Future<Fa07TopologyContractSnapshot?> loadActiveForLoop({
+    required String projectId,
+    required String designRevisionId,
+    required String loopId,
+  }) async {
+    final rows = await database
+        .customSelect(
+          'SELECT id, revision, process_codes_json, definition_ref_json FROM discipline_policy_bindings WHERE project_id = ? AND design_revision_id = ? AND subject_kind = ? AND subject_id = ? AND deleted_at IS NULL ORDER BY id',
+          variables: <Variable>[
+            Variable.withString(projectId),
+            Variable.withString(designRevisionId),
+            Variable.withString('FIRE_LOOP'),
+            Variable.withString(loopId),
+          ],
+        )
+        .get();
+    final matching = <QueryRow>[];
+    for (final row in rows) {
+      final codes = jsonDecode(row.read<String>('process_codes_json'));
+      if (codes is! List)
+        throw StateError(
+          'FA07_POLICY_PROCESS_CODES_INVALID:${row.read<String>('id')}',
+        );
+      if (codes.contains('FA-07')) matching.add(row);
+    }
+    if (matching.isEmpty) return null;
+    if (matching.length != 1)
+      throw StateError('FA07_ACTIVE_CONTRACT_BINDING_AMBIGUOUS:$loopId');
+    final binding = matching.single;
+    final raw = jsonDecode(binding.read<String>('definition_ref_json'));
+    if (raw is! Map) throw StateError('FA07_DEFINITION_REF_INVALID:$loopId');
+    final def = Map<String, Object?>.from(raw);
+    if (def['policyCode'] != 'FA07_TOPOLOGY_CONTRACT')
+      throw StateError('FA07_DEFINITION_POLICY_CODE_INVALID:$loopId');
+    final ref = _text(def, 'editionId');
+    final hash = _text(def, 'contentHash');
+    final evidence = await database
+        .customSelect(
+          'SELECT canonical_payload_json, payload_sha256 FROM elv_revision_aggregate_evidence_records WHERE evidence_ref = ? AND project_id = ? AND design_revision_id = ? AND aggregate_kind = ? AND aggregate_id = ?',
+          variables: <Variable>[
+            Variable.withString(ref),
+            Variable.withString(projectId),
+            Variable.withString(designRevisionId),
+            Variable.withString('FA07_TOPOLOGY_CONTRACT'),
+            Variable.withString(loopId),
+          ],
+        )
+        .getSingleOrNull();
+    if (evidence == null)
+      throw StateError('FA07_CONTRACT_EVIDENCE_MISSING:$ref');
+    final decoded = jsonDecode(evidence.read<String>('canonical_payload_json'));
+    if (decoded is! Map) throw StateError('FA07_CONTRACT_PAYLOAD_INVALID:$ref');
+    final payload = Map<String, Object?>.from(decoded);
+    if (_encoder.sha256(payload) != hash ||
+        evidence.read<String>('payload_sha256') != hash)
+      throw StateError('FA07_CONTRACT_HASH_MISMATCH:$ref');
+    final contract = Fa07TopologyContract.fromMap(payload);
+    if (contract.loopId != loopId)
+      throw StateError(
+        'FA07_CONTRACT_LOOP_MISMATCH:$loopId:${contract.loopId}',
+      );
+    return Fa07TopologyContractSnapshot(
+      bindingId: binding.read<String>('id'),
+      bindingRevision: binding.read<int>('revision'),
+      evidenceRef: ref,
+      contentHash: hash,
+      contract: contract,
+    );
   }
 
   @override
-  Future<void> replace(ReplaceFa07TopologyContractCommand command)=>database.transaction(() async {
-    final now=_nowUtc().toUtc();final rev=await database.customSelect('SELECT state, revision FROM project_design_revisions WHERE project_id = ? AND id = ? AND deleted_at IS NULL',variables:<Variable>[Variable.withString(command.projectId),Variable.withString(command.designRevisionId)]).getSingleOrNull();if(rev==null)throw StateError('FA07_DESIGN_REVISION_NOT_FOUND:${command.designRevisionId}');if(rev.read<String>('state')!='WORKING')throw StateError('FA07_DESIGN_REVISION_READ_ONLY');if(rev.read<int>('revision')!=command.expectedDesignRevision)throw StateError('FA07_DESIGN_REVISION_CONFLICT');
-    final payload=command.contract.toCanonicalValue();final hash=_encoder.sha256(payload);final ref='FA07:${command.contract.loopId}:$hash';final existing=await database.customSelect('SELECT payload_sha256 FROM elv_revision_aggregate_evidence_records WHERE evidence_ref = ?',variables:<Variable>[Variable.withString(ref)]).getSingleOrNull();if(existing==null){await runRawStatement(database,'INSERT INTO elv_revision_aggregate_evidence_records (evidence_ref, project_id, design_revision_id, aggregate_kind, aggregate_id, canonical_payload_json, payload_sha256, created_at, origin_device_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',<Variable>[Variable.withString(ref),Variable.withString(command.projectId),Variable.withString(command.designRevisionId),Variable.withString('FA07_TOPOLOGY_CONTRACT'),Variable.withString(command.contract.loopId),Variable.withString(_canonical(payload)),Variable.withString(hash),Variable<DateTime>(now),Variable.withString(originDeviceId)]);}else if(existing.read<String>('payload_sha256')!=hash){throw StateError('FA07_EVIDENCE_REF_COLLISION:$ref');}
-    final def=<String,Object?>{'policyCode':'FA07_TOPOLOGY_CONTRACT','editionId':ref,'contentHash':hash};final app=<String,Object?>{'scopeKinds':<String>['DESIGN']};
-    if(command.expectedBindingRevision==null){final rows=await database.customSelect('SELECT id, process_codes_json FROM discipline_policy_bindings WHERE project_id = ? AND design_revision_id = ? AND subject_kind = ? AND subject_id = ? AND deleted_at IS NULL',variables:<Variable>[Variable.withString(command.projectId),Variable.withString(command.designRevisionId),Variable.withString('FIRE_LOOP'),Variable.withString(command.contract.loopId)]).get();for(final row in rows){final codes=jsonDecode(row.read<String>('process_codes_json'));if(codes is List&&codes.contains('FA-07'))throw StateError('FA07_ACTIVE_CONTRACT_ALREADY_EXISTS:${row.read<String>('id')}');}await runRawStatement(database,'INSERT INTO discipline_policy_bindings (project_id, design_revision_id, id, revision, created_at, updated_at, deleted_at, origin_device_id, subject_kind, subject_id, process_codes_json, definition_ref_json, definition_sha256, applicability_json, applicability_sha256) VALUES (?, ?, ?, 1, ?, ?, NULL, ?, ?, ?, ?, ?, ?, ?, ?)',<Variable>[Variable.withString(command.projectId),Variable.withString(command.designRevisionId),Variable.withString(command.bindingId),Variable<DateTime>(now),Variable<DateTime>(now),Variable.withString(originDeviceId),Variable.withString('FIRE_LOOP'),Variable.withString(command.contract.loopId),Variable.withString(_canonical(<String>['FA-07'])),Variable.withString(_canonical(def)),Variable.withString(hash),Variable.withString(_canonical(app)),Variable.withString(_encoder.sha256(app))]);}else{final changed=await database.customUpdate('UPDATE discipline_policy_bindings SET revision = revision + 1, updated_at = ?, origin_device_id = ?, definition_ref_json = ?, definition_sha256 = ?, applicability_json = ?, applicability_sha256 = ? WHERE project_id = ? AND design_revision_id = ? AND id = ? AND subject_kind = ? AND subject_id = ? AND revision = ? AND deleted_at IS NULL',variables:<Variable>[Variable<DateTime>(now),Variable.withString(originDeviceId),Variable.withString(_canonical(def)),Variable.withString(hash),Variable.withString(_canonical(app)),Variable.withString(_encoder.sha256(app)),Variable.withString(command.projectId),Variable.withString(command.designRevisionId),Variable.withString(command.bindingId),Variable.withString('FIRE_LOOP'),Variable.withString(command.contract.loopId),Variable<int>(command.expectedBindingRevision!)]);if(changed!=1)throw StateError('FA07_CONTRACT_BINDING_CAS_FAILED');}
-    final changedDesign=await database.customUpdate('UPDATE project_design_revisions SET revision = revision + 1, updated_at = ?, origin_device_id = ? WHERE project_id = ? AND id = ? AND revision = ? AND state = ? AND deleted_at IS NULL',variables:<Variable>[Variable<DateTime>(now),Variable.withString(originDeviceId),Variable.withString(command.projectId),Variable.withString(command.designRevisionId),Variable<int>(command.expectedDesignRevision),Variable.withString('WORKING')]);if(changedDesign!=1)throw StateError('FA07_DESIGN_REVISION_CAS_FAILED');
+  Future<void> replace(
+    ReplaceFa07TopologyContractCommand command,
+  ) => database.transaction(() async {
+    final now = _nowUtc().toUtc();
+    final rev = await database
+        .customSelect(
+          'SELECT state, revision FROM project_design_revisions WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
+          variables: <Variable>[
+            Variable.withString(command.projectId),
+            Variable.withString(command.designRevisionId),
+          ],
+        )
+        .getSingleOrNull();
+    if (rev == null)
+      throw StateError(
+        'FA07_DESIGN_REVISION_NOT_FOUND:${command.designRevisionId}',
+      );
+    if (rev.read<String>('state') != 'WORKING')
+      throw StateError('FA07_DESIGN_REVISION_READ_ONLY');
+    if (rev.read<int>('revision') != command.expectedDesignRevision)
+      throw StateError('FA07_DESIGN_REVISION_CONFLICT');
+    final payload = command.contract.toCanonicalValue();
+    final hash = _encoder.sha256(payload);
+    final ref = 'FA07:${command.contract.loopId}:$hash';
+    final existing = await database
+        .customSelect(
+          'SELECT payload_sha256 FROM elv_revision_aggregate_evidence_records WHERE evidence_ref = ?',
+          variables: <Variable>[Variable.withString(ref)],
+        )
+        .getSingleOrNull();
+    if (existing == null) {
+      await runRawStatement(
+        database,
+        'INSERT INTO elv_revision_aggregate_evidence_records (evidence_ref, project_id, design_revision_id, aggregate_kind, aggregate_id, canonical_payload_json, payload_sha256, created_at, origin_device_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        <Variable>[
+          Variable.withString(ref),
+          Variable.withString(command.projectId),
+          Variable.withString(command.designRevisionId),
+          Variable.withString('FA07_TOPOLOGY_CONTRACT'),
+          Variable.withString(command.contract.loopId),
+          Variable.withString(_canonical(payload)),
+          Variable.withString(hash),
+          Variable<DateTime>(now),
+          Variable.withString(originDeviceId),
+        ],
+      );
+    } else if (existing.read<String>('payload_sha256') != hash) {
+      throw StateError('FA07_EVIDENCE_REF_COLLISION:$ref');
+    }
+    final def = <String, Object?>{
+      'policyCode': 'FA07_TOPOLOGY_CONTRACT',
+      'editionId': ref,
+      'contentHash': hash,
+    };
+    final app = <String, Object?>{
+      'scopeKinds': <String>['DESIGN'],
+    };
+    if (command.expectedBindingRevision == null) {
+      final rows = await database
+          .customSelect(
+            'SELECT id, process_codes_json FROM discipline_policy_bindings WHERE project_id = ? AND design_revision_id = ? AND subject_kind = ? AND subject_id = ? AND deleted_at IS NULL',
+            variables: <Variable>[
+              Variable.withString(command.projectId),
+              Variable.withString(command.designRevisionId),
+              Variable.withString('FIRE_LOOP'),
+              Variable.withString(command.contract.loopId),
+            ],
+          )
+          .get();
+      for (final row in rows) {
+        final codes = jsonDecode(row.read<String>('process_codes_json'));
+        if (codes is List && codes.contains('FA-07'))
+          throw StateError(
+            'FA07_ACTIVE_CONTRACT_ALREADY_EXISTS:${row.read<String>('id')}',
+          );
+      }
+      await runRawStatement(
+        database,
+        'INSERT INTO discipline_policy_bindings (project_id, design_revision_id, id, revision, created_at, updated_at, deleted_at, origin_device_id, subject_kind, subject_id, process_codes_json, definition_ref_json, definition_sha256, applicability_json, applicability_sha256) VALUES (?, ?, ?, 1, ?, ?, NULL, ?, ?, ?, ?, ?, ?, ?, ?)',
+        <Variable>[
+          Variable.withString(command.projectId),
+          Variable.withString(command.designRevisionId),
+          Variable.withString(command.bindingId),
+          Variable<DateTime>(now),
+          Variable<DateTime>(now),
+          Variable.withString(originDeviceId),
+          Variable.withString('FIRE_LOOP'),
+          Variable.withString(command.contract.loopId),
+          Variable.withString(_canonical(<String>['FA-07'])),
+          Variable.withString(_canonical(def)),
+          Variable.withString(hash),
+          Variable.withString(_canonical(app)),
+          Variable.withString(_encoder.sha256(app)),
+        ],
+      );
+    } else {
+      final changed = await database.customUpdate(
+        'UPDATE discipline_policy_bindings SET revision = revision + 1, updated_at = ?, origin_device_id = ?, definition_ref_json = ?, definition_sha256 = ?, applicability_json = ?, applicability_sha256 = ? WHERE project_id = ? AND design_revision_id = ? AND id = ? AND subject_kind = ? AND subject_id = ? AND revision = ? AND deleted_at IS NULL',
+        variables: <Variable>[
+          Variable<DateTime>(now),
+          Variable.withString(originDeviceId),
+          Variable.withString(_canonical(def)),
+          Variable.withString(hash),
+          Variable.withString(_canonical(app)),
+          Variable.withString(_encoder.sha256(app)),
+          Variable.withString(command.projectId),
+          Variable.withString(command.designRevisionId),
+          Variable.withString(command.bindingId),
+          Variable.withString('FIRE_LOOP'),
+          Variable.withString(command.contract.loopId),
+          Variable<int>(command.expectedBindingRevision!),
+        ],
+      );
+      if (changed != 1) throw StateError('FA07_CONTRACT_BINDING_CAS_FAILED');
+    }
+    final changedDesign = await database.customUpdate(
+      'UPDATE project_design_revisions SET revision = revision + 1, updated_at = ?, origin_device_id = ? WHERE project_id = ? AND id = ? AND revision = ? AND state = ? AND deleted_at IS NULL',
+      variables: <Variable>[
+        Variable<DateTime>(now),
+        Variable.withString(originDeviceId),
+        Variable.withString(command.projectId),
+        Variable.withString(command.designRevisionId),
+        Variable<int>(command.expectedDesignRevision),
+        Variable.withString('WORKING'),
+      ],
+    );
+    if (changedDesign != 1) throw StateError('FA07_DESIGN_REVISION_CAS_FAILED');
   });
-  String _canonical(Object? value)=>utf8.decode(_encoder.encode(value),allowMalformed:false);
+  String _canonical(Object? value) =>
+      utf8.decode(_encoder.encode(value), allowMalformed: false);
 }
-String _text(Map<String,Object?> map,String key){final v=map[key];if(v is! String||v.trim().isEmpty)throw FormatException('$key must be non-empty text.');return v.trim();}
+
+String _text(Map<String, Object?> map, String key) {
+  final v = map[key];
+  if (v is! String || v.trim().isEmpty)
+    throw FormatException('$key must be non-empty text.');
+  return v.trim();
+}

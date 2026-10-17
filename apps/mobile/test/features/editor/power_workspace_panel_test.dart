@@ -141,22 +141,20 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Builder(
-          builder:
-              (context) => Scaffold(
-                body: Focus(
-                  focusNode: focus,
-                  child: ElevatedButton(
-                    key: const ValueKey('open-power-sheet'),
-                    onPressed:
-                        () => showPowerWorkspaceSheet(
-                          context: context,
-                          restoreFocusTo: focus,
-                          child: const Center(child: Text('Power sheet body')),
-                        ),
-                    child: const Text('Power'),
-                  ),
+          builder: (context) => Scaffold(
+            body: Focus(
+              focusNode: focus,
+              child: ElevatedButton(
+                key: const ValueKey('open-power-sheet'),
+                onPressed: () => showPowerWorkspaceSheet(
+                  context: context,
+                  restoreFocusTo: focus,
+                  child: const Center(child: Text('Power sheet body')),
                 ),
+                child: const Text('Power'),
               ),
+            ),
+          ),
         ),
       ),
     );
@@ -263,10 +261,9 @@ PowerWorkspaceProjection _projection({
       PowerWorkspaceCardProjection(
         code: code,
         title: code.name,
-        summary:
-            code == PowerWorkspaceCardCode.backup
-                ? 'Backup summary'
-                : '${code.name} summary',
+        summary: code == PowerWorkspaceCardCode.backup
+            ? 'Backup summary'
+            : '${code.name} summary',
         currentness: currentness,
       ),
     PowerWorkspaceCardProjection(

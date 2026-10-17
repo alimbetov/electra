@@ -202,77 +202,70 @@ class _PersistedRoomEditorScreenState
                 return geometryAsync.when(
                   loading: () => const _LoadingScaffold(),
                   error: (error, stackTrace) => _ErrorScaffold(error: error),
-                  data:
-                      (geometry) => componentsAsync.when(
-                        loading: () => const _LoadingScaffold(),
-                        error:
-                            (error, stackTrace) => _ErrorScaffold(error: error),
-                        data:
-                            (components) => RoomEditorScreen(
-                              key: ValueKey(room.id),
-                              project: project,
-                              room: room,
-                              geometry: geometry,
-                              components: components,
-                              powerWorkspace: _powerBinding,
-                              powerOverlaySegments: powerOverlaySegments,
-                              powerWorkspaceError: powerWorkspaceError,
-                              engineeringReferences:
-                                  referencesAsync.asData?.value,
-                              engineeringReferenceMessage:
-                                  referencesAsync.hasError
-                                      ? 'Unable to load reference catalogs: ${referencesAsync.error}'
-                                      : 'Loading engineering reference catalogs…',
-                              engineeringTopologyProfiles:
-                                  topologyAsync
-                                      .asData
-                                      ?.value
-                                      .topologyProfiles ??
-                                  const [],
-                              catalogPreferences: ref.watch(
-                                catalogPreferencesRepositoryProvider,
-                              ),
-                              canUndoPlacement: history.canUndo,
-                              canRedoPlacement: history.canRedo,
-                              onUndoPlacement: () => changeHistory(true),
-                              onRedoPlacement: () => changeHistory(false),
-                              onPlaceEngineeringProfile: (command) async {
-                                final placementHistory = history;
-                                final repository = ref.read(
-                                  engineeringPlacementRepositoryProvider,
-                                );
-                                final result = await repository.place(command);
-                                placementHistory.recordEngineering(
-                                  EngineeringPlacementHistoryEntry(
-                                    command: command,
-                                    result: result,
-                                  ),
-                                  repository,
-                                );
-                                await _refreshPowerWorkspace();
-                                if (mounted) setState(() {});
-                                return result;
-                              },
-                              onPlaceComponent: (
-                                definition,
-                                hostSurfacePatchId,
-                                localPosition,
-                              ) async {
-                                final placementHistory = history;
-                                final instance = await ref
-                                    .read(componentPlacementServiceProvider)
-                                    .place(
-                                      roomId: room.id,
-                                      definition: definition,
-                                      hostSurfacePatchId: hostSurfacePatchId,
-                                      localPosition: localPosition,
-                                    );
-                                placementHistory.record(instance);
-                                await _refreshPowerWorkspace();
-                                if (mounted) setState(() {});
-                              },
-                            ),
+                  data: (geometry) => componentsAsync.when(
+                    loading: () => const _LoadingScaffold(),
+                    error: (error, stackTrace) => _ErrorScaffold(error: error),
+                    data: (components) => RoomEditorScreen(
+                      key: ValueKey(room.id),
+                      project: project,
+                      room: room,
+                      geometry: geometry,
+                      components: components,
+                      powerWorkspace: _powerBinding,
+                      powerOverlaySegments: powerOverlaySegments,
+                      powerWorkspaceError: powerWorkspaceError,
+                      engineeringReferences: referencesAsync.asData?.value,
+                      engineeringReferenceMessage: referencesAsync.hasError
+                          ? 'Unable to load reference catalogs: ${referencesAsync.error}'
+                          : 'Loading engineering reference catalogs…',
+                      engineeringTopologyProfiles:
+                          topologyAsync.asData?.value.topologyProfiles ??
+                          const [],
+                      catalogPreferences: ref.watch(
+                        catalogPreferencesRepositoryProvider,
                       ),
+                      canUndoPlacement: history.canUndo,
+                      canRedoPlacement: history.canRedo,
+                      onUndoPlacement: () => changeHistory(true),
+                      onRedoPlacement: () => changeHistory(false),
+                      onPlaceEngineeringProfile: (command) async {
+                        final placementHistory = history;
+                        final repository = ref.read(
+                          engineeringPlacementRepositoryProvider,
+                        );
+                        final result = await repository.place(command);
+                        placementHistory.recordEngineering(
+                          EngineeringPlacementHistoryEntry(
+                            command: command,
+                            result: result,
+                          ),
+                          repository,
+                        );
+                        await _refreshPowerWorkspace();
+                        if (mounted) setState(() {});
+                        return result;
+                      },
+                      onPlaceComponent:
+                          (
+                            definition,
+                            hostSurfacePatchId,
+                            localPosition,
+                          ) async {
+                            final placementHistory = history;
+                            final instance = await ref
+                                .read(componentPlacementServiceProvider)
+                                .place(
+                                  roomId: room.id,
+                                  definition: definition,
+                                  hostSurfacePatchId: hostSurfacePatchId,
+                                  localPosition: localPosition,
+                                );
+                            placementHistory.record(instance);
+                            await _refreshPowerWorkspace();
+                            if (mounted) setState(() {});
+                          },
+                    ),
+                  ),
                 );
               },
             );

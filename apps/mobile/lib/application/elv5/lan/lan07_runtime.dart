@@ -112,7 +112,10 @@ final class Lan07PersistedInputResolver
       );
     }
 
-    final policyRef = _map(aggregate.payload['sparePolicyRef'], 'sparePolicyRef');
+    final policyRef = _map(
+      aggregate.payload['sparePolicyRef'],
+      'sparePolicyRef',
+    );
     if (_text(policyRef, 'policyCode') != contract.policyRef.policyCode ||
         _text(policyRef, 'editionId') != contract.policyRef.editionId ||
         _text(policyRef, 'contentHash').toLowerCase() !=

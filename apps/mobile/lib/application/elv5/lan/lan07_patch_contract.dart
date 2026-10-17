@@ -5,19 +5,19 @@ final class Lan07PolicyRef {
     required String policyCode,
     required String editionId,
     required String contentHash,
-  })  : policyCode = _text(policyCode, 'policyCode'),
-        editionId = _text(editionId, 'editionId'),
-        contentHash = _sha(contentHash, 'contentHash');
+  }) : policyCode = _text(policyCode, 'policyCode'),
+       editionId = _text(editionId, 'editionId'),
+       contentHash = _sha(contentHash, 'contentHash');
 
   final String policyCode;
   final String editionId;
   final String contentHash;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'policyCode': policyCode,
-        'editionId': editionId,
-        'contentHash': contentHash,
-      };
+    'policyCode': policyCode,
+    'editionId': editionId,
+    'contentHash': contentHash,
+  };
 
   factory Lan07PolicyRef.fromMap(Map<String, Object?> map) {
     _exact(map, const {'policyCode', 'editionId', 'contentHash'}, 'policyRef');
@@ -42,26 +42,30 @@ final class Lan07PatchPanelContract {
     required String spareCombinerCode,
     required String panelEvidenceRef,
     required String panelEvidenceContentHash,
-  })  : panelId = _text(panelId, 'panelId'),
-        expectedAggregateFingerprint =
-            _sha(expectedAggregateFingerprint, 'expectedAggregateFingerprint'),
-        policyRef = policyRef,
-        physicalPortIds = Set.unmodifiable(
-          physicalPortIds.map((value) => _text(value, 'physicalPortId')),
-        ),
-        unavailablePortIds = Set.unmodifiable(
-          unavailablePortIds.map((value) => _text(value, 'unavailablePortId')),
-        ),
-        requiredSourceEndpointIds = Set.unmodifiable(
-          requiredSourceEndpointIds.map(
-            (value) => _text(value, 'requiredSourceEndpointId'),
-          ),
-        ),
-        spareRatio = spareRatio,
-        spareCombinerCode = _combiner(spareCombinerCode),
-        panelEvidenceRef = _text(panelEvidenceRef, 'panelEvidenceRef'),
-        panelEvidenceContentHash =
-            _sha(panelEvidenceContentHash, 'panelEvidenceContentHash') {
+  }) : panelId = _text(panelId, 'panelId'),
+       expectedAggregateFingerprint = _sha(
+         expectedAggregateFingerprint,
+         'expectedAggregateFingerprint',
+       ),
+       policyRef = policyRef,
+       physicalPortIds = Set.unmodifiable(
+         physicalPortIds.map((value) => _text(value, 'physicalPortId')),
+       ),
+       unavailablePortIds = Set.unmodifiable(
+         unavailablePortIds.map((value) => _text(value, 'unavailablePortId')),
+       ),
+       requiredSourceEndpointIds = Set.unmodifiable(
+         requiredSourceEndpointIds.map(
+           (value) => _text(value, 'requiredSourceEndpointId'),
+         ),
+       ),
+       spareRatio = spareRatio,
+       spareCombinerCode = _combiner(spareCombinerCode),
+       panelEvidenceRef = _text(panelEvidenceRef, 'panelEvidenceRef'),
+       panelEvidenceContentHash = _sha(
+         panelEvidenceContentHash,
+         'panelEvidenceContentHash',
+       ) {
     if (this.physicalPortIds.isEmpty) {
       throw ArgumentError('LAN07 physical port inventory must not be empty.');
     }
@@ -88,53 +92,56 @@ final class Lan07PatchPanelContract {
   final String panelEvidenceContentHash;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'schema': schema,
-        'panelId': panelId,
-        'expectedAggregateFingerprint': expectedAggregateFingerprint,
-        'policyRef': policyRef.toCanonicalValue(),
-        'physicalPortIds': physicalPortIds.toList()..sort(),
-        'unavailablePortIds': unavailablePortIds.toList()..sort(),
-        'requiredSourceEndpointIds': requiredSourceEndpointIds.toList()..sort(),
-        'absoluteMinimumSpare': absoluteMinimumSpare,
-        'spareRatio': spareRatio.toMap(),
-        'spareCombinerCode': spareCombinerCode,
-        'panelEvidenceRef': panelEvidenceRef,
-        'panelEvidenceContentHash': panelEvidenceContentHash,
-      };
+    'schema': schema,
+    'panelId': panelId,
+    'expectedAggregateFingerprint': expectedAggregateFingerprint,
+    'policyRef': policyRef.toCanonicalValue(),
+    'physicalPortIds': physicalPortIds.toList()..sort(),
+    'unavailablePortIds': unavailablePortIds.toList()..sort(),
+    'requiredSourceEndpointIds': requiredSourceEndpointIds.toList()..sort(),
+    'absoluteMinimumSpare': absoluteMinimumSpare,
+    'spareRatio': spareRatio.toMap(),
+    'spareCombinerCode': spareCombinerCode,
+    'panelEvidenceRef': panelEvidenceRef,
+    'panelEvidenceContentHash': panelEvidenceContentHash,
+  };
 
   factory Lan07PatchPanelContract.fromMap(Map<String, Object?> map) {
-    _exact(
-      map,
-      const {
-        'schema',
-        'panelId',
-        'expectedAggregateFingerprint',
-        'policyRef',
-        'physicalPortIds',
-        'unavailablePortIds',
-        'requiredSourceEndpointIds',
-        'absoluteMinimumSpare',
-        'spareRatio',
-        'spareCombinerCode',
-        'panelEvidenceRef',
-        'panelEvidenceContentHash',
-      },
-      'LAN07 contract',
-    );
+    _exact(map, const {
+      'schema',
+      'panelId',
+      'expectedAggregateFingerprint',
+      'policyRef',
+      'physicalPortIds',
+      'unavailablePortIds',
+      'requiredSourceEndpointIds',
+      'absoluteMinimumSpare',
+      'spareRatio',
+      'spareCombinerCode',
+      'panelEvidenceRef',
+      'panelEvidenceContentHash',
+    }, 'LAN07 contract');
     if (map['schema'] != schema) {
       throw const FormatException('Unsupported LAN07 contract schema.');
     }
     final absoluteMinimumSpare = map['absoluteMinimumSpare'];
     if (absoluteMinimumSpare is! int) {
-      throw const FormatException('LAN07 absoluteMinimumSpare must be integer.');
+      throw const FormatException(
+        'LAN07 absoluteMinimumSpare must be integer.',
+      );
     }
     return Lan07PatchPanelContract(
       panelId: _mapText(map, 'panelId'),
-      expectedAggregateFingerprint: _mapText(map, 'expectedAggregateFingerprint'),
+      expectedAggregateFingerprint: _mapText(
+        map,
+        'expectedAggregateFingerprint',
+      ),
       policyRef: Lan07PolicyRef.fromMap(_map(map['policyRef'], 'policyRef')),
       physicalPortIds: _strings(map['physicalPortIds'], 'physicalPortIds'),
-      unavailablePortIds:
-          _strings(map['unavailablePortIds'], 'unavailablePortIds'),
+      unavailablePortIds: _strings(
+        map['unavailablePortIds'],
+        'unavailablePortIds',
+      ),
       requiredSourceEndpointIds: _strings(
         map['requiredSourceEndpointIds'],
         'requiredSourceEndpointIds',

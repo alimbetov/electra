@@ -17,17 +17,12 @@ final class DriftElv5CalculationWriteUnitOfWork
   @override
   Future<T> run<T>(
     Future<T> Function(Elv5CalculationWriteSession session) action,
-  ) => DriftElv5RuntimeWriteUnitOfWork(
-    database,
-    originDeviceId: originDeviceId,
-  ).run((runtime) async {
-    return action(
-      _Session(
-        runtime,
-        publicationGuards: _GuardStore(database),
-      ),
-    );
-  });
+  ) => DriftElv5RuntimeWriteUnitOfWork(database, originDeviceId: originDeviceId)
+      .run((runtime) async {
+        return action(
+          _Session(runtime, publicationGuards: _GuardStore(database)),
+        );
+      });
 }
 
 final class _Session implements Elv5CalculationWriteSession {

@@ -10,7 +10,8 @@ import '../../database/app_database.dart';
 ///
 /// This intentionally repeats the identity/hash checks used by ELV4
 /// qualification rather than trusting a row merely because it exists.
-final class DriftElv4CurrentEvidenceSource implements Elv4CurrentEvidenceSource {
+final class DriftElv4CurrentEvidenceSource
+    implements Elv4CurrentEvidenceSource {
   const DriftElv4CurrentEvidenceSource(this.database);
 
   final AppDatabase database;
@@ -26,26 +27,28 @@ final class DriftElv4CurrentEvidenceSource implements Elv4CurrentEvidenceSource 
     String? subjectKind,
     String? subjectId,
   }) async {
-    final rows = await database.customSelect(
-      'SELECT e.logical_node_key_json, e.logical_node_key_sha256, '
-      'e.evaluation_id, e.input_fingerprint, e.evidence_json, '
-      'e.evidence_sha256, p.generation, p.state AS pointer_state, '
-      'p.evaluation_id AS pointer_evaluation_id, '
-      'p.evidence_sha256 AS pointer_evidence_sha256 '
-      'FROM power_evaluation_records e '
-      'JOIN power_evaluation_pointers p '
-      'ON p.project_id = e.project_id '
-      'AND p.design_revision_id = e.design_revision_id '
-      'AND p.logical_node_key_sha256 = e.logical_node_key_sha256 '
-      'WHERE e.project_id = ? AND e.design_revision_id = ? '
-      'AND e.process_code = ? AND p.state = ?',
-      variables: <Variable>[
-        Variable.withString(projectId),
-        Variable.withString(designRevisionId),
-        Variable.withString(_wire(processCode)),
-        Variable.withString('CURRENT'),
-      ],
-    ).get();
+    final rows = await database
+        .customSelect(
+          'SELECT e.logical_node_key_json, e.logical_node_key_sha256, '
+          'e.evaluation_id, e.input_fingerprint, e.evidence_json, '
+          'e.evidence_sha256, p.generation, p.state AS pointer_state, '
+          'p.evaluation_id AS pointer_evaluation_id, '
+          'p.evidence_sha256 AS pointer_evidence_sha256 '
+          'FROM power_evaluation_records e '
+          'JOIN power_evaluation_pointers p '
+          'ON p.project_id = e.project_id '
+          'AND p.design_revision_id = e.design_revision_id '
+          'AND p.logical_node_key_sha256 = e.logical_node_key_sha256 '
+          'WHERE e.project_id = ? AND e.design_revision_id = ? '
+          'AND e.process_code = ? AND p.state = ?',
+          variables: <Variable>[
+            Variable.withString(projectId),
+            Variable.withString(designRevisionId),
+            Variable.withString(_wire(processCode)),
+            Variable.withString('CURRENT'),
+          ],
+        )
+        .get();
 
     final result = <Elv4CurrentEvaluationSnapshot>[];
     for (final row in rows) {
@@ -67,7 +70,9 @@ final class DriftElv4CurrentEvidenceSource implements Elv4CurrentEvidenceSource 
       final evidenceSha = row.read<String>('evidence_sha256');
       if (row.readNullable<String>('pointer_evaluation_id') != evaluationId ||
           row.readNullable<String>('pointer_evidence_sha256') != evidenceSha) {
-        throw StateError('ELV4_CURRENT_POINTER_IDENTITY_MISMATCH:$evaluationId');
+        throw StateError(
+          'ELV4_CURRENT_POINTER_IDENTITY_MISMATCH:$evaluationId',
+        );
       }
 
       final evidenceJson = row.read<String>('evidence_json');
@@ -85,10 +90,14 @@ final class DriftElv4CurrentEvidenceSource implements Elv4CurrentEvidenceSource 
           canonicalEngineeringJsonV1(embeddedNode) != nodeJson ||
           evidence['evaluationId'] != evaluationId ||
           evidence['inputFingerprint'] != inputFingerprint) {
-        throw StateError('ELV4_CURRENT_EMBEDDED_IDENTITY_MISMATCH:$evaluationId');
+        throw StateError(
+          'ELV4_CURRENT_EMBEDDED_IDENTITY_MISMATCH:$evaluationId',
+        );
       }
       if (!RegExp(r'^[a-f0-9]{64}$').hasMatch(inputFingerprint)) {
-        throw StateError('ELV4_CURRENT_INPUT_FINGERPRINT_INVALID:$evaluationId');
+        throw StateError(
+          'ELV4_CURRENT_INPUT_FINGERPRINT_INVALID:$evaluationId',
+        );
       }
 
       result.add(

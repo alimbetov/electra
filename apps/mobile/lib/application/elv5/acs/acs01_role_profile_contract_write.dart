@@ -9,7 +9,9 @@ final class ReplaceAcs01RoleProfileContractCommand {
     required this.expectedBindingRevision,
     required this.contract,
   }) {
-    if (projectId.trim().isEmpty || designRevisionId.trim().isEmpty || bindingId.trim().isEmpty) {
+    if (projectId.trim().isEmpty ||
+        designRevisionId.trim().isEmpty ||
+        bindingId.trim().isEmpty) {
       throw ArgumentError('ACS01 contract command identity is required.');
     }
     if (expectedDesignRevision < 1 ||

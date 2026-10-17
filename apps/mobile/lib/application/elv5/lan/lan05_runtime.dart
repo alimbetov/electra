@@ -52,7 +52,9 @@ final class Lan05PersistedInputResolver
       subjectId: request.subject.id,
     );
     if (optical == null || composition == null) {
-      throw StateError('LAN05_REQUIRED_LINK_FACTS_MISSING:${request.subject.id}');
+      throw StateError(
+        'LAN05_REQUIRED_LINK_FACTS_MISSING:${request.subject.id}',
+      );
     }
     final linkId = _text(optical.payload, 'linkId');
     if (linkId != request.subject.id ||
@@ -108,7 +110,9 @@ final class Lan05PersistedInputResolver
         );
       } on StateError catch (error) {
         final message = error.message.toString();
-        if (message.startsWith('ELV3_REALIZED_SECTION_EXACT_RESERVE_REQUIRED') ||
+        if (message.startsWith(
+              'ELV3_REALIZED_SECTION_EXACT_RESERVE_REQUIRED',
+            ) ||
             message.startsWith(
               'ELV3_REALIZED_SECTION_ALLOWANCE_PROVENANCE_REQUIRED',
             )) {
@@ -201,10 +205,8 @@ final class Lan05PersistedInputResolver
       sectionEvidence.add(<String, Object?>{
         'sectionId': sectionId,
         'lengthFingerprint': lengthFact.sourceFingerprint,
-        'forwardAttenuationFingerprint':
-            forwardAttenuation.evidenceFingerprint,
-        'reverseAttenuationFingerprint':
-            reverseAttenuation.evidenceFingerprint,
+        'forwardAttenuationFingerprint': forwardAttenuation.evidenceFingerprint,
+        'reverseAttenuationFingerprint': reverseAttenuation.evidenceFingerprint,
       });
       dependencies.addAll(<Elv5DependencyMarker>[
         _dependency(
@@ -345,8 +347,9 @@ Elv5PureKernelExecutor<Lan05Input, Lan05Result> buildLan05Executor({
     'sectionEvidenceSchema': 'electra.elv5-optical-fiber-evidence.v1',
   },
   executionOf: (_) => Elv5Execution.succeeded,
-  completionOf: (result) =>
-      result.passes == null ? Elv5Completion.incomplete : Elv5Completion.complete,
+  completionOf: (result) => result.passes == null
+      ? Elv5Completion.incomplete
+      : Elv5Completion.complete,
   assessmentOf: (result) => switch (result.passes) {
     true => Elv5Assessment.pass,
     false => Elv5Assessment.fail,

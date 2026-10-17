@@ -21,11 +21,10 @@ enum EngineeringPlacementFailurePoint {
   beforeCommit,
 }
 
-typedef EngineeringPlacementFault =
-    FutureOr<void> Function(
-      EngineeringPlacementFailurePoint point,
-      String? portCode,
-    );
+typedef EngineeringPlacementFault = FutureOr<void> Function(
+  EngineeringPlacementFailurePoint point,
+  String? portCode,
+);
 
 /// All methods run inside the placement owner's transaction. No public save/bind
 /// repositories are composed, and this helper never opens a transaction.
@@ -57,8 +56,9 @@ final class DriftEngineeringPlacementAggregate {
         code: EngineeringPlacementFailureCode.profileDeprecated,
         message: 'Deprecated profiles cannot be placed.',
       );
-    final codes =
-        profile.portTemplates.map((p) => p.code.trim().toUpperCase()).toList();
+    final codes = profile.portTemplates
+        .map((p) => p.code.trim().toUpperCase())
+        .toList();
     if (codes.toSet().length != codes.length)
       throw EngineeringPlacementFailure(
         code: EngineeringPlacementFailureCode.portConflict,
@@ -69,12 +69,13 @@ final class DriftEngineeringPlacementAggregate {
     if (ref != null) {
       final row =
           await (database.select(database.engineeringTopologyProfiles)..where(
-            (r) =>
-                r.id.equals(ref.id) &
-                r.projectId.equals(command.projectId) &
-                r.profileVersion.equals(ref.version) &
-                r.deletedAt.isNull(),
-          )).getSingleOrNull();
+                (r) =>
+                    r.id.equals(ref.id) &
+                    r.projectId.equals(command.projectId) &
+                    r.profileVersion.equals(ref.version) &
+                    r.deletedAt.isNull(),
+              ))
+              .getSingleOrNull();
       TopologyShape? shape;
       if (row != null) {
         final topology = TopologyProfile.fromMap(
@@ -105,10 +106,9 @@ final class DriftEngineeringPlacementAggregate {
     );
     if (!result.compatible)
       throw EngineeringPlacementFailure(
-        code:
-            result.status == PlacementCompatibilityStatus.forbidden
-                ? EngineeringPlacementFailureCode.placementForbidden
-                : EngineeringPlacementFailureCode.placementUnresolved,
+        code: result.status == PlacementCompatibilityStatus.forbidden
+            ? EngineeringPlacementFailureCode.placementForbidden
+            : EngineeringPlacementFailureCode.placementUnresolved,
         message: 'Current placement evidence is ${result.status.name}.',
         findings: result.findings,
       );
@@ -129,16 +129,16 @@ final class DriftEngineeringPlacementAggregate {
     PlacementCandidateContext context,
     DateTime now,
   ) async {
-    if ((await (database.select(database.componentReferenceBindings)
-          ..where((r) => r.componentId.equals(componentId))).get())
-        .isNotEmpty)
+    if ((await (database.select(
+      database.componentReferenceBindings,
+    )..where((r) => r.componentId.equals(componentId))).get()).isNotEmpty)
       throw EngineeringPlacementFailure(
         code: EngineeringPlacementFailureCode.bindingConflict,
         message: 'Binding identity already exists.',
       );
-    if ((await (database.select(database.engineeringPortInstances)
-          ..where((r) => r.componentId.equals(componentId))).get())
-        .isNotEmpty)
+    if ((await (database.select(
+      database.engineeringPortInstances,
+    )..where((r) => r.componentId.equals(componentId))).get()).isNotEmpty)
       throw EngineeringPlacementFailure(
         code: EngineeringPlacementFailureCode.portConflict,
         message: 'Manual or retired port identities already exist.',
@@ -176,9 +176,9 @@ final class DriftEngineeringPlacementAggregate {
           ..sort((a, b) => a.code.compareTo(b.code));
     for (final port in ports) {
       await hit(EngineeringPlacementFailurePoint.beforePort, port.code);
-      final old =
-          await (database.select(database.engineeringPortInstances)
-            ..where((r) => r.id.equals(port.id))).getSingleOrNull();
+      final old = await (database.select(
+        database.engineeringPortInstances,
+      )..where((r) => r.id.equals(port.id))).getSingleOrNull();
       if (old != null || port.validate().isNotEmpty)
         throw EngineeringPlacementFailure(
           code: EngineeringPlacementFailureCode.portConflict,
@@ -239,21 +239,24 @@ final class DriftEngineeringPlacementAggregate {
     List<EngineeringPort> ports,
   ) async {
     final component =
-        await (database.select(database.componentInstances)..where(
-          (r) => r.id.equals(componentId) & r.deletedAt.isNull(),
-        )).getSingle();
+        await (database.select(database.componentInstances)
+              ..where((r) => r.id.equals(componentId) & r.deletedAt.isNull()))
+            .getSingle();
     final members =
         await (database.select(database.componentEngineeringMemberships)..where(
-          (r) => r.componentId.equals(componentId) & r.deletedAt.isNull(),
-        )).get();
+              (r) => r.componentId.equals(componentId) & r.deletedAt.isNull(),
+            ))
+            .get();
     final rows =
         await (database.select(database.engineeringPortInstances)..where(
-          (r) => r.componentId.equals(componentId) & r.deletedAt.isNull(),
-        )).get();
+              (r) => r.componentId.equals(componentId) & r.deletedAt.isNull(),
+            ))
+            .get();
     final row =
         await (database.select(database.componentReferenceBindings)..where(
-          (r) => r.componentId.equals(componentId) & r.deletedAt.isNull(),
-        )).getSingle();
+              (r) => r.componentId.equals(componentId) & r.deletedAt.isNull(),
+            ))
+            .getSingle();
     final binding = ComponentReferenceBinding.fromMap(
       jsonDecode(row.payloadJson) as Map<String, dynamic>,
     );
@@ -316,32 +319,32 @@ final class DriftEngineeringPlacementAggregate {
   }) async {
     final result = <String, Object?>{};
     for (final e in aggregateTables.entries) {
-      final rows =
-          await database
-              .customSelect(
-                'SELECT * FROM ${e.key} WHERE ${e.value} = ? AND deleted_at IS ${retired ? 'NOT ' : ''}NULL',
-                variables: [Variable.withString(componentId)],
-                readsFrom: database.allTables.toSet(),
-              )
-              .get();
+      final rows = await database
+          .customSelect(
+            'SELECT * FROM ${e.key} WHERE ${e.value} = ? AND deleted_at IS ${retired ? 'NOT ' : ''}NULL',
+            variables: [Variable.withString(componentId)],
+            readsFrom: database.allTables.toSet(),
+          )
+          .get();
       final values =
           rows
               .map(
-                (r) => Map<String, Object?>.from(r.data)..removeWhere(
-                  (k, _) => [
-                    'revision',
-                    'created_at',
-                    'updated_at',
-                    'deleted_at',
-                    'origin_device_id',
-                  ].contains(k),
-                ),
+                (r) => Map<String, Object?>.from(r.data)
+                  ..removeWhere(
+                    (k, _) => [
+                      'revision',
+                      'created_at',
+                      'updated_at',
+                      'deleted_at',
+                      'origin_device_id',
+                    ].contains(k),
+                  ),
               )
               .toList()
             ..sort(
-              (a, b) => canonicalEngineeringJson(
-                a,
-              ).compareTo(canonicalEngineeringJson(b)),
+              (a, b) =>
+                  canonicalEngineeringJson(a)
+                      .compareTo(canonicalEngineeringJson(b)),
             );
       result[e.key] = values;
     }
@@ -352,25 +355,28 @@ final class DriftEngineeringPlacementAggregate {
     final ids = result.portIds;
     final connections =
         await (database.select(database.engineeringPortConnections)..where(
-          (r) =>
-              r.deletedAt.isNull() &
-              (r.fromPortId.isIn(ids) | r.toPortId.isIn(ids)),
-        )).get();
+              (r) =>
+                  r.deletedAt.isNull() &
+                  (r.fromPortId.isIn(ids) | r.toPortId.isIn(ids)),
+            ))
+            .get();
     final mappings =
         await (database.select(database.engineeringInternalMappings)..where(
-          (r) =>
-              r.deletedAt.isNull() &
-              (r.fromPortId.isIn(ids) | r.toPortId.isIn(ids)),
-        )).get();
+              (r) =>
+                  r.deletedAt.isNull() &
+                  (r.fromPortId.isIn(ids) | r.toPortId.isIn(ids)),
+            ))
+            .get();
     final groups =
         await (database.select(database.engineeringTopologyGroups)..where(
-          (r) =>
-              r.deletedAt.isNull() &
-              (r.startPortId.isIn(ids) | r.endPortId.isIn(ids)),
-        )).get();
-    final assemblies =
-        await (database.select(database.engineeringComponentAssemblies)
-          ..where((r) => r.deletedAt.isNull())).get();
+              (r) =>
+                  r.deletedAt.isNull() &
+                  (r.startPortId.isIn(ids) | r.endPortId.isIn(ids)),
+            ))
+            .get();
+    final assemblies = await (database.select(
+      database.engineeringComponentAssemblies,
+    )..where((r) => r.deletedAt.isNull())).get();
     if (connections.isNotEmpty ||
         mappings.isNotEmpty ||
         groups.isNotEmpty ||
@@ -381,8 +387,7 @@ final class DriftEngineeringPlacementAggregate {
         )) {
       throw EngineeringPlacementFailure(
         code: EngineeringPlacementFailureCode.historyConflict,
-        message:
-            'Resolve later connections, mappings, groups or assemblies before undo/redo.',
+        message: 'Resolve later connections, mappings, groups or assemblies before undo/redo.',
       );
     }
     // Also guard later physical/electrical ownership through declared component FKs.
@@ -390,24 +395,20 @@ final class DriftEngineeringPlacementAggregate {
       if (aggregateTables.containsKey(table.actualTableName) ||
           table.actualTableName == 'engineering_placement_operations')
         continue;
-      final fks =
-          await database
-              .customSelect(
-                'PRAGMA foreign_key_list("${table.actualTableName}")',
-              )
-              .get();
+      final fks = await database
+          .customSelect('PRAGMA foreign_key_list("${table.actualTableName}")')
+          .get();
       for (final fk in fks.where(
         (r) => r.read<String>('table') == 'component_instances',
       )) {
         final column = fk.read<String>('from');
         final hasDeleted = table.$columns.any((c) => c.$name == 'deleted_at');
-        final refs =
-            await database
-                .customSelect(
-                  'SELECT 1 FROM "${table.actualTableName}" WHERE "$column" = ?${hasDeleted ? ' AND deleted_at IS NULL' : ''} LIMIT 1',
-                  variables: [Variable.withString(result.componentId)],
-                )
-                .get();
+        final refs = await database
+            .customSelect(
+              'SELECT 1 FROM "${table.actualTableName}" WHERE "$column" = ?${hasDeleted ? ' AND deleted_at IS NULL' : ''} LIMIT 1',
+              variables: [Variable.withString(result.componentId)],
+            )
+            .get();
         if (refs.isNotEmpty)
           throw EngineeringPlacementFailure(
             code: EngineeringPlacementFailureCode.historyConflict,
@@ -424,14 +425,12 @@ final class DriftEngineeringPlacementAggregate {
     required DateTime now,
   }) async {
     for (final e in aggregateTables.entries.toList().reversed) {
-      final portFilter =
-          e.key == 'engineering_port_instances'
-              ? ' AND id IN (${List.filled(result.portIds.length, '?').join(',')})'
-              : '';
-      final memberFilter =
-          e.key == 'component_engineering_memberships'
-              ? ' AND system_id = ?'
-              : '';
+      final portFilter = e.key == 'engineering_port_instances'
+          ? ' AND id IN (${List.filled(result.portIds.length, '?').join(',')})'
+          : '';
+      final memberFilter = e.key == 'component_engineering_memberships'
+          ? ' AND system_id = ?'
+          : '';
       await database.customUpdate(
         'UPDATE ${e.key} SET deleted_at = ?, updated_at = ?, revision = revision + 1, origin_device_id = ? WHERE ${e.value} = ?$portFilter$memberFilter',
         variables: [

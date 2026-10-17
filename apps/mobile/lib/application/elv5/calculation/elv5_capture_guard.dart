@@ -52,9 +52,7 @@ final class Elv5RevisionGuardedInputResolver<I>
       );
       if (before != after) {
         if (attempt == 0) continue;
-        throw StateError(
-          'ELV5_CAPTURE_CHANGED_DURING_READ:$before:$after',
-        );
+        throw StateError('ELV5_CAPTURE_CHANGED_DURING_READ:$before:$after');
       }
 
       if (blocked != null) {

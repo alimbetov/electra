@@ -11,7 +11,8 @@ import '../../database/app_database.dart';
 import '../../database/drift_raw_statement.dart';
 import 'drift_elv5_replacement_write_unit_of_work.dart';
 
-final class DriftElv5PolicyWriteUnitOfWork implements Elv5PolicyWriteUnitOfWork {
+final class DriftElv5PolicyWriteUnitOfWork
+    implements Elv5PolicyWriteUnitOfWork {
   const DriftElv5PolicyWriteUnitOfWork(
     this.database, {
     required this.originDeviceId,
@@ -241,8 +242,6 @@ final class _DriftElv5PolicyMutationStore implements Elv5PolicyMutationStore {
     if (changed != 1) throw StateError('ELV5_POLICY_ROOT_CAS_CONFLICT');
   }
 
-  String _canonicalJson(Object? value) => utf8.decode(
-    _encoder.encode(value),
-    allowMalformed: false,
-  );
+  String _canonicalJson(Object? value) =>
+      utf8.decode(_encoder.encode(value), allowMalformed: false);
 }

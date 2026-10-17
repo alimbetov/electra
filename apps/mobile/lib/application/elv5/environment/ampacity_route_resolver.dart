@@ -57,7 +57,11 @@ final class Elv5AmpacityRouteResolver {
     required String designRevisionId,
     required String cableRunId,
   }) async {
-    final run = await cableRuns.findRun(projectId, designRevisionId, cableRunId);
+    final run = await cableRuns.findRun(
+      projectId,
+      designRevisionId,
+      cableRunId,
+    );
     if (run == null || run.state != CanonicalCableRunState.active) {
       throw Elv5AmpacityRouteResolutionException(
         'ELV5_AMPACITY_ACTIVE_CABLE_RUN_REQUIRED',
@@ -72,7 +76,8 @@ final class Elv5AmpacityRouteResolver {
         <String, Object?>{'cableRunId': cableRunId},
       );
     }
-    final ordered = [...traversals]..sort((a, b) => a.sequence.compareTo(b.sequence));
+    final ordered = [...traversals]
+      ..sort((a, b) => a.sequence.compareTo(b.sequence));
 
     final sections = <Elv5RouteAmpacitySectionInput>[];
     for (final traversal in ordered) {
@@ -114,10 +119,12 @@ final class Elv5AmpacityRouteResolver {
           'ELV5_AMPACITY_TEMPERATURE_EVIDENCE_SCOPE_MISMATCH',
           <String, Object?>{
             'routeSectionId': traversal.routeSegmentId,
-            'profileMaximumC':
-                environment.binding.profile.temperatureC.maximum.toMap(),
-            'correctionTemperatureC':
-                evidence.temperatureCorrection.actualAmbientTemperatureC.toMap(),
+            'profileMaximumC': environment.binding.profile.temperatureC.maximum
+                .toMap(),
+            'correctionTemperatureC': evidence
+                .temperatureCorrection
+                .actualAmbientTemperatureC
+                .toMap(),
           },
         );
       }

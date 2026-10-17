@@ -42,11 +42,14 @@ final class Elv5CalculationService {
 
   Future<Elv5CalculationResult> execute(Elv5WireCommandEnvelope command) async {
     if (command.operation != 'CALCULATE_DISCIPLINE_PROCESS') {
-      throw FormatException('Unsupported calculation operation: ${command.operation}.');
+      throw FormatException(
+        'Unsupported calculation operation: ${command.operation}.',
+      );
     }
 
     final preflightReplay = await publicationUnitOfWork.run(
-      (session) => session.commandLedger.find(command.projectId, command.commandId),
+      (session) =>
+          session.commandLedger.find(command.projectId, command.commandId),
     );
     if (preflightReplay != null) {
       _verifyReplay(command, preflightReplay);
@@ -110,13 +113,10 @@ final class Elv5CalculationService {
         );
       }
       if (guard.rowRevision != command.expectedDesignRowRevision) {
-        throw Elv5ReplacementCommandException(
-          'ELV5_DESIGN_REVISION_CONFLICT',
-          {
-            'expected': command.expectedDesignRowRevision,
-            'actual': guard.rowRevision,
-          },
-        );
+        throw Elv5ReplacementCommandException('ELV5_DESIGN_REVISION_CONFLICT', {
+          'expected': command.expectedDesignRowRevision,
+          'actual': guard.rowRevision,
+        });
       }
       for (final input in captured) {
         if (input.captureRevision != guard.rowRevision) {
@@ -137,7 +137,8 @@ final class Elv5CalculationService {
           command,
           evaluation.nodeKeySha256,
         );
-        final actual = existingPointers[evaluation.nodeKeySha256]?.generation ?? 0;
+        final actual =
+            existingPointers[evaluation.nodeKeySha256]?.generation ?? 0;
         if (expected != actual) {
           throw Elv5ReplacementCommandException(
             'ELV5_POINTER_GENERATION_CONFLICT',
@@ -205,10 +206,7 @@ final class Elv5CalculationService {
           originDeviceId: originDeviceId,
         ),
       );
-      return Elv5CalculationResult(
-        replayed: false,
-        logicalResultJson: logical,
-      );
+      return Elv5CalculationResult(replayed: false, logicalResultJson: logical);
     });
   }
 
@@ -268,7 +266,9 @@ final class Elv5CalculationService {
         );
       }
     }
-    requests.sort((a, b) => _nodeHash(a.nodeKey).compareTo(_nodeHash(b.nodeKey)));
+    requests.sort(
+      (a, b) => _nodeHash(a.nodeKey).compareTo(_nodeHash(b.nodeKey)),
+    );
     return requests;
   }
 
@@ -317,13 +317,14 @@ final class Elv5CalculationService {
               'nodeKeySha256': evaluation.nodeKeySha256,
               'evaluationId': evaluation.evaluationId,
               'evaluationIdentitySchema': evaluation.evaluationIdentitySchema,
-              'qualificationIdentitySha256':
-                  evaluation.qualificationIdentity?.canonicalSha256(),
+              'qualificationIdentitySha256': evaluation.qualificationIdentity
+                  ?.canonicalSha256(),
               'outputSha256': evaluation.outputSha256,
               'assessment': evaluation.assessment.name.toUpperCase(),
               'completion': evaluation.completion.name.toUpperCase(),
               'execution': evaluation.execution.name.toUpperCase(),
-              'publishedCurrent': evaluation.nodeKey.scope.scenarioKey == 'NONE',
+              'publishedCurrent':
+                  evaluation.nodeKey.scope.scenarioKey == 'NONE',
             },
         ],
       }),

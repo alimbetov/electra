@@ -114,7 +114,8 @@ final class Acs04PersistedInputResolver
           dependencies,
           <String, Object?>{
             'caseId': sourceCase.caseId,
-            'expectedInputFingerprint': sourceCase.expectedPwr02InputFingerprint,
+            'expectedInputFingerprint':
+                sourceCase.expectedPwr02InputFingerprint,
             'actualInputFingerprint': pwr02.inputFingerprint,
             'evaluationId': pwr02.evaluationId,
           },
@@ -125,9 +126,8 @@ final class Acs04PersistedInputResolver
       final pwr02Inputs = _map(pwr02.evidence['inputs'], 'PWR02 inputs');
       final pwr02Output = pwr02.output;
       final dimensionWire = _text(pwr02Inputs, 'dimension');
-      final expectedDimension = sourceCase.dimension == Acs04SourceDimension.watt
-          ? 'WATT'
-          : 'AMPERE';
+      final expectedDimension =
+          sourceCase.dimension == Acs04SourceDimension.watt ? 'WATT' : 'AMPERE';
       if (dimensionWire != expectedDimension) {
         _blocked(
           request,
@@ -161,9 +161,9 @@ final class Acs04PersistedInputResolver
       }
 
       final pwr01Demand = _powerRational(
-        pwr01Output[
-          sourceCase.dimension == Acs04SourceDimension.watt ? 'knownW' : 'knownA'
-        ],
+        pwr01Output[sourceCase.dimension == Acs04SourceDimension.watt
+            ? 'knownW'
+            : 'knownA'],
         'PWR01 demand',
       );
       final pwr02Demand = _powerRational(pwr02Inputs['demand'], 'PWR02 demand');
@@ -182,8 +182,14 @@ final class Acs04PersistedInputResolver
         );
       }
 
-      final required = _powerRational(pwr02Output['required'], 'PWR02 required');
-      final available = _powerRational(pwr02Output['available'], 'PWR02 available');
+      final required = _powerRational(
+        pwr02Output['required'],
+        'PWR02 required',
+      );
+      final available = _powerRational(
+        pwr02Output['available'],
+        'PWR02 available',
+      );
       final dimensionStatus = pwr02Output['dimensionStatus'];
       if (dimensionStatus != 'PASS' && dimensionStatus != 'FAIL') {
         _blocked(
@@ -234,7 +240,8 @@ final class Acs04PersistedInputResolver
         'demand': pwr02Demand.toMap(),
       });
       for (final snapshot in <Elv4CurrentEvaluationSnapshot>[pwr01, pwr02]) {
-        upstreamGenerations[snapshot.nodeKey.sha256] = snapshot.pointerGeneration;
+        upstreamGenerations[snapshot.nodeKey.sha256] =
+            snapshot.pointerGeneration;
         dependencies.add(
           _dependency(
             request,
@@ -267,7 +274,8 @@ final class Acs04PersistedInputResolver
       expectedRequirementSetFingerprint: requirementSetFingerprint,
       pwr02RequirementSetFingerprint: requirementSetFingerprint,
       requirementContributors: <String>[
-        for (final contributor in contract.contributors) contributor.contributorId,
+        for (final contributor in contract.contributors)
+          contributor.contributorId,
       ],
       powerCases: powerCases,
       currentCases: currentCases,
@@ -279,8 +287,9 @@ final class Acs04PersistedInputResolver
       'requirementSetFingerprint': requirementSetFingerprint,
       'upstream': upstreamBasis
         ..sort(
-          (a, b) => (a['evaluationId']! as String)
-              .compareTo(b['evaluationId']! as String),
+          (a, b) => (a['evaluationId']! as String).compareTo(
+            b['evaluationId']! as String,
+          ),
         ),
     });
 
@@ -338,7 +347,9 @@ final class Acs04PersistedInputResolver
 
   String _demandFingerprint(List<Map<String, Object?>> values) {
     final canonical = [...values]
-      ..sort((a, b) => (a['caseId']! as String).compareTo(b['caseId']! as String));
+      ..sort(
+        (a, b) => (a['caseId']! as String).compareTo(b['caseId']! as String),
+      );
     return _encoder.sha256(<String, Object?>{
       'schema': 'electra.elv5-acs04-global-demand-closure.v1',
       'cases': canonical,
@@ -426,10 +437,12 @@ Elv5PureKernelExecutor<Acs04Input, Acs04Result> buildAcs04Executor({
   },
   encodeEvidence: (captured, _) => <String, Object?>{
     'schema': 'electra.elv5-acs04-evidence.v1',
-    'source': 'VERIFIED_CURRENT_PWR01_PWR02_PLUS_EXACT_REQUIREMENT_SET_CONTRACT',
+    'source':
+        'VERIFIED_CURRENT_PWR01_PWR02_PLUS_EXACT_REQUIREMENT_SET_CONTRACT',
     'captureRevision': captured.captureRevision,
     'upstreamPointerGenerations': captured.upstreamPointerGenerations,
-    'requirementSetFingerprint': captured.value.expectedRequirementSetFingerprint,
+    'requirementSetFingerprint':
+        captured.value.expectedRequirementSetFingerprint,
     'globalDemandFingerprint': captured.value.expectedGlobalDemandFingerprint,
   },
   executionOf: (result) => result.status == Acs04AssessmentStatus.blocked

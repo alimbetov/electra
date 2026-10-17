@@ -108,7 +108,10 @@ final class Acs06PersistedInputResolver
       );
     }
 
-    final persistedProfile = _map(payload['topologyProfileRef'], 'topologyProfileRef');
+    final persistedProfile = _map(
+      payload['topologyProfileRef'],
+      'topologyProfileRef',
+    );
     final actualProfile = <String, Object?>{
       'profileCode': _text(persistedProfile, 'profileCode'),
       'editionId': _text(persistedProfile, 'editionId'),
@@ -181,7 +184,10 @@ final class Acs06PersistedInputResolver
       );
     }
 
-    final truthRows = _objects(payload['releaseTruthTable'], 'releaseTruthTable');
+    final truthRows = _objects(
+      payload['releaseTruthTable'],
+      'releaseTruthTable',
+    );
     final truthTable = <Acs06TruthRow>[];
     final seenCauses = <String>{};
     for (final row in truthRows) {
@@ -196,9 +202,10 @@ final class Acs06PersistedInputResolver
           <String, Object?>{'causeCode': causeCode},
         );
       }
-      final requiredRoles = _strings(row['requiredEvidenceRoles'], 'requiredEvidenceRoles')
-          .map((e) => e.toUpperCase())
-          .toSet();
+      final requiredRoles = _strings(
+        row['requiredEvidenceRoles'],
+        'requiredEvidenceRoles',
+      ).map((e) => e.toUpperCase()).toSet();
       final missingRoles = requiredRoles.difference(roleCodes);
       if (missingRoles.isNotEmpty) {
         _blocked(
@@ -274,8 +281,8 @@ final class Acs06PersistedInputResolver
       safetyMode: _safetyMode(_text(payload, 'safetyMode')),
       projectDefinedPowerFailureOutcome:
           contract.projectDefinedPowerFailureOutcomeCode == null
-              ? null
-              : _outcome(contract.projectDefinedPowerFailureOutcomeCode!),
+          ? null
+          : _outcome(contract.projectDefinedPowerFailureOutcomeCode!),
     );
 
     final inputFingerprint = _encoder.sha256(<String, Object?>{
@@ -303,13 +310,13 @@ final class Acs06PersistedInputResolver
     List<Elv5DependencyMarker> dependencies,
     Map<String, Object?> evidence,
   ) => throw Elv5CaptureBlockedException(
-        request: request,
-        reasonCode: reasonCode,
-        inputFingerprint: inputFingerprint,
-        policyFingerprint: policyFingerprint,
-        dependencies: dependencies,
-        evidence: evidence,
-      );
+    request: request,
+    reasonCode: reasonCode,
+    inputFingerprint: inputFingerprint,
+    policyFingerprint: policyFingerprint,
+    dependencies: dependencies,
+    evidence: evidence,
+  );
 
   Elv5DependencyMarker _dependency(
     Elv5CalculationRequest request,
@@ -340,58 +347,59 @@ final class Acs06PersistedInputResolver
 Elv5PureKernelExecutor<Acs06Input, Acs06Result> buildAcs06Executor({
   DateTime Function()? nowUtc,
 }) => Elv5PureKernelExecutor<Acs06Input, Acs06Result>(
-      processCode: Elv5ProcessCode.acs06,
-      calculate: const Acs06DoorTopologyKernel().evaluate,
-      encodeOutput: (result) => <String, Object?>{
-        'schema': 'electra.elv5-acs06-output.v1',
-        'status': result.status.name,
-        'governingCause': result.governingCause?.name,
-        'causes': <String, Object?>{
-          for (final entry in result.causes.entries)
-            entry.key.name: <String, Object?>{
-              'status': entry.value.status.name,
-              'expectedOutcome': entry.value.expectedOutcome.name,
-              'modeledOutcome': entry.value.modeledOutcome?.name,
-              'failedRequirementId': entry.value.failedRequirementId,
-              'reason': entry.value.reason,
-            },
+  processCode: Elv5ProcessCode.acs06,
+  calculate: const Acs06DoorTopologyKernel().evaluate,
+  encodeOutput: (result) => <String, Object?>{
+    'schema': 'electra.elv5-acs06-output.v1',
+    'status': result.status.name,
+    'governingCause': result.governingCause?.name,
+    'causes': <String, Object?>{
+      for (final entry in result.causes.entries)
+        entry.key.name: <String, Object?>{
+          'status': entry.value.status.name,
+          'expectedOutcome': entry.value.expectedOutcome.name,
+          'modeledOutcome': entry.value.modeledOutcome?.name,
+          'failedRequirementId': entry.value.failedRequirementId,
+          'reason': entry.value.reason,
         },
-      },
-      encodeEvidence: (captured, _) => <String, Object?>{
-        'schema': 'electra.elv5-acs06-evidence.v1',
-        'source': 'PERSISTED_DOOR_ROLES_TRUTH_PLUS_IMMUTABLE_TOPOLOGY_CONTRACT',
-        'captureRevision': captured.captureRevision,
-      },
-      executionOf: (result) => result.status == Acs06AssessmentStatus.blocked
-          ? Elv5Execution.blocked
-          : Elv5Execution.succeeded,
-      completionOf: (result) => result.status == Acs06AssessmentStatus.blocked
-          ? Elv5Completion.incomplete
-          : Elv5Completion.complete,
-      assessmentOf: (result) => switch (result.status) {
-        Acs06AssessmentStatus.pass => Elv5Assessment.pass,
-        Acs06AssessmentStatus.fail => Elv5Assessment.fail,
-        Acs06AssessmentStatus.blocked => Elv5Assessment.unresolved,
-      },
-      nowUtc: nowUtc,
-    );
+    },
+  },
+  encodeEvidence: (captured, _) => <String, Object?>{
+    'schema': 'electra.elv5-acs06-evidence.v1',
+    'source': 'PERSISTED_DOOR_ROLES_TRUTH_PLUS_IMMUTABLE_TOPOLOGY_CONTRACT',
+    'captureRevision': captured.captureRevision,
+  },
+  executionOf: (result) => result.status == Acs06AssessmentStatus.blocked
+      ? Elv5Execution.blocked
+      : Elv5Execution.succeeded,
+  completionOf: (result) => result.status == Acs06AssessmentStatus.blocked
+      ? Elv5Completion.incomplete
+      : Elv5Completion.complete,
+  assessmentOf: (result) => switch (result.status) {
+    Acs06AssessmentStatus.pass => Elv5Assessment.pass,
+    Acs06AssessmentStatus.fail => Elv5Assessment.fail,
+    Acs06AssessmentStatus.blocked => Elv5Assessment.unresolved,
+  },
+  nowUtc: nowUtc,
+);
 
 Acs06ReleaseCause _cause(String code) => switch (code.trim().toUpperCase()) {
-      'NORMAL_ACCESS' => Acs06ReleaseCause.normalAccess,
-      'REQUEST_TO_EXIT' => Acs06ReleaseCause.requestToExit,
-      'FIRE_RELEASE' => Acs06ReleaseCause.fireRelease,
-      'EMERGENCY_BREAK_GLASS' => Acs06ReleaseCause.emergencyBreakGlass,
-      'POWER_FAILURE' => Acs06ReleaseCause.powerFailure,
-      _ => throw StateError('ACS06_UNSUPPORTED_RELEASE_CAUSE:$code'),
-    };
+  'NORMAL_ACCESS' => Acs06ReleaseCause.normalAccess,
+  'REQUEST_TO_EXIT' => Acs06ReleaseCause.requestToExit,
+  'FIRE_RELEASE' => Acs06ReleaseCause.fireRelease,
+  'EMERGENCY_BREAK_GLASS' => Acs06ReleaseCause.emergencyBreakGlass,
+  'POWER_FAILURE' => Acs06ReleaseCause.powerFailure,
+  _ => throw StateError('ACS06_UNSUPPORTED_RELEASE_CAUSE:$code'),
+};
 
 Acs06LockOutcome _outcome(String code) => switch (code.trim().toUpperCase()) {
-      'LOCKED' || 'SECURED' => Acs06LockOutcome.secured,
-      'UNLOCKED' || 'RELEASED' => Acs06LockOutcome.released,
-      _ => throw StateError('ACS06_UNSUPPORTED_LOCK_OUTCOME:$code'),
-    };
+  'LOCKED' || 'SECURED' => Acs06LockOutcome.secured,
+  'UNLOCKED' || 'RELEASED' => Acs06LockOutcome.released,
+  _ => throw StateError('ACS06_UNSUPPORTED_LOCK_OUTCOME:$code'),
+};
 
-Acs06LockSafetyMode _safetyMode(String code) => switch (code.trim().toUpperCase()) {
+Acs06LockSafetyMode _safetyMode(String code) =>
+    switch (code.trim().toUpperCase()) {
       'FAIL_SAFE' => Acs06LockSafetyMode.failSafe,
       'FAIL_SECURE' => Acs06LockSafetyMode.failSecure,
       'PROJECT_DEFINED' => Acs06LockSafetyMode.projectDefined,
@@ -399,19 +407,17 @@ Acs06LockSafetyMode _safetyMode(String code) => switch (code.trim().toUpperCase(
     };
 
 Acs06EdgeKind _edgeKind(String code) => switch (code.trim().toUpperCase()) {
-      'DATA' => Acs06EdgeKind.data,
-      'CONTROL' => Acs06EdgeKind.control,
-      'POWER_FEED' => Acs06EdgeKind.powerFeed,
-      'MONITOR' => Acs06EdgeKind.monitor,
-      'RELEASE' => Acs06EdgeKind.release,
-      _ => throw StateError('ACS06_UNSUPPORTED_EDGE_KIND:$code'),
-    };
+  'DATA' => Acs06EdgeKind.data,
+  'CONTROL' => Acs06EdgeKind.control,
+  'POWER_FEED' => Acs06EdgeKind.powerFeed,
+  'MONITOR' => Acs06EdgeKind.monitor,
+  'RELEASE' => Acs06EdgeKind.release,
+  _ => throw StateError('ACS06_UNSUPPORTED_EDGE_KIND:$code'),
+};
 
 List<Map<String, Object?>> _objects(Object? value, String field) {
   if (value is! List) throw FormatException('$field must be array.');
-  return <Map<String, Object?>>[
-    for (final raw in value) _map(raw, field),
-  ];
+  return <Map<String, Object?>>[for (final raw in value) _map(raw, field)];
 }
 
 Map<String, Object?> _map(Object? value, String field) {

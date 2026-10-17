@@ -6,60 +6,65 @@ import 'package:electra_mobile/data/repositories/elv5/drift_fa04_source_requirem
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('keeps FA-04 requirement editions immutable and CAS-switches selector', () async {
-    final db = AppDatabase(NativeDatabase.memory());
-    addTearDown(db.close);
-    await _seed(db);
-    final store = DriftFa04SourceRequirementContractStore(
-      db,
-      originDeviceId: 'test',
-      nowUtc: () => DateTime.utc(2026, 10, 17, 12),
-    );
+  test(
+    'keeps FA-04 requirement editions immutable and CAS-switches selector',
+    () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      await _seed(db);
+      final store = DriftFa04SourceRequirementContractStore(
+        db,
+        originDeviceId: 'test',
+        nowUtc: () => DateTime.utc(2026, 10, 17, 12),
+      );
 
-    await store.replace(
-      ReplaceFa04SourceRequirementContractCommand(
+      await store.replace(
+        ReplaceFa04SourceRequirementContractCommand(
+          projectId: 'p',
+          designRevisionId: 'd',
+          bindingId: 'fa04-binding-1',
+          expectedBindingRevision: null,
+          expectedDesignRevision: 1,
+          contract: _contract(_hash('a')),
+        ),
+      );
+      final first = await store.loadActiveForSource(
         projectId: 'p',
         designRevisionId: 'd',
-        bindingId: 'fa04-binding-1',
-        expectedBindingRevision: null,
-        expectedDesignRevision: 1,
-        contract: _contract(_hash('a')),
-      ),
-    );
-    final first = await store.loadActiveForSource(
-      projectId: 'p',
-      designRevisionId: 'd',
-      sourceId: 'psu-1',
-    );
-    expect(first, isNotNull);
-    expect(first!.bindingRevision, 1);
-    final firstEvidence = first.evidenceRef;
+        sourceId: 'psu-1',
+      );
+      expect(first, isNotNull);
+      expect(first!.bindingRevision, 1);
+      final firstEvidence = first.evidenceRef;
 
-    await store.replace(
-      ReplaceFa04SourceRequirementContractCommand(
+      await store.replace(
+        ReplaceFa04SourceRequirementContractCommand(
+          projectId: 'p',
+          designRevisionId: 'd',
+          bindingId: 'fa04-binding-1',
+          expectedBindingRevision: 1,
+          expectedDesignRevision: 2,
+          contract: _contract(_hash('e')),
+        ),
+      );
+      final second = await store.loadActiveForSource(
         projectId: 'p',
         designRevisionId: 'd',
-        bindingId: 'fa04-binding-1',
-        expectedBindingRevision: 1,
-        expectedDesignRevision: 2,
-        contract: _contract(_hash('e')),
-      ),
-    );
-    final second = await store.loadActiveForSource(
-      projectId: 'p',
-      designRevisionId: 'd',
-      sourceId: 'psu-1',
-    );
-    expect(second, isNotNull);
-    expect(second!.bindingRevision, 2);
-    expect(second.evidenceRef, isNot(firstEvidence));
+        sourceId: 'psu-1',
+      );
+      expect(second, isNotNull);
+      expect(second!.bindingRevision, 2);
+      expect(second.evidenceRef, isNot(firstEvidence));
 
-    final evidence = await db.customSelect(
-      "SELECT evidence_ref FROM elv_revision_aggregate_evidence_records "
-      "WHERE aggregate_kind = 'FA04_SOURCE_REQUIREMENT_SET'",
-    ).get();
-    expect(evidence, hasLength(2));
-  });
+      final evidence = await db
+          .customSelect(
+            "SELECT evidence_ref FROM elv_revision_aggregate_evidence_records "
+            "WHERE aggregate_kind = 'FA04_SOURCE_REQUIREMENT_SET'",
+          )
+          .get();
+      expect(evidence, hasLength(2));
+    },
+  );
 }
 
 Fa04SourceRequirementContract _contract(String fingerprint) =>

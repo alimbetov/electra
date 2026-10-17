@@ -110,12 +110,14 @@ void main() {
       expect(current!.bindingRevision, 2);
       expect(current.evidenceRef, isNot(firstEvidenceRef));
 
-      final evidenceCount = await restartedDb.customSelect(
-        "SELECT COUNT(*) AS c FROM elv_revision_aggregate_evidence_records "
-        "WHERE project_id = 'p' AND design_revision_id = 'd' "
-        "AND aggregate_kind = 'ELV5_AMPACITY_SECTION_CONTRACT' "
-        "AND aggregate_id = 'section-1'",
-      ).getSingle();
+      final evidenceCount = await restartedDb
+          .customSelect(
+            "SELECT COUNT(*) AS c FROM elv_revision_aggregate_evidence_records "
+            "WHERE project_id = 'p' AND design_revision_id = 'd' "
+            "AND aggregate_kind = 'ELV5_AMPACITY_SECTION_CONTRACT' "
+            "AND aggregate_id = 'section-1'",
+          )
+          .getSingle();
       expect(evidenceCount.read<int>('c'), 2);
 
       // Q8: freeze makes the historical selector read-only while preserving the
@@ -167,12 +169,11 @@ void main() {
 DriftElv5AmpacitySectionContractStore _store(
   AppDatabase db,
   String originDeviceId,
-) =>
-    DriftElv5AmpacitySectionContractStore(
-      db,
-      originDeviceId: originDeviceId,
-      nowUtc: () => DateTime.utc(2026, 10, 17, 12),
-    );
+) => DriftElv5AmpacitySectionContractStore(
+  db,
+  originDeviceId: originDeviceId,
+  nowUtc: () => DateTime.utc(2026, 10, 17, 12),
+);
 
 Future<_WriteOutcome> _attempt(
   DriftElv5AmpacitySectionContractStore store,
@@ -187,9 +188,7 @@ Future<_WriteOutcome> _attempt(
 }
 
 final class _WriteOutcome {
-  const _WriteOutcome.success()
-      : succeeded = true,
-        error = null;
+  const _WriteOutcome.success() : succeeded = true, error = null;
 
   const _WriteOutcome.failure(this.error) : succeeded = false;
 
@@ -211,39 +210,38 @@ INSERT INTO project_design_revisions (
 Elv5AmpacitySectionContract _contract({
   required String factor,
   required String seed,
-}) =>
-    Elv5AmpacitySectionContract(
-      routeSectionId: 'section-1',
-      cableRunId: 'run-1',
-      cableId: 'cable-1',
-      expectedEnvironmentProfileId: 'ENV',
-      expectedEnvironmentEditionId: 'env-$seed',
-      expectedEnvironmentContentHash: _hash(seed),
-      referenceRow: Elv5AmpacityReferenceRow(
-        conductorCrossSectionMm2: Elv5Rational.parseDecimal('2.5'),
-        conductorMaterialCode: 'CU',
-        insulationSystemCode: 'PVC70',
-        referenceAmbientTemperatureC: Elv5Rational.integer(30),
-        installationMethodCode: 'B2',
-        loadedConductors: 3,
-        baseAllowableCurrentA: Elv5Rational.integer(30),
-        evidenceRef: 'ROW:$seed',
-        evidenceContentHash: _hash('r'),
-      ),
-      temperatureCorrection: Elv5AmpacityTemperatureCorrection(
-        actualAmbientTemperatureC: Elv5Rational.integer(40),
-        factor: Elv5Rational.parseDecimal(factor),
-        evidenceRef: 'TEMP:$factor',
-        evidenceContentHash: _hash('t'),
-      ),
-      groupingCorrection: Elv5AmpacityGroupingCorrection(
-        groupedCableOrCircuitCount: 1,
-        arrangementCode: 'SINGLE',
-        factor: Elv5Rational.one,
-        evidenceRef: 'GROUP:1',
-        evidenceContentHash: _hash('g'),
-      ),
-    );
+}) => Elv5AmpacitySectionContract(
+  routeSectionId: 'section-1',
+  cableRunId: 'run-1',
+  cableId: 'cable-1',
+  expectedEnvironmentProfileId: 'ENV',
+  expectedEnvironmentEditionId: 'env-$seed',
+  expectedEnvironmentContentHash: _hash(seed),
+  referenceRow: Elv5AmpacityReferenceRow(
+    conductorCrossSectionMm2: Elv5Rational.parseDecimal('2.5'),
+    conductorMaterialCode: 'CU',
+    insulationSystemCode: 'PVC70',
+    referenceAmbientTemperatureC: Elv5Rational.integer(30),
+    installationMethodCode: 'B2',
+    loadedConductors: 3,
+    baseAllowableCurrentA: Elv5Rational.integer(30),
+    evidenceRef: 'ROW:$seed',
+    evidenceContentHash: _hash('r'),
+  ),
+  temperatureCorrection: Elv5AmpacityTemperatureCorrection(
+    actualAmbientTemperatureC: Elv5Rational.integer(40),
+    factor: Elv5Rational.parseDecimal(factor),
+    evidenceRef: 'TEMP:$factor',
+    evidenceContentHash: _hash('t'),
+  ),
+  groupingCorrection: Elv5AmpacityGroupingCorrection(
+    groupedCableOrCircuitCount: 1,
+    arrangementCode: 'SINGLE',
+    factor: Elv5Rational.one,
+    evidenceRef: 'GROUP:1',
+    evidenceContentHash: _hash('g'),
+  ),
+);
 
 String _hash(String seed) {
   final char = seed.codeUnitAt(0).toRadixString(16).padLeft(2, '0')[0];

@@ -20,21 +20,26 @@ void main() {
     expect(captured.value, 'capture-2');
   });
 
-  test('rejects capture when revision keeps changing across both attempts', () async {
-    final guarded = Elv5RevisionGuardedInputResolver<String>(
-      inner: _Resolver(),
-      revisions: _RevisionSource(<int>[1, 2, 2, 3]),
-    );
+  test(
+    'rejects capture when revision keeps changing across both attempts',
+    () async {
+      final guarded = Elv5RevisionGuardedInputResolver<String>(
+        inner: _Resolver(),
+        revisions: _RevisionSource(<int>[1, 2, 2, 3]),
+      );
 
-    await expectLater(
-      guarded.capture(_request()),
-      throwsA(isA<StateError>().having(
-        (value) => value.message,
-        'message',
-        contains('ELV5_CAPTURE_CHANGED_DURING_READ'),
-      )),
-    );
-  });
+      await expectLater(
+        guarded.capture(_request()),
+        throwsA(
+          isA<StateError>().having(
+            (value) => value.message,
+            'message',
+            contains('ELV5_CAPTURE_CHANGED_DURING_READ'),
+          ),
+        ),
+      );
+    },
+  );
 
   test('retries blocked capture and stamps only stable revision', () async {
     final inner = _BlockedResolver();
@@ -45,26 +50,28 @@ void main() {
 
     await expectLater(
       guarded.capture(_request()),
-      throwsA(isA<Elv5CaptureBlockedException>()
-          .having((value) => value.captureRevision, 'captureRevision', 5)
-          .having((value) => value.reasonCode, 'reasonCode', 'TEST_BLOCKED')),
+      throwsA(
+        isA<Elv5CaptureBlockedException>()
+            .having((value) => value.captureRevision, 'captureRevision', 5)
+            .having((value) => value.reasonCode, 'reasonCode', 'TEST_BLOCKED'),
+      ),
     );
     expect(inner.captureCount, 2);
   });
 }
 
 Elv5CalculationRequest _request() => Elv5CalculationRequest(
-      projectId: 'p',
-      designRevisionId: 'd',
-      scope: Elv5ScopeRef(
-        kind: Elv5ScopeKind.design,
-        scopeId: 'd',
-        scenarioKey: 'NONE',
-      ),
-      processCode: Elv5ProcessCode.fa01,
-      subject: Elv5SubjectRef(kind: 'FIRE_LOOP', id: 'loop-1'),
-      expectedPointerGeneration: 0,
-    );
+  projectId: 'p',
+  designRevisionId: 'd',
+  scope: Elv5ScopeRef(
+    kind: Elv5ScopeKind.design,
+    scopeId: 'd',
+    scenarioKey: 'NONE',
+  ),
+  processCode: Elv5ProcessCode.fa01,
+  subject: Elv5SubjectRef(kind: 'FIRE_LOOP', id: 'loop-1'),
+  expectedPointerGeneration: 0,
+);
 
 final class _RevisionSource implements Elv5CaptureRevisionSource {
   _RevisionSource(this.values);

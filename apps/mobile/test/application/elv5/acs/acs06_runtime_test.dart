@@ -7,26 +7,33 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('ACS-06 validates five release causes and fail-safe power failure', () async {
-    final payload = _payload();
-    final contract = _contract(_fingerprint(payload));
-    final resolver = Acs06PersistedInputResolver(
-      acsStore: _AcsStore(payload),
-      contractSource: _ContractSource(contract),
-      nowUtc: () => DateTime.utc(2026, 10, 17),
-    );
+  test(
+    'ACS-06 validates five release causes and fail-safe power failure',
+    () async {
+      final payload = _payload();
+      final contract = _contract(_fingerprint(payload));
+      final resolver = Acs06PersistedInputResolver(
+        acsStore: _AcsStore(payload),
+        contractSource: _ContractSource(contract),
+        nowUtc: () => DateTime.utc(2026, 10, 17),
+      );
 
-    final captured = await resolver.capture(_request());
-    final candidate = await buildAcs06Executor().execute(captured);
+      final captured = await resolver.capture(_request());
+      final candidate = await buildAcs06Executor().execute(captured);
 
-    expect(candidate.assessment, Elv5Assessment.pass);
-    expect(candidate.output['status'], 'pass');
-    final causes = Map<String, Object?>.from(candidate.output['causes']! as Map);
-    expect(causes, hasLength(5));
-    final powerFailure = Map<String, Object?>.from(causes['powerFailure']! as Map);
-    expect(powerFailure['modeledOutcome'], 'released');
-    expect(powerFailure['expectedOutcome'], 'released');
-  });
+      expect(candidate.assessment, Elv5Assessment.pass);
+      expect(candidate.output['status'], 'pass');
+      final causes = Map<String, Object?>.from(
+        candidate.output['causes']! as Map,
+      );
+      expect(causes, hasLength(5));
+      final powerFailure = Map<String, Object?>.from(
+        causes['powerFailure']! as Map,
+      );
+      expect(powerFailure['modeledOutcome'], 'released');
+      expect(powerFailure['expectedOutcome'], 'released');
+    },
+  );
 
   test('ACS-06 stale topology edition remains BLOCKED', () async {
     final payload = _payload();
@@ -49,51 +56,72 @@ void main() {
 }
 
 Map<String, Object?> _payload() => <String, Object?>{
-      'doorAssemblyId': 'door-1',
-      'topologyProfileRef': <String, Object?>{
-        'profileCode': 'ACS-DOOR-SINGLE',
-        'editionId': 'v1',
-        'contentHash': _hash('a'),
-      },
-      'safetyMode': 'FAIL_SAFE',
-      'roleAssignments': <Object?>[
-        <String, Object?>{'roleCode': 'READER_ENTRY', 'slot': 0, 'componentId': 'reader'},
-        <String, Object?>{'roleCode': 'REQUEST_TO_EXIT', 'slot': 0, 'componentId': 'rte'},
-        <String, Object?>{'roleCode': 'FIRE_RELEASE_INPUT', 'slot': 0, 'componentId': 'fire'},
-        <String, Object?>{'roleCode': 'EMERGENCY_RELEASE', 'slot': 0, 'componentId': 'breakglass'},
-        <String, Object?>{'roleCode': 'DOOR_CONTACT', 'slot': 0, 'componentId': 'contact'},
-        <String, Object?>{'roleCode': 'LOCK', 'slot': 0, 'componentId': 'lock'},
-      ],
-      'releaseTruthTable': <Object?>[
-        <String, Object?>{
-          'causeCode': 'NORMAL_ACCESS',
-          'expectedOutcomeCode': 'UNLOCKED',
-          'requiredEvidenceRoles': <String>['READER_ENTRY', 'LOCK'],
-        },
-        <String, Object?>{
-          'causeCode': 'REQUEST_TO_EXIT',
-          'expectedOutcomeCode': 'UNLOCKED',
-          'requiredEvidenceRoles': <String>['REQUEST_TO_EXIT', 'LOCK'],
-        },
-        <String, Object?>{
-          'causeCode': 'FIRE_RELEASE',
-          'expectedOutcomeCode': 'UNLOCKED',
-          'requiredEvidenceRoles': <String>['FIRE_RELEASE_INPUT', 'LOCK'],
-        },
-        <String, Object?>{
-          'causeCode': 'EMERGENCY_BREAK_GLASS',
-          'expectedOutcomeCode': 'UNLOCKED',
-          'requiredEvidenceRoles': <String>['EMERGENCY_RELEASE', 'LOCK'],
-        },
-        <String, Object?>{
-          'causeCode': 'POWER_FAILURE',
-          'expectedOutcomeCode': 'UNLOCKED',
-          'requiredEvidenceRoles': <String>['LOCK'],
-        },
-      ],
-    };
+  'doorAssemblyId': 'door-1',
+  'topologyProfileRef': <String, Object?>{
+    'profileCode': 'ACS-DOOR-SINGLE',
+    'editionId': 'v1',
+    'contentHash': _hash('a'),
+  },
+  'safetyMode': 'FAIL_SAFE',
+  'roleAssignments': <Object?>[
+    <String, Object?>{
+      'roleCode': 'READER_ENTRY',
+      'slot': 0,
+      'componentId': 'reader',
+    },
+    <String, Object?>{
+      'roleCode': 'REQUEST_TO_EXIT',
+      'slot': 0,
+      'componentId': 'rte',
+    },
+    <String, Object?>{
+      'roleCode': 'FIRE_RELEASE_INPUT',
+      'slot': 0,
+      'componentId': 'fire',
+    },
+    <String, Object?>{
+      'roleCode': 'EMERGENCY_RELEASE',
+      'slot': 0,
+      'componentId': 'breakglass',
+    },
+    <String, Object?>{
+      'roleCode': 'DOOR_CONTACT',
+      'slot': 0,
+      'componentId': 'contact',
+    },
+    <String, Object?>{'roleCode': 'LOCK', 'slot': 0, 'componentId': 'lock'},
+  ],
+  'releaseTruthTable': <Object?>[
+    <String, Object?>{
+      'causeCode': 'NORMAL_ACCESS',
+      'expectedOutcomeCode': 'UNLOCKED',
+      'requiredEvidenceRoles': <String>['READER_ENTRY', 'LOCK'],
+    },
+    <String, Object?>{
+      'causeCode': 'REQUEST_TO_EXIT',
+      'expectedOutcomeCode': 'UNLOCKED',
+      'requiredEvidenceRoles': <String>['REQUEST_TO_EXIT', 'LOCK'],
+    },
+    <String, Object?>{
+      'causeCode': 'FIRE_RELEASE',
+      'expectedOutcomeCode': 'UNLOCKED',
+      'requiredEvidenceRoles': <String>['FIRE_RELEASE_INPUT', 'LOCK'],
+    },
+    <String, Object?>{
+      'causeCode': 'EMERGENCY_BREAK_GLASS',
+      'expectedOutcomeCode': 'UNLOCKED',
+      'requiredEvidenceRoles': <String>['EMERGENCY_RELEASE', 'LOCK'],
+    },
+    <String, Object?>{
+      'causeCode': 'POWER_FAILURE',
+      'expectedOutcomeCode': 'UNLOCKED',
+      'requiredEvidenceRoles': <String>['LOCK'],
+    },
+  ],
+};
 
-Acs06TopologyContract _contract(String aggregateFingerprint) => Acs06TopologyContract(
+Acs06TopologyContract _contract(String aggregateFingerprint) =>
+    Acs06TopologyContract(
       doorId: 'door-1',
       expectedDoorAggregateFingerprint: aggregateFingerprint,
       topologyProfile: Acs06TopologyProfileIdentity(
@@ -179,17 +207,17 @@ Acs06CauseProfileContract _cause(String code, String source, String kind) =>
     );
 
 Elv5CalculationRequest _request() => Elv5CalculationRequest(
-      projectId: 'p',
-      designRevisionId: 'd',
-      scope: Elv5ScopeRef(
-        kind: Elv5ScopeKind.design,
-        scopeId: 'd',
-        scenarioKey: 'NONE',
-      ),
-      processCode: Elv5ProcessCode.acs06,
-      subject: Elv5SubjectRef(kind: 'DOOR', id: 'door-1'),
-      expectedPointerGeneration: 0,
-    );
+  projectId: 'p',
+  designRevisionId: 'd',
+  scope: Elv5ScopeRef(
+    kind: Elv5ScopeKind.design,
+    scopeId: 'd',
+    scenarioKey: 'NONE',
+  ),
+  processCode: Elv5ProcessCode.acs06,
+  subject: Elv5SubjectRef(kind: 'DOOR', id: 'door-1'),
+  expectedPointerGeneration: 0,
+);
 
 final class _AcsStore implements Elv5AcsFactStore {
   const _AcsStore(this.payload);
@@ -202,12 +230,12 @@ final class _AcsStore implements Elv5AcsFactStore {
     required String operation,
     required String subjectId,
   }) async => Elv5AcsAggregateSnapshot(
-        aggregateKind: 'ACS_DOOR_CALCULATION',
-        aggregateId: 'ELV5:ACS_DOOR_CALCULATION:door-1',
-        subjectId: 'door-1',
-        revision: 4,
-        payload: payload,
-      );
+    aggregateKind: 'ACS_DOOR_CALCULATION',
+    aggregateId: 'ELV5:ACS_DOOR_CALCULATION:door-1',
+    subjectId: 'door-1',
+    revision: 4,
+    payload: payload,
+  );
 }
 
 final class _ContractSource implements Acs06TopologyContractSource {
@@ -220,12 +248,12 @@ final class _ContractSource implements Acs06TopologyContractSource {
     required String designRevisionId,
     required String doorId,
   }) async => Acs06TopologyContractSnapshot(
-        bindingId: 'acs06-binding',
-        bindingRevision: 2,
-        evidenceRef: 'ACS06:door-1:${_hash('b')}',
-        contentHash: _hash('b'),
-        contract: contract,
-      );
+    bindingId: 'acs06-binding',
+    bindingRevision: 2,
+    evidenceRef: 'ACS06:door-1:${_hash('b')}',
+    contentHash: _hash('b'),
+    contract: contract,
+  );
 }
 
 String _fingerprint(Map<String, Object?> payload) =>

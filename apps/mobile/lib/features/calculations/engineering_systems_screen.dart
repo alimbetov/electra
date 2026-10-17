@@ -19,24 +19,20 @@ class EngineeringSystemsScreen extends ConsumerWidget {
         IconButton(
           tooltip: "Reference catalogs",
           icon: const Icon(Icons.library_books_outlined),
-          onPressed:
-              () => Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder:
-                      (_) => EngineeringReferenceScreen(projectId: projectId),
-                ),
-              ),
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => EngineeringReferenceScreen(projectId: projectId),
+            ),
+          ),
         ),
         IconButton(
           tooltip: 'Ports / topology',
           icon: const Icon(Icons.account_tree_outlined),
-          onPressed:
-              () => Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder:
-                      (_) => EngineeringTopologyScreen(projectId: projectId),
-                ),
-              ),
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => EngineeringTopologyScreen(projectId: projectId),
+            ),
+          ),
         ),
       ],
     ),
@@ -106,22 +102,20 @@ class _EngineeringSystemsWorkspaceState
 
   void edit([EngineeringSystem? system]) => showDialog<void>(
     context: context,
-    builder:
-        (_) => EngineeringSystemDialog(
-          snapshot: widget.snapshot,
-          id: system?.id ?? widget.nextId(),
-          initial: system,
-          onSave: widget.onSave,
-        ),
+    builder: (_) => EngineeringSystemDialog(
+      snapshot: widget.snapshot,
+      id: system?.id ?? widget.nextId(),
+      initial: system,
+      onSave: widget.onSave,
+    ),
   );
   void assign(EngineeringSystem system) => showDialog<void>(
     context: context,
-    builder:
-        (_) => SystemMembershipDialog(
-          snapshot: widget.snapshot,
-          system: system,
-          onSave: widget.onAssign,
-        ),
+    builder: (_) => SystemMembershipDialog(
+      snapshot: widget.snapshot,
+      system: system,
+      onSave: widget.onAssign,
+    ),
   );
   @override
   Widget build(BuildContext context) {
@@ -137,17 +131,15 @@ class _EngineeringSystemsWorkspaceState
               child: const Text('New system'),
             ),
             OutlinedButton(
-              onPressed:
-                  busy
-                      ? null
-                      : () => showDialog<void>(
-                        context: context,
-                        builder:
-                            (_) => EngineeringFamilyDialog(
-                              id: widget.nextId(),
-                              onSave: widget.onFamily,
-                            ),
+              onPressed: busy
+                  ? null
+                  : () => showDialog<void>(
+                      context: context,
+                      builder: (_) => EngineeringFamilyDialog(
+                        id: widget.nextId(),
+                        onSave: widget.onFamily,
                       ),
+                    ),
               child: const Text('New family edition'),
             ),
           ],
@@ -172,8 +164,9 @@ class _EngineeringSystemsWorkspaceState
                 ListTile(
                   title: Text('${system.code} · ${system.name}'),
                   trailing: TextButton(
-                    onPressed:
-                        busy ? null : () => work(() => widget.onSave(system)),
+                    onPressed: busy
+                        ? null
+                        : () => work(() => widget.onSave(system)),
                     child: const Text('Restore system'),
                   ),
                 ),
@@ -207,17 +200,15 @@ class _EngineeringSystemsWorkspaceState
                         child: const Text('Edit system'),
                       ),
                       TextButton(
-                        onPressed:
-                            busy || s.components.isEmpty
-                                ? null
-                                : () => assign(system),
+                        onPressed: busy || s.components.isEmpty
+                            ? null
+                            : () => assign(system),
                         child: const Text('Assign placed device'),
                       ),
                       TextButton(
-                        onPressed:
-                            busy
-                                ? null
-                                : () => work(() => widget.onArchive(system.id)),
+                        onPressed: busy
+                            ? null
+                            : () => work(() => widget.onArchive(system.id)),
                         child: const Text('Archive system'),
                       ),
                     ],
@@ -227,10 +218,9 @@ class _EngineeringSystemsWorkspaceState
                   ))
                     Builder(
                       builder: (context) {
-                        final c =
-                            s.components
-                                .where((c) => c.id == m.componentId)
-                                .firstOrNull;
+                        final c = s.components
+                            .where((c) => c.id == m.componentId)
+                            .firstOrNull;
                         return ListTile(
                           contentPadding: EdgeInsets.zero,
                           title: Text(
@@ -242,15 +232,14 @@ class _EngineeringSystemsWorkspaceState
                           trailing: IconButton(
                             tooltip: 'Detach from this system',
                             icon: const Icon(Icons.link_off),
-                            onPressed:
-                                busy
-                                    ? null
-                                    : () => work(
-                                      () => widget.onDetach(
-                                        system.id,
-                                        m.componentId,
-                                      ),
+                            onPressed: busy
+                                ? null
+                                : () => work(
+                                    () => widget.onDetach(
+                                      system.id,
+                                      m.componentId,
                                     ),
+                                  ),
                           ),
                         );
                       },

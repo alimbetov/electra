@@ -35,16 +35,16 @@ final class DriftPowerSnapshotFacts {
   final AppDatabase database;
 
   Future<List<Map<String, Object?>>> rows(String sql, String scope) async {
-    final values =
-        await database
-            .customSelect(sql, variables: [Variable.withString(scope)])
-            .get();
-    final result =
-        values.map((r) => Map<String, Object?>.from(r.data)).toList();
+    final values = await database
+        .customSelect(sql, variables: [Variable.withString(scope)])
+        .get();
+    final result = values
+        .map((r) => Map<String, Object?>.from(r.data))
+        .toList();
     result.sort(
-      (a, b) => canonicalEngineeringJsonV1(
-        a,
-      ).compareTo(canonicalEngineeringJsonV1(b)),
+      (a, b) =>
+          canonicalEngineeringJsonV1(a)
+              .compareTo(canonicalEngineeringJsonV1(b)),
     );
     return result;
   }

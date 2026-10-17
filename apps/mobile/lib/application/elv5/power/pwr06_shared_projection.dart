@@ -15,9 +15,8 @@ String elv5Pwr06SharedClosureFingerprint({
     normalized.add(<String, Object?>{
       'originId': _text(member, 'originId'),
       'portId': _text(member, 'portId'),
-      'reservedW': Elv5Rational.fromMap(
-        _map(member['reservedW'], 'reservedW'),
-      ).toMap(),
+      'reservedW': Elv5Rational.fromMap(_map(member['reservedW'], 'reservedW'))
+          .toMap(),
     });
   }
   normalized.sort(

@@ -8,9 +8,9 @@ final class ReplaceAcs03ElectricalContractCommand {
     required this.expectedBindingRevision,
     required this.expectedDesignRevision,
     required this.contract,
-  })  : projectId = _text(projectId, 'projectId'),
-        designRevisionId = _text(designRevisionId, 'designRevisionId'),
-        bindingId = _text(bindingId, 'bindingId') {
+  }) : projectId = _text(projectId, 'projectId'),
+       designRevisionId = _text(designRevisionId, 'designRevisionId'),
+       bindingId = _text(bindingId, 'bindingId') {
     if (expectedBindingRevision != null && expectedBindingRevision! < 1) {
       throw ArgumentError('ACS03 expected binding revision must be positive.');
     }

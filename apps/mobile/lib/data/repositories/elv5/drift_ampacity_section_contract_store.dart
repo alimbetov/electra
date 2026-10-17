@@ -34,19 +34,21 @@ final class DriftElv5AmpacitySectionContractStore
     required String designRevisionId,
     required String routeSectionId,
   }) async {
-    final rows = await database.customSelect(
-      'SELECT id, revision, definition_ref_json '
-      'FROM discipline_policy_bindings '
-      'WHERE project_id = ? AND design_revision_id = ? '
-      'AND subject_kind = ? AND subject_id = ? '
-      'AND deleted_at IS NULL ORDER BY id',
-      variables: <Variable>[
-        Variable.withString(projectId),
-        Variable.withString(designRevisionId),
-        Variable.withString('ROUTE_SECTION'),
-        Variable.withString(routeSectionId),
-      ],
-    ).get();
+    final rows = await database
+        .customSelect(
+          'SELECT id, revision, definition_ref_json '
+          'FROM discipline_policy_bindings '
+          'WHERE project_id = ? AND design_revision_id = ? '
+          'AND subject_kind = ? AND subject_id = ? '
+          'AND deleted_at IS NULL ORDER BY id',
+          variables: <Variable>[
+            Variable.withString(projectId),
+            Variable.withString(designRevisionId),
+            Variable.withString('ROUTE_SECTION'),
+            Variable.withString(routeSectionId),
+          ],
+        )
+        .get();
 
     final matching = <QueryRow>[];
     for (final row in rows) {
@@ -75,19 +77,21 @@ final class DriftElv5AmpacitySectionContractStore
     final evidenceRef = _text(definition, 'editionId');
     final contentHash = _text(definition, 'contentHash');
 
-    final evidence = await database.customSelect(
-      'SELECT canonical_payload_json, payload_sha256 '
-      'FROM elv_revision_aggregate_evidence_records '
-      'WHERE evidence_ref = ? AND project_id = ? AND design_revision_id = ? '
-      'AND aggregate_kind = ? AND aggregate_id = ?',
-      variables: <Variable>[
-        Variable.withString(evidenceRef),
-        Variable.withString(projectId),
-        Variable.withString(designRevisionId),
-        Variable.withString('ELV5_AMPACITY_SECTION_CONTRACT'),
-        Variable.withString(routeSectionId),
-      ],
-    ).getSingleOrNull();
+    final evidence = await database
+        .customSelect(
+          'SELECT canonical_payload_json, payload_sha256 '
+          'FROM elv_revision_aggregate_evidence_records '
+          'WHERE evidence_ref = ? AND project_id = ? AND design_revision_id = ? '
+          'AND aggregate_kind = ? AND aggregate_id = ?',
+          variables: <Variable>[
+            Variable.withString(evidenceRef),
+            Variable.withString(projectId),
+            Variable.withString(designRevisionId),
+            Variable.withString('ELV5_AMPACITY_SECTION_CONTRACT'),
+            Variable.withString(routeSectionId),
+          ],
+        )
+        .getSingleOrNull();
     if (evidence == null) {
       throw StateError('ELV5_AMPACITY_SECTION_EVIDENCE_MISSING:$evidenceRef');
     }
@@ -154,7 +158,8 @@ final class DriftElv5AmpacitySectionContractStore
     final profile = environment.binding.profile;
     if (contract.expectedEnvironmentProfileId != profile.profileId ||
         contract.expectedEnvironmentEditionId != profile.editionId ||
-        contract.expectedEnvironmentContentHash != environment.binding.contentHash) {
+        contract.expectedEnvironmentContentHash !=
+            environment.binding.contentHash) {
       throw Elv5AmpacityRouteResolutionException(
         'ELV5_AMPACITY_SECTION_ENVIRONMENT_IDENTITY_MISMATCH',
         <String, Object?>{
@@ -175,8 +180,10 @@ final class DriftElv5AmpacitySectionContractStore
         <String, Object?>{
           'routeSectionId': contract.routeSectionId,
           'profileMaximumC': profile.temperatureC.maximum.toMap(),
-          'correctionTemperatureC':
-              contract.temperatureCorrection.actualAmbientTemperatureC.toMap(),
+          'correctionTemperatureC': contract
+              .temperatureCorrection
+              .actualAmbientTemperatureC
+              .toMap(),
         },
       );
     }
@@ -234,14 +241,16 @@ final class DriftElv5AmpacitySectionContractStore
   Future<void> _requireWorkingRevision(
     ReplaceElv5AmpacitySectionContractCommand command,
   ) async {
-    final revision = await database.customSelect(
-      'SELECT state, revision FROM project_design_revisions '
-      'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
-      variables: <Variable>[
-        Variable.withString(command.projectId),
-        Variable.withString(command.designRevisionId),
-      ],
-    ).getSingleOrNull();
+    final revision = await database
+        .customSelect(
+          'SELECT state, revision FROM project_design_revisions '
+          'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
+          variables: <Variable>[
+            Variable.withString(command.projectId),
+            Variable.withString(command.designRevisionId),
+          ],
+        )
+        .getSingleOrNull();
     if (revision == null) {
       throw StateError('ELV5_AMPACITY_DESIGN_REVISION_NOT_FOUND');
     }
@@ -260,11 +269,13 @@ final class DriftElv5AmpacitySectionContractStore
     required Map<String, Object?> payload,
     required DateTime now,
   }) async {
-    final existing = await database.customSelect(
-      'SELECT payload_sha256 FROM elv_revision_aggregate_evidence_records '
-      'WHERE evidence_ref = ?',
-      variables: <Variable>[Variable.withString(evidenceRef)],
-    ).getSingleOrNull();
+    final existing = await database
+        .customSelect(
+          'SELECT payload_sha256 FROM elv_revision_aggregate_evidence_records '
+          'WHERE evidence_ref = ?',
+          variables: <Variable>[Variable.withString(evidenceRef)],
+        )
+        .getSingleOrNull();
     if (existing != null) {
       if (existing.read<String>('payload_sha256') != hash) {
         throw StateError('ELV5_AMPACITY_EVIDENCE_REF_COLLISION:$evidenceRef');
@@ -308,17 +319,19 @@ final class DriftElv5AmpacitySectionContractStore
     };
 
     if (command.expectedBindingRevision == null) {
-      final rows = await database.customSelect(
-        'SELECT id, definition_ref_json FROM discipline_policy_bindings '
-        'WHERE project_id = ? AND design_revision_id = ? '
-        'AND subject_kind = ? AND subject_id = ? AND deleted_at IS NULL',
-        variables: <Variable>[
-          Variable.withString(command.projectId),
-          Variable.withString(command.designRevisionId),
-          Variable.withString('ROUTE_SECTION'),
-          Variable.withString(command.contract.routeSectionId),
-        ],
-      ).get();
+      final rows = await database
+          .customSelect(
+            'SELECT id, definition_ref_json FROM discipline_policy_bindings '
+            'WHERE project_id = ? AND design_revision_id = ? '
+            'AND subject_kind = ? AND subject_id = ? AND deleted_at IS NULL',
+            variables: <Variable>[
+              Variable.withString(command.projectId),
+              Variable.withString(command.designRevisionId),
+              Variable.withString('ROUTE_SECTION'),
+              Variable.withString(command.contract.routeSectionId),
+            ],
+          )
+          .get();
       for (final row in rows) {
         final decoded = jsonDecode(row.read<String>('definition_ref_json'));
         if (decoded is Map &&

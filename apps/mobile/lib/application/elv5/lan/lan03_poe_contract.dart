@@ -5,8 +5,7 @@ import '../power/pwr06_shared_projection.dart';
 String lan03Pwr06ClosureFingerprint({
   required String pseId,
   required Iterable<Map<String, Object?>> members,
-}) =>
-    elv5Pwr06SharedClosureFingerprint(pseId: pseId, members: members);
+}) => elv5Pwr06SharedClosureFingerprint(pseId: pseId, members: members);
 
 final class Lan03PoeProjectionContract {
   Lan03PoeProjectionContract({
@@ -16,17 +15,19 @@ final class Lan03PoeProjectionContract {
     required String expectedClosureFingerprint,
     required Map<String, String> expectedInputFingerprintByDeliveryId,
     required Iterable<String> lanLoadIds,
-  })  : pseId = _text(pseId, 'pseId'),
-        scenarioId = _text(scenarioId, 'scenarioId'),
-        segmentId = _text(segmentId, 'segmentId'),
-        expectedClosureFingerprint =
-            _sha(expectedClosureFingerprint, 'expectedClosureFingerprint'),
-        expectedInputFingerprintByDeliveryId = Map.unmodifiable(
-          _fingerprints(expectedInputFingerprintByDeliveryId),
-        ),
-        lanLoadIds = Set.unmodifiable(
-          lanLoadIds.map((e) => _text(e, 'lanLoadId')),
-        ) {
+  }) : pseId = _text(pseId, 'pseId'),
+       scenarioId = _text(scenarioId, 'scenarioId'),
+       segmentId = _text(segmentId, 'segmentId'),
+       expectedClosureFingerprint = _sha(
+         expectedClosureFingerprint,
+         'expectedClosureFingerprint',
+       ),
+       expectedInputFingerprintByDeliveryId = Map.unmodifiable(
+         _fingerprints(expectedInputFingerprintByDeliveryId),
+       ),
+       lanLoadIds = Set.unmodifiable(
+         lanLoadIds.map((e) => _text(e, 'lanLoadId')),
+       ) {
     if (this.lanLoadIds.isEmpty) {
       throw ArgumentError('LAN03 LAN load membership must not be empty.');
     }
@@ -41,33 +42,29 @@ final class Lan03PoeProjectionContract {
   final Set<String> lanLoadIds;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'schema': schema,
-        'pseId': pseId,
-        'scenarioId': scenarioId,
-        'segmentId': segmentId,
-        'expectedClosureFingerprint': expectedClosureFingerprint,
-        'expectedInputFingerprintByDeliveryId': <String, Object?>{
-          for (final key
-              in expectedInputFingerprintByDeliveryId.keys.toList()..sort())
-            key: expectedInputFingerprintByDeliveryId[key],
-        },
-        'lanLoadIds': lanLoadIds.toList()..sort(),
-      };
+    'schema': schema,
+    'pseId': pseId,
+    'scenarioId': scenarioId,
+    'segmentId': segmentId,
+    'expectedClosureFingerprint': expectedClosureFingerprint,
+    'expectedInputFingerprintByDeliveryId': <String, Object?>{
+      for (final key
+          in expectedInputFingerprintByDeliveryId.keys.toList()..sort())
+        key: expectedInputFingerprintByDeliveryId[key],
+    },
+    'lanLoadIds': lanLoadIds.toList()..sort(),
+  };
 
   factory Lan03PoeProjectionContract.fromMap(Map<String, Object?> map) {
-    _exact(
-      map,
-      const {
-        'schema',
-        'pseId',
-        'scenarioId',
-        'segmentId',
-        'expectedClosureFingerprint',
-        'expectedInputFingerprintByDeliveryId',
-        'lanLoadIds',
-      },
-      'LAN03 contract',
-    );
+    _exact(map, const {
+      'schema',
+      'pseId',
+      'scenarioId',
+      'segmentId',
+      'expectedClosureFingerprint',
+      'expectedInputFingerprintByDeliveryId',
+      'lanLoadIds',
+    }, 'LAN03 contract');
     if (map['schema'] != schema) {
       throw const FormatException('Unsupported LAN03 contract schema.');
     }
@@ -76,7 +73,8 @@ final class Lan03PoeProjectionContract {
       'expectedInputFingerprintByDeliveryId',
     );
     final loads = map['lanLoadIds'];
-    if (loads is! List) throw const FormatException('lanLoadIds must be array.');
+    if (loads is! List)
+      throw const FormatException('lanLoadIds must be array.');
     return Lan03PoeProjectionContract(
       pseId: _mapText(map, 'pseId'),
       scenarioId: _mapText(map, 'scenarioId'),
@@ -89,9 +87,7 @@ final class Lan03PoeProjectionContract {
             'inputFingerprint',
           ),
       },
-      lanLoadIds: <String>[
-        for (final raw in loads) _string(raw, 'lanLoadId'),
-      ],
+      lanLoadIds: <String>[for (final raw in loads) _string(raw, 'lanLoadId')],
     );
   }
 }

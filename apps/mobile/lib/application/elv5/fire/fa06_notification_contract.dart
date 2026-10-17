@@ -12,13 +12,13 @@ final class Fa06CaseContract {
     required String pwr01SubjectId,
     required String pwr03SubjectKind,
     required String pwr03SubjectId,
-  })  : stateCode = _text(stateCode, 'stateCode'),
-        scenarioId = _text(scenarioId, 'scenarioId'),
-        segmentId = _text(segmentId, 'segmentId'),
-        pwr01SubjectKind = _text(pwr01SubjectKind, 'pwr01SubjectKind'),
-        pwr01SubjectId = _text(pwr01SubjectId, 'pwr01SubjectId'),
-        pwr03SubjectKind = _text(pwr03SubjectKind, 'pwr03SubjectKind'),
-        pwr03SubjectId = _text(pwr03SubjectId, 'pwr03SubjectId');
+  }) : stateCode = _text(stateCode, 'stateCode'),
+       scenarioId = _text(scenarioId, 'scenarioId'),
+       segmentId = _text(segmentId, 'segmentId'),
+       pwr01SubjectKind = _text(pwr01SubjectKind, 'pwr01SubjectKind'),
+       pwr01SubjectId = _text(pwr01SubjectId, 'pwr01SubjectId'),
+       pwr03SubjectKind = _text(pwr03SubjectKind, 'pwr03SubjectKind'),
+       pwr03SubjectId = _text(pwr03SubjectId, 'pwr03SubjectId');
 
   final Fa06ContractCase operatingCase;
   final String stateCode;
@@ -30,18 +30,18 @@ final class Fa06CaseContract {
   final String pwr03SubjectId;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'operatingCase': switch (operatingCase) {
-          Fa06ContractCase.activeNotification => 'ACTIVE_NOTIFICATION',
-          Fa06ContractCase.startupInrush => 'STARTUP_INRUSH',
-        },
-        'stateCode': stateCode,
-        'scenarioId': scenarioId,
-        'segmentId': segmentId,
-        'pwr01SubjectKind': pwr01SubjectKind,
-        'pwr01SubjectId': pwr01SubjectId,
-        'pwr03SubjectKind': pwr03SubjectKind,
-        'pwr03SubjectId': pwr03SubjectId,
-      };
+    'operatingCase': switch (operatingCase) {
+      Fa06ContractCase.activeNotification => 'ACTIVE_NOTIFICATION',
+      Fa06ContractCase.startupInrush => 'STARTUP_INRUSH',
+    },
+    'stateCode': stateCode,
+    'scenarioId': scenarioId,
+    'segmentId': segmentId,
+    'pwr01SubjectKind': pwr01SubjectKind,
+    'pwr01SubjectId': pwr01SubjectId,
+    'pwr03SubjectKind': pwr03SubjectKind,
+    'pwr03SubjectId': pwr03SubjectId,
+  };
 
   factory Fa06CaseContract.fromMap(Map<String, Object?> map) {
     _exact(map, const <String>{
@@ -57,7 +57,9 @@ final class Fa06CaseContract {
     final operatingCase = switch (_mapText(map, 'operatingCase')) {
       'ACTIVE_NOTIFICATION' => Fa06ContractCase.activeNotification,
       'STARTUP_INRUSH' => Fa06ContractCase.startupInrush,
-      final value => throw FormatException('Unsupported FA06 operatingCase: $value'),
+      final value => throw FormatException(
+        'Unsupported FA06 operatingCase: $value',
+      ),
     };
     return Fa06CaseContract(
       operatingCase: operatingCase,
@@ -73,24 +75,27 @@ final class Fa06CaseContract {
 }
 
 final class Fa06SupervisionFaultResult {
-  Fa06SupervisionFaultResult({
-    required String faultCode,
-    required this.passed,
-  }) : faultCode = _text(faultCode, 'faultCode');
+  Fa06SupervisionFaultResult({required String faultCode, required this.passed})
+    : faultCode = _text(faultCode, 'faultCode');
 
   final String faultCode;
   final bool passed;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'faultCode': faultCode,
-        'passed': passed,
-      };
+    'faultCode': faultCode,
+    'passed': passed,
+  };
 
   factory Fa06SupervisionFaultResult.fromMap(Map<String, Object?> map) {
-    _exact(map, const <String>{'faultCode', 'passed'}, 'FA06 supervision fault');
+    _exact(map, const <String>{
+      'faultCode',
+      'passed',
+    }, 'FA06 supervision fault');
     final passed = map['passed'];
     if (passed is! bool) {
-      throw const FormatException('FA06 supervision fault passed must be boolean.');
+      throw const FormatException(
+        'FA06 supervision fault passed must be boolean.',
+      );
     }
     return Fa06SupervisionFaultResult(
       faultCode: _mapText(map, 'faultCode'),
@@ -115,7 +120,9 @@ final class Fa06SupervisionContract {
       throw ArgumentError('FA06 supported supervision needs evidenceRef.');
     }
     if (required && modelSupported && this.faultResults.isEmpty) {
-      throw ArgumentError('FA06 supported supervision needs explicit fault results.');
+      throw ArgumentError(
+        'FA06 supported supervision needs explicit fault results.',
+      );
     }
     if (evidenceContentHash != null) {
       _sha(evidenceContentHash!, 'evidenceContentHash');
@@ -136,15 +143,15 @@ final class Fa06SupervisionContract {
           faultResults.every((value) => value.passed));
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'required': required,
-        'modelSupported': modelSupported,
-        'modelCode': modelCode,
-        'evidenceRef': evidenceRef,
-        'evidenceContentHash': evidenceContentHash,
-        'faultResults': [
-          for (final value in faultResults) value.toCanonicalValue(),
-        ],
-      };
+    'required': required,
+    'modelSupported': modelSupported,
+    'modelCode': modelCode,
+    'evidenceRef': evidenceRef,
+    'evidenceContentHash': evidenceContentHash,
+    'faultResults': [
+      for (final value in faultResults) value.toCanonicalValue(),
+    ],
+  };
 
   factory Fa06SupervisionContract.fromMap(Map<String, Object?> map) {
     _exact(map, const <String>{
@@ -166,11 +173,15 @@ final class Fa06SupervisionContract {
       modelSupported: supported,
       modelCode: _nullableText(map['modelCode'], 'modelCode'),
       evidenceRef: _nullableText(map['evidenceRef'], 'evidenceRef'),
-      evidenceContentHash:
-          _nullableText(map['evidenceContentHash'], 'evidenceContentHash'),
+      evidenceContentHash: _nullableText(
+        map['evidenceContentHash'],
+        'evidenceContentHash',
+      ),
       faultResults: <Fa06SupervisionFaultResult>[
         for (final raw in rawFaults)
-          Fa06SupervisionFaultResult.fromMap(_object(raw, 'FA06 supervision fault')),
+          Fa06SupervisionFaultResult.fromMap(
+            _object(raw, 'FA06 supervision fault'),
+          ),
       ],
     );
   }
@@ -186,11 +197,11 @@ final class Fa06NotificationContract {
     required Iterable<Fa06CaseContract> cases,
     required Map<String, String> terminalLoadIdByDeviceId,
     required this.supervision,
-  })  : circuitId = _text(circuitId, 'circuitId'),
-        cases = List.unmodifiable(_cases(cases)),
-        terminalLoadIdByDeviceId = Map.unmodifiable(
-          _terminalMap(terminalLoadIdByDeviceId),
-        ) {
+  }) : circuitId = _text(circuitId, 'circuitId'),
+       cases = List.unmodifiable(_cases(cases)),
+       terminalLoadIdByDeviceId = Map.unmodifiable(
+         _terminalMap(terminalLoadIdByDeviceId),
+       ) {
     if (deviceLimit < 0) {
       throw ArgumentError('FA06 deviceLimit must be nonnegative.');
     }
@@ -234,19 +245,19 @@ final class Fa06NotificationContract {
       });
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'schema': schema,
-        'circuitId': circuitId,
-        'deviceLimit': deviceLimit,
-        'outputCurrentLimitA': outputCurrentLimitA.toMap(),
-        'minimumTerminalVoltageV': minimumTerminalVoltageV.toMap(),
-        'maximumTerminalVoltageV': maximumTerminalVoltageV.toMap(),
-        'cases': [for (final value in cases) value.toCanonicalValue()],
-        'terminalLoadIdByDeviceId': <String, Object?>{
-          for (final key in (terminalLoadIdByDeviceId.keys.toList()..sort()))
-            key: terminalLoadIdByDeviceId[key],
-        },
-        'supervision': supervision.toCanonicalValue(),
-      };
+    'schema': schema,
+    'circuitId': circuitId,
+    'deviceLimit': deviceLimit,
+    'outputCurrentLimitA': outputCurrentLimitA.toMap(),
+    'minimumTerminalVoltageV': minimumTerminalVoltageV.toMap(),
+    'maximumTerminalVoltageV': maximumTerminalVoltageV.toMap(),
+    'cases': [for (final value in cases) value.toCanonicalValue()],
+    'terminalLoadIdByDeviceId': <String, Object?>{
+      for (final key in (terminalLoadIdByDeviceId.keys.toList()..sort()))
+        key: terminalLoadIdByDeviceId[key],
+    },
+    'supervision': supervision.toCanonicalValue(),
+  };
 
   factory Fa06NotificationContract.fromMap(Map<String, Object?> map) {
     _exact(map, const <String>{
@@ -272,19 +283,30 @@ final class Fa06NotificationContract {
     final terminals = <String, String>{};
     for (final entry in terminalMap.entries) {
       if (entry.key is! String || entry.value is! String) {
-        throw const FormatException('FA06 terminal map must contain text pairs.');
+        throw const FormatException(
+          'FA06 terminal map must contain text pairs.',
+        );
       }
-      terminals[_text(entry.key as String, 'deviceId')] =
-          _text(entry.value as String, 'terminalLoadId');
+      terminals[_text(entry.key as String, 'deviceId')] = _text(
+        entry.value as String,
+        'terminalLoadId',
+      );
     }
     return Fa06NotificationContract(
       circuitId: _mapText(map, 'circuitId'),
       deviceLimit: deviceLimit,
-      outputCurrentLimitA: _rational(map['outputCurrentLimitA'], 'outputCurrentLimitA'),
-      minimumTerminalVoltageV:
-          _rational(map['minimumTerminalVoltageV'], 'minimumTerminalVoltageV'),
-      maximumTerminalVoltageV:
-          _rational(map['maximumTerminalVoltageV'], 'maximumTerminalVoltageV'),
+      outputCurrentLimitA: _rational(
+        map['outputCurrentLimitA'],
+        'outputCurrentLimitA',
+      ),
+      minimumTerminalVoltageV: _rational(
+        map['minimumTerminalVoltageV'],
+        'minimumTerminalVoltageV',
+      ),
+      maximumTerminalVoltageV: _rational(
+        map['maximumTerminalVoltageV'],
+        'maximumTerminalVoltageV',
+      ),
       cases: <Fa06CaseContract>[
         for (final raw in rawCases)
           Fa06CaseContract.fromMap(_object(raw, 'FA06 case')),
@@ -327,7 +349,9 @@ List<Fa06CaseContract> _cases(Iterable<Fa06CaseContract> values) {
   final seen = <Fa06ContractCase>{};
   for (final value in result) {
     if (!seen.add(value.operatingCase)) {
-      throw ArgumentError('FA06 duplicate operating case: ${value.operatingCase}');
+      throw ArgumentError(
+        'FA06 duplicate operating case: ${value.operatingCase}',
+      );
     }
   }
   return result;
@@ -336,11 +360,14 @@ List<Fa06CaseContract> _cases(Iterable<Fa06CaseContract> values) {
 List<Fa06SupervisionFaultResult> _faultResults(
   Iterable<Fa06SupervisionFaultResult> values,
 ) {
-  final result = values.toList()..sort((a, b) => a.faultCode.compareTo(b.faultCode));
+  final result = values.toList()
+    ..sort((a, b) => a.faultCode.compareTo(b.faultCode));
   final codes = <String>{};
   for (final value in result) {
     if (!codes.add(value.faultCode)) {
-      throw ArgumentError('FA06 duplicate supervision fault: ${value.faultCode}');
+      throw ArgumentError(
+        'FA06 duplicate supervision fault: ${value.faultCode}',
+      );
     }
   }
   return result;

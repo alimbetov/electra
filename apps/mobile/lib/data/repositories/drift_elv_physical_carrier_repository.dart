@@ -55,16 +55,15 @@ final class DriftElvPhysicalCarrierRepository
     String projectId,
     String carrierId,
   ) async {
-    final rows =
-        await database
-            .customSelect(
-              'SELECT DISTINCT a.cable_run_id FROM traversal_carrier_assignments a WHERE a.project_id = ? AND a.carrier_id = ? AND a.deleted_at IS NULL ORDER BY a.cable_run_id',
-              variables: [
-                Variable.withString(projectId),
-                Variable.withString(carrierId),
-              ],
-            )
-            .get();
+    final rows = await database
+        .customSelect(
+          'SELECT DISTINCT a.cable_run_id FROM traversal_carrier_assignments a WHERE a.project_id = ? AND a.carrier_id = ? AND a.deleted_at IS NULL ORDER BY a.cable_run_id',
+          variables: [
+            Variable.withString(projectId),
+            Variable.withString(carrierId),
+          ],
+        )
+        .get();
     final ids = rows
         .map((row) => row.read<String>('cable_run_id'))
         .toList(growable: false);
@@ -92,12 +91,13 @@ final class DriftElvPhysicalCarrierRepository
       );
     final pathway =
         await (database.select(database.pathwayContexts)..where(
-          (row) =>
-              row.id.equals(carrier.pathwayContextId) &
-              row.projectId.equals(carrier.projectId) &
-              row.lifecycleState.equals('ACTIVE') &
-              row.deletedAt.isNull(),
-        )).getSingleOrNull();
+              (row) =>
+                  row.id.equals(carrier.pathwayContextId) &
+                  row.projectId.equals(carrier.projectId) &
+                  row.lifecycleState.equals('ACTIVE') &
+                  row.deletedAt.isNull(),
+            ))
+            .getSingleOrNull();
     if (pathway == null)
       return elvRuntimeFailure(
         'ELV_CARRIER_PATHWAY_NOT_FOUND',
@@ -105,12 +105,13 @@ final class DriftElvPhysicalCarrierRepository
       );
     final duplicate =
         await (database.select(database.physicalCarriers)..where(
-          (row) =>
-              row.projectId.equals(carrier.projectId) &
-              row.normalizedCode.equals(carrier.normalizedCode) &
-              row.lifecycleState.equals('ACTIVE') &
-              row.deletedAt.isNull(),
-        )).getSingleOrNull();
+              (row) =>
+                  row.projectId.equals(carrier.projectId) &
+                  row.normalizedCode.equals(carrier.normalizedCode) &
+                  row.lifecycleState.equals('ACTIVE') &
+                  row.deletedAt.isNull(),
+            ))
+            .getSingleOrNull();
     if (duplicate != null)
       return elvRuntimeFailure(
         'ELV_CARRIER_CODE_EXISTS',
@@ -145,11 +146,12 @@ final class DriftElvPhysicalCarrierRepository
   ) => database.transaction(() async {
     final row =
         await (database.select(database.physicalCarriers)..where(
-          (candidate) =>
-              candidate.id.equals(command.carrier.id) &
-              candidate.projectId.equals(command.carrier.projectId) &
-              candidate.deletedAt.isNull(),
-        )).getSingleOrNull();
+              (candidate) =>
+                  candidate.id.equals(command.carrier.id) &
+                  candidate.projectId.equals(command.carrier.projectId) &
+                  candidate.deletedAt.isNull(),
+            ))
+            .getSingleOrNull();
     if (row == null)
       return elvRuntimeFailure(
         'ELV_CARRIER_NOT_FOUND',
@@ -191,8 +193,9 @@ final class DriftElvPhysicalCarrierRepository
         ElvFailureCategory.validation,
         details: {'errors': errors},
       );
-    await (database.update(database.physicalCarriers)
-      ..where((candidate) => candidate.id.equals(next.id))).write(
+    await (database.update(
+      database.physicalCarriers,
+    )..where((candidate) => candidate.id.equals(next.id))).write(
       PhysicalCarriersCompanion(
         pathwayContextId: Value(next.pathwayContextId),
         code: Value(next.code),
@@ -215,11 +218,12 @@ final class DriftElvPhysicalCarrierRepository
   ) => database.transaction(() async {
     final row =
         await (database.select(database.physicalCarriers)..where(
-          (candidate) =>
-              candidate.id.equals(command.carrierId) &
-              candidate.projectId.equals(command.projectId) &
-              candidate.deletedAt.isNull(),
-        )).getSingleOrNull();
+              (candidate) =>
+                  candidate.id.equals(command.carrierId) &
+                  candidate.projectId.equals(command.projectId) &
+                  candidate.deletedAt.isNull(),
+            ))
+            .getSingleOrNull();
     if (row == null)
       return elvRuntimeFailure(
         'ELV_CARRIER_NOT_FOUND',
@@ -234,17 +238,19 @@ final class DriftElvPhysicalCarrierRepository
       );
     final assignment =
         await (database.select(database.traversalCarrierAssignments)..where(
-          (candidate) =>
-              candidate.carrierId.equals(command.carrierId) &
-              candidate.deletedAt.isNull(),
-        )).getSingleOrNull();
+              (candidate) =>
+                  candidate.carrierId.equals(command.carrierId) &
+                  candidate.deletedAt.isNull(),
+            ))
+            .getSingleOrNull();
     if (assignment != null)
       return elvRuntimeFailure(
         'ELV_CARRIER_IN_USE',
         ElvFailureCategory.referenceIntegrity,
       );
-    await (database.update(database.physicalCarriers)
-      ..where((candidate) => candidate.id.equals(command.carrierId))).write(
+    await (database.update(
+      database.physicalCarriers,
+    )..where((candidate) => candidate.id.equals(command.carrierId))).write(
       PhysicalCarriersCompanion(
         lifecycleState: const Value('ARCHIVED'),
         revision: Value(row.revision + 1),
@@ -261,12 +267,13 @@ final class DriftElvPhysicalCarrierRepository
   ) => database.transaction(() async {
     final carrierRow =
         await (database.select(database.physicalCarriers)..where(
-          (row) =>
-              row.id.equals(command.compartment.carrierId) &
-              row.projectId.equals(command.projectId) &
-              row.lifecycleState.equals('ACTIVE') &
-              row.deletedAt.isNull(),
-        )).getSingleOrNull();
+              (row) =>
+                  row.id.equals(command.compartment.carrierId) &
+                  row.projectId.equals(command.projectId) &
+                  row.lifecycleState.equals('ACTIVE') &
+                  row.deletedAt.isNull(),
+            ))
+            .getSingleOrNull();
     if (carrierRow == null)
       return elvRuntimeFailure(
         'ELV_CARRIER_NOT_FOUND',
@@ -297,8 +304,8 @@ final class DriftElvPhysicalCarrierRepository
             payloadJson: jsonEncode(
               _crossSectionToMap(command.compartment.crossSection),
             ),
-            lifecycleState:
-                command.compartment.lifecycleState.name.toUpperCase(),
+            lifecycleState: command.compartment.lifecycleState.name
+                .toUpperCase(),
             revision: Value(command.compartment.revision),
             createdAt: now,
             updatedAt: now,
@@ -314,10 +321,11 @@ final class DriftElvPhysicalCarrierRepository
   ) => database.transaction(() async {
     final row =
         await (database.select(database.physicalCarrierCompartments)..where(
-          (candidate) =>
-              candidate.id.equals(command.compartment.id) &
-              candidate.deletedAt.isNull(),
-        )).getSingleOrNull();
+              (candidate) =>
+                  candidate.id.equals(command.compartment.id) &
+                  candidate.deletedAt.isNull(),
+            ))
+            .getSingleOrNull();
     if (row == null)
       return elvRuntimeFailure(
         'ELV_CARRIER_COMPARTMENT_NOT_FOUND',
@@ -348,13 +356,11 @@ final class DriftElvPhysicalCarrierRepository
       lifecycleState: command.compartment.lifecycleState,
       revision: row.revision + 1,
     );
-    final carrierRow =
-        await (database.select(database.physicalCarriers)..where(
-          (candidate) => candidate.id.equals(next.carrierId),
-        )).getSingle();
-    final others = (await loadCompartments(
-      next.carrierId,
-    )).where((item) => item.id != next.id);
+    final carrierRow = await (database.select(
+      database.physicalCarriers,
+    )..where((candidate) => candidate.id.equals(next.carrierId))).getSingle();
+    final others = (await loadCompartments(next.carrierId))
+        .where((item) => item.id != next.id);
     final errors = validateCarrierCompartments(
       carrier: _carrierFromRow(carrierRow),
       compartments: [...others, next],
@@ -365,8 +371,9 @@ final class DriftElvPhysicalCarrierRepository
         ElvFailureCategory.validation,
         details: {'errors': errors},
       );
-    await (database.update(database.physicalCarrierCompartments)
-      ..where((candidate) => candidate.id.equals(next.id))).write(
+    await (database.update(
+      database.physicalCarrierCompartments,
+    )..where((candidate) => candidate.id.equals(next.id))).write(
       PhysicalCarrierCompartmentsCompanion(
         code: Value(next.code),
         normalizedCode: Value(next.normalizedCode),
@@ -387,11 +394,12 @@ final class DriftElvPhysicalCarrierRepository
   ) => database.transaction(() async {
     final run =
         await (database.select(database.canonicalCableRuns)..where(
-          (row) =>
-              row.id.equals(command.cableRunId) &
-              row.projectId.equals(command.projectId) &
-              row.deletedAt.isNull(),
-        )).getSingleOrNull();
+              (row) =>
+                  row.id.equals(command.cableRunId) &
+                  row.projectId.equals(command.projectId) &
+                  row.deletedAt.isNull(),
+            ))
+            .getSingleOrNull();
     if (run == null)
       return elvRuntimeFailure(
         'ELV_CABLE_RUN_NOT_FOUND',
@@ -406,11 +414,12 @@ final class DriftElvPhysicalCarrierRepository
       );
     final traversal =
         await (database.select(database.cableRunTraversals)..where(
-          (row) =>
-              row.id.equals(command.traversalId) &
-              row.cableRunId.equals(command.cableRunId) &
-              row.deletedAt.isNull(),
-        )).getSingleOrNull();
+              (row) =>
+                  row.id.equals(command.traversalId) &
+                  row.cableRunId.equals(command.cableRunId) &
+                  row.deletedAt.isNull(),
+            ))
+            .getSingleOrNull();
     if (traversal == null)
       return elvRuntimeFailure(
         'ELV_TRAVERSAL_NOT_FOUND',
@@ -418,12 +427,13 @@ final class DriftElvPhysicalCarrierRepository
       );
     final carrier =
         await (database.select(database.physicalCarriers)..where(
-          (row) =>
-              row.id.equals(command.carrierId) &
-              row.projectId.equals(command.projectId) &
-              row.lifecycleState.equals('ACTIVE') &
-              row.deletedAt.isNull(),
-        )).getSingleOrNull();
+              (row) =>
+                  row.id.equals(command.carrierId) &
+                  row.projectId.equals(command.projectId) &
+                  row.lifecycleState.equals('ACTIVE') &
+                  row.deletedAt.isNull(),
+            ))
+            .getSingleOrNull();
     if (carrier == null)
       return elvRuntimeFailure(
         'ELV_CARRIER_NOT_FOUND',
@@ -433,12 +443,13 @@ final class DriftElvPhysicalCarrierRepository
     if (command.compartmentId != null) {
       compartment =
           await (database.select(database.physicalCarrierCompartments)..where(
-            (row) =>
-                row.id.equals(command.compartmentId!) &
-                row.carrierId.equals(command.carrierId) &
-                row.lifecycleState.equals('ACTIVE') &
-                row.deletedAt.isNull(),
-          )).getSingleOrNull();
+                (row) =>
+                    row.id.equals(command.compartmentId!) &
+                    row.carrierId.equals(command.carrierId) &
+                    row.lifecycleState.equals('ACTIVE') &
+                    row.deletedAt.isNull(),
+              ))
+              .getSingleOrNull();
       if (compartment == null)
         return elvRuntimeFailure(
           'ELV_CARRIER_COMPARTMENT_NOT_FOUND',
@@ -447,18 +458,20 @@ final class DriftElvPhysicalCarrierRepository
     }
     final revisionRow =
         await (database.select(database.projectDesignRevisions)..where(
-          (row) =>
-              row.id.equals(run.designRevisionId) &
-              row.state.equals('WORKING') &
-              row.deletedAt.isNull(),
-        )).getSingleOrNull();
+              (row) =>
+                  row.id.equals(run.designRevisionId) &
+                  row.state.equals('WORKING') &
+                  row.deletedAt.isNull(),
+            ))
+            .getSingleOrNull();
     if (revisionRow == null)
       return elvRuntimeFailure(
         'ELV_DESIGN_REVISION_READ_ONLY',
         ElvFailureCategory.lifecycle,
       );
-    await (database.update(database.cableRunTraversals)
-      ..where((row) => row.id.equals(command.traversalId))).write(
+    await (database.update(
+      database.cableRunTraversals,
+    )..where((row) => row.id.equals(command.traversalId))).write(
       CableRunTraversalsCompanion(
         physicalCarrierId: Value(command.carrierId),
         carrierCompartmentId: Value(command.compartmentId),
@@ -479,11 +492,13 @@ final class DriftElvPhysicalCarrierRepository
             carrierId: command.carrierId,
             compartmentId: Value(command.compartmentId),
             revision: Value(
-              ((await (database.select(database.traversalCarrierAssignments)
-                            ..where(
-                              (row) =>
-                                  row.traversalId.equals(command.traversalId),
-                            )).getSingleOrNull())
+              ((await (database.select(
+                                database.traversalCarrierAssignments,
+                              )..where(
+                                (row) =>
+                                    row.traversalId.equals(command.traversalId),
+                              ))
+                              .getSingleOrNull())
                           ?.revision ??
                       0) +
                   1,
@@ -496,8 +511,9 @@ final class DriftElvPhysicalCarrierRepository
     await failureProbe.hit(
       ElvFailurePoints.p4AttachCarrierAfterTraversalUpdate,
     );
-    await (database.update(database.canonicalCableRuns)
-      ..where((row) => row.id.equals(run.id))).write(
+    await (database.update(
+      database.canonicalCableRuns,
+    )..where((row) => row.id.equals(run.id))).write(
       CanonicalCableRunsCompanion(
         revision: Value(run.revision + 1),
         updatedAt: Value(now),
@@ -528,13 +544,12 @@ Map<String, Object?> _carrierPayload(PhysicalCarrier carrier) => {
     'moistureClassCode': carrier.environmentFacts.moistureClassCode,
     'contaminationClassCode': carrier.environmentFacts.contaminationClassCode,
     'climateClassCode': carrier.environmentFacts.climateClassCode,
-    'temperatureRange':
-        carrier.environmentFacts.temperatureRange == null
-            ? null
-            : {
-              'minimumC': carrier.environmentFacts.temperatureRange!.minimumC,
-              'maximumC': carrier.environmentFacts.temperatureRange!.maximumC,
-            },
+    'temperatureRange': carrier.environmentFacts.temperatureRange == null
+        ? null
+        : {
+            'minimumC': carrier.environmentFacts.temperatureRange!.minimumC,
+            'maximumC': carrier.environmentFacts.temperatureRange!.maximumC,
+          },
   },
   'installationFacts': {
     'installationClassCode': carrier.installationFacts.installationClassCode,
@@ -581,10 +596,9 @@ PhysicalCarrier _carrierFromRow(PhysicalCarrierRow row) {
   final payload = (jsonDecode(row.payloadJson) as Map).cast<String, dynamic>();
   final env = (payload['environmentFacts'] as Map).cast<String, dynamic>();
   final install = (payload['installationFacts'] as Map).cast<String, dynamic>();
-  final temperature =
-      env['temperatureRange'] == null
-          ? null
-          : (env['temperatureRange'] as Map).cast<String, dynamic>();
+  final temperature = env['temperatureRange'] == null
+      ? null
+      : (env['temperatureRange'] as Map).cast<String, dynamic>();
   return PhysicalCarrier(
     id: row.id,
     projectId: row.projectId,
@@ -596,31 +610,26 @@ PhysicalCarrier _carrierFromRow(PhysicalCarrierRow row) {
       (payload['crossSection'] as Map).cast<String, dynamic>(),
     ),
     environmentFacts: CarrierEnvironmentFacts(
-      exposure:
-          env['exposure'] == null
-              ? null
-              : CarrierEnclosureExposure.values.byName(
-                env['exposure'] as String,
-              ),
+      exposure: env['exposure'] == null
+          ? null
+          : CarrierEnclosureExposure.values.byName(env['exposure'] as String),
       moistureClassCode: env['moistureClassCode'] as String?,
       contaminationClassCode: env['contaminationClassCode'] as String?,
       climateClassCode: env['climateClassCode'] as String?,
-      temperatureRange:
-          temperature == null
-              ? null
-              : CarrierTemperatureRange(
-                minimumC: (temperature['minimumC'] as num).toDouble(),
-                maximumC: (temperature['maximumC'] as num).toDouble(),
-              ),
+      temperatureRange: temperature == null
+          ? null
+          : CarrierTemperatureRange(
+              minimumC: (temperature['minimumC'] as num).toDouble(),
+              maximumC: (temperature['maximumC'] as num).toDouble(),
+            ),
     ),
     installationFacts: CarrierInstallationFacts(
       installationClassCode: install['installationClassCode'] as String?,
-      accessibility:
-          install['accessibility'] == null
-              ? null
-              : MaintenanceAccessibility.values.byName(
-                install['accessibility'] as String,
-              ),
+      accessibility: install['accessibility'] == null
+          ? null
+          : MaintenanceAccessibility.values.byName(
+              install['accessibility'] as String,
+            ),
       barrierPresent: install['barrierPresent'] as bool? ?? false,
     ),
     lifecycleState: PhysicalCarrierLifecycleState.values.byName(

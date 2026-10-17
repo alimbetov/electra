@@ -22,23 +22,21 @@ final class DriftElv5ReplacementWriteUnitOfWork
   @override
   Future<T> run<T>(
     Future<T> Function(Elv5ReplacementWriteSession session) action,
-  ) => DriftElv5RuntimeWriteUnitOfWork(
-    database,
-    originDeviceId: originDeviceId,
-  ).run((runtime) async {
-    final session = _DriftElv5ReplacementWriteSession(
-      runtime,
-      revisions: _DriftElv5RevisionMutationStore(
-        database,
-        originDeviceId: originDeviceId,
-      ),
-      history: _DriftElv5RevisionHistoryStore(
-        database,
-        originDeviceId: originDeviceId,
-      ),
-    );
-    return action(session);
-  });
+  ) => DriftElv5RuntimeWriteUnitOfWork(database, originDeviceId: originDeviceId)
+      .run((runtime) async {
+        final session = _DriftElv5ReplacementWriteSession(
+          runtime,
+          revisions: _DriftElv5RevisionMutationStore(
+            database,
+            originDeviceId: originDeviceId,
+          ),
+          history: _DriftElv5RevisionHistoryStore(
+            database,
+            originDeviceId: originDeviceId,
+          ),
+        );
+        return action(session);
+      });
 }
 
 final class _DriftElv5ReplacementWriteSession
@@ -129,8 +127,7 @@ final class _DriftElv5RevisionMutationStore
   }
 }
 
-final class _DriftElv5RevisionHistoryStore
-    implements Elv5RevisionHistoryStore {
+final class _DriftElv5RevisionHistoryStore implements Elv5RevisionHistoryStore {
   const _DriftElv5RevisionHistoryStore(
     this.database, {
     required this.originDeviceId,
@@ -172,15 +169,17 @@ final class _DriftElv5RevisionHistoryStore
       );
     }
 
-    final maxRow = await database.customSelect(
-      'SELECT COALESCE(MAX(sequence), 0) AS max_sequence '
-      'FROM elv_revision_command_history_operations '
-      'WHERE project_id = ? AND design_revision_id = ?',
-      variables: [
-        Variable.withString(append.projectId),
-        Variable.withString(append.designRevisionId),
-      ],
-    ).getSingle();
+    final maxRow = await database
+        .customSelect(
+          'SELECT COALESCE(MAX(sequence), 0) AS max_sequence '
+          'FROM elv_revision_command_history_operations '
+          'WHERE project_id = ? AND design_revision_id = ?',
+          variables: [
+            Variable.withString(append.projectId),
+            Variable.withString(append.designRevisionId),
+          ],
+        )
+        .getSingle();
     final sequence = maxRow.read<int>('max_sequence') + 1;
     final nextGeneration = currentGeneration + 1;
     final beforeRef = _evidenceRef(append, 'BEFORE');

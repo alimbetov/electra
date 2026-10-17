@@ -18,30 +18,33 @@ final class DriftElv5EnvironmentScopeResolver
     required String designRevisionId,
     required String routeSectionId,
   }) async {
-    final section = await (database.select(database.cableRouteSegments)
-          ..where(
-            (row) =>
-                row.id.equals(routeSectionId) & row.deletedAt.isNull(),
-          ))
-        .getSingleOrNull();
+    final section =
+        await (database.select(database.cableRouteSegments)..where(
+              (row) => row.id.equals(routeSectionId) & row.deletedAt.isNull(),
+            ))
+            .getSingleOrNull();
     if (section == null) {
-      throw StateError('ELV5_ENVIRONMENT_ROUTE_SECTION_NOT_FOUND:$routeSectionId');
+      throw StateError(
+        'ELV5_ENVIRONMENT_ROUTE_SECTION_NOT_FOUND:$routeSectionId',
+      );
     }
 
-    final route = await (database.select(database.cableRoutes)
-          ..where(
-            (row) => row.id.equals(section.routeId) & row.deletedAt.isNull(),
-          ))
-        .getSingleOrNull();
+    final route =
+        await (database.select(database.cableRoutes)..where(
+              (row) => row.id.equals(section.routeId) & row.deletedAt.isNull(),
+            ))
+            .getSingleOrNull();
     if (route == null) {
       throw StateError(
         'ELV5_ENVIRONMENT_ROUTE_NOT_FOUND:${section.routeId}:$routeSectionId',
       );
     }
 
-    final room = await (database.select(database.rooms)
-          ..where((row) => row.id.equals(route.roomId) & row.deletedAt.isNull()))
-        .getSingleOrNull();
+    final room =
+        await (database.select(database.rooms)..where(
+              (row) => row.id.equals(route.roomId) & row.deletedAt.isNull(),
+            ))
+            .getSingleOrNull();
     if (room == null) {
       throw StateError('ELV5_ENVIRONMENT_ROOM_NOT_FOUND:${route.roomId}');
     }

@@ -90,9 +90,9 @@ void main() {
             ),
           );
 
-      final original = (await builder.topology.load(
-        builder.projectId,
-      )).connections.singleWhere((value) => value.id == 'poe-link');
+      final original = (await builder.topology.load(builder.projectId))
+          .connections
+          .singleWhere((value) => value.id == 'poe-link');
       await builder.topology.saveConnection(builder.projectId, original);
 
       const alternateProfileId = 'qualification-profile-cctv-alt';
@@ -147,9 +147,9 @@ void main() {
         owned,
       );
 
-      final durable = (await builder.topology.load(
-        builder.projectId,
-      )).connections.singleWhere((value) => value.id == 'poe-link');
+      final durable = (await builder.topology.load(builder.projectId))
+          .connections
+          .singleWhere((value) => value.id == 'poe-link');
       expect(durable.toMap(), original.toMap());
       expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
     },

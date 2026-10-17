@@ -24,7 +24,8 @@ abstract interface class Elv5CalculationPublicationGuardStore {
   });
 }
 
-abstract interface class Elv5CalculationWriteSession extends Elv5RuntimeWriteSession {
+abstract interface class Elv5CalculationWriteSession
+    extends Elv5RuntimeWriteSession {
   Elv5CalculationPublicationGuardStore get publicationGuards;
 }
 

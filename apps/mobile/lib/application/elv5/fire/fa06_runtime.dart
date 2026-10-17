@@ -84,12 +84,7 @@ final class Fa06PersistedInputResolver
     final dependencies = <Elv5DependencyMarker>[
       _dependency(request, 'SET', 'FIRE_NOTIFICATION_CIRCUIT', circuitId),
       for (final deviceId in deviceIds)
-        _dependency(
-          request,
-          'FACT',
-          'COMPONENT_REFERENCE_BINDING',
-          deviceId,
-        ),
+        _dependency(request, 'FACT', 'COMPONENT_REFERENCE_BINDING', deviceId),
     ];
 
     final contractSnapshot = await contractSource.loadActiveForCircuit(
@@ -112,7 +107,8 @@ final class Fa06PersistedInputResolver
       throw StateError('FA06_CONTRACT_CIRCUIT_IDENTITY_MISMATCH:$circuitId');
     }
     final mappedIds = contract.terminalLoadIdByDeviceId.keys.toSet();
-    if (mappedIds.length != deviceIds.length || !mappedIds.containsAll(deviceIds)) {
+    if (mappedIds.length != deviceIds.length ||
+        !mappedIds.containsAll(deviceIds)) {
       _blocked(
         request,
         'FA06_TERMINAL_MEMBERSHIP_MAPPING_MISMATCH',
@@ -296,7 +292,8 @@ final class Fa06PersistedInputResolver
       );
     }
 
-    if (contract.supervision.required && contract.supervision.evidenceRef != null) {
+    if (contract.supervision.required &&
+        contract.supervision.evidenceRef != null) {
       dependencies.add(
         _dependency(
           request,
@@ -328,8 +325,9 @@ final class Fa06PersistedInputResolver
       'membershipFingerprint': membershipFingerprint,
       'upstream': upstreamBasis
         ..sort(
-          (a, b) => (a['evaluationId']! as String)
-              .compareTo(b['evaluationId']! as String),
+          (a, b) => (a['evaluationId']! as String).compareTo(
+            b['evaluationId']! as String,
+          ),
         ),
     });
     return Elv5CapturedInput<Fa06Input>(
@@ -528,10 +526,10 @@ Elv5PureKernelExecutor<Fa06Input, Fa06Result> buildFa06Executor({
           'outputCurrentLowerA': entry.value.outputCurrent.lower.value.toMap(),
           'outputCurrentUpperA': entry.value.outputCurrent.upper.value.toMap(),
           'currentMarginA': entry.value.currentMargin.value.toMap(),
-          'terminalVoltageLowerV':
-              entry.value.terminalVoltage.lower.value.toMap(),
-          'terminalVoltageUpperV':
-              entry.value.terminalVoltage.upper.value.toMap(),
+          'terminalVoltageLowerV': entry.value.terminalVoltage.lower.value
+              .toMap(),
+          'terminalVoltageUpperV': entry.value.terminalVoltage.upper.value
+              .toMap(),
           'lowVoltageMarginV': entry.value.lowVoltageMargin.value.toMap(),
           'highVoltageMarginV': entry.value.highVoltageMargin.value.toMap(),
           'status': entry.value.status.name,
@@ -563,9 +561,7 @@ Elv5PureKernelExecutor<Fa06Input, Fa06Result> buildFa06Executor({
 
 List<Map<String, Object?>> _objects(Object? raw, String field) {
   if (raw is! List) throw FormatException('$field must be an array.');
-  return <Map<String, Object?>>[
-    for (final value in raw) _map(value, field),
-  ];
+  return <Map<String, Object?>>[for (final value in raw) _map(value, field)];
 }
 
 Map<String, Object?> _map(Object? raw, String field) {

@@ -63,18 +63,17 @@ class ElectricalCircuitsScreen extends ConsumerWidget {
         RoomConsumptionGroup? group,
       }) => showDialog<void>(
         context: context,
-        builder:
-            (_) => ElectricalCircuitDialog(
-              circuitId:
-                  existing?.circuit.id ?? ref.read(idGeneratorProvider).next(),
-              roomId: roomId,
-              existing: existing?.circuit,
-              sourceGroup: group,
-              loads: roomLoads,
-              titles: titles,
-              assignedCircuitIds: assignments,
-              onSave: ref.read(electricalCircuitRepositoryProvider).saveCircuit,
-            ),
+        builder: (_) => ElectricalCircuitDialog(
+          circuitId:
+              existing?.circuit.id ?? ref.read(idGeneratorProvider).next(),
+          roomId: roomId,
+          existing: existing?.circuit,
+          sourceGroup: group,
+          loads: roomLoads,
+          titles: titles,
+          assignedCircuitIds: assignments,
+          onSave: ref.read(electricalCircuitRepositoryProvider).saveCircuit,
+        ),
       );
       body = ListView(
         padding: const EdgeInsets.all(16),
@@ -169,28 +168,24 @@ class ElectricalCircuitsScreen extends ConsumerWidget {
                       FilledButton.tonal(
                         onPressed:
                             !snapshot.calculation.ready ||
-                                    snapshot.status == CircuitStatus.confirmed
-                                ? null
-                                : () async {
-                                  try {
-                                    await ref
-                                        .read(
-                                          electricalCircuitRepositoryProvider,
-                                        )
-                                        .confirmCircuit(snapshot.circuit.id);
-                                  } catch (error) {
-                                    if (context.mounted)
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            'Unable to confirm: $error',
-                                          ),
+                                snapshot.status == CircuitStatus.confirmed
+                            ? null
+                            : () async {
+                                try {
+                                  await ref
+                                      .read(electricalCircuitRepositoryProvider)
+                                      .confirmCircuit(snapshot.circuit.id);
+                                } catch (error) {
+                                  if (context.mounted)
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          'Unable to confirm: $error',
                                         ),
-                                      );
-                                  }
-                                },
+                                      ),
+                                    );
+                                }
+                              },
                         child: const Text('Confirm proposal'),
                       ),
                     ],
@@ -267,11 +262,10 @@ class _ElectricalCircuitDialogState extends State<ElectricalCircuitDialog> {
             )
             .map((load) => load.componentInstanceId),
   };
-  late final initialProfile =
-      widget.loads
-          .where((load) => selected.contains(load.componentInstanceId))
-          .firstOrNull
-          ?.profile;
+  late final initialProfile = widget.loads
+      .where((load) => selected.contains(load.componentInstanceId))
+      .firstOrNull
+      ?.profile;
   late final name = TextEditingController(
     text:
         widget.existing?.name ??
@@ -325,9 +319,7 @@ class _ElectricalCircuitDialogState extends State<ElectricalCircuitDialog> {
     final circuit = draft();
     if (circuit.name.isEmpty || circuit.inputs.validate().isNotEmpty) {
       setState(
-        () =>
-            error =
-                'Enter a name, positive voltage and demand factor above zero and at most one; match the phase count to the supply.',
+        () => error = 'Enter a name, positive voltage and demand factor above zero and at most one; match the phase count to the supply.',
       );
       return;
     }
@@ -351,8 +343,9 @@ class _ElectricalCircuitDialogState extends State<ElectricalCircuitDialog> {
       draft(),
       widget.loads,
     );
-    final availableIds =
-        widget.loads.map((load) => load.componentInstanceId).toSet();
+    final availableIds = widget.loads
+        .map((load) => load.componentInstanceId)
+        .toSet();
     return AlertDialog(
       title: Text(widget.existing == null ? 'New circuit' : 'Edit circuit'),
       content: SizedBox(
@@ -372,50 +365,43 @@ class _ElectricalCircuitDialogState extends State<ElectricalCircuitDialog> {
                 isExpanded: true,
                 initialValue: supply,
                 decoration: const InputDecoration(labelText: 'Supply system'),
-                items:
-                    SupplySystem.values
-                        .map(
-                          (value) => DropdownMenuItem(
-                            value: value,
-                            child: Text(
-                              _supplyName(value),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        )
-                        .toList(),
-                onChanged:
-                    saving
-                        ? null
-                        : (value) {
-                          if (value != null)
-                            setState(() {
-                              supply = value;
-                              phases =
-                                  value == SupplySystem.threePhaseAc ? 3 : 1;
-                            });
-                        },
+                items: SupplySystem.values
+                    .map(
+                      (value) => DropdownMenuItem(
+                        value: value,
+                        child: Text(
+                          _supplyName(value),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    )
+                    .toList(),
+                onChanged: saving
+                    ? null
+                    : (value) {
+                        if (value != null)
+                          setState(() {
+                            supply = value;
+                            phases = value == SupplySystem.threePhaseAc ? 3 : 1;
+                          });
+                      },
               ),
               DropdownButtonFormField<int>(
                 isExpanded: true,
                 key: ValueKey(phases),
                 initialValue: phases,
                 decoration: const InputDecoration(labelText: 'Phases'),
-                items:
-                    [1, 2, 3]
-                        .map(
-                          (value) => DropdownMenuItem(
-                            value: value,
-                            child: Text('$value'),
-                          ),
-                        )
-                        .toList(),
-                onChanged:
-                    saving
-                        ? null
-                        : (value) {
-                          if (value != null) setState(() => phases = value);
-                        },
+                items: [1, 2, 3]
+                    .map(
+                      (value) =>
+                          DropdownMenuItem(value: value, child: Text('$value')),
+                    )
+                    .toList(),
+                onChanged: saving
+                    ? null
+                    : (value) {
+                        if (value != null) setState(() => phases = value);
+                      },
               ),
               TextField(
                 controller: voltage,
@@ -424,10 +410,9 @@ class _ElectricalCircuitDialogState extends State<ElectricalCircuitDialog> {
                   decimal: true,
                 ),
                 decoration: InputDecoration(
-                  labelText:
-                      phases == 3
-                          ? 'Line-to-line voltage (V)'
-                          : 'Nominal voltage (V)',
+                  labelText: phases == 3
+                      ? 'Line-to-line voltage (V)'
+                      : 'Nominal voltage (V)',
                 ),
                 onChanged: (_) => setState(() {}),
               ),
@@ -459,30 +444,29 @@ class _ElectricalCircuitDialogState extends State<ElectricalCircuitDialog> {
                   value: selected.contains(load.componentInstanceId),
                   onChanged:
                       saving ||
-                              (widget.assignedCircuitIds[load
-                                          .componentInstanceId] !=
-                                      null &&
-                                  widget.assignedCircuitIds[load
-                                          .componentInstanceId] !=
-                                      widget.circuitId &&
-                                  !selected.contains(load.componentInstanceId))
-                          ? null
-                          : (value) => setState(() {
-                            if (value == true)
-                              selected.add(load.componentInstanceId);
-                            else
-                              selected.remove(load.componentInstanceId);
-                          }),
+                          (widget.assignedCircuitIds[load
+                                      .componentInstanceId] !=
+                                  null &&
+                              widget.assignedCircuitIds[load
+                                      .componentInstanceId] !=
+                                  widget.circuitId &&
+                              !selected.contains(load.componentInstanceId))
+                      ? null
+                      : (value) => setState(() {
+                          if (value == true)
+                            selected.add(load.componentInstanceId);
+                          else
+                            selected.remove(load.componentInstanceId);
+                        }),
                 ),
               for (final id in selected.difference(availableIds))
                 CheckboxListTile(
                   contentPadding: EdgeInsets.zero,
                   title: Text('${widget.titles[id] ?? id} · unavailable'),
                   value: true,
-                  onChanged:
-                      saving
-                          ? null
-                          : (_) => setState(() => selected.remove(id)),
+                  onChanged: saving
+                      ? null
+                      : (_) => setState(() => selected.remove(id)),
                 ),
               Text(
                 calculation.ready

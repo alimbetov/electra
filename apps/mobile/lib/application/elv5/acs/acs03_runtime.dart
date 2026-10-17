@@ -59,7 +59,10 @@ final class Acs03PersistedInputResolver
       throw StateError('ACS03_DOOR_ID_MISMATCH:$doorId:${request.subject.id}');
     }
 
-    final assignments = _objects(door.payload['roleAssignments'], 'roleAssignments');
+    final assignments = _objects(
+      door.payload['roleAssignments'],
+      'roleAssignments',
+    );
     final lockAssignments = assignments
         .where((row) => _text(row, 'roleCode').toUpperCase() == 'LOCK')
         .toList();
@@ -94,7 +97,9 @@ final class Acs03PersistedInputResolver
     }
 
     final lockId = _text(lockAssignments.single, 'componentId');
-    dependencies.add(_dependency(request, 'FACT', 'ACS_LOCK_COMPONENT', lockId));
+    dependencies.add(
+      _dependency(request, 'FACT', 'ACS_LOCK_COMPONENT', lockId),
+    );
     final contractSnapshot = await contractSource.loadActiveForDoor(
       projectId: request.projectId,
       designRevisionId: request.designRevisionId,
@@ -135,7 +140,8 @@ final class Acs03PersistedInputResolver
         'POLICY',
         'ACS03_ELECTRICAL_CONTRACT',
         contractSnapshot.evidenceRef,
-        memberId: '${contractSnapshot.bindingId}:${contractSnapshot.bindingRevision}:${contractSnapshot.contentHash}',
+        memberId:
+            '${contractSnapshot.bindingId}:${contractSnapshot.bindingRevision}:${contractSnapshot.contentHash}',
       ),
     );
 
@@ -177,7 +183,10 @@ final class Acs03PersistedInputResolver
           doorFingerprint,
           contractSnapshot.contentHash,
           dependencies,
-          <String, Object?>{'eventId': event.eventId, 'evaluationId': pwr01.evaluationId},
+          <String, Object?>{
+            'eventId': event.eventId,
+            'evaluationId': pwr01.evaluationId,
+          },
         );
       }
       final knownA = _powerRational(pwr01Output['knownA'], 'knownA');
@@ -206,7 +215,10 @@ final class Acs03PersistedInputResolver
           doorFingerprint,
           contractSnapshot.contentHash,
           dependencies,
-          <String, Object?>{'eventId': event.eventId, 'evaluationId': pwr03.evaluationId},
+          <String, Object?>{
+            'eventId': event.eventId,
+            'evaluationId': pwr03.evaluationId,
+          },
         );
       }
       final terminal = _singleById(
@@ -249,14 +261,24 @@ final class Acs03PersistedInputResolver
         Acs03PwrEvidence(
           eventId: event.eventId,
           membershipFingerprint: membershipFingerprint,
-          terminalVoltage: Elv5Interval<VoltageDim>(terminalMinimum, terminalMaximum),
-          sharedTrunkCurrent: Elv5Interval<CurrentDim>(trunkCurrent, trunkCurrent),
-          sourceCurrentMargin: Elv5Interval<CurrentDim>(currentMargin, currentMargin),
+          terminalVoltage: Elv5Interval<VoltageDim>(
+            terminalMinimum,
+            terminalMaximum,
+          ),
+          sharedTrunkCurrent: Elv5Interval<CurrentDim>(
+            trunkCurrent,
+            trunkCurrent,
+          ),
+          sourceCurrentMargin: Elv5Interval<CurrentDim>(
+            currentMargin,
+            currentMargin,
+          ),
         ),
       );
 
       for (final snapshot in <Elv4CurrentEvaluationSnapshot>[pwr01, pwr03]) {
-        upstreamGenerations[snapshot.nodeKey.sha256] = snapshot.pointerGeneration;
+        upstreamGenerations[snapshot.nodeKey.sha256] =
+            snapshot.pointerGeneration;
         dependencies.add(
           _dependency(
             request,
@@ -265,7 +287,8 @@ final class Acs03PersistedInputResolver
                 ? 'ELV4_PWR01_CURRENT'
                 : 'ELV4_PWR03_CURRENT',
             snapshot.evaluationId,
-            memberId: '${snapshot.nodeKey.sha256}:${snapshot.pointerGeneration}:${snapshot.evidenceSha256}',
+            memberId:
+                '${snapshot.nodeKey.sha256}:${snapshot.pointerGeneration}:${snapshot.evidenceSha256}',
           ),
         );
         upstreamBasis.add(<String, Object?>{
@@ -293,9 +316,12 @@ final class Acs03PersistedInputResolver
       'doorFingerprint': doorFingerprint,
       'contractEvidenceRef': contractSnapshot.evidenceRef,
       'contractContentHash': contractSnapshot.contentHash,
-      'upstream': upstreamBasis..sort(
-        (a, b) => (a['evaluationId']! as String).compareTo(b['evaluationId']! as String),
-      ),
+      'upstream': upstreamBasis
+        ..sort(
+          (a, b) => (a['evaluationId']! as String).compareTo(
+            b['evaluationId']! as String,
+          ),
+        ),
     });
 
     return Elv5CapturedInput<Acs03Input>(
@@ -370,14 +396,18 @@ final class Acs03PersistedInputResolver
     final inputs = _map(snapshot.evidence['inputs'], 'inputs');
     final rawKeys = inputs['dependencyKeys'];
     if (rawKeys is! List || rawKeys.any((value) => value is! String)) {
-      throw StateError('ACS03_PWR03_DEPENDENCY_KEYS_INVALID:${snapshot.evaluationId}');
+      throw StateError(
+        'ACS03_PWR03_DEPENDENCY_KEYS_INVALID:${snapshot.evaluationId}',
+      );
     }
     final closure = <String>[
       for (final raw in rawKeys.cast<String>())
         if (PowerDependencyKey.decode(raw).scenarioId == null) raw,
     ]..sort();
     if (closure.isEmpty) {
-      throw StateError('ACS03_PWR03_MEMBERSHIP_CLOSURE_EMPTY:${snapshot.evaluationId}');
+      throw StateError(
+        'ACS03_PWR03_MEMBERSHIP_CLOSURE_EMPTY:${snapshot.evaluationId}',
+      );
     }
     return _encoder.sha256(<String, Object?>{
       'schema': 'electra.elv5-acs03-pwr03-membership-closure.v1',
@@ -430,12 +460,16 @@ Elv5PureKernelExecutor<Acs03Input, Acs03Result> buildAcs03Executor({
           'status': item.status.name,
           'terminalVoltageLowerV': item.terminalVoltage?.lower.value.toMap(),
           'terminalVoltageUpperV': item.terminalVoltage?.upper.value.toMap(),
-          'sharedTrunkCurrentLowerA': item.sharedTrunkCurrent?.lower.value.toMap(),
-          'sharedTrunkCurrentUpperA': item.sharedTrunkCurrent?.upper.value.toMap(),
+          'sharedTrunkCurrentLowerA': item.sharedTrunkCurrent?.lower.value
+              .toMap(),
+          'sharedTrunkCurrentUpperA': item.sharedTrunkCurrent?.upper.value
+              .toMap(),
           'minimumVoltageMarginV': item.minimumVoltageMargin?.value.toMap(),
           'maximumVoltageMarginV': item.maximumVoltageMargin?.value.toMap(),
-          'sourceCurrentMarginLowerA': item.sourceCurrentMargin?.lower.value.toMap(),
-          'sourceCurrentMarginUpperA': item.sourceCurrentMargin?.upper.value.toMap(),
+          'sourceCurrentMarginLowerA': item.sourceCurrentMargin?.lower.value
+              .toMap(),
+          'sourceCurrentMarginUpperA': item.sourceCurrentMargin?.upper.value
+              .toMap(),
           'reason': item.reason,
         },
     ],
@@ -452,9 +486,9 @@ Elv5PureKernelExecutor<Acs03Input, Acs03Result> buildAcs03Executor({
       : Elv5Execution.succeeded,
   completionOf: (result) =>
       result.status == Acs03AssessmentStatus.unresolved ||
-              result.status == Acs03AssessmentStatus.blocked
-          ? Elv5Completion.incomplete
-          : Elv5Completion.complete,
+          result.status == Acs03AssessmentStatus.blocked
+      ? Elv5Completion.incomplete
+      : Elv5Completion.complete,
   assessmentOf: (result) => switch (result.status) {
     Acs03AssessmentStatus.pass => Elv5Assessment.pass,
     Acs03AssessmentStatus.fail => Elv5Assessment.fail,

@@ -54,9 +54,9 @@ final class DriftEngineeringPlacementRepository
     String operationId,
   ) async {
     final row =
-        await (database.select(database.engineeringPlacementOperations)..where(
-          (candidate) => candidate.operationId.equals(operationId),
-        )).getSingleOrNull();
+        await (database.select(database.engineeringPlacementOperations)
+              ..where((candidate) => candidate.operationId.equals(operationId)))
+            .getSingleOrNull();
     return row == null ? null : _operationFromRow(row);
   }
 
@@ -73,11 +73,12 @@ final class DriftEngineeringPlacementRepository
     try {
       return await database.transaction(() async {
         final existing =
-            await (database.select(
-              database.engineeringPlacementOperations,
-            )..where(
-              (candidate) => candidate.operationId.equals(command.operationId),
-            )).getSingleOrNull();
+            await (database.select(database.engineeringPlacementOperations)
+                  ..where(
+                    (candidate) =>
+                        candidate.operationId.equals(command.operationId),
+                  ))
+                .getSingleOrNull();
 
         if (existing != null) {
           if (existing.fingerprintVersion !=
@@ -85,8 +86,7 @@ final class DriftEngineeringPlacementRepository
               existing.commandFingerprint != fingerprint) {
             throw EngineeringPlacementFailure(
               code: EngineeringPlacementFailureCode.idempotencyConflict,
-              message:
-                  'operationId is already bound to different placement semantics.',
+              message: 'operationId is already bound to different placement semantics.',
               details: {
                 'operationId': command.operationId,
                 'storedFingerprintVersion': existing.fingerprintVersion,
@@ -105,8 +105,7 @@ final class DriftEngineeringPlacementRepository
             case EngineeringPlacementOperationStatus.undone:
               throw EngineeringPlacementFailure(
                 code: EngineeringPlacementFailureCode.operationUndone,
-                message:
-                    'The completed placement was undone. Normal retry cannot reactivate it.',
+                message: 'The completed placement was undone. Normal retry cannot reactivate it.',
                 details: {'operationId': command.operationId},
               );
           }
@@ -213,11 +212,9 @@ final class DriftEngineeringPlacementRepository
   }) async {
     try {
       await database.transaction(() async {
-        final row =
-            await (database.select(database.engineeringPlacementOperations)
-              ..where(
-                (r) => r.operationId.equals(operationId),
-              )).getSingleOrNull();
+        final row = await (database.select(
+          database.engineeringPlacementOperations,
+        )..where((r) => r.operationId.equals(operationId))).getSingleOrNull();
         if (row == null || row.status != (retire ? 'COMPLETED' : 'UNDONE')) {
           throw EngineeringPlacementFailure(
             code: EngineeringPlacementFailureCode.historyConflict,
@@ -276,8 +273,9 @@ final class DriftEngineeringPlacementRepository
         }
         final now = _clock().toUtc();
         await _aggregate.transition(result, retire: retire, now: now);
-        await (database.update(database.engineeringPlacementOperations)
-          ..where((r) => r.operationId.equals(operationId))).write(
+        await (database.update(
+          database.engineeringPlacementOperations,
+        )..where((r) => r.operationId.equals(operationId))).write(
           EngineeringPlacementOperationsCompanion(
             status: Value(retire ? 'UNDONE' : 'COMPLETED'),
             updatedAt: Value(now),
@@ -310,10 +308,9 @@ final class DriftEngineeringPlacementRepository
     final status = switch (row.status) {
       'COMPLETED' => EngineeringPlacementOperationStatus.completed,
       'UNDONE' => EngineeringPlacementOperationStatus.undone,
-      _ =>
-        throw StateError(
-          'Unsupported engineering placement operation status: ${row.status}',
-        ),
+      _ => throw StateError(
+        'Unsupported engineering placement operation status: ${row.status}',
+      ),
     };
     return EngineeringPlacementOperationRecord(
       operationId: row.operationId,
@@ -361,9 +358,9 @@ final class DriftEngineeringPlacementComponentWriter {
       );
     }
 
-    final existing =
-        await (database.select(database.componentInstances)
-          ..where((row) => row.id.equals(componentId))).getSingleOrNull();
+    final existing = await (database.select(
+      database.componentInstances,
+    )..where((row) => row.id.equals(componentId))).getSingleOrNull();
     if (existing != null) {
       throw EngineeringPlacementFailure(
         code: EngineeringPlacementFailureCode.componentConflict,
@@ -430,8 +427,10 @@ final class DriftEngineeringPlacementComponentWriter {
     _validateCanonicalDefinition();
     final project =
         await (database.select(database.projects)..where(
-          (row) => row.id.equals(command.projectId) & row.deletedAt.isNull(),
-        )).getSingleOrNull();
+              (row) =>
+                  row.id.equals(command.projectId) & row.deletedAt.isNull(),
+            ))
+            .getSingleOrNull();
     if (project == null) {
       throw EngineeringPlacementFailure(
         code: EngineeringPlacementFailureCode.projectNotFound,
@@ -442,8 +441,9 @@ final class DriftEngineeringPlacementComponentWriter {
 
     final room =
         await (database.select(database.rooms)..where(
-          (row) => row.id.equals(command.roomId) & row.deletedAt.isNull(),
-        )).getSingleOrNull();
+              (row) => row.id.equals(command.roomId) & row.deletedAt.isNull(),
+            ))
+            .getSingleOrNull();
     if (room == null) {
       throw EngineeringPlacementFailure(
         code: EngineeringPlacementFailureCode.roomNotFound,
@@ -454,8 +454,9 @@ final class DriftEngineeringPlacementComponentWriter {
 
     final floor =
         await (database.select(database.floors)..where(
-          (row) => row.id.equals(room.floorId) & row.deletedAt.isNull(),
-        )).getSingleOrNull();
+              (row) => row.id.equals(room.floorId) & row.deletedAt.isNull(),
+            ))
+            .getSingleOrNull();
     if (floor == null || floor.projectId != project.id) {
       throw EngineeringPlacementFailure(
         code: EngineeringPlacementFailureCode.roomNotFound,
@@ -471,10 +472,11 @@ final class DriftEngineeringPlacementComponentWriter {
 
     final patch =
         await (database.select(database.surfacePatches)..where(
-          (row) =>
-              row.id.equals(command.hostSurfacePatchId) &
-              row.deletedAt.isNull(),
-        )).getSingleOrNull();
+              (row) =>
+                  row.id.equals(command.hostSurfacePatchId) &
+                  row.deletedAt.isNull(),
+            ))
+            .getSingleOrNull();
     if (patch == null || patch.roomId != command.roomId) {
       throw EngineeringPlacementFailure(
         code: EngineeringPlacementFailureCode.surfacePatchNotFound,

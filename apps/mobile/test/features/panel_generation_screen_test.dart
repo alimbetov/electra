@@ -33,17 +33,16 @@ ProjectPanelGenerationSnapshot fixture({bool stale = false}) {
     label: 'Panel',
     version: 'test',
     inputs: {'revision': stale ? 2 : 1},
-    evaluate:
-        (_) => DependencyProposal(
-          values: {
-            'proposalState': 'proposed',
-            'circuits': [],
-            'incoming': {},
-            'warnings': [],
-            'inputIssues': [],
-            'recommendedCapacityModules': 8,
-          },
-        ),
+    evaluate: (_) => DependencyProposal(
+      values: {
+        'proposalState': 'proposed',
+        'circuits': [],
+        'incoming': {},
+        'warnings': [],
+        'inputIssues': [],
+        'recommendedCapacityModules': 8,
+      },
+    ),
   );
   final original = RecalculationSession(
     nodes: [

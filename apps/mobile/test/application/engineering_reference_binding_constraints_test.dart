@@ -9,11 +9,9 @@ void main() {
   test('component binding roundtrips exact embedded constraint snapshot', () {
     final catalog = EngineeringReferenceCatalog.fromMap(
       jsonDecode(
-            File(
-              '../../docs/examples/elv2-reference-catalog.json',
-            ).readAsStringSync(),
-          )
-          as Map<String, dynamic>,
+        File('../../docs/examples/elv2-reference-catalog.json')
+            .readAsStringSync(),
+      ) as Map<String, dynamic>,
     );
     final profile = catalog.profile('CAMERA');
     final binding = ComponentReferenceBinding(

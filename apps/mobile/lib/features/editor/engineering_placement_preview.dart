@@ -167,10 +167,9 @@ class _CandidateConditionsDialogState extends State<CandidateConditionsDialog> {
     climate = c.environmentClimate;
     enclosure = c.hasEnclosure;
     role = c.topologyRole;
-    shape =
-        widget.system.topologyProfile == null
-            ? c.topologyShape
-            : resolvePaletteTopology(widget.system, widget.topologyProfiles);
+    shape = widget.system.topologyProfile == null
+        ? c.topologyShape
+        : resolvePaletteTopology(widget.system, widget.topologyProfiles);
     temperature = TextEditingController(
       text: c.ambientTemperatureC?.toString() ?? '',
     );
@@ -248,8 +247,9 @@ class _CandidateConditionsDialogState extends State<CandidateConditionsDialog> {
         environmentContamination: contamination,
         environmentClimate: climate,
         ambientTemperatureC: numeric(temperature),
-        actualIpRating:
-            ip.text.trim().isEmpty ? null : IpProtectionClass.parse(ip.text),
+        actualIpRating: ip.text.trim().isEmpty
+            ? null
+            : IpProtectionClass.parse(ip.text),
         hasEnclosure: enclosure,
         availableClearanceMm: numeric(clearance),
         topologyShape: shape,
@@ -397,11 +397,10 @@ class EngineeringCandidatePainter extends CustomPainter {
     );
     final mapped = transform.localToViewport(point);
     final center = Offset(mapped.x, mapped.y);
-    final paint =
-        Paint()
-          ..color = placementStatusColor(status)
-          ..strokeWidth = 3
-          ..style = PaintingStyle.stroke;
+    final paint = Paint()
+      ..color = placementStatusColor(status)
+      ..strokeWidth = 3
+      ..style = PaintingStyle.stroke;
     canvas.drawCircle(center, 11, paint);
     canvas.drawLine(
       center - const Offset(16, 0),

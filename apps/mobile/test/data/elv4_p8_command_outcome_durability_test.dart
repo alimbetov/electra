@@ -92,18 +92,21 @@ void _expectSameFailure(ElvFailure left, ElvFailure right) {
 
 Future<void> _expectNoFreezeArtifacts(AppDatabase db) async {
   expect(
-    await (db.select(db.designRevisionPhysicalSnapshots)
-      ..where((row) => row.designRevisionId.equals(_revisionId))).get(),
+    await (db.select(
+      db.designRevisionPhysicalSnapshots,
+    )..where((row) => row.designRevisionId.equals(_revisionId))).get(),
     isEmpty,
   );
   expect(
-    await (db.select(db.designRevisionPowerSnapshots)
-      ..where((row) => row.designRevisionId.equals(_revisionId))).get(),
+    await (db.select(
+      db.designRevisionPowerSnapshots,
+    )..where((row) => row.designRevisionId.equals(_revisionId))).get(),
     isEmpty,
   );
   expect(
-    await (db.select(db.designRevisionSnapshotManifests)
-      ..where((row) => row.designRevisionId.equals(_revisionId))).get(),
+    await (db.select(
+      db.designRevisionSnapshotManifests,
+    )..where((row) => row.designRevisionId.equals(_revisionId))).get(),
     isEmpty,
   );
 }
@@ -118,53 +121,50 @@ Future<List<CommandExecutionRecordRow>> _ledger(
         .get();
 
 void main() {
-  test(
-    'P8 deterministic freeze rejection is durable and replays verbatim after reopen',
-    () async {
-      final dir = await Directory.systemTemp.createTemp('electra-p8-rejected-');
-      addTearDown(() => dir.delete(recursive: true));
-      final file = File('${dir.path}/electra.sqlite');
+  test('P8 deterministic freeze rejection is durable and replays verbatim after reopen', () async {
+    final dir = await Directory.systemTemp.createTemp('electra-p8-rejected-');
+    addTearDown(() => dir.delete(recursive: true));
+    final file = File('${dir.path}/electra.sqlite');
 
-      var db = AppDatabase(_native(file, configureWal: true));
-      await _seed(db);
-      final repository = _repository(db);
+    var db = AppDatabase(_native(file, configureWal: true));
+    await _seed(db);
+    final repository = _repository(db);
 
-      const rejectedCommand = FreezeProjectDesignRevisionCommand(
-        commandId: 'freeze-stale-durable',
+    const rejectedCommand = FreezeProjectDesignRevisionCommand(
+      commandId: 'freeze-stale-durable',
+      projectId: _projectId,
+      designRevisionId: _revisionId,
+      expectedRevision: 2,
+    );
+    final first = _failure(await repository.freeze(rejectedCommand));
+    expect(first.code, 'ELV_DESIGN_REVISION_REVISION_CONFLICT');
+    expect(first.category, ElvFailureCategory.revisionConflict);
+    expect(first.expectedRevision, 2);
+    expect(first.actualRevision, 1);
+    await _expectNoFreezeArtifacts(db);
+
+    final rejectedRows = await _ledger(db, rejectedCommand.commandId);
+    expect(rejectedRows, hasLength(1));
+    expect(rejectedRows.single.outcomeKind, 'REJECTED');
+    expect(rejectedRows.single.commandType, 'FREEZE_PROJECT_DESIGN_REVISION');
+
+    final successfulFreeze = await repository.freeze(
+      const FreezeProjectDesignRevisionCommand(
+        commandId: 'freeze-r1-valid',
         projectId: _projectId,
         designRevisionId: _revisionId,
-        expectedRevision: 2,
-      );
-      final first = _failure(await repository.freeze(rejectedCommand));
-      expect(first.code, 'ELV_DESIGN_REVISION_REVISION_CONFLICT');
-      expect(first.category, ElvFailureCategory.revisionConflict);
-      expect(first.expectedRevision, 2);
-      expect(first.actualRevision, 1);
-      await _expectNoFreezeArtifacts(db);
+        expectedRevision: 1,
+      ),
+    );
+    expect(successfulFreeze, isA<ElvCommandSuccess<ProjectDesignRevision>>());
 
-      final rejectedRows = await _ledger(db, rejectedCommand.commandId);
-      expect(rejectedRows, hasLength(1));
-      expect(rejectedRows.single.outcomeKind, 'REJECTED');
-      expect(rejectedRows.single.commandType, 'FREEZE_PROJECT_DESIGN_REVISION');
-
-      final successfulFreeze = await repository.freeze(
-        const FreezeProjectDesignRevisionCommand(
-          commandId: 'freeze-r1-valid',
-          projectId: _projectId,
-          designRevisionId: _revisionId,
-          expectedRevision: 1,
-        ),
-      );
-      expect(successfulFreeze, isA<ElvCommandSuccess<ProjectDesignRevision>>());
-
-      await db.close();
-      db = AppDatabase(_native(file));
-      addTearDown(db.close);
-      final replay = _failure(await _repository(db).freeze(rejectedCommand));
-      _expectSameFailure(first, replay);
-      expect(await _ledger(db, rejectedCommand.commandId), hasLength(1));
-    },
-  );
+    await db.close();
+    db = AppDatabase(_native(file));
+    addTearDown(db.close);
+    final replay = _failure(await _repository(db).freeze(rejectedCommand));
+    _expectSameFailure(first, replay);
+    expect(await _ledger(db, rejectedCommand.commandId), hasLength(1));
+  });
 
   test(
     'P8 same commandId with another command type is an envelope conflict',
@@ -250,9 +250,9 @@ void main() {
       addTearDown(db.close);
       expect(await _ledger(db, commandId), isEmpty);
       await _expectNoFreezeArtifacts(db);
-      final revision =
-          await (db.select(db.projectDesignRevisions)
-            ..where((row) => row.id.equals(_revisionId))).getSingle();
+      final revision = await (db.select(
+        db.projectDesignRevisions,
+      )..where((row) => row.id.equals(_revisionId))).getSingle();
       expect(revision.state, 'WORKING');
       expect(revision.revision, 1);
     },

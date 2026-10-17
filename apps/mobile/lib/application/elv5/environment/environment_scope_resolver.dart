@@ -16,12 +16,12 @@ final class Elv5ResolvedEnvironment {
   final bool usedSectionOverride;
 
   Elv5EnvironmentScopeBinding toCoreBinding() => Elv5EnvironmentScopeBinding(
-        bindingId: binding.bindingId,
-        scopeKind: binding.scopeKind,
-        scopeId: binding.scopeId,
-        profile: binding.profile,
-        priority: usedSectionOverride ? 200 : 100,
-      );
+    bindingId: binding.bindingId,
+    scopeKind: binding.scopeKind,
+    scopeId: binding.scopeId,
+    profile: binding.profile,
+    priority: usedSectionOverride ? 200 : 100,
+  );
 }
 
 abstract interface class Elv5EnvironmentScopeResolver {

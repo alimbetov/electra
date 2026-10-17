@@ -79,7 +79,12 @@ final class Fa02PersistedInputResolver
     final dependencies = <Elv5DependencyMarker>[
       _dependency(request, 'SET', 'FIRE_LOOP', loopId),
       for (final componentId in memberIds.toList()..sort())
-        _dependency(request, 'FACT', 'POWER_COMPONENT_STATE_LOADS', componentId),
+        _dependency(
+          request,
+          'FACT',
+          'POWER_COMPONENT_STATE_LOADS',
+          componentId,
+        ),
       for (final segment in scenarios)
         _dependency(
           request,
@@ -157,7 +162,9 @@ final class Fa02PersistedInputResolver
       (Fa02OperatingCase.alarm, PowerScenarioRole.alarm),
       (Fa02OperatingCase.startupInrush, PowerScenarioRole.startup),
     ]) {
-      final matching = scenarios.where((segment) => segment.role == entry.$2).toList();
+      final matching = scenarios
+          .where((segment) => segment.role == entry.$2)
+          .toList();
       if (matching.isEmpty) continue;
       Map<String, PowerDeviceState>? canonical;
       for (final segment in matching) {
@@ -195,7 +202,9 @@ final class Fa02PersistedInputResolver
 
     final factsByComponent = <String, List<Elv4ExactDcLoadFact>>{};
     for (final fact in loadFacts) {
-      (factsByComponent[fact.componentId] ??= <Elv4ExactDcLoadFact>[]).add(fact);
+      (factsByComponent[fact.componentId] ??= <Elv4ExactDcLoadFact>[]).add(
+        fact,
+      );
     }
 
     final origins = <Fa02LoadOrigin>[];
@@ -213,16 +222,20 @@ final class Fa02PersistedInputResolver
         continue;
       }
       for (final originId in originIds.toList()..sort()) {
-        final originFacts =
-            componentFacts.where((value) => value.originId == originId).toList();
+        final originFacts = componentFacts
+            .where((value) => value.originId == originId)
+            .toList();
         final currents = <Fa02OperatingCase, Elv5Interval<CurrentDim>>{};
         for (final entry in stateByCase.entries) {
           final state = entry.value[componentId]!;
           final stateCode = state.name.toUpperCase();
-          final matching =
-              originFacts.where((fact) => fact.stateCode == stateCode).toList();
+          final matching = originFacts
+              .where((fact) => fact.stateCode == stateCode)
+              .toList();
           if (matching.length > 1) {
-            throw StateError('FA02_DUPLICATE_ORIGIN_STATE:$originId:$stateCode');
+            throw StateError(
+              'FA02_DUPLICATE_ORIGIN_STATE:$originId:$stateCode',
+            );
           }
           selectedByCase[entry.key]!.add(originId);
           if (matching.isEmpty) continue;
@@ -292,10 +305,18 @@ Elv5PureKernelExecutor<Fa02Input, Fa02Result> buildFa02Executor({
       for (final operatingCase in Fa02OperatingCase.values)
         if (result.cases.containsKey(operatingCase))
           operatingCase.name: <String, Object?>{
-            'knownSubtotalLowerA':
-                result.cases[operatingCase]!.knownSubtotal.lower.value.toMap(),
-            'knownSubtotalUpperA':
-                result.cases[operatingCase]!.knownSubtotal.upper.value.toMap(),
+            'knownSubtotalLowerA': result
+                .cases[operatingCase]!
+                .knownSubtotal
+                .lower
+                .value
+                .toMap(),
+            'knownSubtotalUpperA': result
+                .cases[operatingCase]!
+                .knownSubtotal
+                .upper
+                .value
+                .toMap(),
             'missingOriginIds': result.cases[operatingCase]!.missingOriginIds,
             'status': result.cases[operatingCase]!.status.name,
             'marginA': result.cases[operatingCase]!.margin?.value.toMap(),
@@ -345,5 +366,6 @@ String _text(Map<String, Object?> value, String key) {
 bool _sameStates(
   Map<String, PowerDeviceState> left,
   Map<String, PowerDeviceState> right,
-) => left.length == right.length &&
+) =>
+    left.length == right.length &&
     left.entries.every((entry) => right[entry.key] == entry.value);

@@ -108,7 +108,10 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
   DateTime Function()? nowUtc,
 }) {
   Elv5ProcessInputResolver<I> guarded<I>(Elv5ProcessInputResolver<I> inner) =>
-      Elv5RevisionGuardedInputResolver<I>(inner: inner, revisions: captureRevisions);
+      Elv5RevisionGuardedInputResolver<I>(
+        inner: inner,
+        revisions: captureRevisions,
+      );
   Elv5ProcessCalculationAdapter blocked<I>(
     Elv5ProcessInputResolver<I> resolver,
     Elv5PureProcessExecutor<I> executor,
@@ -136,8 +139,18 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
       ),
       buildCctv02Executor(nowUtc: nowUtc),
     ),
-    blocked(Cctv03PersistedInputResolver(store: cctvStore, nowUtc: nowUtc), buildCctv03Executor(nowUtc: nowUtc)),
-    blocked(Cctv04PersistedInputResolver(contractSource: cctv04Contracts, powerEvidence: currentPowerEvidence, nowUtc: nowUtc), buildCctv04Executor(nowUtc: nowUtc)),
+    blocked(
+      Cctv03PersistedInputResolver(store: cctvStore, nowUtc: nowUtc),
+      buildCctv03Executor(nowUtc: nowUtc),
+    ),
+    blocked(
+      Cctv04PersistedInputResolver(
+        contractSource: cctv04Contracts,
+        powerEvidence: currentPowerEvidence,
+        nowUtc: nowUtc,
+      ),
+      buildCctv04Executor(nowUtc: nowUtc),
+    ),
     blocked(
       Cctv05PersistedInputResolver(
         recorderStore: cctvRecorderStore,
@@ -158,37 +171,176 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
       ),
       buildCctv06Executor(nowUtc: nowUtc),
     ),
-    blocked(Lan01PersistedInputResolver(lanStore: lanStore, elv3Facts: elv3LinkFacts, nowUtc: nowUtc), buildLan01Executor(nowUtc: nowUtc)),
-    blocked(Lan02PersistedInputResolver(lanStore: lanStore, contractSource: lan02Contracts, nowUtc: nowUtc), buildLan02Executor(nowUtc: nowUtc)),
-    blocked(Lan03PersistedInputResolver(contractSource: lan03Contracts, powerEvidence: currentPowerEvidence, nowUtc: nowUtc), buildLan03Executor(nowUtc: nowUtc)),
-    blocked(Lan04PersistedInputResolver(lanStore: lanStore, contractSource: lan04Contracts, nowUtc: nowUtc), buildLan04Executor(nowUtc: nowUtc)),
     blocked(
-      Lan05PersistedInputResolver(lanStore: lanStore, elv3Facts: elv3LinkFacts, opticalEvidence: opticalSectionEvidence, nowUtc: nowUtc),
+      Lan01PersistedInputResolver(
+        lanStore: lanStore,
+        elv3Facts: elv3LinkFacts,
+        nowUtc: nowUtc,
+      ),
+      buildLan01Executor(nowUtc: nowUtc),
+    ),
+    blocked(
+      Lan02PersistedInputResolver(
+        lanStore: lanStore,
+        contractSource: lan02Contracts,
+        nowUtc: nowUtc,
+      ),
+      buildLan02Executor(nowUtc: nowUtc),
+    ),
+    blocked(
+      Lan03PersistedInputResolver(
+        contractSource: lan03Contracts,
+        powerEvidence: currentPowerEvidence,
+        nowUtc: nowUtc,
+      ),
+      buildLan03Executor(nowUtc: nowUtc),
+    ),
+    blocked(
+      Lan04PersistedInputResolver(
+        lanStore: lanStore,
+        contractSource: lan04Contracts,
+        nowUtc: nowUtc,
+      ),
+      buildLan04Executor(nowUtc: nowUtc),
+    ),
+    blocked(
+      Lan05PersistedInputResolver(
+        lanStore: lanStore,
+        elv3Facts: elv3LinkFacts,
+        opticalEvidence: opticalSectionEvidence,
+        nowUtc: nowUtc,
+      ),
       buildLan05Executor(nowUtc: nowUtc),
     ),
-    blocked(Lan06PersistedInputResolver(lanStore: lanStore, contractSource: lan06Contracts, nowUtc: nowUtc), buildLan06Executor(nowUtc: nowUtc)),
-    blocked(Lan07PersistedInputResolver(lanStore: lanStore, contractSource: lan07Contracts, nowUtc: nowUtc), buildLan07Executor(nowUtc: nowUtc)),
-    blocked(Acs01PersistedInputResolver(acsStore: acsStore, contractSource: acs01Contracts, nowUtc: nowUtc), buildAcs01Executor(nowUtc: nowUtc)),
-    blocked(Acs02PersistedInputResolver(acsStore: acsStore, contractSource: acs02Contracts, nowUtc: nowUtc), buildAcs02Executor(nowUtc: nowUtc)),
     blocked(
-      Acs03PersistedInputResolver(acsStore: acsStore, contractSource: acs03Contracts, powerEvidence: currentPowerEvidence, nowUtc: nowUtc),
+      Lan06PersistedInputResolver(
+        lanStore: lanStore,
+        contractSource: lan06Contracts,
+        nowUtc: nowUtc,
+      ),
+      buildLan06Executor(nowUtc: nowUtc),
+    ),
+    blocked(
+      Lan07PersistedInputResolver(
+        lanStore: lanStore,
+        contractSource: lan07Contracts,
+        nowUtc: nowUtc,
+      ),
+      buildLan07Executor(nowUtc: nowUtc),
+    ),
+    blocked(
+      Acs01PersistedInputResolver(
+        acsStore: acsStore,
+        contractSource: acs01Contracts,
+        nowUtc: nowUtc,
+      ),
+      buildAcs01Executor(nowUtc: nowUtc),
+    ),
+    blocked(
+      Acs02PersistedInputResolver(
+        acsStore: acsStore,
+        contractSource: acs02Contracts,
+        nowUtc: nowUtc,
+      ),
+      buildAcs02Executor(nowUtc: nowUtc),
+    ),
+    blocked(
+      Acs03PersistedInputResolver(
+        acsStore: acsStore,
+        contractSource: acs03Contracts,
+        powerEvidence: currentPowerEvidence,
+        nowUtc: nowUtc,
+      ),
       buildAcs03Executor(nowUtc: nowUtc),
     ),
-    blocked(Acs04PersistedInputResolver(contractSource: acs04Contracts, powerEvidence: currentPowerEvidence, nowUtc: nowUtc), buildAcs04Executor(nowUtc: nowUtc)),
-    blocked(Acs05PersistedInputResolver(contractSource: acs05Contracts, powerEvidence: currentPowerEvidence, nowUtc: nowUtc), buildAcs05Executor(nowUtc: nowUtc)),
-    blocked(Acs06PersistedInputResolver(acsStore: acsStore, contractSource: acs06Contracts, nowUtc: nowUtc), buildAcs06Executor(nowUtc: nowUtc)),
-    blocked(Fa01PersistedInputResolver(fireStore: fireStore, contractSource: fa01Contracts, nowUtc: nowUtc), buildFa01Executor(nowUtc: nowUtc)),
-    blocked(Fa02PersistedInputResolver(fireStore: fireStore, powerFacts: powerOperatingFacts, nowUtc: nowUtc), buildFa02Executor(nowUtc: nowUtc)),
-    blocked(Fa03PersistedInputResolver(contractSource: fa03Contracts, powerEvidence: currentPowerEvidence, nowUtc: nowUtc), buildFa03Executor(nowUtc: nowUtc)),
-    blocked(Fa04PersistedInputResolver(contractSource: fa04Contracts, powerEvidence: currentPowerEvidence, nowUtc: nowUtc), buildFa04Executor(nowUtc: nowUtc)),
-    blocked(Fa05PersistedInputResolver(contractSource: fa05Contracts, powerEvidence: currentPowerEvidence, nowUtc: nowUtc), buildFa05Executor(nowUtc: nowUtc)),
     blocked(
-      Fa06PersistedInputResolver(fireStore: fireStore, contractSource: fa06Contracts, powerEvidence: currentPowerEvidence, nowUtc: nowUtc),
+      Acs04PersistedInputResolver(
+        contractSource: acs04Contracts,
+        powerEvidence: currentPowerEvidence,
+        nowUtc: nowUtc,
+      ),
+      buildAcs04Executor(nowUtc: nowUtc),
+    ),
+    blocked(
+      Acs05PersistedInputResolver(
+        contractSource: acs05Contracts,
+        powerEvidence: currentPowerEvidence,
+        nowUtc: nowUtc,
+      ),
+      buildAcs05Executor(nowUtc: nowUtc),
+    ),
+    blocked(
+      Acs06PersistedInputResolver(
+        acsStore: acsStore,
+        contractSource: acs06Contracts,
+        nowUtc: nowUtc,
+      ),
+      buildAcs06Executor(nowUtc: nowUtc),
+    ),
+    blocked(
+      Fa01PersistedInputResolver(
+        fireStore: fireStore,
+        contractSource: fa01Contracts,
+        nowUtc: nowUtc,
+      ),
+      buildFa01Executor(nowUtc: nowUtc),
+    ),
+    blocked(
+      Fa02PersistedInputResolver(
+        fireStore: fireStore,
+        powerFacts: powerOperatingFacts,
+        nowUtc: nowUtc,
+      ),
+      buildFa02Executor(nowUtc: nowUtc),
+    ),
+    blocked(
+      Fa03PersistedInputResolver(
+        contractSource: fa03Contracts,
+        powerEvidence: currentPowerEvidence,
+        nowUtc: nowUtc,
+      ),
+      buildFa03Executor(nowUtc: nowUtc),
+    ),
+    blocked(
+      Fa04PersistedInputResolver(
+        contractSource: fa04Contracts,
+        powerEvidence: currentPowerEvidence,
+        nowUtc: nowUtc,
+      ),
+      buildFa04Executor(nowUtc: nowUtc),
+    ),
+    blocked(
+      Fa05PersistedInputResolver(
+        contractSource: fa05Contracts,
+        powerEvidence: currentPowerEvidence,
+        nowUtc: nowUtc,
+      ),
+      buildFa05Executor(nowUtc: nowUtc),
+    ),
+    blocked(
+      Fa06PersistedInputResolver(
+        fireStore: fireStore,
+        contractSource: fa06Contracts,
+        powerEvidence: currentPowerEvidence,
+        nowUtc: nowUtc,
+      ),
       buildFa06Executor(nowUtc: nowUtc),
     ),
-    blocked(Fa07PersistedInputResolver(fireStore: fireStore, contractSource: fa07Contracts, nowUtc: nowUtc), buildFa07Executor(nowUtc: nowUtc)),
     blocked(
-      Fa08PersistedInputResolver(policySource: fa08Contracts, ampacityResolver: ampacityRouteResolver, routeCableFacts: fa08RouteCableFacts, nowUtc: nowUtc),
+      Fa07PersistedInputResolver(
+        fireStore: fireStore,
+        contractSource: fa07Contracts,
+        nowUtc: nowUtc,
+      ),
+      buildFa07Executor(nowUtc: nowUtc),
+    ),
+    blocked(
+      Fa08PersistedInputResolver(
+        policySource: fa08Contracts,
+        ampacityResolver: ampacityRouteResolver,
+        routeCableFacts: fa08RouteCableFacts,
+        nowUtc: nowUtc,
+      ),
       buildFa08Executor(nowUtc: nowUtc),
     ),
   ]);

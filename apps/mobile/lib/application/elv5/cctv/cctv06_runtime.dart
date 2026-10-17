@@ -115,8 +115,10 @@ final class Cctv06PersistedInputResolver
       );
     }
 
-    final rows = _objects(compositionPayload['orderedSections'], 'orderedSections')
-      ..sort((a, b) => _ordinal(a).compareTo(_ordinal(b)));
+    final rows = _objects(
+      compositionPayload['orderedSections'],
+      'orderedSections',
+    )..sort((a, b) => _ordinal(a).compareTo(_ordinal(b)));
     for (var i = 0; i < rows.length; i++) {
       if (_ordinal(rows[i]) != i) {
         _blocked(
@@ -135,10 +137,14 @@ final class Cctv06PersistedInputResolver
     final pathIds = <String>[
       for (final row in rows) _text(row, 'realizedSectionId'),
     ];
-    final contractIds = <String>[for (final item in contract.sections) item.sectionId];
+    final contractIds = <String>[
+      for (final item in contract.sections) item.sectionId,
+    ];
     if (pathIds.length != contractIds.length ||
-        List<bool>.generate(pathIds.length, (i) => pathIds[i] == contractIds[i])
-            .contains(false)) {
+        List<bool>.generate(
+          pathIds.length,
+          (i) => pathIds[i] == contractIds[i],
+        ).contains(false)) {
       _blocked(
         request,
         'CCTV06_SECTION_MEMBERSHIP_ORDER_MISMATCH',
@@ -225,9 +231,13 @@ final class Cctv06PersistedInputResolver
         if (value.output['groupId'] == contract.pseId) group.add(value);
       }
       group.sort((a, b) => a.nodeKey.subjectId.compareTo(b.nodeKey.subjectId));
-      final actualDeliveries = <String>{for (final value in group) value.nodeKey.subjectId};
-      final expectedDeliveries =
-          contract.expectedPwr06InputFingerprintByDeliveryId.keys.toSet();
+      final actualDeliveries = <String>{
+        for (final value in group) value.nodeKey.subjectId,
+      };
+      final expectedDeliveries = contract
+          .expectedPwr06InputFingerprintByDeliveryId
+          .keys
+          .toSet();
       if (!_sameSet(actualDeliveries, expectedDeliveries)) {
         _blocked(
           request,
@@ -317,7 +327,8 @@ final class Cctv06PersistedInputResolver
       final requiredSections = contract.poweredSectionToDeliveryId.keys.toSet();
       final evidencedSections = <String>{};
       for (final entry in contract.poweredSectionToDeliveryId.entries) {
-        if (actualDeliveries.contains(entry.value)) evidencedSections.add(entry.key);
+        if (actualDeliveries.contains(entry.value))
+          evidencedSections.add(entry.key);
       }
       power = Cctv06PowerEvidence(
         pathFingerprint: pathFingerprint,
@@ -336,15 +347,17 @@ final class Cctv06PersistedInputResolver
         allowedInterfaceKinds: contract.allowedInterfaceKinds,
         allowedCategoryTokens: contract.allowedCategoryTokens,
         shieldingRequired: contract.shieldingRequired,
-        maximumLength:
-            contract.maximumLengthM == null ? null : Length(contract.maximumLengthM!),
+        maximumLength: contract.maximumLengthM == null
+            ? null
+            : Length(contract.maximumLengthM!),
       ),
       powered: contract.powered,
       powerEvidence: power,
     );
     upstream.sort(
-      (a, b) => (a['evaluationId']! as String)
-          .compareTo(b['evaluationId']! as String),
+      (a, b) => (a['evaluationId']! as String).compareTo(
+        b['evaluationId']! as String,
+      ),
     );
     final inputFingerprint = _encoder.sha256(<String, Object?>{
       'schema': 'electra.elv5-cctv06-captured-input.v1',
@@ -370,15 +383,14 @@ final class Cctv06PersistedInputResolver
     String policy,
     List<Elv5DependencyMarker> deps,
     Map<String, Object?> evidence,
-  ) =>
-      throw Elv5CaptureBlockedException(
-        request: request,
-        reasonCode: reason,
-        inputFingerprint: input,
-        policyFingerprint: policy,
-        dependencies: deps,
-        evidence: evidence,
-      );
+  ) => throw Elv5CaptureBlockedException(
+    request: request,
+    reasonCode: reason,
+    inputFingerprint: input,
+    policyFingerprint: policy,
+    dependencies: deps,
+    evidence: evidence,
+  );
 
   Elv5DependencyMarker _dependency(
     Elv5CalculationRequest request,
@@ -443,9 +455,9 @@ Elv5PureKernelExecutor<Cctv06Input, Cctv06Result> buildCctv06Executor({
       : Elv5Execution.succeeded,
   completionOf: (r) =>
       r.status == Cctv06AssessmentStatus.blocked ||
-              r.status == Cctv06AssessmentStatus.unresolved
-          ? Elv5Completion.incomplete
-          : Elv5Completion.complete,
+          r.status == Cctv06AssessmentStatus.unresolved
+      ? Elv5Completion.incomplete
+      : Elv5Completion.complete,
   assessmentOf: (r) => switch (r.status) {
     Cctv06AssessmentStatus.pass => Elv5Assessment.pass,
     Cctv06AssessmentStatus.fail => Elv5Assessment.fail,
@@ -468,10 +480,12 @@ Map<String, Object?> _map(Object? value, String field) {
   if (value is! Map) throw FormatException('$field must be object.');
   return Map<String, Object?>.from(value);
 }
+
 List<Map<String, Object?>> _objects(Object? value, String field) {
   if (value is! List) throw FormatException('$field must be list.');
   return <Map<String, Object?>>[for (final raw in value) _map(raw, field)];
 }
+
 String _text(Map<String, Object?> map, String key) {
   final value = map[key];
   if (value is! String || value.trim().isEmpty) {
@@ -479,6 +493,7 @@ String _text(Map<String, Object?> map, String key) {
   }
   return value.trim();
 }
+
 int _ordinal(Map<String, Object?> value) {
   final raw = value['ordinal'];
   if (raw is! int || raw < 0) {
@@ -486,5 +501,6 @@ int _ordinal(Map<String, Object?> value) {
   }
   return raw;
 }
+
 bool _sameSet(Set<String> a, Set<String> b) =>
     a.length == b.length && a.containsAll(b);

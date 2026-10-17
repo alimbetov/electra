@@ -15,15 +15,14 @@ import 'drift_elv5_lan_write_unit_of_work.dart';
 /// own short transaction; [Elv5RevisionGuardedInputResolver] captures the
 /// design-revision token after all reads, so any concurrent mutation makes the
 /// later publication stale instead of publishing a mixed snapshot.
-final class DriftElv5CctvCalculationFactStore
-    implements Elv5CctvMutationStore {
+final class DriftElv5CctvCalculationFactStore implements Elv5CctvMutationStore {
   DriftElv5CctvCalculationFactStore(
     AppDatabase database, {
     required String originDeviceId,
   }) : _uow = DriftElv5CctvWriteUnitOfWork(
-          database,
-          originDeviceId: originDeviceId,
-        );
+         database,
+         originDeviceId: originDeviceId,
+       );
 
   final DriftElv5CctvWriteUnitOfWork _uow;
 
@@ -32,22 +31,26 @@ final class DriftElv5CctvCalculationFactStore
     required String projectId,
     required String designRevisionId,
     required String cameraId,
-  }) => _uow.run((session) => session.cctv.loadCameraStreams(
-        projectId: projectId,
-        designRevisionId: designRevisionId,
-        cameraId: cameraId,
-      ));
+  }) => _uow.run(
+    (session) => session.cctv.loadCameraStreams(
+      projectId: projectId,
+      designRevisionId: designRevisionId,
+      cameraId: cameraId,
+    ),
+  );
 
   @override
   Future<Elv5CctvAggregateSnapshot?> loadRecordingPool({
     required String projectId,
     required String designRevisionId,
     required String poolId,
-  }) => _uow.run((session) => session.cctv.loadRecordingPool(
-        projectId: projectId,
-        designRevisionId: designRevisionId,
-        poolId: poolId,
-      ));
+  }) => _uow.run(
+    (session) => session.cctv.loadRecordingPool(
+      projectId: projectId,
+      designRevisionId: designRevisionId,
+      poolId: poolId,
+    ),
+  );
 
   @override
   Future<void> replaceCameraStreams({
@@ -77,9 +80,9 @@ final class DriftElv5LanCalculationFactStore implements Elv5LanMutationStore {
     AppDatabase database, {
     required String originDeviceId,
   }) : _uow = DriftElv5LanWriteUnitOfWork(
-          database,
-          originDeviceId: originDeviceId,
-        );
+         database,
+         originDeviceId: originDeviceId,
+       );
 
   final DriftElv5LanWriteUnitOfWork _uow;
 
@@ -89,12 +92,14 @@ final class DriftElv5LanCalculationFactStore implements Elv5LanMutationStore {
     required String designRevisionId,
     required String operation,
     required String subjectId,
-  }) => _uow.run((session) => session.lan.load(
-        projectId: projectId,
-        designRevisionId: designRevisionId,
-        operation: operation,
-        subjectId: subjectId,
-      ));
+  }) => _uow.run(
+    (session) => session.lan.load(
+      projectId: projectId,
+      designRevisionId: designRevisionId,
+      operation: operation,
+      subjectId: subjectId,
+    ),
+  );
 
   @override
   Future<void> replace({
@@ -114,9 +119,9 @@ final class DriftElv5AcsCalculationFactStore implements Elv5AcsMutationStore {
     AppDatabase database, {
     required String originDeviceId,
   }) : _uow = DriftElv5AcsWriteUnitOfWork(
-          database,
-          originDeviceId: originDeviceId,
-        );
+         database,
+         originDeviceId: originDeviceId,
+       );
 
   final DriftElv5AcsWriteUnitOfWork _uow;
 
@@ -126,12 +131,14 @@ final class DriftElv5AcsCalculationFactStore implements Elv5AcsMutationStore {
     required String designRevisionId,
     required String operation,
     required String subjectId,
-  }) => _uow.run((session) => session.acs.load(
-        projectId: projectId,
-        designRevisionId: designRevisionId,
-        operation: operation,
-        subjectId: subjectId,
-      ));
+  }) => _uow.run(
+    (session) => session.acs.load(
+      projectId: projectId,
+      designRevisionId: designRevisionId,
+      operation: operation,
+      subjectId: subjectId,
+    ),
+  );
 
   @override
   Future<void> replace({
@@ -151,9 +158,9 @@ final class DriftElv5FireCalculationFactStore implements Elv5FireMutationStore {
     AppDatabase database, {
     required String originDeviceId,
   }) : _uow = DriftElv5FireWriteUnitOfWork(
-          database,
-          originDeviceId: originDeviceId,
-        );
+         database,
+         originDeviceId: originDeviceId,
+       );
 
   final DriftElv5FireWriteUnitOfWork _uow;
 
@@ -163,12 +170,14 @@ final class DriftElv5FireCalculationFactStore implements Elv5FireMutationStore {
     required String designRevisionId,
     required String operation,
     required String subjectId,
-  }) => _uow.run((session) => session.fire.load(
-        projectId: projectId,
-        designRevisionId: designRevisionId,
-        operation: operation,
-        subjectId: subjectId,
-      ));
+  }) => _uow.run(
+    (session) => session.fire.load(
+      projectId: projectId,
+      designRevisionId: designRevisionId,
+      operation: operation,
+      subjectId: subjectId,
+    ),
+  );
 
   @override
   Future<void> replace({
