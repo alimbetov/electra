@@ -176,6 +176,7 @@ final class _CableFacts implements Fa08RouteCableFactSource {
   }) async => const <Fa08RouteCableFact>[
         Fa08RouteCableFact(
           sectionId: 'section-1',
+          cableId: 'cable-1',
           cableEditionId: 'catalog:v1:CABLE-A:hash',
           cableClass: 'TEST_CLASS_A',
           numericFacts: <Fa08NumericFact>[],
