@@ -1330,7 +1330,15 @@ final class AppDatabase extends _$AppDatabase {
       await _createPowerIntegrityGuards();
       await _createDisciplineIndexesAndGuards();
       final now = DateTime.now().toUtc();
+      // Reopening an initialized catalog must remain read-only. INSERT OR
+      // IGNORE still requests a SQLite writer lock and can deadlock against
+      // another connection upgrading its active domain transaction.
+      final existingFamilies =
+          (await select(engineeringFamilyDefinitions).get())
+              .map((row) => row.id)
+              .toSet();
       for (final family in bundledEngineeringSystemFamilies) {
+        if (existingFamilies.contains(family.id)) continue;
         await into(engineeringFamilyDefinitions).insert(
           EngineeringFamilyDefinitionsCompanion.insert(
             id: family.id,
@@ -1344,7 +1352,10 @@ final class AppDatabase extends _$AppDatabase {
           mode: InsertMode.insertOrIgnore,
         );
       }
+      final existingDocuments =
+          (await select(normativeDocuments).get()).map((row) => row.id).toSet();
       for (final doc in bundledNormativeDocuments) {
+        if (existingDocuments.contains(doc.id)) continue;
         await into(normativeDocuments).insert(
           NormativeDocumentsCompanion.insert(
             id: doc.id,

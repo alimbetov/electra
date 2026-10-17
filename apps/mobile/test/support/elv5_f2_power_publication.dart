@@ -115,7 +115,7 @@ Future<void> replaceF2PowerDefinition(
         definitionRefs: [
           PowerDefinitionRef(
             catalogId: 'f2-power',
-            catalogVersion: '1',
+            catalogVersion: edition,
             definitionKind: PowerDefinitionKind.component,
             definitionCode: componentId,
             definitionVersion: edition,
