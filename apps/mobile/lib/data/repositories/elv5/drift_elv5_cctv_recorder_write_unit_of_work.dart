@@ -91,7 +91,8 @@ final class _DriftElv5CctvRecorderMutationStore
   }) async {
     final root = await database
         .customSelect(
-          'SELECT id, revision, accounting_basis FROM recorder_capacity_bindings '
+          'SELECT id, revision, accounting_basis, recorder_definition_ref_json, '
+          'recorder_definition_sha256 FROM recorder_capacity_bindings '
           'WHERE project_id = ? AND design_revision_id = ? AND recorder_id = ? '
           'AND deleted_at IS NULL',
           variables: [
@@ -120,6 +121,10 @@ final class _DriftElv5CctvRecorderMutationStore
       payload: {
         'recorderId': recorderId,
         'accountingBasis': root.read<String>('accounting_basis'),
+        'recorderDefinitionRef':
+            jsonDecode(root.read<String>('recorder_definition_ref_json')),
+        'recorderDefinitionSha256':
+            root.read<String>('recorder_definition_sha256'),
         'assignments': [
           for (final row in rows)
             {
