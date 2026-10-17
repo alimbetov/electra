@@ -548,3 +548,36 @@ Lifecycle coverage is 22/27, qualified remains 0/27. The next remaining wave is
 CCTV-01/02/04/05/06; its source is committed and its own exact-SHA CI is pending.
 Q0–Q5/Q9 reconciliation, automatic provenance, global reliability and final
 acceptance remain open. ELV5 is not ACCEPTED.
+
+
+## CCTV wave and FA-03 production lifecycle checkpoint
+
+Source `03de876b063a9db4f290f3c10f54f9481c008e02` passed complete
+Flutter Local Foundation run `39070036186`, artifact `12114309867`:
+484 mobile tests passed, one dedicated historical-migration skip, 485 core tests
+passed, both analyzers and formatters passed. Preserved logs explicitly execute
+CCTV-01/02/04/05/06 and the new full-production FA-03 lifecycle witness.
+
+CCTV-01 uses persisted integer geometry and immutable exact orthonormal frames;
+a focal-length replacement changes full coverage to exactly 3/16. CCTV-02 uses
+public streams and explicit recorder assignment, doubles exact ingress, and
+retains COMPLETE / NOTASSESSED without capacity authority. CCTV-04 projects the
+shared 30 W PWR06 closure, including LAN demand, and fails its -3 W global margin.
+CCTV-05 consumes real CURRENT results calculated and published by CCTV-02/03;
+storage changes from +70.4 GB to -29.6 GB without reserve being applied again.
+CCTV-06 verifies the exact 1 m ELV3 link at its inclusive limit, then fails at
+an explicit 0.5 m maximum. FA-03 now covers independent SQLite CAS, durable
+restart and frozen replay through its real registry, plus atomic invalidation
+when terminal-voltage policy changes. The old adapter-based witness is retained
+as lower-level regression evidence, not the production Q7/Q8 witness.
+
+CCTV-05 exposed a production read-model defect: canonical persisted NOTASSESSED
+was rejected even though the runtime writes it. The reader now accepts this
+and historical NOT_ASSESSED, preserves the original persisted spelling, and
+continues rejecting unknown vocabulary; three regression cases pass in CI.
+
+Q6/Q7/Q8 production lifecycle coverage is now 27/27. This completes the process
+wave stage only: qualified stays 0/27, Q0–Q5/Q9 reconciliation remains open,
+and automatic execution-backed matrix/provenance is the next fixed stage.
+Global rollback/CAS/restart/freeze/fault qualification, final exact-SHA CI and
+ELV5 acceptance are still pending. ELV5 is not ACCEPTED.
