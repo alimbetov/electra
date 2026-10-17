@@ -78,7 +78,8 @@ final class Elv5F2QualificationHarness {
       expect(
         republished.inputFingerprint,
         isNot(initial.inputFingerprint),
-        reason: '${scenario.processCode} Q6 mutation must change captured input',
+        reason:
+            '${scenario.processCode} Q6 mutation must change captured input',
       );
     }
 

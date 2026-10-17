@@ -62,10 +62,7 @@ final class Elv5PhysicalLinkCapability {
 /// `known == false` means the continuity is unresolved and therefore cannot
 /// be represented as continuous.
 final class Elv5ShieldContinuity {
-  const Elv5ShieldContinuity._({
-    required this.known,
-    required this.continuous,
-  });
+  const Elv5ShieldContinuity._({required this.known, required this.continuous});
 
   factory Elv5ShieldContinuity.validated({
     required bool known,
@@ -101,6 +98,5 @@ void validateElv5ShieldContinuity({
   Elv5ShieldContinuity.validated(known: known, continuous: continuous);
 }
 
-Set<String> _tokens(Iterable<String> values, String field) => Set.unmodifiable(
-  values.map((value) => elv5PhysicalToken(value, field)),
-);
+Set<String> _tokens(Iterable<String> values, String field) =>
+    Set.unmodifiable(values.map((value) => elv5PhysicalToken(value, field)));
