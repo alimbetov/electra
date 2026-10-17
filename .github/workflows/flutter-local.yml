@@ -86,6 +86,10 @@ jobs:
         working-directory: .
         run: python3 scripts/ci/check-elv5-fa08-invalidation.py
 
+      - name: Verify ELV5 foundation F1/F2 lifecycle status
+        working-directory: .
+        run: python3 scripts/ci/check-elv5-foundation-f1-f2-status.py
+
       - name: Verify ELV5 market simulation P0-P9 bindings
         working-directory: .
         run: python3 scripts/ci/check-elv5-market-p0-p9-bindings.py
