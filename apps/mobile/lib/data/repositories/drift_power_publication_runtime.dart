@@ -365,6 +365,43 @@ final class DriftPowerPublicationRuntime {
     });
   }
 
+  /// Propagates a power pointer transition to exact ELV5 consumers. Both ELV4
+  /// mutation implementations call this within their source transaction.
+  Future<int> invalidateDisciplineConsumersForNode({
+    required String projectId,
+    required String designRevisionId,
+    required PowerNodeKeyV2 nodeKey,
+  }) => database.transaction(() async {
+    await _requireRevision(
+      projectId: projectId,
+      designRevisionId: designRevisionId,
+      requireWorking: true,
+    );
+    final pointer = await _loadPointer(
+      projectId: projectId,
+      designRevisionId: designRevisionId,
+      nodeKey: nodeKey,
+    );
+    if (pointer == null) return 0;
+    final evaluationId = pointer.evaluationId;
+    if (evaluationId == null) {
+      throw const PowerRuntimeStorageException(
+        'ELV4_POINTER_EVALUATION_ID_MISSING',
+      );
+    }
+    return DriftElv5DependencyInvalidator(
+      database,
+      originDeviceId: originDeviceId,
+      nowUtc: now,
+    ).invalidateSubject(
+      projectId: projectId,
+      designRevisionId: designRevisionId,
+      relationKind: 'EVAL',
+      domain: 'ELV4_${nodeKey.processCode.name.toUpperCase()}_CURRENT',
+      subjectId: evaluationId,
+    );
+  });
+
   /// Executes the canonical edit and invalidation in one transaction. The edit
   /// must advance the WORKING design revision token exactly once. [oldClosure]
   /// is captured before the edit; [captureNewClosure] runs after the edit.
@@ -750,7 +787,14 @@ final class DriftPowerPublicationRuntime {
           Variable.withString('CURRENT'),
         ],
       );
-      if (updated == 1) actuallyInvalidated.add(key);
+      if (updated == 1) {
+        actuallyInvalidated.add(key);
+        await invalidateDisciplineConsumersForNode(
+          projectId: projectId,
+          designRevisionId: designRevisionId,
+          nodeKey: key,
+        );
+      }
       await database.customUpdate(
         'DELETE FROM power_dependency_index_records '
         'WHERE project_id = ? AND design_revision_id = ? '

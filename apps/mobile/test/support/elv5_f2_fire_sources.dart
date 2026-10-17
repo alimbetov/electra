@@ -210,3 +210,23 @@ Future<void> replaceF2FireLoop(
     ),
   );
 }
+
+Future<void> seedF2FireComponent(AppDatabase db, String id) async {
+  final now = DateTime.utc(2026, 10, 17, 15);
+  await db
+      .into(db.componentInstances)
+      .insert(
+        ComponentInstancesCompanion.insert(
+          id: id,
+          definitionId: 'fictional-$id',
+          definitionVersion: 1,
+          roomId: 'room-1',
+          hostSurfacePatchId: 'patch-x',
+          localXmm: 0,
+          localYmm: 0,
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'f2-fire',
+        ),
+      );
+}

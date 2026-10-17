@@ -23,6 +23,7 @@ void main() {
       await lifecycle.run(
         seed: (db) async {
           await seedF2FireTopology(db);
+          await seedF2FireComponent(db, 'bank-1');
           final demand = aggregatePowerDemand([
             for (final e in {'acs-lock': '10', 'fire-loop': '9.2'}.entries)
               PowerDemandContribution(
@@ -57,7 +58,7 @@ void main() {
             'normal',
             PowerRational.parseDecimal('0.8'),
           );
-          await _replace(db, fingerprint, 1, null);
+          await _replace(db, fingerprint, await lifecycle.revision(), null);
         },
         mutate: (db) async {
           fingerprint = await _battery(
@@ -70,7 +71,7 @@ void main() {
             'STALE',
           );
           expect((await lifecycle.pointer()).read<int>('generation'), 2);
-          await _replace(db, fingerprint, 2, 1);
+          await _replace(db, fingerprint, await lifecycle.revision(), 1);
         },
         dependencyDomains: {
           'FA05_AUTONOMY_CONTRACT',
@@ -118,6 +119,13 @@ Future<String> _battery(
   String edition,
   PowerRational factor,
 ) async {
+  await replaceF2PowerDefinition(
+    db,
+    componentId: 'bank-1',
+    edition: edition,
+    definition: {'temperatureFactor': factor.toMap()},
+    capability: PowerComponentCapability.storage,
+  );
   final pwr01 =
       (await DriftElv4CurrentEvidenceSource(db).loadCurrent(
         projectId: 'p',

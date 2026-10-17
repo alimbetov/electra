@@ -1,4 +1,6 @@
 import 'package:electra_mobile/data/database/app_database.dart';
+import 'package:electra_mobile/application/power_mutation_command.dart';
+import 'package:electra_mobile/data/repositories/drift_power_command_service.dart';
 import 'package:electra_mobile/data/repositories/drift_power_publication_runtime.dart';
 import 'package:engineering_core/engineering_core.dart';
 
@@ -69,4 +71,59 @@ Future<String> publishF2PowerEvidence(
     recaptureInput: () async => input,
   );
   return input.inputFingerprint;
+}
+
+Future<void> replaceF2PowerDefinition(
+  AppDatabase db, {
+  required String componentId,
+  required String edition,
+  required Map<String, Object?> definition,
+  required PowerComponentCapability capability,
+}) async {
+  final revision = (await db
+          .customSelect(
+            "SELECT revision FROM project_design_revisions WHERE id = 'd'",
+          )
+          .getSingle())
+      .read<int>('revision');
+  await DriftPowerCommandService(
+    db,
+    originDeviceId: 'f2-fire',
+    now: () => DateTime.utc(2026, 10, 17, 15),
+  ).execute(
+    BindPowerComponentCommand(
+      operationId: 'definition-$componentId-$edition',
+      projectId: 'p',
+      designRevisionId: 'd',
+      expectedRevision: revision,
+      changedDependencies: [
+        PowerDependencyKey(
+          projectId: 'p',
+          revisionId: 'd',
+          kind: PowerDependencyKind.definition,
+          entityId: componentId,
+          purpose: 'F2_EXPLICIT_POWER_FIXTURE',
+        ),
+      ],
+      bindingId: 'source-$componentId',
+      binding: PowerComponentBinding(
+        componentId: componentId,
+        capabilities: [capability],
+        definitionRefs: [
+          PowerDefinitionRef(
+            catalogId: 'f2-power',
+            catalogVersion: '1',
+            definitionKind: PowerDefinitionKind.component,
+            definitionCode: componentId,
+            definitionVersion: edition,
+            definitionSchema: 'electra.f2-power-source-fact.v1',
+            contentSha256: sha256HexUtf8(
+              canonicalEngineeringJsonV1(definition),
+            ),
+            sourceRef: 'Fictional exact qualification vector',
+          ),
+        ],
+      ),
+    ),
+  );
 }

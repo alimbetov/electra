@@ -24,6 +24,7 @@ void main() {
       await lifecycle.run(
         seed: (db) async {
           await seedF2FireTopology(db);
+          await seedF2FireComponent(db, 'psu-1');
           final demand = aggregatePowerDemand([
             PowerDemandContribution(
               originId: 'fire-source-load',
@@ -51,7 +52,7 @@ void main() {
             status: source.status,
           );
           fingerprint = await _capacity(db, 40, 'normal');
-          await _replace(db, fingerprint, 1, null);
+          await _replace(db, fingerprint, await lifecycle.revision(), null);
         },
         mutate: (db) async {
           // Invalidation must occur at the upstream writer, before the contract
@@ -94,7 +95,7 @@ void main() {
             'STALE',
           );
           expect((await lifecycle.pointer()).read<int>('generation'), 2);
-          await _replace(db, fingerprint, 2, 1);
+          await _replace(db, fingerprint, await lifecycle.revision(), 1);
         },
         dependencyDomains: {
           'FA04_SOURCE_REQUIREMENT_SET',
@@ -140,7 +141,14 @@ void main() {
   );
 }
 
-Future<String> _capacity(AppDatabase db, int available, String edition) {
+Future<String> _capacity(AppDatabase db, int available, String edition) async {
+  await replaceF2PowerDefinition(
+    db,
+    componentId: 'psu-1',
+    edition: edition,
+    definition: {'nameplateW': PowerRational.integer(available).toMap()},
+    capability: PowerComponentCapability.source,
+  );
   final input = PowerCapabilityDimension(
     dimension: PowerQuantityDimension.watt,
     demand: PowerRational.integer(30),
