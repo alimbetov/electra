@@ -1,3 +1,5 @@
+import '../../../application/elv5/fire/fa03_terminal_voltage_contract_write.dart';
+import 'drift_fa03_terminal_voltage_contract_store.dart';
 import '../../../application/elv5/fire/fa04_source_requirement_contract_write.dart';
 import '../../../application/elv5/fire/fa05_autonomy_contract_write.dart';
 import '../../../application/elv5/fire/fa06_notification_contract_write.dart';
@@ -19,7 +21,12 @@ final class DriftElv5FireContractMutationCoordinator {
     this.database, {
     required String originDeviceId,
     DateTime Function()? nowUtc,
-  }) : _fa04 = DriftFa04SourceRequirementContractStore(
+  }) : _fa03 = DriftFa03TerminalVoltageContractStore(
+         database,
+         originDeviceId: originDeviceId,
+         nowUtc: nowUtc,
+       ),
+       _fa04 = DriftFa04SourceRequirementContractStore(
          database,
          originDeviceId: originDeviceId,
          nowUtc: nowUtc,
@@ -41,10 +48,30 @@ final class DriftElv5FireContractMutationCoordinator {
        );
 
   final AppDatabase database;
+  final DriftFa03TerminalVoltageContractStore _fa03;
   final DriftFa04SourceRequirementContractStore _fa04;
   final DriftFa05AutonomyContractStore _fa05;
   final DriftFa06NotificationContractStore _fa06;
   final DriftElv5DependencyInvalidator _invalidator;
+
+  Future<void> replaceFa03(ReplaceFa03TerminalVoltageContractCommand command) =>
+      database.transaction(() async {
+        final previous = await _fa03.loadActiveForCircuit(
+          projectId: command.projectId,
+          designRevisionId: command.designRevisionId,
+          circuitId: command.contract.circuitId,
+        );
+        await _fa03.replace(command);
+        if (previous != null) {
+          await _invalidator.invalidateSubject(
+            projectId: command.projectId,
+            designRevisionId: command.designRevisionId,
+            relationKind: 'POLICY',
+            domain: 'FA03_TERMINAL_VOLTAGE_CONTRACT',
+            subjectId: previous.evidenceRef,
+          );
+        }
+      });
 
   Future<void> replaceFa04(
     ReplaceFa04SourceRequirementContractCommand command,
