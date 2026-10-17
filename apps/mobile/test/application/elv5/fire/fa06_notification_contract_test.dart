@@ -30,10 +30,14 @@ void main() {
       supervision: Fa06SupervisionContract(
         required: true,
         modelSupported: true,
-        passed: true,
         modelCode: 'EOL-SUPERVISION-V1',
         evidenceRef: 'SUP:nac-1:v1',
         evidenceContentHash: _hash('a'),
+        faultResults: <Fa06SupervisionFaultResult>[
+          Fa06SupervisionFaultResult(faultCode: 'OPEN', passed: true),
+          Fa06SupervisionFaultResult(faultCode: 'SHORT', passed: true),
+          Fa06SupervisionFaultResult(faultCode: 'RETURN_LOSS', passed: true),
+        ],
       ),
     );
 
@@ -42,6 +46,7 @@ void main() {
     expect(restored.outputCurrentLimitA, Elv5Rational.parseDecimal('0.5'));
     expect(restored.cases.single.stateCode, 'ALARM');
     expect(restored.supervision.passed, isTrue);
+    expect(restored.supervision.faultResults, hasLength(3));
     expect(
       restored.membershipFingerprint(const <String>['horn-3', 'horn-1', 'horn-2']),
       contract.membershipFingerprint(const <String>['horn-1', 'horn-2', 'horn-3']),
@@ -72,8 +77,20 @@ void main() {
         supervision: Fa06SupervisionContract(
           required: false,
           modelSupported: false,
-          passed: false,
         ),
+      ),
+      throwsArgumentError,
+    );
+  });
+
+  test('required supported supervision needs explicit fault results', () {
+    expect(
+      () => Fa06SupervisionContract(
+        required: true,
+        modelSupported: true,
+        modelCode: 'EOL-SUPERVISION-V1',
+        evidenceRef: 'SUP:nac-1:v1',
+        evidenceContentHash: _hash('b'),
       ),
       throwsArgumentError,
     );
