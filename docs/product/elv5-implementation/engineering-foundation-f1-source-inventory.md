@@ -79,10 +79,12 @@ Current production application resolvers already use durable `Elv5CaptureBlocked
 
 Status: **PARTIAL / AUDIT REQUIRED**.
 
-Required next audit:
+First-pass critical-path review completed for ampacity reference/corrections, environment profile/route resolution and CCTV-03 storage/recurrence. No `UNKNOWN -> implicit engineering default -> PASS` path was found in those reviewed paths: temperature/grouping/material/installation evidence is mandatory; missing environment/section evidence blocks; CCTV-03 guaranteed-rate sizing does not fall back to expected bitrate; recurrence without a pinned expander blocks; reserve multiplier is explicit and validated.
+
+Required remaining audit:
 
 - search application/core for engineering `?? 0`, `?? 1`, implicit material/temperature/efficiency/reserve defaults;
-- explicitly inspect temperature, grouping, installation method, material, resistance/current rating, reserve multiplier, storage overhead, optical loss and battery inputs;
+- explicitly inspect efficiency/transfer loss, resistance/current rating, optical loss and battery inputs in addition to the already reviewed temperature/grouping/material/reserve paths;
 - classify every hit as domain invariant, UI-only default, optional dimension, or false-PASS risk.
 
 Any false-PASS risk preempts new vertical development.
@@ -132,11 +134,31 @@ These values are not currently first-class fields of `Elv5ProcessEvaluationCandi
 
 ## 6. Result status axes
 
-Current runtime keeps execution/completion/assessment as independent evaluation fields; current/stale is pointer state in persistence.
+The current source keeps assessment and pointer freshness separate, but its execution/completion vocabulary does not yet match the foundation contract exactly.
 
-Status: **IMPLEMENTED SEMANTICS**.
+Current source:
 
-No collapse into a single pass/fail enum is allowed during foundation adoption.
+```text
+Execution  = SUCCEEDED | BLOCKED | FAILED
+Completion = COMPLETE | INCOMPLETE
+Assessment = PASS | FAIL | UNRESOLVED | NOT_ASSESSED
+Freshness  = CURRENT | STALE
+```
+
+Foundation target:
+
+```text
+Execution  = SUCCEEDED | FAILED
+Completion = COMPLETE | PARTIAL | BLOCKED
+Assessment = PASS | FAIL | UNRESOLVED | NOT_ASSESSED
+Freshness  = CURRENT | STALE
+```
+
+### F1-HIGH-02 — result-axis vocabulary mismatch
+
+`BLOCKED` is currently encoded as an execution state by multiple adapters, while the foundation explicitly treats a blocked engineering calculation as a completion state and permits `SUCCEEDED + BLOCKED + UNRESOLVED`. `INCOMPLETE` also conflates foundation `PARTIAL` and `BLOCKED` semantics.
+
+This does not authorize a blind enum rename: existing adapters, persisted strings and replay semantics must be reconciled together. `QUALIFIED` promotion is blocked until migration/compatibility is defined and tests prove historical/current interpretation.
 
 ## 7. Provenance graph
 
@@ -181,9 +203,9 @@ No production dependency on a test framework is allowed.
 |---|---|
 | Quantity inventory | IMPLEMENTED / qualification pending |
 | Typed evidence primitive | IMPLEMENTED / process migration pending |
-| Unknown/default audit | TODO / high priority |
+| Unknown/default audit | PARTIAL / critical-path first pass clean |
 | Canonicalization | IMPLEMENTED CORE / qualification pending |
-| Result axes | IMPLEMENTED semantics |
+| Result axes | PARTIAL — F1-HIGH-02 open |
 | Calculation identity | PARTIAL — F1-HIGH-01 open |
 | Provenance graph | PARTIAL |
 | Governing metadata | PARTIAL process-specific |
