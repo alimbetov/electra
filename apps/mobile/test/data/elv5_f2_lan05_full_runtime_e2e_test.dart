@@ -13,10 +13,13 @@ import 'package:electra_mobile/data/repositories/elv5/drift_lan05_optical_sectio
 import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../support/elv5_f2_qualification_harness.dart';
+
 void main() {
   test(
     'F2 LAN-05 Q6/Q7/Q8 qualifies exact ELV3 length, optical evidence invalidation, restart and freeze',
     () async {
+      const harness = Elv5F2QualificationHarness();
       final directory = await Directory.systemTemp.createTemp(
         'electra-f2-lan05-full-runtime-',
       );
@@ -71,6 +74,12 @@ void main() {
       expect(firstEvaluation.completion, 'COMPLETE');
       expect(firstEvaluation.assessment, 'PASS');
       expect(firstEvaluation.inputFingerprint, hasLength(64));
+      final firstSnapshot = _snapshot(
+        firstPointer,
+        firstEvaluation,
+        first.logicalResultJson,
+      );
+      harness.assertQ6Initial('LAN-05', firstSnapshot);
 
       final dependencyRows =
           await db
@@ -148,6 +157,12 @@ void main() {
         secondEvaluation.inputFingerprint,
         isNot(firstEvaluation.inputFingerprint),
       );
+      final secondSnapshot = _snapshot(
+        secondPointer,
+        secondEvaluation,
+        second.logicalResultJson,
+      );
+      harness.assertQ6Republished('LAN-05', firstSnapshot, secondSnapshot);
 
       // Q7: reconstruct the complete production registry and evidence readers
       // from the durable SQLite file. Ledger replay must not republish.
@@ -166,24 +181,25 @@ void main() {
       final restartedPointer = await _pointer(db);
       expect(restartedPointer.generation, 3);
       expect(restartedPointer.evaluationId, secondPointer.evaluationId);
+      harness.assertQ7Replay(
+        'LAN-05',
+        secondSnapshot,
+        _snapshot(restartedPointer, secondEvaluation, replay.logicalResultJson),
+      );
 
       // Q7 stale writer: a client still holding generation 2 cannot overwrite
       // the generation-3 CURRENT pointer after restart.
-      await expectLater(
-        runtime.service.execute(
-          _calculationCommand(
-            commandId: 'lan05-stale-writer',
-            expectedPointerGeneration: 2,
-            expectedDesignRevision: 3,
-          ),
-        ),
-        throwsA(
-          isA<Elv5ReplacementCommandException>().having(
-            (error) => error.code,
-            'code',
-            'ELV5_POINTER_GENERATION_CONFLICT',
-          ),
-        ),
+      await harness.expectQ7StaleWriter(
+        'LAN-05',
+        () async {
+          await runtime.service.execute(
+            _calculationCommand(
+              commandId: 'lan05-stale-writer',
+              expectedPointerGeneration: 2,
+              expectedDesignRevision: 3,
+            ),
+          );
+        },
       );
 
       // Q8: historical result/command replay remains available after freeze,
@@ -195,22 +211,29 @@ void main() {
       final frozenReplay = await runtime.service.execute(secondCommand);
       expect(frozenReplay.replayed, isTrue);
       expect(frozenReplay.logicalResultJson, secondLogicalResult);
+      final frozenReplayPointer = await _pointer(db);
+      harness.assertQ8Replay(
+        'LAN-05',
+        secondSnapshot,
+        _snapshot(
+          frozenReplayPointer,
+          secondEvaluation,
+          frozenReplay.logicalResultJson,
+        ),
+      );
 
-      await expectLater(
-        runtime.service.execute(
-          _calculationCommand(
-            commandId: 'lan05-after-freeze',
-            expectedPointerGeneration: 3,
-            expectedDesignRevision: 4,
-          ),
-        ),
-        throwsA(
-          isA<Elv5ReplacementCommandException>().having(
-            (error) => error.code,
-            'code',
-            'ELV5_DESIGN_REVISION_READ_ONLY',
-          ),
-        ),
+      await harness.expectQ8ReadOnly(
+        'LAN-05',
+        () async {
+          await runtime.service.execute(
+            _calculationCommand(
+              commandId: 'lan05-after-freeze',
+              expectedPointerGeneration: 3,
+              expectedDesignRevision: 4,
+            ),
+          );
+        },
+        operation: 'new calculation',
       );
       await expectLater(
         evidenceWriter.replace(
@@ -244,6 +267,20 @@ void main() {
     },
   );
 }
+
+Elv5F2PublicationSnapshot _snapshot(
+  _PointerRow pointer,
+  _EvaluationRow evaluation,
+  String logicalResultJson,
+) => Elv5F2PublicationSnapshot(
+  generation: pointer.generation,
+  evaluationId: pointer.evaluationId!,
+  freshness: pointer.freshness,
+  execution: evaluation.execution,
+  completion: evaluation.completion,
+  inputFingerprint: evaluation.inputFingerprint,
+  logicalResultJson: logicalResultJson,
+);
 
 DriftLan05OpticalSectionEvidenceWriter _evidenceWriter(AppDatabase db) =>
     DriftLan05OpticalSectionEvidenceWriter(
