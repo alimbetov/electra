@@ -20,6 +20,7 @@ void main() {
       containsAll(<Elv5ProcessCode>{
         Elv5ProcessCode.cctv02,
         Elv5ProcessCode.cctv03,
+        Elv5ProcessCode.cctv04,
         Elv5ProcessCode.lan01,
         Elv5ProcessCode.lan02,
         Elv5ProcessCode.lan03,
@@ -43,6 +44,6 @@ void main() {
         Elv5ProcessCode.fa08,
       }),
     );
-    expect(runtime.registry.registeredCodes, hasLength(23));
+    expect(runtime.registry.registeredCodes, hasLength(24));
   });
 }
