@@ -191,19 +191,14 @@ final class Elv5DependencyMarker {
     required this.dependencyKey,
     required this.dependencyKeySha256,
     required this.logicalNodeKeySha256,
-    required this.relationKind,
+    required String relationKind,
     required this.updatedAtUtc,
-  }) {
+  }) : relationKind = _canonicalRelationKind(relationKind) {
     _text(projectId, 'projectId');
     _text(designRevisionId, 'designRevisionId');
     _text(dependencyKey, 'dependencyKey');
     _sha256(dependencyKeySha256, 'dependencyKeySha256');
     _sha256(logicalNodeKeySha256, 'logicalNodeKeySha256');
-    final kind = relationKind.trim().toUpperCase();
-    if (!const {'FACT', 'SET', 'POLICY', 'EVAL', 'POINTER', 'MISSING'}
-        .contains(kind)) {
-      throw ArgumentError.value(relationKind, 'relationKind', 'Unsupported kind.');
-    }
   }
 
   final String projectId;
@@ -276,6 +271,16 @@ abstract interface class Elv5RuntimeWriteSession extends ElvWriteSession {
 
 typedef Elv5RuntimeWriteUnitOfWork =
     ElvWriteUnitOfWork<Elv5RuntimeWriteSession>;
+
+String _canonicalRelationKind(String value) {
+  final kind = _text(value, 'relationKind').toUpperCase();
+  if (kind == 'UPSTREAM_EVALUATION') return 'EVAL';
+  if (!const {'FACT', 'SET', 'POLICY', 'EVAL', 'POINTER', 'MISSING'}
+      .contains(kind)) {
+    throw ArgumentError.value(value, 'relationKind', 'Unsupported kind.');
+  }
+  return kind;
+}
 
 String _text(String value, String field) {
   final normalized = value.trim();
