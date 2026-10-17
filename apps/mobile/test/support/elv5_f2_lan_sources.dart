@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:drift/drift.dart' show Value;
 import 'package:electra_mobile/application/elv5/lan/elv5_lan_mutation_service.dart';
 import 'package:electra_mobile/application/elv5/lan/elv5_lan_rack_mutation_service.dart';
 import 'package:electra_mobile/application/elv5/wire/elv5_wire_command.dart';
@@ -52,6 +53,8 @@ Future<void> seedF2LanTopology(AppDatabase db) async {
     final count =
         e.key == 'switch-1'
             ? 3
+            : e.key == 'pse-1'
+            ? 2
             : e.key == 'patch-panel-1'
             ? 8
             : 0;
@@ -256,3 +259,125 @@ Map<String, Object?> f2Lan07Payload(List<Map<String, Object?>> assignments) =>
         'contentHash': f2LanHash('d'),
       },
     };
+
+Future<void> seedF2LanRoute(AppDatabase db) async {
+  final now = Elv5F2ProductionLifecycle.now();
+  await db.customStatement(
+    "INSERT INTO cable_routes (id,room_id,name,revision,created_at,updated_at,deleted_at,origin_device_id) VALUES ('route-1','room-1','Fire route',1,'${now.millisecondsSinceEpoch ~/ 1000}','${now.millisecondsSinceEpoch ~/ 1000}',NULL,'f2-fa08-production')",
+  );
+  for (final entry in {'node-a': 0, 'node-b': 1000}.entries) {
+    await db
+        .into(db.cableRouteNodes)
+        .insert(
+          CableRouteNodesCompanion.insert(
+            id: entry.key,
+            routeId: 'route-1',
+            sequence: entry.value == 0 ? 1 : 2,
+            kind: 'WAYPOINT',
+            patchId: 'patch-x',
+            localXmm: entry.value,
+            localYmm: 0,
+            worldXmm: entry.value,
+            worldYmm: 0,
+            worldZmm: 0,
+            createdAt: now,
+            updatedAt: now,
+            originDeviceId: 'f2-fa08-production',
+          ),
+        );
+  }
+  await db.customStatement(
+    "INSERT INTO cable_route_segments (id,route_id,sequence,from_node_id,to_node_id,surface_patch_id,laying_method,physical_channel_id,revision,created_at,updated_at,deleted_at,origin_device_id) VALUES ('section-1','route-1',1,'node-a','node-b','patch-x','TRAY',NULL,1,'${now.millisecondsSinceEpoch ~/ 1000}','${now.millisecondsSinceEpoch ~/ 1000}',NULL,'f2-fa08-production')",
+  );
+
+  final definition = CableDefinition(
+    code: 'LAN-CABLE',
+    label: 'Fictional LAN cable',
+    mediaCode: 'COPPER',
+    resourceDefinitions: [
+      CableResourceDefinition(
+        identity: '__WHOLE_CABLE__',
+        kind: CableResourceKind.wholeCable,
+        allocatable: true,
+        atomic: true,
+        terminationPolicy: TerminationPolicy(
+          mode: TerminationPolicyMode.bothEnds,
+          terminalRequired: true,
+        ),
+      ),
+    ],
+  );
+  final catalog = EngineeringReferenceCatalog(
+    id: 'catalog-lan-cables',
+    code: 'LAN-CABLES',
+    version: '1',
+    source: 'F2 explicit routing fixture',
+    cableDefinitions: [definition],
+  );
+  final definitionRef = catalog.cableDefinitionRef('LAN-CABLE');
+  await db
+      .into(db.engineeringReferenceCatalogs)
+      .insert(
+        EngineeringReferenceCatalogsCompanion.insert(
+          id: catalog.id,
+          projectId: 'p',
+          code: catalog.code,
+          catalogVersion: catalog.version,
+          payloadJson: canonicalEngineeringJsonV1(catalog.toMap()),
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'f2-lan',
+        ),
+      );
+  await db
+      .into(db.elvCables)
+      .insert(
+        ElvCablesCompanion.insert(
+          id: 'cable-1',
+          projectId: 'p',
+          label: 'FC-1',
+          normalizedLabel: 'FC-1',
+          name: 'Fire cable',
+          definitionCatalogId: definitionRef.catalogId,
+          definitionCatalogVersion: definitionRef.catalogVersion,
+          definitionCode: definitionRef.definitionCode,
+          definitionContentHash: definitionRef.definitionContentHash,
+          lifecycleState: 'ACTIVE',
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'f2-fa08-production',
+        ),
+      );
+  await db
+      .into(db.canonicalCableRuns)
+      .insert(
+        CanonicalCableRunsCompanion.insert(
+          id: 'run-1',
+          projectId: 'p',
+          cableId: 'cable-1',
+          designRevisionId: 'd',
+          lifecycleState: 'ACTIVE',
+          reservePercent: const Value(0),
+          terminationAllowanceMm: const Value(0),
+          revision: const Value(1),
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'f2-fa08-production',
+        ),
+      );
+  await db
+      .into(db.cableRunTraversals)
+      .insert(
+        CableRunTraversalsCompanion.insert(
+          id: 'traversal-1',
+          cableRunId: 'run-1',
+          sequence: 1,
+          routeSegmentId: 'section-1',
+          direction: 'FORWARD',
+          revision: const Value(1),
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'f2-fa08-production',
+        ),
+      );
+}
