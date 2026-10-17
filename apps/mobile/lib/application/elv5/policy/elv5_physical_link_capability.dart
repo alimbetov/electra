@@ -37,7 +37,7 @@ final class Elv5PhysicalLinkCapability {
        categoryTokens = _tokens(categoryTokens, 'categoryToken'),
        connectorKinds = _tokens(connectorKinds, 'connectorKind'),
        speedModes = _tokens(speedModes, 'speedMode'),
-       shieldContinuity = Elv5ShieldContinuity(
+       shieldContinuity = Elv5ShieldContinuity.validated(
          known: shieldContinuityKnown,
          continuous: shieldContinuity,
        ) {
@@ -62,10 +62,10 @@ final class Elv5PhysicalLinkCapability {
 /// `known == false` means the continuity is unresolved and therefore cannot
 /// be represented as continuous.
 final class Elv5ShieldContinuity {
-  const Elv5ShieldContinuity({
+  const Elv5ShieldContinuity._({
     required this.known,
     required this.continuous,
-  }) : assert(known || !continuous);
+  });
 
   factory Elv5ShieldContinuity.validated({
     required bool known,
@@ -76,7 +76,7 @@ final class Elv5ShieldContinuity {
         'Unknown ELV5 shield continuity cannot assert continuity.',
       );
     }
-    return Elv5ShieldContinuity(known: known, continuous: continuous);
+    return Elv5ShieldContinuity._(known: known, continuous: continuous);
   }
 
   final bool known;
