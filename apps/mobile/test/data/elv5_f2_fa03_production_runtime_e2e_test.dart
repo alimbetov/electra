@@ -110,6 +110,7 @@ void main() {
           execution: evaluation.read<String>('execution'),
           completion: evaluation.read<String>('completion'),
           inputFingerprint: evaluation.read<String>('input_fingerprint'),
+          outputSha256: evaluation.read<String>('output_sha256'),
           logicalResultJson: result.logicalResultJson,
         ),
       );

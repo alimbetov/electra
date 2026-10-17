@@ -1,3 +1,5 @@
+import 'drift_elv5_dependency_invalidator.dart';
+import 'drift_fa08_invalidation_coordinator.dart';
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
@@ -202,6 +204,11 @@ final class DriftElv5AmpacitySectionContractStore
         final now = _nowUtc().toUtc();
         await _requireWorkingRevision(command);
 
+        final previous = await loadActiveForSection(
+          projectId: command.projectId,
+          designRevisionId: command.designRevisionId,
+          routeSectionId: command.contract.routeSectionId,
+        );
         final payload = command.contract.toCanonicalValue();
         final hash = _encoder.sha256(payload);
         final evidenceRef = 'AMPACITY:${command.contract.routeSectionId}:$hash';
@@ -235,6 +242,55 @@ final class DriftElv5AmpacitySectionContractStore
         );
         if (changedDesign != 1) {
           throw StateError('ELV5_AMPACITY_DESIGN_REVISION_CAS_FAILED');
+        }
+        if (previous != null) {
+          final contract = previous.contract;
+          await DriftElv5DependencyInvalidator(
+            database,
+            originDeviceId: originDeviceId,
+            nowUtc: _nowUtc,
+          ).invalidate(
+            projectId: command.projectId,
+            designRevisionId: command.designRevisionId,
+            dependencies: [
+              Elv5InvalidationDependency(
+                relationKind: 'POLICY',
+                domain: 'AMPACITY_REFERENCE_ROW',
+                subjectId: contract.referenceRow.evidenceRef,
+                memberId: contract.referenceRow.evidenceContentHash,
+              ),
+              Elv5InvalidationDependency(
+                relationKind: 'POLICY',
+                domain: 'AMPACITY_TEMPERATURE_CORRECTION',
+                subjectId: contract.temperatureCorrection.evidenceRef,
+                memberId: contract.temperatureCorrection.evidenceContentHash,
+              ),
+              Elv5InvalidationDependency(
+                relationKind: 'POLICY',
+                domain: 'AMPACITY_GROUPING_CORRECTION',
+                subjectId: contract.groupingCorrection.evidenceRef,
+                memberId: contract.groupingCorrection.evidenceContentHash,
+              ),
+              for (final correction in contract.additionalCorrections)
+                Elv5InvalidationDependency(
+                  relationKind: 'POLICY',
+                  domain: 'AMPACITY_ADDITIONAL_CORRECTION',
+                  subjectId: correction.evidenceRef,
+                  memberId:
+                      '${correction.code}:${correction.evidenceContentHash}',
+                ),
+            ],
+          );
+        } else {
+          await DriftFa08InvalidationCoordinator(
+            database,
+            originDeviceId: originDeviceId,
+            nowUtc: _nowUtc,
+          ).routeChanged(
+            projectId: command.projectId,
+            designRevisionId: command.designRevisionId,
+            cableRunId: command.contract.cableRunId,
+          );
         }
       });
 

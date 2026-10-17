@@ -13,6 +13,7 @@ final class Elv5F2PublicationSnapshot {
     required this.execution,
     required this.completion,
     required this.inputFingerprint,
+    required this.outputSha256,
     required this.logicalResultJson,
   });
 
@@ -22,6 +23,7 @@ final class Elv5F2PublicationSnapshot {
   final String execution;
   final String completion;
   final String inputFingerprint;
+  final String outputSha256;
   final String logicalResultJson;
 }
 
@@ -173,7 +175,8 @@ final class Elv5F2QualificationHarness {
     expect(snapshot.evaluationId, isNotEmpty);
     expect(snapshot.execution, 'SUCCEEDED');
     expect(snapshot.completion, 'COMPLETE');
-    expect(snapshot.inputFingerprint, hasLength(64));
+    expect(snapshot.inputFingerprint, matches(RegExp(r'^[0-9a-f]{64}$')));
+    expect(snapshot.outputSha256, matches(RegExp(r'^[0-9a-f]{64}$')));
     expect(snapshot.logicalResultJson, isNotEmpty);
   }
 
@@ -188,6 +191,11 @@ final class Elv5F2QualificationHarness {
       actual.inputFingerprint,
       expected.inputFingerprint,
       reason: '$processCode $gate replay must preserve input identity',
+    );
+    expect(
+      actual.outputSha256,
+      expected.outputSha256,
+      reason: '$processCode $gate replay must preserve output identity',
     );
     expect(actual.execution, expected.execution);
     expect(actual.completion, expected.completion);

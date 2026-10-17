@@ -126,6 +126,7 @@ Elv5F2PublicationSnapshot _snapshot(
   execution: 'SUCCEEDED',
   completion: 'COMPLETE',
   inputFingerprint: pointer.inputFingerprint!,
+  outputSha256: pointer.outputSha256!,
   logicalResultJson: logicalResultJson,
 );
 

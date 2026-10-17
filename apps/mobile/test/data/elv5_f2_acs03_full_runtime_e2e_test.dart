@@ -226,6 +226,7 @@ Elv5F2PublicationSnapshot _snapshot(
   execution: evaluation.execution,
   completion: evaluation.completion,
   inputFingerprint: evaluation.inputFingerprint,
+  outputSha256: evaluation.outputSha256,
   logicalResultJson: logicalResultJson,
 );
 

@@ -271,6 +271,7 @@ Elv5F2PublicationSnapshot _snapshot(
   execution: evaluation.execution,
   completion: evaluation.completion,
   inputFingerprint: evaluation.inputFingerprint,
+  outputSha256: evaluation.outputSha256,
   logicalResultJson: logicalResultJson,
 );
 
@@ -437,7 +438,7 @@ Future<_EvaluationRow> _evaluation(AppDatabase db, String evaluationId) async {
   final row =
       await db
           .customSelect(
-            'SELECT execution, completion, assessment, input_fingerprint '
+            'SELECT execution, completion, assessment, input_fingerprint, output_sha256 '
             'FROM discipline_evaluation_records '
             'WHERE project_id = ? AND evaluation_id = ?',
             variables: <Variable>[
@@ -451,6 +452,7 @@ Future<_EvaluationRow> _evaluation(AppDatabase db, String evaluationId) async {
     completion: row.read<String>('completion'),
     assessment: row.read<String>('assessment'),
     inputFingerprint: row.read<String>('input_fingerprint'),
+    outputSha256: row.read<String>('output_sha256'),
   );
 }
 
@@ -472,12 +474,14 @@ final class _EvaluationRow {
     required this.completion,
     required this.assessment,
     required this.inputFingerprint,
+    required this.outputSha256,
   });
 
   final String execution;
   final String completion;
   final String assessment;
   final String inputFingerprint;
+  final String outputSha256;
 }
 
 Future<void> _seedProjectAndRealizedSection(AppDatabase db) async {

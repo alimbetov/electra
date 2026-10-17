@@ -1,3 +1,5 @@
+import 'drift_elv5_dependency_invalidator.dart';
+import 'drift_fa08_invalidation_coordinator.dart';
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
@@ -124,6 +126,11 @@ final class DriftFa08CablePolicyContractStore
       throw StateError('FA08_DESIGN_REVISION_CONFLICT');
     }
 
+    final previous = await loadActiveForCableRun(
+      projectId: command.projectId,
+      designRevisionId: command.designRevisionId,
+      cableRunId: command.contract.cableRunId,
+    );
     final payload = command.contract.toCanonicalValue();
     final hash = _encoder.sha256(payload);
     final evidenceRef = 'FA08:${command.contract.cableRunId}:$hash';
@@ -249,6 +256,29 @@ final class DriftFa08CablePolicyContractStore
       ],
     );
     if (changedDesign != 1) throw StateError('FA08_DESIGN_REVISION_CAS_FAILED');
+    if (previous != null) {
+      await DriftElv5DependencyInvalidator(
+        database,
+        originDeviceId: originDeviceId,
+        nowUtc: _nowUtc,
+      ).invalidateSubject(
+        projectId: command.projectId,
+        designRevisionId: command.designRevisionId,
+        relationKind: 'POLICY',
+        domain: 'FA08_CABLE_POLICY_CONTRACT',
+        subjectId: previous.evidenceRef,
+      );
+    } else {
+      await DriftFa08InvalidationCoordinator(
+        database,
+        originDeviceId: originDeviceId,
+        nowUtc: _nowUtc,
+      ).routeChanged(
+        projectId: command.projectId,
+        designRevisionId: command.designRevisionId,
+        cableRunId: command.contract.cableRunId,
+      );
+    }
   });
 
   String _canonical(Object? value) => utf8.decode(_encoder.encode(value));

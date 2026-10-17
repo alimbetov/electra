@@ -37,51 +37,10 @@ void main() {
       });
 
       await _seedTopology(db);
+      await _seedSources(db);
       var environmentStore = _environmentStore(db);
       var ampacityStore = _ampacityStore(db);
       var policyStore = _policyStore(db);
-
-      await environmentStore.replace(
-        ReplaceElv5EnvironmentProfileCommand(
-          projectId: 'p',
-          designRevisionId: 'd',
-          expectedDesignRevision: 1,
-          bindingId: 'env-room',
-          expectedBindingRevision: null,
-          scopeKind: 'ROOM',
-          scopeId: 'room-1',
-          profile: _environment(
-            editionId: 'env-normal',
-            maximumTemperatureC: '40',
-            evidenceSeed: 'a',
-          ),
-        ),
-      );
-      final normalEnvironment = await _activeEnvironment(environmentStore);
-      await ampacityStore.replace(
-        ReplaceElv5AmpacitySectionContractCommand(
-          projectId: 'p',
-          designRevisionId: 'd',
-          expectedDesignRevision: 2,
-          bindingId: 'ampacity-section',
-          expectedBindingRevision: null,
-          contract: _ampacityContract(
-            environment: normalEnvironment,
-            factor: '0.90',
-            evidenceSeed: 'b',
-          ),
-        ),
-      );
-      await policyStore.replace(
-        ReplaceFa08CablePolicyContractCommand(
-          projectId: 'p',
-          designRevisionId: 'd',
-          expectedDesignRevision: 3,
-          bindingId: 'fa08-policy',
-          expectedBindingRevision: null,
-          contract: _policy(),
-        ),
-      );
 
       var runtime = _runtime(db);
       final firstCommand = _command(
@@ -407,6 +366,130 @@ void main() {
       );
     },
   );
+  for (final source in ['ampacity', 'policy']) {
+    test(
+      'FA-08 $source replacement atomically invalidates CURRENT and republishes',
+      () async {
+        final directory = await Directory.systemTemp.createTemp(
+          'fa08-$source-',
+        );
+        final db = AppDatabase(
+          NativeDatabase(File('${directory.path}/qualification.sqlite')),
+        );
+        addTearDown(() async {
+          await db.close();
+          await directory.delete(recursive: true);
+        });
+        await _seedTopology(db);
+        await _seedSources(db);
+        final runtime = _runtime(db);
+        final first = await runtime.service.execute(
+          _command(
+            commandId: 'initial',
+            expectedDesignRevision: 4,
+            expectedPointerGeneration: 0,
+          ),
+        );
+        final initial = await _snapshot(
+          db,
+          first.logicalResultJson,
+          expectedAssessment: 'PASS',
+          expectedMargin: 2,
+        );
+        if (source == 'ampacity') {
+          await _ampacityStore(db).replace(
+            ReplaceElv5AmpacitySectionContractCommand(
+              projectId: 'p',
+              designRevisionId: 'd',
+              bindingId: 'ampacity-section',
+              expectedDesignRevision: 4,
+              expectedBindingRevision: 1,
+              contract: _ampacityContract(
+                environment: await _activeEnvironment(_environmentStore(db)),
+                factor: '0.70',
+                evidenceSeed: 'e',
+              ),
+            ),
+          );
+        } else {
+          await _policyStore(db).replace(
+            ReplaceFa08CablePolicyContractCommand(
+              projectId: 'p',
+              designRevisionId: 'd',
+              bindingId: 'fa08-policy',
+              expectedDesignRevision: 4,
+              expectedBindingRevision: 1,
+              contract: _policy(minimumIz: '28'),
+            ),
+          );
+        }
+        await _expectPointer(db: db, freshness: 'STALE', generation: 2);
+        final result = await runtime.service.execute(
+          _command(
+            commandId: 'republish',
+            expectedDesignRevision: 5,
+            expectedPointerGeneration: 2,
+          ),
+        );
+        final republished = await _snapshot(
+          db,
+          result.logicalResultJson,
+          expectedAssessment: 'FAIL',
+          expectedMargin: source == 'ampacity' ? -4 : -1,
+        );
+        const Elv5F2QualificationHarness().assertQ6Republished(
+          'FA-08',
+          initial,
+          republished,
+        );
+        expect(republished.generation, 3);
+      },
+    );
+  }
+}
+
+Future<void> _seedSources(AppDatabase db) async {
+  final environmentStore = _environmentStore(db);
+  await environmentStore.replace(
+    ReplaceElv5EnvironmentProfileCommand(
+      projectId: 'p',
+      designRevisionId: 'd',
+      expectedDesignRevision: 1,
+      bindingId: 'env-room',
+      expectedBindingRevision: null,
+      scopeKind: 'ROOM',
+      scopeId: 'room-1',
+      profile: _environment(
+        editionId: 'env-normal',
+        maximumTemperatureC: '40',
+        evidenceSeed: 'a',
+      ),
+    ),
+  );
+  await _ampacityStore(db).replace(
+    ReplaceElv5AmpacitySectionContractCommand(
+      projectId: 'p',
+      designRevisionId: 'd',
+      expectedDesignRevision: 2,
+      bindingId: 'ampacity-section',
+      expectedBindingRevision: null,
+      contract: _ampacityContract(
+        environment: await _activeEnvironment(environmentStore),
+        factor: '0.90',
+        evidenceSeed: 'b',
+      ),
+    ),
+  );
+  await _policyStore(db).replace(
+    ReplaceFa08CablePolicyContractCommand(
+      projectId: 'p',
+      designRevisionId: 'd',
+      expectedDesignRevision: 3,
+      bindingId: 'fa08-policy',
+      expectedBindingRevision: null,
+      contract: _policy(),
+    ),
+  );
 }
 
 DriftElv5CalculationRuntime _runtime(AppDatabase db) =>
@@ -558,6 +641,7 @@ Future<Elv5F2PublicationSnapshot> _snapshot(
     execution: evaluation.read<String>('execution'),
     completion: evaluation.read<String>('completion'),
     inputFingerprint: pointer.read<String>('input_fingerprint'),
+    outputSha256: evaluation.read<String>('output_sha256'),
     logicalResultJson: logicalResultJson,
   );
 }

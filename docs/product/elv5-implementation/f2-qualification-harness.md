@@ -28,7 +28,7 @@ The shared harness requires durable SQLite reopen/restart replay to preserve:
 - evaluation identity;
 - logical result.
 
-Replay additionally preserves the exact input fingerprint and the execution/completion axes.
+Replay additionally preserves the exact input fingerprint, output SHA-256 and the execution/completion axes. Both hashes must be non-empty lowercase 64-hex values; every baseline witness reads output identity from persisted evaluation/pointer state.
 
 A stale writer must fail closed with `ELV5_POINTER_GENERATION_CONFLICT`.
 
@@ -99,3 +99,10 @@ exactly one advances generation 3 to 4, the other receives a typed pointer CAS
 conflict. An old design revision is rejected with no extra evaluation/ledger
 records. Independent-connection races remain part of the global reliability
 suite. After freeze, policy, environment and ampacity replacement all reject.
+
+Policy and ampacity writers also invalidate their exact consumed markers in
+the source-replacement transaction. Separate production witnesses replace each
+source while CURRENT, require STALE generation 2, then republish a complete
+engineering FAIL at generation 3 (+27 A versus 28 A policy, or 21 A versus
+25 A policy respectively). New bindings invalidate missing-selector route
+closures so previously blocked calculations cannot remain silently CURRENT.
