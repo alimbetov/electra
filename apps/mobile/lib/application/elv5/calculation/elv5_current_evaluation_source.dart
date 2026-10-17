@@ -88,6 +88,6 @@ Elv5Assessment _assessment(String value) => switch (value.toUpperCase()) {
   'PASS' => Elv5Assessment.pass,
   'FAIL' => Elv5Assessment.fail,
   'UNRESOLVED' => Elv5Assessment.unresolved,
-  'NOT_ASSESSED' => Elv5Assessment.notAssessed,
+  'NOTASSESSED' || 'NOT_ASSESSED' => Elv5Assessment.notAssessed,
   _ => throw FormatException('Unknown persisted ELV5 assessment: $value'),
 };

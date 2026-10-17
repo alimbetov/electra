@@ -3,6 +3,30 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  for (final spelling in ['NOTASSESSED', 'NOT_ASSESSED']) {
+    test(
+      'current snapshot reads $spelling without rewriting persisted assessment',
+      () {
+        final snapshot = _current(spelling);
+        expect(snapshot.assessment, spelling);
+        expect(
+          snapshot.foundationStatus.assessment,
+          Elv5Assessment.notAssessed,
+        );
+        expect(
+          snapshot.foundationStatus.completion,
+          Elv5FoundationCompletion.complete,
+        );
+      },
+    );
+  }
+  test(
+    'unknown assessment is rejected even for successful complete snapshot',
+    () {
+      expect(() => _current('UNRECOGNIZED'), throwsFormatException);
+    },
+  );
+
   test(
     'historical BLOCKED/INCOMPLETE record projects without persisted rewrite',
     () {
@@ -67,3 +91,24 @@ void main() {
     );
   });
 }
+
+Elv5CurrentEvaluationSnapshot _current(String assessment) =>
+    Elv5CurrentEvaluationSnapshot(
+      logicalNodeKeySha256: List.filled(64, 'a').join(),
+      processCode: Elv5ProcessCode.cctv02,
+      scopeKind: 'DESIGN',
+      scopeId: 'd',
+      scenarioKey: 'NONE',
+      subjectKind: 'CAMERA',
+      subjectId: 'cam-1',
+      evaluationId: List.filled(64, 'b').join(),
+      inputFingerprint: List.filled(64, 'c').join(),
+      outputSha256: List.filled(64, 'd').join(),
+      evidenceSha256: List.filled(64, 'e').join(),
+      pointerGeneration: 1,
+      execution: 'SUCCEEDED',
+      completion: 'COMPLETE',
+      assessment: assessment,
+      output: const {},
+      evidence: const {},
+    );
