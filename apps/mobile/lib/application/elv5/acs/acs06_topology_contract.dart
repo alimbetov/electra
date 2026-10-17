@@ -113,7 +113,7 @@ final class Acs06CauseProfileContract {
     required this.requiresConductiveFeed,
     required this.requiresSupervision,
   })  : causeCode = _cause(causeCode),
-        requiredPaths = List.unmodifiable(requiredPaths),
+        requiredPaths = List.unmodifiable(_paths(requiredPaths)),
         outcomeWhenSatisfiedCode = _outcome(outcomeWhenSatisfiedCode);
 
   final String causeCode;
@@ -125,9 +125,7 @@ final class Acs06CauseProfileContract {
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
         'causeCode': causeCode,
         'requiredPaths': <Object?>[
-          for (final value in [...requiredPaths]
-            ..sort((a, b) => a.requirementId.compareTo(b.requirementId)))
-            value.toCanonicalValue(),
+          for (final value in requiredPaths) value.toCanonicalValue(),
         ],
         'outcomeWhenSatisfiedCode': outcomeWhenSatisfiedCode,
         'requiresConductiveFeed': requiresConductiveFeed,
@@ -192,6 +190,17 @@ final class Acs06TopologyContract {
     };
     if (!graphNodes.containsAll(this.componentNodeIdByComponentId.values)) {
       throw ArgumentError('ACS06 graph omits mapped component node.');
+    }
+    for (final profile in this.causeProfiles) {
+      for (final path in profile.requiredPaths) {
+        if (!graphNodes.contains(path.fromNodeId) ||
+            !graphNodes.contains(path.toNodeId)) {
+          throw ArgumentError(
+            'ACS06 path requirement references node outside graph: '
+            '${path.requirementId}',
+          );
+        }
+      }
     }
   }
 
@@ -304,6 +313,22 @@ List<Acs06TopologyEdgeContract> _edges(Iterable<Acs06TopologyEdgeContract> value
     if (!ids.add(edge.edgeId)) throw ArgumentError('ACS06 duplicate edgeId: ${edge.edgeId}');
   }
   if (out.isEmpty) throw ArgumentError('ACS06 edge set must not be empty.');
+  return out;
+}
+
+List<Acs06PathRequirementContract> _paths(
+  Iterable<Acs06PathRequirementContract> values,
+) {
+  final out = values.toList()
+    ..sort((a, b) => a.requirementId.compareTo(b.requirementId));
+  final ids = <String>{};
+  for (final path in out) {
+    if (!ids.add(path.requirementId)) {
+      throw ArgumentError(
+        'ACS06 duplicate path requirementId: ${path.requirementId}',
+      );
+    }
+  }
   return out;
 }
 
