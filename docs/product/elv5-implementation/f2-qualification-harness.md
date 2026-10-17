@@ -52,6 +52,10 @@ The mature witness files are formatted only after `flutter pub get --enforce-loc
 
 Formatter alignment itself is not qualification evidence. The harness wave remains pending until the resulting exact source SHA passes formatting, mobile analyze/test, engineering-core analyze/test and all ELV5 foundation gates.
 
+## Analyze hygiene
+
+The first exact-SHA harness run reached `flutter analyze` after the formatter gate and identified only three unused imports left from the former bespoke exception assertions. Those imports were removed without changing production behavior or shared Q6/Q7/Q8 semantics. The cleanup must still pass the complete exact-SHA foundation workflow before this migration wave is considered closed.
+
 ## Promotion rule
 
 A process is not promoted merely because it imports or calls the harness. Q6/Q7/Q8 status is promoted only when the corresponding production witness is present in the canonical F2 matrix and the exact source SHA has passed the repository Flutter CI gates.
