@@ -19,8 +19,11 @@ import '../cctv/cctv02_runtime.dart';
 import '../cctv/cctv03_runtime.dart';
 import '../cctv/cctv04_pse_contract.dart';
 import '../cctv/cctv04_runtime.dart';
+import '../cctv/cctv05_capability_contract.dart';
+import '../cctv/cctv05_runtime.dart';
 import '../cctv/cctv_recorder_assignment_source.dart';
 import '../cctv/elv5_cctv_persistence.dart';
+import '../cctv/elv5_cctv_recorder_persistence.dart';
 import '../environment/ampacity_route_resolver.dart';
 import '../fire/elv5_fire_persistence.dart';
 import '../fire/fa01_address_capacity_contract.dart';
@@ -59,9 +62,11 @@ import '../power/elv4_operating_fact_source.dart';
 import 'elv5_blocked_capture.dart';
 import 'elv5_calculation_runtime.dart';
 import 'elv5_capture_guard.dart';
+import 'elv5_current_evaluation_source.dart';
 
 Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
   required Elv5CctvMutationStore cctvStore,
+  required Elv5CctvRecorderFactStore cctvRecorderStore,
   required Elv5LanMutationStore lanStore,
   required Elv5AcsMutationStore acsStore,
   required Elv5FireMutationStore fireStore,
@@ -70,6 +75,8 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
   required GeometryRepository geometryRepository,
   required CctvRecorderAssignmentSource recorderAssignments,
   required Cctv04PseProjectionContractSource cctv04Contracts,
+  required Cctv05CapabilityContractSource cctv05Contracts,
+  required Elv5CurrentEvaluationSource currentEvaluations,
   required Elv3RealizedLinkFactSource elv3LinkFacts,
   required Lan05OpticalSectionEvidenceSource opticalSectionEvidence,
   required Lan02PortContractSource lan02Contracts,
@@ -128,6 +135,16 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
     ),
     blocked(Cctv03PersistedInputResolver(store: cctvStore, nowUtc: nowUtc), buildCctv03Executor(nowUtc: nowUtc)),
     blocked(Cctv04PersistedInputResolver(contractSource: cctv04Contracts, powerEvidence: currentPowerEvidence, nowUtc: nowUtc), buildCctv04Executor(nowUtc: nowUtc)),
+    blocked(
+      Cctv05PersistedInputResolver(
+        recorderStore: cctvRecorderStore,
+        cctvStore: cctvStore,
+        contractSource: cctv05Contracts,
+        currentEvaluations: currentEvaluations,
+        nowUtc: nowUtc,
+      ),
+      buildCctv05Executor(nowUtc: nowUtc),
+    ),
     blocked(Lan01PersistedInputResolver(lanStore: lanStore, elv3Facts: elv3LinkFacts, nowUtc: nowUtc), buildLan01Executor(nowUtc: nowUtc)),
     blocked(Lan02PersistedInputResolver(lanStore: lanStore, contractSource: lan02Contracts, nowUtc: nowUtc), buildLan02Executor(nowUtc: nowUtc)),
     blocked(Lan03PersistedInputResolver(contractSource: lan03Contracts, powerEvidence: currentPowerEvidence, nowUtc: nowUtc), buildLan03Executor(nowUtc: nowUtc)),
