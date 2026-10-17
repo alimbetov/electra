@@ -8,6 +8,7 @@ import '../acs/elv5_acs_persistence.dart';
 import '../cctv/cctv02_runtime.dart';
 import '../cctv/cctv03_runtime.dart';
 import '../cctv/elv5_cctv_persistence.dart';
+import '../environment/ampacity_route_resolver.dart';
 import '../fire/elv5_fire_persistence.dart';
 import '../fire/fa01_address_capacity_contract.dart';
 import '../fire/fa01_runtime.dart';
@@ -22,6 +23,9 @@ import '../fire/fa06_notification_contract.dart';
 import '../fire/fa06_runtime.dart';
 import '../fire/fa07_runtime.dart';
 import '../fire/fa07_topology_contract.dart';
+import '../fire/fa08_policy_contract.dart';
+import '../fire/fa08_route_facts.dart';
+import '../fire/fa08_runtime.dart';
 import '../lan/elv3_realized_link_facts.dart';
 import '../lan/elv5_lan_persistence.dart';
 import '../lan/lan01_runtime.dart';
@@ -52,6 +56,9 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
   required Fa05AutonomyContractSource fa05Contracts,
   required Fa06NotificationContractSource fa06Contracts,
   required Fa07TopologyContractSource fa07Contracts,
+  required Fa08CablePolicyContractSource fa08Contracts,
+  required Elv5AmpacityRouteResolver ampacityRouteResolver,
+  required Fa08RouteCableFactSource fa08RouteCableFacts,
   required Elv4CurrentEvidenceSource currentPowerEvidence,
   required Elv4OperatingFactSource powerOperatingFacts,
   required Elv5CaptureRevisionSource captureRevisions,
@@ -211,6 +218,18 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
         ),
       ),
       executor: buildFa07Executor(nowUtc: nowUtc),
+      nowUtc: nowUtc,
+    ),
+    Elv5BlockedAwareTypedProcessCalculationAdapter(
+      resolver: guarded(
+        Fa08PersistedInputResolver(
+          policySource: fa08Contracts,
+          ampacityResolver: ampacityRouteResolver,
+          routeCableFacts: fa08RouteCableFacts,
+          nowUtc: nowUtc,
+        ),
+      ),
+      executor: buildFa08Executor(nowUtc: nowUtc),
       nowUtc: nowUtc,
     ),
   ]);
