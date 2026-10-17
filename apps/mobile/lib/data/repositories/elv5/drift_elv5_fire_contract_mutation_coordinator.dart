@@ -85,23 +85,22 @@ final class DriftElv5FireContractMutationCoordinator {
         }
       });
 
-  Future<void> replaceFa06(
-    ReplaceFa06NotificationContractCommand command,
-  ) => database.transaction(() async {
-    final previous = await _fa06.loadActiveForCircuit(
-      projectId: command.projectId,
-      designRevisionId: command.designRevisionId,
-      circuitId: command.contract.circuitId,
-    );
-    await _fa06.replace(command);
-    if (previous != null) {
-      await _invalidator.invalidateSubject(
-        projectId: command.projectId,
-        designRevisionId: command.designRevisionId,
-        relationKind: 'POLICY',
-        domain: 'FA06_NOTIFICATION_CONTRACT',
-        subjectId: previous.evidenceRef,
-      );
-    }
-  });
+  Future<void> replaceFa06(ReplaceFa06NotificationContractCommand command) =>
+      database.transaction(() async {
+        final previous = await _fa06.loadActiveForCircuit(
+          projectId: command.projectId,
+          designRevisionId: command.designRevisionId,
+          circuitId: command.contract.circuitId,
+        );
+        await _fa06.replace(command);
+        if (previous != null) {
+          await _invalidator.invalidateSubject(
+            projectId: command.projectId,
+            designRevisionId: command.designRevisionId,
+            relationKind: 'POLICY',
+            domain: 'FA06_NOTIFICATION_CONTRACT',
+            subjectId: previous.evidenceRef,
+          );
+        }
+      });
 }
