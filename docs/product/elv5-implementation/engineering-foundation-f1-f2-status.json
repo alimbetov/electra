@@ -5,15 +5,17 @@
   "acceptanceClaimed": false,
   "runtimeBaseline": {
     "processCount": 27,
-    "productionAdapters": 24,
-    "remainingAdapters": 3,
+    "productionAdapters": 27,
+    "remainingAdapters": 0,
+    "sourceWiringComplete": true,
+    "ciQualificationComplete": false,
     "byDiscipline": {
       "ACS": {"integrated": 6, "total": 6},
       "FIRE": {"integrated": 8, "total": 8},
       "LAN": {"integrated": 7, "total": 7},
-      "CCTV": {"integrated": 3, "total": 6}
+      "CCTV": {"integrated": 6, "total": 6}
     },
-    "remaining": ["CCTV-01", "CCTV-05", "CCTV-06"]
+    "remaining": []
   },
   "foundationStages": {
     "F0": {
@@ -32,7 +34,7 @@
         "quantityInventory": "IMPLEMENTED_SHARED_DIMENSIONS_QUALIFICATION_PENDING",
         "typedEvidenceReconciliation": "SHARED_PRIMITIVE_IMPLEMENTED_PROCESS_MIGRATION_PENDING",
         "unknownFailClosedAudit": "PARTIAL_FALSE_PASS_FOUND_AND_FIXED_CCTV01",
-        "provenanceGraph": "PARTIAL_EXISTING_PRIMITIVES_TO_RECONCILE",
+        "provenanceGraph": "PARTIAL_CURRENT_EVALUATION_SOURCE_ADDED_MORE_RECONCILIATION_REQUIRED",
         "calculationIdentity": "PARTIAL_F1_HIGH_01_OPEN",
         "deterministicCanonicalization": "IMPLEMENTED_CORE_QUALIFICATION_PENDING",
         "independentStatusAxes": "PARTIAL_F1_HIGH_02_OPEN",
@@ -44,7 +46,10 @@
           "AMPACITY_REFERENCE_AND_CORRECTIONS",
           "ENVIRONMENT_PROFILE_AND_ROUTE_RESOLUTION",
           "CCTV03_STORAGE_AND_RECURRENCE",
-          "CCTV01_GEOMETRY_THRESHOLD_SEMANTICS"
+          "CCTV01_GEOMETRY_THRESHOLD_SEMANTICS",
+          "CCTV02_RECORDER_ROLE_BINDING",
+          "CCTV05_UPSTREAM_INGRESS_AND_STORAGE_REUSE",
+          "CCTV06_REALIZED_LINK_AND_PWR06_REUSE"
         ],
         "falsePassDefaultsFound": 1,
         "falsePassDefaultsFixed": 1,
@@ -62,6 +67,18 @@
           "severity": "HIGH",
           "summary": "Current runtime encodes BLOCKED as Execution and INCOMPLETE as Completion, while the foundation requires Execution SUCCEEDED/FAILED and Completion COMPLETE/PARTIAL/BLOCKED.",
           "acceptanceImpact": "BLOCKS_F2_QUALIFIED_PROMOTION_UNTIL_COMPATIBLE_AXIS_RECONCILIATION"
+        },
+        {
+          "id": "F1-HIGH-03",
+          "severity": "HIGH",
+          "summary": "Inherited ELV3 LocalCoordinateFrame axes are stored as binary floating values. CCTV-01 captures a deterministic decimal projection and exact contract orientation, but inherited frame axes are not yet an exact/bounded Foundation geometry contract.",
+          "acceptanceImpact": "BLOCKS_CCTV01_FOUNDATION_QUALIFICATION_UNTIL_ELV3_FRAME_NUMERIC_BASIS_IS_RECONCILED"
+        },
+        {
+          "id": "F1-MEDIUM-04",
+          "severity": "MEDIUM",
+          "summary": "CCTV-06 and LAN-04 both carry immutable physical section capability evidence. Path identity is shared, but categorical medium/interface/shield evidence is still process-specific and should be reconciled into the smallest shared primitive before final foundation acceptance.",
+          "acceptanceImpact": "REUSE_AND_PROVENANCE_DEBT_NOT_A_RUNTIME_COMPLETENESS_BLOCKER"
         }
       ]
     },
@@ -79,11 +96,14 @@
     }
   },
   "executionOrder": {
-    "runtimeTrack": ["CCTV-01", "CCTV-05", "CCTV-06"],
+    "runtimeTrack": [],
+    "runtimeTrackStatus": "SOURCE_WIRING_COMPLETE_27_OF_27_CI_PENDING",
     "foundationTrack": [
       "F1_UNKNOWN_AND_SILENT_DEFAULT_AUDIT_COMPLETE",
       "F1_CALCULATION_IDENTITY_RECONCILIATION",
       "F1_RESULT_AXIS_RECONCILIATION",
+      "F1_ELV3_FRAME_NUMERIC_RECONCILIATION",
+      "F1_SECTION_CAPABILITY_EVIDENCE_RECONCILIATION",
       "F1_PROVENANCE_RECONCILIATION",
       "F1_SHARED_QUALIFICATION_SUPPORT",
       "F2_AMPACITY_ROUTE_IZ",
