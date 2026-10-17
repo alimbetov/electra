@@ -27,19 +27,19 @@
     },
     "F1": {
       "name": "SHARED_PRIMITIVES_RECONCILIATION",
-      "status": "IN_PROGRESS",
+      "status": "SOURCE_RECONCILIATION_ADVANCED_CI_PENDING",
       "exitGateSatisfied": false,
       "sourceInventory": "docs/product/elv5-implementation/engineering-foundation-f1-source-inventory.md",
       "workItems": {
         "quantityInventory": "IMPLEMENTED_SHARED_DIMENSIONS_QUALIFICATION_PENDING",
         "typedEvidenceReconciliation": "SHARED_PRIMITIVE_IMPLEMENTED_PROCESS_MIGRATION_PENDING",
         "unknownFailClosedAudit": "PARTIAL_TWO_TARGETED_PASSES_ONE_FALSE_PASS_FIXED",
-        "provenanceGraph": "PARTIAL_CURRENT_EVALUATION_SOURCE_ADDED_MORE_RECONCILIATION_REQUIRED",
-        "calculationIdentity": "PARTIAL_STRICT_QUALIFICATION_IDENTITY_PRIMITIVE_ADDED_PROVIDER_AND_EVALUATION_INTEGRATION_PENDING",
-        "deterministicCanonicalization": "IMPLEMENTED_CORE_QUALIFICATION_PENDING",
-        "independentStatusAxes": "PARTIAL_COMPATIBLE_FOUNDATION_PROJECTION_ADDED_PERSISTED_MIGRATION_PENDING",
+        "provenanceGraph": "PARTIAL_CURRENT_EVALUATION_AND_QUALIFICATION_IDENTITY_PROVENANCE_ADDED_MORE_RECONCILIATION_REQUIRED",
+        "calculationIdentity": "SOURCE_RECONCILED_PROCESS_VERSION_AUTHORITY_MANIFEST_BUILD_SHA_AND_V2_EVALUATION_ID_CI_PENDING",
+        "deterministicCanonicalization": "IMPLEMENTED_CORE_CCTV05_ROW_ORDER_HARDENED_QUALIFICATION_PENDING",
+        "independentStatusAxes": "SOURCE_RECONCILED_BACKWARD_COMPATIBLE_PERSISTED_REPLAY_PROJECTION_CI_PENDING",
         "governingCasePrimitive": "PARTIAL_PROCESS_SPECIFIC",
-        "sharedQualificationSupport": "PARTIAL_PROCESS_REFERENCE_TESTS_ADDED_SHARED_HARNESS_TODO"
+        "sharedQualificationSupport": "IMPLEMENTED_TEST_ONLY_EXECUTABLE_Q0_TO_Q9_SUPPORT_CI_PENDING"
       },
       "unknownAudit": {
         "inspected": [
@@ -63,43 +63,47 @@
         {
           "id": "F1-HIGH-01",
           "severity": "HIGH",
-          "progress": "STRICT_QUALIFICATION_IDENTITY_PRIMITIVE_IMPLEMENTED",
-          "summary": "Elv5QualificationIdentity now requires processVersion, rulesetVersion, exact sourceSha and authorityFingerprint with no defaults. A real build/authority provider and integration into immutable evaluation identity/persistence are still missing.",
-          "acceptanceImpact": "BLOCKS_QUALIFIED_AND_ACCEPTED_PROMOTION"
+          "progress": "SOURCE_RECONCILED_CI_AND_EXACT_SHA_QUALIFICATION_PENDING",
+          "summary": "Qualification builds now require exact ELECTRA_SOURCE_SHA, derive authorityFingerprint from the canonical 27-process authority manifest, bind processVersion/rulesetVersion/sourceSha/authorityFingerprint into evaluation identity v2, and persist the same self-describing identity inside immutable evidence. Dev/historical evaluations remain v1. Exact-head CI and qualification evidence are still required before closure.",
+          "acceptanceImpact": "BLOCKS_QUALIFIED_AND_ACCEPTED_PROMOTION_UNTIL_EXACT_SHA_QUALIFICATION"
         },
         {
           "id": "F1-HIGH-02",
           "severity": "HIGH",
-          "progress": "BACKWARD_COMPATIBLE_FOUNDATION_STATUS_PROJECTION_IMPLEMENTED",
-          "summary": "Persisted legacy status strings are preserved for replay while the Foundation projection maps legacy BLOCKED to SUCCEEDED + BLOCKED and legacy INCOMPLETE to PARTIAL where applicable. Persistence/replay migration and qualification remain open.",
-          "acceptanceImpact": "BLOCKS_F2_QUALIFIED_PROMOTION_UNTIL_PERSISTED_COMPATIBILITY_IS_QUALIFIED"
+          "progress": "SOURCE_RECONCILED_CI_PENDING",
+          "summary": "Legacy persisted status strings remain replay-compatible while strict read projection maps BLOCKED/INCOMPLETE/UNRESOLVED to Foundation SUCCEEDED/BLOCKED/UNRESOLVED. Unknown persisted vocabulary fails closed. Exact-head replay qualification is still required.",
+          "acceptanceImpact": "BLOCKS_F2_QUALIFIED_PROMOTION_UNTIL_EXACT_HEAD_REPLAY_QUALIFICATION"
         },
         {
           "id": "F1-HIGH-03",
           "severity": "HIGH",
-          "summary": "Inherited ELV3 LocalCoordinateFrame axes are stored as binary floating values. CCTV-01 captures a deterministic decimal projection and exact contract orientation, but inherited frame axes are not yet an exact/bounded Foundation geometry contract.",
-          "acceptanceImpact": "BLOCKS_CCTV01_FOUNDATION_QUALIFICATION_UNTIL_ELV3_FRAME_NUMERIC_BASIS_IS_RECONCILED"
+          "progress": "SOURCE_RECONCILED_EXACT_CCTV01_FRAME_V2_CI_PENDING",
+          "summary": "CCTV-01 contract v2 now carries exact orthonormal host/target surface axes. Verdict geometry uses only integer-mm origins/local placement plus exact contract axes; inherited ELV3 binary-floating axes are compatibility witnesses checked against an explicit tolerance and cannot drive engineering math. Exact-head qualification is pending.",
+          "acceptanceImpact": "BLOCKS_CCTV01_FOUNDATION_QUALIFICATION_UNTIL_EXACT_HEAD_TESTS_PASS"
         },
         {
           "id": "F1-MEDIUM-04",
           "severity": "MEDIUM",
+          "progress": "OPEN",
           "summary": "CCTV-06 and LAN-04 share realized path identity but categorical medium/interface/shield evidence is still process-specific and should be reconciled into the smallest shared primitive.",
           "acceptanceImpact": "REUSE_AND_PROVENANCE_DEBT_NOT_A_RUNTIME_COMPLETENESS_BLOCKER"
         },
         {
           "id": "F1-MEDIUM-05",
           "severity": "MEDIUM",
-          "summary": "CCTV-05 assignment scope must gain an explicit persisted-row-order metamorphic qualification and canonical set ordering independent of ordinal where ordinal is not engineering-significant.",
-          "acceptanceImpact": "DETERMINISM_QUALIFICATION_DEBT"
+          "progress": "SOURCE_FIXED_METAMORPHIC_TEST_ADDED_CI_PENDING",
+          "summary": "CCTV-05 recorder assignments are canonically sorted before scope/input fingerprint construction, duplicate assignment identities block, and a reversed-row-order metamorphic test requires identical input/output/evidence hashes.",
+          "acceptanceImpact": "DETERMINISM_QUALIFICATION_PENDING_CI"
         }
       ]
     },
     "F2": {
       "name": "PILOT_QUALIFICATION",
-      "status": "NOT_QUALIFIED",
+      "status": "IN_PROGRESS_NOT_QUALIFIED",
       "exitGateSatisfied": false,
+      "sharedSupport": "Q0_Q9_TEST_SUPPORT_IMPLEMENTED_CI_PENDING",
       "pilots": [
-        {"id":"AMPACITY_ROUTE_IZ","implementation":"RUNTIME_FOUNDATION_EXISTS","lifecycle":"RUNTIME_INTEGRATED_PARTIAL","qualification":{"Q0":"PARTIAL","Q1":"PARTIAL","Q2":"TODO","Q3":"PARTIAL","Q4":"PARTIAL","Q5":"TODO","Q6":"PARTIAL","Q7":"TODO","Q8":"TODO","Q9":"TODO_IF_APPLICABLE"}},
+        {"id":"AMPACITY_ROUTE_IZ","implementation":"RUNTIME_FOUNDATION_EXISTS","lifecycle":"RUNTIME_INTEGRATED_PARTIAL","qualification":{"Q0":"SOURCE_TEST_ADDED_CI_PENDING","Q1":"SOURCE_TEST_ADDED_CI_PENDING","Q2":"INDEPENDENT_ORACLE_SOURCE_TEST_ADDED_CI_PENDING","Q3":"SOURCE_TEST_ADDED_CI_PENDING","Q4":"METAMORPHIC_SOURCE_TEST_ADDED_CI_PENDING","Q5":"TODO","Q6":"PARTIAL_EXISTING_RUNTIME_EVIDENCE","Q7":"TODO","Q8":"TODO","Q9":"TODO_IF_APPLICABLE"}},
         {"id":"FA-03","implementation":"PRODUCTION_ADAPTER_PRESENT","lifecycle":"RUNTIME_INTEGRATED","qualification":{"Q0":"PARTIAL","Q1":"PARTIAL","Q2":"TODO","Q3":"PARTIAL","Q4":"TODO","Q5":"TODO","Q6":"PARTIAL","Q7":"TODO","Q8":"TODO","Q9":"TODO_IF_APPLICABLE"}},
         {"id":"ACS-03","implementation":"PRODUCTION_ADAPTER_PRESENT","lifecycle":"RUNTIME_INTEGRATED","canonicalOracle":"23.51 V / +1.51 V where applicable","qualification":{"Q0":"PARTIAL","Q1":"PARTIAL","Q2":"TODO_INDEPENDENT","Q3":"PARTIAL","Q4":"TODO","Q5":"TODO","Q6":"PARTIAL","Q7":"TODO","Q8":"TODO","Q9":"TODO_IF_APPLICABLE"}},
         {"id":"CCTV-03","implementation":"PRODUCTION_ADAPTER_PRESENT","lifecycle":"RUNTIME_INTEGRATED","qualification":{"Q0":"PARTIAL","Q1":"PARTIAL","Q2":"TODO","Q3":"PARTIAL","Q4":"TODO","Q5":"TODO","Q6":"PARTIAL","Q7":"TODO","Q8":"TODO","Q9":"TODO_IF_APPLICABLE"}},
@@ -109,21 +113,17 @@
   },
   "executionOrder": {
     "runtimeTrack": [],
-    "runtimeTrackStatus": "SOURCE_WIRING_COMPLETE_27_OF_27_CI_PENDING",
+    "runtimeTrackStatus": "SOURCE_WIRING_COMPLETE_27_OF_27",
     "foundationTrack": [
+      "F1_EXACT_HEAD_CI_AND_REPLAY_QUALIFICATION",
       "F1_UNKNOWN_AND_SILENT_DEFAULT_AUDIT_COMPLETE",
-      "F1_CALCULATION_IDENTITY_PROVIDER_AND_EVALUATION_INTEGRATION",
-      "F1_RESULT_AXIS_PERSISTENCE_AND_REPLAY_QUALIFICATION",
-      "F1_ELV3_FRAME_NUMERIC_RECONCILIATION",
       "F1_SECTION_CAPABILITY_EVIDENCE_RECONCILIATION",
-      "F1_CCTV05_DETERMINISM_QUALIFICATION",
       "F1_PROVENANCE_RECONCILIATION",
-      "F1_SHARED_QUALIFICATION_SUPPORT",
-      "F2_AMPACITY_ROUTE_IZ",
-      "F2_FA-03",
-      "F2_ACS-03",
-      "F2_LAN-05",
-      "F2_CCTV-03",
+      "F2_AMPACITY_ROUTE_IZ_Q5_TO_Q9",
+      "F2_FA-03_Q0_TO_Q9",
+      "F2_ACS-03_Q0_TO_Q9",
+      "F2_LAN-05_Q0_TO_Q9",
+      "F2_CCTV-03_Q0_TO_Q9",
       "F2_EXACT_SHA_QUALIFICATION_MATRIX"
     ]
   },
