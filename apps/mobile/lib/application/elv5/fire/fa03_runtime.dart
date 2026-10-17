@@ -61,7 +61,10 @@ final class Fa03PersistedInputResolver
     }
     final contract = contractSnapshot!.contract;
     if (contract.circuitId != request.subject.id) {
-      throw StateError('FA03_CONTRACT_CIRCUIT_IDENTITY_MISMATCH:${request.subject.id}:${contract.circuitId}');
+      throw StateError(
+        'FA03_CONTRACT_CIRCUIT_IDENTITY_MISMATCH:'
+        '${request.subject.id}:${contract.circuitId}',
+      );
     }
 
     final dependencies = <Elv5DependencyMarker>[
@@ -123,6 +126,30 @@ final class Fa03PersistedInputResolver
         );
       }
       final pwr03 = values.single;
+
+      // Register the exact upstream identity before any check that can produce
+      // a durable BLOCKED result. A later PWR-03 publication can therefore
+      // invalidate/recalculate an FA-03 result that was blocked by its content.
+      dependencies.add(
+        _dependency(
+          request,
+          'UPSTREAM_EVALUATION',
+          'ELV4_PWR03_CURRENT',
+          pwr03.evaluationId,
+          memberId:
+              '${pwr03.nodeKey.sha256}:${pwr03.pointerGeneration}:${pwr03.evidenceSha256}',
+        ),
+      );
+      upstreamGenerations[pwr03.nodeKey.sha256] = pwr03.pointerGeneration;
+      upstreamBasis.add(<String, Object?>{
+        'caseId': caseContract.caseId,
+        'evaluationId': pwr03.evaluationId,
+        'nodeKeySha256': pwr03.nodeKey.sha256,
+        'generation': pwr03.pointerGeneration,
+        'evidenceSha256': pwr03.evidenceSha256,
+        'inputFingerprint': pwr03.inputFingerprint,
+      });
+
       if (pwr03.inputFingerprint != caseContract.expectedPwr03InputFingerprint) {
         _blocked(
           request,
@@ -132,7 +159,8 @@ final class Fa03PersistedInputResolver
           dependencies,
           <String, Object?>{
             'caseId': caseContract.caseId,
-            'expectedInputFingerprint': caseContract.expectedPwr03InputFingerprint,
+            'expectedInputFingerprint':
+                caseContract.expectedPwr03InputFingerprint,
             'actualInputFingerprint': pwr03.inputFingerprint,
             'evaluationId': pwr03.evaluationId,
           },
@@ -205,6 +233,9 @@ final class Fa03PersistedInputResolver
               'loadId': mapping.value,
               'matchCount': matching.length,
               'evaluationId': pwr03.evaluationId,
+              'nodeKeySha256': pwr03.nodeKey.sha256,
+              'pointerGeneration': pwr03.pointerGeneration,
+              'evidenceSha256': pwr03.evidenceSha256,
             },
           );
         }
@@ -223,26 +254,6 @@ final class Fa03PersistedInputResolver
           ),
         );
       }
-
-      upstreamGenerations[pwr03.nodeKey.sha256] = pwr03.pointerGeneration;
-      dependencies.add(
-        _dependency(
-          request,
-          'UPSTREAM_EVALUATION',
-          'ELV4_PWR03_CURRENT',
-          pwr03.evaluationId,
-          memberId:
-              '${pwr03.nodeKey.sha256}:${pwr03.pointerGeneration}:${pwr03.evidenceSha256}',
-        ),
-      );
-      upstreamBasis.add(<String, Object?>{
-        'caseId': caseContract.caseId,
-        'evaluationId': pwr03.evaluationId,
-        'nodeKeySha256': pwr03.nodeKey.sha256,
-        'generation': pwr03.pointerGeneration,
-        'evidenceSha256': pwr03.evidenceSha256,
-        'inputFingerprint': pwr03.inputFingerprint,
-      });
     }
 
     final input = Fa03Input(
@@ -267,7 +278,10 @@ final class Fa03PersistedInputResolver
       'contractScopeFingerprint': contract.scopeFingerprint,
       'physicalScopeFingerprint': physicalScopeFingerprint,
       'upstream': upstreamBasis
-        ..sort((a, b) => (a['caseId']! as String).compareTo(b['caseId']! as String)),
+        ..sort(
+          (a, b) => (a['caseId']! as String)
+              .compareTo(b['caseId']! as String),
+        ),
     });
     return Elv5CapturedInput<Fa03Input>(
       request: request,
@@ -335,7 +349,7 @@ Elv5PureKernelExecutor<Fa03Input, Fa03Result> buildFa03Executor({
     'governingTerminalId': result.governingTerminalId,
     'governingCaseId': result.governingCaseId,
     'blockingReason': result.blockingReason,
-    'terminals': [
+    'terminals': <Object?>[
       for (final item in result.terminals)
         <String, Object?>{
           'terminalId': item.terminalId,
@@ -371,14 +385,20 @@ Elv5PureKernelExecutor<Fa03Input, Fa03Result> buildFa03Executor({
 
 List<Map<String, Object?>> _objects(Object? raw, String field) {
   if (raw is! List) throw FormatException('$field must be an array.');
-  return [for (final value in raw) _object(value, field)];
+  return <Map<String, Object?>>[
+    for (final value in raw) _object(value, field),
+  ];
 }
+
 Map<String, Object?> _object(Object? raw, String field) {
   if (raw is! Map) throw FormatException('$field must be an object.');
   return Map<String, Object?>.from(raw);
 }
+
 PowerRational _powerRational(Object? raw, String field) {
   if (raw is! Map) throw FormatException('$field must be a rational map.');
   return PowerRational.fromMap(Map<String, Object?>.from(raw));
 }
-Elv5Rational _elv5(PowerRational value) => Elv5Rational(value.numerator, value.denominator);
+
+Elv5Rational _elv5(PowerRational value) =>
+    Elv5Rational(value.numerator, value.denominator);
