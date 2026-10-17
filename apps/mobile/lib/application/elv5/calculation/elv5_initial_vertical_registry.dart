@@ -1,5 +1,7 @@
 import '../acs/acs01_role_profile_contract.dart';
 import '../acs/acs01_runtime.dart';
+import '../acs/acs02_resource_contract.dart';
+import '../acs/acs02_runtime.dart';
 import '../acs/acs03_electrical_contract.dart';
 import '../acs/acs03_runtime.dart';
 import '../acs/acs04_runtime.dart';
@@ -41,9 +43,6 @@ import 'elv5_blocked_capture.dart';
 import 'elv5_calculation_runtime.dart';
 import 'elv5_capture_guard.dart';
 
-/// Production ELV5 persisted-fact vertical backed by revision-scoped ELV3,
-/// ELV4 and ELV5 evidence. Mandatory evidence gaps become durable BLOCKED
-/// evaluations; calculation kernels remain repository-free and deterministic.
 Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
   required Elv5CctvMutationStore cctvStore,
   required Elv5LanMutationStore lanStore,
@@ -52,6 +51,7 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
   required Elv3RealizedLinkFactSource elv3LinkFacts,
   required Lan05OpticalSectionEvidenceSource opticalSectionEvidence,
   required Acs01RoleProfileContractSource acs01Contracts,
+  required Acs02ResourceContractSource acs02Contracts,
   required Acs03ElectricalContractSource acs03Contracts,
   required Acs04SourceRequirementContractSource acs04Contracts,
   required Acs05AutonomyContractSource acs05Contracts,
@@ -71,194 +71,102 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
   DateTime Function()? nowUtc,
 }) {
   Elv5ProcessInputResolver<I> guarded<I>(Elv5ProcessInputResolver<I> inner) =>
-      Elv5RevisionGuardedInputResolver<I>(
-        inner: inner,
-        revisions: captureRevisions,
-      );
+      Elv5RevisionGuardedInputResolver<I>(inner: inner, revisions: captureRevisions);
+  Elv5ProcessCalculationAdapter blocked<I, O>(
+    Elv5ProcessInputResolver<I> resolver,
+    Elv5ProcessKernelExecutor<I, O> executor,
+  ) => Elv5BlockedAwareTypedProcessCalculationAdapter(
+    resolver: guarded(resolver),
+    executor: executor,
+    nowUtc: nowUtc,
+  );
 
   return Elv5ProcessCalculationRegistry(<Elv5ProcessCalculationAdapter>[
-    Elv5BlockedAwareTypedProcessCalculationAdapter(
-      resolver: guarded(
-        Cctv02PersistedInputResolver(store: cctvStore, nowUtc: nowUtc),
-      ),
-      executor: buildCctv02Executor(nowUtc: nowUtc),
-      nowUtc: nowUtc,
+    blocked(Cctv02PersistedInputResolver(store: cctvStore, nowUtc: nowUtc), buildCctv02Executor(nowUtc: nowUtc)),
+    blocked(Cctv03PersistedInputResolver(store: cctvStore, nowUtc: nowUtc), buildCctv03Executor(nowUtc: nowUtc)),
+    blocked(
+      Lan01PersistedInputResolver(lanStore: lanStore, elv3Facts: elv3LinkFacts, nowUtc: nowUtc),
+      buildLan01Executor(nowUtc: nowUtc),
     ),
-    Elv5BlockedAwareTypedProcessCalculationAdapter(
-      resolver: guarded(
-        Cctv03PersistedInputResolver(store: cctvStore, nowUtc: nowUtc),
+    blocked(
+      Lan05PersistedInputResolver(
+        lanStore: lanStore,
+        elv3Facts: elv3LinkFacts,
+        opticalEvidence: opticalSectionEvidence,
+        nowUtc: nowUtc,
       ),
-      executor: buildCctv03Executor(nowUtc: nowUtc),
-      nowUtc: nowUtc,
+      buildLan05Executor(nowUtc: nowUtc),
     ),
-    Elv5BlockedAwareTypedProcessCalculationAdapter(
-      resolver: guarded(
-        Lan01PersistedInputResolver(
-          lanStore: lanStore,
-          elv3Facts: elv3LinkFacts,
-          nowUtc: nowUtc,
-        ),
-      ),
-      executor: buildLan01Executor(nowUtc: nowUtc),
-      nowUtc: nowUtc,
+    blocked(
+      Acs01PersistedInputResolver(acsStore: acsStore, contractSource: acs01Contracts, nowUtc: nowUtc),
+      buildAcs01Executor(nowUtc: nowUtc),
     ),
-    Elv5BlockedAwareTypedProcessCalculationAdapter(
-      resolver: guarded(
-        Lan05PersistedInputResolver(
-          lanStore: lanStore,
-          elv3Facts: elv3LinkFacts,
-          opticalEvidence: opticalSectionEvidence,
-          nowUtc: nowUtc,
-        ),
-      ),
-      executor: buildLan05Executor(nowUtc: nowUtc),
-      nowUtc: nowUtc,
+    blocked(
+      Acs02PersistedInputResolver(acsStore: acsStore, contractSource: acs02Contracts, nowUtc: nowUtc),
+      buildAcs02Executor(nowUtc: nowUtc),
     ),
-    Elv5BlockedAwareTypedProcessCalculationAdapter(
-      resolver: guarded(
-        Acs01PersistedInputResolver(
-          acsStore: acsStore,
-          contractSource: acs01Contracts,
-          nowUtc: nowUtc,
-        ),
+    blocked(
+      Acs03PersistedInputResolver(
+        acsStore: acsStore,
+        contractSource: acs03Contracts,
+        powerEvidence: currentPowerEvidence,
+        nowUtc: nowUtc,
       ),
-      executor: buildAcs01Executor(nowUtc: nowUtc),
-      nowUtc: nowUtc,
+      buildAcs03Executor(nowUtc: nowUtc),
     ),
-    Elv5BlockedAwareTypedProcessCalculationAdapter(
-      resolver: guarded(
-        Acs03PersistedInputResolver(
-          acsStore: acsStore,
-          contractSource: acs03Contracts,
-          powerEvidence: currentPowerEvidence,
-          nowUtc: nowUtc,
-        ),
-      ),
-      executor: buildAcs03Executor(nowUtc: nowUtc),
-      nowUtc: nowUtc,
+    blocked(
+      Acs04PersistedInputResolver(contractSource: acs04Contracts, powerEvidence: currentPowerEvidence, nowUtc: nowUtc),
+      buildAcs04Executor(nowUtc: nowUtc),
     ),
-    Elv5BlockedAwareTypedProcessCalculationAdapter(
-      resolver: guarded(
-        Acs04PersistedInputResolver(
-          contractSource: acs04Contracts,
-          powerEvidence: currentPowerEvidence,
-          nowUtc: nowUtc,
-        ),
-      ),
-      executor: buildAcs04Executor(nowUtc: nowUtc),
-      nowUtc: nowUtc,
+    blocked(
+      Acs05PersistedInputResolver(contractSource: acs05Contracts, powerEvidence: currentPowerEvidence, nowUtc: nowUtc),
+      buildAcs05Executor(nowUtc: nowUtc),
     ),
-    Elv5BlockedAwareTypedProcessCalculationAdapter(
-      resolver: guarded(
-        Acs05PersistedInputResolver(
-          contractSource: acs05Contracts,
-          powerEvidence: currentPowerEvidence,
-          nowUtc: nowUtc,
-        ),
-      ),
-      executor: buildAcs05Executor(nowUtc: nowUtc),
-      nowUtc: nowUtc,
+    blocked(
+      Acs06PersistedInputResolver(acsStore: acsStore, contractSource: acs06Contracts, nowUtc: nowUtc),
+      buildAcs06Executor(nowUtc: nowUtc),
     ),
-    Elv5BlockedAwareTypedProcessCalculationAdapter(
-      resolver: guarded(
-        Acs06PersistedInputResolver(
-          acsStore: acsStore,
-          contractSource: acs06Contracts,
-          nowUtc: nowUtc,
-        ),
-      ),
-      executor: buildAcs06Executor(nowUtc: nowUtc),
-      nowUtc: nowUtc,
+    blocked(
+      Fa01PersistedInputResolver(fireStore: fireStore, contractSource: fa01Contracts, nowUtc: nowUtc),
+      buildFa01Executor(nowUtc: nowUtc),
     ),
-    Elv5BlockedAwareTypedProcessCalculationAdapter(
-      resolver: guarded(
-        Fa01PersistedInputResolver(
-          fireStore: fireStore,
-          contractSource: fa01Contracts,
-          nowUtc: nowUtc,
-        ),
-      ),
-      executor: buildFa01Executor(nowUtc: nowUtc),
-      nowUtc: nowUtc,
+    blocked(
+      Fa02PersistedInputResolver(fireStore: fireStore, powerFacts: powerOperatingFacts, nowUtc: nowUtc),
+      buildFa02Executor(nowUtc: nowUtc),
     ),
-    Elv5BlockedAwareTypedProcessCalculationAdapter(
-      resolver: guarded(
-        Fa02PersistedInputResolver(
-          fireStore: fireStore,
-          powerFacts: powerOperatingFacts,
-          nowUtc: nowUtc,
-        ),
-      ),
-      executor: buildFa02Executor(nowUtc: nowUtc),
-      nowUtc: nowUtc,
+    blocked(
+      Fa03PersistedInputResolver(contractSource: fa03Contracts, powerEvidence: currentPowerEvidence, nowUtc: nowUtc),
+      buildFa03Executor(nowUtc: nowUtc),
     ),
-    Elv5BlockedAwareTypedProcessCalculationAdapter(
-      resolver: guarded(
-        Fa03PersistedInputResolver(
-          contractSource: fa03Contracts,
-          powerEvidence: currentPowerEvidence,
-          nowUtc: nowUtc,
-        ),
-      ),
-      executor: buildFa03Executor(nowUtc: nowUtc),
-      nowUtc: nowUtc,
+    blocked(
+      Fa04PersistedInputResolver(contractSource: fa04Contracts, powerEvidence: currentPowerEvidence, nowUtc: nowUtc),
+      buildFa04Executor(nowUtc: nowUtc),
     ),
-    Elv5BlockedAwareTypedProcessCalculationAdapter(
-      resolver: guarded(
-        Fa04PersistedInputResolver(
-          contractSource: fa04Contracts,
-          powerEvidence: currentPowerEvidence,
-          nowUtc: nowUtc,
-        ),
-      ),
-      executor: buildFa04Executor(nowUtc: nowUtc),
-      nowUtc: nowUtc,
+    blocked(
+      Fa05PersistedInputResolver(contractSource: fa05Contracts, powerEvidence: currentPowerEvidence, nowUtc: nowUtc),
+      buildFa05Executor(nowUtc: nowUtc),
     ),
-    Elv5BlockedAwareTypedProcessCalculationAdapter(
-      resolver: guarded(
-        Fa05PersistedInputResolver(
-          contractSource: fa05Contracts,
-          powerEvidence: currentPowerEvidence,
-          nowUtc: nowUtc,
-        ),
+    blocked(
+      Fa06PersistedInputResolver(
+        fireStore: fireStore,
+        contractSource: fa06Contracts,
+        powerEvidence: currentPowerEvidence,
+        nowUtc: nowUtc,
       ),
-      executor: buildFa05Executor(nowUtc: nowUtc),
-      nowUtc: nowUtc,
+      buildFa06Executor(nowUtc: nowUtc),
     ),
-    Elv5BlockedAwareTypedProcessCalculationAdapter(
-      resolver: guarded(
-        Fa06PersistedInputResolver(
-          fireStore: fireStore,
-          contractSource: fa06Contracts,
-          powerEvidence: currentPowerEvidence,
-          nowUtc: nowUtc,
-        ),
-      ),
-      executor: buildFa06Executor(nowUtc: nowUtc),
-      nowUtc: nowUtc,
+    blocked(
+      Fa07PersistedInputResolver(fireStore: fireStore, contractSource: fa07Contracts, nowUtc: nowUtc),
+      buildFa07Executor(nowUtc: nowUtc),
     ),
-    Elv5BlockedAwareTypedProcessCalculationAdapter(
-      resolver: guarded(
-        Fa07PersistedInputResolver(
-          fireStore: fireStore,
-          contractSource: fa07Contracts,
-          nowUtc: nowUtc,
-        ),
+    blocked(
+      Fa08PersistedInputResolver(
+        policySource: fa08Contracts,
+        ampacityResolver: ampacityRouteResolver,
+        routeCableFacts: fa08RouteCableFacts,
+        nowUtc: nowUtc,
       ),
-      executor: buildFa07Executor(nowUtc: nowUtc),
-      nowUtc: nowUtc,
-    ),
-    Elv5BlockedAwareTypedProcessCalculationAdapter(
-      resolver: guarded(
-        Fa08PersistedInputResolver(
-          policySource: fa08Contracts,
-          ampacityResolver: ampacityRouteResolver,
-          routeCableFacts: fa08RouteCableFacts,
-          nowUtc: nowUtc,
-        ),
-      ),
-      executor: buildFa08Executor(nowUtc: nowUtc),
-      nowUtc: nowUtc,
+      buildFa08Executor(nowUtc: nowUtc),
     ),
   ]);
 }
