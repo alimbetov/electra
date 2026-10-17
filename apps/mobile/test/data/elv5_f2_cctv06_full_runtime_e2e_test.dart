@@ -47,7 +47,7 @@ void main() {
         dependencyDomains: {
           'LAN_LINK_COMPOSITION',
           'CCTV06_LINK_CONTRACT',
-          'ELV3_REALIZED_LINK_SECTION',
+          'ELV3_REALIZED_SECTION_LENGTH',
         },
         initialOutput: (o) {
           expect(o['status'], 'pass');
