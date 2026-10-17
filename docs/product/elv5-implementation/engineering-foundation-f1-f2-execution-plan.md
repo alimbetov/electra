@@ -347,27 +347,37 @@ Use as the time-integration/storage pilot. Qualification must cover bitrate, str
 
 Use as the logarithmic/interval optical pilot. Qualification must preserve independent optical budget derivation, exact/interval loss provenance, boundary margin behavior and deterministic path/event ordering.
 
-## 6. Parallel development order
+## 6. Fixed execution order (2026-10-17)
 
-The active execution order is:
+The following order supersedes the earlier parallel development order. A later
+step must not promote qualification before its preceding gate is satisfied.
 
-```text
-A1 finish remaining runtime verticals
-   LAN-06 -> LAN-07 -> CCTV-04 -> CCTV-01 -> CCTV-05 -> CCTV-06
+1. Fix the formatter diff blocking FA-03 production qualification.
+2. Obtain `flutter analyze` and `flutter test` PASS on the exact source commit.
+3. Only after that PASS, promote FA-03 Q6 to `PASS_PRODUCTION_PATH`.
+4. Connect CCTV-03, LAN-05 and ACS-03 to `Elv5F2QualificationHarness`.
+5. Migrate the remaining processes in waves to the same Q6/Q7/Q8 lifecycle.
+6. Close the automatic witness matrix and provenance.
+7. Run the common rollback/CAS/restart/freeze/fault suite.
+8. Obtain final exact-SHA CI PASS.
+9. Only then, after every acceptance gate is satisfied, claim `ELV5 = ACCEPTED`.
 
-B1 F1 audit/inventory starts immediately and runs in parallel
-B2 close F1 defects that affect current/future runtime captures
-B3 build shared qualification support
-B4 execute F2 pilots in risk/reuse order:
-   AMPACITY_ROUTE_IZ -> FA-03 -> ACS-03 -> LAN-05 -> CCTV-03
-B5 publish exact-SHA F2 qualification matrix
-B6 only then promote eligible pilots to QUALIFIED
+### FA-03 Q6 verified checkpoint
 
-After A1 + F2:
-F3 reconciles all 27 processes against the same foundation lifecycle.
-```
+Steps 1–3 are complete. Step 4 is next; steps 4–9 remain open.
 
-Priority override rule: an F1 defect that can produce false PASS, nondeterministic hash, stale-current publication or loss of provenance preempts new vertical work and is fixed immediately.
+- Verified source commit: `f9def8bbad951ccc6bef7b576600a459a05862d0`.
+- [Flutter Local Foundation run 39046456889](https://github.com/alimbetov/electra/actions/runs/39046456889): PASS.
+- Mobile formatter and analyze: PASS; mobile tests: 454 passed, 1 skipped.
+- Core formatter and analyze: PASS; core tests: 484 passed.
+- FA-03 production witness: `apps/mobile/test/data/elv5_f2_fa03_production_runtime_e2e_test.dart`.
+- Verification log artifact: `12106376397`.
+- Q6 promotion is evidence for the verified source commit, not a claim that
+  the status-recording commit or future source changes have passed CI.
+- The skipped historical migration matrix remains a separate execution
+  obligation in step 7.
+- Full process qualification, automatic provenance and ELV5 acceptance remain
+  pending. This checkpoint does not satisfy those gates.
 
 ## 7. Current adoption baseline
 
