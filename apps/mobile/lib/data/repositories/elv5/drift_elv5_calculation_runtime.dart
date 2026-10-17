@@ -3,7 +3,9 @@ import '../../../application/elv5/calculation/elv5_calculation_service.dart';
 import '../../../application/elv5/calculation/elv5_initial_vertical_registry.dart';
 import '../../../application/elv5/environment/ampacity_route_resolver.dart';
 import '../../database/app_database.dart';
+import '../drift_component_instance_repository.dart';
 import '../drift_elv_cable_run_repository.dart';
+import '../drift_geometry_repository.dart';
 import 'drift_acs01_role_profile_contract_store.dart';
 import 'drift_acs02_resource_contract_store.dart';
 import 'drift_acs03_electrical_contract_store.dart';
@@ -11,6 +13,7 @@ import 'drift_acs04_source_requirement_contract_store.dart';
 import 'drift_acs05_autonomy_contract_store.dart';
 import 'drift_acs06_topology_contract_store.dart';
 import 'drift_ampacity_section_contract_store.dart';
+import 'drift_cctv01_geometry_contract_store.dart';
 import 'drift_cctv04_pse_contract_store.dart';
 import 'drift_elv3_realized_link_fact_source.dart';
 import 'drift_elv4_current_evidence_source.dart';
@@ -51,6 +54,8 @@ final class DriftElv5CalculationRuntime {
     final acsFacts = DriftElv5AcsCalculationFactStore(database, originDeviceId: originDeviceId);
     final fireFacts = DriftElv5FireCalculationFactStore(database, originDeviceId: originDeviceId);
     final cableRuns = DriftElvCableRunRepository(database, originDeviceId: originDeviceId);
+    final componentInstances = DriftComponentInstanceRepository(database, originDeviceId: originDeviceId, clock: nowUtc);
+    final geometryRepository = DriftGeometryRepository(database, originDeviceId: originDeviceId, clock: nowUtc);
 
     final environmentProfiles = DriftElv5EnvironmentProfileStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
     final environmentResolver = DriftElv5EnvironmentScopeResolver(database: database, profileSource: environmentProfiles);
@@ -61,6 +66,7 @@ final class DriftElv5CalculationRuntime {
       sectionEvidence: ampacitySections,
     );
 
+    final cctv01Contracts = DriftCctv01GeometryContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
     final cctv04Contracts = DriftCctv04PseProjectionContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
     final lan02Contracts = DriftLan02PortContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
     final lan03Contracts = DriftLan03PoeProjectionContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
@@ -87,6 +93,9 @@ final class DriftElv5CalculationRuntime {
       lanStore: lanFacts,
       acsStore: acsFacts,
       fireStore: fireFacts,
+      cctv01Contracts: cctv01Contracts,
+      componentInstances: componentInstances,
+      geometryRepository: geometryRepository,
       cctv04Contracts: cctv04Contracts,
       elv3LinkFacts: DriftElv3RealizedLinkFactSource(database),
       opticalSectionEvidence: DriftLan05OpticalSectionEvidenceSource(database),
