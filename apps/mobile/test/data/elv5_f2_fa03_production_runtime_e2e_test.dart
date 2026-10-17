@@ -13,10 +13,13 @@ import 'package:engineering_core/engineering_core.dart';
 import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../support/elv5_f2_qualification_harness.dart';
+
 void main() {
   test(
     'F2 FA-03 Q6 qualifies persisted contract plus real PWR-03 CURRENT through production runtime',
     () async {
+      const harness = Elv5F2QualificationHarness();
       final directory = await Directory.systemTemp.createTemp(
         'electra-f2-fa03-production-',
       );
@@ -98,6 +101,18 @@ void main() {
       expect(evaluation.read<String>('assessment'), 'PASS');
       expect(evaluation.read<String>('input_fingerprint'), hasLength(64));
       expect(evaluation.read<String>('output_sha256'), hasLength(64));
+      harness.assertQ6Initial(
+        'FA-03',
+        Elv5F2PublicationSnapshot(
+          generation: pointer.read<int>('generation'),
+          evaluationId: evaluationId,
+          freshness: pointer.read<String>('freshness'),
+          execution: evaluation.read<String>('execution'),
+          completion: evaluation.read<String>('completion'),
+          inputFingerprint: evaluation.read<String>('input_fingerprint'),
+          logicalResultJson: result.logicalResultJson,
+        ),
+      );
 
       final dependencies =
           await db
