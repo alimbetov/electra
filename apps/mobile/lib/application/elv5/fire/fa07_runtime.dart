@@ -23,6 +23,8 @@ final class Fa07PersistedInputResolver implements Elv5ProcessInputResolver<Fa07I
     if(loop==null)_blocked(request,'FA07_FIRE_LOOP_ASSIGNMENTS_MISSING',_hashMissing(request.subject.id),_hashMissing(request.subject.id),const <Elv5DependencyMarker>[],<String,Object?>{'loopId':request.subject.id});
     final loopId=_text(loop!.payload,'loopId');if(loopId!=request.subject.id)throw StateError('FA07_LOOP_ID_MISMATCH:$loopId:${request.subject.id}');
     final assignments=_objects(loop.payload['deviceAssignments'],'deviceAssignments');
+    final persistedDeviceIds=<String>[for(final row in assignments)_text(row,'deviceId')];
+    if(persistedDeviceIds.toSet().length!=persistedDeviceIds.length)throw StateError('FA07_DUPLICATE_PERSISTED_DEVICE_ID:$loopId');
     final addressDomain=_map(loop.payload['addressDomain'],'addressDomain');
     final membership=fa01MembershipFingerprint(loopId:loopId,addressDomain:addressDomain,deviceAssignments:assignments);
     final deps=<Elv5DependencyMarker>[_dependency(request,'SET','FIRE_LOOP',loopId,memberId:membership)];
@@ -39,7 +41,7 @@ final class Fa07PersistedInputResolver implements Elv5ProcessInputResolver<Fa07I
     final expectedProfile=contract.topologyProfile.toCanonicalValue();
     if(_encoder.sha256(actualProfile)!=_encoder.sha256(expectedProfile)){_blocked(request,'FA07_TOPOLOGY_PROFILE_IDENTITY_MISMATCH',aggregateFp,snap.contentHash,deps,<String,Object?>{'persisted':actualProfile,'contract':expectedProfile});}
 
-    final deviceIds=<String>{for(final row in assignments)_text(row,'deviceId')};
+    final deviceIds=persistedDeviceIds.toSet();
     final mappedIds=contract.deviceNodeIdByDeviceId.keys.toSet();
     if(deviceIds.length!=mappedIds.length||!deviceIds.containsAll(mappedIds)){_blocked(request,'FA07_DEVICE_NODE_MAPPING_MISMATCH',aggregateFp,snap.contentHash,deps,<String,Object?>{'persistedDeviceIds':deviceIds.toList()..sort(),'mappedDeviceIds':mappedIds.toList()..sort()});}
     final deviceNodes=<String>{for(final id in deviceIds)contract.deviceNodeIdByDeviceId[id]!};
