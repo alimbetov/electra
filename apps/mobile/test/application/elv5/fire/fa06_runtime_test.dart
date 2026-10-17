@@ -97,7 +97,6 @@ Fa06NotificationContract _contract({required bool includeStartup}) =>
       supervision: Fa06SupervisionContract(
         required: false,
         modelSupported: false,
-        passed: false,
       ),
     );
 
