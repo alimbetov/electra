@@ -18,6 +18,7 @@ void main() {
     expect(
       runtime.registry.registeredCodes,
       containsAll(<Elv5ProcessCode>{
+        Elv5ProcessCode.cctv01,
         Elv5ProcessCode.cctv02,
         Elv5ProcessCode.cctv03,
         Elv5ProcessCode.cctv04,
@@ -44,6 +45,6 @@ void main() {
         Elv5ProcessCode.fa08,
       }),
     );
-    expect(runtime.registry.registeredCodes, hasLength(24));
+    expect(runtime.registry.registeredCodes, hasLength(25));
   });
 }
