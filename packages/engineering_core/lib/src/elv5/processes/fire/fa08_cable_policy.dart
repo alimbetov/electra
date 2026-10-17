@@ -1,3 +1,4 @@
+import '../../evidence/ampacity_contract.dart';
 import '../../numeric/rational.dart';
 
 enum Fa08AssessmentStatus { pass, fail, blocked, notAssessed }
@@ -28,6 +29,7 @@ final class Fa08RouteSection {
     required this.environmentEvidenceComplete,
     required this.environmentTags,
     required this.numericFacts,
+    this.ampacityInput,
   }) {
     if (sectionId.isEmpty || cableEditionId.isEmpty) {
       throw ArgumentError('FA08 section/cable edition identity must not be empty.');
@@ -37,8 +39,20 @@ final class Fa08RouteSection {
       if (!seen.add(fact.propertyCode)) {
         throw ArgumentError('FA08 duplicate numeric property: ${fact.propertyCode}');
       }
+      if (fact.propertyCode == ampacityIzPropertyCode) {
+        throw ArgumentError(
+          'FA08 $ampacityIzPropertyCode is reserved for the shared ampacity contract.',
+        );
+      }
+    }
+    if (ampacityInput != null && ampacityInput!.cableOrSectionId != sectionId) {
+      throw ArgumentError(
+        'FA08 ampacity input must reference the same route section.',
+      );
     }
   }
+
+  static const ampacityIzPropertyCode = 'AMPACITY_IZ_A';
 
   final String sectionId;
   final String cableEditionId;
@@ -46,6 +60,7 @@ final class Fa08RouteSection {
   final bool environmentEvidenceComplete;
   final Set<String> environmentTags;
   final List<Fa08NumericFact> numericFacts;
+  final Elv5AmpacityInput? ampacityInput;
 }
 
 final class Fa08Requirement {
@@ -83,6 +98,9 @@ final class Fa08Requirement {
     }
     if (propertyCode == null || propertyCode!.isEmpty || unitCode == null || unitCode!.isEmpty) {
       throw ArgumentError('FA08 numeric requirement property/unit is invalid.');
+    }
+    if (propertyCode == Fa08RouteSection.ampacityIzPropertyCode && unitCode != 'A') {
+      throw ArgumentError('FA08 ampacity Iz requirement must use unit A.');
     }
   }
 
@@ -182,6 +200,16 @@ final class Fa08CablePolicyKernel {
       final facts = <String, Fa08NumericFact>{
         for (final fact in section.numericFacts) fact.propertyCode: fact,
       };
+      final ampacityInput = section.ampacityInput;
+      if (ampacityInput != null) {
+        final ampacity = const Elv5AmpacityKernel().evaluate(ampacityInput);
+        facts[Fa08RouteSection.ampacityIzPropertyCode] = Fa08NumericFact(
+          propertyCode: Fa08RouteSection.ampacityIzPropertyCode,
+          unitCode: 'A',
+          value: ampacity.allowableCurrentIzA,
+        );
+      }
+
       for (final req in requirements) {
         late Fa08AssessmentStatus status;
         Elv5Rational? margin;
@@ -199,7 +227,11 @@ final class Fa08CablePolicyKernel {
                   : Fa08AssessmentStatus.fail);
         } else {
           final fact = facts[req.propertyCode];
-          if (!section.environmentEvidenceComplete || fact == null || fact.unitCode != req.unitCode) {
+          final isAmpacity =
+              req.propertyCode == Fa08RouteSection.ampacityIzPropertyCode;
+          if ((!isAmpacity && !section.environmentEvidenceComplete) ||
+              fact == null ||
+              fact.unitCode != req.unitCode) {
             status = Fa08AssessmentStatus.blocked;
           } else if (req.kind == Fa08RequirementKind.numericMinimum) {
             margin = fact.value - req.threshold!;
