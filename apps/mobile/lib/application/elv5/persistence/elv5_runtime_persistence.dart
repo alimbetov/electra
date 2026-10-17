@@ -1,3 +1,5 @@
+import 'package:engineering_core/engineering_core_elv5.dart';
+
 import '../../elv_write_unit_of_work.dart';
 
 enum Elv5PointerFreshness { current, stale }
@@ -30,6 +32,7 @@ final class Elv5EvaluationRecord {
     required this.evidenceJson,
     required this.evidenceSha256,
     required this.completedAtUtc,
+    this.qualificationIdentity,
   }) {
     _text(projectId, 'projectId');
     _text(designRevisionId, 'designRevisionId');
@@ -84,6 +87,7 @@ final class Elv5EvaluationRecord {
   final String evidenceJson;
   final String evidenceSha256;
   final DateTime completedAtUtc;
+  final Elv5QualificationIdentity? qualificationIdentity;
 }
 
 final class Elv5EvaluationPointer {
@@ -107,14 +111,10 @@ final class Elv5EvaluationPointer {
       throw ArgumentError.value(generation, 'generation', 'Must be >= 0.');
     }
     if (evaluationId != null) _text(evaluationId!, 'evaluationId');
-    if (inputFingerprint != null) {
-      _sha256(inputFingerprint!, 'inputFingerprint');
-    }
+    if (inputFingerprint != null) _sha256(inputFingerprint!, 'inputFingerprint');
     if (outputSha256 != null) _sha256(outputSha256!, 'outputSha256');
     if (freshness == Elv5PointerFreshness.current &&
-        (evaluationId == null ||
-            inputFingerprint == null ||
-            outputSha256 == null)) {
+        (evaluationId == null || inputFingerprint == null || outputSha256 == null)) {
       throw ArgumentError(
         'CURRENT pointer requires evaluationId, inputFingerprint and outputSha256.',
       );
@@ -151,21 +151,13 @@ final class Elv5PointerWrite {
     _text(logicalNodeKeyJson, 'logicalNodeKeyJson');
     _sha256(logicalNodeKeySha256, 'logicalNodeKeySha256');
     if (expectedGeneration < 0) {
-      throw ArgumentError.value(
-        expectedGeneration,
-        'expectedGeneration',
-        'Must be >= 0.',
-      );
+      throw ArgumentError.value(expectedGeneration, 'expectedGeneration', 'Must be >= 0.');
     }
     if (evaluationId != null) _text(evaluationId!, 'evaluationId');
-    if (inputFingerprint != null) {
-      _sha256(inputFingerprint!, 'inputFingerprint');
-    }
+    if (inputFingerprint != null) _sha256(inputFingerprint!, 'inputFingerprint');
     if (outputSha256 != null) _sha256(outputSha256!, 'outputSha256');
     if (freshness == Elv5PointerFreshness.current &&
-        (evaluationId == null ||
-            inputFingerprint == null ||
-            outputSha256 == null)) {
+        (evaluationId == null || inputFingerprint == null || outputSha256 == null)) {
       throw ArgumentError(
         'CURRENT pointer requires evaluationId, inputFingerprint and outputSha256.',
       );
@@ -226,12 +218,8 @@ abstract interface class Elv5PointerStore {
     required Set<String> logicalNodeKeySha256s,
   });
 
-  /// Creates generation 1 when expectedGeneration == 0, otherwise performs a
-  /// generation CAS and advances the pointer by exactly one generation.
   Future<bool> compareAndSet(Elv5PointerWrite write);
 
-  /// Marks all matching pointers stale in one bounded SQL operation and bumps
-  /// generation exactly once for each pointer that changes freshness.
   Future<int> markStaleBulk({
     required String projectId,
     required String designRevisionId,
@@ -253,8 +241,6 @@ abstract interface class Elv5DependencyStore {
     required Set<String> dependencyKeySha256s,
   });
 
-  /// Replaces the complete dependency set for one engineering node. Callers
-  /// must supply canonical keys for FACT/SET/POLICY/EVAL/POINTER/MISSING.
   Future<void> replaceNodeDependencies({
     required String projectId,
     required String designRevisionId,
@@ -269,14 +255,12 @@ abstract interface class Elv5RuntimeWriteSession extends ElvWriteSession {
   Elv5DependencyStore get dependencies;
 }
 
-typedef Elv5RuntimeWriteUnitOfWork =
-    ElvWriteUnitOfWork<Elv5RuntimeWriteSession>;
+typedef Elv5RuntimeWriteUnitOfWork = ElvWriteUnitOfWork<Elv5RuntimeWriteSession>;
 
 String _canonicalRelationKind(String value) {
   final kind = _text(value, 'relationKind').toUpperCase();
   if (kind == 'UPSTREAM_EVALUATION') return 'EVAL';
-  if (!const {'FACT', 'SET', 'POLICY', 'EVAL', 'POINTER', 'MISSING'}
-      .contains(kind)) {
+  if (!const {'FACT', 'SET', 'POLICY', 'EVAL', 'POINTER', 'MISSING'}.contains(kind)) {
     throw ArgumentError.value(value, 'relationKind', 'Unsupported kind.');
   }
   return kind;
