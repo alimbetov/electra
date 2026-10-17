@@ -32,8 +32,14 @@ void main() {
     final cases = candidate.output['cases']! as Map<String, Object?>;
     final active = cases['activeNotification']! as Map<String, Object?>;
     expect(active['currentMarginA'], Elv5Rational.parseDecimal('0.2').toMap());
-    expect(active['terminalVoltageLowerV'], Elv5Rational.parseDecimal('22.8').toMap());
-    expect(active['terminalVoltageUpperV'], Elv5Rational.parseDecimal('23.5').toMap());
+    expect(
+      active['terminalVoltageLowerV'],
+      Elv5Rational.parseDecimal('22.8').toMap(),
+    );
+    expect(
+      active['terminalVoltageUpperV'],
+      Elv5Rational.parseDecimal('23.5').toMap(),
+    );
   });
 
   test('blocks required startup when one device has no startup current fact', () async {
@@ -54,6 +60,34 @@ void main() {
           'reasonCode',
           'FA06_STARTUP_CURRENT_EVIDENCE_MISSING',
         ),
+      ),
+    );
+  });
+
+  test('blocks when a mapped PWR-03 terminal is missing', () async {
+    final resolver = Fa06PersistedInputResolver(
+      fireStore: _FireStore(includeStartup: false),
+      contractSource: _ContractSource(_contract(includeStartup: false)),
+      powerEvidence: _EvidenceSource(<Elv4CurrentEvaluationSnapshot>[
+        _pwr01(segmentId: 'NAC_ACTIVE', currentA: '0.3'),
+        _pwr03(segmentId: 'NAC_ACTIVE', omitLoadId: 'horn-3'),
+      ]),
+    );
+
+    await expectLater(
+      resolver.capture(_request()),
+      throwsA(
+        isA<Elv5CaptureBlockedException>()
+            .having(
+              (value) => value.reasonCode,
+              'reasonCode',
+              'FA06_PWR03_DEVICE_TERMINAL_MISSING',
+            )
+            .having(
+              (value) => value.evidence['terminalLoadId'],
+              'terminalLoadId',
+              'horn-3',
+            ),
       ),
     );
   });
@@ -109,7 +143,10 @@ Elv5CalculationRequest _request() => Elv5CalculationRequest(
         scenarioKey: 'NONE',
       ),
       processCode: Elv5ProcessCode.fa06,
-      subject: Elv5SubjectRef(kind: 'FIRE_NOTIFICATION_CIRCUIT', id: 'nac-1'),
+      subject: Elv5SubjectRef(
+        kind: 'FIRE_NOTIFICATION_CIRCUIT',
+        id: 'nac-1',
+      ),
       expectedPointerGeneration: 0,
     );
 
@@ -225,7 +262,10 @@ Elv4CurrentEvaluationSnapshot _pwr01({
       },
     );
 
-Elv4CurrentEvaluationSnapshot _pwr03({required String segmentId}) =>
+Elv4CurrentEvaluationSnapshot _pwr03({
+  required String segmentId,
+  String? omitLoadId,
+}) =>
     Elv4CurrentEvaluationSnapshot(
       nodeKey: PowerNodeKeyV2(
         revisionId: 'd',
@@ -244,24 +284,27 @@ Elv4CurrentEvaluationSnapshot _pwr03({required String segmentId}) =>
         'output': <String, Object?>{
           'physicalComplete': true,
           'terminals': <Object?>[
-            <String, Object?>{
-              'loadId': 'horn-1',
-              'minimumV': PowerRational.parseDecimal('23.0').toMap(),
-              'nominalV': PowerRational.parseDecimal('23.2').toMap(),
-              'maximumV': PowerRational.parseDecimal('23.4').toMap(),
-            },
-            <String, Object?>{
-              'loadId': 'horn-2',
-              'minimumV': PowerRational.parseDecimal('22.8').toMap(),
-              'nominalV': PowerRational.parseDecimal('23.0').toMap(),
-              'maximumV': PowerRational.parseDecimal('23.2').toMap(),
-            },
-            <String, Object?>{
-              'loadId': 'horn-3',
-              'minimumV': PowerRational.parseDecimal('23.1').toMap(),
-              'nominalV': PowerRational.parseDecimal('23.3').toMap(),
-              'maximumV': PowerRational.parseDecimal('23.5').toMap(),
-            },
+            if (omitLoadId != 'horn-1')
+              <String, Object?>{
+                'loadId': 'horn-1',
+                'minimumV': PowerRational.parseDecimal('23.0').toMap(),
+                'nominalV': PowerRational.parseDecimal('23.2').toMap(),
+                'maximumV': PowerRational.parseDecimal('23.4').toMap(),
+              },
+            if (omitLoadId != 'horn-2')
+              <String, Object?>{
+                'loadId': 'horn-2',
+                'minimumV': PowerRational.parseDecimal('22.8').toMap(),
+                'nominalV': PowerRational.parseDecimal('23.0').toMap(),
+                'maximumV': PowerRational.parseDecimal('23.2').toMap(),
+              },
+            if (omitLoadId != 'horn-3')
+              <String, Object?>{
+                'loadId': 'horn-3',
+                'minimumV': PowerRational.parseDecimal('23.1').toMap(),
+                'nominalV': PowerRational.parseDecimal('23.3').toMap(),
+                'maximumV': PowerRational.parseDecimal('23.5').toMap(),
+              },
           ],
           'sections': <Object?>[],
         },
