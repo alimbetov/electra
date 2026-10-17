@@ -1,0 +1,418 @@
+# ELV5 Engineering Foundation — F1/F2 execution process
+
+Status: **ACTIVE / ACCEPTANCE NOT CLAIMED**  
+Branch: `feat/flutter-elv5-power-topology-design`  
+Parent authority: `engineering-calculation-simulation-foundation.md`  
+Machine status: `engineering-foundation-f1-f2-status.json`
+
+## 1. Purpose
+
+This execution plan turns Foundation v1 from an authority/design contract into an evidence-backed implementation program. It does not create a new ELV5 process code and does not replace the 27-process runtime rollout.
+
+Two workstreams run in parallel:
+
+```text
+TRACK A — ELV5 runtime completion
+  21/27 production adapters integrated at the adoption baseline
+  -> finish remaining LAN/CCTV verticals
+
+TRACK B — Foundation adoption
+  F1 shared primitives reconciliation
+  -> F2 five-pilot qualification
+  -> only then evidence-backed QUALIFIED lifecycle claims
+```
+
+`RUNTIME_INTEGRATED` is not `QUALIFIED`. `QUALIFIED` is not `ACCEPTED`.
+
+## 2. Source-backed lifecycle rule
+
+Every process/foundation primitive uses:
+
+```text
+DESIGNED
+-> KERNEL_IMPLEMENTED
+-> RUNTIME_INTEGRATED
+-> QUALIFIED
+-> ACCEPTED
+```
+
+A lifecycle promotion requires exact evidence. Old prose such as `RUNTIME NOT STARTED` is historical if source/runtime already exists. Conversely, source files and unit tests alone never justify `QUALIFIED` or `ACCEPTED`.
+
+Minimum runtime-status evidence:
+
+```text
+source
++ kernel tests
++ persistence/runtime binding where applicable
++ application adapter
++ qualification evidence
++ exact source SHA
+```
+
+## 3. F1 — Shared Primitives Reconciliation
+
+F1 is an audit-and-reconciliation phase first. Do not build a universal framework when existing ELV4/ELV5 primitives already satisfy the invariant.
+
+### F1.1 Quantity inventory and dimension safety
+
+Inventory existing public engineering quantities in `engineering_core` and application contracts against:
+
+```text
+Current
+Voltage
+Resistance
+Power
+ApparentPower
+Energy
+Charge/Ah
+Length
+Area
+CrossSectionArea
+Temperature
+Duration
+DataRate
+StorageCapacity
+Attenuation
+OpticalPower
+Mass
+HeatPower
+Ratio
+Frequency
+```
+
+For every dimension classify the canonical arithmetic representation:
+
+```text
+INTEGER_CANONICAL_BASE_UNIT
+RATIONAL
+FIXED_DECIMAL
+INTERVAL
+FLOATING_ONLY_WHEN_REQUIRED
+```
+
+Deliverable: a reconciliation matrix `existing type -> canonical dimension -> arithmetic -> gaps -> migration action`.
+
+Gate F1-QTY:
+- no public engineering PASS/FAIL boundary depends on an unqualified binary `double` when an exact/bounded representation is practical;
+- unit normalization is deterministic;
+- presentation rounding is outside engineering verdict logic;
+- tolerance/rounding policy is explicit where exact comparison is impossible.
+
+### F1.2 Typed evidence
+
+Reconcile existing evidence records to states:
+
+```text
+VERIFIED
+DECLARED
+DERIVED
+ASSUMED
+UNKNOWN
+```
+
+Substantial evidence must carry stable identity/provenance including evidence/source identity, edition/revision, content hash, applicability and value/reference. `ASSUMED` must expose reason, scope and author/source and can never satisfy `VERIFIED_ONLY` automatically.
+
+Gate F1-EVIDENCE: no pilot may synthesize stronger evidence state than its captured source supports.
+
+### F1.3 Unknown/fail-closed audit
+
+Search production resolvers/kernels for engineering-significant fallback patterns such as:
+
+```text
+value ?? 0
+value ?? 1
+implicit material
+implicit ambient temperature
+implicit grouping factor
+implicit installation method
+implicit efficiency/resistance/current rating/reserve/overhead/loss/battery data
+```
+
+Each finding must be classified as:
+
+```text
+VALID_DOMAIN_INVARIANT
+EXPLICIT_VERSIONED_DEFAULT
+BLOCKED/PARTIAL/UNRESOLVED_REQUIRED
+DEFECT_FIXED
+```
+
+Mandatory unknown input must never become silent PASS.
+
+### F1.4 Provenance graph
+
+Define/reconcile a common minimal trace graph:
+
+```text
+SOURCE_FACT / EXTERNAL_EVIDENCE
+  -> DERIVED_INPUT
+  -> ALGORITHM
+  -> SCENARIO
+  -> RESULT
+  -> FINDING
+```
+
+Use stable IDs and immutable hashes. Do not embed entire source aggregates into every result.
+
+Result trace must answer:
+- why this value;
+- which source facts/evidence;
+- which algorithm/version;
+- which project revision/scenario;
+- which governing case/section;
+- which authority/ruleset where applicable.
+
+### F1.5 Calculation identity and canonicalization
+
+Reconcile accepted evaluation identity to include at minimum:
+
+```text
+processCode
+processVersion
+algorithmId
+algorithmVersion
+inputSchemaVersion
+resultSchemaVersion
+rulesetVersion
+projectRevisionId
+subject/scope
+scenarioId
+sourceSha
+authorityFingerprint
+inputFingerprint
+outputFingerprint
+```
+
+Determinism gates:
+- map/set insertion order cannot alter unordered results/hashes;
+- repository row order cannot alter results;
+- worker/isolate scheduling cannot alter results;
+- physically ordered routes/sequences remain explicitly order-sensitive;
+- decimal/unit/enum/null canonicalization is stable.
+
+### F1.6 Independent result axes
+
+Preserve independent axes:
+
+```text
+Freshness  CURRENT | STALE
+Completion COMPLETE | PARTIAL | BLOCKED
+Assessment PASS | FAIL | UNRESOLVED | NOT_ASSESSED
+Execution  SUCCEEDED | FAILED
+```
+
+No adapter may collapse execution failure into engineering FAIL, or normative unresolved into technical PASS.
+
+### F1.7 Governing result
+
+For multi-case/section processes expose typed deterministic governing evidence:
+
+```text
+governingScenarioId
+governingSectionId
+governingValue
+governingMargin
+governingReason
+tieBreakRule
+```
+
+Tie-break must be code-owned and deterministic.
+
+### F1.8 Shared qualification support
+
+Create test/support-only reusable primitives for:
+
+```text
+reference vectors
+independent oracle comparison
+boundary triplets
+property tests
+metamorphic tests
+scenario fixtures
+provenance assertions
+determinism assertions
+replay assertions
+```
+
+No production dependency on a test framework.
+
+### F1 exit gate
+
+F1 may be marked complete only when:
+1. inventory matrices are source-backed;
+2. critical silent-default findings are closed or explicitly blocked;
+3. common evidence/provenance/identity/status contracts are implemented or existing equivalents formally mapped;
+4. deterministic canonicalization tests exist;
+5. shared qualification support is executable;
+6. exact source SHA is recorded.
+
+## 4. F2 — Pilot Qualification
+
+Pilots:
+
+```text
+AMPACITY_ROUTE_IZ
+FA-03
+ACS-03
+CCTV-03
+LAN-05
+```
+
+Every pilot executes the same profile:
+
+```text
+Q0 contract/schema/inventory
+Q1 mathematical reference vectors
+Q2 independent oracle
+Q3 boundary qualification
+Q4 property/metamorphic qualification
+Q5 realistic scenario/combinatorial qualification
+Q6 persistence/replay/invalidation/publication
+Q7 failure/concurrency/restart
+Q8 freeze/historical determinism
+Q9 performance bounds where applicable
+```
+
+A pilot stays below `QUALIFIED` until every applicable mandatory Q gate has exact-SHA evidence.
+
+## 5. Pilot-specific additions
+
+### AMPACITY_ROUTE_IZ
+
+Retain ownership boundaries:
+
+```text
+ELV3 physical cable/route facts
+shared/ELV4 physical electrical basis
+ELV7 jurisdictional ampacity rules/evidence
+ELV8 exact SKU selection
+```
+
+Required model supports at least:
+
+```text
+crossSection
+conductorMaterial
+insulation/temperature class
+installationMethod
+ambientTemperature
+grouping
+numberOfLoadedConductors
+routeSections
+parallelConductors
+referenceAmpacity + evidence
+correctionFactors
+designCurrent Ib
+protectiveDeviceCurrent In when applicable
+```
+
+Core relation:
+
+```text
+Iz_section = Iz_reference * k_temperature * k_grouping * k_installation * ...
+Iz_route = min(Iz_section...)
+```
+
+Persist governing section. If coordination applies, qualify `Ib <= In <= Iz` without issuing ELV7 normative PASS unless normative evidence is resolved. A physically complete Iz result with unresolved normative profile may legitimately be `COMPLETE + UNRESOLVED`.
+
+Mandatory boundaries/properties include below/equal/above Iz, protective-current boundaries, correction-factor boundaries, mixed route sections, shared route, parallel conductors, monotonic cross-section/correction behavior, route-minimum property and permutation invariance for independent unordered section sets.
+
+### FA-03
+
+Adopt foundation without rewriting a verified kernel unnecessarily. Qualify source voltage, route resistance, current, terminal voltage, shared trunk current and worst endpoint. Independently verify:
+
+```text
+dU = I * Rloop
+Uload = Usource - sum(dU)
+```
+
+and prove the resistance convention does not double-count forward/return resistance.
+
+### ACS-03
+
+Preserve the canonical reference oracle when applicable:
+
+```text
+23.51 V
++1.51 V margin
+```
+
+Do not edit expected values to fit implementation. Production/oracle disagreement beyond the declared tolerance blocks qualification. Include exact boundary, below/above, cable-resistance, route-length, current, missing-evidence, replay and ordering/worker vectors.
+
+### CCTV-03
+
+Use as the time-integration/storage pilot. Qualification must cover bitrate, stream count, schedule, retention duration, reserve multiplier and codec/profile evidence when applicable. Storage arithmetic, schedule ownership and temporal boundary behavior must be independently oracle-checked.
+
+### LAN-05
+
+Use as the logarithmic/interval optical pilot. Qualification must preserve independent optical budget derivation, exact/interval loss provenance, boundary margin behavior and deterministic path/event ordering.
+
+## 6. Parallel development order
+
+The active execution order is:
+
+```text
+A1 finish remaining runtime verticals
+   LAN-06 -> LAN-07 -> CCTV-04 -> CCTV-01 -> CCTV-05 -> CCTV-06
+
+B1 F1 audit/inventory starts immediately and runs in parallel
+B2 close F1 defects that affect current/future runtime captures
+B3 build shared qualification support
+B4 execute F2 pilots in risk/reuse order:
+   AMPACITY_ROUTE_IZ -> FA-03 -> ACS-03 -> LAN-05 -> CCTV-03
+B5 publish exact-SHA F2 qualification matrix
+B6 only then promote eligible pilots to QUALIFIED
+
+After A1 + F2:
+F3 reconciles all 27 processes against the same foundation lifecycle.
+```
+
+Priority override rule: an F1 defect that can produce false PASS, nondeterministic hash, stale-current publication or loss of provenance preempts new vertical work and is fixed immediately.
+
+## 7. Current adoption baseline
+
+At the baseline when this execution process was introduced:
+
+```text
+ELV5 process codes:       27 fixed
+Production adapters:      21 / 27
+ACS runtime:              6 / 6
+Fire runtime:             8 / 8
+LAN runtime:              5 / 7
+CCTV runtime:             2 / 6
+Remaining runtime:        6
+
+Foundation F0:            DESIGNED / authority established
+Foundation F1:            IN PROGRESS / not qualified
+Foundation F2:            NOT QUALIFIED; pilot implementation partially exists
+ELV5 acceptance:          NOT CLAIMED
+```
+
+Remaining runtime verticals:
+
+```text
+LAN-06
+LAN-07
+CCTV-01
+CCTV-04
+CCTV-05
+CCTV-06
+```
+
+This baseline is descriptive, not a permanent truth. Machine status must be updated from source/test/persistence/application/qualification evidence on the exact branch HEAD.
+
+## 8. Reporting rule
+
+Every development status report must separately state:
+
+```text
+runtime integration count
+lifecycle by process/pilot
+F1 gate status
+F2 Q0-Q9 status
+exact HEAD SHA
+CI/analyze/test evidence actually executed
+known blockers/debts
+```
+
+Never report `PASS`, `QUALIFIED`, `ACCEPTED` or CI success merely because code/tests were committed.
