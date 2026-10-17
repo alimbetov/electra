@@ -66,7 +66,9 @@ final class Lan07Input {
   static void _unique(Iterable<String> values, String label) {
     final seen = <String>{};
     for (final value in values) {
-      if (!seen.add(value)) throw ArgumentError('LAN07 duplicate $label identity: $value');
+      if (!seen.add(value)) {
+        throw ArgumentError('LAN07 duplicate $label identity: $value');
+      }
     }
   }
 }
@@ -107,7 +109,8 @@ final class Lan07PatchPanelKernel {
   Lan07Result evaluate(Lan07Input input) {
     final knownPorts = input.ports.map((e) => e.portId).toSet();
     final occupied = <String>{};
-    final conflicts = <String>[];
+    final firstAssignmentByPort = <String, String>{};
+    final conflicts = <String>{};
     final destinationsBySource = <String, Set<String>>{};
 
     for (final assignment in input.assignments) {
@@ -115,6 +118,14 @@ final class Lan07PatchPanelKernel {
           input.unavailablePortIds.contains(assignment.portId)) {
         conflicts.add(assignment.assignmentId);
         continue;
+      }
+      final firstAssignmentId = firstAssignmentByPort[assignment.portId];
+      if (firstAssignmentId != null) {
+        conflicts
+          ..add(firstAssignmentId)
+          ..add(assignment.assignmentId);
+      } else {
+        firstAssignmentByPort[assignment.portId] = assignment.assignmentId;
       }
       occupied.add(assignment.portId);
       final destination = assignment.destinationEndpointId;
@@ -124,14 +135,16 @@ final class Lan07PatchPanelKernel {
             .add(destination);
       }
     }
-    conflicts.sort();
+    final sortedConflicts = conflicts.toList()..sort();
 
     final mappings = <Lan07MappingResult>[];
     var mappingFailure = false;
     var mappingUnresolved = false;
     final requiredSources = [...input.requiredSourceEndpointIds]..sort();
     for (final source in requiredSources) {
-      final destinations = [...(destinationsBySource[source] ?? const <String>{})]..sort();
+      final destinations = [
+        ...(destinationsBySource[source] ?? const <String>{}),
+      ]..sort();
       final status = destinations.isEmpty
           ? Lan07AssessmentStatus.unresolved
           : (destinations.length == 1
@@ -139,11 +152,13 @@ final class Lan07PatchPanelKernel {
               : Lan07AssessmentStatus.fail);
       if (status == Lan07AssessmentStatus.fail) mappingFailure = true;
       if (status == Lan07AssessmentStatus.unresolved) mappingUnresolved = true;
-      mappings.add(Lan07MappingResult(
-        sourceEndpointId: source,
-        status: status,
-        destinationEndpointIds: List.unmodifiable(destinations),
-      ));
+      mappings.add(
+        Lan07MappingResult(
+          sourceEndpointId: source,
+          status: status,
+          destinationEndpointIds: List.unmodifiable(destinations),
+        ),
+      );
     }
 
     final available = input.ports
@@ -151,16 +166,22 @@ final class Lan07PatchPanelKernel {
         .length;
     final free = available - occupied.length;
     final ratioSpare =
-        (Elv5Rational.integer(occupied.length) * input.sparePolicy.ratio).ceil().toInt();
+        (Elv5Rational.integer(occupied.length) * input.sparePolicy.ratio)
+            .ceil()
+            .toInt();
     final requiredSpare = switch (input.sparePolicy.combiner) {
-      Lan07SpareCombiner.max => ratioSpare > input.sparePolicy.absoluteMinimum
-          ? ratioSpare
-          : input.sparePolicy.absoluteMinimum,
-      Lan07SpareCombiner.sum => ratioSpare + input.sparePolicy.absoluteMinimum,
+      Lan07SpareCombiner.max =>
+        ratioSpare > input.sparePolicy.absoluteMinimum
+            ? ratioSpare
+            : input.sparePolicy.absoluteMinimum,
+      Lan07SpareCombiner.sum =>
+        ratioSpare + input.sparePolicy.absoluteMinimum,
     };
     final spareHeadroom = free - requiredSpare;
 
-    final status = conflicts.isNotEmpty || mappingFailure || spareHeadroom < 0
+    final status = sortedConflicts.isNotEmpty ||
+            mappingFailure ||
+            spareHeadroom < 0
         ? Lan07AssessmentStatus.fail
         : (mappingUnresolved
             ? Lan07AssessmentStatus.unresolved
@@ -172,7 +193,7 @@ final class Lan07PatchPanelKernel {
       requiredSpare: requiredSpare,
       spareHeadroom: spareHeadroom,
       mappings: List.unmodifiable(mappings),
-      conflictingAssignmentIds: List.unmodifiable(conflicts),
+      conflictingAssignmentIds: List.unmodifiable(sortedConflicts),
     );
   }
 }
