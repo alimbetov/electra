@@ -393,7 +393,7 @@ still an explicit global-suite obligation.
 | --- | --- | --- |
 | 0 | CCTV-03, LAN-05, ACS-03, FA-03 | Baseline harness integrated; final reconciliation/seal pending |
 | 1 | FA-08 | Production Q6–Q9 CI verified; full qualification/seal pending |
-| 2 | FA-01, FA-02, FA-04, FA-05, FA-06, FA-07 | NEXT — FIRE production witnesses |
+| 2 | FA-01, FA-02, FA-04, FA-05, FA-06, FA-07 | FA-01/02/07 Q6–Q8 exact-SHA verified; NEXT: FA-04/05/06 mini-wave |
 | 3 | ACS-01, ACS-02, ACS-04, ACS-05, ACS-06 | Pending FIRE exact-SHA barrier |
 | 4 | LAN-01, LAN-02, LAN-03, LAN-04, LAN-06, LAN-07 | Pending ACS exact-SHA barrier |
 | 5 | CCTV-01, CCTV-02, CCTV-04, CCTV-05, CCTV-06 | Pending LAN exact-SHA barrier |
@@ -453,3 +453,21 @@ known blockers/debts
 ```
 
 Never report `PASS`, `QUALIFIED`, `ACCEPTED` or CI success merely because code/tests were committed.
+
+## FIRE lifecycle checkpoint — FA-01 / FA-02 / FA-07
+
+Source `a30cdded0cb745140bab7a4ac25320ce0254ff05` passed complete
+Flutter Local Foundation run `39065428504`, artifact `12112709305`:
+460 mobile tests passed, one historical-migration test skipped by its dedicated
+suite contract, 485 engineering-core tests passed, both analyzers and formatters
+passed. The logs explicitly execute all three production witnesses.
+
+FA-01 and FA-07 exercise complete PASS→FAIL republication; FA-02 deliberately
+retains COMPLETE / NOTASSESSED because exact current aggregation has no capacity
+authority. Its witness verifies all three operating cases, an authoritative
+load-profile replacement, invalidation/recalculation, independent-connection CAS,
+restart and frozen replay. Lifecycle PASS must not invent a capacity verdict.
+
+Q6/Q7/Q8 coverage is now 8/27. Q0–Q5/Q9 reconciliation, automatic matrix and
+provenance seal remain open; qualified stays 0/27 and ELV5 is not ACCEPTED.
+FA-04/05/06 form the next FIRE mini-wave with a separate exact-SHA barrier.
