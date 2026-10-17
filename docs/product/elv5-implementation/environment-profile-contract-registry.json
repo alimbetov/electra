@@ -22,6 +22,12 @@
     "CONDENSATION_RISK",
     "EXPOSURE"
   ],
+  "fa08ExactNumericProperties": [
+    {"propertyCode": "ENVIRONMENT_TEMP_MIN_C", "unitCode": "C"},
+    {"propertyCode": "ENVIRONMENT_TEMP_MAX_C", "unitCode": "C"},
+    {"propertyCode": "ENVIRONMENT_RH_MIN_PCT", "unitCode": "PCT"},
+    {"propertyCode": "ENVIRONMENT_RH_MAX_PCT", "unitCode": "PCT"}
+  ],
   "optionalClassDimensions": [
     "MOISTURE_CLASS",
     "CONTAMINATION_CLASS",
@@ -52,6 +58,9 @@
     "Elv5EnvironmentScopeResolver",
     "DriftElv5EnvironmentProfileStore",
     "DriftElv5EnvironmentScopeResolver",
-    "Elv5RouteAmpacityKernel"
+    "Elv5RouteAmpacityKernel",
+    "Elv5AmpacityRouteResolver",
+    "DriftElv5AmpacitySectionContractStore",
+    "Fa08PersistedInputResolver"
   ]
 }
