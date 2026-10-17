@@ -123,8 +123,9 @@ abstract interface class Lan05OpticalSectionEvidenceSource {
 }
 
 /// Production write contract for attaching exact optical authority evidence to a
-/// realized link section. Implementations must guard both the link-composition
-/// aggregate revision and the design-revision token in one transaction.
+/// realized link section. Implementations must invalidate dependent CURRENT
+/// evaluations and guard both the link-composition revision and design token in
+/// the same transaction before the new evidence becomes observable.
 abstract interface class Lan05OpticalSectionEvidenceWriter {
   Future<void> replace(ReplaceLan05OpticalSectionEvidenceCommand command);
 }
