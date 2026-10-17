@@ -8,13 +8,24 @@ final class Fa01AddressCapacityContract {
     required this.requiredDeviceSpare,
     required this.requiredAddressSpare,
     required Map<String, int> profileAddressConsumption,
+    required Map<String, int> profileDeviceCountContribution,
   })  : loopId = _text(loopId, 'loopId'),
         profileAddressConsumption = Map.unmodifiable(
-          _profileConsumption(profileAddressConsumption),
+          _profileConsumption(profileAddressConsumption, 'address consumption'),
+        ),
+        profileDeviceCountContribution = Map.unmodifiable(
+          _profileConsumption(profileDeviceCountContribution, 'device contribution'),
         ) {
     if (deviceLimit < 0 || addressLimit < 0 ||
         requiredDeviceSpare < 0 || requiredAddressSpare < 0) {
       throw ArgumentError('FA01 limits/spares must be nonnegative.');
+    }
+    if (this.profileAddressConsumption.keys.toSet().length !=
+            this.profileDeviceCountContribution.keys.toSet().length ||
+        !this.profileAddressConsumption.keys
+            .toSet()
+            .containsAll(this.profileDeviceCountContribution.keys)) {
+      throw ArgumentError('FA01 profile resource maps must have identical keys.');
     }
   }
 
@@ -25,6 +36,7 @@ final class Fa01AddressCapacityContract {
   final int requiredDeviceSpare;
   final int requiredAddressSpare;
   final Map<String, int> profileAddressConsumption;
+  final Map<String, int> profileDeviceCountContribution;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
         'schema': schema,
@@ -37,19 +49,25 @@ final class Fa01AddressCapacityContract {
           for (final key in (profileAddressConsumption.keys.toList()..sort()))
             key: profileAddressConsumption[key],
         },
+        'profileDeviceCountContribution': <String, Object?>{
+          for (final key in (profileDeviceCountContribution.keys.toList()..sort()))
+            key: profileDeviceCountContribution[key],
+        },
       };
 
   factory Fa01AddressCapacityContract.fromMap(Map<String, Object?> map) {
     _exact(map, const <String>{
       'schema','loopId','deviceLimit','addressLimit','requiredDeviceSpare',
       'requiredAddressSpare','profileAddressConsumption',
+      'profileDeviceCountContribution',
     });
     if (map['schema'] != schema) {
       throw const FormatException('Unsupported FA01 contract schema.');
     }
-    final profiles = map['profileAddressConsumption'];
-    if (profiles is! Map) {
-      throw const FormatException('profileAddressConsumption must be object.');
+    final addresses = map['profileAddressConsumption'];
+    final devices = map['profileDeviceCountContribution'];
+    if (addresses is! Map || devices is! Map) {
+      throw const FormatException('FA01 profile resource maps must be objects.');
     }
     return Fa01AddressCapacityContract(
       loopId: _mapText(map, 'loopId'),
@@ -57,13 +75,9 @@ final class Fa01AddressCapacityContract {
       addressLimit: _int(map, 'addressLimit'),
       requiredDeviceSpare: _int(map, 'requiredDeviceSpare'),
       requiredAddressSpare: _int(map, 'requiredAddressSpare'),
-      profileAddressConsumption: <String, int>{
-        for (final entry in profiles.entries)
-          _text(entry.key.toString(), 'profileRef'):
-              entry.value is int
-                  ? entry.value as int
-                  : throw const FormatException('profile consumption must be int.'),
-      },
+      profileAddressConsumption: _intMap(addresses, 'profileAddressConsumption'),
+      profileDeviceCountContribution:
+          _intMap(devices, 'profileDeviceCountContribution'),
     );
   }
 }
@@ -91,16 +105,24 @@ abstract interface class Fa01AddressCapacityContractSource {
   });
 }
 
-Map<String, int> _profileConsumption(Map<String, int> input) {
+Map<String, int> _profileConsumption(Map<String, int> input, String label) {
   final out = <String, int>{};
   for (final entry in input.entries) {
     final key = _text(entry.key, 'profileRef');
     if (entry.value <= 0) {
-      throw ArgumentError('FA01 profile consumption must be positive: $key');
+      throw ArgumentError('FA01 profile $label must be positive: $key');
     }
     out[key] = entry.value;
   }
   if (out.isEmpty) throw ArgumentError('FA01 profile map must not be empty.');
+  return out;
+}
+Map<String,int> _intMap(Map raw, String field) {
+  final out = <String,int>{};
+  for (final entry in raw.entries) {
+    if (entry.value is! int) throw FormatException('$field values must be int.');
+    out[_text(entry.key.toString(), 'profileRef')] = entry.value as int;
+  }
   return out;
 }
 void _exact(Map<String,Object?> map, Set<String> expected) {
