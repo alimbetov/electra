@@ -96,7 +96,6 @@ Fa06NotificationContract _contract({required String limitA}) =>
       supervision: Fa06SupervisionContract(
         required: false,
         modelSupported: false,
-        passed: false,
       ),
     );
 
