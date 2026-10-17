@@ -1,0 +1,190 @@
+{
+  "schema": "electra.engineering-calculation-simulation-foundation.v1",
+  "status": "FOUNDATION_DESIGNED",
+  "owner": "SHARED_ENGINEERING_METHOD",
+  "introducedInStage": "ELV5",
+  "processInventoryImpact": "NO_NEW_ELV5_PROCESS_CODE",
+  "technicalCriterion": "Engineering results are reproducible, deterministic, source-traceable, independently oracle-checked, boundary-tested, scenario-qualified, and fail closed on unknown required input.",
+  "authority": {
+    "higherAuthority": [
+      "docs/product/elv5-implementation/project-alignment-hardening-v1.md"
+    ],
+    "domainFormulaAuthority": "process-specific ELV contracts and dossiers",
+    "normativeComplianceOwner": "ELV7",
+    "equipmentSelectionOwner": "ELV8"
+  },
+  "mandatoryInvariants": [
+    "ECF-01",
+    "ECF-02",
+    "ECF-03",
+    "ECF-04",
+    "ECF-05",
+    "ECF-06",
+    "ECF-07",
+    "ECF-08",
+    "ECF-09",
+    "ECF-10",
+    "ECF-11",
+    "ECF-12",
+    "ECF-13",
+    "ECF-14",
+    "ECF-15",
+    "ECF-16",
+    "ECF-17",
+    "ECF-18",
+    "ECF-19",
+    "ECF-20"
+  ],
+  "inputEvidenceStates": [
+    "VERIFIED",
+    "DECLARED",
+    "DERIVED",
+    "ASSUMED",
+    "UNKNOWN"
+  ],
+  "unknownPolicy": {
+    "mandatoryUnknown": "FAIL_CLOSED_BLOCKED_OR_PARTIAL",
+    "silentDefaultsForbidden": true,
+    "assumptionMustBeExplicit": true,
+    "assumptionCanSatisfyVerifiedOnly": false,
+    "assumptionMaySupport": "PROVISIONAL_WHAT_IF_ONLY"
+  },
+  "resultAxes": {
+    "freshness": ["CURRENT", "STALE"],
+    "completion": ["COMPLETE", "PARTIAL", "BLOCKED"],
+    "assessment": ["PASS", "FAIL", "UNRESOLVED", "NOT_ASSESSED"],
+    "execution": ["SUCCEEDED", "FAILED"]
+  },
+  "lifecycle": [
+    "DESIGNED",
+    "KERNEL_IMPLEMENTED",
+    "RUNTIME_INTEGRATED",
+    "QUALIFIED",
+    "ACCEPTED"
+  ],
+  "numericPolicy": {
+    "preferenceOrder": [
+      "INTEGER_CANONICAL_BASE_UNIT",
+      "RATIONAL",
+      "FIXED_DECIMAL",
+      "INTERVAL",
+      "FLOATING_ONLY_WHEN_MATHEMATICALLY_REQUIRED"
+    ],
+    "dimensionSafePublicContracts": true,
+    "presentationRoundingSeparated": true,
+    "floatingPassFailWithoutDeclaredToleranceForbidden": true
+  },
+  "scenarioTypes": [
+    "BASELINE",
+    "NOMINAL",
+    "BOUNDARY",
+    "WORST_CASE",
+    "FAILURE",
+    "COMBINATORIAL",
+    "SENSITIVITY",
+    "UNCERTAINTY",
+    "MONTE_CARLO_EXPLORATORY"
+  ],
+  "simulationPolicy": {
+    "deterministicGenerationRequired": true,
+    "boundaryTripletRequired": ["BELOW", "EXACT", "ABOVE"],
+    "coveringArraysPreferredForLargeSpaces": true,
+    "monteCarloMayReplaceWorstCase": false,
+    "monteCarloRequiresFrozenSeedAndPrng": true
+  },
+  "oraclePolicy": {
+    "independentOracleRequired": true,
+    "productionKernelMayGenerateExpected": false,
+    "allowedFamilies": [
+      "HAND_DERIVATION",
+      "REFERENCE_TABLE",
+      "SECOND_SIMPLE_IMPLEMENTATION",
+      "PUBLISHED_EXAMPLE",
+      "INDEPENDENT_TOOL_RESULT",
+      "CLOSED_FORM_IDENTITY"
+    ],
+    "oracleDisagreementBeyondTolerance": "BLOCK_ACCEPTANCE"
+  },
+  "qualificationProfiles": [
+    {"id": "Q0", "name": "CONTRACT_SCHEMA_INVENTORY"},
+    {"id": "Q1", "name": "MATHEMATICAL_REFERENCE_VECTORS"},
+    {"id": "Q2", "name": "INDEPENDENT_ORACLE"},
+    {"id": "Q3", "name": "BOUNDARY_VALUE"},
+    {"id": "Q4", "name": "PROPERTY_METAMORPHIC"},
+    {"id": "Q5", "name": "SCENARIO_COMBINATORIAL"},
+    {"id": "Q6", "name": "PERSISTENCE_REPLAY_INVALIDATION_PUBLICATION"},
+    {"id": "Q7", "name": "FAILURE_CONCURRENCY_RESTART"},
+    {"id": "Q8", "name": "FREEZE_HISTORICAL_DETERMINISM"},
+    {"id": "Q9", "name": "PERFORMANCE_BOUNDS"}
+  ],
+  "confidenceDimensions": [
+    "INPUT_COMPLETENESS",
+    "SOURCE_PROVENANCE",
+    "NUMERIC_QUALIFICATION",
+    "INDEPENDENT_ORACLE",
+    "BOUNDARY_COVERAGE",
+    "PROPERTY_COVERAGE",
+    "SCENARIO_COVERAGE",
+    "RUNTIME_REPLAY",
+    "HISTORICAL_REPLAY",
+    "NORMATIVE_RESOLUTION"
+  ],
+  "scalarConfidenceWithoutStatisticalModelForbidden": true,
+  "requiredAcceptedResultBindings": [
+    "processCode",
+    "processVersion",
+    "algorithmVersion",
+    "inputSchemaVersion",
+    "resultSchemaVersion",
+    "rulesetVersion",
+    "sourceSha",
+    "authorityFingerprint",
+    "inputFingerprint",
+    "outputFingerprint"
+  ],
+  "processDefinitionTarget": [
+    "processCode",
+    "ownerStage",
+    "criticality",
+    "inputSchema",
+    "outputSchema",
+    "algorithmId",
+    "algorithmVersion",
+    "dependencies",
+    "requiredEvidence",
+    "unknownInputPolicy",
+    "scenarioFamilies",
+    "governingRule",
+    "oracleIds",
+    "boundaryDimensions",
+    "propertyIds",
+    "metamorphicIds",
+    "persistenceBinding",
+    "invalidationBinding",
+    "performanceClass",
+    "qualificationState"
+  ],
+  "pilotBindings": [
+    "AMPACITY_ROUTE_IZ",
+    "FA-03",
+    "ACS-03",
+    "CCTV-03",
+    "LAN-05"
+  ],
+  "existingElv5SimulationEvidence": {
+    "marketScenarios": 450,
+    "combinatorialScenarios": 1500,
+    "runtimeAcceptanceImplied": false
+  },
+  "stageAdoption": [
+    "F0_FOUNDATION_AUTHORITY",
+    "F1_SHARED_PRIMITIVES",
+    "F2_PILOT_QUALIFICATION",
+    "F3_ELV5_27_PROCESS_ADOPTION",
+    "F4_SHARED_ELECTRICAL_HARDENING",
+    "F5_ELV6_ADOPTION",
+    "F6_ELV7_ADOPTION",
+    "F7_ELV8_ADOPTION"
+  ],
+  "acceptanceRequiresExactSourceShaAndAuthorityFingerprint": true
+}
