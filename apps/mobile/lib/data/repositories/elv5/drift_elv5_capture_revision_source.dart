@@ -1,3 +1,4 @@
+import '../../../application/elv5/commands/elv5_replacement_command_runner.dart';
 import 'package:drift/drift.dart';
 
 import '../../../application/elv5/calculation/elv5_capture_guard.dart';
@@ -32,7 +33,10 @@ final class DriftElv5CaptureRevisionSource
     }
     final state = row.read<String>('state');
     if (state != 'WORKING') {
-      throw StateError('ELV5_CAPTURE_DESIGN_REVISION_READ_ONLY:$state');
+      throw Elv5ReplacementCommandException(
+        'ELV5_DESIGN_REVISION_READ_ONLY',
+        <String, Object?>{'state': state},
+      );
     }
     return row.read<int>('revision');
   }
