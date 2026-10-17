@@ -4,6 +4,7 @@ import '../../../application/elv5/calculation/elv5_initial_vertical_registry.dar
 import '../../../application/elv5/environment/ampacity_route_resolver.dart';
 import '../../database/app_database.dart';
 import '../drift_elv_cable_run_repository.dart';
+import 'drift_acs01_role_profile_contract_store.dart';
 import 'drift_acs03_electrical_contract_store.dart';
 import 'drift_acs04_source_requirement_contract_store.dart';
 import 'drift_acs05_autonomy_contract_store.dart';
@@ -83,6 +84,11 @@ final class DriftElv5CalculationRuntime {
       environments: environmentResolver,
       sectionEvidence: ampacitySections,
     );
+    final acs01Contracts = DriftAcs01RoleProfileContractStore(
+      database,
+      originDeviceId: originDeviceId,
+      nowUtc: nowUtc,
+    );
     final acs03Contracts = DriftAcs03ElectricalContractStore(
       database,
       originDeviceId: originDeviceId,
@@ -146,6 +152,7 @@ final class DriftElv5CalculationRuntime {
       fireStore: fireFacts,
       elv3LinkFacts: DriftElv3RealizedLinkFactSource(database),
       opticalSectionEvidence: DriftLan05OpticalSectionEvidenceSource(database),
+      acs01Contracts: acs01Contracts,
       acs03Contracts: acs03Contracts,
       acs04Contracts: acs04Contracts,
       acs05Contracts: acs05Contracts,
