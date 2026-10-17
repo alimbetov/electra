@@ -63,6 +63,7 @@ final class Elv5BlockedAwareTypedProcessCalculationAdapter<I>
   final Elv5ProcessInputResolver<I> resolver;
   final Elv5PureProcessExecutor<I> executor;
   final DateTime Function() _nowUtc;
+  static const _encoder = Elv5CanonicalJsonV1();
 
   @override
   Elv5ProcessCode get processCode => resolver.processCode;
@@ -82,8 +83,10 @@ final class Elv5BlockedAwareTypedProcessCalculationAdapter<I>
         captureRevision: captured.captureRevision,
       );
     } on Elv5CaptureBlockedException catch (blocked) {
-      if (blocked.request.nodeKey.toCanonicalValue().toString() !=
-          request.nodeKey.toCanonicalValue().toString()) {
+      final blockedNodeHash =
+          _encoder.sha256(blocked.request.nodeKey.toCanonicalValue());
+      final requestedNodeHash = _encoder.sha256(request.nodeKey.toCanonicalValue());
+      if (blockedNodeHash != requestedNodeHash) {
         throw StateError('ELV5_BLOCKED_CAPTURE_NODE_IDENTITY_CHANGED');
       }
       final captureRevision = blocked.captureRevision;
