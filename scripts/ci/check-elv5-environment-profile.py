@@ -12,6 +12,9 @@ ROUTE = ROOT / "packages/engineering_core/lib/src/elv5/evidence/route_ampacity_c
 STORE = ROOT / "apps/mobile/lib/data/repositories/elv5/drift_environment_profile_store.dart"
 RESOLVER = ROOT / "apps/mobile/lib/data/repositories/elv5/drift_environment_scope_resolver.dart"
 AMPACITY_RESOLVER = ROOT / "apps/mobile/lib/application/elv5/environment/ampacity_route_resolver.dart"
+FA08_RUNTIME = ROOT / "apps/mobile/lib/application/elv5/fire/fa08_runtime.dart"
+FA08_CABLE_SOURCE = ROOT / "apps/mobile/lib/data/repositories/elv5/drift_fa08_route_cable_fact_source.dart"
+PRODUCTION_REGISTRY = ROOT / "apps/mobile/lib/application/elv5/calculation/elv5_initial_vertical_registry.dart"
 
 
 def require(condition: bool, message: str) -> None:
@@ -23,22 +26,10 @@ def main() -> None:
     registry = json.loads(REGISTRY.read_text(encoding="utf-8"))
     require(registry["processInventoryChange"] == 0, "must not create process 28")
     require(registry["databaseSchemaChange"] == 0, "must not bump frozen schema")
-    require(
-        registry["precedence"] == ["ROUTE_SECTION", "ROOM", "MISSING"],
-        "scope precedence drifted",
-    )
-    require(
-        registry["roomClassificationIsEngineeringEvidence"] is False,
-        "room type/category must remain metadata only",
-    )
-    require(
-        registry["ampacityTemperatureSelection"] == "PROFILE_MAXIMUM_AMBIENT",
-        "ampacity temperature selection drifted",
-    )
-    require(
-        registry["routeAmpacityEquation"] == "Iz(run) = min(Iz(section_i))",
-        "route ampacity equation drifted",
-    )
+    require(registry["precedence"] == ["ROUTE_SECTION", "ROOM", "MISSING"], "scope precedence drifted")
+    require(registry["roomClassificationIsEngineeringEvidence"] is False, "room type/category must remain metadata only")
+    require(registry["ampacityTemperatureSelection"] == "PROFILE_MAXIMUM_AMBIENT", "ampacity temperature selection drifted")
+    require(registry["routeAmpacityEquation"] == "Iz(run) = min(Iz(section_i))", "route ampacity equation drifted")
 
     doc = DOC.read_text(encoding="utf-8")
     core = CORE.read_text(encoding="utf-8")
@@ -46,6 +37,9 @@ def main() -> None:
     store = STORE.read_text(encoding="utf-8")
     resolver = RESOLVER.read_text(encoding="utf-8")
     ampacity_resolver = AMPACITY_RESOLVER.read_text(encoding="utf-8")
+    fa08_runtime = FA08_RUNTIME.read_text(encoding="utf-8")
+    cable_source = FA08_CABLE_SOURCE.read_text(encoding="utf-8")
+    production_registry = PRODUCTION_REGISTRY.read_text(encoding="utf-8")
 
     for token in (
         "Room.roomType",
@@ -84,6 +78,29 @@ def main() -> None:
         "temperatureC.maximum",
     ):
         require(token in ampacity_resolver, f"ampacity route resolver missing {token!r}")
+
+    for token in (
+        "ENVIRONMENT_TEMP_MIN_C",
+        "ENVIRONMENT_TEMP_MAX_C",
+        "ENVIRONMENT_RH_MIN_PCT",
+        "ENVIRONMENT_RH_MAX_PCT",
+        "verifiedComplianceOwner",
+        "ELV7",
+    ):
+        require(token in fa08_runtime, f"FA-08 runtime missing {token!r}")
+    require("roomType" not in fa08_runtime and "roomCategory" not in fa08_runtime, "FA-08 must not infer environment from room classification")
+
+    require("cableDefinitionContentHashV1" in cable_source, "FA-08 must verify pinned cable definition hash")
+    require("firePerformanceCode" in cable_source, "FA-08 cable class must come from pinned cable edition")
+    for forbidden in (
+        "conductorCrossSectionMm2",
+        "outerDiameterMm",
+        "dcResistanceOhmPerKm",
+    ):
+        require(forbidden not in cable_source, f"legacy floating numeric field leaked into FA-08 route facts: {forbidden}")
+
+    require("Fa08PersistedInputResolver" in production_registry, "FA-08 production resolver is not registered")
+    require("buildFa08Executor" in production_registry, "FA-08 production executor is not registered")
 
     print("ELV5 environment profile contract: PASS")
 
