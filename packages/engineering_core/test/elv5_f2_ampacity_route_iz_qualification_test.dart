@@ -125,6 +125,73 @@ void main() {
       expect(baseline.allowableCurrentIzA, Elv5Rational.integer(72));
       expect(harsher.allowableCurrentIzA, Elv5Rational.integer(64));
     });
+
+    test('Q5 realistic mixed route selects the physically weakest section', () {
+      final input = _routeInput(<_SectionSpec>[
+        _SectionSpec(
+          'office-tray',
+          baseA: 38,
+          temperatureFactor: '1',
+          groupingFactor: '0.8',
+        ),
+        _SectionSpec(
+          'shaft-bundle',
+          baseA: 38,
+          temperatureFactor: '0.87',
+          groupingFactor: '0.7',
+          additionalFactors: const <String, String>{'THERMAL_INSULATION': '0.9'},
+        ),
+        _SectionSpec(
+          'plant-room',
+          baseA: 41,
+          temperatureFactor: '0.82',
+          groupingFactor: '0.85',
+        ),
+      ]);
+
+      final result = const Elv5RouteAmpacityKernel().evaluate(input);
+      final oracleBySection = <String, Elv5Rational>{};
+      for (final section in input.orderedSections) {
+        var value = section.ampacityInput.referenceRow.baseAllowableCurrentA;
+        value *= section.ampacityInput.temperatureCorrection.factor;
+        value *= section.ampacityInput.groupingCorrection.factor;
+        for (final correction in section.ampacityInput.additionalCorrections) {
+          value *= correction.factor;
+        }
+        oracleBySection[section.sectionId] = value;
+      }
+      final weakest = oracleBySection.entries.reduce(
+        (a, b) => a.value <= b.value ? a : b,
+      );
+
+      expect(weakest.key, 'shaft-bundle');
+      expect(weakest.value, Elv5Rational.parseDecimal('20.8278'));
+      expect(result.governingSectionId, weakest.key);
+      expect(result.allowableCurrentIzA, weakest.value);
+    });
+
+    test('Q9 bounded route fold remains deterministic at declared pilot scale', () {
+      const sectionCount = 256;
+      final specs = <_SectionSpec>[
+        for (var i = 0; i < sectionCount; i++)
+          _SectionSpec(
+            's-${i.toString().padLeft(3, '0')}',
+            baseA: 100 + (i % 7),
+            temperatureFactor: i == 173 ? '0.51' : '0.9',
+            groupingFactor: '0.8',
+          ),
+      ];
+      final input = _routeInput(specs);
+      final kernel = const Elv5RouteAmpacityKernel();
+      final first = kernel.evaluate(input);
+      final second = kernel.evaluate(input);
+
+      expect(input.orderedSections, hasLength(sectionCount));
+      expect(first.governingSectionId, 's-173');
+      expect(first.allowableCurrentIzA, second.allowableCurrentIzA);
+      expect(first.governingSectionId, second.governingSectionId);
+      expect(first.sectionResults, hasLength(sectionCount));
+    });
   });
 }
 
