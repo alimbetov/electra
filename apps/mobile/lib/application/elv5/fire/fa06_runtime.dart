@@ -48,23 +48,28 @@ final class Fa06PersistedInputResolver
       subjectId: request.subject.id,
     );
     if (circuit == null) {
-      throw StateError('FA06_NOTIFICATION_CIRCUIT_FACTS_MISSING:${request.subject.id}');
+      throw StateError(
+        'FA06_NOTIFICATION_CIRCUIT_FACTS_MISSING:${request.subject.id}',
+      );
     }
     final circuitId = _text(circuit.payload, 'circuitId');
     if (circuitId != request.subject.id) {
-      throw StateError('FA06_CIRCUIT_ID_MISMATCH:$circuitId:${request.subject.id}');
+      throw StateError(
+        'FA06_CIRCUIT_ID_MISMATCH:$circuitId:${request.subject.id}',
+      );
     }
 
     final assignments = _objects(
       circuit.payload['deviceAssignments'],
       'deviceAssignments',
     );
+    final aggregateFingerprint = _aggregateFingerprint(circuit);
     if (assignments.isEmpty) {
       _blocked(
         request,
         'FA06_NOTIFICATION_MEMBERSHIP_EMPTY',
-        _aggregateFingerprint(circuit),
-        _aggregateFingerprint(circuit),
+        aggregateFingerprint,
+        aggregateFingerprint,
         const <Elv5DependencyMarker>[],
         <String, Object?>{'circuitId': circuitId},
       );
@@ -79,9 +84,13 @@ final class Fa06PersistedInputResolver
     final dependencies = <Elv5DependencyMarker>[
       _dependency(request, 'SET', 'FIRE_NOTIFICATION_CIRCUIT', circuitId),
       for (final deviceId in deviceIds)
-        _dependency(request, 'FACT', 'COMPONENT_REFERENCE_BINDING', deviceId),
+        _dependency(
+          request,
+          'FACT',
+          'COMPONENT_REFERENCE_BINDING',
+          deviceId,
+        ),
     ];
-    final aggregateFingerprint = _aggregateFingerprint(circuit);
 
     final contractSnapshot = await contractSource.loadActiveForCircuit(
       projectId: request.projectId,
@@ -102,8 +111,8 @@ final class Fa06PersistedInputResolver
     if (contract.circuitId != circuitId) {
       throw StateError('FA06_CONTRACT_CIRCUIT_IDENTITY_MISMATCH:$circuitId');
     }
-    if (contract.terminalLoadIdByDeviceId.keys.toSet().length != deviceIds.length ||
-        !contract.terminalLoadIdByDeviceId.keys.toSet().containsAll(deviceIds)) {
+    final mappedIds = contract.terminalLoadIdByDeviceId.keys.toSet();
+    if (mappedIds.length != deviceIds.length || !mappedIds.containsAll(deviceIds)) {
       _blocked(
         request,
         'FA06_TERMINAL_MEMBERSHIP_MAPPING_MISMATCH',
@@ -112,7 +121,7 @@ final class Fa06PersistedInputResolver
         dependencies,
         <String, Object?>{
           'deviceIds': deviceIds,
-          'mappedDeviceIds': contract.terminalLoadIdByDeviceId.keys.toList()..sort(),
+          'mappedDeviceIds': mappedIds.toList()..sort(),
         },
       );
     }
@@ -133,39 +142,16 @@ final class Fa06PersistedInputResolver
     final upstreamBasis = <Map<String, Object?>>[];
 
     for (final caseContract in contract.cases) {
-      var expectedMilliamp = Elv5Rational.zero;
-      final missingState = <String>[];
-      for (final assignment in assignments) {
-        final deviceId = _text(assignment, 'deviceId');
-        final currents = _map(assignment['stateCurrentMa'], 'stateCurrentMa');
-        final raw = currents[caseContract.stateCode];
-        if (raw == null) {
-          missingState.add(deviceId);
-          continue;
-        }
-        if (raw is! String) {
-          throw StateError('FA06_STATE_CURRENT_NOT_DECIMAL:$deviceId:${caseContract.stateCode}');
-        }
-        expectedMilliamp += Elv5Rational.parseDecimal(raw);
-      }
-      if (missingState.isNotEmpty) {
-        _blocked(
-          request,
-          caseContract.operatingCase == Fa06ContractCase.startupInrush
-              ? 'FA06_STARTUP_CURRENT_EVIDENCE_MISSING'
-              : 'FA06_ACTIVE_CURRENT_EVIDENCE_MISSING',
-          aggregateFingerprint,
-          contractSnapshot.contentHash,
-          dependencies,
-          <String, Object?>{
-            'stateCode': caseContract.stateCode,
-            'missingDeviceIds': missingState..sort(),
-          },
-        );
-      }
-      final expectedA = expectedMilliamp / Elv5Rational.integer(1000);
+      final expectedA = _resolveExpectedCurrent(
+        request: request,
+        assignments: assignments,
+        caseContract: caseContract,
+        aggregateFingerprint: aggregateFingerprint,
+        policyFingerprint: contractSnapshot.contentHash,
+        dependencies: dependencies,
+      );
 
-      final pwr01 = await _requireSingle(
+      final pwr01 = await _requireSingleCurrent(
         request: request,
         processCode: PowerProcessCode.pwr01,
         scenarioId: caseContract.scenarioId,
@@ -204,7 +190,7 @@ final class Fa06PersistedInputResolver
         );
       }
 
-      final pwr03 = await _requireSingle(
+      final pwr03 = await _requireSingleCurrent(
         request: request,
         processCode: PowerProcessCode.pwr03,
         scenarioId: caseContract.scenarioId,
@@ -227,16 +213,35 @@ final class Fa06PersistedInputResolver
         );
       }
 
+      final terminalRows = _objects(pwr03.output['terminals'], 'terminals');
       PowerRational? minimumV;
       PowerRational? maximumV;
       for (final deviceId in deviceIds) {
         final terminalId = contract.terminalLoadIdByDeviceId[deviceId]!;
-        final terminal = _singleById(
-          pwr03.output['terminals'],
-          'loadId',
-          terminalId,
-          'FA06_PWR03_DEVICE_TERMINAL_MISSING',
-        );
+        final matches = terminalRows
+            .where((row) => row['loadId'] == terminalId)
+            .toList();
+        if (matches.length != 1) {
+          _blocked(
+            request,
+            matches.isEmpty
+                ? 'FA06_PWR03_DEVICE_TERMINAL_MISSING'
+                : 'FA06_PWR03_DEVICE_TERMINAL_AMBIGUOUS',
+            aggregateFingerprint,
+            contractSnapshot.contentHash,
+            dependencies,
+            <String, Object?>{
+              'deviceId': deviceId,
+              'terminalLoadId': terminalId,
+              'matchCount': matches.length,
+              'evaluationId': pwr03.evaluationId,
+              'nodeKeySha256': pwr03.nodeKey.sha256,
+              'pointerGeneration': pwr03.pointerGeneration,
+              'evidenceSha256': pwr03.evidenceSha256,
+            },
+          );
+        }
+        final terminal = matches.single;
         final low = _powerRational(terminal['minimumV'], 'minimumV');
         final high = _powerRational(terminal['maximumV'], 'maximumV');
         minimumV = minimumV == null || low < minimumV ? low : minimumV;
@@ -317,8 +322,10 @@ final class Fa06PersistedInputResolver
       'contractContentHash': contractSnapshot.contentHash,
       'membershipFingerprint': membershipFingerprint,
       'upstream': upstreamBasis
-        ..sort((a, b) => (a['evaluationId']! as String)
-            .compareTo(b['evaluationId']! as String)),
+        ..sort(
+          (a, b) => (a['evaluationId']! as String)
+              .compareTo(b['evaluationId']! as String),
+        ),
     });
     return Elv5CapturedInput<Fa06Input>(
       request: request,
@@ -331,7 +338,50 @@ final class Fa06PersistedInputResolver
     );
   }
 
-  Future<Elv4CurrentEvaluationSnapshot> _requireSingle({
+  Elv5Rational _resolveExpectedCurrent({
+    required Elv5CalculationRequest request,
+    required List<Map<String, Object?>> assignments,
+    required Fa06CaseContract caseContract,
+    required String aggregateFingerprint,
+    required String policyFingerprint,
+    required List<Elv5DependencyMarker> dependencies,
+  }) {
+    var expectedMilliamp = Elv5Rational.zero;
+    final missingState = <String>[];
+    for (final assignment in assignments) {
+      final deviceId = _text(assignment, 'deviceId');
+      final currents = _map(assignment['stateCurrentMa'], 'stateCurrentMa');
+      final raw = currents[caseContract.stateCode];
+      if (raw == null) {
+        missingState.add(deviceId);
+        continue;
+      }
+      if (raw is! String) {
+        throw StateError(
+          'FA06_STATE_CURRENT_NOT_DECIMAL:$deviceId:${caseContract.stateCode}',
+        );
+      }
+      expectedMilliamp += Elv5Rational.parseDecimal(raw);
+    }
+    if (missingState.isNotEmpty) {
+      _blocked(
+        request,
+        caseContract.operatingCase == Fa06ContractCase.startupInrush
+            ? 'FA06_STARTUP_CURRENT_EVIDENCE_MISSING'
+            : 'FA06_ACTIVE_CURRENT_EVIDENCE_MISSING',
+        aggregateFingerprint,
+        policyFingerprint,
+        dependencies,
+        <String, Object?>{
+          'stateCode': caseContract.stateCode,
+          'missingDeviceIds': missingState..sort(),
+        },
+      );
+    }
+    return expectedMilliamp / Elv5Rational.integer(1000);
+  }
+
+  Future<Elv4CurrentEvaluationSnapshot> _requireSingleCurrent({
     required Elv5CalculationRequest request,
     required PowerProcessCode processCode,
     required String scenarioId,
@@ -445,8 +495,10 @@ Elv5PureKernelExecutor<Fa06Input, Fa06Result> buildFa06Executor({
           'outputCurrentLowerA': entry.value.outputCurrent.lower.value.toMap(),
           'outputCurrentUpperA': entry.value.outputCurrent.upper.value.toMap(),
           'currentMarginA': entry.value.currentMargin.value.toMap(),
-          'terminalVoltageLowerV': entry.value.terminalVoltage.lower.value.toMap(),
-          'terminalVoltageUpperV': entry.value.terminalVoltage.upper.value.toMap(),
+          'terminalVoltageLowerV':
+              entry.value.terminalVoltage.lower.value.toMap(),
+          'terminalVoltageUpperV':
+              entry.value.terminalVoltage.upper.value.toMap(),
           'lowVoltageMarginV': entry.value.lowVoltageMargin.value.toMap(),
           'highVoltageMarginV': entry.value.highVoltageMargin.value.toMap(),
           'status': entry.value.status.name,
@@ -456,7 +508,8 @@ Elv5PureKernelExecutor<Fa06Input, Fa06Result> buildFa06Executor({
   },
   encodeEvidence: (captured, _) => <String, Object?>{
     'schema': 'electra.elv5-fa06-evidence.v1',
-    'source': 'PERSISTED_NOTIFICATION_ASSIGNMENTS_PLUS_VERIFIED_CURRENT_PWR01_PWR03',
+    'source':
+        'PERSISTED_NOTIFICATION_ASSIGNMENTS_PLUS_VERIFIED_CURRENT_PWR01_PWR03',
     'captureRevision': captured.captureRevision,
     'upstreamPointerGenerations': captured.upstreamPointerGenerations,
     'membershipFingerprint': captured.value.expectedMembershipFingerprint,
@@ -502,16 +555,3 @@ PowerRational _powerRational(Object? raw, String field) {
 
 Elv5Rational _elv5(PowerRational value) =>
     Elv5Rational(value.numerator, value.denominator);
-
-Map<String, Object?> _singleById(
-  Object? raw,
-  String key,
-  String id,
-  String errorCode,
-) {
-  final matches = _objects(raw, key).where((value) => value[key] == id).toList();
-  if (matches.length != 1) {
-    throw StateError('$errorCode:$id:${matches.length}');
-  }
-  return matches.single;
-}
