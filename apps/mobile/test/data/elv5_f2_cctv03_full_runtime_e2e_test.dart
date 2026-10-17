@@ -11,10 +11,13 @@ import 'package:electra_mobile/data/repositories/elv5/drift_elv5_cctv_write_unit
 import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../support/elv5_f2_qualification_harness.dart';
+
 void main() {
   test(
     'F2 CCTV-03 Q6/Q7/Q8 qualifies persisted recording facts, invalidation, restart and freeze',
     () async {
+      const harness = Elv5F2QualificationHarness();
       final directory = await Directory.systemTemp.createTemp(
         'electra-f2-cctv03-full-runtime-',
       );
@@ -60,6 +63,12 @@ void main() {
       expect(firstEvaluation.completion, 'COMPLETE');
       expect(firstEvaluation.inputFingerprint, hasLength(64));
       expect(firstEvaluation.outputSha256, hasLength(64));
+      final firstSnapshot = _snapshot(
+        firstPointer,
+        firstEvaluation,
+        first.logicalResultJson,
+      );
+      harness.assertQ6Initial('CCTV-03', firstSnapshot);
 
       final dependencyDomains = await _dependencyDomains(db);
       expect(dependencyDomains, contains('CCTV_RECORDING_POOL'));
@@ -105,6 +114,12 @@ void main() {
         secondEvaluation.outputSha256,
         isNot(firstEvaluation.outputSha256),
       );
+      final secondSnapshot = _snapshot(
+        secondPointer,
+        secondEvaluation,
+        second.logicalResultJson,
+      );
+      harness.assertQ6Republished('CCTV-03', firstSnapshot, secondSnapshot);
 
       // Q7: reconstruct the complete production runtime from durable SQLite.
       // Ledger replay must not recapture or republish the committed result.
@@ -124,24 +139,25 @@ void main() {
       final restartedPointer = await _pointer(db);
       expect(restartedPointer.generation, 3);
       expect(restartedPointer.evaluationId, secondPointer.evaluationId);
+      harness.assertQ7Replay(
+        'CCTV-03',
+        secondSnapshot,
+        _snapshot(restartedPointer, secondEvaluation, replay.logicalResultJson),
+      );
 
       // Q7 competing publication: a stale client that still owns generation 2
       // cannot overwrite the generation-3 CURRENT pointer after restart.
-      await expectLater(
-        runtime.service.execute(
-          _calculationCommand(
-            commandId: 'cctv03-stale-writer',
-            expectedPointerGeneration: 2,
-            expectedDesignRevision: 3,
-          ),
-        ),
-        throwsA(
-          isA<Elv5ReplacementCommandException>().having(
-            (error) => error.code,
-            'code',
-            'ELV5_POINTER_GENERATION_CONFLICT',
-          ),
-        ),
+      await harness.expectQ7StaleWriter(
+        'CCTV-03',
+        () async {
+          await runtime.service.execute(
+            _calculationCommand(
+              commandId: 'cctv03-stale-writer',
+              expectedPointerGeneration: 2,
+              expectedDesignRevision: 3,
+            ),
+          );
+        },
       );
 
       // Q8: committed historical result remains replayable after freeze while
@@ -153,22 +169,29 @@ void main() {
       final frozenReplay = await runtime.service.execute(secondCommand);
       expect(frozenReplay.replayed, isTrue);
       expect(frozenReplay.logicalResultJson, logicalBeforeRestart);
+      final frozenReplayPointer = await _pointer(db);
+      harness.assertQ8Replay(
+        'CCTV-03',
+        secondSnapshot,
+        _snapshot(
+          frozenReplayPointer,
+          secondEvaluation,
+          frozenReplay.logicalResultJson,
+        ),
+      );
 
-      await expectLater(
-        runtime.service.execute(
-          _calculationCommand(
-            commandId: 'cctv03-after-freeze',
-            expectedPointerGeneration: 3,
-            expectedDesignRevision: 4,
-          ),
-        ),
-        throwsA(
-          isA<Elv5ReplacementCommandException>().having(
-            (error) => error.code,
-            'code',
-            'ELV5_DESIGN_REVISION_READ_ONLY',
-          ),
-        ),
+      await harness.expectQ8ReadOnly(
+        'CCTV-03',
+        () async {
+          await runtime.service.execute(
+            _calculationCommand(
+              commandId: 'cctv03-after-freeze',
+              expectedPointerGeneration: 3,
+              expectedDesignRevision: 4,
+            ),
+          );
+        },
+        operation: 'new calculation',
       );
       await expectLater(
         mutations.preview(
@@ -193,6 +216,20 @@ void main() {
     },
   );
 }
+
+Elv5F2PublicationSnapshot _snapshot(
+  _PointerRow pointer,
+  _EvaluationRow evaluation,
+  String logicalResultJson,
+) => Elv5F2PublicationSnapshot(
+  generation: pointer.generation,
+  evaluationId: pointer.evaluationId!,
+  freshness: pointer.freshness,
+  execution: evaluation.execution,
+  completion: evaluation.completion,
+  inputFingerprint: evaluation.inputFingerprint,
+  logicalResultJson: logicalResultJson,
+);
 
 Elv5CctvMutationService _mutationService(AppDatabase db) =>
     Elv5CctvMutationService(
