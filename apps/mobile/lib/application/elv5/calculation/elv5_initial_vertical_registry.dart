@@ -4,6 +4,8 @@ import '../acs/acs04_runtime.dart';
 import '../acs/acs04_source_requirement_contract.dart';
 import '../acs/acs05_autonomy_contract.dart';
 import '../acs/acs05_runtime.dart';
+import '../acs/acs06_runtime.dart';
+import '../acs/acs06_topology_contract.dart';
 import '../acs/elv5_acs_persistence.dart';
 import '../cctv/cctv02_runtime.dart';
 import '../cctv/cctv03_runtime.dart';
@@ -50,6 +52,7 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
   required Acs03ElectricalContractSource acs03Contracts,
   required Acs04SourceRequirementContractSource acs04Contracts,
   required Acs05AutonomyContractSource acs05Contracts,
+  required Acs06TopologyContractSource acs06Contracts,
   required Fa01AddressCapacityContractSource fa01Contracts,
   required Fa03TerminalVoltageContractSource fa03Contracts,
   required Fa04SourceRequirementContractSource fa04Contracts,
@@ -140,6 +143,17 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
         ),
       ),
       executor: buildAcs05Executor(nowUtc: nowUtc),
+      nowUtc: nowUtc,
+    ),
+    Elv5BlockedAwareTypedProcessCalculationAdapter(
+      resolver: guarded(
+        Acs06PersistedInputResolver(
+          acsStore: acsStore,
+          contractSource: acs06Contracts,
+          nowUtc: nowUtc,
+        ),
+      ),
+      executor: buildAcs06Executor(nowUtc: nowUtc),
       nowUtc: nowUtc,
     ),
     Elv5BlockedAwareTypedProcessCalculationAdapter(
