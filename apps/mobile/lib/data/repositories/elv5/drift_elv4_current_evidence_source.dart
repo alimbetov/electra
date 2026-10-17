@@ -101,6 +101,8 @@ final class DriftElv4CurrentEvidenceSource
         evidence = <String, Object?>{
           ...inner.cast<String, Object?>(),
           'dependencyKeys': consumed['dependencyKeys'],
+          'consumedFacts': consumed['consumedFacts'],
+          'consumedEvaluations': consumed['consumedEvaluations'],
         };
       } else {
         evidence = stored;
