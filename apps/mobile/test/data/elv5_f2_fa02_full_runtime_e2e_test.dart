@@ -107,7 +107,10 @@ void main() {
           expect(output['status'], 'complete');
           expect(output['governingCase'], 'startupInrush');
           final cases = Map<String, Object?>.from(output['cases'] as Map);
-          expect(cases.keys, containsAll(<String>['standby', 'alarm', 'startupInrush']));
+          expect(
+            cases.keys,
+            containsAll(<String>['standby', 'alarm', 'startupInrush']),
+          );
           final startup = Map<String, Object?>.from(
             cases['startupInrush'] as Map,
           );
@@ -121,7 +124,10 @@ void main() {
             (output['cases'] as Map)['startupInrush'] as Map,
           );
           expect(startup['missingOriginIds'], isEmpty);
-          expect(startup['knownSubtotalUpperA'], isNot(equals(initialStartupUpper)));
+          expect(
+            startup['knownSubtotalUpperA'],
+            isNot(equals(initialStartupUpper)),
+          );
         },
         mutationAfterFreeze: (db) async {
           await expectLater(
@@ -155,13 +161,12 @@ DriftElv5PowerMutationCoordinator _coordinator(AppDatabase db) =>
       nowUtc: Elv5F2ProductionLifecycle.now,
     );
 
-Future<int> _revision(AppDatabase db) async =>
-    (await db
-            .customSelect(
-              "SELECT revision FROM project_design_revisions WHERE project_id = 'p' AND id = 'd'",
-            )
-            .getSingle())
-        .read<int>('revision');
+Future<int> _revision(AppDatabase db) async => (await db
+        .customSelect(
+          "SELECT revision FROM project_design_revisions WHERE project_id = 'p' AND id = 'd'",
+        )
+        .getSingle())
+    .read<int>('revision');
 
 Future<void> _seedPowerPorts(Elv4QualificationBuilder builder) async {
   for (final componentId in const <String>['panel-1', 'd1', 'd2']) {
