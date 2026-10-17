@@ -1,0 +1,50 @@
+name: Temporary ELV5 F2 Analyze Cleanup
+
+on:
+  push:
+    branches:
+      - feat/flutter-elv5-power-topology-design
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Remove only analyze-proven unused imports
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          paths = [
+              Path('apps/mobile/test/data/elv5_f2_cctv03_full_runtime_e2e_test.dart'),
+              Path('apps/mobile/test/data/elv5_f2_lan05_full_runtime_e2e_test.dart'),
+              Path('apps/mobile/test/data/elv5_f2_acs03_full_runtime_e2e_test.dart'),
+          ]
+          needle = "import 'package:electra_mobile/application/elv5/commands/elv5_replacement_command_runner.dart';\n"
+          for path in paths:
+              text = path.read_text()
+              count = text.count(needle)
+              if count != 1:
+                  raise SystemExit(f'{path}: expected exactly one unused import, found {count}')
+              path.write_text(text.replace(needle, '', 1))
+          PY
+
+      - name: Remove one-shot workflow and commit analyze cleanup
+        run: |
+          git rm .github/workflows/tmp-elv5-f2-remove-unused-imports.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add apps/mobile/test/data/elv5_f2_cctv03_full_runtime_e2e_test.dart \
+                  apps/mobile/test/data/elv5_f2_lan05_full_runtime_e2e_test.dart \
+                  apps/mobile/test/data/elv5_f2_acs03_full_runtime_e2e_test.dart
+          git commit -m 'fix(f2): remove unused harness witness imports'
+          git push origin HEAD:feat/flutter-elv5-power-topology-design
