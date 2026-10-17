@@ -210,10 +210,7 @@ final class Elv5F2ProductionLifecycle {
         Object? error,
       })
     >
-    attempt(
-      AppDatabase database,
-      Elv5WireCommandEnvelope cmd,
-    ) async {
+    attempt(AppDatabase database, Elv5WireCommandEnvelope cmd) async {
       try {
         final result = await runtime(database).service.execute(cmd);
         return (
@@ -223,12 +220,7 @@ final class Elv5F2ProductionLifecycle {
           error: null,
         );
       } catch (error) {
-        return (
-          database: database,
-          command: cmd,
-          logical: null,
-          error: error,
-        );
+        return (database: database, command: cmd, logical: null, error: error);
       }
     }
 
