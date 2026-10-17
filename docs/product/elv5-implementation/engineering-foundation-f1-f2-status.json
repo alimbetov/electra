@@ -33,15 +33,15 @@
       "workItems": {
         "quantityInventory": "IMPLEMENTED_SHARED_DIMENSIONS_QUALIFICATION_PENDING",
         "typedEvidenceReconciliation": "SHARED_PRIMITIVE_IMPLEMENTED_PROCESS_MIGRATION_PENDING",
-        "unknownFailClosedAudit": "PARTIAL_FALSE_PASS_FOUND_AND_FIXED_CCTV01",
+        "unknownFailClosedAudit": "PARTIAL_TWO_TARGETED_PASSES_ONE_FALSE_PASS_FIXED",
         "provenanceGraph": "PARTIAL_CURRENT_EVALUATION_SOURCE_ADDED_MORE_RECONCILIATION_REQUIRED",
-        "calculationIdentity": "PARTIAL_F1_HIGH_01_OPEN",
+        "calculationIdentity": "PARTIAL_STRICT_QUALIFICATION_IDENTITY_PRIMITIVE_ADDED_PROVIDER_AND_EVALUATION_INTEGRATION_PENDING",
         "deterministicCanonicalization": "IMPLEMENTED_CORE_QUALIFICATION_PENDING",
-        "independentStatusAxes": "PARTIAL_F1_HIGH_02_OPEN",
+        "independentStatusAxes": "PARTIAL_COMPATIBLE_FOUNDATION_PROJECTION_ADDED_PERSISTED_MIGRATION_PENDING",
         "governingCasePrimitive": "PARTIAL_PROCESS_SPECIFIC",
-        "sharedQualificationSupport": "TODO"
+        "sharedQualificationSupport": "PARTIAL_PROCESS_REFERENCE_TESTS_ADDED_SHARED_HARNESS_TODO"
       },
-      "unknownAuditFirstPass": {
+      "unknownAudit": {
         "inspected": [
           "AMPACITY_REFERENCE_AND_CORRECTIONS",
           "ENVIRONMENT_PROFILE_AND_ROUTE_RESOLUTION",
@@ -49,7 +49,11 @@
           "CCTV01_GEOMETRY_THRESHOLD_SEMANTICS",
           "CCTV02_RECORDER_ROLE_BINDING",
           "CCTV05_UPSTREAM_INGRESS_AND_STORAGE_REUSE",
-          "CCTV06_REALIZED_LINK_AND_PWR06_REUSE"
+          "CCTV06_REALIZED_LINK_AND_PWR06_REUSE",
+          "TRANSFER_EFFICIENCY_AND_IDLE_ACCOUNTING",
+          "DC_RESISTANCE_AND_CURRENT_RATING",
+          "OPTICAL_ATTENUATION_EVIDENCE",
+          "BATTERY_SOC_TEMPERATURE_AGING_RATE_FACTORS"
         ],
         "falsePassDefaultsFound": 1,
         "falsePassDefaultsFixed": 1,
@@ -59,14 +63,16 @@
         {
           "id": "F1-HIGH-01",
           "severity": "HIGH",
-          "summary": "Persisted evaluation identity does not yet carry explicit sourceSha, authorityFingerprint and rulesetVersion required for foundation acceptance.",
+          "progress": "STRICT_QUALIFICATION_IDENTITY_PRIMITIVE_IMPLEMENTED",
+          "summary": "Elv5QualificationIdentity now requires processVersion, rulesetVersion, exact sourceSha and authorityFingerprint with no defaults. A real build/authority provider and integration into immutable evaluation identity/persistence are still missing.",
           "acceptanceImpact": "BLOCKS_QUALIFIED_AND_ACCEPTED_PROMOTION"
         },
         {
           "id": "F1-HIGH-02",
           "severity": "HIGH",
-          "summary": "Current runtime encodes BLOCKED as Execution and INCOMPLETE as Completion, while the foundation requires Execution SUCCEEDED/FAILED and Completion COMPLETE/PARTIAL/BLOCKED.",
-          "acceptanceImpact": "BLOCKS_F2_QUALIFIED_PROMOTION_UNTIL_COMPATIBLE_AXIS_RECONCILIATION"
+          "progress": "BACKWARD_COMPATIBLE_FOUNDATION_STATUS_PROJECTION_IMPLEMENTED",
+          "summary": "Persisted legacy status strings are preserved for replay while the Foundation projection maps legacy BLOCKED to SUCCEEDED + BLOCKED and legacy INCOMPLETE to PARTIAL where applicable. Persistence/replay migration and qualification remain open.",
+          "acceptanceImpact": "BLOCKS_F2_QUALIFIED_PROMOTION_UNTIL_PERSISTED_COMPATIBILITY_IS_QUALIFIED"
         },
         {
           "id": "F1-HIGH-03",
@@ -77,8 +83,14 @@
         {
           "id": "F1-MEDIUM-04",
           "severity": "MEDIUM",
-          "summary": "CCTV-06 and LAN-04 both carry immutable physical section capability evidence. Path identity is shared, but categorical medium/interface/shield evidence is still process-specific and should be reconciled into the smallest shared primitive before final foundation acceptance.",
+          "summary": "CCTV-06 and LAN-04 share realized path identity but categorical medium/interface/shield evidence is still process-specific and should be reconciled into the smallest shared primitive.",
           "acceptanceImpact": "REUSE_AND_PROVENANCE_DEBT_NOT_A_RUNTIME_COMPLETENESS_BLOCKER"
+        },
+        {
+          "id": "F1-MEDIUM-05",
+          "severity": "MEDIUM",
+          "summary": "CCTV-05 assignment scope must gain an explicit persisted-row-order metamorphic qualification and canonical set ordering independent of ordinal where ordinal is not engineering-significant.",
+          "acceptanceImpact": "DETERMINISM_QUALIFICATION_DEBT"
         }
       ]
     },
@@ -100,10 +112,11 @@
     "runtimeTrackStatus": "SOURCE_WIRING_COMPLETE_27_OF_27_CI_PENDING",
     "foundationTrack": [
       "F1_UNKNOWN_AND_SILENT_DEFAULT_AUDIT_COMPLETE",
-      "F1_CALCULATION_IDENTITY_RECONCILIATION",
-      "F1_RESULT_AXIS_RECONCILIATION",
+      "F1_CALCULATION_IDENTITY_PROVIDER_AND_EVALUATION_INTEGRATION",
+      "F1_RESULT_AXIS_PERSISTENCE_AND_REPLAY_QUALIFICATION",
       "F1_ELV3_FRAME_NUMERIC_RECONCILIATION",
       "F1_SECTION_CAPABILITY_EVIDENCE_RECONCILIATION",
+      "F1_CCTV05_DETERMINISM_QUALIFICATION",
       "F1_PROVENANCE_RECONCILIATION",
       "F1_SHARED_QUALIFICATION_SUPPORT",
       "F2_AMPACITY_ROUTE_IZ",
@@ -114,7 +127,7 @@
       "F2_EXACT_SHA_QUALIFICATION_MATRIX"
     ]
   },
-  "priorityOverride": "Any F1 defect capable of false PASS, nondeterministic hash, stale-current publication or provenance loss preempts new vertical work.",
+  "priorityOverride": "Any F1 defect capable of false PASS, nondeterministic hash, stale-current publication or provenance loss preempts qualification promotion.",
   "reportingRequirements": ["exactHeadSha","runtimeIntegrationCount","processLifecycle","F1GateStatus","F2Q0ToQ9Status","actuallyExecutedCIAnalyzeTests","knownBlockersAndDebts"],
   "qualificationPromotionRule": "No pilot may become QUALIFIED without all applicable mandatory Q gates backed by exact-source-SHA evidence.",
   "acceptancePromotionRule": "ACCEPTED additionally requires stage acceptance pinned to exact source SHA and authority fingerprint."
