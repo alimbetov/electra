@@ -153,7 +153,7 @@ final class Fa04SourceRequirementContract {
   final List<Fa04SourceCaseContract> cases;
 
   String get requirementSetFingerprint => _encoder.sha256(<String, Object?>{
-        'schema': 'electra.elv5-shared-source-requirement-set-fingerprint.v1',
+        'schema': 'electra.elv5-source-requirement-set-fingerprint.v1',
         'sourceId': sourceId,
         'sourceDefinitionContentHash': sourceDefinitionContentHash,
         'contributors': [for (final value in contributors) value.toCanonicalValue()],
