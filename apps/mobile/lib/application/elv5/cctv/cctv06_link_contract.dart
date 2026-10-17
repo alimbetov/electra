@@ -1,5 +1,7 @@
 import 'package:engineering_core/engineering_core_elv5.dart';
 
+import '../policy/elv5_physical_link_capability.dart';
+
 final class Cctv06SectionEvidenceContract {
   Cctv06SectionEvidenceContract({
     required String sectionId,
@@ -11,16 +13,15 @@ final class Cctv06SectionEvidenceContract {
     required String evidenceRef,
     required String evidenceContentHash,
   }) : sectionId = _text(sectionId, 'sectionId'),
-       mediumCode = _medium(mediumCode),
-       interfaceKind = _token(interfaceKind, 'interfaceKind'),
-       categoryToken = _token(categoryToken, 'categoryToken'),
+       mediumCode = elv5PhysicalMediumCode(mediumCode),
+       interfaceKind = elv5PhysicalToken(interfaceKind, 'interfaceKind'),
+       categoryToken = elv5PhysicalToken(categoryToken, 'categoryToken'),
        evidenceRef = _text(evidenceRef, 'evidenceRef'),
        evidenceContentHash = _sha(evidenceContentHash, 'evidenceContentHash') {
-    if (!shieldContinuityKnown && shieldContinuity) {
-      throw ArgumentError(
-        'CCTV06 unknown shield continuity cannot assert true.',
-      );
-    }
+    validateElv5ShieldContinuity(
+      known: shieldContinuityKnown,
+      continuous: shieldContinuity,
+    );
   }
 
   final String sectionId;
@@ -88,12 +89,18 @@ final class Cctv06LinkContract {
          expectedCompositionFingerprint,
          'expectedCompositionFingerprint',
        ),
-       allowedMediaCodes = Set.unmodifiable(allowedMediaCodes.map(_medium)),
+       allowedMediaCodes = Set.unmodifiable(
+         allowedMediaCodes.map(elv5PhysicalMediumCode),
+       ),
        allowedInterfaceKinds = Set.unmodifiable(
-         allowedInterfaceKinds.map((e) => _token(e, 'allowedInterfaceKind')),
+         allowedInterfaceKinds.map(
+           (e) => elv5PhysicalToken(e, 'allowedInterfaceKind'),
+         ),
        ),
        allowedCategoryTokens = Set.unmodifiable(
-         allowedCategoryTokens.map((e) => _token(e, 'allowedCategoryToken')),
+         allowedCategoryTokens.map(
+           (e) => elv5PhysicalToken(e, 'allowedCategoryToken'),
+         ),
        ),
        sections = List.unmodifiable(sections),
        expectedPwr06InputFingerprintByDeliveryId = Map.unmodifiable(
@@ -324,16 +331,6 @@ Map<String, String> _fingerprints(Map<String, String> values) =>
       for (final entry in values.entries)
         _text(entry.key, 'deliveryId'): _sha(entry.value, 'inputFingerprint'),
     };
-
-String _medium(String value) {
-  final normalized = _token(value, 'mediumCode');
-  if (!const <String>{'COPPER', 'FIBER', 'OTHER'}.contains(normalized)) {
-    throw ArgumentError('Unsupported CCTV06 medium $normalized');
-  }
-  return normalized;
-}
-
-String _token(String value, String field) => _text(value, field).toUpperCase();
 
 String _text(String value, String field) {
   final normalized = value.trim();
