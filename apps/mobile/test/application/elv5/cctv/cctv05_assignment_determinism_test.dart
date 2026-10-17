@@ -70,7 +70,7 @@ final class _Recorder implements Elv5CctvRecorderFactStore {
     required String designRevisionId,
     required String recorderId,
   }) async {
-    final rows = <Map<String,Object?>>[
+    final baseRows = <Map<String,Object?>>[
       <String,Object?>{
         'assignmentId':'a1','cameraId':'cam-1','encodedStreamId':'main',
         'licenseChannelId':'ch-1','storagePoolId':'pool-1',
@@ -80,7 +80,7 @@ final class _Recorder implements Elv5CctvRecorderFactStore {
         'licenseChannelId':'ch-2','storagePoolId':'pool-1',
       },
     ];
-    if (reversed) rows.reverse();
+    final rows = reversed ? baseRows.reversed.toList() : baseRows;
     return Elv5CctvRecorderSnapshot(
       aggregateId: 'rec-bind',
       recorderId: 'rec-1',
