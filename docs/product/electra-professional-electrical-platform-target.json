@@ -1,0 +1,91 @@
+{
+  "schema": "electra.professional-electrical-platform-target.v1",
+  "status": "TARGET_NOT_IMPLEMENTATION_NOT_ACCEPTANCE",
+  "productStatement": "One engineering model for building electrical power and ELV: design, calculate, validate, audit, document and verify.",
+  "primaryDifferentiators": [
+    "POWER_PLUS_ELV_ONE_MODEL",
+    "TRACEABLE_REPRODUCIBLE_CALCULATIONS",
+    "OFFLINE_FIRST_MOBILE_WORKFLOW",
+    "AUTOMATIC_PROJECT_AUDIT",
+    "MODEL_DERIVED_PROFESSIONAL_DELIVERABLES"
+  ],
+  "capabilities": [
+    {"code":"CAP-01","name":"Project Model","priority":"P0","target":"ACCEPTED"},
+    {"code":"CAP-02","name":"Electrical Topology","priority":"P0","target":"ACCEPTED"},
+    {"code":"CAP-03","name":"Sources and Transformation","priority":"P1","target":"ACCEPTED"},
+    {"code":"CAP-04","name":"Loads and Demand","priority":"P0","target":"ACCEPTED"},
+    {"code":"CAP-05","name":"Switchboards Panelboards MCC","priority":"P0","target":"ACCEPTED"},
+    {"code":"CAP-06","name":"Cables Conductors Containment","priority":"P0","target":"ACCEPTED"},
+    {"code":"CAP-07","name":"Core Electrical Calculations","priority":"P0","target":"ACCEPTED"},
+    {"code":"CAP-08","name":"Protection and Coordination","priority":"P0","target":"ACCEPTED"},
+    {"code":"CAP-09","name":"Motors and Drives","priority":"P1","target":"ACCEPTED"},
+    {"code":"CAP-10","name":"Earthing Bonding SPD","priority":"P1","target":"ACCEPTED"},
+    {"code":"CAP-11","name":"Lighting and Small Power","priority":"P1","target":"ACCEPTED"},
+    {"code":"CAP-12","name":"ELV CCTV LAN ACS FIRE","priority":"P0","target":"ACCEPTED"},
+    {"code":"CAP-13","name":"Operating Scenarios","priority":"P1","target":"ACCEPTED"},
+    {"code":"CAP-14","name":"Reliability and Failure Analysis","priority":"P2","target":"ACCEPTED"},
+    {"code":"CAP-15","name":"Normative Validation","priority":"P0","target":"ACCEPTED"},
+    {"code":"CAP-16","name":"Equipment Selection","priority":"P1","target":"ACCEPTED"},
+    {"code":"CAP-17","name":"Single Line Diagram","priority":"P0","target":"ACCEPTED"},
+    {"code":"CAP-18","name":"Automatic Project Audit","priority":"P0","target":"ACCEPTED"},
+    {"code":"CAP-19","name":"Professional Deliverables","priority":"P0","target":"ACCEPTED"},
+    {"code":"CAP-20","name":"Collaboration and Sharing","priority":"P2","target":"ACCEPTED"},
+    {"code":"CAP-21","name":"Field Verification and Commissioning","priority":"P2","target":"ACCEPTED"}
+  ],
+  "minimumMarketableProfessionalRelease": [
+    "CAP-01",
+    "CAP-02",
+    "CAP-04",
+    "CAP-05",
+    "CAP-06",
+    "CAP-07",
+    "CAP-08",
+    "CAP-12",
+    "CAP-15",
+    "CAP-17",
+    "CAP-18",
+    "CAP-19",
+    "OFFLINE_FIRST"
+  ],
+  "targetElectricalProgram": [
+    {"code":"ELEC1","name":"Electrical Domain Foundation"},
+    {"code":"ELEC2","name":"Sources Transformer Generator ATS"},
+    {"code":"ELEC3","name":"Switchboards Panelboards MCC"},
+    {"code":"ELEC4","name":"Short Circuit Protection Selectivity"},
+    {"code":"ELEC5","name":"Motors Drives Operating States"},
+    {"code":"ELEC6","name":"Earthing Bonding SPD"},
+    {"code":"ELEC7","name":"Lighting Small Power Emergency Lighting"},
+    {"code":"ELEC8","name":"Electrical Scenarios Reliability SPOF"},
+    {"code":"ELEC9","name":"SLD Audit Professional Dossier Integration"}
+  ],
+  "maturityModel": [
+    "DESIGNED",
+    "KERNEL_IMPLEMENTED",
+    "RUNTIME_INTEGRATED",
+    "QUALIFIED",
+    "ACCEPTED",
+    "MARKET_VALIDATED"
+  ],
+  "scopeGuardQuestions": [
+    "WHAT_IS_ELECTRICALLY_CONNECTED_TO_WHAT",
+    "WHAT_POWERS_THIS_ASSET_AND_THROUGH_WHICH_PATH",
+    "WHAT_IS_THE_ELECTRICAL_LOAD_CURRENT_POWER_STATE",
+    "IS_THE_CONDUCTOR_DISTRIBUTION_PATH_ADEQUATE",
+    "IS_PROTECTION_ADEQUATE_AND_COORDINATED",
+    "WHAT_HAPPENS_UNDER_AN_OPERATING_OR_FAILURE_SCENARIO",
+    "IS_THE_DESIGN_COMPLIANT_WITH_THE_SELECTED_PROFILE",
+    "WHICH_EQUIPMENT_SATISFIES_THE_ENGINEERING_REQUIREMENT",
+    "WHAT_BELONGS_IN_PROFESSIONAL_DELIVERABLES",
+    "WHAT_WAS_INSTALLED_AND_VERIFIED_IN_THE_FIELD"
+  ],
+  "explicitlyDeferredAdvancedCapabilities": [
+    "ADVANCED_HARMONICS",
+    "ARC_FLASH",
+    "ELECTROMAGNETIC_TRANSIENTS",
+    "FULL_MV_HV_STUDIES",
+    "ADVANCED_RELAY_ENGINEERING",
+    "FULL_BIM_AUTHORING",
+    "CFD",
+    "GENERIC_MEP_SOLVERS"
+  ]
+}
