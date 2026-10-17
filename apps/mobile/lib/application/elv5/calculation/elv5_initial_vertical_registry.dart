@@ -9,6 +9,8 @@ import '../cctv/cctv02_runtime.dart';
 import '../cctv/cctv03_runtime.dart';
 import '../cctv/elv5_cctv_persistence.dart';
 import '../fire/elv5_fire_persistence.dart';
+import '../fire/fa01_address_capacity_contract.dart';
+import '../fire/fa01_runtime.dart';
 import '../fire/fa02_runtime.dart';
 import '../fire/fa03_runtime.dart';
 import '../fire/fa03_terminal_voltage_contract.dart';
@@ -42,6 +44,7 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
   required Acs03ElectricalContractSource acs03Contracts,
   required Acs04SourceRequirementContractSource acs04Contracts,
   required Acs05AutonomyContractSource acs05Contracts,
+  required Fa01AddressCapacityContractSource fa01Contracts,
   required Fa03TerminalVoltageContractSource fa03Contracts,
   required Fa04SourceRequirementContractSource fa04Contracts,
   required Fa05AutonomyContractSource fa05Contracts,
@@ -127,6 +130,17 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
         ),
       ),
       executor: buildAcs05Executor(nowUtc: nowUtc),
+      nowUtc: nowUtc,
+    ),
+    Elv5BlockedAwareTypedProcessCalculationAdapter(
+      resolver: guarded(
+        Fa01PersistedInputResolver(
+          fireStore: fireStore,
+          contractSource: fa01Contracts,
+          nowUtc: nowUtc,
+        ),
+      ),
+      executor: buildFa01Executor(nowUtc: nowUtc),
       nowUtc: nowUtc,
     ),
     Elv5BlockedAwareTypedProcessCalculationAdapter(
