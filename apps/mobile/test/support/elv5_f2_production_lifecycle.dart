@@ -151,7 +151,6 @@ final class Elv5F2ProductionLifecycle {
     });
     await seed(db);
     expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
-    await emitF2PersistedWitness(db, process.wireCode);
     final initial = await runtime(
       db,
     ).service.execute(command('initial', await revision(), 0));
