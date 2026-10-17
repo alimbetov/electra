@@ -1,0 +1,142 @@
+{
+  "schema": "electra.smart-building-home-automation-target.v1",
+  "status": "TARGET_NORTH_STAR_NOT_IMPLEMENTATION_NOT_ACCEPTANCE",
+  "killerCapabilityId": "K13",
+  "name": "Smart Building & Home Automation Designer",
+  "productBoundary": {
+    "electraOwns": [
+      "DESIGN",
+      "CALCULATE",
+      "PLACE",
+      "CONNECT",
+      "VALIDATE",
+      "SIMULATE",
+      "DOCUMENT",
+      "COMMISSION"
+    ],
+    "externalRuntimeOwns": [
+      "RUN",
+      "CONTROL",
+      "AUTOMATE",
+      "MONITOR"
+    ]
+  },
+  "capabilities": [
+    {
+      "id": "SH-01",
+      "name": "Automation topology",
+      "outputs": ["automation_network", "automation_segment", "controller", "gateway", "bus_power_supply", "sensor", "actuator", "communication_binding"]
+    },
+    {
+      "id": "SH-02",
+      "name": "Electrical-load binding",
+      "outputs": ["control_path", "electrical_path", "availability_axes", "dependency_trace"]
+    },
+    {
+      "id": "SH-03",
+      "name": "Lighting automation / DALI",
+      "outputs": ["dali_subnet", "control_gear", "control_device", "group", "scene", "gateway_binding"]
+    },
+    {
+      "id": "SH-04",
+      "name": "KNX engineering",
+      "outputs": ["knx_area", "knx_line", "knx_device_binding", "address_validation", "bus_power_validation", "spof_dependency"]
+    },
+    {
+      "id": "SH-05",
+      "name": "Matter / Thread / Zigbee / Z-Wave / Wi-Fi / PLC-IoT",
+      "outputs": ["protocol_binding", "transport_binding", "mesh_or_ip_segment", "gateway_dependency"]
+    },
+    {
+      "id": "SH-06",
+      "name": "Scenes and control logic",
+      "outputs": ["automation_scene", "trigger", "conditions", "commands", "targets", "priority", "fallback", "override_policy"]
+    },
+    {
+      "id": "SH-07",
+      "name": "Automation failure simulation",
+      "outputs": ["electrical_availability", "control_availability", "communication_availability", "degraded_state", "failure_trace"]
+    },
+    {
+      "id": "SH-08",
+      "name": "Smart Room Wizard",
+      "outputs": ["automation_candidates", "sensor_candidates", "actuator_candidates", "control_bindings", "scene_candidates"]
+    },
+    {
+      "id": "SH-09",
+      "name": "Control / I-O matrices",
+      "outputs": ["control_matrix", "io_schedule", "sensor_schedule", "actuator_schedule", "knx_schedule", "dali_schedule", "scene_schedule", "commissioning_checklist"]
+    },
+    {
+      "id": "SH-10",
+      "name": "Automation Audit",
+      "outputs": ["spof_findings", "address_findings", "channel_findings", "gateway_findings", "fallback_findings", "security_findings", "commissioning_findings"]
+    }
+  ],
+  "protocolFamilies": [
+    "KNX_CLASSIC",
+    "KNX_IP",
+    "KNX_SECURE",
+    "KNX_IOT",
+    "DALI_2",
+    "D4I",
+    "DALI_PLUS",
+    "MATTER",
+    "THREAD",
+    "ZIGBEE",
+    "ZWAVE",
+    "ZWAVE_LONG_RANGE",
+    "WIFI",
+    "PLC_IOT",
+    "MODBUS_RTU",
+    "MODBUS_TCP",
+    "BACNET_IP"
+  ],
+  "domainInvariants": [
+    "K13-01_PROTOCOL_AGNOSTIC_PRIMARY_MODEL",
+    "K13-02_PROTOCOL_AND_TRANSPORT_ARE_SEPARATE",
+    "K13-03_ELECTRICAL_AND_CONTROL_AVAILABILITY_ARE_SEPARATE_AXES",
+    "K13-04_CONTROLLED_LOAD_REMAINS_REAL_ELECTRICAL_ASSET",
+    "K13-05_CANDIDATE_BEFORE_MUTATION",
+    "K13-06_DETERMINISTIC_VALIDATION_BEFORE_ACCEPTANCE",
+    "K13-07_LIFE_SAFETY_OVERRIDES_COMFORT_POLICY",
+    "K13-08_UNKNOWN_ENGINEERING_FACTS_FAIL_VISIBLY",
+    "K13-09_NO_SECRET_CREDENTIALS_IN_ENGINEERING_MODEL",
+    "K13-10_RUNTIME_SMART_HOME_PLATFORM_IS_OUT_OF_SCOPE"
+  ],
+  "regionalProfiles": {
+    "USA": ["MATTER", "THREAD", "ZWAVE_LONG_RANGE", "ZIGBEE", "WIFI", "HOME_ENERGY_MANAGEMENT"],
+    "EUROPE": ["KNX", "DALI", "MATTER", "THREAD", "BACNET", "MODBUS", "ENERGY_ORCHESTRATION"],
+    "CIS": ["ZIGBEE", "WIFI", "MATTER", "LOCAL_OFFLINE_HUBS", "KNX_HIGH_END"],
+    "CHINA": ["PLC_IOT", "WHOLE_HOME_INTELLIGENCE", "ZIGBEE", "WIFI", "MATTER_BRIDGES", "ENERGY_MANAGEMENT"]
+  },
+  "killerCapabilityDependencies": ["K12", "K0", "K2", "K3", "K6", "K7"],
+  "extendedSynergies": ["K1", "K4", "K5", "K8", "K9", "K10", "K11"],
+  "candidateWorkflow": ["GENERATE", "PREVIEW", "VALIDATE", "SIMULATE", "EDIT", "ACCEPT"],
+  "referenceAcceptanceScenarios": [
+    "NORMAL_OPERATION",
+    "AUTOMATION_BUS_OR_POWER_SUPPLY_FAILURE",
+    "GATEWAY_FAILURE",
+    "ELECTRICAL_SOURCE_LOSS",
+    "LOCAL_MANUAL_FALLBACK",
+    "EMERGENCY_LIFE_SAFETY_OVERRIDE",
+    "REVISION_INVALIDATES_BINDINGS",
+    "DESIGN_VS_INSTALLED_DEVIATION",
+    "DETERMINISTIC_REPLAY",
+    "NO_FALSE_PASS_SENTINELS"
+  ],
+  "nonGoals": [
+    "HOME_ASSISTANT_RUNTIME",
+    "APPLE_HOME_RUNTIME",
+    "GOOGLE_HOME_RUNTIME",
+    "ALEXA_RUNTIME",
+    "ALICE_RUNTIME",
+    "KNX_ETS_REPLACEMENT",
+    "VENDOR_CLOUD",
+    "MQTT_BROKER",
+    "NVR_PLATFORM",
+    "VOICE_ASSISTANT",
+    "GENERIC_IOT_BACKEND",
+    "SCADA_RUNTIME"
+  ]
+}
