@@ -364,7 +364,8 @@ step must not promote qualification before its preceding gate is satisfied.
 
 ### FA-03 Q6 verified checkpoint
 
-Steps 1–3 are complete. Step 4 is next; steps 4–9 remain open.
+At this historical FA-03 checkpoint, steps 1–3 were complete. The current
+production-wave checkpoint below supersedes that progress position.
 
 - Verified source commit: `f9def8bbad951ccc6bef7b576600a459a05862d0`.
 - [Flutter Local Foundation run 39046456889](https://github.com/alimbetov/electra/actions/runs/39046456889): PASS.
@@ -378,6 +379,32 @@ Steps 1–3 are complete. Step 4 is next; steps 4–9 remain open.
   obligation in step 7.
 - Full process qualification, automatic provenance and ELV5 acceptance remain
   pending. This checkpoint does not satisfy those gates.
+
+### Production qualification wave checkpoint
+
+The baseline harness is integrated. FA-08 Q6/Q7/Q8/Q9 are verified on
+`0f7e9a9d78be11629793c33f470b723c1e98f8a6` by
+[run 39054479428](https://github.com/alimbetov/electra/actions/runs/39054479428).
+Both formatters/analyzers pass; mobile: 457 passed, 1 skipped; core: 485 passed.
+Verification logs: artifact `12109445841`. The historical migration skip is
+still an explicit global-suite obligation.
+
+| Wave | Processes | Current gate |
+| --- | --- | --- |
+| 0 | CCTV-03, LAN-05, ACS-03, FA-03 | Baseline harness integrated; final reconciliation/seal pending |
+| 1 | FA-08 | Production Q6–Q9 CI verified; full qualification/seal pending |
+| 2 | FA-01, FA-02, FA-04, FA-05, FA-06, FA-07 | NEXT — FIRE production witnesses |
+| 3 | ACS-01, ACS-02, ACS-04, ACS-05, ACS-06 | Pending FIRE exact-SHA barrier |
+| 4 | LAN-01, LAN-02, LAN-03, LAN-04, LAN-06, LAN-07 | Pending ACS exact-SHA barrier |
+| 5 | CCTV-01, CCTV-02, CCTV-04, CCTV-05, CCTV-06 | Pending LAN exact-SHA barrier |
+
+These are 27 distinct process codes. Each wave requires its own complete
+exact-SHA CI barrier. After all witnesses exist, reconcile all 27 records,
+generate the execution-backed witness matrix, seal provenance, run the global
+rollback/CAS/restart/freeze/fault suite, then require final exact-SHA CI before
+acceptance. Q0–Q5 and automatic provenance remain pending for FA-08; this record
+is not a `QUALIFIED` or `ACCEPTED` claim. The status-recording commit seals the
+already-tested source commit and is not itself represented as verified code.
 
 ## 7. Current adoption baseline
 
