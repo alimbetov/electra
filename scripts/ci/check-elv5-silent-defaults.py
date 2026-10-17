@@ -10,6 +10,7 @@ persisted/pinned engineering facts.
 Structural identities are allowed when they are explicit and semantics-preserving:
 * `?.length ?? 0` is empty-set cardinality;
 * a named `_zero...` value is an explicit additive identity;
+* a missing persistence cursor starts operational generation/head at zero;
 * `?? throw`, including formatter-wrapped `(throw ...)`, is fail-closed.
 
 A reviewed exception must be placed on the same line as the expression using:
@@ -43,6 +44,9 @@ HOST_LOCAL_TEMPORAL = re.compile(
     r"(?:\.toLocal\s*\(\)|Platform\.localeName)"
 )
 NAMED_ZERO_IDENTITY = re.compile(r"^_zero[A-Za-z0-9_]*[,;)]?$", re.IGNORECASE)
+CURSOR_ZERO_IDENTITY = re.compile(
+    r"cursor\?\.read<int>\(['\"](?:generation|head_sequence)['\"]\)\s*$"
+)
 
 
 @dataclass(frozen=True)
@@ -75,6 +79,8 @@ def _has_reviewed_exception(line: str) -> bool:
 def _is_structural_identity(left: str, right: str) -> bool:
     right = right.strip()
     if re.search(r"\?\.length\s*$", left) and re.match(r"^0\b", right):
+        return True
+    if CURSOR_ZERO_IDENTITY.search(left) and re.match(r"^0\b", right):
         return True
     return NAMED_ZERO_IDENTITY.match(right) is not None
 
