@@ -195,7 +195,12 @@ final class Elv5F2ProductionLifecycle {
     expect(changed.generation, 3);
 
     // Separate SQLite connections and production runtimes contend for one CAS.
+    // SQLite may serialize BEGIN IMMEDIATE before the ELV5 pointer CAS executes;
+    // wait through that physical writer lock so the losing writer is judged by
+    // the logical generation precondition rather than by transient SQLITE_BUSY.
     final competingDb = AppDatabase(NativeDatabase(file));
+    await db.customStatement('PRAGMA busy_timeout = 5000');
+    await competingDb.customStatement('PRAGMA busy_timeout = 5000');
     Future<({Elv5WireCommandEnvelope command, String? logical, Object? error})>
     attempt(AppDatabase database, String id) async {
       final cmd = command(id, designRevision, 3);
