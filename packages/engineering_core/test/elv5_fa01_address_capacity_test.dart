@@ -36,6 +36,31 @@ void main() {
     expect(result.status, Fa01AssessmentStatus.pass);
   });
 
+  test('profile physical-device contribution is independent from assignment count', () {
+    final result = const Fa01AddressCapacityKernel().evaluate(
+      Fa01Input(
+        loopId: 'loop-1',
+        devices: [
+          Fa01DeviceAssignment(
+            deviceId: 'dual-device-module',
+            addresses: {
+              Fa01AddressKey(domainId: 'L1', address: 1),
+              Fa01AddressKey(domainId: 'L1', address: 2),
+            },
+            expectedConsumption: 2,
+            physicalDeviceCountContribution: 2,
+          ),
+        ],
+        reserved: {},
+        policy: Fa01CapacityPolicy(deviceLimit: 2, addressLimit: 2),
+      ),
+    );
+    expect(result.deviceCount, 2);
+    expect(result.addressCount, 2);
+    expect(result.deviceHeadroom, 0);
+    expect(result.status, Fa01AssessmentStatus.pass);
+  });
+
   test('expanded multi-address overlap is detected', () {
     final result = const Fa01AddressCapacityKernel().evaluate(
       Fa01Input(
@@ -72,7 +97,11 @@ void main() {
       Fa01Input(
         loopId: 'loop-1',
         devices: [
-          Fa01DeviceAssignment(deviceId: 'd1', addresses: {key}, expectedConsumption: 1),
+          Fa01DeviceAssignment(
+            deviceId: 'd1',
+            addresses: {key},
+            expectedConsumption: 1,
+          ),
         ],
         reserved: {key},
         policy: Fa01CapacityPolicy(deviceLimit: 2, addressLimit: 2),
