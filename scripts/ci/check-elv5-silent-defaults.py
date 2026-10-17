@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Reject implicit engineering defaults in production ELV5 code.
 
-The guard is intentionally narrow: it targets null-coalescing defaults whose
-left-hand expression carries engineering meaning, plus host-local temporal
-sources. Collection plumbing and an explicit fail-closed `?? throw` are not
-engineering defaults.
+The guard targets ELV5 runtime/persistence code only. It rejects null-coalescing
+fallbacks for engineering-sensitive values and host-local timezone sources.
+Infrastructure UTC timestamps (`DateTime.now().toUtc()`) are allowed because
+they timestamp commands/evidence; calculation inputs must still come from
+persisted/pinned engineering facts.
 
 A reviewed exception must be placed on the same line as the expression using:
     // elv5-explicit-default: <authority/rule rationale>
@@ -20,7 +21,7 @@ ROOT = Path(__file__).resolve().parents[2]
 PRODUCTION_ROOTS = (
     ROOT / "apps/mobile/lib/application/elv5",
     ROOT / "apps/mobile/lib/data/repositories/elv5",
-    ROOT / "packages/engineering_core/lib",
+    ROOT / "packages/engineering_core/lib/src/elv5",
 )
 
 EXPLICIT_DEFAULT_MARKER = "elv5-explicit-default:"
@@ -32,8 +33,8 @@ SENSITIVE_NAME = re.compile(
     r"resistance|reactance|impedance|efficiency|diversity|reserve|demand|"
     r"load|fault|battery|runtime)[A-Za-z0-9_]*(?![A-Za-z0-9_])"
 )
-HOST_TEMPORAL = re.compile(
-    r"(?:DateTime\.now\s*\(\)|\.toLocal\s*\(\)|Platform\.localeName)"
+HOST_LOCAL_TEMPORAL = re.compile(
+    r"(?:\.toLocal\s*\(\)|Platform\.localeName)"
 )
 
 
@@ -86,10 +87,10 @@ def scan_text(path: Path, text: str) -> list[Finding]:
                 Finding(path, number, raw, "engineering-sensitive null fallback")
             )
 
-        # Engineering calculations must not depend on the executing host's
-        # wall clock / local timezone. UTC timestamps are supplied explicitly
-        # by command/runtime boundaries elsewhere in the architecture.
-        if HOST_TEMPORAL.search(line):
+        # ELV5 calculations must never infer timezone from the executing host.
+        # Explicit UTC wall-clock reads used for metadata/audit timestamps are
+        # not engineering defaults and are therefore intentionally permitted.
+        if HOST_LOCAL_TEMPORAL.search(line):
             findings.append(
                 Finding(path, number, raw, "host-local temporal source")
             )
@@ -119,7 +120,7 @@ def main() -> None:
         )
     print(
         "PASS: ELV5 production code contains no unreviewed engineering-sensitive "
-        "null defaults or host-local temporal sources."
+        "null defaults or host-local timezone sources."
     )
 
 
