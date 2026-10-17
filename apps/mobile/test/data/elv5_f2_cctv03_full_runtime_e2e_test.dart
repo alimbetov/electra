@@ -1,3 +1,4 @@
+import '../support/elv5_f2_execution_witness.dart';
 import 'dart:io';
 
 import 'package:drift/drift.dart' show Value, Variable;
@@ -208,6 +209,7 @@ void main() {
       expect(frozenPointer.freshness, 'CURRENT');
       expect(frozenPointer.generation, 3);
       expect(frozenPointer.evaluationId, secondPointer.evaluationId);
+      await emitF2PersistedWitness(db, 'CCTV-03');
       await db.close();
     },
   );

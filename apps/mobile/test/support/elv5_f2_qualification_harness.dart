@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 
 /// Process-neutral observation of the durable ELV5 publication state.
@@ -98,6 +100,7 @@ final class Elv5F2QualificationHarness {
       isNotEmpty,
       reason: '$processCode Q6 must persist an evaluation identity',
     );
+    _emit(processCode, 'Q6_INITIAL', snapshot);
   }
 
   /// Shared Q6 invalidation/republication contract.
@@ -120,6 +123,7 @@ final class Elv5F2QualificationHarness {
       isNot(initial.inputFingerprint),
       reason: '$processCode Q6 mutation must change captured input',
     );
+    _emit(processCode, 'Q6_REPUBLISHED', republished);
   }
 
   /// Shared Q7 durable restart/replay contract.
@@ -129,17 +133,21 @@ final class Elv5F2QualificationHarness {
     Elv5F2PublicationSnapshot restarted,
   ) {
     _assertSameCommittedResult(processCode, committed, restarted, gate: 'Q7');
+    _emit(processCode, 'Q7_REPLAY', restarted);
   }
 
   /// Shared Q7 stale-writer CAS contract.
   Future<void> expectQ7StaleWriter(
     String processCode,
     Future<void> Function() action,
-  ) => _expectFailureCode(
-    action,
-    'ELV5_POINTER_GENERATION_CONFLICT',
-    '$processCode Q7 stale writer',
-  );
+  ) async {
+    await _expectFailureCode(
+      action,
+      'ELV5_POINTER_GENERATION_CONFLICT',
+      '$processCode Q7 stale writer',
+    );
+    _emit(processCode, 'Q7_CAS_REJECTED');
+  }
 
   /// Shared Q8 frozen historical replay contract.
   void assertQ8Replay(
@@ -153,6 +161,7 @@ final class Elv5F2QualificationHarness {
       frozenReplay,
       gate: 'Q8',
     );
+    _emit(processCode, 'Q8_REPLAY', frozenReplay);
   }
 
   /// Shared Q8 fail-closed read-only contract for new work after freeze.
@@ -160,11 +169,14 @@ final class Elv5F2QualificationHarness {
     String processCode,
     Future<void> Function() action, {
     String operation = 'operation',
-  }) => _expectFailureCode(
-    action,
-    'ELV5_DESIGN_REVISION_READ_ONLY',
-    '$processCode Q8 $operation after freeze',
-  );
+  }) async {
+    await _expectFailureCode(
+      action,
+      'ELV5_DESIGN_REVISION_READ_ONLY',
+      '$processCode Q8 $operation after freeze',
+    );
+    _emit(processCode, 'Q8_READ_ONLY');
+  }
 
   void _assertCurrentPublication(
     Elv5F2PublicationSnapshot snapshot, {
@@ -234,4 +246,24 @@ final class Elv5F2QualificationHarness {
       reason: '$reason must expose $code',
     );
   }
+}
+
+void _emit(
+  String processCode,
+  String stage, [
+  Elv5F2PublicationSnapshot? snapshot,
+]) {
+  const source = String.fromEnvironment('ELECTRA_SOURCE_SHA');
+  if (source.isEmpty) return;
+  // Machine reporter associates this event with the executing test. A collector
+  // must still require a successful testDone and complete successful suite.
+  print(
+    'ELV5_F2_WITNESS:${jsonEncode({
+      'schema': 'electra.elv5-f2-lifecycle-event.v1',
+      'processCode': processCode,
+      'sourceSha': source,
+      'stage': stage,
+      if (snapshot != null) ...{'evaluationId': snapshot.evaluationId, 'pointerGeneration': snapshot.generation, 'inputFingerprint': snapshot.inputFingerprint, 'outputSha256': snapshot.outputSha256, 'freshness': snapshot.freshness, 'execution': snapshot.execution, 'completion': snapshot.completion},
+    })}',
+  );
 }

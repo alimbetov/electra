@@ -1,3 +1,4 @@
+import '../support/elv5_f2_execution_witness.dart';
 import 'package:electra_mobile/application/elv5/commands/elv5_replacement_command_runner.dart';
 import 'dart:convert';
 import 'dart:io';
@@ -364,6 +365,7 @@ void main() {
         ))?.bindingRevision,
         2,
       );
+      await emitF2PersistedWitness(db, 'FA-08');
     },
   );
   for (final source in ['ampacity', 'policy']) {

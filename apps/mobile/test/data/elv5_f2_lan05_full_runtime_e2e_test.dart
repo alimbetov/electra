@@ -1,3 +1,4 @@
+import '../support/elv5_f2_execution_witness.dart';
 import 'dart:convert';
 import 'dart:io';
 
@@ -259,6 +260,7 @@ void main() {
       expect(frozenPointer.freshness, 'CURRENT');
       expect(frozenPointer.generation, 3);
       expect(frozenPointer.evaluationId, secondPointer.evaluationId);
+      await emitF2PersistedWitness(db, 'LAN-05');
       await db.close();
     },
   );

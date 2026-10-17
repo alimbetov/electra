@@ -11,6 +11,7 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'elv5_f2_qualification_harness.dart';
+import 'elv5_f2_execution_witness.dart';
 
 /// File-backed production qualification. Callbacks supply authoritative source
 /// writes and domain assertions only; resolvers/executors are never injected.
@@ -150,6 +151,7 @@ final class Elv5F2ProductionLifecycle {
     });
     await seed(db);
     expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
+    await emitF2PersistedWitness(db, process.wireCode);
     final initial = await runtime(
       db,
     ).service.execute(command('initial', await revision(), 0));
@@ -350,6 +352,7 @@ final class Elv5F2ProductionLifecycle {
       ledger.map((r) => r.data).toList(),
     );
     expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
+    await emitF2PersistedWitness(db, process.wireCode);
   }
 }
 

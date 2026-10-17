@@ -1,3 +1,4 @@
+import '../support/elv5_f2_execution_witness.dart';
 import 'dart:convert';
 import 'dart:io';
 
@@ -214,6 +215,7 @@ void main() {
       final frozenPointer = await _acsPointer(db);
       expect(frozenPointer.generation, 1);
       expect(frozenPointer.evaluationId, pointerBeforeRestart.evaluationId);
+      await emitF2PersistedWitness(db, 'ACS-03');
       await db.close();
     },
   );
