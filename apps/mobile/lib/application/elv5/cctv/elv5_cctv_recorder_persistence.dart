@@ -15,13 +15,16 @@ final class Elv5CctvRecorderSnapshot {
   final Map<String, Object?> payload;
 }
 
-abstract interface class Elv5CctvRecorderMutationStore {
+abstract interface class Elv5CctvRecorderFactStore {
   Future<Elv5CctvRecorderSnapshot?> loadRecorder({
     required String projectId,
     required String designRevisionId,
     required String recorderId,
   });
+}
 
+abstract interface class Elv5CctvRecorderMutationStore
+    implements Elv5CctvRecorderFactStore {
   Future<void> replaceRecorder({
     required String projectId,
     required String designRevisionId,
