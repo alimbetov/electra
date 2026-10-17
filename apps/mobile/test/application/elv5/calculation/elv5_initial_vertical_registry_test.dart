@@ -26,8 +26,10 @@ void main() {
         Elv5ProcessCode.acs04,
         Elv5ProcessCode.acs05,
         Elv5ProcessCode.fa02,
+        Elv5ProcessCode.fa04,
+        Elv5ProcessCode.fa05,
       }),
     );
-    expect(runtime.registry.registeredCodes, hasLength(8));
+    expect(runtime.registry.registeredCodes, hasLength(10));
   });
 }
