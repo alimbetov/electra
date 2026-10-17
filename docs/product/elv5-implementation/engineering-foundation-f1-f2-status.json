@@ -1,0 +1,114 @@
+{
+  "schema": "electra.engineering-foundation-f1-f2-status.v1",
+  "branch": "feat/flutter-elv5-power-topology-design",
+  "status": "ACTIVE",
+  "acceptanceClaimed": false,
+  "runtimeBaseline": {
+    "processCount": 27,
+    "productionAdapters": 21,
+    "remainingAdapters": 6,
+    "byDiscipline": {
+      "ACS": {"integrated": 6, "total": 6},
+      "FIRE": {"integrated": 8, "total": 8},
+      "LAN": {"integrated": 5, "total": 7},
+      "CCTV": {"integrated": 2, "total": 6}
+    },
+    "remaining": [
+      "LAN-06",
+      "LAN-07",
+      "CCTV-01",
+      "CCTV-04",
+      "CCTV-05",
+      "CCTV-06"
+    ]
+  },
+  "foundationStages": {
+    "F0": {
+      "name": "FOUNDATION_AUTHORITY",
+      "lifecycle": "DESIGNED",
+      "status": "COMPLETE_AS_DESIGN_AUTHORITY",
+      "qualified": false,
+      "accepted": false
+    },
+    "F1": {
+      "name": "SHARED_PRIMITIVES_RECONCILIATION",
+      "status": "IN_PROGRESS",
+      "exitGateSatisfied": false,
+      "workItems": {
+        "quantityInventory": "TODO_AUDIT_EXISTING_FIRST",
+        "typedEvidenceReconciliation": "TODO_AUDIT_EXISTING_FIRST",
+        "unknownFailClosedAudit": "TODO",
+        "provenanceGraph": "PARTIAL_EXISTING_PRIMITIVES_TO_RECONCILE",
+        "calculationIdentity": "PARTIAL_EXISTING_PRIMITIVES_TO_RECONCILE",
+        "deterministicCanonicalization": "PARTIAL_EXISTING_PRIMITIVES_TO_RECONCILE",
+        "independentStatusAxes": "IMPLEMENTED_IN_ELV5_RUNTIME",
+        "governingCasePrimitive": "PARTIAL_PROCESS_SPECIFIC",
+        "sharedQualificationSupport": "TODO"
+      }
+    },
+    "F2": {
+      "name": "PILOT_QUALIFICATION",
+      "status": "NOT_QUALIFIED",
+      "exitGateSatisfied": false,
+      "pilots": [
+        {
+          "id": "AMPACITY_ROUTE_IZ",
+          "implementation": "RUNTIME_FOUNDATION_EXISTS",
+          "lifecycle": "RUNTIME_INTEGRATED_PARTIAL",
+          "qualification": {"Q0": "PARTIAL", "Q1": "PARTIAL", "Q2": "TODO", "Q3": "PARTIAL", "Q4": "PARTIAL", "Q5": "TODO", "Q6": "PARTIAL", "Q7": "TODO", "Q8": "TODO", "Q9": "TODO_IF_APPLICABLE"}
+        },
+        {
+          "id": "FA-03",
+          "implementation": "PRODUCTION_ADAPTER_PRESENT",
+          "lifecycle": "RUNTIME_INTEGRATED",
+          "qualification": {"Q0": "PARTIAL", "Q1": "PARTIAL", "Q2": "TODO", "Q3": "PARTIAL", "Q4": "TODO", "Q5": "TODO", "Q6": "PARTIAL", "Q7": "TODO", "Q8": "TODO", "Q9": "TODO_IF_APPLICABLE"}
+        },
+        {
+          "id": "ACS-03",
+          "implementation": "PRODUCTION_ADAPTER_PRESENT",
+          "lifecycle": "RUNTIME_INTEGRATED",
+          "canonicalOracle": "23.51 V / +1.51 V where applicable",
+          "qualification": {"Q0": "PARTIAL", "Q1": "PARTIAL", "Q2": "TODO_INDEPENDENT", "Q3": "PARTIAL", "Q4": "TODO", "Q5": "TODO", "Q6": "PARTIAL", "Q7": "TODO", "Q8": "TODO", "Q9": "TODO_IF_APPLICABLE"}
+        },
+        {
+          "id": "CCTV-03",
+          "implementation": "PRODUCTION_ADAPTER_PRESENT",
+          "lifecycle": "RUNTIME_INTEGRATED",
+          "qualification": {"Q0": "PARTIAL", "Q1": "PARTIAL", "Q2": "TODO", "Q3": "PARTIAL", "Q4": "TODO", "Q5": "TODO", "Q6": "PARTIAL", "Q7": "TODO", "Q8": "TODO", "Q9": "TODO_IF_APPLICABLE"}
+        },
+        {
+          "id": "LAN-05",
+          "implementation": "PRODUCTION_ADAPTER_PRESENT",
+          "lifecycle": "RUNTIME_INTEGRATED",
+          "qualification": {"Q0": "PARTIAL", "Q1": "PARTIAL", "Q2": "TODO_INDEPENDENT", "Q3": "PARTIAL", "Q4": "TODO", "Q5": "TODO", "Q6": "PARTIAL", "Q7": "TODO", "Q8": "TODO", "Q9": "TODO_IF_APPLICABLE"}
+        }
+      ]
+    }
+  },
+  "executionOrder": {
+    "runtimeTrack": ["LAN-06", "LAN-07", "CCTV-04", "CCTV-01", "CCTV-05", "CCTV-06"],
+    "foundationTrack": [
+      "F1_INVENTORY_AND_AUDIT",
+      "F1_FALSE_PASS_AND_DETERMINISM_DEFECT_FIXES",
+      "F1_SHARED_QUALIFICATION_SUPPORT",
+      "F2_AMPACITY_ROUTE_IZ",
+      "F2_FA-03",
+      "F2_ACS-03",
+      "F2_LAN-05",
+      "F2_CCTV-03",
+      "F2_EXACT_SHA_QUALIFICATION_MATRIX"
+    ]
+  },
+  "priorityOverride": "Any F1 defect capable of false PASS, nondeterministic hash, stale-current publication or provenance loss preempts new vertical work.",
+  "reportingRequirements": [
+    "exactHeadSha",
+    "runtimeIntegrationCount",
+    "processLifecycle",
+    "F1GateStatus",
+    "F2Q0ToQ9Status",
+    "actuallyExecutedCIAnalyzeTests",
+    "knownBlockersAndDebts"
+  ],
+  "qualificationPromotionRule": "No pilot may become QUALIFIED without all applicable mandatory Q gates backed by exact-source-SHA evidence.",
+  "acceptancePromotionRule": "ACCEPTED additionally requires stage acceptance pinned to exact source SHA and authority fingerprint."
+}
