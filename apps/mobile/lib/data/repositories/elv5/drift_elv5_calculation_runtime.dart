@@ -5,6 +5,7 @@ import '../../../application/elv5/environment/ampacity_route_resolver.dart';
 import '../../database/app_database.dart';
 import '../drift_elv_cable_run_repository.dart';
 import 'drift_acs01_role_profile_contract_store.dart';
+import 'drift_acs02_resource_contract_store.dart';
 import 'drift_acs03_electrical_contract_store.dart';
 import 'drift_acs04_source_requirement_contract_store.dart';
 import 'drift_acs05_autonomy_contract_store.dart';
@@ -28,14 +29,8 @@ import 'drift_fa08_policy_contract_store.dart';
 import 'drift_fa08_route_cable_fact_source.dart';
 import 'drift_lan05_optical_section_evidence_source.dart';
 
-/// Production composition root for the persisted ELV5 calculation vertical.
-/// Application runtime depends on interfaces; Drift construction remains here
-/// at the data edge.
 final class DriftElv5CalculationRuntime {
-  DriftElv5CalculationRuntime._({
-    required this.registry,
-    required this.service,
-  });
+  DriftElv5CalculationRuntime._({required this.registry, required this.service});
 
   final Elv5ProcessCalculationRegistry registry;
   final Elv5CalculationService service;
@@ -45,26 +40,12 @@ final class DriftElv5CalculationRuntime {
     String originDeviceId = 'local-device',
     DateTime Function()? nowUtc,
   }) {
-    final cctvFacts = DriftElv5CctvCalculationFactStore(
-      database,
-      originDeviceId: originDeviceId,
-    );
-    final lanFacts = DriftElv5LanCalculationFactStore(
-      database,
-      originDeviceId: originDeviceId,
-    );
-    final acsFacts = DriftElv5AcsCalculationFactStore(
-      database,
-      originDeviceId: originDeviceId,
-    );
-    final fireFacts = DriftElv5FireCalculationFactStore(
-      database,
-      originDeviceId: originDeviceId,
-    );
-    final cableRuns = DriftElvCableRunRepository(
-      database,
-      originDeviceId: originDeviceId,
-    );
+    final cctvFacts = DriftElv5CctvCalculationFactStore(database, originDeviceId: originDeviceId);
+    final lanFacts = DriftElv5LanCalculationFactStore(database, originDeviceId: originDeviceId);
+    final acsFacts = DriftElv5AcsCalculationFactStore(database, originDeviceId: originDeviceId);
+    final fireFacts = DriftElv5FireCalculationFactStore(database, originDeviceId: originDeviceId);
+    final cableRuns = DriftElvCableRunRepository(database, originDeviceId: originDeviceId);
+
     final environmentProfiles = DriftElv5EnvironmentProfileStore(
       database,
       originDeviceId: originDeviceId,
@@ -84,7 +65,13 @@ final class DriftElv5CalculationRuntime {
       environments: environmentResolver,
       sectionEvidence: ampacitySections,
     );
+
     final acs01Contracts = DriftAcs01RoleProfileContractStore(
+      database,
+      originDeviceId: originDeviceId,
+      nowUtc: nowUtc,
+    );
+    final acs02Contracts = DriftAcs02ResourceContractStore(
       database,
       originDeviceId: originDeviceId,
       nowUtc: nowUtc,
@@ -109,6 +96,7 @@ final class DriftElv5CalculationRuntime {
       originDeviceId: originDeviceId,
       nowUtc: nowUtc,
     );
+
     final fa01Contracts = DriftFa01AddressCapacityContractStore(
       database,
       originDeviceId: originDeviceId,
@@ -144,6 +132,7 @@ final class DriftElv5CalculationRuntime {
       originDeviceId: originDeviceId,
       nowUtc: nowUtc,
     );
+
     final currentPowerEvidence = DriftElv4CurrentEvidenceSource(database);
     final registry = buildElv5InitialVerticalRegistry(
       cctvStore: cctvFacts,
@@ -153,6 +142,7 @@ final class DriftElv5CalculationRuntime {
       elv3LinkFacts: DriftElv3RealizedLinkFactSource(database),
       opticalSectionEvidence: DriftLan05OpticalSectionEvidenceSource(database),
       acs01Contracts: acs01Contracts,
+      acs02Contracts: acs02Contracts,
       acs03Contracts: acs03Contracts,
       acs04Contracts: acs04Contracts,
       acs05Contracts: acs05Contracts,
@@ -183,9 +173,6 @@ final class DriftElv5CalculationRuntime {
       originDeviceId: originDeviceId,
       now: nowUtc,
     );
-    return DriftElv5CalculationRuntime._(
-      registry: registry,
-      service: service,
-    );
+    return DriftElv5CalculationRuntime._(registry: registry, service: service);
   }
 }
