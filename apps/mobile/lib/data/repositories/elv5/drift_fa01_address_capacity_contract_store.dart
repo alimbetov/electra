@@ -7,6 +7,7 @@ import '../../../application/elv5/fire/fa01_address_capacity_contract.dart';
 import '../../../application/elv5/fire/fa01_address_capacity_contract_write.dart';
 import '../../database/app_database.dart';
 import '../../database/drift_raw_statement.dart';
+import 'drift_elv5_dependency_invalidator.dart';
 
 final class DriftFa01AddressCapacityContractStore
     implements
@@ -129,6 +130,11 @@ final class DriftFa01AddressCapacityContractStore
     if (revision.read<int>('revision') != command.expectedDesignRevision)
       throw StateError('FA01_DESIGN_REVISION_CONFLICT');
 
+    final previous = await loadActiveForLoop(
+      projectId: command.projectId,
+      designRevisionId: command.designRevisionId,
+      loopId: command.contract.loopId,
+    );
     final payload = command.contract.toCanonicalValue();
     final hash = _encoder.sha256(payload);
     final ref = 'FA01:${command.contract.loopId}:$hash';
@@ -246,6 +252,29 @@ final class DriftFa01AddressCapacityContractStore
       ],
     );
     if (changedDesign != 1) throw StateError('FA01_DESIGN_REVISION_CAS_FAILED');
+    final invalidator = DriftElv5DependencyInvalidator(
+      database,
+      originDeviceId: originDeviceId,
+      nowUtc: _nowUtc,
+    );
+    if (previous != null) {
+      await invalidator.invalidateSubject(
+        projectId: command.projectId,
+        designRevisionId: command.designRevisionId,
+        relationKind: 'POLICY',
+        domain: 'FA01_ADDRESS_CAPACITY_CONTRACT',
+        subjectId: previous.evidenceRef,
+      );
+    } else {
+      // A prior BLOCKED capture still consumes the loop selector.
+      await invalidator.invalidateSubject(
+        projectId: command.projectId,
+        designRevisionId: command.designRevisionId,
+        relationKind: 'SET',
+        domain: 'FIRE_LOOP',
+        subjectId: command.contract.loopId,
+      );
+    }
   });
 
   String _canonical(Object? value) =>
