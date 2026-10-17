@@ -154,9 +154,7 @@ final class DriftElv4OperatingFactSource implements Elv4OperatingFactSource {
           originId: row.read<String>('origin_id'),
           stateCode: row.read<String>('state_code'),
           currentA: demand.currentA,
-          accountingKind: _accountingKind(
-            row.read<String>('accounting_kind'),
-          ),
+          accountingKind: _accountingKind(row.read<String>('accounting_kind')),
         ),
       );
     }
