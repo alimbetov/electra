@@ -163,6 +163,13 @@ final class Fa06PersistedInputResolver
         inputFingerprint: aggregateFingerprint,
         policyFingerprint: contractSnapshot.contentHash,
       );
+      _registerUpstream(
+        request: request,
+        snapshot: pwr01,
+        dependencies: dependencies,
+        upstreamGenerations: upstreamGenerations,
+        upstreamBasis: upstreamBasis,
+      );
       if (pwr01.output['completeA'] != true) {
         _blocked(
           request,
@@ -170,7 +177,12 @@ final class Fa06PersistedInputResolver
           aggregateFingerprint,
           contractSnapshot.contentHash,
           dependencies,
-          <String, Object?>{'evaluationId': pwr01.evaluationId},
+          <String, Object?>{
+            'evaluationId': pwr01.evaluationId,
+            'nodeKeySha256': pwr01.nodeKey.sha256,
+            'pointerGeneration': pwr01.pointerGeneration,
+            'evidenceSha256': pwr01.evidenceSha256,
+          },
         );
       }
       final pwr01A = _powerRational(pwr01.output['knownA'], 'knownA');
@@ -186,6 +198,9 @@ final class Fa06PersistedInputResolver
             'assignmentCurrentA': expectedA.toMap(),
             'pwr01CurrentA': pwr01A.toMap(),
             'evaluationId': pwr01.evaluationId,
+            'nodeKeySha256': pwr01.nodeKey.sha256,
+            'pointerGeneration': pwr01.pointerGeneration,
+            'evidenceSha256': pwr01.evidenceSha256,
           },
         );
       }
@@ -202,6 +217,13 @@ final class Fa06PersistedInputResolver
         inputFingerprint: aggregateFingerprint,
         policyFingerprint: contractSnapshot.contentHash,
       );
+      _registerUpstream(
+        request: request,
+        snapshot: pwr03,
+        dependencies: dependencies,
+        upstreamGenerations: upstreamGenerations,
+        upstreamBasis: upstreamBasis,
+      );
       if (pwr03.output['physicalComplete'] != true) {
         _blocked(
           request,
@@ -209,7 +231,12 @@ final class Fa06PersistedInputResolver
           aggregateFingerprint,
           contractSnapshot.contentHash,
           dependencies,
-          <String, Object?>{'evaluationId': pwr03.evaluationId},
+          <String, Object?>{
+            'evaluationId': pwr03.evaluationId,
+            'nodeKeySha256': pwr03.nodeKey.sha256,
+            'pointerGeneration': pwr03.pointerGeneration,
+            'evidenceSha256': pwr03.evidenceSha256,
+          },
         );
       }
 
@@ -267,28 +294,6 @@ final class Fa06PersistedInputResolver
           maximumTerminalVoltage: Voltage(contract.maximumTerminalVoltageV),
         ),
       );
-
-      for (final snapshot in <Elv4CurrentEvaluationSnapshot>[pwr01, pwr03]) {
-        upstreamGenerations[snapshot.nodeKey.sha256] = snapshot.pointerGeneration;
-        dependencies.add(
-          _dependency(
-            request,
-            'UPSTREAM_EVALUATION',
-            snapshot.nodeKey.processCode == PowerProcessCode.pwr01
-                ? 'ELV4_PWR01_CURRENT'
-                : 'ELV4_PWR03_CURRENT',
-            snapshot.evaluationId,
-            memberId:
-                '${snapshot.nodeKey.sha256}:${snapshot.pointerGeneration}:${snapshot.evidenceSha256}',
-          ),
-        );
-        upstreamBasis.add(<String, Object?>{
-          'evaluationId': snapshot.evaluationId,
-          'nodeKeySha256': snapshot.nodeKey.sha256,
-          'generation': snapshot.pointerGeneration,
-          'evidenceSha256': snapshot.evidenceSha256,
-        });
-      }
     }
 
     if (contract.supervision.required && contract.supervision.evidenceRef != null) {
@@ -336,6 +341,34 @@ final class Fa06PersistedInputResolver
       upstreamPointerGenerations: upstreamGenerations,
       captureRevision: circuit.revision,
     );
+  }
+
+  void _registerUpstream({
+    required Elv5CalculationRequest request,
+    required Elv4CurrentEvaluationSnapshot snapshot,
+    required List<Elv5DependencyMarker> dependencies,
+    required Map<String, int> upstreamGenerations,
+    required List<Map<String, Object?>> upstreamBasis,
+  }) {
+    upstreamGenerations[snapshot.nodeKey.sha256] = snapshot.pointerGeneration;
+    dependencies.add(
+      _dependency(
+        request,
+        'UPSTREAM_EVALUATION',
+        snapshot.nodeKey.processCode == PowerProcessCode.pwr01
+            ? 'ELV4_PWR01_CURRENT'
+            : 'ELV4_PWR03_CURRENT',
+        snapshot.evaluationId,
+        memberId:
+            '${snapshot.nodeKey.sha256}:${snapshot.pointerGeneration}:${snapshot.evidenceSha256}',
+      ),
+    );
+    upstreamBasis.add(<String, Object?>{
+      'evaluationId': snapshot.evaluationId,
+      'nodeKeySha256': snapshot.nodeKey.sha256,
+      'generation': snapshot.pointerGeneration,
+      'evidenceSha256': snapshot.evidenceSha256,
+    });
   }
 
   Elv5Rational _resolveExpectedCurrent({
