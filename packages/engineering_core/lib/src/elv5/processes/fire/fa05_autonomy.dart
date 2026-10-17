@@ -41,7 +41,7 @@ final class Fa05Pwr04Evidence {
     required this.availableEnergy,
     required this.contributors,
     required this.governingDimension,
-    required this.governingSegmentId,
+    this.governingSegmentId,
     this.peakCurrentMargin,
     this.endOfDischargePass = true,
   }) {
@@ -51,6 +51,12 @@ final class Fa05Pwr04Evidence {
     if (globalRequiredEnergy.value < Elv5Rational.zero ||
         availableEnergy.value < Elv5Rational.zero) {
       throw ArgumentError('FA05 energy values must be nonnegative.');
+    }
+    if (governingDimension != Fa05GoverningDimension.energy &&
+        (governingSegmentId == null || governingSegmentId!.isEmpty)) {
+      throw ArgumentError(
+        'FA05 non-energy governing dimension requires a segment identity.',
+      );
     }
     final ids = <String>{};
     for (final contributor in contributors) {
@@ -67,7 +73,7 @@ final class Fa05Pwr04Evidence {
   final Energy availableEnergy;
   final List<Fa05ContributorEnergy> contributors;
   final Fa05GoverningDimension governingDimension;
-  final String governingSegmentId;
+  final String? governingSegmentId;
   final Current? peakCurrentMargin;
   final bool endOfDischargePass;
 }
@@ -111,7 +117,7 @@ final class Fa05Result {
     required this.energyMargin,
     required this.fireContributionEnergy,
     required this.governingDimension,
-    required this.governingSegmentId,
+    this.governingSegmentId,
     this.blockingReason,
   });
 
@@ -121,7 +127,7 @@ final class Fa05Result {
   final Energy energyMargin;
   final Energy fireContributionEnergy;
   final Fa05GoverningDimension governingDimension;
-  final String governingSegmentId;
+  final String? governingSegmentId;
   final String? blockingReason;
 }
 
@@ -157,6 +163,7 @@ final class Fa05AutonomyProjectionKernel {
         ? Fa05AssessmentStatus.pass
         : Fa05AssessmentStatus.fail;
     var governing = evidence.governingDimension;
+    var governingSegment = evidence.governingSegmentId;
     if (evidence.peakCurrentMargin != null &&
         evidence.peakCurrentMargin!.value < Elv5Rational.zero) {
       status = Fa05AssessmentStatus.fail;
@@ -166,6 +173,9 @@ final class Fa05AutonomyProjectionKernel {
       governing = Fa05GoverningDimension.endOfDischarge;
     } else if (energyMargin.value < Elv5Rational.zero) {
       governing = Fa05GoverningDimension.energy;
+      governingSegment = null;
+    } else if (governing == Fa05GoverningDimension.energy) {
+      governingSegment = null;
     }
 
     return Fa05Result(
@@ -175,7 +185,7 @@ final class Fa05AutonomyProjectionKernel {
       energyMargin: energyMargin,
       fireContributionEnergy: fireContribution,
       governingDimension: governing,
-      governingSegmentId: evidence.governingSegmentId,
+      governingSegmentId: governingSegment,
     );
   }
 
