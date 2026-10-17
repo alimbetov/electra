@@ -1,3 +1,5 @@
+import '../policy/elv5_physical_link_capability.dart';
+
 final class Lan04SectionCapabilityContract {
   Lan04SectionCapabilityContract({
     required String sectionId,
@@ -10,15 +12,19 @@ final class Lan04SectionCapabilityContract {
     required String evidenceRef,
     required String evidenceContentHash,
   }) : sectionId = _text(sectionId, 'sectionId'),
-       mediumCode = _medium(mediumCode),
+       mediumCode = elv5PhysicalMediumCode(mediumCode),
        supportedInterfaceKinds = Set.unmodifiable(
-         supportedInterfaceKinds.map((e) => _token(e, 'interfaceKind')),
+         supportedInterfaceKinds.map(
+           (e) => elv5PhysicalToken(e, 'interfaceKind'),
+         ),
        ),
        supportedSpeedModes = Set.unmodifiable(
-         supportedSpeedModes.map((e) => _token(e, 'speedMode')),
+         supportedSpeedModes.map((e) => elv5PhysicalToken(e, 'speedMode')),
        ),
        supportedConnectorKinds = Set.unmodifiable(
-         supportedConnectorKinds.map((e) => _token(e, 'connectorKind')),
+         supportedConnectorKinds.map(
+           (e) => elv5PhysicalToken(e, 'connectorKind'),
+         ),
        ),
        evidenceRef = _text(evidenceRef, 'evidenceRef'),
        evidenceContentHash = _sha(evidenceContentHash, 'evidenceContentHash') {
@@ -29,11 +35,10 @@ final class Lan04SectionCapabilityContract {
         'LAN04 section capability edition requires explicit non-empty interface/speed/connector evidence.',
       );
     }
-    if (!shieldContinuityKnown && shieldContinuity) {
-      throw ArgumentError(
-        'LAN04 unknown shield continuity cannot assert true.',
-      );
-    }
+    validateElv5ShieldContinuity(
+      known: shieldContinuityKnown,
+      continuous: shieldContinuity,
+    );
   }
   final String sectionId;
   final String mediumCode;
@@ -68,8 +73,9 @@ final class Lan04SectionCapabilityContract {
       'evidenceContentHash',
     }, 'sectionCapability');
     if (map['shieldContinuityKnown'] is! bool ||
-        map['shieldContinuity'] is! bool)
+        map['shieldContinuity'] is! bool) {
       throw const FormatException('LAN04 shield fields must be boolean.');
+    }
     return Lan04SectionCapabilityContract(
       sectionId: _mapText(map, 'sectionId'),
       mediumCode: _mapText(map, 'mediumCode'),
@@ -108,13 +114,16 @@ final class Lan04CompatibilityContract {
          expectedCompositionFingerprint,
          'expectedCompositionFingerprint',
        ),
-       requiredMediumCode = _medium(requiredMediumCode),
-       requiredInterfaceKind = _token(
+       requiredMediumCode = elv5PhysicalMediumCode(requiredMediumCode),
+       requiredInterfaceKind = elv5PhysicalToken(
          requiredInterfaceKind,
          'requiredInterfaceKind',
        ),
-       requiredSpeedMode = _token(requiredSpeedMode, 'requiredSpeedMode'),
-       requiredConnectorKind = _token(
+       requiredSpeedMode = elv5PhysicalToken(
+         requiredSpeedMode,
+         'requiredSpeedMode',
+       ),
+       requiredConnectorKind = elv5PhysicalToken(
          requiredConnectorKind,
          'requiredConnectorKind',
        ),
@@ -151,11 +160,13 @@ final class Lan04CompatibilityContract {
       'shieldingRequired',
       'sections',
     }, 'LAN04 contract');
-    if (map['schema'] != schema || map['shieldingRequired'] is! bool)
+    if (map['schema'] != schema || map['shieldingRequired'] is! bool) {
       throw const FormatException('Unsupported/invalid LAN04 contract schema.');
+    }
     final sections = map['sections'];
-    if (sections is! List)
+    if (sections is! List) {
       throw const FormatException('LAN04 sections must be array.');
+    }
     return Lan04CompatibilityContract(
       linkId: _mapText(map, 'linkId'),
       expectedCompositionFingerprint: _mapText(
@@ -209,11 +220,13 @@ final class ReplaceLan04CompatibilityContractCommand {
   }) {
     if (projectId.trim().isEmpty ||
         designRevisionId.trim().isEmpty ||
-        bindingId.trim().isEmpty)
+        bindingId.trim().isEmpty) {
       throw ArgumentError('LAN04 command identity is required.');
+    }
     if (expectedDesignRevision < 1 ||
-        (expectedBindingRevision != null && expectedBindingRevision! < 1))
+        (expectedBindingRevision != null && expectedBindingRevision! < 1)) {
       throw ArgumentError('LAN04 expected revisions must be positive.');
+    }
   }
   final String projectId;
   final String designRevisionId;
@@ -233,24 +246,20 @@ List<Lan04SectionCapabilityContract> _sections(
   final out = input.toList();
   final seen = <String>{};
   for (final s in out) {
-    if (!seen.add(s.sectionId))
+    if (!seen.add(s.sectionId)) {
       throw ArgumentError('LAN04 duplicate sectionId: ${s.sectionId}');
+    }
   }
-  if (out.isEmpty) throw ArgumentError('LAN04 sections must not be empty.');
+  if (out.isEmpty) {
+    throw ArgumentError('LAN04 sections must not be empty.');
+  }
   return out;
 }
 
-String _medium(String value) {
-  final code = _text(value, 'mediumCode').toUpperCase();
-  if (!const {'COPPER', 'FIBER', 'OTHER'}.contains(code))
-    throw ArgumentError('LAN04 unsupported medium: $code');
-  return code;
-}
-
-String _token(String value, String field) => _text(value, field).toUpperCase();
 List<String> _strings(Object? value, String field) {
-  if (value is! List || value.any((e) => e is! String))
+  if (value is! List || value.any((e) => e is! String)) {
     throw FormatException('$field must be string array.');
+  }
   return value.cast<String>();
 }
 
@@ -273,8 +282,9 @@ String _text(String value, String field) {
 
 String _sha(String value, String field) {
   final v = _text(value, field).toLowerCase();
-  if (!RegExp(r'^[0-9a-f]{64}$').hasMatch(v))
+  if (!RegExp(r'^[0-9a-f]{64}$').hasMatch(v)) {
     throw ArgumentError.value(value, field, 'Expected lowercase SHA-256.');
+  }
   return v;
 }
 
@@ -282,6 +292,7 @@ void _exact(Map<String, Object?> map, Set<String> expected, String field) {
   final actual = map.keys.toSet();
   if (actual.length != expected.length ||
       actual.difference(expected).isNotEmpty ||
-      expected.difference(actual).isNotEmpty)
+      expected.difference(actual).isNotEmpty) {
     throw FormatException('$field has missing or unknown fields.');
+  }
 }
