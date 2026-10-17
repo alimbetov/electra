@@ -5,6 +5,7 @@ import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:electra_mobile/application/elv5/acs/acs03_electrical_contract.dart';
 import 'package:electra_mobile/application/elv5/acs/acs03_electrical_contract_write.dart';
+import 'package:electra_mobile/application/elv5/commands/elv5_replacement_command_runner.dart';
 import 'package:electra_mobile/application/elv5/wire/elv5_wire_command.dart';
 import 'package:electra_mobile/data/database/app_database.dart';
 import 'package:electra_mobile/data/repositories/drift_power_publication_runtime.dart';
@@ -67,8 +68,8 @@ void main() {
         );
       }
 
-      // Q6: use the complete production ELV5 runtime. ACS-03 capture reads the
-      // persisted door aggregate + immutable electrical contract + verified
+      // Q6: run the complete production ELV5 path. ACS-03 capture reads the
+      // persisted door aggregate, immutable electrical contract and verified
       // ELV4 PWR01/PWR03 CURRENT pointers before publishing its own evaluation.
       var runtime = DriftElv5CalculationRuntime.create(
         db,
@@ -84,7 +85,7 @@ void main() {
       expect(first.replayed, isFalse);
 
       final pointerBeforeRestart = await _acsPointer(db);
-      expect(pointerBeforeRestart.state, 'CURRENT');
+      expect(pointerBeforeRestart.freshness, 'CURRENT');
       expect(pointerBeforeRestart.generation, 1);
       expect(pointerBeforeRestart.evaluationId, isNotNull);
 
@@ -92,14 +93,14 @@ void main() {
         db,
         pointerBeforeRestart.evaluationId!,
       );
-      expect(persisted.executionStatus, 'SUCCEEDED');
-      expect(persisted.completionStatus, 'COMPLETE');
-      expect(persisted.assessmentStatus, 'PASS');
+      expect(persisted.execution, 'SUCCEEDED');
+      expect(persisted.completion, 'COMPLETE');
+      expect(persisted.assessment, 'PASS');
       expect(persisted.inputFingerprint, hasLength(64));
       expect(persisted.outputSha256, hasLength(64));
 
       final dependencyRows = await db.customSelect(
-        'SELECT dependency_key FROM elv5_dependency_markers '
+        'SELECT dependency_key FROM discipline_dependency_index '
         'WHERE project_id = ? AND design_revision_id = ? '
         'AND logical_node_key_sha256 = ? ORDER BY dependency_key',
         variables: <Variable>[
@@ -126,9 +127,9 @@ void main() {
         hasLength(_events.length),
       );
 
-      // Q7 restart: rebuild the registry, resolvers, evidence readers and
-      // publication stores from the durable file. Command replay must happen
-      // before recapture and preserve the exact logical result.
+      // Q7 restart: rebuild registry, resolvers, evidence readers and
+      // publication stores from the durable file. Replay must happen before
+      // recapture and preserve the exact logical result.
       final logicalBeforeRestart = first.logicalResultJson;
       await db.close();
       db = AppDatabase(NativeDatabase(file));
@@ -147,8 +148,8 @@ void main() {
         pointerBeforeRestart.evaluationId,
       );
 
-      // Q7 competing publication: a stale client captured pointer generation 0.
-      // The current generation is already 1, so publication must fail closed.
+      // Q7 competing publication: a stale writer still expects generation 0.
+      // The durable CURRENT generation is already 1, so publication fails closed.
       await expectLater(
         runtime.service.execute(
           _calculationCommand(
@@ -158,16 +159,16 @@ void main() {
           ),
         ),
         throwsA(
-          isA<StateError>().having(
-            (error) => error.toString(),
-            'message',
-            contains('ELV5_POINTER_GENERATION_CONFLICT'),
+          isA<Elv5ReplacementCommandException>().having(
+            (error) => error.code,
+            'code',
+            'ELV5_POINTER_GENERATION_CONFLICT',
           ),
         ),
       );
 
-      // Q8: freeze preserves the published ACS-03 result and command replay,
-      // while new calculations are forbidden even with the latest generation.
+      // Q8: freeze preserves historical replay, while new calculations are
+      // forbidden even when the caller supplies the latest pointer generation.
       await db.customUpdate(
         "UPDATE project_design_revisions SET state = 'FROZEN', revision = 3 "
         "WHERE project_id = 'p' AND id = 'd'",
@@ -185,10 +186,10 @@ void main() {
           ),
         ),
         throwsA(
-          isA<StateError>().having(
-            (error) => error.toString(),
-            'message',
-            contains('ELV5_DESIGN_REVISION_READ_ONLY'),
+          isA<Elv5ReplacementCommandException>().having(
+            (error) => error.code,
+            'code',
+            'ELV5_DESIGN_REVISION_READ_ONLY',
           ),
         ),
       );
@@ -480,7 +481,8 @@ String _acsNodeSha() => const Elv5CanonicalJsonV1().sha256(
 
 Future<_PointerRow> _acsPointer(AppDatabase db) async {
   final row = await db.customSelect(
-    'SELECT state, generation, evaluation_id FROM elv5_evaluation_pointers '
+    'SELECT freshness, generation, evaluation_id '
+    'FROM discipline_evaluation_pointers '
     'WHERE project_id = ? AND design_revision_id = ? '
     'AND logical_node_key_sha256 = ?',
     variables: <Variable>[
@@ -490,7 +492,7 @@ Future<_PointerRow> _acsPointer(AppDatabase db) async {
     ],
   ).getSingle();
   return _PointerRow(
-    state: row.read<String>('state'),
+    freshness: row.read<String>('freshness'),
     generation: row.read<int>('generation'),
     evaluationId: row.readNullable<String>('evaluation_id'),
   );
@@ -501,8 +503,8 @@ Future<_EvaluationRow> _acsEvaluation(
   String evaluationId,
 ) async {
   final row = await db.customSelect(
-    'SELECT execution_status, completion_status, assessment_status, '
-    'input_fingerprint, output_sha256 FROM elv5_evaluation_records '
+    'SELECT execution, completion, assessment, input_fingerprint, output_sha256 '
+    'FROM discipline_evaluation_records '
     'WHERE project_id = ? AND evaluation_id = ?',
     variables: <Variable>[
       Variable.withString('p'),
@@ -510,9 +512,9 @@ Future<_EvaluationRow> _acsEvaluation(
     ],
   ).getSingle();
   return _EvaluationRow(
-    executionStatus: row.read<String>('execution_status'),
-    completionStatus: row.read<String>('completion_status'),
-    assessmentStatus: row.read<String>('assessment_status'),
+    execution: row.read<String>('execution'),
+    completion: row.read<String>('completion'),
+    assessment: row.read<String>('assessment'),
     inputFingerprint: row.read<String>('input_fingerprint'),
     outputSha256: row.read<String>('output_sha256'),
   );
@@ -520,26 +522,28 @@ Future<_EvaluationRow> _acsEvaluation(
 
 final class _PointerRow {
   const _PointerRow({
-    required this.state,
+    required this.freshness,
     required this.generation,
     required this.evaluationId,
   });
-  final String state;
+
+  final String freshness;
   final int generation;
   final String? evaluationId;
 }
 
 final class _EvaluationRow {
   const _EvaluationRow({
-    required this.executionStatus,
-    required this.completionStatus,
-    required this.assessmentStatus,
+    required this.execution,
+    required this.completion,
+    required this.assessment,
     required this.inputFingerprint,
     required this.outputSha256,
   });
-  final String executionStatus;
-  final String completionStatus;
-  final String assessmentStatus;
+
+  final String execution;
+  final String completion;
+  final String assessment;
   final String inputFingerprint;
   final String outputSha256;
 }
