@@ -29,6 +29,7 @@ import 'drift_fa08_policy_contract_store.dart';
 import 'drift_fa08_route_cable_fact_source.dart';
 import 'drift_lan02_port_contract_store.dart';
 import 'drift_lan03_poe_contract_store.dart';
+import 'drift_lan04_compatibility_contract_store.dart';
 import 'drift_lan05_optical_section_evidence_source.dart';
 
 final class DriftElv5CalculationRuntime {
@@ -59,6 +60,7 @@ final class DriftElv5CalculationRuntime {
 
     final lan02Contracts = DriftLan02PortContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
     final lan03Contracts = DriftLan03PoeProjectionContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
+    final lan04Contracts = DriftLan04CompatibilityContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
     final acs01Contracts = DriftAcs01RoleProfileContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
     final acs02Contracts = DriftAcs02ResourceContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
     final acs03Contracts = DriftAcs03ElectricalContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
@@ -83,6 +85,7 @@ final class DriftElv5CalculationRuntime {
       opticalSectionEvidence: DriftLan05OpticalSectionEvidenceSource(database),
       lan02Contracts: lan02Contracts,
       lan03Contracts: lan03Contracts,
+      lan04Contracts: lan04Contracts,
       acs01Contracts: acs01Contracts,
       acs02Contracts: acs02Contracts,
       acs03Contracts: acs03Contracts,
