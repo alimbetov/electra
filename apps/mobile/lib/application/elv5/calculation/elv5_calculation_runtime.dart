@@ -80,11 +80,26 @@ final class Elv5ProcessEvaluationCandidate {
       throw StateError('ELV5_PROCESS_VERSION_MISMATCH');
     }
     final identity = qualificationIdentity;
-    if (identity != null &&
-        identity.processVersion != descriptor.versions.processVersion) {
-      throw StateError('ELV5_QUALIFICATION_PROCESS_VERSION_MISMATCH');
+    if (identity != null) {
+      if (identity.processVersion != descriptor.versions.processVersion) {
+        throw StateError('ELV5_QUALIFICATION_PROCESS_VERSION_MISMATCH');
+      }
+      final canonical = evidence[_qualificationEvidenceKey];
+      final sha = evidence[_qualificationEvidenceShaKey];
+      if (canonical is! Map ||
+          !_sameCanonicalMap(canonical, identity.toCanonicalValue()) ||
+          sha != identity.canonicalSha256()) {
+        throw StateError('ELV5_QUALIFICATION_EVIDENCE_IDENTITY_MISMATCH');
+      }
+    } else if (evidence.containsKey(_qualificationEvidenceKey) ||
+        evidence.containsKey(_qualificationEvidenceShaKey)) {
+      throw StateError('ELV5_QUALIFICATION_EVIDENCE_WITHOUT_IDENTITY');
     }
   }
+
+  static const _qualificationEvidenceKey = 'foundationQualificationIdentity';
+  static const _qualificationEvidenceShaKey =
+      'foundationQualificationIdentitySha256';
 
   final Elv5EngineeringNodeKeyV3 nodeKey;
   final String algorithmVersion;
@@ -136,24 +151,31 @@ final class Elv5ProcessEvaluationCandidate {
 
   Elv5ProcessEvaluationCandidate withQualificationIdentity(
     Elv5QualificationIdentity identity,
-  ) => Elv5ProcessEvaluationCandidate(
-    nodeKey: nodeKey,
-    algorithmVersion: algorithmVersion,
-    inputSchemaVersion: inputSchemaVersion,
-    outputSchemaVersion: outputSchemaVersion,
-    numericBackendVersion: numericBackendVersion,
-    canonicalEncoderVersion: canonicalEncoderVersion,
-    inputFingerprint: inputFingerprint,
-    policyFingerprint: policyFingerprint,
-    execution: execution,
-    completion: completion,
-    assessment: assessment,
-    output: output,
-    evidence: evidence,
-    dependencies: dependencies,
-    completedAtUtc: completedAtUtc,
-    qualificationIdentity: identity,
-  );
+  ) {
+    final qualifiedEvidence = <String, Object?>{
+      ...evidence,
+      _qualificationEvidenceKey: identity.toCanonicalValue(),
+      _qualificationEvidenceShaKey: identity.canonicalSha256(),
+    };
+    return Elv5ProcessEvaluationCandidate(
+      nodeKey: nodeKey,
+      algorithmVersion: algorithmVersion,
+      inputSchemaVersion: inputSchemaVersion,
+      outputSchemaVersion: outputSchemaVersion,
+      numericBackendVersion: numericBackendVersion,
+      canonicalEncoderVersion: canonicalEncoderVersion,
+      inputFingerprint: inputFingerprint,
+      policyFingerprint: policyFingerprint,
+      execution: execution,
+      completion: completion,
+      assessment: assessment,
+      output: output,
+      evidence: qualifiedEvidence,
+      dependencies: dependencies,
+      completedAtUtc: completedAtUtc,
+      qualificationIdentity: identity,
+    );
+  }
 
   Elv5EvaluationRecord toRecord({required String projectId}) =>
       Elv5EvaluationRecord(
@@ -187,6 +209,9 @@ final class Elv5ProcessEvaluationCandidate {
       );
 
   static const _encoder = Elv5CanonicalJsonV1();
+
+  static bool _sameCanonicalMap(Map<Object?, Object?> left, Map<String, Object?> right) =>
+      _encoder.sha256(Map<String, Object?>.from(left)) == _encoder.sha256(right);
 
   static String _canonicalJson(Object? value) => utf8.decode(
     _encoder.encode(value),
