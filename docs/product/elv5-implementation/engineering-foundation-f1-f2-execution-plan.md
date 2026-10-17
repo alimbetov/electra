@@ -521,3 +521,30 @@ old consumed evidence-reference invalidation in one SQLite transaction.
 Lifecycle coverage is 16/27, qualified remains 0/27. Q0–Q5/Q9 reconciliation,
 automatic provenance, global reliability and acceptance remain open. The next
 ordered wave is LAN-01/02/03/04/06/07; CCTV follows its exact-SHA barrier.
+
+
+## LAN wave checkpoint
+
+Source `685c0df22b3b5c8d762ef6e71b2e55c72a006fc3` passed complete
+Flutter Local Foundation run `39069134142`, artifact `12115165171`:
+475 mobile tests passed, one dedicated historical-migration skip, 485 core tests
+passed, both analyzers and formatters passed. Preserved logs explicitly execute
+LAN-01/02/03/04/06/07 production witnesses through the common lifecycle harness.
+
+LAN-01 consumes exact persisted ELV3 geometry and authoritative composition;
+COMPLETE / NOTASSESSED is retained because numeric threshold authority is absent.
+LAN-02 rejects an assigned endpoint above its port speed. LAN-03 projects the
+complete PWR06 LAN+CCTV closure: 30 W global demand, 18 W LAN contribution,
+and global margin +5 W to -3 W. LAN-04 rejects an incompatible section mode.
+LAN-06 reads the actual rack write unit of work and changes RU margin +2 to -1;
+layout remains unassessed, owned by ELV6. LAN-07 changes spare port margin +1
+to -1 when two unused ports become unavailable. All six cover independent
+SQLite CAS, durable restart, exact frozen replay and source read-only rejection.
+
+The LAN rack calculation adapter now dispatches to its actual rack persistence
+boundary. Atomic LAN contract replacement invalidates consumers of the previous
+immutable policy edition in the same transaction as source/design CAS.
+Lifecycle coverage is 22/27, qualified remains 0/27. The next remaining wave is
+CCTV-01/02/04/05/06; its source is committed and its own exact-SHA CI is pending.
+Q0–Q5/Q9 reconciliation, automatic provenance, global reliability and final
+acceptance remain open. ELV5 is not ACCEPTED.
