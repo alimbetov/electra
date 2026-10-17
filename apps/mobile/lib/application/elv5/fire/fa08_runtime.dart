@@ -24,6 +24,16 @@ final class Fa08PersistedInputResolver
   final Fa08RouteCableFactSource routeCableFacts;
   final DateTime Function() _nowUtc;
   static const _encoder = Elv5CanonicalJsonV1();
+  static const environmentTempMinCode = 'ENVIRONMENT_TEMP_MIN_C';
+  static const environmentTempMaxCode = 'ENVIRONMENT_TEMP_MAX_C';
+  static const environmentRhMinCode = 'ENVIRONMENT_RH_MIN_PCT';
+  static const environmentRhMaxCode = 'ENVIRONMENT_RH_MAX_PCT';
+  static const _reservedEnvironmentNumericCodes = <String>{
+    environmentTempMinCode,
+    environmentTempMaxCode,
+    environmentRhMinCode,
+    environmentRhMaxCode,
+  };
 
   @override
   Elv5ProcessCode get processCode => Elv5ProcessCode.fa08;
@@ -120,6 +130,23 @@ final class Fa08PersistedInputResolver
           <String, Object?>{'sectionId': fact.sectionId},
         );
       }
+      final reserved = fact.numericFacts
+          .map((item) => item.propertyCode)
+          .where(_reservedEnvironmentNumericCodes.contains)
+          .toList(growable: false);
+      if (reserved.isNotEmpty) {
+        _blocked(
+          request,
+          'FA08_ROUTE_CABLE_FACT_RESERVED_ENVIRONMENT_PROPERTY',
+          basisFingerprint,
+          policySnapshot.contentHash,
+          dependencies,
+          <String, Object?>{
+            'sectionId': fact.sectionId,
+            'propertyCodes': reserved..sort(),
+          },
+        );
+      }
     }
     final ampacityIds = ampacity.orderedSections.map((e) => e.sectionId).toSet();
     final factIds = factBySection.keys.toSet();
@@ -153,6 +180,28 @@ final class Fa08PersistedInputResolver
         if (environment.climateClassCode != null)
           'CLIMATE:${environment.climateClassCode}',
       };
+      final exactEnvironmentFacts = <Fa08NumericFact>[
+        Fa08NumericFact(
+          propertyCode: environmentTempMinCode,
+          unitCode: 'C',
+          value: environment.temperatureC.minimum,
+        ),
+        Fa08NumericFact(
+          propertyCode: environmentTempMaxCode,
+          unitCode: 'C',
+          value: environment.temperatureC.maximum,
+        ),
+        Fa08NumericFact(
+          propertyCode: environmentRhMinCode,
+          unitCode: 'PCT',
+          value: environment.relativeHumidityPercent.minimum,
+        ),
+        Fa08NumericFact(
+          propertyCode: environmentRhMaxCode,
+          unitCode: 'PCT',
+          value: environment.relativeHumidityPercent.maximum,
+        ),
+      ];
 
       sections.add(
         Fa08RouteSection(
@@ -161,7 +210,10 @@ final class Fa08PersistedInputResolver
           cableClass: fact.cableClass,
           environmentEvidenceComplete: true,
           environmentTags: tags,
-          numericFacts: fact.numericFacts,
+          numericFacts: <Fa08NumericFact>[
+            ...fact.numericFacts,
+            ...exactEnvironmentFacts,
+          ],
           ampacityInput: section.ampacityInput,
         ),
       );
@@ -218,6 +270,14 @@ final class Fa08PersistedInputResolver
         'sectionId': section.sectionId,
         'cableEditionId': fact.cableEditionId,
         'environment': section.environmentBinding.toCanonicalValue(),
+        'environmentNumericFacts': <Object?>[
+          for (final item in exactEnvironmentFacts)
+            <String, Object?>{
+              'propertyCode': item.propertyCode,
+              'unitCode': item.unitCode,
+              'value': item.value.toMap(),
+            },
+        ],
         'ampacity': section.ampacityInput.toCanonicalValue(),
       });
     }
@@ -230,7 +290,7 @@ final class Fa08PersistedInputResolver
       complianceEvidence: null,
     );
     final inputFingerprint = _encoder.sha256(<String, Object?>{
-      'schema': 'electra.elv5-fa08-captured-input.v1',
+      'schema': 'electra.elv5-fa08-captured-input.v2',
       'cableRunId': cableRunId,
       'policyEvidenceRef': policySnapshot.evidenceRef,
       'policyContentHash': policySnapshot.contentHash,
@@ -314,7 +374,7 @@ Elv5PureKernelExecutor<Fa08Input, Fa08Result> buildFa08Executor({
     ],
   },
   encodeEvidence: (captured, _) => <String, Object?>{
-    'schema': 'electra.elv5-fa08-evidence.v1',
+    'schema': 'electra.elv5-fa08-evidence.v2',
     'source':
         'PINNED_CABLE_EDITION_PLUS_VERSIONED_ENVIRONMENT_PLUS_EXACT_ROUTE_AMPACITY',
     'captureRevision': captured.captureRevision,
