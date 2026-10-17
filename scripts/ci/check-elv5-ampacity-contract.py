@@ -9,6 +9,7 @@ REGISTRY = ROOT / "docs/product/elv5-implementation/ampacity-contract-registry.j
 PROCESS_AMENDMENT = ROOT / "docs/product/elv5-implementation/process-registry-ampacity-amendment.json"
 NORM_AMENDMENT = ROOT / "docs/product/elv5-implementation/normative-requirements-ampacity-amendment.json"
 CONTRACT_DOC = ROOT / "docs/product/elv5-implementation/ampacity-engineering-contract.md"
+DOSSIER_AMENDMENT = ROOT / "docs/product/elv5-implementation/process-specifications/fa08-ampacity-amendment.md"
 CORE = ROOT / "packages/engineering_core/lib/src/elv5/evidence/ampacity_contract.dart"
 FA08 = ROOT / "packages/engineering_core/lib/src/elv5/processes/fire/fa08_cable_policy.dart"
 
@@ -66,6 +67,7 @@ def main() -> None:
     )
 
     contract_text = CONTRACT_DOC.read_text(encoding="utf-8")
+    dossier_text = DOSSIER_AMENDMENT.read_text(encoding="utf-8")
     core_text = CORE.read_text(encoding="utf-8")
     fa08_text = FA08.read_text(encoding="utf-8")
 
@@ -79,6 +81,14 @@ def main() -> None:
         "Iz = Iref * kT * kG * product(kAdditional[i])",
     ):
         require(token in contract_text, f"contract document missing {token!r}")
+
+    for token in (
+        "## 1. Physical meaning",
+        "## 25. Cross-discipline vector",
+        "AMPACITY_IZ_A",
+        "FA08_COMPUTE_IZ_V1",
+    ):
+        require(token in dossier_text, f"FA-08 dossier amendment missing {token!r}")
 
     for symbol in (
         "Elv5AmpacityReferenceRow",
