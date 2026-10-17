@@ -46,6 +46,12 @@ The first qualification wave binds the previously proven production E2E scenario
 
 Their existing dependency, result, invalidation and mutation assertions remain in place.
 
+## Formatter reproducibility
+
+The mature witness files are formatted only after `flutter pub get --enforce-lockfile`, matching the repository `Flutter Local Foundation` ordering. This ensures `dart format` uses the package language configuration seen by the authoritative CI gate instead of an unconfigured formatter context.
+
+Formatter alignment itself is not qualification evidence. The harness wave remains pending until the resulting exact source SHA passes formatting, mobile analyze/test, engineering-core analyze/test and all ELV5 foundation gates.
+
 ## Promotion rule
 
 A process is not promoted merely because it imports or calls the harness. Q6/Q7/Q8 status is promoted only when the corresponding production witness is present in the canonical F2 matrix and the exact source SHA has passed the repository Flutter CI gates.
