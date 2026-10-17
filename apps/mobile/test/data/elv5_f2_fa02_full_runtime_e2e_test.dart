@@ -148,11 +148,7 @@ void main() {
                     'code',
                     'ELV4_REVISION_NOT_WORKING',
                   )
-                  .having(
-                    (error) => error.details['state'],
-                    'state',
-                    'FROZEN',
-                  ),
+                  .having((error) => error.details['state'], 'state', 'FROZEN'),
             ),
           );
         },
