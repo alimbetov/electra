@@ -2,7 +2,7 @@
   "schema": "electra.killer-capability-layer.v1",
   "status": "TARGET_NORTH_STAR_NOT_IMPLEMENTATION_NOT_ACCEPTANCE",
   "parentTarget": "electra-professional-electrical-platform-target.md",
-  "capabilityCount": 13,
+  "capabilityCount": 14,
   "capabilities": [
     {
       "id": "K0",
@@ -142,6 +142,17 @@
         "EMERGENCY_LIGHTING_POINT"
       ],
       "outputs": ["reference_guides", "placement_candidate", "symmetry_alignment_state", "accepted_project_devices"]
+    },
+    {
+      "id": "K13",
+      "name": "Smart Building & Home Automation Designer",
+      "intent": "Design, validate, simulate and document the automation/control infrastructure linked to real electrical assets and room geometry without turning Electra into a runtime smart-home platform.",
+      "specification": "electra-smart-building-home-automation-target.md",
+      "machineContract": "electra-smart-building-home-automation-target.json",
+      "primaryDependencies": ["CAP-02", "CAP-03", "CAP-04", "CAP-11", "CAP-13", "CAP-14", "CAP-15", "CAP-16", "CAP-18", "CAP-21", "K12", "K3", "K6"],
+      "subCapabilities": ["SH-01", "SH-02", "SH-03", "SH-04", "SH-05", "SH-06", "SH-07", "SH-08", "SH-09", "SH-10"],
+      "protocolFamilies": ["KNX", "DALI", "MATTER", "THREAD", "ZIGBEE", "ZWAVE", "WIFI", "PLC_IOT", "MODBUS", "BACNET"],
+      "outputs": ["automation_topology", "electrical_control_binding", "automation_scene", "failure_simulation", "control_matrix", "io_schedule", "automation_audit", "commissioning_evidence"]
     }
   ],
   "crossCuttingInvariants": [
@@ -156,7 +167,7 @@
     "KC-09_OFFLINE_DETERMINISM",
     "KC-10_NORMATIVE_SEPARATION"
   ],
-  "recommendedDeliveryOrder": ["K4", "K3", "K0", "K12", "K2", "K8", "K5", "K6", "K7", "K9", "K10", "K1", "K11"],
+  "recommendedDeliveryOrder": ["K4", "K3", "K0", "K12", "K13", "K2", "K8", "K5", "K6", "K7", "K9", "K10", "K1", "K11"],
   "marketValidationQuestions": [
     "Does it save measurable engineering time?",
     "Does it catch or prevent costly errors?",
