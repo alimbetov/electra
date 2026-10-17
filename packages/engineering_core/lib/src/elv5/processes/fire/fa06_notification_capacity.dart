@@ -163,7 +163,8 @@ final class Fa06NotificationCapacityKernel {
     }
 
     final results = <Fa06OperatingCase, Fa06CaseResult>{};
-    final ordered = [...input.cases]..sort((a, b) => a.operatingCase.index.compareTo(b.operatingCase.index));
+    final ordered = [...input.cases]
+      ..sort((a, b) => a.operatingCase.index.compareTo(b.operatingCase.index));
     for (final item in ordered) {
       if (item.membershipFingerprint != input.expectedMembershipFingerprint) {
         return _blocked(input, countMargin, 'FA06_MEMBERSHIP_CLOSURE_MISMATCH');
@@ -171,16 +172,14 @@ final class Fa06NotificationCapacityKernel {
       final currentMargin = item.outputCurrentLimit - item.outputCurrent.upper;
       final lowMargin = item.terminalVoltage.lower - item.minimumTerminalVoltage;
       final highMargin = item.maximumTerminalVoltage - item.terminalVoltage.upper;
-      Fa06GoverningDimension dimension = Fa06GoverningDimension.outputCurrent;
-      var fail = currentMargin.value < Elv5Rational.zero;
-      if (lowMargin.value < Elv5Rational.zero) {
-        fail = true;
-        dimension = Fa06GoverningDimension.terminalLow;
-      }
-      if (highMargin.value < Elv5Rational.zero) {
-        fail = true;
-        dimension = Fa06GoverningDimension.terminalHigh;
-      }
+      final failedDimensions = <Fa06GoverningDimension>[
+        if (currentMargin.value < Elv5Rational.zero)
+          Fa06GoverningDimension.outputCurrent,
+        if (lowMargin.value < Elv5Rational.zero)
+          Fa06GoverningDimension.terminalLow,
+        if (highMargin.value < Elv5Rational.zero)
+          Fa06GoverningDimension.terminalHigh,
+      ];
       results[item.operatingCase] = Fa06CaseResult(
         operatingCase: item.operatingCase,
         outputCurrent: item.outputCurrent,
@@ -188,8 +187,13 @@ final class Fa06NotificationCapacityKernel {
         terminalVoltage: item.terminalVoltage,
         lowVoltageMargin: lowMargin,
         highVoltageMargin: highMargin,
-        status: fail ? Fa06AssessmentStatus.fail : Fa06AssessmentStatus.pass,
-        governingDimension: fail ? dimension : null,
+        status: failedDimensions.isEmpty
+            ? Fa06AssessmentStatus.pass
+            : Fa06AssessmentStatus.fail,
+        // Current and voltage margins are dimensionally different. Only expose
+        // a governing dimension when exactly one independent dimension fails.
+        governingDimension:
+            failedDimensions.length == 1 ? failedDimensions.single : null,
       );
     }
 
@@ -208,36 +212,19 @@ final class Fa06NotificationCapacityKernel {
       }
     }
 
-    Fa06CaseResult? governing;
-    Elv5Rational? smallest;
-    Fa06GoverningDimension? dimension;
-    for (final result in results.values) {
-      final candidates = <Fa06GoverningDimension, Elv5Rational>{
-        Fa06GoverningDimension.outputCurrent: result.currentMargin.value,
-        Fa06GoverningDimension.terminalLow: result.lowVoltageMargin.value,
-        Fa06GoverningDimension.terminalHigh: result.highVoltageMargin.value,
-      };
-      for (final entry in candidates.entries) {
-        if (smallest == null || entry.value < smallest) {
-          smallest = entry.value;
-          governing = result;
-          dimension = entry.key;
-        }
-      }
-    }
-
+    // PASS has no synthetic cross-unit governing dimension. Current and voltage
+    // headroom remain independently available in each case result.
     return Fa06Result(
       status: Fa06AssessmentStatus.pass,
       activeDeviceCount: input.deviceIds.length,
       deviceCountMargin: countMargin,
       cases: Map.unmodifiable(results),
       acousticCoverageAssessed: false,
-      governingCase: governing?.operatingCase,
-      governingDimension: dimension,
     );
   }
 
-  static Fa06Result _blocked(Fa06Input input, int countMargin, String reason) => Fa06Result(
+  static Fa06Result _blocked(Fa06Input input, int countMargin, String reason) =>
+      Fa06Result(
         status: Fa06AssessmentStatus.blocked,
         activeDeviceCount: input.deviceIds.length,
         deviceCountMargin: countMargin,
