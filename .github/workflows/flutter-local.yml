@@ -169,9 +169,20 @@ jobs:
         run: dart run build_runner build
 
       - name: Verify mobile formatting
+        id: mobile-format
         run: |
           dart format lib test
+          git diff -- lib test > "${RUNNER_TEMP}/mobile-format.diff"
           git diff --exit-code -- lib test
+
+      - name: Preserve mobile formatter diff
+        if: failure() && steps.mobile-format.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-format-diff-${{ github.sha }}
+          path: ${{ runner.temp }}/mobile-format.diff
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Analyze mobile app
         run: flutter analyze
