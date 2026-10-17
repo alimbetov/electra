@@ -73,10 +73,14 @@ final class Fa04Input {
     }
     final keys = <String>{};
     for (final c in powerCases) {
-      if (!keys.add('P:${c.caseId}')) throw ArgumentError('FA04 duplicate case dimension.');
+      if (!keys.add('P:${c.caseId}')) {
+        throw ArgumentError('FA04 duplicate case dimension.');
+      }
     }
     for (final c in currentCases) {
-      if (!keys.add('I:${c.caseId}')) throw ArgumentError('FA04 duplicate case dimension.');
+      if (!keys.add('I:${c.caseId}')) {
+        throw ArgumentError('FA04 duplicate case dimension.');
+      }
     }
   }
 
@@ -93,7 +97,14 @@ final class Fa04Input {
 }
 
 final class Fa04PowerCaseResult {
-  const Fa04PowerCaseResult({required this.caseId, required this.globalDemand, required this.requiredCapability, required this.availableCapability, required this.margin, required this.status});
+  const Fa04PowerCaseResult({
+    required this.caseId,
+    required this.globalDemand,
+    required this.requiredCapability,
+    required this.availableCapability,
+    required this.margin,
+    required this.status,
+  });
   final String caseId;
   final Power globalDemand;
   final Power requiredCapability;
@@ -103,7 +114,14 @@ final class Fa04PowerCaseResult {
 }
 
 final class Fa04CurrentCaseResult {
-  const Fa04CurrentCaseResult({required this.caseId, required this.globalDemand, required this.requiredCapability, required this.availableCapability, required this.margin, required this.status});
+  const Fa04CurrentCaseResult({
+    required this.caseId,
+    required this.globalDemand,
+    required this.requiredCapability,
+    required this.availableCapability,
+    required this.margin,
+    required this.status,
+  });
   final String caseId;
   final Current globalDemand;
   final Current requiredCapability;
@@ -113,7 +131,15 @@ final class Fa04CurrentCaseResult {
 }
 
 final class Fa04Result {
-  const Fa04Result({required this.status, required this.powerCases, required this.currentCases, required this.requirementContributors, this.governingCaseId, this.governingDimension, this.blockingReason});
+  const Fa04Result({
+    required this.status,
+    required this.powerCases,
+    required this.currentCases,
+    required this.requirementContributors,
+    this.governingCaseId,
+    this.governingDimension,
+    this.blockingReason,
+  });
   final Fa04AssessmentStatus status;
   final List<Fa04PowerCaseResult> powerCases;
   final List<Fa04CurrentCaseResult> currentCases;
@@ -127,41 +153,159 @@ final class Fa04SourceRequirementKernel {
   const Fa04SourceRequirementKernel();
 
   Fa04Result evaluate(Fa04Input input) {
-    if (input.requirementConflict) return _blocked(input, 'FA04_REQUIREMENT_SEMANTICS_CONFLICT');
-    if (input.pwr01GlobalDemandFingerprint != input.expectedGlobalDemandFingerprint ||
-        input.pwr02GlobalDemandFingerprint != input.expectedGlobalDemandFingerprint) {
+    if (input.requirementConflict) {
+      return _blocked(input, 'FA04_REQUIREMENT_SEMANTICS_CONFLICT');
+    }
+    if (input.pwr01GlobalDemandFingerprint !=
+            input.expectedGlobalDemandFingerprint ||
+        input.pwr02GlobalDemandFingerprint !=
+            input.expectedGlobalDemandFingerprint) {
       return _blocked(input, 'FA04_GLOBAL_DEMAND_CLOSURE_MISMATCH');
     }
-    if (input.pwr02RequirementSetFingerprint != input.expectedRequirementSetFingerprint) {
+    if (input.pwr02RequirementSetFingerprint !=
+        input.expectedRequirementSetFingerprint) {
       return _blocked(input, 'FA04_REQUIREMENT_SET_FINGERPRINT_MISMATCH');
     }
 
-    final p = [...input.powerCases]..sort((a,b)=>a.caseId.compareTo(b.caseId));
-    final i = [...input.currentCases]..sort((a,b)=>a.caseId.compareTo(b.caseId));
-    final pr = <Fa04PowerCaseResult>[];
-    final ir = <Fa04CurrentCaseResult>[];
-    for (final c in p) {
-      final margin = c.availableCapability - c.requiredCapability;
-      pr.add(Fa04PowerCaseResult(caseId:c.caseId,globalDemand:c.globalDemand,requiredCapability:c.requiredCapability,availableCapability:c.availableCapability,margin:margin,status:margin.value>=Elv5Rational.zero?Fa04AssessmentStatus.pass:Fa04AssessmentStatus.fail));
+    final power = [...input.powerCases]
+      ..sort((a, b) => a.caseId.compareTo(b.caseId));
+    final current = [...input.currentCases]
+      ..sort((a, b) => a.caseId.compareTo(b.caseId));
+    final powerResults = <Fa04PowerCaseResult>[];
+    final currentResults = <Fa04CurrentCaseResult>[];
+
+    for (final item in power) {
+      final margin = item.availableCapability - item.requiredCapability;
+      powerResults.add(Fa04PowerCaseResult(
+        caseId: item.caseId,
+        globalDemand: item.globalDemand,
+        requiredCapability: item.requiredCapability,
+        availableCapability: item.availableCapability,
+        margin: margin,
+        status: margin.value >= Elv5Rational.zero
+            ? Fa04AssessmentStatus.pass
+            : Fa04AssessmentStatus.fail,
+      ));
     }
-    for (final c in i) {
-      final margin = c.availableCapability - c.requiredCapability;
-      ir.add(Fa04CurrentCaseResult(caseId:c.caseId,globalDemand:c.globalDemand,requiredCapability:c.requiredCapability,availableCapability:c.availableCapability,margin:margin,status:margin.value>=Elv5Rational.zero?Fa04AssessmentStatus.pass:Fa04AssessmentStatus.fail));
+    for (final item in current) {
+      final margin = item.availableCapability - item.requiredCapability;
+      currentResults.add(Fa04CurrentCaseResult(
+        caseId: item.caseId,
+        globalDemand: item.globalDemand,
+        requiredCapability: item.requiredCapability,
+        availableCapability: item.availableCapability,
+        margin: margin,
+        status: margin.value >= Elv5Rational.zero
+            ? Fa04AssessmentStatus.pass
+            : Fa04AssessmentStatus.fail,
+      ));
     }
 
-    for (final r in pr) {
-      if (r.status == Fa04AssessmentStatus.fail) return _result(input,pr,ir,Fa04AssessmentStatus.fail,r.caseId,Fa04GoverningDimension.power);
+    for (final result in powerResults) {
+      if (result.status == Fa04AssessmentStatus.fail) {
+        return _result(
+          input,
+          powerResults,
+          currentResults,
+          Fa04AssessmentStatus.fail,
+          result.caseId,
+          Fa04GoverningDimension.power,
+        );
+      }
     }
-    for (final r in ir) {
-      if (r.status == Fa04AssessmentStatus.fail) return _result(input,pr,ir,Fa04AssessmentStatus.fail,r.caseId,Fa04GoverningDimension.current);
+    for (final result in currentResults) {
+      if (result.status == Fa04AssessmentStatus.fail) {
+        return _result(
+          input,
+          powerResults,
+          currentResults,
+          Fa04AssessmentStatus.fail,
+          result.caseId,
+          Fa04GoverningDimension.current,
+        );
+      }
     }
-    Fa04PowerCaseResult? gp;
-    for (final r in pr) { if (gp == null || r.margin < gp.margin) gp = r; }
-    Fa04CurrentCaseResult? gi;
-    for (final r in ir) { if (gi == null || r.margin < gi.margin) gi = r; }
-    return _result(input,pr,ir,Fa04AssessmentStatus.pass,gp?.caseId ?? gi?.caseId,gp != null ? Fa04GoverningDimension.power : (gi != null ? Fa04GoverningDimension.current : null));
+
+    // PASS headroom in W and A is not physically comparable. Preserve both
+    // dimension results without fabricating one cross-unit governing margin.
+    final hasPower = powerResults.isNotEmpty;
+    final hasCurrent = currentResults.isNotEmpty;
+    if (hasPower && hasCurrent) {
+      return _result(
+        input,
+        powerResults,
+        currentResults,
+        Fa04AssessmentStatus.pass,
+        null,
+        null,
+      );
+    }
+    if (hasPower) {
+      final governing = _smallestPowerMargin(powerResults);
+      return _result(
+        input,
+        powerResults,
+        currentResults,
+        Fa04AssessmentStatus.pass,
+        governing?.caseId,
+        Fa04GoverningDimension.power,
+      );
+    }
+    final governing = _smallestCurrentMargin(currentResults);
+    return _result(
+      input,
+      powerResults,
+      currentResults,
+      Fa04AssessmentStatus.pass,
+      governing?.caseId,
+      Fa04GoverningDimension.current,
+    );
   }
 
-  static Fa04Result _blocked(Fa04Input input,String reason)=>Fa04Result(status:Fa04AssessmentStatus.blocked,powerCases:const[],currentCases:const[],requirementContributors:List.unmodifiable(input.requirementContributors),blockingReason:reason);
-  static Fa04Result _result(Fa04Input input,List<Fa04PowerCaseResult> p,List<Fa04CurrentCaseResult> i,Fa04AssessmentStatus s,String? caseId,Fa04GoverningDimension? d)=>Fa04Result(status:s,powerCases:List.unmodifiable(p),currentCases:List.unmodifiable(i),requirementContributors:List.unmodifiable(input.requirementContributors),governingCaseId:caseId,governingDimension:d);
+  static Fa04Result _blocked(Fa04Input input, String reason) => Fa04Result(
+        status: Fa04AssessmentStatus.blocked,
+        powerCases: const [],
+        currentCases: const [],
+        requirementContributors:
+            List.unmodifiable(input.requirementContributors),
+        blockingReason: reason,
+      );
+
+  static Fa04Result _result(
+    Fa04Input input,
+    List<Fa04PowerCaseResult> power,
+    List<Fa04CurrentCaseResult> current,
+    Fa04AssessmentStatus status,
+    String? caseId,
+    Fa04GoverningDimension? dimension,
+  ) =>
+      Fa04Result(
+        status: status,
+        powerCases: List.unmodifiable(power),
+        currentCases: List.unmodifiable(current),
+        requirementContributors:
+            List.unmodifiable(input.requirementContributors),
+        governingCaseId: caseId,
+        governingDimension: dimension,
+      );
+
+  static Fa04PowerCaseResult? _smallestPowerMargin(
+    List<Fa04PowerCaseResult> values,
+  ) {
+    Fa04PowerCaseResult? best;
+    for (final value in values) {
+      if (best == null || value.margin < best.margin) best = value;
+    }
+    return best;
+  }
+
+  static Fa04CurrentCaseResult? _smallestCurrentMargin(
+    List<Fa04CurrentCaseResult> values,
+  ) {
+    Fa04CurrentCaseResult? best;
+    for (final value in values) {
+      if (best == null || value.margin < best.margin) best = value;
+    }
+    return best;
+  }
 }
