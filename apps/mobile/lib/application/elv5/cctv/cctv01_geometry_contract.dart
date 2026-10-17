@@ -63,11 +63,10 @@ final class Cctv01GeometryContract {
         (minimumCoverageRatio! < Elv5Rational.zero || minimumCoverageRatio! > Elv5Rational.one)) {
       throw ArgumentError.value(minimumCoverageRatio, 'minimumCoverageRatio', 'Must be in [0,1].');
     }
-    final f = _norm2(forward);
-    final r = _norm2(right);
-    final u = _norm2(up);
-    if (f.isZero || r.isZero || u.isZero) {
-      throw ArgumentError('CCTV01 orientation vectors must be non-zero.');
+    if (_norm2(forward) != Elv5Rational.one ||
+        _norm2(right) != Elv5Rational.one ||
+        _norm2(up) != Elv5Rational.one) {
+      throw ArgumentError('CCTV01 orientation vectors must be exact unit vectors.');
     }
     if (!_dot(forward, right).isZero || !_dot(forward, up).isZero || !_dot(right, up).isZero) {
       throw ArgumentError('CCTV01 orientation vectors must be exactly orthogonal.');
