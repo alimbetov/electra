@@ -46,9 +46,20 @@ void main() {
     expect(qualified.isQualificationAddressed, isTrue);
     expect(qualified.evaluationId, isNot(base.evaluationId));
     expect(
+      qualified.evidence['foundationQualificationIdentity'],
+      identity.toCanonicalValue(),
+    );
+    expect(
+      qualified.evidence['foundationQualificationIdentitySha256'],
+      identity.canonicalSha256(),
+    );
+    expect(
       qualified.withQualificationIdentity(identity).evaluationId,
       qualified.evaluationId,
     );
+    final record = qualified.toRecord(projectId: 'project-1');
+    expect(record.evidenceJson, contains(identity.sourceSha));
+    expect(record.evidenceJson, contains(identity.authorityFingerprint));
   });
 
   test('qualification identity cannot bind another process version', () {
@@ -88,6 +99,48 @@ void main() {
           sourceSha: List<String>.filled(64, 'd').join(),
           authorityFingerprint: Elv5FoundationAuthorityManifest.instance.fingerprint(),
         ),
+      ),
+      throwsStateError,
+    );
+  });
+
+  test('qualification identity cannot exist without matching persisted evidence', () {
+    final descriptor = Elv5ProcessCatalog.require(Elv5ProcessCode.cctv01);
+    final fingerprint = List<String>.filled(64, 'e').join();
+    final identity = Elv5QualificationIdentity(
+      processVersion: descriptor.versions.processVersion,
+      rulesetVersion: Elv5FoundationAuthorityManifest.rulesetVersion,
+      sourceSha: List<String>.filled(64, 'f').join(),
+      authorityFingerprint: Elv5FoundationAuthorityManifest.instance.fingerprint(),
+    );
+
+    expect(
+      () => Elv5ProcessEvaluationCandidate(
+        nodeKey: Elv5EngineeringNodeKeyV3(
+          designRevisionId: 'design-1',
+          scope: Elv5ScopeRef(
+            kind: Elv5ScopeKind.design,
+            scopeId: 'design-1',
+            scenarioKey: 'NONE',
+          ),
+          processCode: Elv5ProcessCode.cctv01,
+          subject: Elv5SubjectRef(kind: 'CAMERA', id: 'cam-1'),
+        ),
+        algorithmVersion: descriptor.versions.algorithmVersion,
+        inputSchemaVersion: descriptor.versions.inputSchemaVersion,
+        outputSchemaVersion: descriptor.versions.outputSchemaVersion,
+        numericBackendVersion: descriptor.versions.numericBackendVersion,
+        canonicalEncoderVersion: Elv5RuntimeContract.canonicalEncoderVersion,
+        inputFingerprint: fingerprint,
+        policyFingerprint: fingerprint,
+        execution: Elv5Execution.succeeded,
+        completion: Elv5Completion.complete,
+        assessment: Elv5Assessment.pass,
+        output: const <String,Object?>{},
+        evidence: const <String,Object?>{},
+        dependencies: const <Never>[],
+        completedAtUtc: DateTime.utc(2026, 10, 17),
+        qualificationIdentity: identity,
       ),
       throwsStateError,
     );
