@@ -1,0 +1,28 @@
+{
+  "schema": "electra.elv5-process-registry-amendment.v1",
+  "status": "AUTHORITATIVE_HARDENING_AMENDMENT",
+  "baseRegistry": "process-registry.json",
+  "processCountDelta": 0,
+  "targetProcessCode": "FA-08",
+  "patch": {
+    "requiredInputsAdd": [
+      "exact shared ampacity contract when AMPACITY_IZ_A is required by selected technical policy",
+      "exact conductor cross-section/material/installation-method/loaded-conductor basis",
+      "exact ambient-temperature correction evidence",
+      "exact grouping membership/arrangement correction evidence"
+    ],
+    "requiredDimensionsAdd": [
+      "ampacity-Iz"
+    ],
+    "algorithmAdd": "Derive AMPACITY_IZ_A only through Elv5AmpacityKernel from immutable reference-row and correction-factor evidence. Never accept caller-supplied raw AMPACITY_IZ_A, never infer missing factors, and never merge Iz with connected-load or voltage-drop verdicts.",
+    "dependencyNotesAdd": [
+      "ampacity reference edition",
+      "grouping membership selector",
+      "temperature evidence edition",
+      "installation method and loaded conductor profile"
+    ],
+    "factKindsAdd": [
+      "EXACT_AMPACITY_EVIDENCE"
+    ]
+  }
+}
