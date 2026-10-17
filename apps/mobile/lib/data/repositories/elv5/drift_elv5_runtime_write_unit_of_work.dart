@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
+import 'package:engineering_core/engineering_core_elv5.dart';
 
 import '../../../application/elv5/persistence/elv5_runtime_persistence.dart';
 import '../../../application/elv_write_unit_of_work.dart';
@@ -115,7 +118,7 @@ final class _DriftElv5CommandLedgerStore implements ElvCommandLedgerStore {
         Variable.withString(entry.logicalResultJson),
         Variable<DateTime>(entry.createdAt.toUtc()),
         Variable<DateTime>(entry.committedAt.toUtc()),
-        Variable.withString(entry.originDeviceId),
+        Variable.withString(originDeviceId),
       ],
     );
   }
@@ -223,34 +226,38 @@ final class _DriftElv5EvaluationStore implements Elv5EvaluationStore {
     );
   }
 
-  Elv5EvaluationRecord _evaluation(QueryRow row) => Elv5EvaluationRecord(
-    projectId: row.read<String>('project_id'),
-    designRevisionId: row.read<String>('design_revision_id'),
-    logicalNodeKeyJson: row.read<String>('logical_node_key_json'),
-    logicalNodeKeySha256: row.read<String>('logical_node_key_sha256'),
-    evaluationId: row.read<String>('evaluation_id'),
-    scopeKind: row.read<String>('scope_kind'),
-    scopeId: row.read<String>('scope_id'),
-    scenarioKey: row.read<String>('scenario_key'),
-    processCode: row.read<String>('process_code'),
-    subjectKind: row.read<String>('subject_kind'),
-    subjectId: row.read<String>('subject_id'),
-    algorithmVersion: row.read<String>('algorithm_version'),
-    inputSchemaVersion: row.read<String>('input_schema_version'),
-    outputSchemaVersion: row.read<String>('output_schema_version'),
-    numericBackendVersion: row.read<String>('numeric_backend_version'),
-    canonicalEncoderVersion: row.read<String>('canonical_encoder_version'),
-    inputFingerprint: row.read<String>('input_fingerprint'),
-    policyFingerprint: row.read<String>('policy_fingerprint'),
-    execution: row.read<String>('execution'),
-    completion: row.read<String>('completion'),
-    assessment: row.read<String>('assessment'),
-    outputJson: row.read<String>('output_json'),
-    outputSha256: row.read<String>('output_sha256'),
-    evidenceJson: row.read<String>('evidence_json'),
-    evidenceSha256: row.read<String>('evidence_sha256'),
-    completedAtUtc: row.read<DateTime>('completed_at_utc').toUtc(),
-  );
+  Elv5EvaluationRecord _evaluation(QueryRow row) {
+    final evidenceJson = row.read<String>('evidence_json');
+    return Elv5EvaluationRecord(
+      projectId: row.read<String>('project_id'),
+      designRevisionId: row.read<String>('design_revision_id'),
+      logicalNodeKeyJson: row.read<String>('logical_node_key_json'),
+      logicalNodeKeySha256: row.read<String>('logical_node_key_sha256'),
+      evaluationId: row.read<String>('evaluation_id'),
+      scopeKind: row.read<String>('scope_kind'),
+      scopeId: row.read<String>('scope_id'),
+      scenarioKey: row.read<String>('scenario_key'),
+      processCode: row.read<String>('process_code'),
+      subjectKind: row.read<String>('subject_kind'),
+      subjectId: row.read<String>('subject_id'),
+      algorithmVersion: row.read<String>('algorithm_version'),
+      inputSchemaVersion: row.read<String>('input_schema_version'),
+      outputSchemaVersion: row.read<String>('output_schema_version'),
+      numericBackendVersion: row.read<String>('numeric_backend_version'),
+      canonicalEncoderVersion: row.read<String>('canonical_encoder_version'),
+      inputFingerprint: row.read<String>('input_fingerprint'),
+      policyFingerprint: row.read<String>('policy_fingerprint'),
+      execution: row.read<String>('execution'),
+      completion: row.read<String>('completion'),
+      assessment: row.read<String>('assessment'),
+      outputJson: row.read<String>('output_json'),
+      outputSha256: row.read<String>('output_sha256'),
+      evidenceJson: evidenceJson,
+      evidenceSha256: row.read<String>('evidence_sha256'),
+      completedAtUtc: row.read<DateTime>('completed_at_utc').toUtc(),
+      qualificationIdentity: _qualificationIdentity(evidenceJson),
+    );
+  }
 }
 
 final class _DriftElv5PointerStore implements Elv5PointerStore {
@@ -331,7 +338,6 @@ final class _DriftElv5PointerStore implements Elv5PointerStore {
         Variable.withString(write.freshness.name.toUpperCase()),
         Variable<String>(write.evaluationId),
         Variable<String>(write.inputFingerprint),
-        Variable<String>(write.outputSha256),
         Variable<DateTime>(write.updatedAtUtc.toUtc()),
         Variable.withString(originDeviceId),
         Variable.withString(write.projectId),
@@ -493,4 +499,27 @@ final class _DriftElv5DependencyStore implements Elv5DependencyStore {
     relationKind: row.read<String>('relation_kind'),
     updatedAtUtc: row.read<DateTime>('updated_at').toUtc(),
   );
+}
+
+Elv5QualificationIdentity? _qualificationIdentity(String evidenceJson) {
+  final decoded = jsonDecode(evidenceJson);
+  if (decoded is! Map) {
+    throw const FormatException('ELV5 persisted evidence must be an object.');
+  }
+  final evidence = Map<String, Object?>.from(decoded);
+  final rawIdentity = evidence['foundationQualificationIdentity'];
+  final rawSha = evidence['foundationQualificationIdentitySha256'];
+  if (rawIdentity == null && rawSha == null) return null;
+  if (rawIdentity is! Map || rawSha is! String) {
+    throw const FormatException(
+      'ELV5 qualification evidence identity/hash must be present together.',
+    );
+  }
+  final identity = Elv5QualificationIdentity.fromMap(
+    Map<String, Object?>.from(rawIdentity),
+  );
+  if (identity.canonicalSha256() != rawSha) {
+    throw StateError('ELV5_QUALIFICATION_EVIDENCE_HASH_MISMATCH');
+  }
+  return identity;
 }
