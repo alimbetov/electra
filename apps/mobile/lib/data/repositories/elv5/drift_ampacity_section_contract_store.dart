@@ -138,9 +138,16 @@ final class DriftElv5AmpacitySectionContractStore
     if (contract.routeSectionId != traversal.routeSegmentId ||
         contract.cableRunId != cableRun.id ||
         contract.cableId != cableRun.cableId) {
-      throw StateError(
-        'ELV5_AMPACITY_SECTION_PHYSICAL_IDENTITY_MISMATCH:'
-        '${contract.routeSectionId}',
+      throw Elv5AmpacityRouteResolutionException(
+        'ELV5_AMPACITY_SECTION_PHYSICAL_IDENTITY_MISMATCH',
+        <String, Object?>{
+          'routeSectionId': traversal.routeSegmentId,
+          'contractRouteSectionId': contract.routeSectionId,
+          'expectedCableRunId': cableRun.id,
+          'contractCableRunId': contract.cableRunId,
+          'expectedCableId': cableRun.cableId,
+          'contractCableId': contract.cableId,
+        },
       );
     }
 
@@ -148,16 +155,29 @@ final class DriftElv5AmpacitySectionContractStore
     if (contract.expectedEnvironmentProfileId != profile.profileId ||
         contract.expectedEnvironmentEditionId != profile.editionId ||
         contract.expectedEnvironmentContentHash != environment.binding.contentHash) {
-      throw StateError(
-        'ELV5_AMPACITY_SECTION_ENVIRONMENT_IDENTITY_MISMATCH:'
-        '${contract.routeSectionId}',
+      throw Elv5AmpacityRouteResolutionException(
+        'ELV5_AMPACITY_SECTION_ENVIRONMENT_IDENTITY_MISMATCH',
+        <String, Object?>{
+          'routeSectionId': contract.routeSectionId,
+          'expectedProfileId': contract.expectedEnvironmentProfileId,
+          'actualProfileId': profile.profileId,
+          'expectedEditionId': contract.expectedEnvironmentEditionId,
+          'actualEditionId': profile.editionId,
+          'expectedContentHash': contract.expectedEnvironmentContentHash,
+          'actualContentHash': environment.binding.contentHash,
+        },
       );
     }
     if (contract.temperatureCorrection.actualAmbientTemperatureC !=
         profile.temperatureC.maximum) {
-      throw StateError(
-        'ELV5_AMPACITY_SECTION_TEMPERATURE_SCOPE_MISMATCH:'
-        '${contract.routeSectionId}',
+      throw Elv5AmpacityRouteResolutionException(
+        'ELV5_AMPACITY_SECTION_TEMPERATURE_SCOPE_MISMATCH',
+        <String, Object?>{
+          'routeSectionId': contract.routeSectionId,
+          'profileMaximumC': profile.temperatureC.maximum.toMap(),
+          'correctionTemperatureC':
+              contract.temperatureCorrection.actualAmbientTemperatureC.toMap(),
+        },
       );
     }
 
@@ -173,7 +193,7 @@ final class DriftElv5AmpacitySectionContractStore
   Future<void> replace(ReplaceElv5AmpacitySectionContractCommand command) =>
       database.transaction(() async {
         final now = _nowUtc().toUtc();
-        await _requireWorkingRevision(command, now);
+        await _requireWorkingRevision(command);
 
         final payload = command.contract.toCanonicalValue();
         final hash = _encoder.sha256(payload);
@@ -213,7 +233,6 @@ final class DriftElv5AmpacitySectionContractStore
 
   Future<void> _requireWorkingRevision(
     ReplaceElv5AmpacitySectionContractCommand command,
-    DateTime now,
   ) async {
     final revision = await database.customSelect(
       'SELECT state, revision FROM project_design_revisions '
