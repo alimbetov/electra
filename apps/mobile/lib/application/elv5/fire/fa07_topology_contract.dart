@@ -59,8 +59,16 @@ final class Fa07TopologyContract {
         requiredFaultCases=Set.unmodifiable(requiredFaultCases.map(_faultCase)),
         faultScenarios=List.unmodifiable(_faults(faultScenarios)) {
     if(maxBranchNodes<0) throw ArgumentError('FA07 maxBranchNodes must be nonnegative.');
+    if(this.sourceNodeId==this.returnNodeId) throw ArgumentError('FA07 source and return nodes must differ.');
     final edgeIds=this.edges.map((e)=>e.edgeId).toSet();
-    for(final fault in this.faultScenarios){if(!edgeIds.containsAll(fault.removedEdgeIds))throw ArgumentError('FA07 fault references unknown edge.');}
+    final graphNodes=<String>{for(final edge in this.edges)...<String>{edge.fromNodeId,edge.toNodeId}};
+    final mandatoryNodes=<String>{this.sourceNodeId,this.returnNodeId,...this.deviceNodeIdByDeviceId.values};
+    if(!graphNodes.containsAll(mandatoryNodes)) throw ArgumentError('FA07 graph omits source/return/device node.');
+    if(!graphNodes.containsAll(this.permittedBranchNodeIds)) throw ArgumentError('FA07 permitted branch node is outside graph.');
+    for(final fault in this.faultScenarios){
+      if(!edgeIds.containsAll(fault.removedEdgeIds))throw ArgumentError('FA07 fault references unknown edge.');
+      if(!this.deviceNodeIdByDeviceId.keys.toSet().containsAll(fault.expectedReachableDeviceIds))throw ArgumentError('FA07 fault expected set references unknown device.');
+    }
   }
   static const schema='electra.elv5-fa07-topology-contract.v1';
   final String loopId; final Fa07TopologyProfileIdentity topologyProfile; final String expectedFa01MembershipFingerprint;
@@ -80,7 +88,7 @@ final class Fa07TopologyContract {
     if(edgeRaw is! List||faultRaw is! List||max is! int)throw const FormatException('FA07 contract field type mismatch.');
     return Fa07TopologyContract(loopId:_mapText(map,'loopId'),topologyProfile:Fa07TopologyProfileIdentity.fromMap(_object(map['topologyProfile'],'topologyProfile')),
       expectedFa01MembershipFingerprint:_mapText(map,'expectedFa01MembershipFingerprint'),sourceNodeId:_mapText(map,'sourceNodeId'),returnNodeId:_mapText(map,'returnNodeId'),
-      deviceNodeIdByDeviceId:<String,String>{for(final e in deviceRaw.entries)_text(e.key,'deviceId'):_text(e.value as String,'nodeId')},
+      deviceNodeIdByDeviceId:<String,String>{for(final e in deviceRaw.entries)_text(e.key,'deviceId'):_stringValue(e.value,'nodeId')},
       edges:[for(final e in edgeRaw)Fa07EdgeContract.fromMap(_object(e,'edge'))],permittedBranchNodeIds:_strings(map['permittedBranchNodeIds'],'permittedBranchNodeIds'),maxBranchNodes:max,
       requiredFaultCases:_strings(map['requiredFaultCases'],'requiredFaultCases'),faultScenarios:[for(final f in faultRaw)Fa07FaultScenarioContract.fromMap(_object(f,'faultScenario'))]);
   }
@@ -95,6 +103,7 @@ List<Fa07FaultScenarioContract> _faults(Iterable<Fa07FaultScenarioContract> valu
 String _faultCase(String value){final code=_text(value,'faultCase');if(!const <String>{'OPEN_FAULT','SHORT_FAULT','RETURN_LOSS'}.contains(code))throw ArgumentError('Unsupported FA07 fault case: $code');return code;}
 Map<String,Object?> _object(Object? v,String f){if(v is! Map)throw FormatException('$f must be object.');return Map<String,Object?>.from(v);}
 List<String> _strings(Object? v,String f){if(v is! List||v.any((e)=>e is! String))throw FormatException('$f must be string array.');return v.cast<String>();}
+String _stringValue(Object? v,String f){if(v is! String)throw FormatException('$f must be text.');return _text(v,f);}
 String _mapText(Map<String,Object?> m,String k){final v=m[k];if(v is! String)throw FormatException('$k must be text.');return _text(v,k);}
 String _text(String v,String f){final n=v.trim();if(n.isEmpty)throw ArgumentError.value(v,f,'Must not be empty.');return n;}
 String _sha(String v,String f){final n=_text(v,f);if(!RegExp(r'^[0-9a-f]{64}$').hasMatch(n))throw ArgumentError.value(v,f,'Must be lowercase SHA-256.');return n;}
