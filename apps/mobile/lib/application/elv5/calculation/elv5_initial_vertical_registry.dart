@@ -43,6 +43,8 @@ import '../lan/lan04_compatibility_contract.dart';
 import '../lan/lan04_runtime.dart';
 import '../lan/lan05_optical_section_evidence.dart';
 import '../lan/lan05_runtime.dart';
+import '../lan/lan06_rack_contract.dart';
+import '../lan/lan06_runtime.dart';
 import '../power/elv4_current_evidence_source.dart';
 import '../power/elv4_operating_fact_source.dart';
 import 'elv5_blocked_capture.dart';
@@ -59,6 +61,7 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
   required Lan02PortContractSource lan02Contracts,
   required Lan03PoeProjectionContractSource lan03Contracts,
   required Lan04CompatibilityContractSource lan04Contracts,
+  required Lan06RackBasisContractSource lan06Contracts,
   required Acs01RoleProfileContractSource acs01Contracts,
   required Acs02ResourceContractSource acs02Contracts,
   required Acs03ElectricalContractSource acs03Contracts,
@@ -117,6 +120,14 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
         nowUtc: nowUtc,
       ),
       buildLan05Executor(nowUtc: nowUtc),
+    ),
+    blocked(
+      Lan06PersistedInputResolver(
+        lanStore: lanStore,
+        contractSource: lan06Contracts,
+        nowUtc: nowUtc,
+      ),
+      buildLan06Executor(nowUtc: nowUtc),
     ),
     blocked(
       Acs01PersistedInputResolver(acsStore: acsStore, contractSource: acs01Contracts, nowUtc: nowUtc),
