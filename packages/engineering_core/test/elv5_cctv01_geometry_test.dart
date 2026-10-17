@@ -87,6 +87,15 @@ void main() {
     expect(result.governingDimension, Cctv01GoverningDimension.zoneCoverage);
   });
 
+  test('geometry without an explicit coverage threshold is not assessed', () {
+    final result = const Cctv01GeometryKernel().evaluate(input());
+
+    expect(result.status, Cctv01AssessmentStatus.notAssessed);
+    expect(result.coverageRatio, q('1'));
+    expect(result.coverageMargin, isNull);
+    expect(result.reasonCode, 'CCTV01_NO_EXPLICIT_COVERAGE_REQUIREMENT');
+  });
+
   test('mixed frames without captured transform block before geometry', () {
     final result = const Cctv01GeometryKernel().evaluate(input(
       cameraFrame: 'camera-local',
@@ -135,7 +144,7 @@ void main() {
     ]);
     final result = const Cctv01GeometryKernel().evaluate(input(zone: concave));
 
-    expect(result.status, Cctv01AssessmentStatus.pass);
+    expect(result.status, Cctv01AssessmentStatus.notAssessed);
     expect(result.coveredArea, concave.area);
     expect(result.coverageRatio, q('1'));
   });
