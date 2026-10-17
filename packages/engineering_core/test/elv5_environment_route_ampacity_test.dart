@@ -2,6 +2,8 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:test/test.dart';
 
 void main() {
+  String hash(String ch) => List<String>.filled(64, ch).join();
+
   Elv5EnvironmentProfile profile({
     required String id,
     required String edition,
@@ -26,7 +28,7 @@ void main() {
         contaminationClassCode: 'C1',
         climateClassCode: 'CL1',
         evidenceRef: 'ENV:$id:$edition',
-        evidenceContentHash: 'a' * 64,
+        evidenceContentHash: hash('a'),
       );
 
   Elv5AmpacityReferenceRow reference() => Elv5AmpacityReferenceRow(
@@ -38,7 +40,7 @@ void main() {
         loadedConductors: 3,
         baseAllowableCurrentA: Elv5Rational.parseDecimal('30'),
         evidenceRef: 'AMPACITY:ROW',
-        evidenceContentHash: 'b' * 64,
+        evidenceContentHash: hash('b'),
       );
 
   Elv5RouteAmpacitySectionInput section({
@@ -62,14 +64,14 @@ void main() {
             actualAmbientTemperatureC: env.temperatureC.maximum,
             factor: Elv5Rational.parseDecimal(temperatureFactor),
             evidenceRef: 'TEMP:$sectionId',
-            evidenceContentHash: 'c' * 64,
+            evidenceContentHash: hash('c'),
           ),
           groupingCorrection: Elv5AmpacityGroupingCorrection(
             groupedCableOrCircuitCount: 2,
             arrangementCode: 'BUNCHED',
             factor: Elv5Rational.parseDecimal(groupingFactor),
             evidenceRef: 'GROUP:$sectionId',
-            evidenceContentHash: 'd' * 64,
+            evidenceContentHash: hash('d'),
           ),
         ),
       );
@@ -157,14 +159,14 @@ void main() {
             actualAmbientTemperatureC: Elv5Rational.parseDecimal('30'),
             factor: Elv5Rational.one,
             evidenceRef: 'TEMP',
-            evidenceContentHash: 'c' * 64,
+            evidenceContentHash: hash('c'),
           ),
           groupingCorrection: Elv5AmpacityGroupingCorrection(
             groupedCableOrCircuitCount: 1,
             arrangementCode: 'SINGLE',
             factor: Elv5Rational.one,
             evidenceRef: 'GROUP',
-            evidenceContentHash: 'd' * 64,
+            evidenceContentHash: hash('d'),
           ),
         ),
       ),
