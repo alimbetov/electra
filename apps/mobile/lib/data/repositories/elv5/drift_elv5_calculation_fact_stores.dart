@@ -7,6 +7,7 @@ import 'drift_elv5_acs_write_unit_of_work.dart';
 import 'drift_elv5_cctv_write_unit_of_work.dart';
 import 'drift_elv5_fire_write_unit_of_work.dart';
 import 'drift_elv5_lan_write_unit_of_work.dart';
+import 'drift_elv5_lan_rack_write_unit_of_work.dart';
 
 /// Read façade used by ELV5 calculation capture.
 ///
@@ -82,9 +83,14 @@ final class DriftElv5LanCalculationFactStore implements Elv5LanMutationStore {
   }) : _uow = DriftElv5LanWriteUnitOfWork(
          database,
          originDeviceId: originDeviceId,
+       ),
+       _rackUow = DriftElv5LanRackWriteUnitOfWork(
+         database,
+         originDeviceId: originDeviceId,
        );
 
   final DriftElv5LanWriteUnitOfWork _uow;
+  final DriftElv5LanRackWriteUnitOfWork _rackUow;
 
   @override
   Future<Elv5LanAggregateSnapshot?> load({
@@ -92,14 +98,33 @@ final class DriftElv5LanCalculationFactStore implements Elv5LanMutationStore {
     required String designRevisionId,
     required String operation,
     required String subjectId,
-  }) => _uow.run(
-    (session) => session.lan.load(
-      projectId: projectId,
-      designRevisionId: designRevisionId,
-      operation: operation,
-      subjectId: subjectId,
-    ),
-  );
+  }) async {
+    if (operation == 'REPLACE_RACK_CAPACITY_BASIS') {
+      final rack = await _rackUow.run(
+        (session) => session.racks.loadRack(
+          projectId: projectId,
+          designRevisionId: designRevisionId,
+          rackId: subjectId,
+        ),
+      );
+      if (rack == null) return null;
+      return Elv5LanAggregateSnapshot(
+        aggregateKind: 'LAN_RACK_CAPACITY_BASIS',
+        aggregateId: rack.aggregateId,
+        subjectId: rack.rackId,
+        revision: rack.revision,
+        payload: rack.payload,
+      );
+    }
+    return _uow.run(
+      (session) => session.lan.load(
+        projectId: projectId,
+        designRevisionId: designRevisionId,
+        operation: operation,
+        subjectId: subjectId,
+      ),
+    );
+  }
 
   @override
   Future<void> replace({
