@@ -12,7 +12,7 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('FA-08 passes exact Iz technical policy but leaves compliance not assessed', () async {
+  test('FA-08 passes exact Iz/environment policy but leaves compliance not assessed', () async {
     final env = _resolvedEnvironment();
     final resolver = Fa08PersistedInputResolver(
       policySource: _PolicySource(),
@@ -31,12 +31,27 @@ void main() {
     expect(candidate.assessment, Elv5Assessment.pass);
     expect(candidate.output['technicalPolicyMatch'], 'pass');
     expect(candidate.output['verifiedCompliance'], 'notAssessed');
-    final results = candidate.output['policyResults']! as List;
-    final iz = Map<String, Object?>.from(results.single as Map);
-    expect(iz['status'], 'pass');
+    final results = <Map<String, Object?>>[
+      for (final row in candidate.output['policyResults']! as List)
+        Map<String, Object?>.from(row as Map),
+    ];
+    expect(results, hasLength(3));
+    expect(results.every((row) => row['status'] == 'pass'), isTrue);
+
+    final byCode = <String, Map<String, Object?>>{
+      for (final row in results) row['requirementCode']! as String: row,
+    };
     expect(
-      Map<String, Object?>.from(iz['numericMargin']! as Map),
+      Map<String, Object?>.from(byCode['MIN_IZ']!['numericMargin']! as Map),
       <String, Object?>{'numerator': '4', 'denominator': '1'},
+    );
+    expect(
+      Map<String, Object?>.from(byCode['MAX_TEMP']!['numericMargin']! as Map),
+      <String, Object?>{'numerator': '5', 'denominator': '1'},
+    );
+    expect(
+      Map<String, Object?>.from(byCode['MAX_RH']!['numericMargin']! as Map),
+      <String, Object?>{'numerator': '10', 'denominator': '1'},
     );
   });
 
@@ -132,6 +147,20 @@ final class _PolicySource implements Fa08CablePolicyContractSource {
               propertyCode: Fa08RouteSection.ampacityIzPropertyCode,
               unitCode: 'A',
               threshold: Elv5Rational.parseDecimal('20'),
+            ),
+            Fa08Requirement.numeric(
+              code: 'MAX_TEMP',
+              kind: Fa08RequirementKind.numericMaximum,
+              propertyCode: Fa08PersistedInputResolver.environmentTempMaxCode,
+              unitCode: 'C',
+              threshold: Elv5Rational.parseDecimal('50'),
+            ),
+            Fa08Requirement.numeric(
+              code: 'MAX_RH',
+              kind: Fa08RequirementKind.numericMaximum,
+              propertyCode: Fa08PersistedInputResolver.environmentRhMaxCode,
+              unitCode: 'PCT',
+              threshold: Elv5Rational.parseDecimal('90'),
             ),
           ],
         ),
