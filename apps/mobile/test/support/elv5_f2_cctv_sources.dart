@@ -1,3 +1,6 @@
+import 'package:electra_mobile/data/repositories/elv5/drift_elv5_current_evaluation_source.dart';
+import 'package:engineering_core/engineering_core_elv5.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:electra_mobile/application/elv5/cctv/elv5_cctv_mutation_service.dart';
 import 'package:electra_mobile/application/elv5/cctv/elv5_cctv_recorder_mutation_service.dart';
 import 'package:electra_mobile/application/elv5/wire/elv5_wire_command.dart';
@@ -171,3 +174,61 @@ Map<String, Object?> f2CctvRecordingPool() => {
   },
   'policyRef': null,
 };
+
+Future<(String, String)> seedF2CctvCurrentDependencies(AppDatabase db) async {
+  await seedF2CctvTopology(db);
+  await replaceF2CctvRecorder(db, f2CctvRecorder(), 'seed-recorder');
+  await replaceF2CctvAggregate(
+    db,
+    operation: 'REPLACE_CAMERA_STREAMS',
+    payload: f2CctvStreams(),
+    commandId: 'seed-streams',
+  );
+  await replaceF2CctvAggregate(
+    db,
+    operation: 'REPLACE_RECORDING_ASSIGNMENTS',
+    payload: f2CctvRecordingPool(),
+    commandId: 'seed-pool',
+  );
+  for (final item in [
+    (Elv5ProcessCode.cctv02, 'CAMERA', 'cam-1'),
+    (Elv5ProcessCode.cctv03, 'RECORDING_POOL', 'pool-1'),
+  ]) {
+    final upstream = Elv5F2ProductionLifecycle(
+      process: item.$1,
+      subjectKind: item.$2,
+      subjectId: item.$3,
+    )..db = db;
+    await upstream
+        .runtime(db)
+        .service
+        .execute(
+          upstream.command(
+            'seed-${item.$1.wireCode}',
+            await upstream.revision(),
+            0,
+          ),
+        );
+  }
+  final source = DriftElv5CurrentEvaluationSource(db);
+  final camera =
+      (await source.loadCurrent(
+        projectId: 'p',
+        designRevisionId: 'd',
+        processCode: Elv5ProcessCode.cctv02,
+        subjectId: 'cam-1',
+      )).single;
+  final pool =
+      (await source.loadCurrent(
+        projectId: 'p',
+        designRevisionId: 'd',
+        processCode: Elv5ProcessCode.cctv03,
+        subjectId: 'pool-1',
+      )).single;
+  expect(camera.execution, 'SUCCEEDED');
+  expect(camera.completion, 'COMPLETE');
+  expect(pool.execution, 'SUCCEEDED');
+  expect(pool.completion, 'COMPLETE');
+  expect(pool.output['sizingBasis'], 'guaranteedUpperBound');
+  return (camera.inputFingerprint, pool.inputFingerprint);
+}

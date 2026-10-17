@@ -7,6 +7,7 @@ import '../../../application/elv5/persistence/elv5_runtime_persistence.dart';
 import '../../../application/elv_write_unit_of_work.dart';
 import '../../database/app_database.dart';
 import '../../database/drift_raw_statement.dart';
+import 'drift_elv5_lifecycle_invalidation.dart';
 
 final class DriftElv5RuntimeWriteUnitOfWork
     implements Elv5RuntimeWriteUnitOfWork {
@@ -331,6 +332,11 @@ final class _DriftElv5PointerStore implements Elv5PointerStore {
       return true;
     }
 
+    final previous = await loadPointersBulk(
+      projectId: write.projectId,
+      designRevisionId: write.designRevisionId,
+      logicalNodeKeySha256s: {write.logicalNodeKeySha256},
+    );
     final updated = await database.customUpdate(
       'UPDATE discipline_evaluation_pointers '
       'SET logical_node_key_json = ?, freshness = ?, generation = generation + 1, '
@@ -352,6 +358,21 @@ final class _DriftElv5PointerStore implements Elv5PointerStore {
         Variable<int>(write.expectedGeneration),
       ],
     );
+    if (updated == 1) {
+      final old = previous[write.logicalNodeKeySha256]?.evaluationId;
+      if (old != null) {
+        await DriftElv5LifecycleInvalidation(
+          database,
+          originDeviceId: originDeviceId,
+        ).invalidateConsumers(
+          projectId: write.projectId,
+          designRevisionId: write.designRevisionId,
+          evaluationId: old,
+          producerNodeHash: write.logicalNodeKeySha256,
+          updatedAtUtc: write.updatedAtUtc,
+        );
+      }
+    }
     return updated == 1;
   }
 
@@ -361,26 +382,15 @@ final class _DriftElv5PointerStore implements Elv5PointerStore {
     required String designRevisionId,
     required Set<String> logicalNodeKeySha256s,
     required DateTime updatedAtUtc,
-  }) async {
-    if (logicalNodeKeySha256s.isEmpty) return 0;
-    final keys = logicalNodeKeySha256s.toList(growable: false)..sort();
-    final placeholders = List.filled(keys.length, '?').join(',');
-    return database.customUpdate(
-      'UPDATE discipline_evaluation_pointers '
-      "SET freshness = 'STALE', generation = generation + 1, updated_at = ?, "
-      'origin_device_id = ? '
-      'WHERE project_id = ? AND design_revision_id = ? '
-      'AND logical_node_key_sha256 IN ($placeholders) '
-      "AND freshness <> 'STALE'",
-      variables: [
-        Variable<DateTime>(updatedAtUtc.toUtc()),
-        Variable.withString(originDeviceId),
-        Variable.withString(projectId),
-        Variable.withString(designRevisionId),
-        ...keys.map(Variable.withString),
-      ],
-    );
-  }
+  }) => DriftElv5LifecycleInvalidation(
+    database,
+    originDeviceId: originDeviceId,
+  ).invalidateNodes(
+    projectId: projectId,
+    designRevisionId: designRevisionId,
+    nodeHashes: logicalNodeKeySha256s,
+    updatedAtUtc: updatedAtUtc,
+  );
 
   Elv5EvaluationPointer _pointer(QueryRow row) => Elv5EvaluationPointer(
     projectId: row.read<String>('project_id'),

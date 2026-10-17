@@ -1,7 +1,6 @@
 import 'package:electra_mobile/application/elv5/cctv/cctv05_capability_contract.dart';
 import 'package:electra_mobile/data/database/app_database.dart';
 import 'package:electra_mobile/data/repositories/elv5/drift_elv5_cctv_contract_mutation_coordinator.dart';
-import 'package:electra_mobile/data/repositories/elv5/drift_elv5_current_evaluation_source.dart';
 import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 import '../support/elv5_f2_cctv_sources.dart';
@@ -19,62 +18,9 @@ void main() {
       late String cameraFingerprint, poolFingerprint;
       await lifecycle.run(
         seed: (db) async {
-          await seedF2CctvTopology(db);
-          await replaceF2CctvRecorder(db, f2CctvRecorder(), 'seed-recorder');
-          await replaceF2CctvAggregate(
-            db,
-            operation: 'REPLACE_CAMERA_STREAMS',
-            payload: f2CctvStreams(),
-            commandId: 'seed-streams',
-          );
-          await replaceF2CctvAggregate(
-            db,
-            operation: 'REPLACE_RECORDING_ASSIGNMENTS',
-            payload: f2CctvRecordingPool(),
-            commandId: 'seed-pool',
-          );
-          for (final item in [
-            (Elv5ProcessCode.cctv02, 'CAMERA', 'cam-1'),
-            (Elv5ProcessCode.cctv03, 'RECORDING_POOL', 'pool-1'),
-          ]) {
-            final upstream = Elv5F2ProductionLifecycle(
-              process: item.$1,
-              subjectKind: item.$2,
-              subjectId: item.$3,
-            )..db = db;
-            await upstream
-                .runtime(db)
-                .service
-                .execute(
-                  upstream.command(
-                    'seed-${item.$1.wireCode}',
-                    await upstream.revision(),
-                    0,
-                  ),
-                );
-          }
-          final source = DriftElv5CurrentEvaluationSource(db);
-          final camera =
-              (await source.loadCurrent(
-                projectId: 'p',
-                designRevisionId: 'd',
-                processCode: Elv5ProcessCode.cctv02,
-                subjectId: 'cam-1',
-              )).single;
-          final pool =
-              (await source.loadCurrent(
-                projectId: 'p',
-                designRevisionId: 'd',
-                processCode: Elv5ProcessCode.cctv03,
-                subjectId: 'pool-1',
-              )).single;
-          expect(camera.execution, 'SUCCEEDED');
-          expect(camera.completion, 'COMPLETE');
-          expect(pool.execution, 'SUCCEEDED');
-          expect(pool.completion, 'COMPLETE');
-          expect(pool.output['sizingBasis'], 'guaranteedUpperBound');
-          cameraFingerprint = camera.inputFingerprint;
-          poolFingerprint = pool.inputFingerprint;
+          final fingerprints = await seedF2CctvCurrentDependencies(db);
+          cameraFingerprint = fingerprints.$1;
+          poolFingerprint = fingerprints.$2;
           await _replace(
             db,
             cameraFingerprint,

@@ -4,6 +4,7 @@ import 'package:drift/drift.dart';
 import 'package:engineering_core/engineering_core_elv5.dart';
 
 import '../../database/app_database.dart';
+import 'drift_elv5_lifecycle_invalidation.dart';
 
 final class DriftElv5DependencyInvalidator {
   const DriftElv5DependencyInvalidator(
@@ -27,6 +28,10 @@ final class DriftElv5DependencyInvalidator {
     required String domain,
     required String subjectId,
   }) => database.transaction(() async {
+    await DriftElv5LifecycleInvalidation(
+      database,
+      originDeviceId: originDeviceId,
+    ).requireWorking(projectId, designRevisionId);
     final rows =
         await database
             .customSelect(
@@ -70,7 +75,12 @@ final class DriftElv5DependencyInvalidator {
     required String projectId,
     required String designRevisionId,
     required Iterable<Elv5InvalidationDependency> dependencies,
-  }) async {
+  }) => database.transaction(() async {
+    final lifecycle = DriftElv5LifecycleInvalidation(
+      database,
+      originDeviceId: originDeviceId,
+    );
+    await lifecycle.requireWorking(projectId, designRevisionId);
     final hashes = <String>{
       for (final dependency in dependencies) dependency.sha256,
     };
@@ -93,24 +103,13 @@ final class DriftElv5DependencyInvalidator {
     final nodeHashes = <String>{
       for (final row in rows) row.read<String>('logical_node_key_sha256'),
     };
-    if (nodeHashes.isEmpty) return 0;
-    final nodes = nodeHashes.toList()..sort();
-    final nodePlaceholders = List.filled(nodes.length, '?').join(',');
-    return database.customUpdate(
-      'UPDATE discipline_evaluation_pointers '
-      "SET freshness = 'STALE', generation = generation + 1, updated_at = ?, "
-      'origin_device_id = ? WHERE project_id = ? AND design_revision_id = ? '
-      'AND logical_node_key_sha256 IN ($nodePlaceholders) '
-      "AND freshness <> 'STALE'",
-      variables: <Variable>[
-        Variable<DateTime>(_nowUtc().toUtc()),
-        Variable.withString(originDeviceId),
-        Variable.withString(projectId),
-        Variable.withString(designRevisionId),
-        ...nodes.map(Variable.withString),
-      ],
+    return lifecycle.invalidateNodes(
+      projectId: projectId,
+      designRevisionId: designRevisionId,
+      nodeHashes: nodeHashes,
+      updatedAtUtc: _nowUtc(),
     );
-  }
+  });
 }
 
 final class Elv5InvalidationDependency {
