@@ -1,3 +1,5 @@
+import '../../component_instance_repository.dart';
+import '../../geometry_repository.dart';
 import '../acs/acs01_role_profile_contract.dart';
 import '../acs/acs01_runtime.dart';
 import '../acs/acs02_resource_contract.dart';
@@ -11,6 +13,8 @@ import '../acs/acs05_runtime.dart';
 import '../acs/acs06_runtime.dart';
 import '../acs/acs06_topology_contract.dart';
 import '../acs/elv5_acs_persistence.dart';
+import '../cctv/cctv01_geometry_contract.dart';
+import '../cctv/cctv01_runtime.dart';
 import '../cctv/cctv02_runtime.dart';
 import '../cctv/cctv03_runtime.dart';
 import '../cctv/cctv04_pse_contract.dart';
@@ -60,6 +64,9 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
   required Elv5LanMutationStore lanStore,
   required Elv5AcsMutationStore acsStore,
   required Elv5FireMutationStore fireStore,
+  required Cctv01GeometryContractSource cctv01Contracts,
+  required ComponentInstanceRepository componentInstances,
+  required GeometryRepository geometryRepository,
   required Cctv04PseProjectionContractSource cctv04Contracts,
   required Elv3RealizedLinkFactSource elv3LinkFacts,
   required Lan05OpticalSectionEvidenceSource opticalSectionEvidence,
@@ -100,6 +107,15 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
   );
 
   return Elv5ProcessCalculationRegistry(<Elv5ProcessCalculationAdapter>[
+    blocked(
+      Cctv01PersistedInputResolver(
+        contractSource: cctv01Contracts,
+        components: componentInstances,
+        geometry: geometryRepository,
+        nowUtc: nowUtc,
+      ),
+      buildCctv01Executor(nowUtc: nowUtc),
+    ),
     blocked(Cctv02PersistedInputResolver(store: cctvStore, nowUtc: nowUtc), buildCctv02Executor(nowUtc: nowUtc)),
     blocked(Cctv03PersistedInputResolver(store: cctvStore, nowUtc: nowUtc), buildCctv03Executor(nowUtc: nowUtc)),
     blocked(Cctv04PersistedInputResolver(contractSource: cctv04Contracts, powerEvidence: currentPowerEvidence, nowUtc: nowUtc), buildCctv04Executor(nowUtc: nowUtc)),
