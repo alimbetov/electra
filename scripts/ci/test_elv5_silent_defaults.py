@@ -51,14 +51,17 @@ class SilentDefaultGuardTest(unittest.TestCase):
         findings = self.scan("final rows = payload['rows'] ?? const <Object>[];")
         self.assertEqual(findings, [])
 
-    def test_rejects_host_local_clock_and_timezone(self):
+    def test_allows_utc_clock_for_audit_metadata(self):
+        findings = self.scan("final now = DateTime.now().toUtc();")
+        self.assertEqual(findings, [])
+
+    def test_rejects_host_local_timezone_sources(self):
         source = """
-final now = DateTime.now();
 final local = capturedAt.toLocal();
 final locale = Platform.localeName;
 """
         findings = self.scan(source)
-        self.assertEqual(len(findings), 3)
+        self.assertEqual(len(findings), 2)
         self.assertTrue(
             all(f.reason == "host-local temporal source" for f in findings)
         )
