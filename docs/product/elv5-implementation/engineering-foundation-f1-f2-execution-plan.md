@@ -581,3 +581,37 @@ wave stage only: qualified stays 0/27, Q0–Q5/Q9 reconciliation remains open,
 and automatic execution-backed matrix/provenance is the next fixed stage.
 Global rollback/CAS/restart/freeze/fault qualification, final exact-SHA CI and
 ELV5 acceptance are still pending. ELV5 is not ACCEPTED.
+
+
+## Automatic execution-backed lifecycle matrix checkpoint
+
+Source `a16b54ef01bee5e526404cef79e745ba31f3a4e0` passed full
+Flutter Local Foundation run `39071222510`: 485 mobile tests passed, one
+historical-migration skip, 486 core tests passed, both analyzers and formatters
+passed. A separate build-addressed machine run passed 29 tests and bound all
+27 named process witnesses. Artifact `12115477309` contains the original
+machine event stream and generated matrix. The durable matrix is
+`docs/audit/elv5-f2-lifecycle-a16b54ef.json`.
+
+Matrix SHA-256:
+`8232f868a74bdb7988f76639941895ce8464ccafd5946022ad2c3e1b02d0fffd`.
+Runtime authority fingerprint:
+`081dac88d24131c2dbb505ae2d79fc84c70c9ce5a50fd9bd49904dfc52e4440d`.
+The matrix binds exact source Git SHA, code-owned process/ruleset versions,
+actual frozen persisted evaluation/input/output/evidence identities, witness
+source-file hash, exact test identity, successful testDone and successful suite
+completion. The collector rejects missing, skipped, failed, foreign, duplicate
+or inconsistent lifecycle events; filenames alone cannot produce PASS.
+
+Source IDs accept full Git SHA-1 or SHA-256 object IDs; evidence/authority hashes
+remain strictly SHA-256. Ordinary developer builds emit no addressed witness.
+The dedicated CI run passes ELECTRA_SOURCE_SHA and verifies it against persisted
+qualification identity after durable restart and frozen replay. The matrix
+explicitly records that ACS-03's mature witness does not observe source mutation;
+this remains a global qualification reconciliation item rather than an invented
+invalidation PASS.
+
+This closes automatic lifecycle matrix/provenance for Q6/Q7/Q8 only. All 27
+rows now have real source/process/ruleset/authority pins; full Q0–Q5/Q9 and
+cross-cutting qualification remain pending. Qualified stays 0, acceptance is
+false. The next fixed stage is global rollback/CAS/restart/freeze/fault testing.

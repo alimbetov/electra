@@ -110,3 +110,20 @@ closures so previously blocked calculations cannot remain silently CURRENT.
 Baseline replay witnesses re-read the evaluation row from SQLite after reopen
 and freeze. Their fingerprint/output identity comparisons must not reuse an
 evaluation object retained in memory from the initial publication.
+
+
+## Executed matrix and persisted provenance
+
+`f2-lifecycle-witness-registry.json` binds one exact named production test per
+process. CI separately executes those files with the machine reporter and
+ELECTRA_SOURCE_SHA set to its exact Git SHA. The harness emits checkpoints only
+after assertions pass. A final observation re-reads the frozen SQLite record,
+checks its persisted Foundation identity against the actual build and code-owned
+authority manifest, and verifies output/evidence hashes.
+
+`collect-elv5-f2-witness-matrix.py` requires successful testDone, successful suite
+completion, every required checkpoint and consistent restart/frozen/persisted
+identities. It records a hash of the executed witness source, machine stream and
+registry. The produced report never upgrades Q0–Q5/Q9 or claims acceptance.
+The first verified 27-process report is retained in
+`docs/audit/elv5-f2-lifecycle-a16b54ef.json`, from run `39071222510`.
