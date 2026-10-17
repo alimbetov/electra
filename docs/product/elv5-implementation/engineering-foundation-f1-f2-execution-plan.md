@@ -393,8 +393,8 @@ still an explicit global-suite obligation.
 | --- | --- | --- |
 | 0 | CCTV-03, LAN-05, ACS-03, FA-03 | Baseline harness integrated; final reconciliation/seal pending |
 | 1 | FA-08 | Production Q6–Q9 CI verified; full qualification/seal pending |
-| 2 | FA-01, FA-02, FA-04, FA-05, FA-06, FA-07 | FA-01/02/07 Q6–Q8 exact-SHA verified; NEXT: FA-04/05/06 mini-wave |
-| 3 | ACS-01, ACS-02, ACS-04, ACS-05, ACS-06 | Pending FIRE exact-SHA barrier |
+| 2 | FA-01, FA-02, FA-04, FA-05, FA-06, FA-07 | Q6–Q8 source witnesses exact-SHA CI verified; full qualification/seal pending |
+| 3 | ACS-01, ACS-02, ACS-04, ACS-05, ACS-06 | NEXT — FIRE exact-SHA barrier passed |
 | 4 | LAN-01, LAN-02, LAN-03, LAN-04, LAN-06, LAN-07 | Pending ACS exact-SHA barrier |
 | 5 | CCTV-01, CCTV-02, CCTV-04, CCTV-05, CCTV-06 | Pending LAN exact-SHA barrier |
 
@@ -471,3 +471,30 @@ restart and frozen replay. Lifecycle PASS must not invent a capacity verdict.
 Q6/Q7/Q8 coverage is now 8/27. Q0–Q5/Q9 reconciliation, automatic matrix and
 provenance seal remain open; qualified stays 0/27 and ELV5 is not ACCEPTED.
 FA-04/05/06 form the next FIRE mini-wave with a separate exact-SHA barrier.
+
+## FIRE mini-wave checkpoint — FA-04 / FA-05 / FA-06
+
+Source `35e5e38b779cae91e1e9e78b9fc61a379bd11384` passed complete
+Flutter Local Foundation run `39067220413`, artifact `12113837997`:
+464 mobile tests passed, one dedicated historical-migration skip, 485 core tests
+passed, both analyzers and formatters passed. All three named production
+lifecycle witnesses execute successfully in the preserved logs.
+
+FA-04 consumes PWR01/PWR02 CURRENT and changes +4 W to -4 W margin. Its fault
+at ELV5 invalidation rolls back the public ELV4 definition replacement, its
+design CAS and pointer transition. FA-05 consumes a real published PWR04 chain
+including its consumed PWR01 identity and persisted backup-sequence fact;
+energy margin changes +115.2 Wh to -2.4 Wh. FA-06 consumes active/startup PWR01
+and exactly solved PWR03 terminal envelopes; startup current margin changes
++0.05 A to -0.05 A, with rollback of a failed contract invalidation.
+
+Both ELV4 mutation implementations propagate STALE to exact ELV5 consumers in
+the same transaction. Guarded republication preserves that invalidation without
+double-incrementing an already STALE consumer. Database reopen no longer tries
+INSERT OR IGNORE for already seeded catalog rows; a SQL fault regression proves
+reopen remains read-only for initialized catalogs while the existing two-SQLite
+connection allocation race remains enabled.
+
+Lifecycle coverage is 11/27, qualified remains 0/27. This is a Q6–Q8 checkpoint;
+Q0–Q5/Q9 reconciliation, global reliability, automatic matrix/provenance and
+final acceptance remain open. The next ordered wave is ACS-01/02/04/05/06.
