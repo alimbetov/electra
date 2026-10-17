@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:drift/native.dart';
 import 'package:electra_mobile/application/elv5/calculation/elv5_calculation_runtime.dart';
 import 'package:electra_mobile/application/elv5/calculation/elv5_calculation_service.dart';
@@ -16,8 +18,17 @@ void main() {
     'F2 FA-03 Q6/Q7/Q8 qualifies publication CAS, restart and frozen replay',
     () async {
       const harness = Elv5F2QualificationHarness();
-      final db = AppDatabase(NativeDatabase.memory());
-      addTearDown(db.close);
+      final directory = await Directory.systemTemp.createTemp(
+        'electra-f2-fa03-restart-',
+      );
+      final file = File('${directory.path}/qualification.sqlite');
+      var db = AppDatabase(NativeDatabase(file));
+      addTearDown(() async {
+        await db.close();
+        if (directory.existsSync()) {
+          await directory.delete(recursive: true);
+        }
+      });
       await _seed(db);
 
       final firstAdapter = _Fa03FixtureAdapter();
@@ -28,25 +39,14 @@ void main() {
       expect(first.replayed, isFalse);
       expect(firstAdapter.captureCount, 1);
 
-      final uow = DriftElv5CalculationWriteUnitOfWork(
-        db,
-        originDeviceId: 'f2-fa03-q7',
-      );
-      final persistedPointers = await uow.run(
-        (session) => session.pointers.loadPointersBulk(
-          projectId: 'project-1',
-          designRevisionId: 'rev-1',
-          logicalNodeKeySha256s: <String>{_nodeSha()},
-        ),
-      );
-      final published = persistedPointers[_nodeSha()]!;
+      final published = await _loadPointer(db);
       expect(published.freshness, Elv5PointerFreshness.current);
       expect(published.generation, 1);
       expect(published.evaluationId, isNotNull);
       expect(published.outputSha256, isNotNull);
       final committedSnapshot = _snapshot(published, first.logicalResultJson);
 
-      // Q7: another writer that captured generation 0 cannot overwrite CURRENT.
+      // Q7 CAS: another writer that captured generation 0 cannot overwrite CURRENT.
       final competing = _command(
         commandId: 'cmd-fa03-2',
         expectedGeneration: 0,
@@ -55,34 +55,39 @@ void main() {
         await firstService.execute(competing);
       });
 
-      // Freeze the exact historical revision after the successful publication.
-      await db.customUpdate(
-        "UPDATE project_design_revisions SET state = 'FROZEN', revision = revision + 1 "
-        "WHERE project_id = 'project-1' AND id = 'rev-1'",
-      );
-
-      // Q8/restart: a fresh service over the same durable DB replays the historical
-      // command before any recapture and therefore preserves the exact result.
+      // Q7 restart: close and reopen durable SQLite, reconstruct the complete
+      // service, and replay the committed command without any recapture.
+      await db.close();
+      db = AppDatabase(NativeDatabase(file));
       final restartedAdapter = _Fa03FixtureAdapter();
       final restartedService = _service(db, restartedAdapter);
       final replay = await restartedService.execute(command);
       expect(replay.replayed, isTrue);
       expect(replay.logicalResultJson, first.logicalResultJson);
       expect(restartedAdapter.captureCount, 0);
+      final restartedPointer = await _loadPointer(db);
       harness.assertQ7Replay(
         'FA-03',
         committedSnapshot,
-        _snapshot(published, replay.logicalResultJson),
+        _snapshot(restartedPointer, replay.logicalResultJson),
       );
+
+      // Q8 freeze is a separate phase from Q7 restart. The exact committed
+      // historical command remains replayable, while new work fails closed.
+      await db.customUpdate(
+        "UPDATE project_design_revisions SET state = 'FROZEN', revision = revision + 1 "
+        "WHERE project_id = 'project-1' AND id = 'rev-1'",
+      );
+      final frozenReplay = await restartedService.execute(command);
+      expect(frozenReplay.replayed, isTrue);
+      expect(frozenReplay.logicalResultJson, first.logicalResultJson);
+      final frozenPointer = await _loadPointer(db);
       harness.assertQ8Replay(
         'FA-03',
         committedSnapshot,
-        _snapshot(published, replay.logicalResultJson),
+        _snapshot(frozenPointer, frozenReplay.logicalResultJson),
       );
 
-      // A new calculation on the frozen revision is forbidden even when it knows
-      // the latest pointer generation. Historical replay and new mutation are kept
-      // deliberately separate.
       await harness.expectQ8ReadOnly('FA-03', () async {
         await restartedService.execute(
           _command(
@@ -96,8 +101,23 @@ void main() {
   );
 }
 
+Future<Elv5EvaluationPointer> _loadPointer(AppDatabase db) async {
+  final uow = DriftElv5CalculationWriteUnitOfWork(
+    db,
+    originDeviceId: 'f2-fa03-q7',
+  );
+  final pointers = await uow.run(
+    (session) => session.pointers.loadPointersBulk(
+      projectId: 'project-1',
+      designRevisionId: 'rev-1',
+      logicalNodeKeySha256s: <String>{_nodeSha()},
+    ),
+  );
+  return pointers[_nodeSha()]!;
+}
+
 Elv5F2PublicationSnapshot _snapshot(
-  Elv5PersistedPointer pointer,
+  Elv5EvaluationPointer pointer,
   String logicalResultJson,
 ) => Elv5F2PublicationSnapshot(
   generation: pointer.generation,
@@ -106,7 +126,7 @@ Elv5F2PublicationSnapshot _snapshot(
       pointer.freshness == Elv5PointerFreshness.current ? 'CURRENT' : 'STALE',
   execution: 'SUCCEEDED',
   completion: 'COMPLETE',
-  inputFingerprint: _hash('1'),
+  inputFingerprint: pointer.inputFingerprint!,
   logicalResultJson: logicalResultJson,
 );
 
