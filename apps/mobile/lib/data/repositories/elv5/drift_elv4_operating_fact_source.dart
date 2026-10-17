@@ -154,9 +154,8 @@ final class DriftElv4OperatingFactSource implements Elv4OperatingFactSource {
           originId: row.read<String>('origin_id'),
           stateCode: row.read<String>('state_code'),
           currentA: demand.currentA,
-          accountingKind: PowerAccountingKind.values.singleWhere(
-            (value) =>
-                value.name.toUpperCase() == row.read<String>('accounting_kind'),
+          accountingKind: _accountingKind(
+            row.read<String>('accounting_kind'),
           ),
         ),
       );
@@ -164,3 +163,9 @@ final class DriftElv4OperatingFactSource implements Elv4OperatingFactSource {
     return List.unmodifiable(result);
   }
 }
+
+PowerAccountingKind _accountingKind(String wireCode) => switch (wireCode) {
+  'CONSUMER_INPUT' => PowerAccountingKind.consumerInput,
+  'TRANSFER_IDLE' => PowerAccountingKind.transferIdle,
+  _ => throw StateError('ELV4_ACCOUNTING_KIND_UNSUPPORTED:$wireCode'),
+};
