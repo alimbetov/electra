@@ -7,6 +7,7 @@ import '../drift_elv_cable_run_repository.dart';
 import 'drift_acs03_electrical_contract_store.dart';
 import 'drift_acs04_source_requirement_contract_store.dart';
 import 'drift_acs05_autonomy_contract_store.dart';
+import 'drift_acs06_topology_contract_store.dart';
 import 'drift_ampacity_section_contract_store.dart';
 import 'drift_elv3_realized_link_fact_source.dart';
 import 'drift_elv4_current_evidence_source.dart';
@@ -97,6 +98,11 @@ final class DriftElv5CalculationRuntime {
       originDeviceId: originDeviceId,
       nowUtc: nowUtc,
     );
+    final acs06Contracts = DriftAcs06TopologyContractStore(
+      database,
+      originDeviceId: originDeviceId,
+      nowUtc: nowUtc,
+    );
     final fa01Contracts = DriftFa01AddressCapacityContractStore(
       database,
       originDeviceId: originDeviceId,
@@ -143,6 +149,7 @@ final class DriftElv5CalculationRuntime {
       acs03Contracts: acs03Contracts,
       acs04Contracts: acs04Contracts,
       acs05Contracts: acs05Contracts,
+      acs06Contracts: acs06Contracts,
       fa01Contracts: fa01Contracts,
       fa03Contracts: fa03Contracts,
       fa04Contracts: fa04Contracts,
