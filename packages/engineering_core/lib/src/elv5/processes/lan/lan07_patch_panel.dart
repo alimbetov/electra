@@ -110,7 +110,7 @@ final class Lan07PatchPanelKernel {
   Lan07Result evaluate(Lan07Input input) {
     final knownPorts = input.ports.map((e) => e.portId).toSet();
     final occupied = <String>{};
-    final firstAssignmentByPort = <String, String>{};
+    final assignmentsByPort = <String, List<Lan07PatchAssignment>>{};
     final conflicts = <String>{};
     final destinationsBySource = <String, Set<String>>{};
 
@@ -120,20 +120,30 @@ final class Lan07PatchPanelKernel {
         conflicts.add(assignment.assignmentId);
         continue;
       }
-      final firstAssignmentId = firstAssignmentByPort[assignment.portId];
-      if (firstAssignmentId != null) {
-        conflicts
-          ..add(firstAssignmentId)
-          ..add(assignment.assignmentId);
-      } else {
-        firstAssignmentByPort[assignment.portId] = assignment.assignmentId;
-      }
+      assignmentsByPort
+          .putIfAbsent(assignment.portId, () => <Lan07PatchAssignment>[])
+          .add(assignment);
       occupied.add(assignment.portId);
       final destination = assignment.destinationEndpointId;
       if (destination != null && destination.isNotEmpty) {
         destinationsBySource
             .putIfAbsent(assignment.sourceEndpointId, () => <String>{})
             .add(destination);
+      }
+    }
+    // A termination and its passive continuation share one physical port.
+    // Exclusive relationships still conflict when they claim different sources
+    // or duplicate the termination/patch role on that port.
+    for (final assignments in assignmentsByPort.values) {
+      final sources = assignments.map((a) => a.sourceEndpointId).toSet();
+      final patches = assignments
+          .where(
+            (a) => a.destinationEndpointId?.isNotEmpty ?? false,
+          )
+          .length;
+      final terminations = assignments.length - patches;
+      if (sources.length > 1 || patches > 1 || terminations > 1) {
+        conflicts.addAll(assignments.map((a) => a.assignmentId));
       }
     }
     final sortedConflicts = conflicts.toList()..sort();

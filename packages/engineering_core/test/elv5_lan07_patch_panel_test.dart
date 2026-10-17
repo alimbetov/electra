@@ -92,6 +92,42 @@ void main() {
     expect(result.status, Lan07AssessmentStatus.pass);
   });
 
+  test('different sources cannot share termination and patch on one port', () {
+    final assignments = [
+      Lan07PatchAssignment(
+        assignmentId: 'termination',
+        portId: 'p1',
+        sourceEndpointId: 's1',
+      ),
+      Lan07PatchAssignment(
+        assignmentId: 'patch',
+        portId: 'p1',
+        sourceEndpointId: 's2',
+        destinationEndpointId: 'd2',
+      ),
+    ];
+    for (final order in [assignments, assignments.reversed.toList()]) {
+      final result = const Lan07PatchPanelKernel().evaluate(Lan07Input(
+        panelId: 'panel-1',
+        ports: [
+          Lan07PhysicalPort(portId: 'p1'),
+          Lan07PhysicalPort(portId: 'p2')
+        ],
+        assignments: order,
+        unavailablePortIds: {},
+        requiredSourceEndpointIds: {'s2'},
+        sparePolicy: Lan07SparePolicy(
+          absoluteMinimum: 0,
+          ratio: Elv5Rational.zero,
+          combiner: Lan07SpareCombiner.max,
+        ),
+      ));
+      expect(result.occupied, 1);
+      expect(result.status, Lan07AssessmentStatus.fail);
+      expect(result.conflictingAssignmentIds, ['patch', 'termination']);
+    }
+  });
+
   test('missing destination leaves mapping unresolved', () {
     final result = const Lan07PatchPanelKernel().evaluate(
       Lan07Input(
