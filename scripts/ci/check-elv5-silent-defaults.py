@@ -25,11 +25,12 @@ PRODUCTION_ROOTS = (
 
 EXPLICIT_DEFAULT_MARKER = "elv5-explicit-default:"
 SENSITIVE_NAME = re.compile(
-    r"(?i)(?:medium|interface|shield|voltage|current|powerfactor|power_factor|"
-    r"temperature|ambient|length|distance|bitrate|rate|capacity|timezone|"
-    r"time_zone|tzdb|redundancy|conductor|material|evidence|policy|environment|"
-    r"route|path|ampacity|attenuation|optical|resistance|reactance|impedance|"
-    r"efficiency|diversity|reserve|demand|load|fault|battery|runtime)"
+    r"(?i)(?<![A-Za-z0-9_])(?:medium|interface|shield|voltage|current|"
+    r"powerfactor|power_factor|temperature|ambient|length|distance|bitrate|"
+    r"rate|capacity|timezone|time_zone|tzdb|redundancy|conductor|material|"
+    r"evidence|policy|environment|route|path|ampacity|attenuation|optical|"
+    r"resistance|reactance|impedance|efficiency|diversity|reserve|demand|"
+    r"load|fault|battery|runtime)[A-Za-z0-9_]*(?![A-Za-z0-9_])"
 )
 HOST_TEMPORAL = re.compile(
     r"(?:DateTime\.now\s*\(\)|\.toLocal\s*\(\)|Platform\.localeName)"
