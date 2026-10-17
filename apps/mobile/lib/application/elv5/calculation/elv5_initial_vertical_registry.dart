@@ -19,6 +19,7 @@ import '../cctv/cctv02_runtime.dart';
 import '../cctv/cctv03_runtime.dart';
 import '../cctv/cctv04_pse_contract.dart';
 import '../cctv/cctv04_runtime.dart';
+import '../cctv/cctv_recorder_assignment_source.dart';
 import '../cctv/elv5_cctv_persistence.dart';
 import '../environment/ampacity_route_resolver.dart';
 import '../fire/elv5_fire_persistence.dart';
@@ -67,6 +68,7 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
   required Cctv01GeometryContractSource cctv01Contracts,
   required ComponentInstanceRepository componentInstances,
   required GeometryRepository geometryRepository,
+  required CctvRecorderAssignmentSource recorderAssignments,
   required Cctv04PseProjectionContractSource cctv04Contracts,
   required Elv3RealizedLinkFactSource elv3LinkFacts,
   required Lan05OpticalSectionEvidenceSource opticalSectionEvidence,
@@ -116,7 +118,14 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
       ),
       buildCctv01Executor(nowUtc: nowUtc),
     ),
-    blocked(Cctv02PersistedInputResolver(store: cctvStore, nowUtc: nowUtc), buildCctv02Executor(nowUtc: nowUtc)),
+    blocked(
+      Cctv02PersistedInputResolver(
+        store: cctvStore,
+        recorderAssignments: recorderAssignments,
+        nowUtc: nowUtc,
+      ),
+      buildCctv02Executor(nowUtc: nowUtc),
+    ),
     blocked(Cctv03PersistedInputResolver(store: cctvStore, nowUtc: nowUtc), buildCctv03Executor(nowUtc: nowUtc)),
     blocked(Cctv04PersistedInputResolver(contractSource: cctv04Contracts, powerEvidence: currentPowerEvidence, nowUtc: nowUtc), buildCctv04Executor(nowUtc: nowUtc)),
     blocked(Lan01PersistedInputResolver(lanStore: lanStore, elv3Facts: elv3LinkFacts, nowUtc: nowUtc), buildLan01Executor(nowUtc: nowUtc)),
