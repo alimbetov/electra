@@ -17,6 +17,55 @@ final class DriftElv5DependencyInvalidator {
   final DateTime Function() _nowUtc;
   static DateTime _defaultNow() => DateTime.now().toUtc();
 
+  /// Expands a semantic subject selector into exact persisted dependencies.
+  /// Capture markers may include member identity (edition/binding generation);
+  /// hashing a member-less selector cannot match those exact index entries.
+  Future<int> invalidateSubject({
+    required String projectId,
+    required String designRevisionId,
+    required String relationKind,
+    required String domain,
+    required String subjectId,
+  }) => database.transaction(() async {
+    final rows =
+        await database
+            .customSelect(
+              'SELECT DISTINCT dependency_key, dependency_key_sha256 '
+              'FROM discipline_dependency_index WHERE project_id = ? '
+              'AND design_revision_id = ? AND relation_kind = ? '
+              r"AND json_extract(dependency_key, '$.domain') = ? "
+              r"AND json_extract(dependency_key, '$.subjectId') = ?",
+              variables: <Variable>[
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                Variable.withString(relationKind.trim().toUpperCase()),
+                Variable.withString(domain),
+                Variable.withString(subjectId),
+              ],
+            )
+            .get();
+    final dependencies = <Elv5InvalidationDependency>[];
+    for (final row in rows) {
+      final value = jsonDecode(row.read<String>('dependency_key')) as Map;
+      final dependency = Elv5InvalidationDependency(
+        relationKind: value['relationKind'] as String,
+        domain: value['domain'] as String,
+        subjectId: value['subjectId'] as String,
+        memberId: value['memberId'] as String?,
+      );
+      if (value['schema'] != 'electra.elv5-dependency-key.v1' ||
+          dependency.sha256 != row.read<String>('dependency_key_sha256')) {
+        throw StateError('ELV5_DEPENDENCY_INDEX_HASH_MISMATCH');
+      }
+      dependencies.add(dependency);
+    }
+    return invalidate(
+      projectId: projectId,
+      designRevisionId: designRevisionId,
+      dependencies: dependencies,
+    );
+  });
+
   Future<int> invalidate({
     required String projectId,
     required String designRevisionId,

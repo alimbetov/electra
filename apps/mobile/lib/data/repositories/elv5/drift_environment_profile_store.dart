@@ -1,3 +1,4 @@
+import 'drift_fa08_invalidation_coordinator.dart';
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
@@ -143,6 +144,12 @@ final class DriftElv5EnvironmentProfileStore
       throw StateError('ELV5_ENVIRONMENT_DESIGN_REVISION_CONFLICT');
     }
 
+    final previous = await loadActiveForScope(
+      projectId: command.projectId,
+      designRevisionId: command.designRevisionId,
+      scopeKind: command.scopeKind,
+      scopeId: command.scopeId,
+    );
     final payload = command.profile.toCanonicalValue();
     final hash = _encoder.sha256(payload);
     final evidenceRef = 'ENV:${command.scopeKind}:${command.scopeId}:$hash';
@@ -276,6 +283,25 @@ final class DriftElv5EnvironmentProfileStore
     );
     if (designChanged != 1) {
       throw StateError('ELV5_ENVIRONMENT_DESIGN_REVISION_CAS_FAILED');
+    }
+    final invalidation = DriftFa08InvalidationCoordinator(
+      database,
+      originDeviceId: originDeviceId,
+      nowUtc: _nowUtc,
+    );
+    if (previous != null) {
+      await invalidation.environmentEditionChanged(
+        projectId: command.projectId,
+        designRevisionId: command.designRevisionId,
+        oldEvidenceRef: previous.profile.evidenceRef,
+      );
+    } else {
+      await invalidation.environmentScopeChanged(
+        projectId: command.projectId,
+        designRevisionId: command.designRevisionId,
+        scopeKind: _scopeKind(command.scopeKind),
+        scopeId: command.scopeId,
+      );
     }
   });
 

@@ -1,3 +1,4 @@
+import 'package:electra_mobile/application/elv5/commands/elv5_replacement_command_runner.dart';
 import 'dart:convert';
 import 'dart:io';
 
@@ -11,7 +12,6 @@ import 'package:electra_mobile/data/database/app_database.dart';
 import 'package:electra_mobile/data/repositories/elv5/drift_ampacity_section_contract_store.dart';
 import 'package:electra_mobile/data/repositories/elv5/drift_elv5_calculation_runtime.dart';
 import 'package:electra_mobile/data/repositories/elv5/drift_environment_profile_store.dart';
-import 'package:electra_mobile/data/repositories/elv5/drift_fa08_invalidation_coordinator.dart';
 import 'package:electra_mobile/data/repositories/elv5/drift_fa08_policy_contract_store.dart';
 import 'package:engineering_core/engineering_core.dart';
 import 'package:engineering_core/engineering_core_elv5.dart';
@@ -100,35 +100,49 @@ void main() {
       harness.assertQ6Initial('FA-08', firstSnapshot);
       await _expectDependencies(db);
 
-      final oldEnvironmentEvidenceRef = normalEnvironment.profile.evidenceRef;
-      await environmentStore.replace(
-        ReplaceElv5EnvironmentProfileCommand(
-          projectId: 'p',
-          designRevisionId: 'd',
-          expectedDesignRevision: 4,
-          bindingId: 'env-room',
-          expectedBindingRevision: 1,
-          scopeKind: 'ROOM',
-          scopeId: 'room-1',
-          profile: _environment(
-            editionId: 'env-hot',
-            maximumTemperatureC: '45',
-            evidenceSeed: 'c',
-          ),
+      final hotCommand = ReplaceElv5EnvironmentProfileCommand(
+        projectId: 'p',
+        designRevisionId: 'd',
+        expectedDesignRevision: 4,
+        bindingId: 'env-room',
+        expectedBindingRevision: 1,
+        scopeKind: 'ROOM',
+        scopeId: 'room-1',
+        profile: _environment(
+          editionId: 'env-hot',
+          maximumTemperatureC: '45',
+          evidenceSeed: 'c',
         ),
+      );
+      // Source replacement and invalidation are one production transaction.
+      // A failure after replacing the selector must roll back both the source
+      // edition/design revision and its pointer transition.
+      await db.customStatement(
+        "CREATE TRIGGER fail_fa08_invalidation BEFORE UPDATE ON discipline_evaluation_pointers "
+        "BEGIN SELECT RAISE(ABORT, 'FA08_INVALIDATION_FAULT'); END",
+      );
+      await expectLater(
+        environmentStore.replace(hotCommand),
+        throwsA(
+          predicate((e) => e.toString().contains('FA08_INVALIDATION_FAULT')),
+        ),
+      );
+      await db.customStatement('DROP TRIGGER fail_fa08_invalidation');
+      expect(
+        (await _activeEnvironment(environmentStore)).profile.editionId,
+        'env-normal',
       );
       expect(
-        await DriftFa08InvalidationCoordinator(
-          db,
-          originDeviceId: 'f2-fa08-production',
-          nowUtc: _now,
-        ).environmentEditionChanged(
-          projectId: 'p',
-          designRevisionId: 'd',
-          oldEvidenceRef: oldEnvironmentEvidenceRef,
-        ),
-        1,
+        (await db
+                .customSelect(
+                  "SELECT revision FROM project_design_revisions WHERE id = 'd'",
+                )
+                .getSingle())
+            .read<int>('revision'),
+        4,
       );
+      await _expectPointer(db: db, freshness: 'CURRENT', generation: 1);
+      await environmentStore.replace(hotCommand);
       await _expectPointer(db: db, freshness: 'STALE', generation: 2);
 
       final hotEnvironment = await _activeEnvironment(environmentStore);
@@ -162,6 +176,103 @@ void main() {
       );
       harness.assertQ6Republished('FA-08', firstSnapshot, secondSnapshot);
 
+      // Two independent production runtimes race from the same generation.
+      Future<
+        ({Elv5WireCommandEnvelope command, String? logical, Object? error})
+      >
+      attempt(
+        DriftElv5CalculationRuntime writer,
+        Elv5WireCommandEnvelope command,
+      ) async {
+        try {
+          final result = await writer.service.execute(command);
+          return (
+            command: command,
+            logical: result.logicalResultJson,
+            error: null,
+          );
+        } catch (error) {
+          return (command: command, logical: null, error: error);
+        }
+      }
+
+      final outcomes = await Future.wait([
+        attempt(
+          runtime,
+          _command(
+            commandId: 'fa08-race-a',
+            expectedDesignRevision: 6,
+            expectedPointerGeneration: 3,
+          ),
+        ),
+        attempt(
+          _runtime(db),
+          _command(
+            commandId: 'fa08-race-b',
+            expectedDesignRevision: 6,
+            expectedPointerGeneration: 3,
+          ),
+        ),
+      ]);
+      expect(outcomes.where((v) => v.error == null), hasLength(1));
+      final winner = outcomes.singleWhere((v) => v.error == null);
+      final loser = outcomes.singleWhere((v) => v.error != null);
+      expect(
+        loser.error,
+        isA<Elv5ReplacementCommandException>().having(
+          (e) => e.code,
+          'code',
+          'ELV5_POINTER_GENERATION_CONFLICT',
+        ),
+      );
+      final committedCommand = winner.command;
+      final committedSnapshot = await _snapshot(
+        db,
+        winner.logical!,
+        expectedAssessment: 'FAIL',
+        expectedMargin: -4,
+      );
+      expect(committedSnapshot.generation, 4);
+      expect(committedSnapshot.evaluationId, secondSnapshot.evaluationId);
+      expect(
+        committedSnapshot.inputFingerprint,
+        secondSnapshot.inputFingerprint,
+      );
+      await expectLater(
+        runtime.service.execute(
+          _command(
+            commandId: 'fa08-stale-design',
+            expectedDesignRevision: 5,
+            expectedPointerGeneration: 4,
+          ),
+        ),
+        throwsA(
+          isA<Elv5ReplacementCommandException>().having(
+            (e) => e.code,
+            'code',
+            'ELV5_DESIGN_REVISION_CONFLICT',
+          ),
+        ),
+      );
+      expect(
+        (await db
+                .customSelect(
+                  'SELECT COUNT(*) AS n FROM discipline_evaluation_records',
+                )
+                .getSingle())
+            .read<int>('n'),
+        2,
+      );
+      expect(
+        (await db
+                .customSelect(
+                  'SELECT COUNT(*) AS n FROM command_execution_records',
+                )
+                .getSingle())
+            .read<int>('n'),
+        3,
+      );
+
       await harness.expectQ7StaleWriter('FA-08', () async {
         await runtime.service.execute(
           _command(
@@ -178,7 +289,7 @@ void main() {
       environmentStore = _environmentStore(db);
       ampacityStore = _ampacityStore(db);
       policyStore = _policyStore(db);
-      final replay = await runtime.service.execute(secondCommand);
+      final replay = await runtime.service.execute(committedCommand);
       expect(replay.replayed, isTrue);
       final restartedSnapshot = await _snapshot(
         db,
@@ -186,13 +297,13 @@ void main() {
         expectedAssessment: 'FAIL',
         expectedMargin: -4,
       );
-      harness.assertQ7Replay('FA-08', secondSnapshot, restartedSnapshot);
+      harness.assertQ7Replay('FA-08', committedSnapshot, restartedSnapshot);
 
       await db.customUpdate(
         "UPDATE project_design_revisions SET state = 'FROZEN', revision = revision + 1 "
         "WHERE project_id = 'p' AND id = 'd'",
       );
-      final frozenReplay = await runtime.service.execute(secondCommand);
+      final frozenReplay = await runtime.service.execute(committedCommand);
       expect(frozenReplay.replayed, isTrue);
       final frozenSnapshot = await _snapshot(
         db,
@@ -200,14 +311,14 @@ void main() {
         expectedAssessment: 'FAIL',
         expectedMargin: -4,
       );
-      harness.assertQ8Replay('FA-08', secondSnapshot, frozenSnapshot);
+      harness.assertQ8Replay('FA-08', committedSnapshot, frozenSnapshot);
 
       await harness.expectQ8ReadOnly('FA-08', () async {
         await runtime.service.execute(
           _command(
             commandId: 'fa08-after-freeze',
             expectedDesignRevision: 7,
-            expectedPointerGeneration: 3,
+            expectedPointerGeneration: 4,
           ),
         );
       }, operation: 'new calculation');
@@ -225,6 +336,55 @@ void main() {
         throwsStateError,
       );
 
+      await expectLater(
+        environmentStore.replace(
+          ReplaceElv5EnvironmentProfileCommand(
+            projectId: 'p',
+            designRevisionId: 'd',
+            expectedDesignRevision: 7,
+            bindingId: 'env-room',
+            expectedBindingRevision: 2,
+            scopeKind: 'ROOM',
+            scopeId: 'room-1',
+            profile: _environment(
+              editionId: 'env-frozen-write',
+              maximumTemperatureC: '50',
+              evidenceSeed: 'e',
+            ),
+          ),
+        ),
+        throwsA(
+          isA<StateError>().having(
+            (e) => e.toString(),
+            'code',
+            contains('ELV5_ENVIRONMENT_DESIGN_REVISION_READ_ONLY'),
+          ),
+        ),
+      );
+      await expectLater(
+        ampacityStore.replace(
+          ReplaceElv5AmpacitySectionContractCommand(
+            projectId: 'p',
+            designRevisionId: 'd',
+            expectedDesignRevision: 7,
+            bindingId: 'ampacity-section',
+            expectedBindingRevision: 2,
+            contract: _ampacityContract(
+              environment: hotEnvironment,
+              factor: '0.60',
+              evidenceSeed: 'f',
+            ),
+          ),
+        ),
+        throwsA(
+          isA<StateError>().having(
+            (e) => e.toString(),
+            'code',
+            contains('ELV5_AMPACITY_DESIGN_REVISION_READ_ONLY'),
+          ),
+        ),
+      );
+      await _expectPointer(db: db, freshness: 'CURRENT', generation: 4);
       expect(
         (await _activeEnvironment(environmentStore)).profile.editionId,
         'env-hot',

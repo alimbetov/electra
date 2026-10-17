@@ -87,3 +87,15 @@ requirements must produce the same 1024 policy results.
 
 These source assertions remain pending qualification until their exact source
 commit passes the complete workflow. The wave does not claim ELV5 acceptance.
+
+The environment writer now invalidates consumed dependencies in the same
+transaction as source replacement and design CAS. Semantic subject expansion
+preserves each persisted dependency member identity. A fault at pointer
+invalidation must roll back the new environment evidence, selector and design
+revision; the witness proves the prior CURRENT pointer survives unchanged.
+
+FA-08 Q7 also races two public runtime callers on the same durable database:
+exactly one advances generation 3 to 4, the other receives a typed pointer CAS
+conflict. An old design revision is rejected with no extra evaluation/ledger
+records. Independent-connection races remain part of the global reliability
+suite. After freeze, policy, environment and ampacity replacement all reject.
