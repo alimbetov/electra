@@ -231,6 +231,11 @@ final class DriftFa07TopologyContractStore
       ],
     );
     if (changedDesign != 1) throw StateError('FA07_DESIGN_REVISION_CAS_FAILED');
+    final invalidationRelationKind = previous == null ? 'SET' : 'POLICY';
+    final invalidationDomain =
+        previous == null ? 'FIRE_LOOP' : 'FA07_TOPOLOGY_CONTRACT';
+    final invalidationSubjectId =
+        previous == null ? command.contract.loopId : previous.evidenceRef;
     await DriftElv5DependencyInvalidator(
       database,
       originDeviceId: originDeviceId,
@@ -238,9 +243,9 @@ final class DriftFa07TopologyContractStore
     ).invalidateSubject(
       projectId: command.projectId,
       designRevisionId: command.designRevisionId,
-      relationKind: previous == null ? 'SET' : 'POLICY',
-      domain: previous == null ? 'FIRE_LOOP' : 'FA07_TOPOLOGY_CONTRACT',
-      subjectId: previous?.evidenceRef ?? command.contract.loopId,
+      relationKind: invalidationRelationKind,
+      domain: invalidationDomain,
+      subjectId: invalidationSubjectId,
     );
   });
   String _canonical(Object? value) =>
