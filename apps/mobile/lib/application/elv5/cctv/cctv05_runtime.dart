@@ -73,7 +73,7 @@ final class Cctv05PersistedInputResolver
         dependencies,
         <String, Object?>{'recorderId': recorderId},
       );
-    final contract = contractSnapshot!.contract;
+    final contract = contractSnapshot.contract;
     dependencies.add(
       _dependency(
         request,
@@ -85,7 +85,7 @@ final class Cctv05PersistedInputResolver
       ),
     );
 
-    final payload = recorder!.payload;
+    final payload = recorder.payload;
     final definitionRef = _map(
       payload['recorderDefinitionRef'],
       'recorderDefinitionRef',
@@ -190,7 +190,7 @@ final class Cctv05PersistedInputResolver
           dependencies,
           <String, Object?>{'cameraId': cameraId},
         );
-      final members = _objects(streams!.payload['streams'], 'streams');
+      final members = _objects(streams.payload['streams'], 'streams');
       for (final stream in members) {
         final streamId = _text(stream, 'encodedStreamId');
         final raw = stream['codecProfileRef'];

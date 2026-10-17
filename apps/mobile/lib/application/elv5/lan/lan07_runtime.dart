@@ -57,7 +57,7 @@ final class Lan07PersistedInputResolver
         <String, Object?>{'panelId': panelId},
       );
     }
-    if (_text(aggregate!.payload, 'panelId') != panelId) {
+    if (_text(aggregate.payload, 'panelId') != panelId) {
       throw StateError('LAN07_PANEL_ID_MISMATCH:$panelId');
     }
 
@@ -86,7 +86,7 @@ final class Lan07PersistedInputResolver
         <String, Object?>{'panelId': panelId},
       );
     }
-    final contract = snapshot!.contract;
+    final contract = snapshot.contract;
     dependencies.add(
       _dependency(
         request,
@@ -275,7 +275,7 @@ Elv5PureKernelExecutor<Lan07Input, Lan07Result> buildLan07Executor({
   completionOf:
       (result) =>
           result.status == Lan07AssessmentStatus.unresolved
-              ? Elv5Completion.partial
+              ? Elv5Completion.incomplete
               : Elv5Completion.complete,
   assessmentOf:
       (result) => switch (result.status) {

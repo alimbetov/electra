@@ -59,7 +59,7 @@ final class Fa04PersistedInputResolver
         <String, Object?>{'sourceId': sourceId},
       );
     }
-    final contract = snapshot!.contract;
+    final contract = snapshot.contract;
     dependencies.add(
       _dependency(
         request,

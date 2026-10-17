@@ -353,7 +353,7 @@ List<Object?> _requiredList(Map<String, Object?> value, String key) {
 
 List<String> _requiredStringList(Map<String, Object?> value, String key) {
   final raw = _requiredList(value, key);
-  if (raw.any((item) => item is! String || (item as String).isEmpty)) {
+  if (raw.any((item) => item is! String || (item).isEmpty)) {
     throw FormatException('Expected non-empty string list $key.');
   }
   return raw.cast<String>();

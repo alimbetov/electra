@@ -56,7 +56,7 @@ final class Lan02PersistedInputResolver
         <String, Object?>{'switchId': switchId},
       );
     }
-    final payload = aggregate!.payload;
+    final payload = aggregate.payload;
     if (_text(payload, 'switchId') != switchId) {
       throw StateError('LAN02_SWITCH_IDENTITY_MISMATCH:$switchId');
     }
@@ -80,7 +80,7 @@ final class Lan02PersistedInputResolver
         <String, Object?>{'switchId': switchId},
       );
     }
-    final contract = snapshot!.contract;
+    final contract = snapshot.contract;
     deps.add(
       _dependency(
         request,

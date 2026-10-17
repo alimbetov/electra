@@ -78,7 +78,7 @@ final class Fa08PersistedInputResolver
         request,
         'POLICY',
         'FA08_CABLE_POLICY_CONTRACT',
-        policySnapshot!.evidenceRef,
+        policySnapshot.evidenceRef,
         memberId:
             '${policySnapshot.bindingId}:${policySnapshot.bindingRevision}:${policySnapshot.contentHash}',
       ),

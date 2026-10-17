@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:engineering_core/engineering_core.dart';
+import 'package:engineering_core/engineering_core.dart' hide Length;
 import 'package:engineering_core/engineering_core_elv5.dart';
 
 import '../../component_instance_repository.dart';
@@ -60,7 +60,7 @@ final class Cctv01PersistedInputResolver
         <String, Object?>{'cameraId': cameraId},
       );
     }
-    final contract = snapshot!.contract;
+    final contract = snapshot.contract;
     dependencies.add(
       _dependency(
         request,
@@ -167,8 +167,8 @@ final class Cctv01PersistedInputResolver
       );
     }
 
-    final hostPatch = host!;
-    final targetPatch = target!;
+    final hostPatch = host;
+    final targetPatch = target;
     final tolerance = contract.legacyFrameAxisTolerance!;
     if (!_frameCompatible(
       hostPatch.frame,

@@ -102,7 +102,7 @@ final class Fa06PersistedInputResolver
         <String, Object?>{'circuitId': circuitId},
       );
     }
-    final contract = contractSnapshot!.contract;
+    final contract = contractSnapshot.contract;
     if (contract.circuitId != circuitId) {
       throw StateError('FA06_CONTRACT_CIRCUIT_IDENTITY_MISMATCH:$circuitId');
     }

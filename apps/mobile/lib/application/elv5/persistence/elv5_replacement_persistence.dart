@@ -1,3 +1,4 @@
+import '../../elv_write_unit_of_work.dart';
 import 'elv5_runtime_persistence.dart';
 
 final class Elv5RevisionSnapshot {
@@ -91,7 +92,7 @@ abstract interface class Elv5RevisionHistoryStore {
 }
 
 abstract interface class Elv5ReplacementWriteSession
-    extends Elv5RuntimeWriteSession {
+    implements Elv5RuntimeWriteSession {
   Elv5RevisionMutationStore get revisions;
   Elv5RevisionHistoryStore get history;
 }

@@ -56,7 +56,7 @@ final class Acs02PersistedInputResolver
         <String, Object?>{'controllerId': controllerId},
       );
     }
-    final payload = aggregate!.payload;
+    final payload = aggregate.payload;
     if (_text(payload, 'controllerId') != controllerId) {
       throw StateError('ACS02_CONTROLLER_IDENTITY_MISMATCH:$controllerId');
     }
@@ -80,7 +80,7 @@ final class Acs02PersistedInputResolver
         <String, Object?>{'controllerId': controllerId},
       );
     }
-    final contract = snapshot!.contract;
+    final contract = snapshot.contract;
     dependencies.add(
       _dependency(
         request,

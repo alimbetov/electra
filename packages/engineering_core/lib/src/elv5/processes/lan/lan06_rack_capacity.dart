@@ -138,7 +138,7 @@ final class Lan06RackCapacityKernel {
       }
       if (item.depth == null) {
         depthComplete = false;
-      } else if (maxDepth == null || item.depth! > maxDepth!) {
+      } else if (maxDepth == null || item.depth! > maxDepth) {
         maxDepth = item.depth;
       }
     }
@@ -172,7 +172,7 @@ final class Lan06RackCapacityKernel {
     } else if (maxDepth == null || input.capacity.depthCapacity == null) {
       depthStatus = Lan06AssessmentStatus.notAssessed;
     } else {
-      depthMargin = input.capacity.depthCapacity! - maxDepth!;
+      depthMargin = input.capacity.depthCapacity! - maxDepth;
       depthStatus = depthMargin.value >= Elv5Rational.zero
           ? Lan06AssessmentStatus.pass
           : Lan06AssessmentStatus.fail;

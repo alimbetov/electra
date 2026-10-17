@@ -40,7 +40,7 @@ abstract interface class Elv5AcsMutationStore implements Elv5AcsFactStore {
 }
 
 abstract interface class Elv5AcsWriteSession
-    extends Elv5ReplacementWriteSession {
+    implements Elv5ReplacementWriteSession {
   Elv5AcsMutationStore get acs;
 }
 

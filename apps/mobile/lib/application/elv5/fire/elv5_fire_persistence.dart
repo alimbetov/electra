@@ -40,7 +40,7 @@ abstract interface class Elv5FireMutationStore implements Elv5FireFactStore {
 }
 
 abstract interface class Elv5FireWriteSession
-    extends Elv5ReplacementWriteSession {
+    implements Elv5ReplacementWriteSession {
   Elv5FireMutationStore get fire;
 }
 

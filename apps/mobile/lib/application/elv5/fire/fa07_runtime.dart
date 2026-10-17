@@ -47,7 +47,7 @@ final class Fa07PersistedInputResolver
         const <Elv5DependencyMarker>[],
         <String, Object?>{'loopId': request.subject.id},
       );
-    final loopId = _text(loop!.payload, 'loopId');
+    final loopId = _text(loop.payload, 'loopId');
     if (loopId != request.subject.id)
       throw StateError('FA07_LOOP_ID_MISMATCH:$loopId:${request.subject.id}');
     final assignments = _objects(
@@ -92,7 +92,7 @@ final class Fa07PersistedInputResolver
           'fa01MembershipFingerprint': membership,
         },
       );
-    final contract = snap!.contract;
+    final contract = snap.contract;
     if (contract.loopId != loopId)
       throw StateError('FA07_CONTRACT_LOOP_IDENTITY_MISMATCH:$loopId');
     deps.add(
@@ -177,7 +177,7 @@ final class Fa07PersistedInputResolver
             deps,
             <String, Object?>{'caseCode': fault.caseCode, 'deviceId': deviceId},
           );
-        expectedNodes.add(node!);
+        expectedNodes.add(node);
       }
       faultScenarios.add(
         Fa07FaultScenario(

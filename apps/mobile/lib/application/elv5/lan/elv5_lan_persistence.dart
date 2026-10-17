@@ -40,7 +40,7 @@ abstract interface class Elv5LanMutationStore implements Elv5LanFactStore {
 }
 
 abstract interface class Elv5LanWriteSession
-    extends Elv5ReplacementWriteSession {
+    implements Elv5ReplacementWriteSession {
   Elv5LanMutationStore get lan;
 }
 

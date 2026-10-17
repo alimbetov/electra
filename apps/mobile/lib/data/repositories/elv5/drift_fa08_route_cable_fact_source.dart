@@ -1,3 +1,5 @@
+import 'package:drift/drift.dart';
+
 import 'dart:convert';
 
 import 'package:engineering_core/engineering_core.dart';

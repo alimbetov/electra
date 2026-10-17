@@ -59,7 +59,7 @@ final class Acs04PersistedInputResolver
         <String, Object?>{'sourceId': sourceId},
       );
     }
-    final contract = contractSnapshot!.contract;
+    final contract = contractSnapshot.contract;
     if (contract.sourceId != sourceId) {
       throw StateError('ACS04_CONTRACT_SOURCE_IDENTITY_MISMATCH:$sourceId');
     }

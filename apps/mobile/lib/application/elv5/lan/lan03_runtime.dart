@@ -58,7 +58,7 @@ final class Lan03PersistedInputResolver
         <String, Object?>{'pseId': pseId},
       );
     }
-    final contract = contractSnapshot!.contract;
+    final contract = contractSnapshot.contract;
     if (contract.pseId != pseId) {
       throw StateError('LAN03_CONTRACT_PSE_IDENTITY_MISMATCH:$pseId');
     }
@@ -226,7 +226,7 @@ final class Lan03PersistedInputResolver
     }
 
     final contributors = <Lan03Pwr06Contributor>[
-      for (final member in canonicalMembers!)
+      for (final member in canonicalMembers)
         Lan03Pwr06Contributor(
           loadId: member['originId']! as String,
           power: Power(
@@ -236,8 +236,8 @@ final class Lan03PersistedInputResolver
           ),
         ),
     ];
-    final demand = globalDemand!;
-    final margin = globalMargin!;
+    final demand = globalDemand;
+    final margin = globalMargin;
     final input = Lan03Input(
       pseId: pseId,
       expectedClosureFingerprint: contract.expectedClosureFingerprint,

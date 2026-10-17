@@ -71,7 +71,8 @@ final class Fa08RouteSection {
 }
 
 final class Fa08Requirement {
-  Fa08Requirement.cableClass({required this.code, required this.expectedClass})
+  Fa08Requirement.cableClass(
+      {required this.code, required String expectedClass})
       : kind = Fa08RequirementKind.cableClassEquals,
         expectedToken = expectedClass,
         propertyCode = null,

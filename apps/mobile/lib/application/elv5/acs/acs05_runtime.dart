@@ -68,7 +68,7 @@ final class Acs05PersistedInputResolver
         <String, Object?>{'bankId': request.subject.id},
       );
     }
-    final contract = contractSnapshot!.contract;
+    final contract = contractSnapshot.contract;
     dependencies.add(
       _dependency(
         request,

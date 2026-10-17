@@ -1,3 +1,5 @@
+import 'package:drift/drift.dart';
+
 import '../../../application/elv5/environment/environment_profile_persistence.dart';
 import '../../../application/elv5/environment/environment_scope_resolver.dart';
 import '../../database/app_database.dart';

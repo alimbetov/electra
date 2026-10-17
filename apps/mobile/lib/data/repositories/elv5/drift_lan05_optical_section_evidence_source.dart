@@ -11,7 +11,6 @@ final class DriftLan05OpticalSectionEvidenceSource
   const DriftLan05OpticalSectionEvidenceSource(this.database);
 
   final AppDatabase database;
-  static const _encoder = Elv5CanonicalJsonV1();
 
   @override
   Future<Lan05OpticalSectionEvidence?> findAttenuation({
@@ -107,6 +106,8 @@ final class DriftLan05OpticalSectionEvidenceSource
 
 final class DriftLan05OpticalSectionEvidenceWriter
     implements Lan05OpticalSectionEvidenceWriter {
+  static const _encoder = Elv5CanonicalJsonV1();
+
   DriftLan05OpticalSectionEvidenceWriter(
     this.database, {
     required this.originDeviceId,
@@ -116,7 +117,6 @@ final class DriftLan05OpticalSectionEvidenceWriter
   final AppDatabase database;
   final String originDeviceId;
   final DateTime Function() _nowUtc;
-  static const _encoder = Elv5CanonicalJsonV1();
 
   @override
   Future<void> replace(

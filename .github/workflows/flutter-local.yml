@@ -185,10 +185,12 @@ jobs:
           retention-days: 7
 
       - name: Analyze mobile app
-        run: flutter analyze
+        shell: bash
+        run: flutter analyze 2>&1 | tee "${RUNNER_TEMP}/mobile-analyze.log"
 
       - name: Test mobile app
-        run: flutter test
+        shell: bash
+        run: flutter test 2>&1 | tee "${RUNNER_TEMP}/mobile-test.log"
 
       - name: Install engineering core dependencies
         working-directory: packages/engineering_core
@@ -202,8 +204,23 @@ jobs:
 
       - name: Analyze engineering core
         working-directory: packages/engineering_core
-        run: dart analyze
+        shell: bash
+        run: dart analyze 2>&1 | tee "${RUNNER_TEMP}/core-analyze.log"
 
       - name: Test engineering core
         working-directory: packages/engineering_core
-        run: dart test
+        shell: bash
+        run: dart test 2>&1 | tee "${RUNNER_TEMP}/core-test.log"
+
+      - name: Preserve analyze and test logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-verification-logs-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/mobile-analyze.log
+            ${{ runner.temp }}/mobile-test.log
+            ${{ runner.temp }}/core-analyze.log
+            ${{ runner.temp }}/core-test.log
+          if-no-files-found: ignore
+          retention-days: 14

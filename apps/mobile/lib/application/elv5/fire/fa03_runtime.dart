@@ -59,7 +59,7 @@ final class Fa03PersistedInputResolver
         <String, Object?>{'circuitId': request.subject.id},
       );
     }
-    final contract = contractSnapshot!.contract;
+    final contract = contractSnapshot.contract;
     if (contract.circuitId != request.subject.id) {
       throw StateError(
         'FA03_CONTRACT_CIRCUIT_IDENTITY_MISMATCH:'

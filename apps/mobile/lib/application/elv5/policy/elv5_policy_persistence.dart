@@ -53,7 +53,7 @@ abstract interface class Elv5PolicyMutationStore {
 }
 
 abstract interface class Elv5PolicyWriteSession
-    extends Elv5ReplacementWriteSession {
+    implements Elv5ReplacementWriteSession {
   Elv5PolicyMutationStore get policies;
 }
 

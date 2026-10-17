@@ -15,7 +15,6 @@ final class DriftElv5DependencyInvalidator {
   final AppDatabase database;
   final String originDeviceId;
   final DateTime Function() _nowUtc;
-  static const _encoder = Elv5CanonicalJsonV1();
   static DateTime _defaultNow() => DateTime.now().toUtc();
 
   Future<int> invalidate({
@@ -66,6 +65,7 @@ final class DriftElv5DependencyInvalidator {
 }
 
 final class Elv5InvalidationDependency {
+  static const _encoder = Elv5CanonicalJsonV1();
   Elv5InvalidationDependency({
     required String relationKind,
     required String domain,
@@ -86,8 +86,6 @@ final class Elv5InvalidationDependency {
   final String domain;
   final String subjectId;
   final String? memberId;
-
-  static const _encoder = Elv5CanonicalJsonV1();
 
   Map<String, Object?> get canonicalValue => <String, Object?>{
     'schema': 'electra.elv5-dependency-key.v1',

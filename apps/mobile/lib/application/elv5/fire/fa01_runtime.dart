@@ -58,7 +58,7 @@ final class Fa01PersistedInputResolver
         <String, Object?>{'loopId': request.subject.id},
       );
     }
-    final loopId = _text(snapshot!.payload, 'loopId');
+    final loopId = _text(snapshot.payload, 'loopId');
     if (loopId != request.subject.id) {
       throw StateError('FA01_LOOP_ID_MISMATCH:$loopId:${request.subject.id}');
     }
@@ -87,7 +87,7 @@ final class Fa01PersistedInputResolver
         <String, Object?>{'loopId': loopId},
       );
     }
-    final contract = contractSnapshot!.contract;
+    final contract = contractSnapshot.contract;
     if (contract.loopId != loopId) {
       throw StateError('FA01_CONTRACT_LOOP_IDENTITY_MISMATCH:$loopId');
     }
@@ -211,8 +211,8 @@ final class Fa01PersistedInputResolver
         Fa01DeviceAssignment(
           deviceId: deviceId,
           addresses: keys,
-          expectedConsumption: expectedAddresses!,
-          physicalDeviceCountContribution: deviceContribution!,
+          expectedConsumption: expectedAddresses,
+          physicalDeviceCountContribution: deviceContribution,
         ),
       );
       dependencies.add(

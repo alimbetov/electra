@@ -1,5 +1,3 @@
-import 'package:engineering_core/engineering_core_elv5.dart';
-
 final class Fa07TopologyProfileIdentity {
   Fa07TopologyProfileIdentity({
     required String profileCode,

@@ -205,7 +205,7 @@ void main() {
       expect(first.governingSectionId, 's-173');
       expect(first.allowableCurrentIzA, second.allowableCurrentIzA);
       expect(first.governingSectionId, second.governingSectionId);
-      expect(first.sectionResults, hasLength(sectionCount));
+      expect(first.sections, hasLength(sectionCount));
     });
   });
 }

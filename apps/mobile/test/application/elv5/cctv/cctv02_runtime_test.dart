@@ -132,7 +132,7 @@ void main() {
 }
 
 final class _FakeCctvStore implements Elv5CctvMutationStore {
-  _FakeCctvStore({this.camera, this.pool});
+  _FakeCctvStore({this.camera}) : pool = null;
 
   final Elv5CctvAggregateSnapshot? camera;
   final Elv5CctvAggregateSnapshot? pool;

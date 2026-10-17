@@ -56,7 +56,7 @@ final class Acs06PersistedInputResolver
         <String, Object?>{'doorId': doorId},
       );
     }
-    final payload = snapshot!.payload;
+    final payload = snapshot.payload;
     final persistedDoorId = _text(payload, 'doorAssemblyId');
     if (persistedDoorId != doorId) {
       throw StateError('ACS06_DOOR_IDENTITY_MISMATCH:$persistedDoorId:$doorId');
@@ -81,7 +81,7 @@ final class Acs06PersistedInputResolver
         <String, Object?>{'doorId': doorId},
       );
     }
-    final contract = contractSnapshot!.contract;
+    final contract = contractSnapshot.contract;
     dependencies.add(
       _dependency(
         request,

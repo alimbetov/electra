@@ -56,7 +56,7 @@ final class Acs01PersistedInputResolver
         <String, Object?>{'doorId': doorId},
       );
     }
-    final payload = aggregate!.payload;
+    final payload = aggregate.payload;
     if (_text(payload, 'doorAssemblyId') != doorId) {
       throw StateError('ACS01_DOOR_IDENTITY_MISMATCH:$doorId');
     }
@@ -80,7 +80,7 @@ final class Acs01PersistedInputResolver
         <String, Object?>{'doorId': doorId},
       );
     }
-    final contract = snapshot!.contract;
+    final contract = snapshot.contract;
     deps.add(
       _dependency(
         request,

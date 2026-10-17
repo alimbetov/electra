@@ -54,7 +54,7 @@ abstract interface class Elv5CctvMutationStore implements Elv5CctvFactStore {
 }
 
 abstract interface class Elv5CctvWriteSession
-    extends Elv5ReplacementWriteSession {
+    implements Elv5ReplacementWriteSession {
   Elv5CctvMutationStore get cctv;
 }
 

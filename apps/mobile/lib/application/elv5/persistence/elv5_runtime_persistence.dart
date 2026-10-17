@@ -259,7 +259,7 @@ abstract interface class Elv5DependencyStore {
   });
 }
 
-abstract interface class Elv5RuntimeWriteSession extends ElvWriteSession {
+abstract interface class Elv5RuntimeWriteSession implements ElvWriteSession {
   Elv5EvaluationStore get evaluations;
   Elv5PointerStore get pointers;
   Elv5DependencyStore get dependencies;

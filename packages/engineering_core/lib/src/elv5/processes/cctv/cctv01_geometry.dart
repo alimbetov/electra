@@ -434,10 +434,9 @@ final class Cctv01GeometryKernel {
   }
 
   static List<List<Cctv01Point2>> _triangulate(Cctv01Polygon2 polygon) {
-    final vertices = [...polygon.vertices];
-    if (polygon.signedDoubleArea.isNegative) {
-      vertices.reverse();
-    }
+    final vertices = polygon.signedDoubleArea.isNegative
+        ? polygon.vertices.reversed.toList()
+        : [...polygon.vertices];
     final indices = List<int>.generate(vertices.length, (i) => i);
     final triangles = <List<Cctv01Point2>>[];
     var guard = 0;

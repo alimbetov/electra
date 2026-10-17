@@ -59,7 +59,7 @@ final class Cctv04PersistedInputResolver
         <String, Object?>{'pseId': pseId},
       );
     }
-    final contract = contractSnapshot!.contract;
+    final contract = contractSnapshot.contract;
     if (contract.pseId != pseId) {
       throw StateError('CCTV04_CONTRACT_PSE_IDENTITY_MISMATCH:$pseId');
     }
@@ -228,7 +228,7 @@ final class Cctv04PersistedInputResolver
     }
 
     final contributors = <Cctv04Pwr06Contributor>[
-      for (final member in canonicalMembers!)
+      for (final member in canonicalMembers)
         Cctv04Pwr06Contributor(
           loadId: member['originId']! as String,
           power: Power(
@@ -238,8 +238,8 @@ final class Cctv04PersistedInputResolver
           ),
         ),
     ];
-    final demand = globalDemand!;
-    final margin = globalMargin!;
+    final demand = globalDemand;
+    final margin = globalMargin;
     final input = Cctv04Input(
       pseId: pseId,
       expectedClosureFingerprint: contract.expectedClosureFingerprint,

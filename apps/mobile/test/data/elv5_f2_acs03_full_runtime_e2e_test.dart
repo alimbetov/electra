@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:drift/drift.dart' show Value;
+import 'package:drift/drift.dart' show Value, Variable;
 import 'package:drift/native.dart';
 import 'package:electra_mobile/application/elv5/acs/acs03_electrical_contract.dart';
 import 'package:electra_mobile/application/elv5/acs/acs03_electrical_contract_write.dart';

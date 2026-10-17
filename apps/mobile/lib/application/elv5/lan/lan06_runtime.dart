@@ -57,7 +57,7 @@ final class Lan06PersistedInputResolver
         <String, Object?>{'rackId': rackId},
       );
     }
-    if (_text(aggregate!.payload, 'rackId') != rackId) {
+    if (_text(aggregate.payload, 'rackId') != rackId) {
       throw StateError('LAN06_RACK_ID_MISMATCH:$rackId');
     }
 
@@ -86,7 +86,7 @@ final class Lan06PersistedInputResolver
         <String, Object?>{'rackId': rackId},
       );
     }
-    final contract = snapshot!.contract;
+    final contract = snapshot.contract;
     dependencies.add(
       _dependency(
         request,
@@ -380,7 +380,7 @@ Elv5PureKernelExecutor<Lan06Input, Lan06Result> buildLan06Executor({
   completionOf:
       (result) =>
           result.status == Lan06AssessmentStatus.unresolved
-              ? Elv5Completion.partial
+              ? Elv5Completion.incomplete
               : Elv5Completion.complete,
   assessmentOf:
       (result) => switch (result.status) {

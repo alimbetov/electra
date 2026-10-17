@@ -332,8 +332,3 @@ final class Elv5CalculationBatch {
   final List<Elv5ProcessEvaluationCandidate> evaluations;
   final Map<String, int> captureRevisions;
 }
-
-const _encoder = Elv5CanonicalJsonV1();
-
-String _canonicalJson(Object? value) =>
-    utf8.decode(_encoder.encode(value), allowMalformed: false);

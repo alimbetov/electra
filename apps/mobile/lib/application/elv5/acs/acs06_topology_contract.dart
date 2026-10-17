@@ -1,5 +1,3 @@
-import 'package:engineering_core/engineering_core_elv5.dart';
-
 final class Acs06TopologyProfileIdentity {
   Acs06TopologyProfileIdentity({
     required String profileCode,

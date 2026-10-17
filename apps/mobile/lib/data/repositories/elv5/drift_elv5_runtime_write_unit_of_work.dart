@@ -120,7 +120,7 @@ final class _DriftElv5CommandLedgerStore implements ElvCommandLedgerStore {
         Variable.withString(entry.logicalResultJson),
         Variable<DateTime>(entry.createdAt.toUtc()),
         Variable<DateTime>(entry.committedAt.toUtc()),
-        Variable.withString(originDeviceId),
+        Variable.withString(entry.originDeviceId),
       ],
     );
   }

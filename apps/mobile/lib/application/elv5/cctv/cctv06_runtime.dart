@@ -66,7 +66,7 @@ final class Cctv06PersistedInputResolver
         <String, Object?>{'linkId': linkId},
       );
     }
-    final compositionPayload = composition!.payload;
+    final compositionPayload = composition.payload;
     if (_text(compositionPayload, 'linkId') != linkId) {
       throw StateError('CCTV06_LINK_IDENTITY_MISMATCH:$linkId');
     }
@@ -90,7 +90,7 @@ final class Cctv06PersistedInputResolver
         <String, Object?>{'linkId': linkId},
       );
     }
-    final contract = contractSnapshot!.contract;
+    final contract = contractSnapshot.contract;
     dependencies.add(
       _dependency(
         request,
@@ -330,7 +330,7 @@ final class Cctv06PersistedInputResolver
       }
       power = Cctv06PowerEvidence(
         pathFingerprint: pathFingerprint,
-        globalMargin: Power(globalMargin!),
+        globalMargin: Power(globalMargin),
         requiredSegmentIds: requiredSections,
         evidencedSegmentIds: evidencedSections,
       );

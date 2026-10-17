@@ -56,7 +56,7 @@ final class Lan04PersistedInputResolver
         <String, Object?>{'linkId': linkId},
       );
     }
-    if (_text(composition!.payload, 'linkId') != linkId) {
+    if (_text(composition.payload, 'linkId') != linkId) {
       throw StateError('LAN04_LINK_IDENTITY_MISMATCH:$linkId');
     }
     final compositionFingerprint = _encoder.sha256(composition.payload);
@@ -79,7 +79,7 @@ final class Lan04PersistedInputResolver
         <String, Object?>{'linkId': linkId},
       );
     }
-    final contract = snapshot!.contract;
+    final contract = snapshot.contract;
     dependencies.add(
       _dependency(
         request,

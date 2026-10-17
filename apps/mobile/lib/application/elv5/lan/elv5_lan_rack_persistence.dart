@@ -37,7 +37,7 @@ abstract interface class Elv5LanRackMutationStore {
 }
 
 abstract interface class Elv5LanRackWriteSession
-    extends Elv5ReplacementWriteSession {
+    implements Elv5ReplacementWriteSession {
   Elv5LanRackMutationStore get racks;
 }
 

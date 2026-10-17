@@ -52,7 +52,7 @@ void main() {
     );
 
     expect(result.assessment, Elv5Assessment.unresolved);
-    expect(result.completion, Elv5Completion.partial);
+    expect(result.completion, Elv5Completion.incomplete);
     final mappings = result.output['mappings']! as List<Object?>;
     expect(
       mappings.whereType<Map<String, Object?>>().singleWhere(

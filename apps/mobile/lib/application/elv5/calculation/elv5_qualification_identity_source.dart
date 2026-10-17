@@ -14,7 +14,6 @@ final class Elv5BuildQualificationIdentitySource
     Elv5FoundationAuthorityManifest authority =
         Elv5FoundationAuthorityManifest.instance,
   }) : _sourceSha = _sha(sourceSha),
-       _authority = authority,
        _authorityFingerprint = authority.fingerprint();
 
   /// Build pipelines should pass:
@@ -33,7 +32,6 @@ final class Elv5BuildQualificationIdentitySource
   }
 
   final String _sourceSha;
-  final Elv5FoundationAuthorityManifest _authority;
   final String _authorityFingerprint;
 
   @override

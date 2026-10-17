@@ -68,7 +68,7 @@ final class Fa05PersistedInputResolver
         <String, Object?>{'bankId': request.subject.id},
       );
     }
-    final contract = snapshot!.contract;
+    final contract = snapshot.contract;
     dependencies.add(
       _dependency(
         request,

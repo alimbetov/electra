@@ -37,7 +37,7 @@ abstract interface class Elv5CctvRecorderMutationStore
 }
 
 abstract interface class Elv5CctvRecorderWriteSession
-    extends Elv5ReplacementWriteSession {
+    implements Elv5ReplacementWriteSession {
   Elv5CctvRecorderMutationStore get recorder;
 }
 

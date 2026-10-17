@@ -4,7 +4,7 @@ import 'package:electra_mobile/application/elv5/cctv/cctv06_runtime.dart';
 import 'package:electra_mobile/application/elv5/lan/elv3_realized_link_facts.dart';
 import 'package:electra_mobile/application/elv5/lan/elv5_lan_persistence.dart';
 import 'package:electra_mobile/application/elv5/power/elv4_current_evidence_source.dart';
-import 'package:engineering_core/engineering_core.dart';
+import 'package:engineering_core/engineering_core.dart' hide Length;
 import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
