@@ -11,6 +11,7 @@ import 'drift_acs04_source_requirement_contract_store.dart';
 import 'drift_acs05_autonomy_contract_store.dart';
 import 'drift_acs06_topology_contract_store.dart';
 import 'drift_ampacity_section_contract_store.dart';
+import 'drift_cctv04_pse_contract_store.dart';
 import 'drift_elv3_realized_link_fact_source.dart';
 import 'drift_elv4_current_evidence_source.dart';
 import 'drift_elv4_operating_fact_source.dart';
@@ -60,6 +61,7 @@ final class DriftElv5CalculationRuntime {
       sectionEvidence: ampacitySections,
     );
 
+    final cctv04Contracts = DriftCctv04PseProjectionContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
     final lan02Contracts = DriftLan02PortContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
     final lan03Contracts = DriftLan03PoeProjectionContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
     final lan04Contracts = DriftLan04CompatibilityContractStore(database, originDeviceId: originDeviceId, nowUtc: nowUtc);
@@ -85,6 +87,7 @@ final class DriftElv5CalculationRuntime {
       lanStore: lanFacts,
       acsStore: acsFacts,
       fireStore: fireFacts,
+      cctv04Contracts: cctv04Contracts,
       elv3LinkFacts: DriftElv3RealizedLinkFactSource(database),
       opticalSectionEvidence: DriftLan05OpticalSectionEvidenceSource(database),
       lan02Contracts: lan02Contracts,
