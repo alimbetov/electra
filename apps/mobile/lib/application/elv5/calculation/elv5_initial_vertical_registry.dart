@@ -72,10 +72,10 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
 }) {
   Elv5ProcessInputResolver<I> guarded<I>(Elv5ProcessInputResolver<I> inner) =>
       Elv5RevisionGuardedInputResolver<I>(inner: inner, revisions: captureRevisions);
-  Elv5ProcessCalculationAdapter blocked<I, O>(
+  Elv5ProcessCalculationAdapter blocked<I>(
     Elv5ProcessInputResolver<I> resolver,
-    Elv5ProcessKernelExecutor<I, O> executor,
-  ) => Elv5BlockedAwareTypedProcessCalculationAdapter(
+    Elv5PureProcessExecutor<I> executor,
+  ) => Elv5BlockedAwareTypedProcessCalculationAdapter<I>(
     resolver: guarded(resolver),
     executor: executor,
     nowUtc: nowUtc,
