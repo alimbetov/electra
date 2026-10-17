@@ -394,8 +394,8 @@ still an explicit global-suite obligation.
 | 0 | CCTV-03, LAN-05, ACS-03, FA-03 | Baseline harness integrated; final reconciliation/seal pending |
 | 1 | FA-08 | Production Q6–Q9 CI verified; full qualification/seal pending |
 | 2 | FA-01, FA-02, FA-04, FA-05, FA-06, FA-07 | Q6–Q8 source witnesses exact-SHA CI verified; full qualification/seal pending |
-| 3 | ACS-01, ACS-02, ACS-04, ACS-05, ACS-06 | NEXT — FIRE exact-SHA barrier passed |
-| 4 | LAN-01, LAN-02, LAN-03, LAN-04, LAN-06, LAN-07 | Pending ACS exact-SHA barrier |
+| 3 | ACS-01, ACS-02, ACS-04, ACS-05, ACS-06 | Q6–Q8 source witnesses exact-SHA CI verified; full qualification/seal pending |
+| 4 | LAN-01, LAN-02, LAN-03, LAN-04, LAN-06, LAN-07 | NEXT — ACS exact-SHA barrier passed |
 | 5 | CCTV-01, CCTV-02, CCTV-04, CCTV-05, CCTV-06 | Pending LAN exact-SHA barrier |
 
 These are 27 distinct process codes. Each wave requires its own complete
@@ -498,3 +498,26 @@ connection allocation race remains enabled.
 Lifecycle coverage is 11/27, qualified remains 0/27. This is a Q6–Q8 checkpoint;
 Q0–Q5/Q9 reconciliation, global reliability, automatic matrix/provenance and
 final acceptance remain open. The next ordered wave is ACS-01/02/04/05/06.
+
+## ACS wave checkpoint
+
+Source `da9d34abb25ca57fbf7e1a6d45ddc30965a0ba8c` passed complete
+Flutter Local Foundation run `39068040087`, artifact `12114187319`:
+469 mobile tests passed, one dedicated historical-migration skip, 485 core tests
+passed, both analyzers and formatters passed. Preserved logs explicitly execute
+ACS-01/02/04/05/06 production witnesses through the common lifecycle harness.
+
+ACS-01 changes the exact mandatory-lock role count from satisfied to deficient,
+with a failed-invalidation transaction rollback. ACS-02 marks an assigned relay
+unavailable and fails on the physical assignment conflict without inventing
+capacity. ACS-04/05 project the shared verified CURRENT power/energy chain and
+preserve its global requirement and consumed provenance. ACS-06 changes an
+actual persisted contract edge so the required fire-release path fails while
+the complete five-cause model remains present. All five assert independent
+SQLite CAS, durable restart, exact frozen replay and source read-only rejection.
+
+The atomic ACS contract coordinator persists each edition/design CAS and its
+old consumed evidence-reference invalidation in one SQLite transaction.
+Lifecycle coverage is 16/27, qualified remains 0/27. Q0–Q5/Q9 reconciliation,
+automatic provenance, global reliability and acceptance remain open. The next
+ordered wave is LAN-01/02/03/04/06/07; CCTV follows its exact-SHA barrier.
