@@ -1,7 +1,11 @@
 import 'package:engineering_core/engineering_core_elv5.dart';
 
 final class Cctv01ExactVec3Contract {
-  const Cctv01ExactVec3Contract({required this.x, required this.y, required this.z});
+  const Cctv01ExactVec3Contract({
+    required this.x,
+    required this.y,
+    required this.z,
+  });
 
   final Elv5Rational x;
   final Elv5Rational y;
@@ -19,6 +23,37 @@ final class Cctv01ExactVec3Contract {
       x: Elv5Rational.fromMap(_map(map['x'], 'x')),
       y: Elv5Rational.fromMap(_map(map['y'], 'y')),
       z: Elv5Rational.fromMap(_map(map['z'], 'z')),
+    );
+  }
+}
+
+final class Cctv01ExactSurfaceFrameContract {
+  Cctv01ExactSurfaceFrameContract({
+    required this.uAxis,
+    required this.vAxis,
+  }) {
+    if (_norm2(uAxis) != Elv5Rational.one ||
+        _norm2(vAxis) != Elv5Rational.one ||
+        !_dot(uAxis, vAxis).isZero) {
+      throw ArgumentError(
+        'CCTV01 surface frame axes must be exact orthonormal unit vectors.',
+      );
+    }
+  }
+
+  final Cctv01ExactVec3Contract uAxis;
+  final Cctv01ExactVec3Contract vAxis;
+
+  Map<String, Object?> toCanonicalValue() => <String, Object?>{
+    'uAxis': uAxis.toCanonicalValue(),
+    'vAxis': vAxis.toCanonicalValue(),
+  };
+
+  factory Cctv01ExactSurfaceFrameContract.fromMap(Map<String, Object?> map) {
+    _exact(map, const {'uAxis', 'vAxis'}, 'CCTV01 surface frame');
+    return Cctv01ExactSurfaceFrameContract(
+      uAxis: Cctv01ExactVec3Contract.fromMap(_map(map['uAxis'], 'uAxis')),
+      vAxis: Cctv01ExactVec3Contract.fromMap(_map(map['vAxis'], 'vAxis')),
     );
   }
 }
@@ -41,14 +76,31 @@ final class Cctv01GeometryContract {
     required this.right,
     required this.up,
     this.minimumCoverageRatio,
+    String? expectedHostSurfacePatchId,
+    this.hostSurfaceFrame,
+    this.targetSurfaceFrame,
+    this.legacyFrameAxisTolerance,
   })  : cameraId = _text(cameraId, 'cameraId'),
         roomId = _text(roomId, 'roomId'),
         expectedDefinitionId = _text(expectedDefinitionId, 'expectedDefinitionId'),
         targetSurfacePatchId = _text(targetSurfacePatchId, 'targetSurfacePatchId'),
-        geometryModelEditionId = _text(geometryModelEditionId, 'geometryModelEditionId'),
-        geometryModelContentHash = _sha(geometryModelContentHash, 'geometryModelContentHash') {
+        geometryModelEditionId = _text(
+          geometryModelEditionId,
+          'geometryModelEditionId',
+        ),
+        geometryModelContentHash = _sha(
+          geometryModelContentHash,
+          'geometryModelContentHash',
+        ),
+        expectedHostSurfacePatchId = expectedHostSurfacePatchId == null
+            ? null
+            : _text(expectedHostSurfacePatchId, 'expectedHostSurfacePatchId') {
     if (expectedDefinitionVersion < 1) {
-      throw ArgumentError.value(expectedDefinitionVersion, 'expectedDefinitionVersion', 'Must be >= 1.');
+      throw ArgumentError.value(
+        expectedDefinitionVersion,
+        'expectedDefinitionVersion',
+        'Must be >= 1.',
+      );
     }
     for (final entry in <MapEntry<String, Elv5Rational>>[
       MapEntry('sensorWidthMm', sensorWidthMm),
@@ -60,20 +112,49 @@ final class Cctv01GeometryContract {
       }
     }
     if (minimumCoverageRatio != null &&
-        (minimumCoverageRatio! < Elv5Rational.zero || minimumCoverageRatio! > Elv5Rational.one)) {
-      throw ArgumentError.value(minimumCoverageRatio, 'minimumCoverageRatio', 'Must be in [0,1].');
+        (minimumCoverageRatio! < Elv5Rational.zero ||
+            minimumCoverageRatio! > Elv5Rational.one)) {
+      throw ArgumentError.value(
+        minimumCoverageRatio,
+        'minimumCoverageRatio',
+        'Must be in [0,1].',
+      );
     }
     if (_norm2(forward) != Elv5Rational.one ||
         _norm2(right) != Elv5Rational.one ||
         _norm2(up) != Elv5Rational.one) {
       throw ArgumentError('CCTV01 orientation vectors must be exact unit vectors.');
     }
-    if (!_dot(forward, right).isZero || !_dot(forward, up).isZero || !_dot(right, up).isZero) {
+    if (!_dot(forward, right).isZero ||
+        !_dot(forward, up).isZero ||
+        !_dot(right, up).isZero) {
       throw ArgumentError('CCTV01 orientation vectors must be exactly orthogonal.');
+    }
+
+    final exactFrameFields = <Object?>[
+      this.expectedHostSurfacePatchId,
+      hostSurfaceFrame,
+      targetSurfaceFrame,
+      legacyFrameAxisTolerance,
+    ];
+    final exactCount = exactFrameFields.where((value) => value != null).length;
+    if (exactCount != 0 && exactCount != exactFrameFields.length) {
+      throw ArgumentError(
+        'CCTV01 exact surface-frame v2 fields must be supplied together.',
+      );
+    }
+    if (legacyFrameAxisTolerance != null &&
+        legacyFrameAxisTolerance! < Elv5Rational.zero) {
+      throw ArgumentError.value(
+        legacyFrameAxisTolerance,
+        'legacyFrameAxisTolerance',
+        'Must be >= 0.',
+      );
     }
   }
 
-  static const schema = 'electra.elv5-cctv01-geometry-contract.v1';
+  static const legacySchema = 'electra.elv5-cctv01-geometry-contract.v1';
+  static const schema = 'electra.elv5-cctv01-geometry-contract.v2';
 
   final String cameraId;
   final String roomId;
@@ -92,8 +173,23 @@ final class Cctv01GeometryContract {
   final Cctv01ExactVec3Contract up;
   final Elv5Rational? minimumCoverageRatio;
 
+  /// V2 exact surface-frame authority. Legacy ELV3 floating axes are retained
+  /// only as a compatibility witness and are never used for engineering math.
+  final String? expectedHostSurfacePatchId;
+  final Cctv01ExactSurfaceFrameContract? hostSurfaceFrame;
+  final Cctv01ExactSurfaceFrameContract? targetSurfaceFrame;
+  final Elv5Rational? legacyFrameAxisTolerance;
+
+  bool get hasExactSurfaceFrames =>
+      expectedHostSurfacePatchId != null &&
+      hostSurfaceFrame != null &&
+      targetSurfaceFrame != null &&
+      legacyFrameAxisTolerance != null;
+
+  String get effectiveSchema => hasExactSurfaceFrames ? schema : legacySchema;
+
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-    'schema': schema,
+    'schema': effectiveSchema,
     'cameraId': cameraId,
     'roomId': roomId,
     'expectedDefinitionId': expectedDefinitionId,
@@ -110,25 +206,55 @@ final class Cctv01GeometryContract {
     'right': right.toCanonicalValue(),
     'up': up.toCanonicalValue(),
     'minimumCoverageRatio': minimumCoverageRatio?.toMap(),
+    if (hasExactSurfaceFrames) ...<String, Object?>{
+      'expectedHostSurfacePatchId': expectedHostSurfacePatchId,
+      'hostSurfaceFrame': hostSurfaceFrame!.toCanonicalValue(),
+      'targetSurfaceFrame': targetSurfaceFrame!.toCanonicalValue(),
+      'legacyFrameAxisTolerance': legacyFrameAxisTolerance!.toMap(),
+    },
   };
 
   factory Cctv01GeometryContract.fromMap(Map<String, Object?> map) {
-    _exact(
-      map,
-      const {
-        'schema','cameraId','roomId','expectedDefinitionId','expectedDefinitionVersion',
-        'targetSurfacePatchId','geometryModelEditionId','geometryModelContentHash',
-        'rectilinearPinholeSupported','targetIsPlanar','sensorWidthMm','sensorHeightMm',
-        'focalLengthMm','forward','right','up','minimumCoverageRatio',
-      },
-      'CCTV01 contract',
-    );
-    if (map['schema'] != schema) throw const FormatException('Unsupported CCTV01 contract schema.');
+    final schemaValue = map['schema'];
+    if (schemaValue == legacySchema) {
+      _exact(map, _legacyFields, 'CCTV01 v1 contract');
+      return _fromCommonMap(map);
+    }
+    if (schemaValue == schema) {
+      _exact(map, _v2Fields, 'CCTV01 v2 contract');
+      return _fromCommonMap(
+        map,
+        expectedHostSurfacePatchId: _mapText(map, 'expectedHostSurfacePatchId'),
+        hostSurfaceFrame: Cctv01ExactSurfaceFrameContract.fromMap(
+          _map(map['hostSurfaceFrame'], 'hostSurfaceFrame'),
+        ),
+        targetSurfaceFrame: Cctv01ExactSurfaceFrameContract.fromMap(
+          _map(map['targetSurfaceFrame'], 'targetSurfaceFrame'),
+        ),
+        legacyFrameAxisTolerance: Elv5Rational.fromMap(
+          _map(map['legacyFrameAxisTolerance'], 'legacyFrameAxisTolerance'),
+        ),
+      );
+    }
+    throw const FormatException('Unsupported CCTV01 contract schema.');
+  }
+
+  static Cctv01GeometryContract _fromCommonMap(
+    Map<String, Object?> map, {
+    String? expectedHostSurfacePatchId,
+    Cctv01ExactSurfaceFrameContract? hostSurfaceFrame,
+    Cctv01ExactSurfaceFrameContract? targetSurfaceFrame,
+    Elv5Rational? legacyFrameAxisTolerance,
+  }) {
     final version = map['expectedDefinitionVersion'];
-    if (version is! int) throw const FormatException('expectedDefinitionVersion must be integer.');
+    if (version is! int) {
+      throw const FormatException('expectedDefinitionVersion must be integer.');
+    }
     final pinhole = map['rectilinearPinholeSupported'];
     final planar = map['targetIsPlanar'];
-    if (pinhole is! bool || planar is! bool) throw const FormatException('CCTV01 applicability flags must be boolean.');
+    if (pinhole is! bool || planar is! bool) {
+      throw const FormatException('CCTV01 applicability flags must be boolean.');
+    }
     return Cctv01GeometryContract(
       cameraId: _mapText(map, 'cameraId'),
       roomId: _mapText(map, 'roomId'),
@@ -139,17 +265,57 @@ final class Cctv01GeometryContract {
       geometryModelContentHash: _mapText(map, 'geometryModelContentHash'),
       rectilinearPinholeSupported: pinhole,
       targetIsPlanar: planar,
-      sensorWidthMm: Elv5Rational.fromMap(_map(map['sensorWidthMm'], 'sensorWidthMm')),
-      sensorHeightMm: Elv5Rational.fromMap(_map(map['sensorHeightMm'], 'sensorHeightMm')),
-      focalLengthMm: Elv5Rational.fromMap(_map(map['focalLengthMm'], 'focalLengthMm')),
+      sensorWidthMm: Elv5Rational.fromMap(
+        _map(map['sensorWidthMm'], 'sensorWidthMm'),
+      ),
+      sensorHeightMm: Elv5Rational.fromMap(
+        _map(map['sensorHeightMm'], 'sensorHeightMm'),
+      ),
+      focalLengthMm: Elv5Rational.fromMap(
+        _map(map['focalLengthMm'], 'focalLengthMm'),
+      ),
       forward: Cctv01ExactVec3Contract.fromMap(_map(map['forward'], 'forward')),
       right: Cctv01ExactVec3Contract.fromMap(_map(map['right'], 'right')),
       up: Cctv01ExactVec3Contract.fromMap(_map(map['up'], 'up')),
       minimumCoverageRatio: map['minimumCoverageRatio'] == null
           ? null
-          : Elv5Rational.fromMap(_map(map['minimumCoverageRatio'], 'minimumCoverageRatio')),
+          : Elv5Rational.fromMap(
+              _map(map['minimumCoverageRatio'], 'minimumCoverageRatio'),
+            ),
+      expectedHostSurfacePatchId: expectedHostSurfacePatchId,
+      hostSurfaceFrame: hostSurfaceFrame,
+      targetSurfaceFrame: targetSurfaceFrame,
+      legacyFrameAxisTolerance: legacyFrameAxisTolerance,
     );
   }
+
+  static const Set<String> _legacyFields = <String>{
+    'schema',
+    'cameraId',
+    'roomId',
+    'expectedDefinitionId',
+    'expectedDefinitionVersion',
+    'targetSurfacePatchId',
+    'geometryModelEditionId',
+    'geometryModelContentHash',
+    'rectilinearPinholeSupported',
+    'targetIsPlanar',
+    'sensorWidthMm',
+    'sensorHeightMm',
+    'focalLengthMm',
+    'forward',
+    'right',
+    'up',
+    'minimumCoverageRatio',
+  };
+
+  static const Set<String> _v2Fields = <String>{
+    ..._legacyFields,
+    'expectedHostSurfacePatchId',
+    'hostSurfaceFrame',
+    'targetSurfaceFrame',
+    'legacyFrameAxisTolerance',
+  };
 }
 
 final class Cctv01GeometryContractSnapshot {
@@ -187,7 +353,8 @@ final class ReplaceCctv01GeometryContractCommand {
     _text(projectId, 'projectId');
     _text(designRevisionId, 'designRevisionId');
     _text(bindingId, 'bindingId');
-    if (expectedDesignRevision < 1 || (expectedBindingRevision != null && expectedBindingRevision! < 1)) {
+    if (expectedDesignRevision < 1 ||
+        (expectedBindingRevision != null && expectedBindingRevision! < 1)) {
       throw ArgumentError('CCTV01 expected revisions must be positive.');
     }
   }
