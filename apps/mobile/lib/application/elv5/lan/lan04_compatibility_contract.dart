@@ -22,6 +22,13 @@ final class Lan04SectionCapabilityContract {
         ),
         evidenceRef = _text(evidenceRef, 'evidenceRef'),
         evidenceContentHash = _sha(evidenceContentHash, 'evidenceContentHash') {
+    if (this.supportedInterfaceKinds.isEmpty ||
+        this.supportedSpeedModes.isEmpty ||
+        this.supportedConnectorKinds.isEmpty) {
+      throw ArgumentError(
+        'LAN04 section capability edition requires explicit non-empty interface/speed/connector evidence.',
+      );
+    }
     if (!shieldContinuityKnown && shieldContinuity) {
       throw ArgumentError('LAN04 unknown shield continuity cannot assert true.');
     }
