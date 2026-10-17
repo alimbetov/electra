@@ -5,20 +5,15 @@
   "acceptanceClaimed": false,
   "runtimeBaseline": {
     "processCount": 27,
-    "productionAdapters": 23,
-    "remainingAdapters": 4,
+    "productionAdapters": 24,
+    "remainingAdapters": 3,
     "byDiscipline": {
       "ACS": {"integrated": 6, "total": 6},
       "FIRE": {"integrated": 8, "total": 8},
       "LAN": {"integrated": 7, "total": 7},
-      "CCTV": {"integrated": 2, "total": 6}
+      "CCTV": {"integrated": 3, "total": 6}
     },
-    "remaining": [
-      "CCTV-01",
-      "CCTV-04",
-      "CCTV-05",
-      "CCTV-06"
-    ]
+    "remaining": ["CCTV-01", "CCTV-05", "CCTV-06"]
   },
   "foundationStages": {
     "F0": {
@@ -36,11 +31,11 @@
       "workItems": {
         "quantityInventory": "IMPLEMENTED_SHARED_DIMENSIONS_QUALIFICATION_PENDING",
         "typedEvidenceReconciliation": "SHARED_PRIMITIVE_IMPLEMENTED_PROCESS_MIGRATION_PENDING",
-        "unknownFailClosedAudit": "PARTIAL_FIRST_PASS_CRITICAL_PATHS_CLEAN",
+        "unknownFailClosedAudit": "PARTIAL_FALSE_PASS_FOUND_AND_FIXED_CCTV01",
         "provenanceGraph": "PARTIAL_EXISTING_PRIMITIVES_TO_RECONCILE",
         "calculationIdentity": "PARTIAL_F1_HIGH_01_OPEN",
         "deterministicCanonicalization": "IMPLEMENTED_CORE_QUALIFICATION_PENDING",
-        "independentStatusAxes": "IMPLEMENTED_IN_ELV5_RUNTIME",
+        "independentStatusAxes": "PARTIAL_F1_HIGH_02_OPEN",
         "governingCasePrimitive": "PARTIAL_PROCESS_SPECIFIC",
         "sharedQualificationSupport": "TODO"
       },
@@ -48,9 +43,11 @@
         "inspected": [
           "AMPACITY_REFERENCE_AND_CORRECTIONS",
           "ENVIRONMENT_PROFILE_AND_ROUTE_RESOLUTION",
-          "CCTV03_STORAGE_AND_RECURRENCE"
+          "CCTV03_STORAGE_AND_RECURRENCE",
+          "CCTV01_GEOMETRY_THRESHOLD_SEMANTICS"
         ],
-        "falsePassDefaultsFound": 0,
+        "falsePassDefaultsFound": 1,
+        "falsePassDefaultsFixed": 1,
         "fullRepositoryAuditComplete": false
       },
       "openFindings": [
@@ -59,6 +56,12 @@
           "severity": "HIGH",
           "summary": "Persisted evaluation identity does not yet carry explicit sourceSha, authorityFingerprint and rulesetVersion required for foundation acceptance.",
           "acceptanceImpact": "BLOCKS_QUALIFIED_AND_ACCEPTED_PROMOTION"
+        },
+        {
+          "id": "F1-HIGH-02",
+          "severity": "HIGH",
+          "summary": "Current runtime encodes BLOCKED as Execution and INCOMPLETE as Completion, while the foundation requires Execution SUCCEEDED/FAILED and Completion COMPLETE/PARTIAL/BLOCKED.",
+          "acceptanceImpact": "BLOCKS_F2_QUALIFIED_PROMOTION_UNTIL_COMPATIBLE_AXIS_RECONCILIATION"
         }
       ]
     },
@@ -67,45 +70,20 @@
       "status": "NOT_QUALIFIED",
       "exitGateSatisfied": false,
       "pilots": [
-        {
-          "id": "AMPACITY_ROUTE_IZ",
-          "implementation": "RUNTIME_FOUNDATION_EXISTS",
-          "lifecycle": "RUNTIME_INTEGRATED_PARTIAL",
-          "qualification": {"Q0": "PARTIAL", "Q1": "PARTIAL", "Q2": "TODO", "Q3": "PARTIAL", "Q4": "PARTIAL", "Q5": "TODO", "Q6": "PARTIAL", "Q7": "TODO", "Q8": "TODO", "Q9": "TODO_IF_APPLICABLE"}
-        },
-        {
-          "id": "FA-03",
-          "implementation": "PRODUCTION_ADAPTER_PRESENT",
-          "lifecycle": "RUNTIME_INTEGRATED",
-          "qualification": {"Q0": "PARTIAL", "Q1": "PARTIAL", "Q2": "TODO", "Q3": "PARTIAL", "Q4": "TODO", "Q5": "TODO", "Q6": "PARTIAL", "Q7": "TODO", "Q8": "TODO", "Q9": "TODO_IF_APPLICABLE"}
-        },
-        {
-          "id": "ACS-03",
-          "implementation": "PRODUCTION_ADAPTER_PRESENT",
-          "lifecycle": "RUNTIME_INTEGRATED",
-          "canonicalOracle": "23.51 V / +1.51 V where applicable",
-          "qualification": {"Q0": "PARTIAL", "Q1": "PARTIAL", "Q2": "TODO_INDEPENDENT", "Q3": "PARTIAL", "Q4": "TODO", "Q5": "TODO", "Q6": "PARTIAL", "Q7": "TODO", "Q8": "TODO", "Q9": "TODO_IF_APPLICABLE"}
-        },
-        {
-          "id": "CCTV-03",
-          "implementation": "PRODUCTION_ADAPTER_PRESENT",
-          "lifecycle": "RUNTIME_INTEGRATED",
-          "qualification": {"Q0": "PARTIAL", "Q1": "PARTIAL", "Q2": "TODO", "Q3": "PARTIAL", "Q4": "TODO", "Q5": "TODO", "Q6": "PARTIAL", "Q7": "TODO", "Q8": "TODO", "Q9": "TODO_IF_APPLICABLE"}
-        },
-        {
-          "id": "LAN-05",
-          "implementation": "PRODUCTION_ADAPTER_PRESENT",
-          "lifecycle": "RUNTIME_INTEGRATED",
-          "qualification": {"Q0": "PARTIAL", "Q1": "PARTIAL", "Q2": "TODO_INDEPENDENT", "Q3": "PARTIAL", "Q4": "TODO", "Q5": "TODO", "Q6": "PARTIAL", "Q7": "TODO", "Q8": "TODO", "Q9": "TODO_IF_APPLICABLE"}
-        }
+        {"id":"AMPACITY_ROUTE_IZ","implementation":"RUNTIME_FOUNDATION_EXISTS","lifecycle":"RUNTIME_INTEGRATED_PARTIAL","qualification":{"Q0":"PARTIAL","Q1":"PARTIAL","Q2":"TODO","Q3":"PARTIAL","Q4":"PARTIAL","Q5":"TODO","Q6":"PARTIAL","Q7":"TODO","Q8":"TODO","Q9":"TODO_IF_APPLICABLE"}},
+        {"id":"FA-03","implementation":"PRODUCTION_ADAPTER_PRESENT","lifecycle":"RUNTIME_INTEGRATED","qualification":{"Q0":"PARTIAL","Q1":"PARTIAL","Q2":"TODO","Q3":"PARTIAL","Q4":"TODO","Q5":"TODO","Q6":"PARTIAL","Q7":"TODO","Q8":"TODO","Q9":"TODO_IF_APPLICABLE"}},
+        {"id":"ACS-03","implementation":"PRODUCTION_ADAPTER_PRESENT","lifecycle":"RUNTIME_INTEGRATED","canonicalOracle":"23.51 V / +1.51 V where applicable","qualification":{"Q0":"PARTIAL","Q1":"PARTIAL","Q2":"TODO_INDEPENDENT","Q3":"PARTIAL","Q4":"TODO","Q5":"TODO","Q6":"PARTIAL","Q7":"TODO","Q8":"TODO","Q9":"TODO_IF_APPLICABLE"}},
+        {"id":"CCTV-03","implementation":"PRODUCTION_ADAPTER_PRESENT","lifecycle":"RUNTIME_INTEGRATED","qualification":{"Q0":"PARTIAL","Q1":"PARTIAL","Q2":"TODO","Q3":"PARTIAL","Q4":"TODO","Q5":"TODO","Q6":"PARTIAL","Q7":"TODO","Q8":"TODO","Q9":"TODO_IF_APPLICABLE"}},
+        {"id":"LAN-05","implementation":"PRODUCTION_ADAPTER_PRESENT","lifecycle":"RUNTIME_INTEGRATED","qualification":{"Q0":"PARTIAL","Q1":"PARTIAL","Q2":"TODO_INDEPENDENT","Q3":"PARTIAL","Q4":"TODO","Q5":"TODO","Q6":"PARTIAL","Q7":"TODO","Q8":"TODO","Q9":"TODO_IF_APPLICABLE"}}
       ]
     }
   },
   "executionOrder": {
-    "runtimeTrack": ["CCTV-04", "CCTV-01", "CCTV-05", "CCTV-06"],
+    "runtimeTrack": ["CCTV-01", "CCTV-05", "CCTV-06"],
     "foundationTrack": [
       "F1_UNKNOWN_AND_SILENT_DEFAULT_AUDIT_COMPLETE",
       "F1_CALCULATION_IDENTITY_RECONCILIATION",
+      "F1_RESULT_AXIS_RECONCILIATION",
       "F1_PROVENANCE_RECONCILIATION",
       "F1_SHARED_QUALIFICATION_SUPPORT",
       "F2_AMPACITY_ROUTE_IZ",
@@ -117,15 +95,7 @@
     ]
   },
   "priorityOverride": "Any F1 defect capable of false PASS, nondeterministic hash, stale-current publication or provenance loss preempts new vertical work.",
-  "reportingRequirements": [
-    "exactHeadSha",
-    "runtimeIntegrationCount",
-    "processLifecycle",
-    "F1GateStatus",
-    "F2Q0ToQ9Status",
-    "actuallyExecutedCIAnalyzeTests",
-    "knownBlockersAndDebts"
-  ],
+  "reportingRequirements": ["exactHeadSha","runtimeIntegrationCount","processLifecycle","F1GateStatus","F2Q0ToQ9Status","actuallyExecutedCIAnalyzeTests","knownBlockersAndDebts"],
   "qualificationPromotionRule": "No pilot may become QUALIFIED without all applicable mandatory Q gates backed by exact-source-SHA evidence.",
   "acceptancePromotionRule": "ACCEPTED additionally requires stage acceptance pinned to exact source SHA and authority fingerprint."
 }
