@@ -128,3 +128,46 @@ Map<String, Object?> f2CctvRecorder() => {
     },
   ],
 };
+
+Map<String, Object?> f2CctvRecordingPool() => {
+  'poolId': 'pool-1',
+  'horizon': {
+    'startUtc': '2026-10-17T00:00:00.000Z',
+    'endUtc': '2026-10-18T00:00:00.000Z',
+  },
+  'temporalPolicy': {
+    'timeZoneId': 'UTC',
+    'tzdbVersion': '2026a',
+    'gapRule': 'SHIFT_FORWARD',
+    'overlapRule': 'EARLIER_OFFSET',
+  },
+  'assignments': [
+    {
+      'encodedStreamId': 'stream-main',
+      'copyRole': 'PRIMARY',
+      'scheduleProfileId': 'always',
+      'expectedBitrateBps': '8000000',
+      'upperBoundBitrateBps': '12000000',
+      'evidenceBasis': 'GUARANTEED_POINTWISE_UPPER_BOUND',
+    },
+  ],
+  'scheduleSegments': [
+    {
+      'scheduleProfileId': 'always',
+      'segmentId': 'always-1',
+      'absoluteWindow': {
+        'startUtc': '2026-10-17T00:00:00.000Z',
+        'endUtc': '2026-10-18T00:00:00.000Z',
+      },
+      'recurrence': null,
+    },
+  ],
+  'sizingBasis': 'GUARANTEED_UPPER_BOUND',
+  'reserveMultiplier': '1.00',
+  'redundancyModel': {
+    'modelCode': 'SINGLE_EXPLICIT',
+    'usableFraction': '1.00',
+    'contentHash': List.filled(64, 'c').join(),
+  },
+  'policyRef': null,
+};
