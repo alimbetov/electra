@@ -96,7 +96,7 @@ final class _FireStore implements Elv5FireFactStore {
       'loopId':'loop-1',
       'topologyProfileRef':<String,Object?>{'profileCode':'CLASS-A','editionId':'v1','contentHash':_hash('a')},
       'addressDomain':<String,Object?>{
-        'panelId':'panel-1','loopId':'loop-1','minAddress':1,'maxAddress':5,
+        'panelId':'panel-1','loopId':'loop-1','minAddress':10,'maxAddress':14,
         'reservedAddresses':reserved,
       },
       'deviceAssignments':<Object?>[
