@@ -5,6 +5,7 @@ export 'src/elv5/canonical/canonical_json_v1.dart';
 export 'src/elv5/evidence/ampacity_contract.dart';
 export 'src/elv5/evidence/engineering_value.dart';
 export 'src/elv5/evidence/environment_profile.dart';
+export 'src/elv5/evidence/route_ampacity_contract.dart';
 export 'src/elv5/findings/comparison.dart';
 export 'src/elv5/numeric/interval.dart';
 export 'src/elv5/numeric/quantity.dart';
