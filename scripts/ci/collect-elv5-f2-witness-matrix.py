@@ -80,7 +80,8 @@ def collect(events, witnesses, source_sha):
         code = witness['processCode']
         matching = [tid for tid, test in tests.items()
                     if test['name'] == witness['testName']
-                    and suites.get(test['suiteID'], '').endswith('/' + witness['path'])]
+                    and (suites.get(test['suiteID'], '') in {witness['path'], witness['path'].removeprefix('apps/mobile/')}
+                         or suites.get(test['suiteID'], '').endswith('/' + witness['path']))]
         require(len(matching) == 1, f'{code}: exact witness test missing or ambiguous')
         tid = matching[0]
         require(outcomes[tid].get('skipped') is False, f'{code}: skipped witness')

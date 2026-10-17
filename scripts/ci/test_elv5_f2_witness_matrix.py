@@ -50,6 +50,13 @@ class ExecutionWitnessTests(unittest.TestCase):
         self.assertTrue(row['fullQualificationResult'].startswith('PENDING'))
         self.assertEqual(row['qualificationIdentity']['sourceSha'], self.source)
 
+    def test_reporter_paths_may_be_mobile_relative_or_absolute(self):
+        for path in [self.witness['path'], self.witness['path'].removeprefix('apps/mobile/'), '/checkout/'+self.witness['path']]:
+            self.events[1]['suite']['path'] = path
+            self.assertEqual(self.collect()[0]['processCode'],self.witness['processCode'])
+        self.events[1]['suite']['path'] = '/unrelated/' + Path(self.witness['path']).name
+        self.assertRaises(ValueError,self.collect)
+
     def test_registry_has_exact_27_unique_real_test_bindings(self):
         self.assertEqual(len(m.registry()), 27)
 
