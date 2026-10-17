@@ -72,20 +72,50 @@ final class Fa06CaseContract {
   }
 }
 
+final class Fa06SupervisionFaultResult {
+  Fa06SupervisionFaultResult({
+    required String faultCode,
+    required this.passed,
+  }) : faultCode = _text(faultCode, 'faultCode');
+
+  final String faultCode;
+  final bool passed;
+
+  Map<String, Object?> toCanonicalValue() => <String, Object?>{
+        'faultCode': faultCode,
+        'passed': passed,
+      };
+
+  factory Fa06SupervisionFaultResult.fromMap(Map<String, Object?> map) {
+    _exact(map, const <String>{'faultCode', 'passed'}, 'FA06 supervision fault');
+    final passed = map['passed'];
+    if (passed is! bool) {
+      throw const FormatException('FA06 supervision fault passed must be boolean.');
+    }
+    return Fa06SupervisionFaultResult(
+      faultCode: _mapText(map, 'faultCode'),
+      passed: passed,
+    );
+  }
+}
+
 final class Fa06SupervisionContract {
   Fa06SupervisionContract({
     required this.required,
     required this.modelSupported,
-    required this.passed,
+    Iterable<Fa06SupervisionFaultResult> faultResults = const [],
     this.modelCode,
     this.evidenceRef,
     this.evidenceContentHash,
-  }) {
+  }) : faultResults = List.unmodifiable(_faultResults(faultResults)) {
     if (required && modelCode == null) {
       throw ArgumentError('FA06 required supervision needs modelCode.');
     }
     if (required && modelSupported && evidenceRef == null) {
       throw ArgumentError('FA06 supported supervision needs evidenceRef.');
+    }
+    if (required && modelSupported && this.faultResults.isEmpty) {
+      throw ArgumentError('FA06 supported supervision needs explicit fault results.');
     }
     if (evidenceContentHash != null) {
       _sha(evidenceContentHash!, 'evidenceContentHash');
@@ -94,43 +124,54 @@ final class Fa06SupervisionContract {
 
   final bool required;
   final bool modelSupported;
-  final bool passed;
+  final List<Fa06SupervisionFaultResult> faultResults;
   final String? modelCode;
   final String? evidenceRef;
   final String? evidenceContentHash;
 
+  bool get passed =>
+      !required ||
+      (modelSupported &&
+          faultResults.isNotEmpty &&
+          faultResults.every((value) => value.passed));
+
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
         'required': required,
         'modelSupported': modelSupported,
-        'passed': passed,
         'modelCode': modelCode,
         'evidenceRef': evidenceRef,
         'evidenceContentHash': evidenceContentHash,
+        'faultResults': [
+          for (final value in faultResults) value.toCanonicalValue(),
+        ],
       };
 
   factory Fa06SupervisionContract.fromMap(Map<String, Object?> map) {
     _exact(map, const <String>{
       'required',
       'modelSupported',
-      'passed',
       'modelCode',
       'evidenceRef',
       'evidenceContentHash',
+      'faultResults',
     }, 'FA06 supervision');
     final required = map['required'];
     final supported = map['modelSupported'];
-    final passed = map['passed'];
-    if (required is! bool || supported is! bool || passed is! bool) {
-      throw const FormatException('FA06 supervision flags must be boolean.');
+    final rawFaults = map['faultResults'];
+    if (required is! bool || supported is! bool || rawFaults is! List) {
+      throw const FormatException('FA06 supervision field type mismatch.');
     }
     return Fa06SupervisionContract(
       required: required,
       modelSupported: supported,
-      passed: passed,
       modelCode: _nullableText(map['modelCode'], 'modelCode'),
       evidenceRef: _nullableText(map['evidenceRef'], 'evidenceRef'),
       evidenceContentHash:
           _nullableText(map['evidenceContentHash'], 'evidenceContentHash'),
+      faultResults: <Fa06SupervisionFaultResult>[
+        for (final raw in rawFaults)
+          Fa06SupervisionFaultResult.fromMap(_object(raw, 'FA06 supervision fault')),
+      ],
     );
   }
 }
@@ -287,6 +328,19 @@ List<Fa06CaseContract> _cases(Iterable<Fa06CaseContract> values) {
   for (final value in result) {
     if (!seen.add(value.operatingCase)) {
       throw ArgumentError('FA06 duplicate operating case: ${value.operatingCase}');
+    }
+  }
+  return result;
+}
+
+List<Fa06SupervisionFaultResult> _faultResults(
+  Iterable<Fa06SupervisionFaultResult> values,
+) {
+  final result = values.toList()..sort((a, b) => a.faultCode.compareTo(b.faultCode));
+  final codes = <String>{};
+  for (final value in result) {
+    if (!codes.add(value.faultCode)) {
+      throw ArgumentError('FA06 duplicate supervision fault: ${value.faultCode}');
     }
   }
   return result;
