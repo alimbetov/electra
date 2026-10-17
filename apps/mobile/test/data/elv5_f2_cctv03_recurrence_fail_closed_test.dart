@@ -78,12 +78,11 @@ void main() {
       final evidence = Map<String, Object?>.from(
         jsonDecode(evaluation.read<String>('evidence_json')) as Map,
       );
-      final processEvidence = Map<String, Object?>.from(
-        evidence['processEvidence'] as Map,
-      );
-      expect(processEvidence['requiredCapability'], 'PINNED_TZDB_RECURRENCE_EXPANDER');
-      expect(processEvidence['timeZoneId'], 'Asia/Almaty');
-      expect(processEvidence['tzdbVersion'], '2026a');
+      expect(evidence['reasonCode'], 'CCTV03_RECURRENCE_EXPANDER_REQUIRED');
+      expect(evidence['requiredCapability'], 'PINNED_TZDB_RECURRENCE_EXPANDER');
+      expect(evidence['timeZoneId'], 'Asia/Almaty');
+      expect(evidence['tzdbVersion'], '2026a');
+      expect(evidence['temporalRulesHash'], isA<String>());
 
       final pointer = await db
           .customSelect(
