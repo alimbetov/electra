@@ -162,7 +162,12 @@ Future<void> _replace(
         Fa07EdgeContract(edgeId: 'e1', fromNodeId: 'source', toNodeId: 'n1'),
         Fa07EdgeContract(edgeId: 'e2', fromNodeId: 'n1', toNodeId: 'n2'),
         if (closed)
-          Fa07EdgeContract(edgeId: 'e3', fromNodeId: 'n2', toNodeId: 'return'),
+          Fa07EdgeContract(edgeId: 'e3', fromNodeId: 'n2', toNodeId: 'return')
+        else
+          // Keep the contract graph structurally complete while deliberately
+          // removing the forward return closure: return participates in the
+          // graph but cannot be reached from source through the device chain.
+          Fa07EdgeContract(edgeId: 'e3', fromNodeId: 'return', toNodeId: 'source'),
       ],
       permittedBranchNodeIds: const [],
       maxBranchNodes: 0,
