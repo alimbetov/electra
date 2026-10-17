@@ -18,8 +18,11 @@ final class Fa01DeviceAssignment {
     required this.deviceId,
     required this.addresses,
     required this.expectedConsumption,
+    this.physicalDeviceCountContribution = 1,
   }) {
-    if (deviceId.isEmpty || expectedConsumption <= 0) {
+    if (deviceId.isEmpty ||
+        expectedConsumption <= 0 ||
+        physicalDeviceCountContribution <= 0) {
       throw ArgumentError('FA01 invalid device assignment.');
     }
     if (addresses.length != expectedConsumption) {
@@ -29,6 +32,7 @@ final class Fa01DeviceAssignment {
   final String deviceId;
   final Set<Fa01AddressKey> addresses;
   final int expectedConsumption;
+  final int physicalDeviceCountContribution;
 }
 
 final class Fa01CapacityPolicy {
@@ -94,7 +98,9 @@ final class Fa01AddressCapacityKernel {
   Fa01Result evaluate(Fa01Input input) {
     final claims = <Fa01AddressKey, List<String>>{};
     var addressCount = 0;
+    var deviceCount = 0;
     for (final device in input.devices) {
+      deviceCount += device.physicalDeviceCountContribution;
       addressCount += device.addresses.length;
       for (final key in device.addresses) {
         claims.putIfAbsent(key, () => <String>[]).add(device.deviceId);
@@ -115,9 +121,10 @@ final class Fa01AddressCapacityKernel {
         return d != 0 ? d : a.key.address.compareTo(b.key.address);
       });
 
-    final deviceCount = input.devices.length;
-    final deviceHeadroom = input.policy.deviceLimit - deviceCount - input.policy.requiredDeviceSpare;
-    final addressHeadroom = input.policy.addressLimit - addressCount - input.policy.requiredAddressSpare;
+    final deviceHeadroom =
+        input.policy.deviceLimit - deviceCount - input.policy.requiredDeviceSpare;
+    final addressHeadroom =
+        input.policy.addressLimit - addressCount - input.policy.requiredAddressSpare;
     final status = collisions.isEmpty && deviceHeadroom >= 0 && addressHeadroom >= 0
         ? Fa01AssessmentStatus.pass
         : Fa01AssessmentStatus.fail;
