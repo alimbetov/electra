@@ -1,3 +1,4 @@
+import 'elv5/drift_elv5_discipline_snapshot_store.dart';
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
@@ -516,7 +517,7 @@ final class DriftPowerPublicationRuntime {
     final manifest =
         await database
             .customSelect(
-              'SELECT manifest_sha256, physical_sha256, power_sha256 FROM design_revision_snapshot_manifests '
+              'SELECT * FROM design_revision_snapshot_manifests '
               'WHERE project_id = ? AND design_revision_id = ?',
               variables: [
                 Variable.withString(projectId),
@@ -529,14 +530,7 @@ final class DriftPowerPublicationRuntime {
             snapshot.read<String>('power_sha256') ||
         manifest.read<String>('physical_sha256') !=
             snapshot.read<String>('physical_sha256') ||
-        sha256HexUtf8(
-              canonicalEngineeringJsonV1({
-                'schema': 'electra.elv4-snapshot-manifest.v1',
-                'physicalSha256': manifest.read<String>('physical_sha256'),
-                'powerSha256': manifest.read<String>('power_sha256'),
-              }),
-            ) !=
-            manifest.read<String>('manifest_sha256')) {
+        !_validRevisionManifest(manifest.data)) {
       throw const PowerRuntimeStorageException(
         'ELV4_FROZEN_MANIFEST_HASH_MISMATCH',
       );
@@ -546,6 +540,21 @@ final class DriftPowerPublicationRuntime {
       designRevisionId,
       snapshot.read<String>('physical_sha256'),
     );
+    if (manifest.read<String>('manifest_schema') ==
+        elv5SnapshotManifestSchema) {
+      try {
+        await DriftElv5DisciplineSnapshotStore(
+          database,
+          originDeviceId: originDeviceId,
+          nowUtc: now,
+        ).read(projectId: projectId, designRevisionId: designRevisionId);
+      } on StateError {
+        throw const PowerRuntimeStorageException(
+          'ELV4_FROZEN_MANIFEST_HASH_MISMATCH',
+        );
+      }
+    }
+
     final payload =
         (jsonDecode(snapshot.read<String>('payload_json')) as Map)
             .cast<String, Object?>();
@@ -1236,4 +1245,12 @@ String _sha256(String value, String field) {
     throw ArgumentError.value(value, field, 'Expected lowercase SHA-256.');
   }
   return normalized;
+}
+
+bool _validRevisionManifest(Map<String, Object?> row) {
+  try {
+    return elvSnapshotManifestHash(row) == row['manifest_sha256'];
+  } on StateError {
+    return false;
+  }
 }
