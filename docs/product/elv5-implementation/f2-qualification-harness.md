@@ -54,7 +54,9 @@ Formatter alignment itself is not qualification evidence. The harness wave remai
 
 ## Analyze hygiene
 
-The first exact-SHA harness run reached `flutter analyze` after the formatter gate and identified only three unused imports left from the former bespoke exception assertions. Those imports were removed without changing production behavior or shared Q6/Q7/Q8 semantics. The cleanup must still pass the complete exact-SHA foundation workflow before this migration wave is considered closed.
+The first exact-SHA harness run reached `flutter analyze` after the formatter gate and identified only three unused imports left from the former bespoke exception assertions. Those imports were removed without changing production behavior or shared Q6/Q7/Q8 semantics.
+
+The formatter residue after that import cleanup was limited to one leading blank line in each of the CCTV-03 and LAN-05 witness files. The exact CI formatter artifact identified those two lines and they were removed without any functional change. The wave remains pending until this post-cleanup exact source SHA passes the complete foundation workflow.
 
 ## Promotion rule
 
