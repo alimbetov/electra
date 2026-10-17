@@ -16,10 +16,13 @@ import 'package:engineering_core/engineering_core.dart';
 import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../support/elv5_f2_qualification_harness.dart';
+
 void main() {
   test(
     'F2 ACS-03 Q6/Q7/Q8 qualifies persisted door, real PWR CURRENT evidence, publication, restart and freeze replay',
     () async {
+      const harness = Elv5F2QualificationHarness();
       final directory = await Directory.systemTemp.createTemp(
         'electra-f2-acs03-full-runtime-',
       );
@@ -98,6 +101,12 @@ void main() {
       expect(persisted.assessment, 'PASS');
       expect(persisted.inputFingerprint, hasLength(64));
       expect(persisted.outputSha256, hasLength(64));
+      final committedSnapshot = _snapshot(
+        pointerBeforeRestart,
+        persisted,
+        first.logicalResultJson,
+      );
+      harness.assertQ6Initial('ACS-03', committedSnapshot);
 
       final dependencyRows =
           await db
@@ -151,24 +160,25 @@ void main() {
         pointerAfterRestart.evaluationId,
         pointerBeforeRestart.evaluationId,
       );
+      harness.assertQ7Replay(
+        'ACS-03',
+        committedSnapshot,
+        _snapshot(pointerAfterRestart, persisted, replay.logicalResultJson),
+      );
 
       // Q7 competing publication: a stale writer still expects generation 0.
       // The durable CURRENT generation is already 1, so publication fails closed.
-      await expectLater(
-        runtime.service.execute(
-          _calculationCommand(
-            commandId: 'acs03-stale-writer',
-            expectedPointerGeneration: 0,
-            expectedDesignRevision: 2,
-          ),
-        ),
-        throwsA(
-          isA<Elv5ReplacementCommandException>().having(
-            (error) => error.code,
-            'code',
-            'ELV5_POINTER_GENERATION_CONFLICT',
-          ),
-        ),
+      await harness.expectQ7StaleWriter(
+        'ACS-03',
+        () async {
+          await runtime.service.execute(
+            _calculationCommand(
+              commandId: 'acs03-stale-writer',
+              expectedPointerGeneration: 0,
+              expectedDesignRevision: 2,
+            ),
+          );
+        },
       );
 
       // Q8: freeze preserves historical replay, while new calculations are
@@ -180,22 +190,25 @@ void main() {
       final frozenReplay = await runtime.service.execute(command);
       expect(frozenReplay.replayed, isTrue);
       expect(frozenReplay.logicalResultJson, logicalBeforeRestart);
+      final frozenReplayPointer = await _acsPointer(db);
+      harness.assertQ8Replay(
+        'ACS-03',
+        committedSnapshot,
+        _snapshot(frozenReplayPointer, persisted, frozenReplay.logicalResultJson),
+      );
 
-      await expectLater(
-        runtime.service.execute(
-          _calculationCommand(
-            commandId: 'acs03-after-freeze',
-            expectedPointerGeneration: 1,
-            expectedDesignRevision: 3,
-          ),
-        ),
-        throwsA(
-          isA<Elv5ReplacementCommandException>().having(
-            (error) => error.code,
-            'code',
-            'ELV5_DESIGN_REVISION_READ_ONLY',
-          ),
-        ),
+      await harness.expectQ8ReadOnly(
+        'ACS-03',
+        () async {
+          await runtime.service.execute(
+            _calculationCommand(
+              commandId: 'acs03-after-freeze',
+              expectedPointerGeneration: 1,
+              expectedDesignRevision: 3,
+            ),
+          );
+        },
+        operation: 'new calculation',
       );
 
       final frozenPointer = await _acsPointer(db);
@@ -205,6 +218,20 @@ void main() {
     },
   );
 }
+
+Elv5F2PublicationSnapshot _snapshot(
+  _PointerRow pointer,
+  _EvaluationRow evaluation,
+  String logicalResultJson,
+) => Elv5F2PublicationSnapshot(
+  generation: pointer.generation,
+  evaluationId: pointer.evaluationId!,
+  freshness: pointer.freshness,
+  execution: evaluation.execution,
+  completion: evaluation.completion,
+  inputFingerprint: evaluation.inputFingerprint,
+  logicalResultJson: logicalResultJson,
+);
 
 final _events = <_AcsEventFixture>[
   const _AcsEventFixture(
