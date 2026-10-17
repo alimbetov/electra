@@ -74,11 +74,9 @@ final class DriftFa08RouteCableFactSource implements Fa08RouteCableFactSource {
       for (final traversal in ordered)
         Fa08RouteCableFact(
           sectionId: traversal.routeSegmentId,
+          cableId: cable.id,
           cableEditionId: editionId,
           cableClass: definition.firePerformanceCode,
-          // Legacy CableDefinition numeric fields are binary floating point and
-          // are deliberately not emitted as FA-08 verdict facts. Exact numeric
-          // facts (including Iz) come from versioned ELV5 evidence contracts.
           numericFacts: const [],
         ),
     ];
