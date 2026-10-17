@@ -25,6 +25,30 @@ final class Elv5QualificationIdentity implements Elv5CanonicalValue {
   final String sourceSha;
   final String authorityFingerprint;
 
+  factory Elv5QualificationIdentity.fromMap(Map<String, Object?> value) {
+    _exactKeys(
+      value,
+      const {
+        'schema',
+        'processVersion',
+        'rulesetVersion',
+        'sourceSha',
+        'authorityFingerprint',
+      },
+    );
+    if (value['schema'] != schema) {
+      throw const FormatException(
+        'Unsupported ELV5 Foundation qualification identity schema.',
+      );
+    }
+    return Elv5QualificationIdentity(
+      processVersion: _mapText(value, 'processVersion'),
+      rulesetVersion: _mapText(value, 'rulesetVersion'),
+      sourceSha: _mapText(value, 'sourceSha'),
+      authorityFingerprint: _mapText(value, 'authorityFingerprint'),
+    );
+  }
+
   @override
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
     'schema': schema,
@@ -34,8 +58,28 @@ final class Elv5QualificationIdentity implements Elv5CanonicalValue {
     'authorityFingerprint': authorityFingerprint,
   };
 
-  String canonicalSha256({Elv5CanonicalEncoder encoder = const Elv5CanonicalJsonV1()}) =>
-      encoder.sha256(toCanonicalValue());
+  String canonicalSha256({
+    Elv5CanonicalEncoder encoder = const Elv5CanonicalJsonV1(),
+  }) => encoder.sha256(toCanonicalValue());
+}
+
+String _mapText(Map<String, Object?> value, String field) {
+  final raw = value[field];
+  if (raw is! String) {
+    throw FormatException('$field must be text.');
+  }
+  return raw;
+}
+
+void _exactKeys(Map<String, Object?> value, Set<String> expected) {
+  final actual = value.keys.toSet();
+  if (actual.length != expected.length ||
+      actual.difference(expected).isNotEmpty ||
+      expected.difference(actual).isNotEmpty) {
+    throw const FormatException(
+      'Qualification identity has missing or unknown fields.',
+    );
+  }
 }
 
 String _text(String value, String field) {
