@@ -12,10 +12,11 @@ abstract interface class Elv5CaptureRevisionSource {
 
 /// Converts a domain resolver capture into a publication-safe capture token.
 ///
-/// Domain resolvers may naturally expose their aggregate revision in evidence,
-/// but `Elv5CalculationService` guards publication against the global design
-/// revision row. This wrapper snapshots that row revision after all domain reads
-/// and makes it the sole `captureRevision` consumed by the publication CAS.
+/// A capture is accepted only when the global design revision is identical
+/// before and after all domain reads. This prevents a mixed snapshot from being
+/// stamped with a newer revision and later passing publication CAS. One retry is
+/// allowed for a concurrent mutation; continued churn fails the command rather
+/// than publishing evidence assembled across two design states.
 final class Elv5RevisionGuardedInputResolver<I>
     implements Elv5ProcessInputResolver<I> {
   Elv5RevisionGuardedInputResolver({
@@ -31,27 +32,46 @@ final class Elv5RevisionGuardedInputResolver<I>
 
   @override
   Future<Elv5CapturedInput<I>> capture(Elv5CalculationRequest request) async {
-    try {
-      final captured = await inner.capture(request);
-      final designRowRevision = await revisions.requireWorkingRevision(
+    for (var attempt = 0; attempt < 2; attempt++) {
+      final before = await revisions.requireWorkingRevision(
         projectId: request.projectId,
         designRevisionId: request.designRevisionId,
       );
+
+      Elv5CapturedInput<I>? captured;
+      Elv5CaptureBlockedException? blocked;
+      try {
+        captured = await inner.capture(request);
+      } on Elv5CaptureBlockedException catch (value) {
+        blocked = value;
+      }
+
+      final after = await revisions.requireWorkingRevision(
+        projectId: request.projectId,
+        designRevisionId: request.designRevisionId,
+      );
+      if (before != after) {
+        if (attempt == 0) continue;
+        throw StateError(
+          'ELV5_CAPTURE_CHANGED_DURING_READ:$before:$after',
+        );
+      }
+
+      if (blocked != null) {
+        throw blocked.withCaptureRevision(after);
+      }
+      final stable = captured!;
       return Elv5CapturedInput<I>(
-        request: captured.request,
-        value: captured.value,
-        inputFingerprint: captured.inputFingerprint,
-        policyFingerprint: captured.policyFingerprint,
-        dependencies: captured.dependencies,
-        upstreamPointerGenerations: captured.upstreamPointerGenerations,
-        captureRevision: designRowRevision,
+        request: stable.request,
+        value: stable.value,
+        inputFingerprint: stable.inputFingerprint,
+        policyFingerprint: stable.policyFingerprint,
+        dependencies: stable.dependencies,
+        upstreamPointerGenerations: stable.upstreamPointerGenerations,
+        captureRevision: after,
       );
-    } on Elv5CaptureBlockedException catch (blocked) {
-      final designRowRevision = await revisions.requireWorkingRevision(
-        projectId: request.projectId,
-        designRevisionId: request.designRevisionId,
-      );
-      throw blocked.withCaptureRevision(designRowRevision);
     }
+
+    throw StateError('ELV5_CAPTURE_STABILITY_RETRY_EXHAUSTED');
   }
 }
