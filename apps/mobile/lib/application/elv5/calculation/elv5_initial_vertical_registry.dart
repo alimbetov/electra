@@ -20,6 +20,8 @@ import '../fire/fa05_autonomy_contract.dart';
 import '../fire/fa05_runtime.dart';
 import '../fire/fa06_notification_contract.dart';
 import '../fire/fa06_runtime.dart';
+import '../fire/fa07_runtime.dart';
+import '../fire/fa07_topology_contract.dart';
 import '../lan/elv3_realized_link_facts.dart';
 import '../lan/elv5_lan_persistence.dart';
 import '../lan/lan01_runtime.dart';
@@ -49,6 +51,7 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
   required Fa04SourceRequirementContractSource fa04Contracts,
   required Fa05AutonomyContractSource fa05Contracts,
   required Fa06NotificationContractSource fa06Contracts,
+  required Fa07TopologyContractSource fa07Contracts,
   required Elv4CurrentEvidenceSource currentPowerEvidence,
   required Elv4OperatingFactSource powerOperatingFacts,
   required Elv5CaptureRevisionSource captureRevisions,
@@ -197,6 +200,17 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
         ),
       ),
       executor: buildFa06Executor(nowUtc: nowUtc),
+      nowUtc: nowUtc,
+    ),
+    Elv5BlockedAwareTypedProcessCalculationAdapter(
+      resolver: guarded(
+        Fa07PersistedInputResolver(
+          fireStore: fireStore,
+          contractSource: fa07Contracts,
+          nowUtc: nowUtc,
+        ),
+      ),
+      executor: buildFa07Executor(nowUtc: nowUtc),
       nowUtc: nowUtc,
     ),
   ]);
