@@ -145,6 +145,7 @@ Future<String> _capacity(AppDatabase db, int available, String edition) async {
   await replaceF2PowerDefinition(
     db,
     componentId: 'psu-1',
+    processCode: PowerProcessCode.pwr02,
     edition: edition,
     definition: {'nameplateW': PowerRational.integer(available).toMap()},
     capability: PowerComponentCapability.source,

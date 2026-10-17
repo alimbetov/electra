@@ -29,7 +29,8 @@ Future<String> publishF2PowerEvidence(
           revisionId: 'd',
           kind: PowerDependencyKind.definition,
           entityId: node.subjectId,
-          purpose: 'F2_EXPLICIT_POWER_FIXTURE',
+          purpose:
+              'F2_EXPLICIT_${node.processCode.name.toUpperCase()}_POWER_FIXTURE',
         ),
         valueSchema: 'electra.f2-power-source-fact.v1',
         value: {'edition': edition, 'inputs': inputs, 'output': output},
@@ -79,6 +80,7 @@ Future<void> replaceF2PowerDefinition(
   required String edition,
   required Map<String, Object?> definition,
   required PowerComponentCapability capability,
+  required PowerProcessCode processCode,
 }) async {
   final revision = (await db
           .customSelect(
@@ -102,7 +104,8 @@ Future<void> replaceF2PowerDefinition(
           revisionId: 'd',
           kind: PowerDependencyKind.definition,
           entityId: componentId,
-          purpose: 'F2_EXPLICIT_POWER_FIXTURE',
+          purpose:
+              'F2_EXPLICIT_${processCode.name.toUpperCase()}_POWER_FIXTURE',
         ),
       ],
       bindingId: 'source-$componentId',

@@ -122,6 +122,7 @@ Future<String> _battery(
   await replaceF2PowerDefinition(
     db,
     componentId: 'bank-1',
+    processCode: PowerProcessCode.pwr04,
     edition: edition,
     definition: {'temperatureFactor': factor.toMap()},
     capability: PowerComponentCapability.storage,
