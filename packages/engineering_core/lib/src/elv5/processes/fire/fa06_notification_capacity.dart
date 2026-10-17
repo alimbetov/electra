@@ -6,7 +6,13 @@ enum Fa06OperatingCase { activeNotification, startupInrush }
 
 enum Fa06AssessmentStatus { pass, fail, blocked }
 
-enum Fa06GoverningDimension { deviceCount, outputCurrent, terminalLow, terminalHigh, supervision }
+enum Fa06GoverningDimension {
+  deviceCount,
+  outputCurrent,
+  terminalLow,
+  terminalHigh,
+  supervision
+}
 
 final class Fa06ElectricalCaseEvidence {
   Fa06ElectricalCaseEvidence({
@@ -62,17 +68,21 @@ final class Fa06Input {
     required this.supervision,
   }) {
     if (circuitId.isEmpty || expectedMembershipFingerprint.isEmpty) {
-      throw ArgumentError('FA06 circuit identity/fingerprint must not be empty.');
+      throw ArgumentError(
+          'FA06 circuit identity/fingerprint must not be empty.');
     }
-    if (deviceLimit < 0) throw ArgumentError('FA06 device limit must be nonnegative.');
-    if (deviceIds.isEmpty) throw ArgumentError('FA06 requires at least one notification device.');
+    if (deviceLimit < 0)
+      throw ArgumentError('FA06 device limit must be nonnegative.');
+    if (deviceIds.isEmpty)
+      throw ArgumentError('FA06 requires at least one notification device.');
     if (deviceIds.length != deviceIds.toSet().length) {
       throw ArgumentError('FA06 duplicate notification device identity.');
     }
     final seen = <Fa06OperatingCase>{};
     for (final item in cases) {
       if (!seen.add(item.operatingCase)) {
-        throw ArgumentError('FA06 duplicate electrical case: ${item.operatingCase}');
+        throw ArgumentError(
+            'FA06 duplicate electrical case: ${item.operatingCase}');
       }
     }
     if (!seen.contains(Fa06OperatingCase.activeNotification)) {
@@ -149,7 +159,8 @@ final class Fa06NotificationCapacityKernel {
     }
 
     if (input.supervision.required && !input.supervision.modelSupported) {
-      return _blocked(input, countMargin, 'FA06_REQUIRED_SUPERVISION_MODEL_UNSUPPORTED');
+      return _blocked(
+          input, countMargin, 'FA06_REQUIRED_SUPERVISION_MODEL_UNSUPPORTED');
     }
     if (input.supervision.required && !input.supervision.passed) {
       return Fa06Result(
@@ -170,8 +181,10 @@ final class Fa06NotificationCapacityKernel {
         return _blocked(input, countMargin, 'FA06_MEMBERSHIP_CLOSURE_MISMATCH');
       }
       final currentMargin = item.outputCurrentLimit - item.outputCurrent.upper;
-      final lowMargin = item.terminalVoltage.lower - item.minimumTerminalVoltage;
-      final highMargin = item.maximumTerminalVoltage - item.terminalVoltage.upper;
+      final lowMargin =
+          item.terminalVoltage.lower - item.minimumTerminalVoltage;
+      final highMargin =
+          item.maximumTerminalVoltage - item.terminalVoltage.upper;
       final failedDimensions = <Fa06GoverningDimension>[
         if (currentMargin.value < Elv5Rational.zero)
           Fa06GoverningDimension.outputCurrent,

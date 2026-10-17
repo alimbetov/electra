@@ -74,18 +74,19 @@ final class DriftFa08InvalidationCoordinator {
     required String designRevisionId,
     required String cableId,
   }) async {
-    final rows = await database
-        .customSelect(
-          'SELECT id FROM canonical_cable_runs '
-          'WHERE project_id = ? AND design_revision_id = ? AND cable_id = ? '
-          "AND lifecycle_state = 'ACTIVE' AND deleted_at IS NULL ORDER BY id",
-          variables: <Variable>[
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            Variable.withString(cableId),
-          ],
-        )
-        .get();
+    final rows =
+        await database
+            .customSelect(
+              'SELECT id FROM canonical_cable_runs '
+              'WHERE project_id = ? AND design_revision_id = ? AND cable_id = ? '
+              "AND lifecycle_state = 'ACTIVE' AND deleted_at IS NULL ORDER BY id",
+              variables: <Variable>[
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                Variable.withString(cableId),
+              ],
+            )
+            .get();
     if (rows.isEmpty) return 0;
     return _invalidator.invalidate(
       projectId: projectId,

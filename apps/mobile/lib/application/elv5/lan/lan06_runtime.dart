@@ -164,9 +164,8 @@ final class Lan06PersistedInputResolver
     final capacityBasis = switch (capacityBasisWire) {
       'GROSS_WITH_EXCLUSIONS' => Lan06CapacityBasis.grossWithExclusions,
       'NET_USABLE' => Lan06CapacityBasis.netUsable,
-      _ => throw StateError(
-        'LAN06_CAPACITY_BASIS_UNSUPPORTED:$capacityBasisWire',
-      ),
+      _ =>
+        throw StateError('LAN06_CAPACITY_BASIS_UNSUPPORTED:$capacityBasisWire'),
     };
 
     final excludedCapacity = _map(
@@ -243,12 +242,14 @@ final class Lan06PersistedInputResolver
       capacityBasis: capacityBasis,
       capacity: Lan06CapacityFacts(
         ruCapacity: contract.ruCapacity,
-        weightCapacity: contract.weightCapacityKg == null
-            ? null
-            : Mass(contract.weightCapacityKg!),
-        depthCapacity: contract.depthCapacityM == null
-            ? null
-            : Length(contract.depthCapacityM!),
+        weightCapacity:
+            contract.weightCapacityKg == null
+                ? null
+                : Mass(contract.weightCapacityKg!),
+        depthCapacity:
+            contract.depthCapacityM == null
+                ? null
+                : Length(contract.depthCapacityM!),
       ),
       exclusions: List.unmodifiable(exclusions),
       explicitSpareRu: contract.explicitSpareRu,
@@ -353,36 +354,41 @@ Elv5PureKernelExecutor<Lan06Input, Lan06Result> buildLan06Executor({
 }) => Elv5PureKernelExecutor<Lan06Input, Lan06Result>(
   processCode: Elv5ProcessCode.lan06,
   calculate: const Lan06RackCapacityKernel().evaluate,
-  encodeOutput: (result) => <String, Object?>{
-    'schema': 'electra.elv5-lan06-output.v1',
-    'status': result.status.name,
-    'requiredRu': result.requiredRu,
-    'availableRu': result.availableRu,
-    'ruMargin': result.ruMargin,
-    'requiredWeightKg': result.requiredWeight?.value.toMap(),
-    'weightMarginKg': result.weightMargin?.value.toMap(),
-    'weightStatus': result.weightStatus.name,
-    'requiredDepthM': result.requiredDepth?.value.toMap(),
-    'depthMarginM': result.depthMargin?.value.toMap(),
-    'depthStatus': result.depthStatus.name,
-    'layoutStatus': result.layoutStatus.name,
-  },
-  encodeEvidence: (captured, _) => <String, Object?>{
-    'schema': 'electra.elv5-lan06-evidence.v1',
-    'source': 'PERSISTED_RACK_MEMBERSHIP_PLUS_IMMUTABLE_DIMENSION_EVIDENCE',
-    'captureRevision': captured.captureRevision,
-    'layoutOwnership': 'ELV6_NOT_ASSESSED',
-  },
+  encodeOutput:
+      (result) => <String, Object?>{
+        'schema': 'electra.elv5-lan06-output.v1',
+        'status': result.status.name,
+        'requiredRu': result.requiredRu,
+        'availableRu': result.availableRu,
+        'ruMargin': result.ruMargin,
+        'requiredWeightKg': result.requiredWeight?.value.toMap(),
+        'weightMarginKg': result.weightMargin?.value.toMap(),
+        'weightStatus': result.weightStatus.name,
+        'requiredDepthM': result.requiredDepth?.value.toMap(),
+        'depthMarginM': result.depthMargin?.value.toMap(),
+        'depthStatus': result.depthStatus.name,
+        'layoutStatus': result.layoutStatus.name,
+      },
+  encodeEvidence:
+      (captured, _) => <String, Object?>{
+        'schema': 'electra.elv5-lan06-evidence.v1',
+        'source': 'PERSISTED_RACK_MEMBERSHIP_PLUS_IMMUTABLE_DIMENSION_EVIDENCE',
+        'captureRevision': captured.captureRevision,
+        'layoutOwnership': 'ELV6_NOT_ASSESSED',
+      },
   executionOf: (_) => Elv5Execution.succeeded,
-  completionOf: (result) => result.status == Lan06AssessmentStatus.unresolved
-      ? Elv5Completion.partial
-      : Elv5Completion.complete,
-  assessmentOf: (result) => switch (result.status) {
-    Lan06AssessmentStatus.pass => Elv5Assessment.pass,
-    Lan06AssessmentStatus.fail => Elv5Assessment.fail,
-    Lan06AssessmentStatus.unresolved => Elv5Assessment.unresolved,
-    Lan06AssessmentStatus.notAssessed => Elv5Assessment.notAssessed,
-  },
+  completionOf:
+      (result) =>
+          result.status == Lan06AssessmentStatus.unresolved
+              ? Elv5Completion.partial
+              : Elv5Completion.complete,
+  assessmentOf:
+      (result) => switch (result.status) {
+        Lan06AssessmentStatus.pass => Elv5Assessment.pass,
+        Lan06AssessmentStatus.fail => Elv5Assessment.fail,
+        Lan06AssessmentStatus.unresolved => Elv5Assessment.unresolved,
+        Lan06AssessmentStatus.notAssessed => Elv5Assessment.notAssessed,
+      },
   nowUtc: nowUtc,
 );
 

@@ -194,8 +194,8 @@ final class Elv4QualificationMatrixContract {
     final expected = {for (final row in expectedRows) row.key: row};
     final missing =
         expected.keys.toSet().difference(actual.keys.toSet()).toList()..sort();
-    final extra = actual.keys.toSet().difference(expected.keys.toSet()).toList()
-      ..sort();
+    final extra =
+        actual.keys.toSet().difference(expected.keys.toSet()).toList()..sort();
     if (missing.isNotEmpty || extra.isNotEmpty) {
       throw StateError(
         'ELV4 qualification matrix mismatch: missing=$missing extra=$extra',

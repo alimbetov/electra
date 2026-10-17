@@ -2,7 +2,13 @@ enum Lan04AssessmentStatus { pass, fail, unresolved, unsupported }
 
 enum Lan04Medium { copper, fiber, other }
 
-enum Lan04PropertyCode { medium, interfaceKind, speedMode, connector, shielding }
+enum Lan04PropertyCode {
+  medium,
+  interfaceKind,
+  speedMode,
+  connector,
+  shielding
+}
 
 final class Lan04RequiredMode {
   Lan04RequiredMode({
@@ -34,7 +40,8 @@ final class Lan04PathSection {
     required this.shieldContinuityKnown,
     required this.shieldContinuity,
   }) {
-    if (sectionId.isEmpty) throw ArgumentError('LAN04 sectionId must not be empty.');
+    if (sectionId.isEmpty)
+      throw ArgumentError('LAN04 sectionId must not be empty.');
   }
 
   final String sectionId;
@@ -76,7 +83,8 @@ final class Lan04Input {
     required this.requiredMode,
   }) {
     if (linkId.isEmpty) throw ArgumentError('LAN04 linkId must not be empty.');
-    if (orderedSections.isEmpty) throw ArgumentError('LAN04 ordered path must not be empty.');
+    if (orderedSections.isEmpty)
+      throw ArgumentError('LAN04 ordered path must not be empty.');
     final seen = <String>{};
     for (final section in orderedSections) {
       if (!seen.add(section.sectionId)) {
@@ -115,28 +123,31 @@ final class Lan04PathCompatibilityKernel {
 
     for (final section in input.orderedSections) {
       final property = <Lan04PropertyCode, Lan04AssessmentStatus>{};
-      property[Lan04PropertyCode.medium] = section.medium == input.requiredMode.medium
-          ? Lan04AssessmentStatus.pass
-          : Lan04AssessmentStatus.unsupported;
-      property[Lan04PropertyCode.interfaceKind] =
-          section.supportedInterfaceKinds.contains(input.requiredMode.interfaceKind)
+      property[Lan04PropertyCode.medium] =
+          section.medium == input.requiredMode.medium
               ? Lan04AssessmentStatus.pass
-              : Lan04AssessmentStatus.fail;
+              : Lan04AssessmentStatus.unsupported;
+      property[Lan04PropertyCode.interfaceKind] = section
+              .supportedInterfaceKinds
+              .contains(input.requiredMode.interfaceKind)
+          ? Lan04AssessmentStatus.pass
+          : Lan04AssessmentStatus.fail;
       property[Lan04PropertyCode.speedMode] =
           section.supportedSpeedModes.contains(input.requiredMode.speedMode)
               ? Lan04AssessmentStatus.pass
               : Lan04AssessmentStatus.fail;
-      property[Lan04PropertyCode.connector] =
-          section.supportedConnectorKinds.contains(input.requiredMode.connectorKind)
-              ? Lan04AssessmentStatus.pass
-              : Lan04AssessmentStatus.fail;
-      property[Lan04PropertyCode.shielding] = !input.requiredMode.shieldingRequired
+      property[Lan04PropertyCode.connector] = section.supportedConnectorKinds
+              .contains(input.requiredMode.connectorKind)
           ? Lan04AssessmentStatus.pass
-          : (!section.shieldContinuityKnown
-              ? Lan04AssessmentStatus.unresolved
-              : (section.shieldContinuity
-                  ? Lan04AssessmentStatus.pass
-                  : Lan04AssessmentStatus.fail));
+          : Lan04AssessmentStatus.fail;
+      property[Lan04PropertyCode.shielding] =
+          !input.requiredMode.shieldingRequired
+              ? Lan04AssessmentStatus.pass
+              : (!section.shieldContinuityKnown
+                  ? Lan04AssessmentStatus.unresolved
+                  : (section.shieldContinuity
+                      ? Lan04AssessmentStatus.pass
+                      : Lan04AssessmentStatus.fail));
 
       final result = Lan04SectionResult(
         sectionId: section.sectionId,

@@ -9,7 +9,8 @@ final class Cctv03TemporalPolicy {
     required this.rulesHash,
   }) {
     if (zoneId.isEmpty || rulesHash.isEmpty) {
-      throw ArgumentError('CCTV03 temporal policy must pin zone and rules hash.');
+      throw ArgumentError(
+          'CCTV03 temporal policy must pin zone and rules hash.');
     }
   }
 
@@ -76,7 +77,8 @@ final class Cctv03RecordingAssignment {
 
 final class Cctv03RedundancyModel {
   Cctv03RedundancyModel({required this.usableFraction}) {
-    if (usableFraction <= Elv5Rational.zero || usableFraction > Elv5Rational.one) {
+    if (usableFraction <= Elv5Rational.zero ||
+        usableFraction > Elv5Rational.one) {
       throw ArgumentError('CCTV03 usable fraction must be in (0, 1].');
     }
   }
@@ -97,8 +99,8 @@ final class Cctv03Input {
     this.redundancy,
     this.availableUsable,
     this.availableRaw,
-  }) : streamRates = List.unmodifiable(streamRates),
-       assignments = List.unmodifiable(assignments) {
+  })  : streamRates = List.unmodifiable(streamRates),
+        assignments = List.unmodifiable(assignments) {
     if (poolId.isEmpty) {
       throw ArgumentError('CCTV03 pool id must be non-empty.');
     }
@@ -112,10 +114,12 @@ final class Cctv03Input {
       throw ArgumentError('CCTV03 reserve multiplier must be >= 1.');
     }
     if (availableUsable?.value.isNegative ?? false) {
-      throw ArgumentError('CCTV03 available usable capacity must be non-negative.');
+      throw ArgumentError(
+          'CCTV03 available usable capacity must be non-negative.');
     }
     if (availableRaw?.value.isNegative ?? false) {
-      throw ArgumentError('CCTV03 available raw capacity must be non-negative.');
+      throw ArgumentError(
+          'CCTV03 available raw capacity must be non-negative.');
     }
   }
 

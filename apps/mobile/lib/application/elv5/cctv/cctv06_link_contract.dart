@@ -249,9 +249,12 @@ final class Cctv06LinkContract {
         'allowedCategoryTokens',
       ),
       shieldingRequired: _bool(map, 'shieldingRequired'),
-      maximumLengthM: map['maximumLengthM'] == null
-          ? null
-          : Elv5Rational.fromMap(_map(map['maximumLengthM'], 'maximumLengthM')),
+      maximumLengthM:
+          map['maximumLengthM'] == null
+              ? null
+              : Elv5Rational.fromMap(
+                _map(map['maximumLengthM'], 'maximumLengthM'),
+              ),
       sections: <Cctv06SectionEvidenceContract>[
         for (final raw in sections)
           Cctv06SectionEvidenceContract.fromMap(_map(raw, 'section')),
@@ -382,9 +385,10 @@ Map<String, String> _stringMap(Object? value, String field) {
   final map = _map(value, field);
   return <String, String>{
     for (final entry in map.entries)
-      _text(entry.key, field): entry.value is String
-          ? _text(entry.value as String, field)
-          : throw FormatException('$field value must be text.'),
+      _text(entry.key, field):
+          entry.value is String
+              ? _text(entry.value as String, field)
+              : throw FormatException('$field value must be text.'),
   };
 }
 

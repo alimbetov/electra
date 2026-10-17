@@ -19,13 +19,15 @@ void main() {
         numericFacts: facts,
       );
 
-  test('technical policy passes while verified compliance remains not assessed', () {
+  test('technical policy passes while verified compliance remains not assessed',
+      () {
     final result = const Fa08CablePolicyKernel().evaluate(Fa08Input(
       orderedSections: [section()],
       policy: Fa08Policy(
         policyId: 'policy-1',
         requirements: [
-          Fa08Requirement.cableClass(code: 'CLASS', expectedClass: 'TEST_CLASS_A'),
+          Fa08Requirement.cableClass(
+              code: 'CLASS', expectedClass: 'TEST_CLASS_A'),
           Fa08Requirement.environmentTag(code: 'ENV', requiredTag: 'INDOOR'),
         ],
       ),
@@ -72,7 +74,8 @@ void main() {
       policy: Fa08Policy(
         policyId: 'policy-1',
         requirements: [
-          Fa08Requirement.cableClass(code: 'CLASS', expectedClass: 'TEST_CLASS_A'),
+          Fa08Requirement.cableClass(
+              code: 'CLASS', expectedClass: 'TEST_CLASS_A'),
         ],
       ),
       complianceEvidence: null,
@@ -82,13 +85,15 @@ void main() {
     expect(result.limitingRequirementCode, 'CLASS');
   });
 
-  test('missing immutable cable class blocks instead of parsing product name', () {
+  test('missing immutable cable class blocks instead of parsing product name',
+      () {
     final result = const Fa08CablePolicyKernel().evaluate(Fa08Input(
       orderedSections: [section(cableClass: null)],
       policy: Fa08Policy(
         policyId: 'policy-1',
         requirements: [
-          Fa08Requirement.cableClass(code: 'CLASS', expectedClass: 'TEST_CLASS_A'),
+          Fa08Requirement.cableClass(
+              code: 'CLASS', expectedClass: 'TEST_CLASS_A'),
         ],
       ),
       complianceEvidence: null,

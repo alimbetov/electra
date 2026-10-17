@@ -97,10 +97,8 @@ final class _Elv3Facts implements Elv3RealizedLinkFactSource {
       ),
       includesRunReserve: true,
       includesTerminationAllowance: true,
-      sourceFingerprint: List.filled(
-        64,
-        realizedSectionId == 't1' ? 'a' : 'b',
-      ).join(),
+      sourceFingerprint:
+          List.filled(64, realizedSectionId == 't1' ? 'a' : 'b').join(),
     );
   }
 }

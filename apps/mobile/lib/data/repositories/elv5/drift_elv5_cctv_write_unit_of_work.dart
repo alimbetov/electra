@@ -81,45 +81,48 @@ final class _DriftElv5CctvMutationStore implements Elv5CctvMutationStore {
     required String designRevisionId,
     required String cameraId,
   }) async {
-    final root = await database
-        .customSelect(
-          'SELECT id, revision, transport_overhead_model_ref_json '
-          'FROM camera_stream_set_bindings WHERE project_id = ? '
-          'AND design_revision_id = ? AND camera_id = ? AND deleted_at IS NULL',
-          variables: [
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            Variable.withString(cameraId),
-          ],
-        )
-        .getSingleOrNull();
+    final root =
+        await database
+            .customSelect(
+              'SELECT id, revision, transport_overhead_model_ref_json '
+              'FROM camera_stream_set_bindings WHERE project_id = ? '
+              'AND design_revision_id = ? AND camera_id = ? AND deleted_at IS NULL',
+              variables: [
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                Variable.withString(cameraId),
+              ],
+            )
+            .getSingleOrNull();
     if (root == null) return null;
     final bindingId = root.read<String>('id');
-    final streams = await database
-        .customSelect(
-          'SELECT stream_profile_json FROM camera_stream_bindings '
-          'WHERE project_id = ? AND design_revision_id = ? AND binding_id = ? '
-          'ORDER BY ordinal, encoded_stream_id',
-          variables: [
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            Variable.withString(bindingId),
-          ],
-        )
-        .get();
-    final subscriptions = await database
-        .customSelect(
-          'SELECT subscription_id, encoded_stream_id, receiver_id, delivery_mode, '
-          'ordered_network_edge_ids_json, multicast_group_id, multicast_tree_json '
-          'FROM camera_stream_subscriptions WHERE project_id = ? '
-          'AND design_revision_id = ? AND binding_id = ? ORDER BY ordinal, subscription_id',
-          variables: [
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            Variable.withString(bindingId),
-          ],
-        )
-        .get();
+    final streams =
+        await database
+            .customSelect(
+              'SELECT stream_profile_json FROM camera_stream_bindings '
+              'WHERE project_id = ? AND design_revision_id = ? AND binding_id = ? '
+              'ORDER BY ordinal, encoded_stream_id',
+              variables: [
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                Variable.withString(bindingId),
+              ],
+            )
+            .get();
+    final subscriptions =
+        await database
+            .customSelect(
+              'SELECT subscription_id, encoded_stream_id, receiver_id, delivery_mode, '
+              'ordered_network_edge_ids_json, multicast_group_id, multicast_tree_json '
+              'FROM camera_stream_subscriptions WHERE project_id = ? '
+              'AND design_revision_id = ? AND binding_id = ? ORDER BY ordinal, subscription_id',
+              variables: [
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                Variable.withString(bindingId),
+              ],
+            )
+            .get();
     final overheadJson = root.readNullable<String>(
       'transport_overhead_model_ref_json',
     );
@@ -149,13 +152,12 @@ final class _DriftElv5CctvMutationStore implements Elv5CctvMutationStore {
               ),
               'multicastTree':
                   row.readNullable<String>('multicast_tree_json') == null
-                  ? null
-                  : jsonDecode(row.read<String>('multicast_tree_json')),
+                      ? null
+                      : jsonDecode(row.read<String>('multicast_tree_json')),
             },
         ],
-        'transportOverheadModelRef': overheadJson == null
-            ? null
-            : jsonDecode(overheadJson),
+        'transportOverheadModelRef':
+            overheadJson == null ? null : jsonDecode(overheadJson),
       },
     );
   }
@@ -295,45 +297,48 @@ final class _DriftElv5CctvMutationStore implements Elv5CctvMutationStore {
     required String designRevisionId,
     required String poolId,
   }) async {
-    final root = await database
-        .customSelect(
-          'SELECT id, revision, horizon_json, temporal_policy_json, sizing_basis, '
-          'reserve_multiplier_json, redundancy_model_json, policy_ref_json '
-          'FROM recording_pool_bindings WHERE project_id = ? '
-          'AND design_revision_id = ? AND pool_id = ? AND deleted_at IS NULL',
-          variables: [
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            Variable.withString(poolId),
-          ],
-        )
-        .getSingleOrNull();
+    final root =
+        await database
+            .customSelect(
+              'SELECT id, revision, horizon_json, temporal_policy_json, sizing_basis, '
+              'reserve_multiplier_json, redundancy_model_json, policy_ref_json '
+              'FROM recording_pool_bindings WHERE project_id = ? '
+              'AND design_revision_id = ? AND pool_id = ? AND deleted_at IS NULL',
+              variables: [
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                Variable.withString(poolId),
+              ],
+            )
+            .getSingleOrNull();
     if (root == null) return null;
     final bindingId = root.read<String>('id');
-    final assignments = await database
-        .customSelect(
-          'SELECT encoded_stream_id, copy_role, schedule_profile_id, bitrate_value_json, '
-          'bitrate_evidence_json FROM recording_assignments WHERE project_id = ? '
-          'AND design_revision_id = ? AND binding_id = ? ORDER BY ordinal, encoded_stream_id, copy_role',
-          variables: [
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            Variable.withString(bindingId),
-          ],
-        )
-        .get();
-    final segments = await database
-        .customSelect(
-          'SELECT schedule_profile_id, segment_id, schedule_json FROM recording_schedule_segments '
-          'WHERE project_id = ? AND design_revision_id = ? AND binding_id = ? '
-          'ORDER BY ordinal, schedule_profile_id, segment_id',
-          variables: [
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            Variable.withString(bindingId),
-          ],
-        )
-        .get();
+    final assignments =
+        await database
+            .customSelect(
+              'SELECT encoded_stream_id, copy_role, schedule_profile_id, bitrate_value_json, '
+              'bitrate_evidence_json FROM recording_assignments WHERE project_id = ? '
+              'AND design_revision_id = ? AND binding_id = ? ORDER BY ordinal, encoded_stream_id, copy_role',
+              variables: [
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                Variable.withString(bindingId),
+              ],
+            )
+            .get();
+    final segments =
+        await database
+            .customSelect(
+              'SELECT schedule_profile_id, segment_id, schedule_json FROM recording_schedule_segments '
+              'WHERE project_id = ? AND design_revision_id = ? AND binding_id = ? '
+              'ORDER BY ordinal, schedule_profile_id, segment_id',
+              variables: [
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                Variable.withString(bindingId),
+              ],
+            )
+            .get();
     return Elv5CctvAggregateSnapshot(
       aggregateKind: 'CCTV_RECORDING_POOL',
       aggregateId: bindingId,
@@ -367,11 +372,12 @@ final class _DriftElv5CctvMutationStore implements Elv5CctvMutationStore {
         ),
         'redundancyModel':
             root.readNullable<String>('redundancy_model_json') == null
-            ? null
-            : jsonDecode(root.read<String>('redundancy_model_json')),
-        'policyRef': root.readNullable<String>('policy_ref_json') == null
-            ? null
-            : jsonDecode(root.read<String>('policy_ref_json')),
+                ? null
+                : jsonDecode(root.read<String>('redundancy_model_json')),
+        'policyRef':
+            root.readNullable<String>('policy_ref_json') == null
+                ? null
+                : jsonDecode(root.read<String>('policy_ref_json')),
       },
     );
   }

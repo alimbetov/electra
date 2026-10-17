@@ -129,9 +129,10 @@ Lan06RackBasisContract _contract(
       contentHash: _hash('d'),
     ),
     ruCapacity: ruCapacity,
-    weightCapacityKg: weightCapacityKg == null
-        ? null
-        : Elv5Rational.parseDecimal(weightCapacityKg),
+    weightCapacityKg:
+        weightCapacityKg == null
+            ? null
+            : Elv5Rational.parseDecimal(weightCapacityKg),
     depthCapacityM: Elv5Rational.parseDecimal('1'),
     explicitSpareRu: 1,
     equipment: <Lan06EquipmentBasisContract>[

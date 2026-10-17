@@ -148,9 +148,8 @@ final class Fa08PersistedInputResolver
         );
       }
     }
-    final ampacityIds = ampacity.orderedSections
-        .map((e) => e.sectionId)
-        .toSet();
+    final ampacityIds =
+        ampacity.orderedSections.map((e) => e.sectionId).toSet();
     final factIds = factBySection.keys.toSet();
     if (ampacityIds.length != factIds.length ||
         !ampacityIds.containsAll(factIds)) {
@@ -360,41 +359,47 @@ Elv5PureKernelExecutor<Fa08Input, Fa08Result> buildFa08Executor({
 }) => Elv5PureKernelExecutor<Fa08Input, Fa08Result>(
   processCode: Elv5ProcessCode.fa08,
   calculate: const Fa08CablePolicyKernel().evaluate,
-  encodeOutput: (result) => <String, Object?>{
-    'schema': 'electra.elv5-fa08-output.v1',
-    'technicalPolicyMatch': result.technicalPolicyMatch.name,
-    'verifiedCompliance': result.verifiedCompliance.name,
-    'limitingSectionId': result.limitingSectionId,
-    'limitingRequirementCode': result.limitingRequirementCode,
-    'policyResults': <Object?>[
-      for (final item in result.policyResults)
-        <String, Object?>{
-          'sectionId': item.sectionId,
-          'requirementCode': item.requirementCode,
-          'status': item.status.name,
-          'numericMargin': item.numericMargin?.toMap(),
-        },
-    ],
-  },
-  encodeEvidence: (captured, _) => <String, Object?>{
-    'schema': 'electra.elv5-fa08-evidence.v2',
-    'source': 'PINNED_CABLE_EDITION_PLUS_VERSIONED_ENVIRONMENT_PLUS_EXACT_ROUTE_AMPACITY',
-    'captureRevision': captured.captureRevision,
-    'verifiedComplianceOwner': 'ELV7',
-  },
-  executionOf: (result) =>
-      result.technicalPolicyMatch == Fa08AssessmentStatus.blocked
-      ? Elv5Execution.blocked
-      : Elv5Execution.succeeded,
-  completionOf: (result) =>
-      result.technicalPolicyMatch == Fa08AssessmentStatus.blocked
-      ? Elv5Completion.incomplete
-      : Elv5Completion.complete,
-  assessmentOf: (result) => switch (result.technicalPolicyMatch) {
-    Fa08AssessmentStatus.pass => Elv5Assessment.pass,
-    Fa08AssessmentStatus.fail => Elv5Assessment.fail,
-    Fa08AssessmentStatus.blocked => Elv5Assessment.unresolved,
-    Fa08AssessmentStatus.notAssessed => Elv5Assessment.unresolved,
-  },
+  encodeOutput:
+      (result) => <String, Object?>{
+        'schema': 'electra.elv5-fa08-output.v1',
+        'technicalPolicyMatch': result.technicalPolicyMatch.name,
+        'verifiedCompliance': result.verifiedCompliance.name,
+        'limitingSectionId': result.limitingSectionId,
+        'limitingRequirementCode': result.limitingRequirementCode,
+        'policyResults': <Object?>[
+          for (final item in result.policyResults)
+            <String, Object?>{
+              'sectionId': item.sectionId,
+              'requirementCode': item.requirementCode,
+              'status': item.status.name,
+              'numericMargin': item.numericMargin?.toMap(),
+            },
+        ],
+      },
+  encodeEvidence:
+      (captured, _) => <String, Object?>{
+        'schema': 'electra.elv5-fa08-evidence.v2',
+        'source':
+            'PINNED_CABLE_EDITION_PLUS_VERSIONED_ENVIRONMENT_PLUS_EXACT_ROUTE_AMPACITY',
+        'captureRevision': captured.captureRevision,
+        'verifiedComplianceOwner': 'ELV7',
+      },
+  executionOf:
+      (result) =>
+          result.technicalPolicyMatch == Fa08AssessmentStatus.blocked
+              ? Elv5Execution.blocked
+              : Elv5Execution.succeeded,
+  completionOf:
+      (result) =>
+          result.technicalPolicyMatch == Fa08AssessmentStatus.blocked
+              ? Elv5Completion.incomplete
+              : Elv5Completion.complete,
+  assessmentOf:
+      (result) => switch (result.technicalPolicyMatch) {
+        Fa08AssessmentStatus.pass => Elv5Assessment.pass,
+        Fa08AssessmentStatus.fail => Elv5Assessment.fail,
+        Fa08AssessmentStatus.blocked => Elv5Assessment.unresolved,
+        Fa08AssessmentStatus.notAssessed => Elv5Assessment.unresolved,
+      },
   nowUtc: nowUtc,
 );

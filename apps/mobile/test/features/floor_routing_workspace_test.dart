@@ -63,14 +63,15 @@ FloorRoutingSnapshot fixture() {
       name: 'Conduit',
       kind: PhysicalChannelKind.conduit,
     );
-    final draft = SurfaceRouteDraft(nextId: () => 'node-${sequence++}')
-      ..addPoint(patch, const Point2Mm(100, 1000))
-      ..addPoint(
-        patch,
-        const Point2Mm(2000, 1000),
-        method: LayingMethod.conduit,
-        channelId: channel.id,
-      );
+    final draft =
+        SurfaceRouteDraft(nextId: () => 'node-${sequence++}')
+          ..addPoint(patch, const Point2Mm(100, 1000))
+          ..addPoint(
+            patch,
+            const Point2Mm(2000, 1000),
+            method: LayingMethod.conduit,
+            channelId: channel.id,
+          );
     final route = draft.route(
       id: room.id,
       roomId: room.id,

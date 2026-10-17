@@ -146,14 +146,15 @@ final class Lan05PersistedInputResolver
         realizedSectionId: sectionId,
         wavelengthNm: forwardWave,
       );
-      final reverseAttenuation = forwardWave == reverseWave
-          ? forwardAttenuation
-          : await opticalEvidence.findAttenuation(
-              projectId: request.projectId,
-              designRevisionId: request.designRevisionId,
-              realizedSectionId: sectionId,
-              wavelengthNm: reverseWave,
-            );
+      final reverseAttenuation =
+          forwardWave == reverseWave
+              ? forwardAttenuation
+              : await opticalEvidence.findAttenuation(
+                projectId: request.projectId,
+                designRevisionId: request.designRevisionId,
+                realizedSectionId: sectionId,
+                wavelengthNm: reverseWave,
+              );
       if (forwardAttenuation == null || reverseAttenuation == null) {
         final missingWaves = <String>[
           if (forwardAttenuation == null) forwardWave.toString(),
@@ -265,9 +266,10 @@ final class Lan05PersistedInputResolver
       policyFingerprint: policyFingerprint,
       dependencies: dependencies,
       upstreamPointerGenerations: const <String, int>{},
-      captureRevision: optical.revision > composition.revision
-          ? optical.revision
-          : composition.revision,
+      captureRevision:
+          optical.revision > composition.revision
+              ? optical.revision
+              : composition.revision,
     );
   }
 
@@ -332,29 +334,34 @@ Elv5PureKernelExecutor<Lan05Input, Lan05Result> buildLan05Executor({
 }) => Elv5PureKernelExecutor<Lan05Input, Lan05Result>(
   processCode: Elv5ProcessCode.lan05,
   calculate: const Lan05OpticalBudgetKernel().evaluate,
-  encodeOutput: (result) => <String, Object?>{
-    'schema': 'electra.elv5-lan05-output.v1',
-    'aToB': _directionResult(result.aToB),
-    'bToA': _directionResult(result.bToA),
-    'governingCase': result.governingCase?.name,
-    'governingMarginDb': result.governingMargin?.value.toMap(),
-    'passes': result.passes,
-  },
-  encodeEvidence: (captured, _) => <String, Object?>{
-    'schema': 'electra.elv5-lan05-evidence.v1',
-    'source': 'ELV5_OPTICAL_LINK_PLUS_ELV3_PATH_PLUS_SECTION_EVIDENCE',
-    'captureRevision': captured.captureRevision,
-    'sectionEvidenceSchema': 'electra.elv5-optical-fiber-evidence.v1',
-  },
+  encodeOutput:
+      (result) => <String, Object?>{
+        'schema': 'electra.elv5-lan05-output.v1',
+        'aToB': _directionResult(result.aToB),
+        'bToA': _directionResult(result.bToA),
+        'governingCase': result.governingCase?.name,
+        'governingMarginDb': result.governingMargin?.value.toMap(),
+        'passes': result.passes,
+      },
+  encodeEvidence:
+      (captured, _) => <String, Object?>{
+        'schema': 'electra.elv5-lan05-evidence.v1',
+        'source': 'ELV5_OPTICAL_LINK_PLUS_ELV3_PATH_PLUS_SECTION_EVIDENCE',
+        'captureRevision': captured.captureRevision,
+        'sectionEvidenceSchema': 'electra.elv5-optical-fiber-evidence.v1',
+      },
   executionOf: (_) => Elv5Execution.succeeded,
-  completionOf: (result) => result.passes == null
-      ? Elv5Completion.incomplete
-      : Elv5Completion.complete,
-  assessmentOf: (result) => switch (result.passes) {
-    true => Elv5Assessment.pass,
-    false => Elv5Assessment.fail,
-    null => Elv5Assessment.unresolved,
-  },
+  completionOf:
+      (result) =>
+          result.passes == null
+              ? Elv5Completion.incomplete
+              : Elv5Completion.complete,
+  assessmentOf:
+      (result) => switch (result.passes) {
+        true => Elv5Assessment.pass,
+        false => Elv5Assessment.fail,
+        null => Elv5Assessment.unresolved,
+      },
   nowUtc: nowUtc,
 );
 

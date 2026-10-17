@@ -10,7 +10,8 @@ final class Acs05SequenceSegment {
     required this.segmentId,
     required this.durationMicroseconds,
   }) {
-    if (segmentId.isEmpty) throw ArgumentError('ACS05 segmentId must not be empty.');
+    if (segmentId.isEmpty)
+      throw ArgumentError('ACS05 segmentId must not be empty.');
     if (durationMicroseconds <= BigInt.zero) {
       throw ArgumentError('ACS05 segment duration must be positive.');
     }
@@ -55,7 +56,8 @@ final class Acs05Pwr04Evidence {
     final ids = <String>{};
     for (final contributor in contributors) {
       if (!ids.add(contributor.loadId)) {
-        throw ArgumentError('ACS05 duplicate contributor loadId: ${contributor.loadId}');
+        throw ArgumentError(
+            'ACS05 duplicate contributor loadId: ${contributor.loadId}');
       }
     }
     if (governingDimension != Acs05GoverningDimension.energy &&
@@ -92,7 +94,8 @@ final class Acs05Input {
         expectedProtectedLoadSetFingerprint.isEmpty) {
       throw ArgumentError('ACS05 required identity must not be empty.');
     }
-    if (sequence.isEmpty) throw ArgumentError('ACS05 sequence must not be empty.');
+    if (sequence.isEmpty)
+      throw ArgumentError('ACS05 sequence must not be empty.');
     final ids = <String>{};
     for (final segment in sequence) {
       if (!ids.add(segment.segmentId)) {
@@ -139,7 +142,8 @@ final class Acs05AutonomyProjectionKernel {
     if (evidence.sequenceFingerprint != input.expectedSequenceFingerprint) {
       return _blocked(input, 'ACS05_SEQUENCE_FINGERPRINT_MISMATCH');
     }
-    if (evidence.protectedLoadSetFingerprint != input.expectedProtectedLoadSetFingerprint) {
+    if (evidence.protectedLoadSetFingerprint !=
+        input.expectedProtectedLoadSetFingerprint) {
       return _blocked(input, 'ACS05_PROTECTED_LOAD_CLOSURE_MISMATCH');
     }
     final requiredSegments = input.sequence.map((e) => e.segmentId).toSet();
@@ -158,7 +162,8 @@ final class Acs05AutonomyProjectionKernel {
       }
     }
 
-    final energyMargin = evidence.availableEnergy - evidence.globalRequiredEnergy;
+    final energyMargin =
+        evidence.availableEnergy - evidence.globalRequiredEnergy;
     var status = energyMargin.value >= Elv5Rational.zero
         ? Acs05AssessmentStatus.pass
         : Acs05AssessmentStatus.fail;

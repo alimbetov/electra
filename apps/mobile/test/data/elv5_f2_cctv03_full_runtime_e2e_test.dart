@@ -11,177 +11,186 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('F2 CCTV-03 Q6/Q7/Q8 qualifies persisted recording facts, invalidation, restart and freeze', () async {
-    final directory = await Directory.systemTemp.createTemp(
-      'electra-f2-cctv03-full-runtime-',
-    );
-    final file = File('${directory.path}/qualification.sqlite');
-    addTearDown(() async {
-      if (directory.existsSync()) {
-        await directory.delete(recursive: true);
-      }
-    });
+  test(
+    'F2 CCTV-03 Q6/Q7/Q8 qualifies persisted recording facts, invalidation, restart and freeze',
+    () async {
+      final directory = await Directory.systemTemp.createTemp(
+        'electra-f2-cctv03-full-runtime-',
+      );
+      final file = File('${directory.path}/qualification.sqlite');
+      addTearDown(() async {
+        if (directory.existsSync()) {
+          await directory.delete(recursive: true);
+        }
+      });
 
-    var db = AppDatabase(NativeDatabase(file));
-    await _seedProject(db);
+      var db = AppDatabase(NativeDatabase(file));
+      await _seedProject(db);
 
-    var mutations = _mutationService(db);
-    await _replaceRecordingPool(
-      mutations,
-      commandId: 'recording-pool-initial',
-      payload: _recordingPayload(expectedBitrateBps: '4000000'),
-    );
+      var mutations = _mutationService(db);
+      await _replaceRecordingPool(
+        mutations,
+        commandId: 'recording-pool-initial',
+        payload: _recordingPayload(expectedBitrateBps: '4000000'),
+      );
 
-    // Q6: the production registry must capture the persisted recording pool,
-    // pinned temporal policy and absolute UTC schedule before evaluating the
-    // exact CCTV-03 storage kernel and publishing CURRENT.
-    var runtime = DriftElv5CalculationRuntime.create(
-      db,
-      originDeviceId: 'f2-cctv03',
-      nowUtc: _now,
-    );
-    final firstCommand = _calculationCommand(
-      commandId: 'cctv03-calc-1',
-      expectedPointerGeneration: 0,
-      expectedDesignRevision: 2,
-    );
-    final first = await runtime.service.execute(firstCommand);
-    expect(first.replayed, isFalse);
+      // Q6: the production registry must capture the persisted recording pool,
+      // pinned temporal policy and absolute UTC schedule before evaluating the
+      // exact CCTV-03 storage kernel and publishing CURRENT.
+      var runtime = DriftElv5CalculationRuntime.create(
+        db,
+        originDeviceId: 'f2-cctv03',
+        nowUtc: _now,
+      );
+      final firstCommand = _calculationCommand(
+        commandId: 'cctv03-calc-1',
+        expectedPointerGeneration: 0,
+        expectedDesignRevision: 2,
+      );
+      final first = await runtime.service.execute(firstCommand);
+      expect(first.replayed, isFalse);
 
-    final firstPointer = await _pointer(db);
-    expect(firstPointer.freshness, 'CURRENT');
-    expect(firstPointer.generation, 1);
-    expect(firstPointer.evaluationId, isNotNull);
-    final firstEvaluation = await _evaluation(db, firstPointer.evaluationId!);
-    expect(firstEvaluation.execution, 'SUCCEEDED');
-    expect(firstEvaluation.completion, 'COMPLETE');
-    expect(firstEvaluation.inputFingerprint, hasLength(64));
-    expect(firstEvaluation.outputSha256, hasLength(64));
+      final firstPointer = await _pointer(db);
+      expect(firstPointer.freshness, 'CURRENT');
+      expect(firstPointer.generation, 1);
+      expect(firstPointer.evaluationId, isNotNull);
+      final firstEvaluation = await _evaluation(db, firstPointer.evaluationId!);
+      expect(firstEvaluation.execution, 'SUCCEEDED');
+      expect(firstEvaluation.completion, 'COMPLETE');
+      expect(firstEvaluation.inputFingerprint, hasLength(64));
+      expect(firstEvaluation.outputSha256, hasLength(64));
 
-    final dependencyDomains = await _dependencyDomains(db);
-    expect(dependencyDomains, contains('CCTV_RECORDING_POOL'));
-    expect(dependencyDomains, contains('CCTV_RECORDING_STREAM'));
-    expect(dependencyDomains, contains('CCTV_RECORDING_SCHEDULE'));
+      final dependencyDomains = await _dependencyDomains(db);
+      expect(dependencyDomains, contains('CCTV_RECORDING_POOL'));
+      expect(dependencyDomains, contains('CCTV_RECORDING_STREAM'));
+      expect(dependencyDomains, contains('CCTV_RECORDING_SCHEDULE'));
 
-    // Q6 invalidation: mutate authoritative bitrate facts only through the
-    // public replacement protocol. The mutation runner must mark the old
-    // CURRENT result STALE in the same transaction that advances the design
-    // revision; recalculation then publishes a different exact result.
-    await _replaceRecordingPool(
-      mutations,
-      commandId: 'recording-pool-rate-change',
-      payload: _recordingPayload(expectedBitrateBps: '8000000'),
-    );
-    final stalePointer = await _pointer(db);
-    expect(stalePointer.freshness, 'STALE');
-    expect(stalePointer.generation, 2);
-    expect(stalePointer.evaluationId, firstPointer.evaluationId);
+      // Q6 invalidation: mutate authoritative bitrate facts only through the
+      // public replacement protocol. The mutation runner must mark the old
+      // CURRENT result STALE in the same transaction that advances the design
+      // revision; recalculation then publishes a different exact result.
+      await _replaceRecordingPool(
+        mutations,
+        commandId: 'recording-pool-rate-change',
+        payload: _recordingPayload(expectedBitrateBps: '8000000'),
+      );
+      final stalePointer = await _pointer(db);
+      expect(stalePointer.freshness, 'STALE');
+      expect(stalePointer.generation, 2);
+      expect(stalePointer.evaluationId, firstPointer.evaluationId);
 
-    final secondCommand = _calculationCommand(
-      commandId: 'cctv03-calc-2',
-      expectedPointerGeneration: 2,
-      expectedDesignRevision: 3,
-    );
-    final second = await runtime.service.execute(secondCommand);
-    expect(second.replayed, isFalse);
-    final secondPointer = await _pointer(db);
-    expect(secondPointer.freshness, 'CURRENT');
-    expect(secondPointer.generation, 3);
-    expect(secondPointer.evaluationId, isNot(firstPointer.evaluationId));
-    final secondEvaluation = await _evaluation(db, secondPointer.evaluationId!);
-    expect(secondEvaluation.execution, 'SUCCEEDED');
-    expect(secondEvaluation.completion, 'COMPLETE');
-    expect(
-      secondEvaluation.inputFingerprint,
-      isNot(firstEvaluation.inputFingerprint),
-    );
-    expect(secondEvaluation.outputSha256, isNot(firstEvaluation.outputSha256));
+      final secondCommand = _calculationCommand(
+        commandId: 'cctv03-calc-2',
+        expectedPointerGeneration: 2,
+        expectedDesignRevision: 3,
+      );
+      final second = await runtime.service.execute(secondCommand);
+      expect(second.replayed, isFalse);
+      final secondPointer = await _pointer(db);
+      expect(secondPointer.freshness, 'CURRENT');
+      expect(secondPointer.generation, 3);
+      expect(secondPointer.evaluationId, isNot(firstPointer.evaluationId));
+      final secondEvaluation = await _evaluation(
+        db,
+        secondPointer.evaluationId!,
+      );
+      expect(secondEvaluation.execution, 'SUCCEEDED');
+      expect(secondEvaluation.completion, 'COMPLETE');
+      expect(
+        secondEvaluation.inputFingerprint,
+        isNot(firstEvaluation.inputFingerprint),
+      );
+      expect(
+        secondEvaluation.outputSha256,
+        isNot(firstEvaluation.outputSha256),
+      );
 
-    // Q7: reconstruct the complete production runtime from durable SQLite.
-    // Ledger replay must not recapture or republish the committed result.
-    final logicalBeforeRestart = second.logicalResultJson;
-    await db.close();
-    db = AppDatabase(NativeDatabase(file));
-    runtime = DriftElv5CalculationRuntime.create(
-      db,
-      originDeviceId: 'f2-cctv03-restarted',
-      nowUtc: _now,
-    );
-    mutations = _mutationService(db);
+      // Q7: reconstruct the complete production runtime from durable SQLite.
+      // Ledger replay must not recapture or republish the committed result.
+      final logicalBeforeRestart = second.logicalResultJson;
+      await db.close();
+      db = AppDatabase(NativeDatabase(file));
+      runtime = DriftElv5CalculationRuntime.create(
+        db,
+        originDeviceId: 'f2-cctv03-restarted',
+        nowUtc: _now,
+      );
+      mutations = _mutationService(db);
 
-    final replay = await runtime.service.execute(secondCommand);
-    expect(replay.replayed, isTrue);
-    expect(replay.logicalResultJson, logicalBeforeRestart);
-    final restartedPointer = await _pointer(db);
-    expect(restartedPointer.generation, 3);
-    expect(restartedPointer.evaluationId, secondPointer.evaluationId);
+      final replay = await runtime.service.execute(secondCommand);
+      expect(replay.replayed, isTrue);
+      expect(replay.logicalResultJson, logicalBeforeRestart);
+      final restartedPointer = await _pointer(db);
+      expect(restartedPointer.generation, 3);
+      expect(restartedPointer.evaluationId, secondPointer.evaluationId);
 
-    // Q7 competing publication: a stale client that still owns generation 2
-    // cannot overwrite the generation-3 CURRENT pointer after restart.
-    await expectLater(
-      runtime.service.execute(
-        _calculationCommand(
-          commandId: 'cctv03-stale-writer',
-          expectedPointerGeneration: 2,
-          expectedDesignRevision: 3,
+      // Q7 competing publication: a stale client that still owns generation 2
+      // cannot overwrite the generation-3 CURRENT pointer after restart.
+      await expectLater(
+        runtime.service.execute(
+          _calculationCommand(
+            commandId: 'cctv03-stale-writer',
+            expectedPointerGeneration: 2,
+            expectedDesignRevision: 3,
+          ),
         ),
-      ),
-      throwsA(
-        isA<StateError>().having(
-          (error) => error.toString(),
-          'message',
-          contains('ELV5_POINTER_GENERATION_CONFLICT'),
+        throwsA(
+          isA<StateError>().having(
+            (error) => error.toString(),
+            'message',
+            contains('ELV5_POINTER_GENERATION_CONFLICT'),
+          ),
         ),
-      ),
-    );
+      );
 
-    // Q8: committed historical result remains replayable after freeze while
-    // both a new calculation and a new recording-pool mutation fail closed.
-    await db.customUpdate(
-      "UPDATE project_design_revisions SET state = 'FROZEN', revision = 4 "
-      "WHERE project_id = 'p' AND id = 'd'",
-    );
-    final frozenReplay = await runtime.service.execute(secondCommand);
-    expect(frozenReplay.replayed, isTrue);
-    expect(frozenReplay.logicalResultJson, logicalBeforeRestart);
+      // Q8: committed historical result remains replayable after freeze while
+      // both a new calculation and a new recording-pool mutation fail closed.
+      await db.customUpdate(
+        "UPDATE project_design_revisions SET state = 'FROZEN', revision = 4 "
+        "WHERE project_id = 'p' AND id = 'd'",
+      );
+      final frozenReplay = await runtime.service.execute(secondCommand);
+      expect(frozenReplay.replayed, isTrue);
+      expect(frozenReplay.logicalResultJson, logicalBeforeRestart);
 
-    await expectLater(
-      runtime.service.execute(
-        _calculationCommand(
-          commandId: 'cctv03-after-freeze',
-          expectedPointerGeneration: 3,
-          expectedDesignRevision: 4,
+      await expectLater(
+        runtime.service.execute(
+          _calculationCommand(
+            commandId: 'cctv03-after-freeze',
+            expectedPointerGeneration: 3,
+            expectedDesignRevision: 4,
+          ),
         ),
-      ),
-      throwsA(
-        isA<StateError>().having(
-          (error) => error.toString(),
-          'message',
-          contains('ELV5_DESIGN_REVISION_READ_ONLY'),
+        throwsA(
+          isA<StateError>().having(
+            (error) => error.toString(),
+            'message',
+            contains('ELV5_DESIGN_REVISION_READ_ONLY'),
+          ),
         ),
-      ),
-    );
-    await expectLater(
-      mutations.preview(
-        projectId: 'p',
-        designRevisionId: 'd',
-        operation: 'REPLACE_RECORDING_ASSIGNMENTS',
-        payload: _recordingPayload(expectedBitrateBps: '12000000'),
-      ),
-      throwsA(
-        predicate(
-          (error) =>
-              error.toString().contains('ELV5_DESIGN_REVISION_READ_ONLY'),
+      );
+      await expectLater(
+        mutations.preview(
+          projectId: 'p',
+          designRevisionId: 'd',
+          operation: 'REPLACE_RECORDING_ASSIGNMENTS',
+          payload: _recordingPayload(expectedBitrateBps: '12000000'),
         ),
-      ),
-    );
+        throwsA(
+          predicate(
+            (error) =>
+                error.toString().contains('ELV5_DESIGN_REVISION_READ_ONLY'),
+          ),
+        ),
+      );
 
-    final frozenPointer = await _pointer(db);
-    expect(frozenPointer.freshness, 'CURRENT');
-    expect(frozenPointer.generation, 3);
-    expect(frozenPointer.evaluationId, secondPointer.evaluationId);
-    await db.close();
-  });
+      final frozenPointer = await _pointer(db);
+      expect(frozenPointer.freshness, 'CURRENT');
+      expect(frozenPointer.generation, 3);
+      expect(frozenPointer.evaluationId, secondPointer.evaluationId);
+      await db.close();
+    },
+  );
 }
 
 Elv5CctvMutationService _mutationService(AppDatabase db) =>
@@ -320,19 +329,20 @@ String _nodeSha() => const Elv5CanonicalJsonV1().sha256(
 );
 
 Future<_PointerRow> _pointer(AppDatabase db) async {
-  final row = await db
-      .customSelect(
-        'SELECT freshness, generation, evaluation_id '
-        'FROM discipline_evaluation_pointers '
-        'WHERE project_id = ? AND design_revision_id = ? '
-        'AND logical_node_key_sha256 = ?',
-        variables: <Variable>[
-          Variable.withString('p'),
-          Variable.withString('d'),
-          Variable.withString(_nodeSha()),
-        ],
-      )
-      .getSingle();
+  final row =
+      await db
+          .customSelect(
+            'SELECT freshness, generation, evaluation_id '
+            'FROM discipline_evaluation_pointers '
+            'WHERE project_id = ? AND design_revision_id = ? '
+            'AND logical_node_key_sha256 = ?',
+            variables: <Variable>[
+              Variable.withString('p'),
+              Variable.withString('d'),
+              Variable.withString(_nodeSha()),
+            ],
+          )
+          .getSingle();
   return _PointerRow(
     freshness: row.read<String>('freshness'),
     generation: row.read<int>('generation'),
@@ -341,17 +351,18 @@ Future<_PointerRow> _pointer(AppDatabase db) async {
 }
 
 Future<_EvaluationRow> _evaluation(AppDatabase db, String evaluationId) async {
-  final row = await db
-      .customSelect(
-        'SELECT execution, completion, input_fingerprint, output_sha256 '
-        'FROM discipline_evaluation_records '
-        'WHERE project_id = ? AND evaluation_id = ?',
-        variables: <Variable>[
-          Variable.withString('p'),
-          Variable.withString(evaluationId),
-        ],
-      )
-      .getSingle();
+  final row =
+      await db
+          .customSelect(
+            'SELECT execution, completion, input_fingerprint, output_sha256 '
+            'FROM discipline_evaluation_records '
+            'WHERE project_id = ? AND evaluation_id = ?',
+            variables: <Variable>[
+              Variable.withString('p'),
+              Variable.withString(evaluationId),
+            ],
+          )
+          .getSingle();
   return _EvaluationRow(
     execution: row.read<String>('execution'),
     completion: row.read<String>('completion'),
@@ -361,18 +372,19 @@ Future<_EvaluationRow> _evaluation(AppDatabase db, String evaluationId) async {
 }
 
 Future<Set<String>> _dependencyDomains(AppDatabase db) async {
-  final rows = await db
-      .customSelect(
-        'SELECT dependency_key FROM discipline_dependency_index '
-        'WHERE project_id = ? AND design_revision_id = ? '
-        'AND logical_node_key_sha256 = ?',
-        variables: <Variable>[
-          Variable.withString('p'),
-          Variable.withString('d'),
-          Variable.withString(_nodeSha()),
-        ],
-      )
-      .get();
+  final rows =
+      await db
+          .customSelect(
+            'SELECT dependency_key FROM discipline_dependency_index '
+            'WHERE project_id = ? AND design_revision_id = ? '
+            'AND logical_node_key_sha256 = ?',
+            variables: <Variable>[
+              Variable.withString('p'),
+              Variable.withString('d'),
+              Variable.withString(_nodeSha()),
+            ],
+          )
+          .get();
   final result = <String>{};
   for (final row in rows) {
     final value = row.read<String>('dependency_key');

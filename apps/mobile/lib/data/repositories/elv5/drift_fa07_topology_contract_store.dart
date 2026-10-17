@@ -27,17 +27,18 @@ final class DriftFa07TopologyContractStore
     required String designRevisionId,
     required String loopId,
   }) async {
-    final rows = await database
-        .customSelect(
-          'SELECT id, revision, process_codes_json, definition_ref_json FROM discipline_policy_bindings WHERE project_id = ? AND design_revision_id = ? AND subject_kind = ? AND subject_id = ? AND deleted_at IS NULL ORDER BY id',
-          variables: <Variable>[
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            Variable.withString('FIRE_LOOP'),
-            Variable.withString(loopId),
-          ],
-        )
-        .get();
+    final rows =
+        await database
+            .customSelect(
+              'SELECT id, revision, process_codes_json, definition_ref_json FROM discipline_policy_bindings WHERE project_id = ? AND design_revision_id = ? AND subject_kind = ? AND subject_id = ? AND deleted_at IS NULL ORDER BY id',
+              variables: <Variable>[
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                Variable.withString('FIRE_LOOP'),
+                Variable.withString(loopId),
+              ],
+            )
+            .get();
     final matching = <QueryRow>[];
     for (final row in rows) {
       final codes = jsonDecode(row.read<String>('process_codes_json'));
@@ -58,18 +59,19 @@ final class DriftFa07TopologyContractStore
       throw StateError('FA07_DEFINITION_POLICY_CODE_INVALID:$loopId');
     final ref = _text(def, 'editionId');
     final hash = _text(def, 'contentHash');
-    final evidence = await database
-        .customSelect(
-          'SELECT canonical_payload_json, payload_sha256 FROM elv_revision_aggregate_evidence_records WHERE evidence_ref = ? AND project_id = ? AND design_revision_id = ? AND aggregate_kind = ? AND aggregate_id = ?',
-          variables: <Variable>[
-            Variable.withString(ref),
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            Variable.withString('FA07_TOPOLOGY_CONTRACT'),
-            Variable.withString(loopId),
-          ],
-        )
-        .getSingleOrNull();
+    final evidence =
+        await database
+            .customSelect(
+              'SELECT canonical_payload_json, payload_sha256 FROM elv_revision_aggregate_evidence_records WHERE evidence_ref = ? AND project_id = ? AND design_revision_id = ? AND aggregate_kind = ? AND aggregate_id = ?',
+              variables: <Variable>[
+                Variable.withString(ref),
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                Variable.withString('FA07_TOPOLOGY_CONTRACT'),
+                Variable.withString(loopId),
+              ],
+            )
+            .getSingleOrNull();
     if (evidence == null)
       throw StateError('FA07_CONTRACT_EVIDENCE_MISSING:$ref');
     final decoded = jsonDecode(evidence.read<String>('canonical_payload_json'));
@@ -97,15 +99,16 @@ final class DriftFa07TopologyContractStore
     ReplaceFa07TopologyContractCommand command,
   ) => database.transaction(() async {
     final now = _nowUtc().toUtc();
-    final rev = await database
-        .customSelect(
-          'SELECT state, revision FROM project_design_revisions WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
-          variables: <Variable>[
-            Variable.withString(command.projectId),
-            Variable.withString(command.designRevisionId),
-          ],
-        )
-        .getSingleOrNull();
+    final rev =
+        await database
+            .customSelect(
+              'SELECT state, revision FROM project_design_revisions WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
+              variables: <Variable>[
+                Variable.withString(command.projectId),
+                Variable.withString(command.designRevisionId),
+              ],
+            )
+            .getSingleOrNull();
     if (rev == null)
       throw StateError(
         'FA07_DESIGN_REVISION_NOT_FOUND:${command.designRevisionId}',
@@ -117,12 +120,13 @@ final class DriftFa07TopologyContractStore
     final payload = command.contract.toCanonicalValue();
     final hash = _encoder.sha256(payload);
     final ref = 'FA07:${command.contract.loopId}:$hash';
-    final existing = await database
-        .customSelect(
-          'SELECT payload_sha256 FROM elv_revision_aggregate_evidence_records WHERE evidence_ref = ?',
-          variables: <Variable>[Variable.withString(ref)],
-        )
-        .getSingleOrNull();
+    final existing =
+        await database
+            .customSelect(
+              'SELECT payload_sha256 FROM elv_revision_aggregate_evidence_records WHERE evidence_ref = ?',
+              variables: <Variable>[Variable.withString(ref)],
+            )
+            .getSingleOrNull();
     if (existing == null) {
       await runRawStatement(
         database,
@@ -151,17 +155,18 @@ final class DriftFa07TopologyContractStore
       'scopeKinds': <String>['DESIGN'],
     };
     if (command.expectedBindingRevision == null) {
-      final rows = await database
-          .customSelect(
-            'SELECT id, process_codes_json FROM discipline_policy_bindings WHERE project_id = ? AND design_revision_id = ? AND subject_kind = ? AND subject_id = ? AND deleted_at IS NULL',
-            variables: <Variable>[
-              Variable.withString(command.projectId),
-              Variable.withString(command.designRevisionId),
-              Variable.withString('FIRE_LOOP'),
-              Variable.withString(command.contract.loopId),
-            ],
-          )
-          .get();
+      final rows =
+          await database
+              .customSelect(
+                'SELECT id, process_codes_json FROM discipline_policy_bindings WHERE project_id = ? AND design_revision_id = ? AND subject_kind = ? AND subject_id = ? AND deleted_at IS NULL',
+                variables: <Variable>[
+                  Variable.withString(command.projectId),
+                  Variable.withString(command.designRevisionId),
+                  Variable.withString('FIRE_LOOP'),
+                  Variable.withString(command.contract.loopId),
+                ],
+              )
+              .get();
       for (final row in rows) {
         final codes = jsonDecode(row.read<String>('process_codes_json'));
         if (codes is List && codes.contains('FA-07'))

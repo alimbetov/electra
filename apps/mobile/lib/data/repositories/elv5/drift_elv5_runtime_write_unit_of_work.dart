@@ -68,19 +68,20 @@ final class _DriftElv5CommandLedgerStore implements ElvCommandLedgerStore {
     String projectId,
     String commandId,
   ) async {
-    final row = await database
-        .customSelect(
-          'SELECT project_id, command_id, command_type, payload_schema_version, '
-          'normalized_payload_sha256, outcome_kind, logical_result_json, '
-          'created_at, committed_at, origin_device_id '
-          'FROM command_execution_records '
-          'WHERE project_id = ? AND command_id = ?',
-          variables: [
-            Variable.withString(projectId),
-            Variable.withString(commandId),
-          ],
-        )
-        .getSingleOrNull();
+    final row =
+        await database
+            .customSelect(
+              'SELECT project_id, command_id, command_type, payload_schema_version, '
+              'normalized_payload_sha256, outcome_kind, logical_result_json, '
+              'created_at, committed_at, origin_device_id '
+              'FROM command_execution_records '
+              'WHERE project_id = ? AND command_id = ?',
+              variables: [
+                Variable.withString(projectId),
+                Variable.withString(commandId),
+              ],
+            )
+            .getSingleOrNull();
     if (row == null) return null;
     return ElvCommandLedgerEntry(
       projectId: row.read<String>('project_id'),
@@ -154,16 +155,17 @@ final class _DriftElv5EvaluationStore implements Elv5EvaluationStore {
     if (evaluationIds.isEmpty) return const {};
     final ids = evaluationIds.toList(growable: false)..sort();
     final placeholders = List.filled(ids.length, '?').join(',');
-    final rows = await database
-        .customSelect(
-          'SELECT * FROM discipline_evaluation_records '
-          'WHERE project_id = ? AND evaluation_id IN ($placeholders)',
-          variables: [
-            Variable.withString(projectId),
-            ...ids.map(Variable.withString),
-          ],
-        )
-        .get();
+    final rows =
+        await database
+            .customSelect(
+              'SELECT * FROM discipline_evaluation_records '
+              'WHERE project_id = ? AND evaluation_id IN ($placeholders)',
+              variables: [
+                Variable.withString(projectId),
+                ...ids.map(Variable.withString),
+              ],
+            )
+            .get();
     return {
       for (final row in rows)
         row.read<String>('evaluation_id'): _evaluation(row),
@@ -278,18 +280,19 @@ final class _DriftElv5PointerStore implements Elv5PointerStore {
     if (logicalNodeKeySha256s.isEmpty) return const {};
     final keys = logicalNodeKeySha256s.toList(growable: false)..sort();
     final placeholders = List.filled(keys.length, '?').join(',');
-    final rows = await database
-        .customSelect(
-          'SELECT * FROM discipline_evaluation_pointers '
-          'WHERE project_id = ? AND design_revision_id = ? '
-          'AND logical_node_key_sha256 IN ($placeholders)',
-          variables: [
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            ...keys.map(Variable.withString),
-          ],
-        )
-        .get();
+    final rows =
+        await database
+            .customSelect(
+              'SELECT * FROM discipline_evaluation_pointers '
+              'WHERE project_id = ? AND design_revision_id = ? '
+              'AND logical_node_key_sha256 IN ($placeholders)',
+              variables: [
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                ...keys.map(Variable.withString),
+              ],
+            )
+            .get();
     return {
       for (final row in rows)
         row.read<String>('logical_node_key_sha256'): _pointer(row),
@@ -409,19 +412,20 @@ final class _DriftElv5DependencyStore implements Elv5DependencyStore {
     if (dependencyKeySha256s.isEmpty) return const {};
     final keys = dependencyKeySha256s.toList(growable: false)..sort();
     final placeholders = List.filled(keys.length, '?').join(',');
-    final rows = await database
-        .customSelect(
-          'SELECT * FROM discipline_dependency_index '
-          'WHERE project_id = ? AND design_revision_id = ? '
-          'AND dependency_key_sha256 IN ($placeholders) '
-          'ORDER BY dependency_key_sha256, logical_node_key_sha256',
-          variables: [
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            ...keys.map(Variable.withString),
-          ],
-        )
-        .get();
+    final rows =
+        await database
+            .customSelect(
+              'SELECT * FROM discipline_dependency_index '
+              'WHERE project_id = ? AND design_revision_id = ? '
+              'AND dependency_key_sha256 IN ($placeholders) '
+              'ORDER BY dependency_key_sha256, logical_node_key_sha256',
+              variables: [
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                ...keys.map(Variable.withString),
+              ],
+            )
+            .get();
     final result = <String, List<Elv5DependencyMarker>>{};
     for (final row in rows) {
       final marker = _marker(row);

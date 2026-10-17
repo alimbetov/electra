@@ -64,9 +64,10 @@ final class _Store implements Elv5FireMutationStore {
     required String designRevisionId,
     required String operation,
     required String subjectId,
-  }) => operation == 'REPLACE_FIRE_LOOP_ASSIGNMENTS'
-      ? _loadLoop(projectId, designRevisionId, subjectId)
-      : _loadCircuit(projectId, designRevisionId, subjectId);
+  }) =>
+      operation == 'REPLACE_FIRE_LOOP_ASSIGNMENTS'
+          ? _loadLoop(projectId, designRevisionId, subjectId)
+          : _loadCircuit(projectId, designRevisionId, subjectId);
 
   @override
   Future<void> replace({
@@ -78,67 +79,71 @@ final class _Store implements Elv5FireMutationStore {
     required int? expectedRootRevision,
     required Map<String, Object?> payload,
     required DateTime updatedAtUtc,
-  }) => operation == 'REPLACE_FIRE_LOOP_ASSIGNMENTS'
-      ? _replaceLoop(
-          projectId,
-          designRevisionId,
-          subjectId,
-          bindingId,
-          expectedRootRevision,
-          payload,
-          updatedAtUtc,
-        )
-      : _replaceCircuit(
-          projectId,
-          designRevisionId,
-          subjectId,
-          bindingId,
-          expectedRootRevision,
-          payload,
-          updatedAtUtc,
-        );
+  }) =>
+      operation == 'REPLACE_FIRE_LOOP_ASSIGNMENTS'
+          ? _replaceLoop(
+            projectId,
+            designRevisionId,
+            subjectId,
+            bindingId,
+            expectedRootRevision,
+            payload,
+            updatedAtUtc,
+          )
+          : _replaceCircuit(
+            projectId,
+            designRevisionId,
+            subjectId,
+            bindingId,
+            expectedRootRevision,
+            payload,
+            updatedAtUtc,
+          );
 
   Future<Elv5FireAggregateSnapshot?> _loadLoop(
     String p,
     String r,
     String id,
   ) async {
-    final root = await database
-        .customSelect(
-          'SELECT id, revision, address_domain_json, topology_profile_ref_json '
-          'FROM fire_loop_bindings WHERE project_id = ? AND design_revision_id = ? '
-          'AND loop_id = ? AND deleted_at IS NULL',
-          variables: [
-            Variable.withString(p),
-            Variable.withString(r),
-            Variable.withString(id),
-          ],
-        )
-        .getSingleOrNull();
+    final root =
+        await database
+            .customSelect(
+              'SELECT id, revision, address_domain_json, topology_profile_ref_json '
+              'FROM fire_loop_bindings WHERE project_id = ? AND design_revision_id = ? '
+              'AND loop_id = ? AND deleted_at IS NULL',
+              variables: [
+                Variable.withString(p),
+                Variable.withString(r),
+                Variable.withString(id),
+              ],
+            )
+            .getSingleOrNull();
     if (root == null) return null;
     final b = root.read<String>('id');
-    final devices = await database
-        .customSelect(
-          'SELECT device_id, expansion_profile_ref_json FROM fire_loop_device_assignments '
-          'WHERE project_id = ? AND design_revision_id = ? AND binding_id = ? ORDER BY ordinal, device_id',
-          variables: [
-            Variable.withString(p),
-            Variable.withString(r),
-            Variable.withString(b),
-          ],
-        )
-        .get();
-    final claims = await database
-        .customSelect(
-          'SELECT device_id, address FROM fire_address_claims WHERE project_id = ? '
-          'AND design_revision_id = ? AND binding_id = ? ORDER BY device_id, address',
-          variables: [
-            Variable.withString(p),
-            Variable.withString(r),
-            Variable.withString(b),
-          ],
-        )
-        .get();
+    final devices =
+        await database
+            .customSelect(
+              'SELECT device_id, expansion_profile_ref_json FROM fire_loop_device_assignments '
+              'WHERE project_id = ? AND design_revision_id = ? AND binding_id = ? ORDER BY ordinal, device_id',
+              variables: [
+                Variable.withString(p),
+                Variable.withString(r),
+                Variable.withString(b),
+              ],
+            )
+            .get();
+    final claims =
+        await database
+            .customSelect(
+              'SELECT device_id, address FROM fire_address_claims WHERE project_id = ? '
+              'AND design_revision_id = ? AND binding_id = ? ORDER BY device_id, address',
+              variables: [
+                Variable.withString(p),
+                Variable.withString(r),
+                Variable.withString(b),
+              ],
+            )
+            .get();
     final byDevice = <String, List<int>>{};
     for (final row in claims) {
       byDevice
@@ -156,9 +161,10 @@ final class _Store implements Elv5FireMutationStore {
           for (final row in devices)
             {
               'deviceId': row.read<String>('device_id'),
-              'profileRef': _object(
-                row.read<String>('expansion_profile_ref_json'),
-              )['profileRef'],
+              'profileRef':
+                  _object(
+                    row.read<String>('expansion_profile_ref_json'),
+                  )['profileRef'],
               'expandedAddresses':
                   byDevice[row.read<String>('device_id')] ?? const <int>[],
             },
@@ -176,30 +182,32 @@ final class _Store implements Elv5FireMutationStore {
     String r,
     String id,
   ) async {
-    final root = await database
-        .customSelect(
-          'SELECT id, revision, output_ref_json, policy_ref_json FROM notification_circuit_bindings '
-          'WHERE project_id = ? AND design_revision_id = ? AND circuit_id = ? AND deleted_at IS NULL',
-          variables: [
-            Variable.withString(p),
-            Variable.withString(r),
-            Variable.withString(id),
-          ],
-        )
-        .getSingleOrNull();
+    final root =
+        await database
+            .customSelect(
+              'SELECT id, revision, output_ref_json, policy_ref_json FROM notification_circuit_bindings '
+              'WHERE project_id = ? AND design_revision_id = ? AND circuit_id = ? AND deleted_at IS NULL',
+              variables: [
+                Variable.withString(p),
+                Variable.withString(r),
+                Variable.withString(id),
+              ],
+            )
+            .getSingleOrNull();
     if (root == null) return null;
     final b = root.read<String>('id');
-    final rows = await database
-        .customSelect(
-          'SELECT device_id, state_load_json FROM notification_circuit_assignments '
-          'WHERE project_id = ? AND design_revision_id = ? AND binding_id = ? ORDER BY device_id',
-          variables: [
-            Variable.withString(p),
-            Variable.withString(r),
-            Variable.withString(b),
-          ],
-        )
-        .get();
+    final rows =
+        await database
+            .customSelect(
+              'SELECT device_id, state_load_json FROM notification_circuit_assignments '
+              'WHERE project_id = ? AND design_revision_id = ? AND binding_id = ? ORDER BY device_id',
+              variables: [
+                Variable.withString(p),
+                Variable.withString(r),
+                Variable.withString(b),
+              ],
+            )
+            .get();
     return Elv5FireAggregateSnapshot(
       aggregateKind: 'FIRE_NOTIFICATION_CIRCUIT',
       aggregateId: b,
@@ -250,7 +258,8 @@ final class _Store implements Elv5FireMutationStore {
       bindingId: b,
       expectedRevision: rev,
       now: now,
-      columns: 'address_domain_json, address_domain, topology_profile_ref_json, policy_ref_json',
+      columns:
+          'address_domain_json, address_domain, topology_profile_ref_json, policy_ref_json',
       values: [
         Variable.withString(_canonical(domain)),
         Variable.withString(domainId),
@@ -415,16 +424,17 @@ final class _Store implements Elv5FireMutationStore {
     String projectId,
     String componentId,
   ) async {
-    final row = await database
-        .customSelect(
-          'SELECT 1 AS found FROM component_reference_bindings WHERE project_id = ? '
-          'AND component_id = ? AND deleted_at IS NULL',
-          variables: [
-            Variable.withString(projectId),
-            Variable.withString(componentId),
-          ],
-        )
-        .getSingleOrNull();
+    final row =
+        await database
+            .customSelect(
+              'SELECT 1 AS found FROM component_reference_bindings WHERE project_id = ? '
+              'AND component_id = ? AND deleted_at IS NULL',
+              variables: [
+                Variable.withString(projectId),
+                Variable.withString(componentId),
+              ],
+            )
+            .getSingleOrNull();
     if (row == null)
       throw StateError(
         'ELV5_COMPONENT_REFERENCE_BINDING_NOT_FOUND:$componentId',
@@ -436,17 +446,18 @@ final class _Store implements Elv5FireMutationStore {
     String componentId,
     String portId,
   ) async {
-    final row = await database
-        .customSelect(
-          'SELECT 1 AS found FROM engineering_port_instances WHERE project_id = ? '
-          'AND component_id = ? AND id = ? AND deleted_at IS NULL',
-          variables: [
-            Variable.withString(projectId),
-            Variable.withString(componentId),
-            Variable.withString(portId),
-          ],
-        )
-        .getSingleOrNull();
+    final row =
+        await database
+            .customSelect(
+              'SELECT 1 AS found FROM engineering_port_instances WHERE project_id = ? '
+              'AND component_id = ? AND id = ? AND deleted_at IS NULL',
+              variables: [
+                Variable.withString(projectId),
+                Variable.withString(componentId),
+                Variable.withString(portId),
+              ],
+            )
+            .getSingleOrNull();
     if (row == null)
       throw StateError('ELV5_NOTIFICATION_OUTPUT_PORT_NOT_FOUND:$portId');
   }

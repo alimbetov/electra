@@ -23,25 +23,26 @@ final class DriftElv5CurrentEvaluationSource
     String? subjectKind,
     String? subjectId,
   }) async {
-    final rows = await database
-        .customSelect(
-          'SELECT p.logical_node_key_sha256 AS pointer_node_sha, p.generation AS pointer_generation, '
-          'r.process_code, r.scope_kind, r.scope_id, r.scenario_key, r.subject_kind, r.subject_id, '
-          'r.evaluation_id, r.input_fingerprint, r.output_sha256, r.evidence_sha256, '
-          'r.execution, r.completion, r.assessment, r.output_json, r.evidence_json '
-          'FROM discipline_evaluation_pointers p '
-          'JOIN discipline_evaluation_records r ON r.project_id = p.project_id '
-          'AND r.design_revision_id = p.design_revision_id AND r.evaluation_id = p.evaluation_id '
-          'WHERE p.project_id = ? AND p.design_revision_id = ? AND p.freshness = ? '
-          'AND r.process_code = ? ORDER BY p.logical_node_key_sha256',
-          variables: <Variable>[
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            Variable.withString('CURRENT'),
-            Variable.withString(processCode.wireCode),
-          ],
-        )
-        .get();
+    final rows =
+        await database
+            .customSelect(
+              'SELECT p.logical_node_key_sha256 AS pointer_node_sha, p.generation AS pointer_generation, '
+              'r.process_code, r.scope_kind, r.scope_id, r.scenario_key, r.subject_kind, r.subject_id, '
+              'r.evaluation_id, r.input_fingerprint, r.output_sha256, r.evidence_sha256, '
+              'r.execution, r.completion, r.assessment, r.output_json, r.evidence_json '
+              'FROM discipline_evaluation_pointers p '
+              'JOIN discipline_evaluation_records r ON r.project_id = p.project_id '
+              'AND r.design_revision_id = p.design_revision_id AND r.evaluation_id = p.evaluation_id '
+              'WHERE p.project_id = ? AND p.design_revision_id = ? AND p.freshness = ? '
+              'AND r.process_code = ? ORDER BY p.logical_node_key_sha256',
+              variables: <Variable>[
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                Variable.withString('CURRENT'),
+                Variable.withString(processCode.wireCode),
+              ],
+            )
+            .get();
 
     final result = <Elv5CurrentEvaluationSnapshot>[];
     for (final row in rows) {

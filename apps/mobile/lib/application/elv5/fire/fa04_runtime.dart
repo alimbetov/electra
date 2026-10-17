@@ -121,9 +121,8 @@ final class Fa04PersistedInputResolver
       final pwr01Output = pwr01.output;
       final pwr02Inputs = _map(pwr02.evidence['inputs'], 'PWR02 inputs');
       final pwr02Output = pwr02.output;
-      final expectedDimension = sourceCase.dimension == Fa04SourceDimension.watt
-          ? 'WATT'
-          : 'AMPERE';
+      final expectedDimension =
+          sourceCase.dimension == Fa04SourceDimension.watt ? 'WATT' : 'AMPERE';
       if (_text(pwr02Inputs, 'dimension') != expectedDimension) {
         _blocked(
           request,
@@ -135,9 +134,10 @@ final class Fa04PersistedInputResolver
         );
       }
 
-      final complete = sourceCase.dimension == Fa04SourceDimension.watt
-          ? pwr01Output['completeW'] == true
-          : pwr01Output['completeA'] == true;
+      final complete =
+          sourceCase.dimension == Fa04SourceDimension.watt
+              ? pwr01Output['completeW'] == true
+              : pwr01Output['completeA'] == true;
       if (!complete) {
         _blocked(
           request,
@@ -269,12 +269,12 @@ final class Fa04PersistedInputResolver
         'schema': 'electra.elv5-fa04-captured-input.v1',
         'contractContentHash': snapshot.contentHash,
         'requirementSetFingerprint': requirementSetFingerprint,
-        'upstream': upstream
-          ..sort(
-            (a, b) => (a['evaluationId']! as String).compareTo(
-              b['evaluationId']! as String,
+        'upstream':
+            upstream..sort(
+              (a, b) => (a['evaluationId']! as String).compareTo(
+                b['evaluationId']! as String,
+              ),
             ),
-          ),
       }),
       policyFingerprint: snapshot.contentHash,
       dependencies: dependencies,
@@ -321,10 +321,9 @@ final class Fa04PersistedInputResolver
   }
 
   String _demandFingerprint(List<Map<String, Object?>> values) {
-    final canonical = [...values]
-      ..sort(
-        (a, b) => (a['caseId']! as String).compareTo(b['caseId']! as String),
-      );
+    final canonical = [...values]..sort(
+      (a, b) => (a['caseId']! as String).compareTo(b['caseId']! as String),
+    );
     return _encoder.sha256(<String, Object?>{
       'schema': 'electra.elv5-shared-global-demand-closure.v1',
       'cases': canonical,
@@ -380,53 +379,60 @@ Elv5PureKernelExecutor<Fa04Input, Fa04Result> buildFa04Executor({
 }) => Elv5PureKernelExecutor<Fa04Input, Fa04Result>(
   processCode: Elv5ProcessCode.fa04,
   calculate: const Fa04SourceRequirementKernel().evaluate,
-  encodeOutput: (result) => <String, Object?>{
-    'schema': 'electra.elv5-fa04-output.v1',
-    'status': result.status.name,
-    'governingCaseId': result.governingCaseId,
-    'governingDimension': result.governingDimension?.name,
-    'blockingReason': result.blockingReason,
-    'requirementContributors': result.requirementContributors,
-    'powerCases': [
-      for (final item in result.powerCases)
-        <String, Object?>{
-          'caseId': item.caseId,
-          'globalDemandW': item.globalDemand.value.toMap(),
-          'requiredW': item.requiredCapability.value.toMap(),
-          'availableW': item.availableCapability.value.toMap(),
-          'marginW': item.margin.value.toMap(),
-          'status': item.status.name,
-        },
-    ],
-    'currentCases': [
-      for (final item in result.currentCases)
-        <String, Object?>{
-          'caseId': item.caseId,
-          'globalDemandA': item.globalDemand.value.toMap(),
-          'requiredA': item.requiredCapability.value.toMap(),
-          'availableA': item.availableCapability.value.toMap(),
-          'marginA': item.margin.value.toMap(),
-          'status': item.status.name,
-        },
-    ],
-  },
-  encodeEvidence: (captured, _) => <String, Object?>{
-    'schema': 'electra.elv5-fa04-evidence.v1',
-    'source': 'VERIFIED_CURRENT_PWR01_PWR02_SHARED_SOURCE_REQUIREMENT_SET',
-    'captureRevision': captured.captureRevision,
-    'upstreamPointerGenerations': captured.upstreamPointerGenerations,
-  },
-  executionOf: (result) => result.status == Fa04AssessmentStatus.blocked
-      ? Elv5Execution.blocked
-      : Elv5Execution.succeeded,
-  completionOf: (result) => result.status == Fa04AssessmentStatus.blocked
-      ? Elv5Completion.incomplete
-      : Elv5Completion.complete,
-  assessmentOf: (result) => switch (result.status) {
-    Fa04AssessmentStatus.pass => Elv5Assessment.pass,
-    Fa04AssessmentStatus.fail => Elv5Assessment.fail,
-    Fa04AssessmentStatus.blocked => Elv5Assessment.unresolved,
-  },
+  encodeOutput:
+      (result) => <String, Object?>{
+        'schema': 'electra.elv5-fa04-output.v1',
+        'status': result.status.name,
+        'governingCaseId': result.governingCaseId,
+        'governingDimension': result.governingDimension?.name,
+        'blockingReason': result.blockingReason,
+        'requirementContributors': result.requirementContributors,
+        'powerCases': [
+          for (final item in result.powerCases)
+            <String, Object?>{
+              'caseId': item.caseId,
+              'globalDemandW': item.globalDemand.value.toMap(),
+              'requiredW': item.requiredCapability.value.toMap(),
+              'availableW': item.availableCapability.value.toMap(),
+              'marginW': item.margin.value.toMap(),
+              'status': item.status.name,
+            },
+        ],
+        'currentCases': [
+          for (final item in result.currentCases)
+            <String, Object?>{
+              'caseId': item.caseId,
+              'globalDemandA': item.globalDemand.value.toMap(),
+              'requiredA': item.requiredCapability.value.toMap(),
+              'availableA': item.availableCapability.value.toMap(),
+              'marginA': item.margin.value.toMap(),
+              'status': item.status.name,
+            },
+        ],
+      },
+  encodeEvidence:
+      (captured, _) => <String, Object?>{
+        'schema': 'electra.elv5-fa04-evidence.v1',
+        'source': 'VERIFIED_CURRENT_PWR01_PWR02_SHARED_SOURCE_REQUIREMENT_SET',
+        'captureRevision': captured.captureRevision,
+        'upstreamPointerGenerations': captured.upstreamPointerGenerations,
+      },
+  executionOf:
+      (result) =>
+          result.status == Fa04AssessmentStatus.blocked
+              ? Elv5Execution.blocked
+              : Elv5Execution.succeeded,
+  completionOf:
+      (result) =>
+          result.status == Fa04AssessmentStatus.blocked
+              ? Elv5Completion.incomplete
+              : Elv5Completion.complete,
+  assessmentOf:
+      (result) => switch (result.status) {
+        Fa04AssessmentStatus.pass => Elv5Assessment.pass,
+        Fa04AssessmentStatus.fail => Elv5Assessment.fail,
+        Fa04AssessmentStatus.blocked => Elv5Assessment.unresolved,
+      },
   nowUtc: nowUtc,
 );
 

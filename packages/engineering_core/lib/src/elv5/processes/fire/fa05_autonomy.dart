@@ -10,7 +10,8 @@ final class Fa05SequenceSegment {
     required this.segmentId,
     required this.durationMicroseconds,
   }) {
-    if (segmentId.isEmpty) throw ArgumentError('FA05 segmentId must not be empty.');
+    if (segmentId.isEmpty)
+      throw ArgumentError('FA05 segmentId must not be empty.');
     if (durationMicroseconds <= BigInt.zero) {
       throw ArgumentError('FA05 segment duration must be positive.');
     }
@@ -61,7 +62,8 @@ final class Fa05Pwr04Evidence {
     final ids = <String>{};
     for (final contributor in contributors) {
       if (!ids.add(contributor.loadId)) {
-        throw ArgumentError('FA05 duplicate contributor loadId: ${contributor.loadId}');
+        throw ArgumentError(
+            'FA05 duplicate contributor loadId: ${contributor.loadId}');
       }
     }
   }
@@ -92,7 +94,8 @@ final class Fa05Input {
         expectedProtectedLoadSetFingerprint.isEmpty) {
       throw ArgumentError('FA05 required identity must not be empty.');
     }
-    if (sequence.isEmpty) throw ArgumentError('FA05 sequence must not be empty.');
+    if (sequence.isEmpty)
+      throw ArgumentError('FA05 sequence must not be empty.');
     final ids = <String>{};
     for (final segment in sequence) {
       if (!ids.add(segment.segmentId)) {
@@ -139,7 +142,8 @@ final class Fa05AutonomyProjectionKernel {
     if (evidence.sequenceFingerprint != input.expectedSequenceFingerprint) {
       return _blocked(input, 'FA05_SEQUENCE_FINGERPRINT_MISMATCH');
     }
-    if (evidence.protectedLoadSetFingerprint != input.expectedProtectedLoadSetFingerprint) {
+    if (evidence.protectedLoadSetFingerprint !=
+        input.expectedProtectedLoadSetFingerprint) {
       return _blocked(input, 'FA05_PROTECTED_LOAD_CLOSURE_MISMATCH');
     }
     final requiredSegments = input.sequence.map((e) => e.segmentId).toSet();
@@ -158,7 +162,8 @@ final class Fa05AutonomyProjectionKernel {
       }
     }
 
-    final energyMargin = evidence.availableEnergy - evidence.globalRequiredEnergy;
+    final energyMargin =
+        evidence.availableEnergy - evidence.globalRequiredEnergy;
     var status = energyMargin.value >= Elv5Rational.zero
         ? Fa05AssessmentStatus.pass
         : Fa05AssessmentStatus.fail;

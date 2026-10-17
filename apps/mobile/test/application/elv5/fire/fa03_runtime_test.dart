@@ -36,43 +36,46 @@ void main() {
     },
   );
 
-  test('F2 Q6 captures exact upstream generation and changes identity after republish', () async {
-    final fingerprint = _hash('a');
-    final contractSource = _ContractSource(_contract(fingerprint));
-    final firstResolver = Fa03PersistedInputResolver(
-      contractSource: contractSource,
-      powerEvidence: _EvidenceSource(
-        _pwr03(fingerprint, evaluationId: 'pwr03-eval-g4', generation: 4),
-      ),
-      nowUtc: () => DateTime.utc(2026, 10, 17),
-    );
-    final secondResolver = Fa03PersistedInputResolver(
-      contractSource: contractSource,
-      powerEvidence: _EvidenceSource(
-        _pwr03(fingerprint, evaluationId: 'pwr03-eval-g5', generation: 5),
-      ),
-      nowUtc: () => DateTime.utc(2026, 10, 17),
-    );
+  test(
+    'F2 Q6 captures exact upstream generation and changes identity after republish',
+    () async {
+      final fingerprint = _hash('a');
+      final contractSource = _ContractSource(_contract(fingerprint));
+      final firstResolver = Fa03PersistedInputResolver(
+        contractSource: contractSource,
+        powerEvidence: _EvidenceSource(
+          _pwr03(fingerprint, evaluationId: 'pwr03-eval-g4', generation: 4),
+        ),
+        nowUtc: () => DateTime.utc(2026, 10, 17),
+      );
+      final secondResolver = Fa03PersistedInputResolver(
+        contractSource: contractSource,
+        powerEvidence: _EvidenceSource(
+          _pwr03(fingerprint, evaluationId: 'pwr03-eval-g5', generation: 5),
+        ),
+        nowUtc: () => DateTime.utc(2026, 10, 17),
+      );
 
-    final first = await firstResolver.capture(_request());
-    final replay = await firstResolver.capture(_request());
-    final republished = await secondResolver.capture(_request());
-    final upstreamNode = _pwr03(fingerprint).nodeKey.sha256;
+      final first = await firstResolver.capture(_request());
+      final replay = await firstResolver.capture(_request());
+      final republished = await secondResolver.capture(_request());
+      final upstreamNode = _pwr03(fingerprint).nodeKey.sha256;
 
-    expect(first.upstreamPointerGenerations[upstreamNode], 4);
-    expect(replay.upstreamPointerGenerations[upstreamNode], 4);
-    expect(republished.upstreamPointerGenerations[upstreamNode], 5);
-    expect(replay.inputFingerprint, first.inputFingerprint);
-    expect(republished.inputFingerprint, isNot(first.inputFingerprint));
-    expect(
-      first.dependencies.any(
-        (value) =>
-            value.relationKind == 'UPSTREAM_EVALUATION' &&
-            value.dependencyKey.contains('ELV4_PWR03_CURRENT'),
-      ),
-      isTrue,
-    );
-  });
+      expect(first.upstreamPointerGenerations[upstreamNode], 4);
+      expect(replay.upstreamPointerGenerations[upstreamNode], 4);
+      expect(republished.upstreamPointerGenerations[upstreamNode], 5);
+      expect(replay.inputFingerprint, first.inputFingerprint);
+      expect(republished.inputFingerprint, isNot(first.inputFingerprint));
+      expect(
+        first.dependencies.any(
+          (value) =>
+              value.relationKind == 'UPSTREAM_EVALUATION' &&
+              value.dependencyKey.contains('ELV4_PWR03_CURRENT'),
+        ),
+        isTrue,
+      );
+    },
+  );
 
   test(
     'F2 Q8 identical capture replay produces deterministic candidate hashes',
@@ -203,9 +206,10 @@ final class _EvidenceSource implements Elv4CurrentEvidenceSource {
     String? scopeId,
     String? subjectKind,
     String? subjectId,
-  }) async => processCode == PowerProcessCode.pwr03
-      ? <Elv4CurrentEvaluationSnapshot>[value]
-      : const [];
+  }) async =>
+      processCode == PowerProcessCode.pwr03
+          ? <Elv4CurrentEvaluationSnapshot>[value]
+          : const [];
 }
 
 Elv4CurrentEvaluationSnapshot _pwr03(
@@ -213,13 +217,14 @@ Elv4CurrentEvaluationSnapshot _pwr03(
   String evaluationId = 'pwr03-eval',
   int generation = 4,
 }) {
-  final dependency = PowerDependencyKey(
-    projectId: 'p',
-    revisionId: 'd',
-    kind: PowerDependencyKind.dcSection,
-    entityId: 'fire-section-1',
-    purpose: 'CONDUCTOR_PATH',
-  ).encode();
+  final dependency =
+      PowerDependencyKey(
+        projectId: 'p',
+        revisionId: 'd',
+        kind: PowerDependencyKind.dcSection,
+        entityId: 'fire-section-1',
+        purpose: 'CONDUCTOR_PATH',
+      ).encode();
   return Elv4CurrentEvaluationSnapshot(
     nodeKey: PowerNodeKeyV2(
       revisionId: 'd',

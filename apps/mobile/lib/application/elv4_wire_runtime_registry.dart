@@ -395,11 +395,12 @@ List<Elv4WireSemanticCodec<TResult>> createElv4WireRuntimeCodecs<TResult>(
 ];
 
 typedef _PayloadValidator = void Function(Elv4ValidatedWirePayload payload);
-typedef _RuntimeHandler<TResult> = Future<TResult> Function(
-  Elv4WireCommandEnvelope envelope,
-  Elv4ValidatedWirePayload payload,
-  Elv4ResolvedWireImpact impact,
-);
+typedef _RuntimeHandler<TResult> =
+    Future<TResult> Function(
+      Elv4WireCommandEnvelope envelope,
+      Elv4ValidatedWirePayload payload,
+      Elv4ResolvedWireImpact impact,
+    );
 
 Elv4WireSemanticCodec<TResult> _codec<TResult>({
   required String operation,

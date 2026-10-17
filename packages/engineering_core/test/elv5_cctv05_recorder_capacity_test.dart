@@ -36,20 +36,23 @@ void main() {
   Cctv05Input input({
     Cctv05RecorderCapability? cap,
     List<Cctv05RecorderAssignment>? assignments,
-    Cctv05ChannelAccountingBasis basis = Cctv05ChannelAccountingBasis.encodedStream,
+    Cctv05ChannelAccountingBasis basis =
+        Cctv05ChannelAccountingBasis.encodedStream,
     String peakIngress = '8000000',
     String storage = '2851200000000',
-    Cctv05StorageClaimBasis storageBasis = Cctv05StorageClaimBasis.guaranteedUpperBound,
+    Cctv05StorageClaimBasis storageBasis =
+        Cctv05StorageClaimBasis.guaranteedUpperBound,
     bool requireGuaranteed = true,
   }) =>
       Cctv05Input(
         recorderId: 'rec-1',
         capability: cap ?? capability(),
         accountingBasis: basis,
-        assignments: assignments ?? [
-          assignment('a1', 'cam-1', 's1', 'lic-1'),
-          assignment('a2', 'cam-2', 's2', 'lic-2'),
-        ],
+        assignments: assignments ??
+            [
+              assignment('a1', 'cam-1', 's1', 'lic-1'),
+              assignment('a2', 'cam-2', 's2', 'lic-2'),
+            ],
         expectedIngressScopeFingerprint: 'ingress-v1',
         expectedStorageScopeFingerprint: 'storage-v1',
         ingressEvidence: Cctv05IngressEvidence(
@@ -73,7 +76,8 @@ void main() {
     expect(result.storageMargin, bytes('148800000000'));
   });
 
-  test('encoded stream basis deduplicates duplicate UI rows for same stream', () {
+  test('encoded stream basis deduplicates duplicate UI rows for same stream',
+      () {
     final result = const Cctv05RecorderCapacityKernel().evaluate(input(
       assignments: [
         assignment('a1', 'cam-1', 'stream-1', 'lic-1'),
@@ -93,15 +97,20 @@ void main() {
     expect(result.storageMargin, bytes('-200000000000'));
   });
 
-  test('missing codec evidence is unresolved rather than assumed compatible', () {
+  test('missing codec evidence is unresolved rather than assumed compatible',
+      () {
     final result = const Cctv05RecorderCapacityKernel().evaluate(input(
-      assignments: [assignment('a1', 'cam-1', 'stream-1', 'lic-1', codec: null)],
+      assignments: [
+        assignment('a1', 'cam-1', 'stream-1', 'lic-1', codec: null)
+      ],
     ));
     expect(result.status, Cctv05AssessmentStatus.unresolved);
     expect(result.governingDimension, Cctv05GoverningDimension.codec);
   });
 
-  test('expected storage estimate cannot qualify guaranteed storage requirement', () {
+  test(
+      'expected storage estimate cannot qualify guaranteed storage requirement',
+      () {
     final result = const Cctv05RecorderCapacityKernel().evaluate(input(
       storageBasis: Cctv05StorageClaimBasis.expectedEstimate,
       requireGuaranteed: true,

@@ -58,19 +58,21 @@ void main() {
       expect(second.evidenceRef, isNot(firstEvidenceRef));
       expect(second.contract.sequenceFingerprint, isNot(firstSequence));
 
-      final evidence = await db
-          .customSelect(
-            "SELECT evidence_ref FROM elv_revision_aggregate_evidence_records "
-            "WHERE aggregate_kind = 'ACS05_AUTONOMY_CONTRACT' ORDER BY evidence_ref",
-          )
-          .get();
+      final evidence =
+          await db
+              .customSelect(
+                "SELECT evidence_ref FROM elv_revision_aggregate_evidence_records "
+                "WHERE aggregate_kind = 'ACS05_AUTONOMY_CONTRACT' ORDER BY evidence_ref",
+              )
+              .get();
       expect(evidence, hasLength(2));
 
-      final revision = await db
-          .customSelect(
-            "SELECT revision FROM project_design_revisions WHERE id = 'd'",
-          )
-          .getSingle();
+      final revision =
+          await db
+              .customSelect(
+                "SELECT revision FROM project_design_revisions WHERE id = 'd'",
+              )
+              .getSingle();
       expect(revision.read<int>('revision'), 3);
     },
   );

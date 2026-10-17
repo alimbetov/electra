@@ -176,9 +176,10 @@ final class Lan07PersistedInputResolver
       sparePolicy: Lan07SparePolicy(
         absoluteMinimum: contract.absoluteMinimumSpare,
         ratio: contract.spareRatio,
-        combiner: contract.spareCombinerCode == 'MAX'
-            ? Lan07SpareCombiner.max
-            : Lan07SpareCombiner.sum,
+        combiner:
+            contract.spareCombinerCode == 'MAX'
+                ? Lan07SpareCombiner.max
+                : Lan07SpareCombiner.sum,
       ),
     );
 
@@ -246,37 +247,42 @@ Elv5PureKernelExecutor<Lan07Input, Lan07Result> buildLan07Executor({
 }) => Elv5PureKernelExecutor<Lan07Input, Lan07Result>(
   processCode: Elv5ProcessCode.lan07,
   calculate: const Lan07PatchPanelKernel().evaluate,
-  encodeOutput: (result) => <String, Object?>{
-    'schema': 'electra.elv5-lan07-output.v1',
-    'status': result.status.name,
-    'occupied': result.occupied,
-    'free': result.free,
-    'requiredSpare': result.requiredSpare,
-    'spareHeadroom': result.spareHeadroom,
-    'mappings': <Object?>[
-      for (final mapping in result.mappings)
-        <String, Object?>{
-          'sourceEndpointId': mapping.sourceEndpointId,
-          'status': mapping.status.name,
-          'destinationEndpointIds': mapping.destinationEndpointIds,
-        },
-    ],
-    'conflictingAssignmentIds': result.conflictingAssignmentIds,
-  },
-  encodeEvidence: (captured, _) => <String, Object?>{
-    'schema': 'electra.elv5-lan07-evidence.v1',
-    'source': 'PERSISTED_PATCH_ASSIGNMENTS_PLUS_IMMUTABLE_PANEL_INVENTORY',
-    'captureRevision': captured.captureRevision,
-  },
+  encodeOutput:
+      (result) => <String, Object?>{
+        'schema': 'electra.elv5-lan07-output.v1',
+        'status': result.status.name,
+        'occupied': result.occupied,
+        'free': result.free,
+        'requiredSpare': result.requiredSpare,
+        'spareHeadroom': result.spareHeadroom,
+        'mappings': <Object?>[
+          for (final mapping in result.mappings)
+            <String, Object?>{
+              'sourceEndpointId': mapping.sourceEndpointId,
+              'status': mapping.status.name,
+              'destinationEndpointIds': mapping.destinationEndpointIds,
+            },
+        ],
+        'conflictingAssignmentIds': result.conflictingAssignmentIds,
+      },
+  encodeEvidence:
+      (captured, _) => <String, Object?>{
+        'schema': 'electra.elv5-lan07-evidence.v1',
+        'source': 'PERSISTED_PATCH_ASSIGNMENTS_PLUS_IMMUTABLE_PANEL_INVENTORY',
+        'captureRevision': captured.captureRevision,
+      },
   executionOf: (_) => Elv5Execution.succeeded,
-  completionOf: (result) => result.status == Lan07AssessmentStatus.unresolved
-      ? Elv5Completion.partial
-      : Elv5Completion.complete,
-  assessmentOf: (result) => switch (result.status) {
-    Lan07AssessmentStatus.pass => Elv5Assessment.pass,
-    Lan07AssessmentStatus.fail => Elv5Assessment.fail,
-    Lan07AssessmentStatus.unresolved => Elv5Assessment.unresolved,
-  },
+  completionOf:
+      (result) =>
+          result.status == Lan07AssessmentStatus.unresolved
+              ? Elv5Completion.partial
+              : Elv5Completion.complete,
+  assessmentOf:
+      (result) => switch (result.status) {
+        Lan07AssessmentStatus.pass => Elv5Assessment.pass,
+        Lan07AssessmentStatus.fail => Elv5Assessment.fail,
+        Lan07AssessmentStatus.unresolved => Elv5Assessment.unresolved,
+      },
   nowUtc: nowUtc,
 );
 

@@ -27,28 +27,29 @@ final class DriftElv4CurrentEvidenceSource
     String? subjectKind,
     String? subjectId,
   }) async {
-    final rows = await database
-        .customSelect(
-          'SELECT e.logical_node_key_json, e.logical_node_key_sha256, '
-          'e.evaluation_id, e.input_fingerprint, e.evidence_json, '
-          'e.evidence_sha256, p.generation, p.state AS pointer_state, '
-          'p.evaluation_id AS pointer_evaluation_id, '
-          'p.evidence_sha256 AS pointer_evidence_sha256 '
-          'FROM power_evaluation_records e '
-          'JOIN power_evaluation_pointers p '
-          'ON p.project_id = e.project_id '
-          'AND p.design_revision_id = e.design_revision_id '
-          'AND p.logical_node_key_sha256 = e.logical_node_key_sha256 '
-          'WHERE e.project_id = ? AND e.design_revision_id = ? '
-          'AND e.process_code = ? AND p.state = ?',
-          variables: <Variable>[
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            Variable.withString(_wire(processCode)),
-            Variable.withString('CURRENT'),
-          ],
-        )
-        .get();
+    final rows =
+        await database
+            .customSelect(
+              'SELECT e.logical_node_key_json, e.logical_node_key_sha256, '
+              'e.evaluation_id, e.input_fingerprint, e.evidence_json, '
+              'e.evidence_sha256, p.generation, p.state AS pointer_state, '
+              'p.evaluation_id AS pointer_evaluation_id, '
+              'p.evidence_sha256 AS pointer_evidence_sha256 '
+              'FROM power_evaluation_records e '
+              'JOIN power_evaluation_pointers p '
+              'ON p.project_id = e.project_id '
+              'AND p.design_revision_id = e.design_revision_id '
+              'AND p.logical_node_key_sha256 = e.logical_node_key_sha256 '
+              'WHERE e.project_id = ? AND e.design_revision_id = ? '
+              'AND e.process_code = ? AND p.state = ?',
+              variables: <Variable>[
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                Variable.withString(_wire(processCode)),
+                Variable.withString('CURRENT'),
+              ],
+            )
+            .get();
 
     final result = <Elv4CurrentEvaluationSnapshot>[];
     for (final row in rows) {

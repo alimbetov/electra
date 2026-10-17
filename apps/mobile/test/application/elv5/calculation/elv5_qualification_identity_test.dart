@@ -37,8 +37,8 @@ void main() {
       processVersion: descriptor.versions.processVersion,
       rulesetVersion: Elv5FoundationAuthorityManifest.rulesetVersion,
       sourceSha: List<String>.filled(64, 'b').join(),
-      authorityFingerprint: Elv5FoundationAuthorityManifest.instance
-          .fingerprint(),
+      authorityFingerprint:
+          Elv5FoundationAuthorityManifest.instance.fingerprint(),
     );
     final qualified = base.withQualificationIdentity(identity);
 
@@ -104,8 +104,8 @@ void main() {
           processVersion: lan.versions.processVersion,
           rulesetVersion: Elv5FoundationAuthorityManifest.rulesetVersion,
           sourceSha: List<String>.filled(64, 'd').join(),
-          authorityFingerprint: Elv5FoundationAuthorityManifest.instance
-              .fingerprint(),
+          authorityFingerprint:
+              Elv5FoundationAuthorityManifest.instance.fingerprint(),
         ),
       ),
       throwsStateError,
@@ -121,8 +121,8 @@ void main() {
         processVersion: descriptor.versions.processVersion,
         rulesetVersion: Elv5FoundationAuthorityManifest.rulesetVersion,
         sourceSha: List<String>.filled(64, 'f').join(),
-        authorityFingerprint: Elv5FoundationAuthorityManifest.instance
-            .fingerprint(),
+        authorityFingerprint:
+            Elv5FoundationAuthorityManifest.instance.fingerprint(),
       );
 
       expect(

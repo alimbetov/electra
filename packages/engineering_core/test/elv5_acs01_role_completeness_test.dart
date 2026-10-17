@@ -22,7 +22,8 @@ void main() {
         allowRoleSharing: share,
       );
 
-  Acs01RoleAssignment assign(String id, String componentId, Acs01RoleCode role) =>
+  Acs01RoleAssignment assign(
+          String id, String componentId, Acs01RoleCode role) =>
       Acs01RoleAssignment(
         assignmentId: id,
         componentId: componentId,
@@ -63,7 +64,8 @@ void main() {
       ],
     ));
     expect(result.status, Acs01AssessmentStatus.pass);
-    final alternative = result.nodeResults.singleWhere((r) => r.nodeId == 'exit-choice');
+    final alternative =
+        result.nodeResults.singleWhere((r) => r.nodeId == 'exit-choice');
     expect(alternative.selectedChildNodeIds, ['exit-button']);
   });
 
@@ -111,7 +113,9 @@ void main() {
     expect(evaluate(false).status, Acs01AssessmentStatus.unresolved);
   });
 
-  test('forbidden role sharing fails even if requirements are numerically satisfied', () {
+  test(
+      'forbidden role sharing fails even if requirements are numerically satisfied',
+      () {
     final root = Acs01RequirementNode.group(
       nodeId: 'root',
       kind: Acs01RequirementKind.allOf,

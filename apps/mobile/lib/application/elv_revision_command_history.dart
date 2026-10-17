@@ -60,10 +60,8 @@ final class ElvRevisionCommandHistoryOperation {
   }) : projectId = _text(projectId, 'projectId'),
        designRevisionId = _text(designRevisionId, 'designRevisionId'),
        originalCommandId = _text(originalCommandId, 'originalCommandId'),
-       forwardCommandType = _text(
-         forwardCommandType,
-         'forwardCommandType',
-       ).toUpperCase(),
+       forwardCommandType =
+           _text(forwardCommandType, 'forwardCommandType').toUpperCase(),
        forwardCommandSchema = _text(
          forwardCommandSchema,
          'forwardCommandSchema',
@@ -76,10 +74,8 @@ final class ElvRevisionCommandHistoryOperation {
          forwardPayloadSha256,
          'forwardPayloadSha256',
        ),
-       inverseCommandType = _text(
-         inverseCommandType,
-         'inverseCommandType',
-       ).toUpperCase(),
+       inverseCommandType =
+           _text(inverseCommandType, 'inverseCommandType').toUpperCase(),
        inverseCommandSchema = _text(
          inverseCommandSchema,
          'inverseCommandSchema',

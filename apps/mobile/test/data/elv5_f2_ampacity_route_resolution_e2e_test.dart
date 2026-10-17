@@ -14,216 +14,221 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('F2 AMPACITY_ROUTE_IZ resolves persisted route, fails closed on environment drift and survives restart/freeze', () async {
-    final directory = await Directory.systemTemp.createTemp(
-      'electra-f2-ampacity-route-e2e-',
-    );
-    final file = File('${directory.path}/qualification.sqlite');
-    addTearDown(() async {
-      if (directory.existsSync()) {
-        await directory.delete(recursive: true);
-      }
-    });
+  test(
+    'F2 AMPACITY_ROUTE_IZ resolves persisted route, fails closed on environment drift and survives restart/freeze',
+    () async {
+      final directory = await Directory.systemTemp.createTemp(
+        'electra-f2-ampacity-route-e2e-',
+      );
+      final file = File('${directory.path}/qualification.sqlite');
+      addTearDown(() async {
+        if (directory.existsSync()) {
+          await directory.delete(recursive: true);
+        }
+      });
 
-    var db = AppDatabase(NativeDatabase(file));
-    await _seedTopology(db);
-    var environmentStore = _environmentStore(db);
-    var ampacityStore = _ampacityStore(db);
+      var db = AppDatabase(NativeDatabase(file));
+      await _seedTopology(db);
+      var environmentStore = _environmentStore(db);
+      var ampacityStore = _ampacityStore(db);
 
-    // Q6: persist the environment basis used by the real route resolver.
-    await environmentStore.replace(
-      ReplaceElv5EnvironmentProfileCommand(
-        projectId: 'p',
-        designRevisionId: 'd',
-        expectedDesignRevision: 1,
-        bindingId: 'env-room',
-        expectedBindingRevision: null,
-        scopeKind: 'ROOM',
-        scopeId: 'room-1',
-        profile: _environment(
-          editionId: 'env-normal',
-          maximumTemperatureC: '40',
-          evidenceSeed: 'a',
-        ),
-      ),
-    );
-    final normalEnvironment = await _activeRoomEnvironment(environmentStore);
-
-    await ampacityStore.replace(
-      ReplaceElv5AmpacitySectionContractCommand(
-        projectId: 'p',
-        designRevisionId: 'd',
-        expectedDesignRevision: 2,
-        bindingId: 'ampacity-section',
-        expectedBindingRevision: null,
-        contract: _ampacityContract(
-          environment: normalEnvironment,
-          factor: '0.90',
-          evidenceSeed: 'b',
-        ),
-      ),
-    );
-
-    var resolver = _resolver(
-      db: db,
-      environmentStore: environmentStore,
-      ampacityStore: ampacityStore,
-    );
-    final firstInput = await resolver.resolve(
-      projectId: 'p',
-      designRevisionId: 'd',
-      cableRunId: 'run-1',
-    );
-    final first = const Elv5RouteAmpacityKernel().evaluate(firstInput);
-    expect(first.governingSectionId, 'section-1');
-    expect(first.allowableCurrentIzA, Elv5Rational.integer(27));
-    expect(first.sections.single.profileEditionId, 'env-normal');
-    expect(
-      first.sections.single.maximumAmbientTemperatureC,
-      Elv5Rational.integer(40),
-    );
-
-    // Q6 invalidation witness: changing the active environment edition makes
-    // the old ampacity evidence unusable immediately. The resolver must not
-    // silently reuse the previous correction factors.
-    await environmentStore.replace(
-      ReplaceElv5EnvironmentProfileCommand(
-        projectId: 'p',
-        designRevisionId: 'd',
-        expectedDesignRevision: 3,
-        bindingId: 'env-room',
-        expectedBindingRevision: 1,
-        scopeKind: 'ROOM',
-        scopeId: 'room-1',
-        profile: _environment(
-          editionId: 'env-hot',
-          maximumTemperatureC: '45',
-          evidenceSeed: 'c',
-        ),
-      ),
-    );
-
-    await expectLater(
-      resolver.resolve(
-        projectId: 'p',
-        designRevisionId: 'd',
-        cableRunId: 'run-1',
-      ),
-      throwsA(
-        isA<Elv5AmpacityRouteResolutionException>().having(
-          (error) => error.code,
-          'code',
-          'ELV5_AMPACITY_SECTION_ENVIRONMENT_IDENTITY_MISMATCH',
-        ),
-      ),
-    );
-
-    // Republishing exact section evidence against the new environment basis
-    // restores calculability and produces a new deterministic Iz.
-    final hotEnvironment = await _activeRoomEnvironment(environmentStore);
-    await ampacityStore.replace(
-      ReplaceElv5AmpacitySectionContractCommand(
-        projectId: 'p',
-        designRevisionId: 'd',
-        expectedDesignRevision: 4,
-        bindingId: 'ampacity-section',
-        expectedBindingRevision: 1,
-        contract: _ampacityContract(
-          environment: hotEnvironment,
-          factor: '0.70',
-          evidenceSeed: 'd',
-        ),
-      ),
-    );
-
-    final secondInput = await resolver.resolve(
-      projectId: 'p',
-      designRevisionId: 'd',
-      cableRunId: 'run-1',
-    );
-    final second = const Elv5RouteAmpacityKernel().evaluate(secondInput);
-    expect(second.governingSectionId, 'section-1');
-    expect(second.allowableCurrentIzA, Elv5Rational.integer(21));
-    expect(second.sections.single.profileEditionId, 'env-hot');
-    expect(
-      second.sections.single.maximumAmbientTemperatureC,
-      Elv5Rational.integer(45),
-    );
-    final canonicalBeforeRestart = second.toCanonicalValue();
-
-    // Q7/Q8 restart witness: reconstruct every production dependency from the
-    // same durable SQLite file rather than retaining in-memory fixture state.
-    await db.close();
-    db = AppDatabase(NativeDatabase(file));
-    environmentStore = _environmentStore(db);
-    ampacityStore = _ampacityStore(db);
-    resolver = _resolver(
-      db: db,
-      environmentStore: environmentStore,
-      ampacityStore: ampacityStore,
-    );
-
-    final restartedInput = await resolver.resolve(
-      projectId: 'p',
-      designRevisionId: 'd',
-      cableRunId: 'run-1',
-    );
-    final restarted = const Elv5RouteAmpacityKernel().evaluate(restartedInput);
-    expect(restarted.toCanonicalValue(), canonicalBeforeRestart);
-
-    // Q8: historical reads remain reproducible after freeze while both source
-    // contracts become immutable.
-    await db.customUpdate(
-      "UPDATE project_design_revisions SET state = 'FROZEN' "
-      "WHERE project_id = 'p' AND id = 'd'",
-    );
-    final frozenInput = await resolver.resolve(
-      projectId: 'p',
-      designRevisionId: 'd',
-      cableRunId: 'run-1',
-    );
-    final frozen = const Elv5RouteAmpacityKernel().evaluate(frozenInput);
-    expect(frozen.toCanonicalValue(), canonicalBeforeRestart);
-
-    await expectLater(
-      environmentStore.replace(
+      // Q6: persist the environment basis used by the real route resolver.
+      await environmentStore.replace(
         ReplaceElv5EnvironmentProfileCommand(
           projectId: 'p',
           designRevisionId: 'd',
-          expectedDesignRevision: 5,
+          expectedDesignRevision: 1,
           bindingId: 'env-room',
-          expectedBindingRevision: 2,
+          expectedBindingRevision: null,
           scopeKind: 'ROOM',
           scopeId: 'room-1',
           profile: _environment(
-            editionId: 'env-forbidden',
-            maximumTemperatureC: '50',
-            evidenceSeed: 'e',
+            editionId: 'env-normal',
+            maximumTemperatureC: '40',
+            evidenceSeed: 'a',
           ),
         ),
-      ),
-      throwsStateError,
-    );
-    await expectLater(
-      ampacityStore.replace(
+      );
+      final normalEnvironment = await _activeRoomEnvironment(environmentStore);
+
+      await ampacityStore.replace(
         ReplaceElv5AmpacitySectionContractCommand(
           projectId: 'p',
           designRevisionId: 'd',
-          expectedDesignRevision: 5,
+          expectedDesignRevision: 2,
           bindingId: 'ampacity-section',
-          expectedBindingRevision: 2,
+          expectedBindingRevision: null,
           contract: _ampacityContract(
-            environment: hotEnvironment,
-            factor: '0.60',
-            evidenceSeed: 'f',
+            environment: normalEnvironment,
+            factor: '0.90',
+            evidenceSeed: 'b',
           ),
         ),
-      ),
-      throwsStateError,
-    );
+      );
 
-    await db.close();
-  });
+      var resolver = _resolver(
+        db: db,
+        environmentStore: environmentStore,
+        ampacityStore: ampacityStore,
+      );
+      final firstInput = await resolver.resolve(
+        projectId: 'p',
+        designRevisionId: 'd',
+        cableRunId: 'run-1',
+      );
+      final first = const Elv5RouteAmpacityKernel().evaluate(firstInput);
+      expect(first.governingSectionId, 'section-1');
+      expect(first.allowableCurrentIzA, Elv5Rational.integer(27));
+      expect(first.sections.single.profileEditionId, 'env-normal');
+      expect(
+        first.sections.single.maximumAmbientTemperatureC,
+        Elv5Rational.integer(40),
+      );
+
+      // Q6 invalidation witness: changing the active environment edition makes
+      // the old ampacity evidence unusable immediately. The resolver must not
+      // silently reuse the previous correction factors.
+      await environmentStore.replace(
+        ReplaceElv5EnvironmentProfileCommand(
+          projectId: 'p',
+          designRevisionId: 'd',
+          expectedDesignRevision: 3,
+          bindingId: 'env-room',
+          expectedBindingRevision: 1,
+          scopeKind: 'ROOM',
+          scopeId: 'room-1',
+          profile: _environment(
+            editionId: 'env-hot',
+            maximumTemperatureC: '45',
+            evidenceSeed: 'c',
+          ),
+        ),
+      );
+
+      await expectLater(
+        resolver.resolve(
+          projectId: 'p',
+          designRevisionId: 'd',
+          cableRunId: 'run-1',
+        ),
+        throwsA(
+          isA<Elv5AmpacityRouteResolutionException>().having(
+            (error) => error.code,
+            'code',
+            'ELV5_AMPACITY_SECTION_ENVIRONMENT_IDENTITY_MISMATCH',
+          ),
+        ),
+      );
+
+      // Republishing exact section evidence against the new environment basis
+      // restores calculability and produces a new deterministic Iz.
+      final hotEnvironment = await _activeRoomEnvironment(environmentStore);
+      await ampacityStore.replace(
+        ReplaceElv5AmpacitySectionContractCommand(
+          projectId: 'p',
+          designRevisionId: 'd',
+          expectedDesignRevision: 4,
+          bindingId: 'ampacity-section',
+          expectedBindingRevision: 1,
+          contract: _ampacityContract(
+            environment: hotEnvironment,
+            factor: '0.70',
+            evidenceSeed: 'd',
+          ),
+        ),
+      );
+
+      final secondInput = await resolver.resolve(
+        projectId: 'p',
+        designRevisionId: 'd',
+        cableRunId: 'run-1',
+      );
+      final second = const Elv5RouteAmpacityKernel().evaluate(secondInput);
+      expect(second.governingSectionId, 'section-1');
+      expect(second.allowableCurrentIzA, Elv5Rational.integer(21));
+      expect(second.sections.single.profileEditionId, 'env-hot');
+      expect(
+        second.sections.single.maximumAmbientTemperatureC,
+        Elv5Rational.integer(45),
+      );
+      final canonicalBeforeRestart = second.toCanonicalValue();
+
+      // Q7/Q8 restart witness: reconstruct every production dependency from the
+      // same durable SQLite file rather than retaining in-memory fixture state.
+      await db.close();
+      db = AppDatabase(NativeDatabase(file));
+      environmentStore = _environmentStore(db);
+      ampacityStore = _ampacityStore(db);
+      resolver = _resolver(
+        db: db,
+        environmentStore: environmentStore,
+        ampacityStore: ampacityStore,
+      );
+
+      final restartedInput = await resolver.resolve(
+        projectId: 'p',
+        designRevisionId: 'd',
+        cableRunId: 'run-1',
+      );
+      final restarted = const Elv5RouteAmpacityKernel().evaluate(
+        restartedInput,
+      );
+      expect(restarted.toCanonicalValue(), canonicalBeforeRestart);
+
+      // Q8: historical reads remain reproducible after freeze while both source
+      // contracts become immutable.
+      await db.customUpdate(
+        "UPDATE project_design_revisions SET state = 'FROZEN' "
+        "WHERE project_id = 'p' AND id = 'd'",
+      );
+      final frozenInput = await resolver.resolve(
+        projectId: 'p',
+        designRevisionId: 'd',
+        cableRunId: 'run-1',
+      );
+      final frozen = const Elv5RouteAmpacityKernel().evaluate(frozenInput);
+      expect(frozen.toCanonicalValue(), canonicalBeforeRestart);
+
+      await expectLater(
+        environmentStore.replace(
+          ReplaceElv5EnvironmentProfileCommand(
+            projectId: 'p',
+            designRevisionId: 'd',
+            expectedDesignRevision: 5,
+            bindingId: 'env-room',
+            expectedBindingRevision: 2,
+            scopeKind: 'ROOM',
+            scopeId: 'room-1',
+            profile: _environment(
+              editionId: 'env-forbidden',
+              maximumTemperatureC: '50',
+              evidenceSeed: 'e',
+            ),
+          ),
+        ),
+        throwsStateError,
+      );
+      await expectLater(
+        ampacityStore.replace(
+          ReplaceElv5AmpacitySectionContractCommand(
+            projectId: 'p',
+            designRevisionId: 'd',
+            expectedDesignRevision: 5,
+            bindingId: 'ampacity-section',
+            expectedBindingRevision: 2,
+            contract: _ampacityContract(
+              environment: hotEnvironment,
+              factor: '0.60',
+              evidenceSeed: 'f',
+            ),
+          ),
+        ),
+        throwsStateError,
+      );
+
+      await db.close();
+    },
+  );
 }
 
 DriftElv5EnvironmentProfileStore _environmentStore(AppDatabase db) =>

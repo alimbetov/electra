@@ -2,7 +2,8 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('derives Iz from immutable reference row and exact correction factors', () {
+  test('derives Iz from immutable reference row and exact correction factors',
+      () {
     final input = Elv5AmpacityInput(
       cableOrSectionId: 'section-1',
       referenceRow: Elv5AmpacityReferenceRow(
@@ -43,7 +44,8 @@ void main() {
     expect(reference['conductorMaterialCode'], 'CU');
     expect(reference['installationMethodCode'], 'B2');
     expect(reference['loadedConductors'], 3);
-    expect(reference['conductorCrossSectionMm2'], Elv5Rational.parseDecimal('2.5').toMap());
+    expect(reference['conductorCrossSectionMm2'],
+        Elv5Rational.parseDecimal('2.5').toMap());
   });
 
   test('applies additional corrections deterministically by code', () {
@@ -101,7 +103,8 @@ void main() {
     );
   });
 
-  test('rejects missing physical basis instead of defaulting engineering facts', () {
+  test('rejects missing physical basis instead of defaulting engineering facts',
+      () {
     expect(
       () => Elv5AmpacityReferenceRow(
         conductorCrossSectionMm2: Elv5Rational.zero,

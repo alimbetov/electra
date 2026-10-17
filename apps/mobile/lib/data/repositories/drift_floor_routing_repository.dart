@@ -124,9 +124,9 @@ class DriftFloorRoutingRepository implements FloorRoutingRepository {
           errors.add('Panel code must be unique on the floor.');
         }
         if (errors.isNotEmpty) throw StateError(errors.join(' '));
-        final old = await (database.select(
-          database.floorRoutingPanels,
-        )..where((r) => r.id.equals(panel.id))).getSingleOrNull();
+        final old =
+            await (database.select(database.floorRoutingPanels)
+              ..where((r) => r.id.equals(panel.id))).getSingleOrNull();
         if (old != null && old.floorId != panel.floorId)
           throw StateError('Cannot move a source panel between floors.');
         final now = DateTime.now().toUtc();
@@ -145,9 +145,8 @@ class DriftFloorRoutingRepository implements FloorRoutingRepository {
                 originDeviceId: Value(originDeviceId),
               ),
             );
-        await (database.delete(
-          database.floorPanelFeeds,
-        )..where((r) => r.panelId.equals(panel.id))).go();
+        await (database.delete(database.floorPanelFeeds)
+          ..where((r) => r.panelId.equals(panel.id))).go();
         for (final feed in panel.feeds) {
           await database
               .into(database.floorPanelFeeds)
@@ -175,9 +174,9 @@ class DriftFloorRoutingRepository implements FloorRoutingRepository {
         final errors = graph.handoffIssues(handoff);
         errors.addAll(graph.issues['handoff:${handoff.id}'] ?? []);
         if (errors.isNotEmpty) throw StateError(errors.toSet().join(' '));
-        final old = await (database.select(
-          database.floorRoutingHandoffs,
-        )..where((r) => r.id.equals(handoff.id))).getSingleOrNull();
+        final old =
+            await (database.select(database.floorRoutingHandoffs)
+              ..where((r) => r.id.equals(handoff.id))).getSingleOrNull();
         if (old != null && old.floorId != handoff.floorId)
           throw StateError('Cannot move a handoff between floors.');
         final now = DateTime.now().toUtc();
@@ -202,14 +201,13 @@ class DriftFloorRoutingRepository implements FloorRoutingRepository {
       });
   @override
   Future<void> deletePanel(String id) => database.transaction(() async {
-    final row = await (database.select(
-      database.floorRoutingPanels,
-    )..where((r) => r.id.equals(id))).getSingleOrNull();
+    final row =
+        await (database.select(database.floorRoutingPanels)
+          ..where((r) => r.id.equals(id))).getSingleOrNull();
     if (row == null || row.deletedAt != null) return;
     final now = DateTime.now().toUtc();
-    await (database.update(
-      database.floorRoutingPanels,
-    )..where((r) => r.id.equals(id))).write(
+    await (database.update(database.floorRoutingPanels)
+      ..where((r) => r.id.equals(id))).write(
       FloorRoutingPanelsCompanion(
         revision: Value(row.revision + 1),
         updatedAt: Value(now),
@@ -220,14 +218,13 @@ class DriftFloorRoutingRepository implements FloorRoutingRepository {
   });
   @override
   Future<void> deleteHandoff(String id) => database.transaction(() async {
-    final row = await (database.select(
-      database.floorRoutingHandoffs,
-    )..where((r) => r.id.equals(id))).getSingleOrNull();
+    final row =
+        await (database.select(database.floorRoutingHandoffs)
+          ..where((r) => r.id.equals(id))).getSingleOrNull();
     if (row == null || row.deletedAt != null) return;
     final now = DateTime.now().toUtc();
-    await (database.update(
-      database.floorRoutingHandoffs,
-    )..where((r) => r.id.equals(id))).write(
+    await (database.update(database.floorRoutingHandoffs)
+      ..where((r) => r.id.equals(id))).write(
       FloorRoutingHandoffsCompanion(
         revision: Value(row.revision + 1),
         updatedAt: Value(now),

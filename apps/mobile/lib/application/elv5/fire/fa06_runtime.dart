@@ -241,9 +241,8 @@ final class Fa06PersistedInputResolver
       PowerRational? maximumV;
       for (final deviceId in deviceIds) {
         final terminalId = contract.terminalLoadIdByDeviceId[deviceId]!;
-        final matches = terminalRows
-            .where((row) => row['loadId'] == terminalId)
-            .toList();
+        final matches =
+            terminalRows.where((row) => row['loadId'] == terminalId).toList();
         if (matches.length != 1) {
           _blocked(
             request,
@@ -323,12 +322,12 @@ final class Fa06PersistedInputResolver
       'contractEvidenceRef': contractSnapshot.evidenceRef,
       'contractContentHash': contractSnapshot.contentHash,
       'membershipFingerprint': membershipFingerprint,
-      'upstream': upstreamBasis
-        ..sort(
-          (a, b) => (a['evaluationId']! as String).compareTo(
-            b['evaluationId']! as String,
+      'upstream':
+          upstreamBasis..sort(
+            (a, b) => (a['evaluationId']! as String).compareTo(
+              b['evaluationId']! as String,
+            ),
           ),
-        ),
     });
     return Elv5CapturedInput<Fa06Input>(
       request: request,
@@ -511,51 +510,60 @@ Elv5PureKernelExecutor<Fa06Input, Fa06Result> buildFa06Executor({
 }) => Elv5PureKernelExecutor<Fa06Input, Fa06Result>(
   processCode: Elv5ProcessCode.fa06,
   calculate: const Fa06NotificationCapacityKernel().evaluate,
-  encodeOutput: (result) => <String, Object?>{
-    'schema': 'electra.elv5-fa06-output.v1',
-    'status': result.status.name,
-    'activeDeviceCount': result.activeDeviceCount,
-    'deviceCountMargin': result.deviceCountMargin,
-    'governingCase': result.governingCase?.name,
-    'governingDimension': result.governingDimension?.name,
-    'blockingReason': result.blockingReason,
-    'acousticCoverageAssessed': result.acousticCoverageAssessed,
-    'cases': <String, Object?>{
-      for (final entry in result.cases.entries)
-        entry.key.name: <String, Object?>{
-          'outputCurrentLowerA': entry.value.outputCurrent.lower.value.toMap(),
-          'outputCurrentUpperA': entry.value.outputCurrent.upper.value.toMap(),
-          'currentMarginA': entry.value.currentMargin.value.toMap(),
-          'terminalVoltageLowerV': entry.value.terminalVoltage.lower.value
-              .toMap(),
-          'terminalVoltageUpperV': entry.value.terminalVoltage.upper.value
-              .toMap(),
-          'lowVoltageMarginV': entry.value.lowVoltageMargin.value.toMap(),
-          'highVoltageMarginV': entry.value.highVoltageMargin.value.toMap(),
-          'status': entry.value.status.name,
-          'governingDimension': entry.value.governingDimension?.name,
+  encodeOutput:
+      (result) => <String, Object?>{
+        'schema': 'electra.elv5-fa06-output.v1',
+        'status': result.status.name,
+        'activeDeviceCount': result.activeDeviceCount,
+        'deviceCountMargin': result.deviceCountMargin,
+        'governingCase': result.governingCase?.name,
+        'governingDimension': result.governingDimension?.name,
+        'blockingReason': result.blockingReason,
+        'acousticCoverageAssessed': result.acousticCoverageAssessed,
+        'cases': <String, Object?>{
+          for (final entry in result.cases.entries)
+            entry.key.name: <String, Object?>{
+              'outputCurrentLowerA':
+                  entry.value.outputCurrent.lower.value.toMap(),
+              'outputCurrentUpperA':
+                  entry.value.outputCurrent.upper.value.toMap(),
+              'currentMarginA': entry.value.currentMargin.value.toMap(),
+              'terminalVoltageLowerV':
+                  entry.value.terminalVoltage.lower.value.toMap(),
+              'terminalVoltageUpperV':
+                  entry.value.terminalVoltage.upper.value.toMap(),
+              'lowVoltageMarginV': entry.value.lowVoltageMargin.value.toMap(),
+              'highVoltageMarginV': entry.value.highVoltageMargin.value.toMap(),
+              'status': entry.value.status.name,
+              'governingDimension': entry.value.governingDimension?.name,
+            },
         },
-    },
-  },
-  encodeEvidence: (captured, _) => <String, Object?>{
-    'schema': 'electra.elv5-fa06-evidence.v1',
-    'source':
-        'PERSISTED_NOTIFICATION_ASSIGNMENTS_PLUS_VERIFIED_CURRENT_PWR01_PWR03',
-    'captureRevision': captured.captureRevision,
-    'upstreamPointerGenerations': captured.upstreamPointerGenerations,
-    'membershipFingerprint': captured.value.expectedMembershipFingerprint,
-  },
-  executionOf: (result) => result.status == Fa06AssessmentStatus.blocked
-      ? Elv5Execution.blocked
-      : Elv5Execution.succeeded,
-  completionOf: (result) => result.status == Fa06AssessmentStatus.blocked
-      ? Elv5Completion.incomplete
-      : Elv5Completion.complete,
-  assessmentOf: (result) => switch (result.status) {
-    Fa06AssessmentStatus.pass => Elv5Assessment.pass,
-    Fa06AssessmentStatus.fail => Elv5Assessment.fail,
-    Fa06AssessmentStatus.blocked => Elv5Assessment.unresolved,
-  },
+      },
+  encodeEvidence:
+      (captured, _) => <String, Object?>{
+        'schema': 'electra.elv5-fa06-evidence.v1',
+        'source':
+            'PERSISTED_NOTIFICATION_ASSIGNMENTS_PLUS_VERIFIED_CURRENT_PWR01_PWR03',
+        'captureRevision': captured.captureRevision,
+        'upstreamPointerGenerations': captured.upstreamPointerGenerations,
+        'membershipFingerprint': captured.value.expectedMembershipFingerprint,
+      },
+  executionOf:
+      (result) =>
+          result.status == Fa06AssessmentStatus.blocked
+              ? Elv5Execution.blocked
+              : Elv5Execution.succeeded,
+  completionOf:
+      (result) =>
+          result.status == Fa06AssessmentStatus.blocked
+              ? Elv5Completion.incomplete
+              : Elv5Completion.complete,
+  assessmentOf:
+      (result) => switch (result.status) {
+        Fa06AssessmentStatus.pass => Elv5Assessment.pass,
+        Fa06AssessmentStatus.fail => Elv5Assessment.fail,
+        Fa06AssessmentStatus.blocked => Elv5Assessment.unresolved,
+      },
   nowUtc: nowUtc,
 );
 

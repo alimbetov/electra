@@ -61,8 +61,8 @@ abstract final class Elv5ProcessCatalog {
 
   static final Map<Elv5ProcessCode, Elv5ProcessDescriptor> byCode =
       Map.unmodifiable(<Elv5ProcessCode, Elv5ProcessDescriptor>{
-        for (final descriptor in all) descriptor.code: descriptor,
-      });
+    for (final descriptor in all) descriptor.code: descriptor,
+  });
 
   static Elv5ProcessDescriptor require(Elv5ProcessCode code) =>
       byCode[code] ?? (throw StateError('Unregistered ELV5 process: $code'));
@@ -71,10 +71,11 @@ abstract final class Elv5ProcessCatalog {
     Elv5ProcessCode code,
     Elv5WorkloadClass workload,
     String complexity,
-  ) => Elv5ProcessDescriptor(
-    code: code,
-    legalScopes: const <Elv5ScopeKind>{Elv5ScopeKind.design},
-    baseWorkloadClass: workload,
-    complexityCode: complexity,
-  );
+  ) =>
+      Elv5ProcessDescriptor(
+        code: code,
+        legalScopes: const <Elv5ScopeKind>{Elv5ScopeKind.design},
+        baseWorkloadClass: workload,
+        complexityCode: complexity,
+      );
 }

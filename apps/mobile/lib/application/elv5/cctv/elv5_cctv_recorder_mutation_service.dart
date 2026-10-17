@@ -75,12 +75,13 @@ final class Elv5CctvRecorderMutationService {
     }
     return _runner.run(
       command,
-      prepare: (session, value) => _prepare(
-        session,
-        projectId: value.projectId,
-        designRevisionId: value.designRevisionId,
-        payload: value.payload,
-      ),
+      prepare:
+          (session, value) => _prepare(
+            session,
+            projectId: value.projectId,
+            designRevisionId: value.designRevisionId,
+            payload: value.payload,
+          ),
       apply: _apply,
     );
   }
@@ -98,9 +99,10 @@ final class Elv5CctvRecorderMutationService {
       recorderId: recorderId,
     );
     final aggregateId = previous?.aggregateId ?? _bindingId(recorderId);
-    final oldDependencies = previous == null
-        ? const <Map<String, Object?>>[]
-        : _dependencies(previous.payload);
+    final oldDependencies =
+        previous == null
+            ? const <Map<String, Object?>>[]
+            : _dependencies(previous.payload);
     final newDependencies = _dependencies(payload);
     final dependencyHashes = <String>{
       for (final dependency in oldDependencies) _encoder.sha256(dependency),
@@ -138,9 +140,10 @@ final class Elv5CctvRecorderMutationService {
       'payload': previous?.payload,
     };
     return Elv5PreparedReplacement(
-      actualRowRevisions: previous == null
-          ? const {}
-          : {previous.aggregateId: previous.revision},
+      actualRowRevisions:
+          previous == null
+              ? const {}
+              : {previous.aggregateId: previous.revision},
       reviewedImpactFingerprint: impactFingerprint,
       staleNodeKeySha256s: staleNodes,
       affectedIds: {recorderId, aggregateId},
@@ -158,9 +161,10 @@ final class Elv5CctvRecorderMutationService {
     Elv5PreparedReplacement prepared,
   ) async {
     final recorderId = command.payload['recorderId']! as String;
-    final bindingId = prepared.actualRowRevisions.keys.isEmpty
-        ? _bindingId(recorderId)
-        : prepared.actualRowRevisions.keys.single;
+    final bindingId =
+        prepared.actualRowRevisions.keys.isEmpty
+            ? _bindingId(recorderId)
+            : prepared.actualRowRevisions.keys.single;
     await session.recorder.replaceRecorder(
       projectId: command.projectId,
       designRevisionId: command.designRevisionId,

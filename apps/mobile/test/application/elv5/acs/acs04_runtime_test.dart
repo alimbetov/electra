@@ -38,23 +38,26 @@ void main() {
     },
   );
 
-  test('blocks when CURRENT PWR-02 was produced from another requirement set input', () async {
-    final resolver = Acs04PersistedInputResolver(
-      contractSource: _ContractSource(_contract(_hash('a'))),
-      powerEvidence: _PowerEvidence(_hash('e')),
-    );
+  test(
+    'blocks when CURRENT PWR-02 was produced from another requirement set input',
+    () async {
+      final resolver = Acs04PersistedInputResolver(
+        contractSource: _ContractSource(_contract(_hash('a'))),
+        powerEvidence: _PowerEvidence(_hash('e')),
+      );
 
-    await expectLater(
-      resolver.capture(_request()),
-      throwsA(
-        isA<Elv5CaptureBlockedException>().having(
-          (value) => value.reasonCode,
-          'reasonCode',
-          'ACS04_PWR02_REQUIREMENT_SET_INPUT_MISMATCH',
+      await expectLater(
+        resolver.capture(_request()),
+        throwsA(
+          isA<Elv5CaptureBlockedException>().having(
+            (value) => value.reasonCode,
+            'reasonCode',
+            'ACS04_PWR02_REQUIREMENT_SET_INPUT_MISMATCH',
+          ),
         ),
-      ),
-    );
-  });
+      );
+    },
+  );
 }
 
 Elv5CalculationRequest _request() => Elv5CalculationRequest(
@@ -187,14 +190,10 @@ Elv4CurrentEvaluationSnapshot _pwr02(String fingerprint) =>
           'dimension': 'WATT',
           'demand': PowerRational.integer(30).toMap(),
           'nameplate': PowerRational.integer(50).toMap(),
-          'reserveMultiplier': PowerRational(
-            BigInt.from(6),
-            BigInt.from(5),
-          ).toMap(),
-          'deratingFactor': PowerRational(
-            BigInt.from(4),
-            BigInt.from(5),
-          ).toMap(),
+          'reserveMultiplier':
+              PowerRational(BigInt.from(6), BigInt.from(5)).toMap(),
+          'deratingFactor':
+              PowerRational(BigInt.from(4), BigInt.from(5)).toMap(),
         },
         'output': <String, Object?>{
           'required': PowerRational.integer(36).toMap(),

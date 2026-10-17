@@ -32,9 +32,10 @@ void main() {
       );
       var sequence = 0;
       CableRoute route(String id, Point2Mm start, Point2Mm end) {
-        final draft = SurfaceRouteDraft(nextId: () => 'node-${sequence++}')
-          ..addPoint(patch, start)
-          ..addPoint(patch, end);
+        final draft =
+            SurfaceRouteDraft(nextId: () => 'node-${sequence++}')
+              ..addPoint(patch, start)
+              ..addPoint(patch, end);
         return draft.route(id: id, roomId: 'room', name: id);
       }
 
@@ -67,9 +68,10 @@ void main() {
           for (final p in paths)
             RoutingJunctionConnection(
               runId: p.id,
-              direction: p.id == 'in'
-                  ? RoutingConnectionDirection.incoming
-                  : RoutingConnectionDirection.outgoing,
+              direction:
+                  p.id == 'in'
+                      ? RoutingConnectionDirection.incoming
+                      : RoutingConnectionDirection.outgoing,
               nodeId: (p.id == 'in' ? p.nodes.last : p.nodes.first).id,
               circuitOrNetworkId: 'c',
             ),

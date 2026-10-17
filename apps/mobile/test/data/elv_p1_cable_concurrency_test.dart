@@ -136,8 +136,9 @@ void main() {
       await b.close();
 
       final verify = AppDatabase(NativeDatabase(file));
-      final cables = await DriftElvCableRepository(verify)
-          .loadProjectCables('project');
+      final cables = await DriftElvCableRepository(
+        verify,
+      ).loadProjectCables('project');
       expect(
         cables.where(
           (cable) => cable.lifecycleState == CableLifecycleState.active,

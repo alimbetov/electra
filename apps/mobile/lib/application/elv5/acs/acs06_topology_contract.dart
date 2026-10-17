@@ -187,8 +187,8 @@ final class Acs06TopologyContract {
        causeProfiles = List.unmodifiable(_causes(causeProfiles)),
        projectDefinedPowerFailureOutcomeCode =
            projectDefinedPowerFailureOutcomeCode == null
-           ? null
-           : _outcome(projectDefinedPowerFailureOutcomeCode) {
+               ? null
+               : _outcome(projectDefinedPowerFailureOutcomeCode) {
     final graphNodes = <String>{
       for (final edge in this.edges) edge.fromNodeId,
       for (final edge in this.edges) edge.toNodeId,
@@ -340,8 +340,9 @@ List<Acs06TopologyEdgeContract> _edges(
 List<Acs06PathRequirementContract> _paths(
   Iterable<Acs06PathRequirementContract> values,
 ) {
-  final out = values.toList()
-    ..sort((a, b) => a.requirementId.compareTo(b.requirementId));
+  final out =
+      values.toList()
+        ..sort((a, b) => a.requirementId.compareTo(b.requirementId));
   final ids = <String>{};
   for (final path in out) {
     if (!ids.add(path.requirementId)) {
@@ -356,8 +357,8 @@ List<Acs06PathRequirementContract> _paths(
 List<Acs06CauseProfileContract> _causes(
   Iterable<Acs06CauseProfileContract> values,
 ) {
-  final out = values.toList()
-    ..sort((a, b) => a.causeCode.compareTo(b.causeCode));
+  final out =
+      values.toList()..sort((a, b) => a.causeCode.compareTo(b.causeCode));
   final actual = out.map((e) => e.causeCode).toSet();
   const expected = {
     'NORMAL_ACCESS',

@@ -17,11 +17,11 @@ final class DriftCatalogPreferencesRepository
 
   @override
   Future<CatalogPreferences> load() async {
-    final rows = await database
-        .select(database.componentCatalogPreferences)
-        .get();
-    final recent = rows.where((row) => row.useOrder != null).toList()
-      ..sort((a, b) => b.useOrder!.compareTo(a.useOrder!));
+    final rows =
+        await database.select(database.componentCatalogPreferences).get();
+    final recent =
+        rows.where((row) => row.useOrder != null).toList()
+          ..sort((a, b) => b.useOrder!.compareTo(a.useOrder!));
     return CatalogPreferences(
       recentIds: List.unmodifiable(
         recent.take(recentLimit).map((row) => row.definitionId),
@@ -36,9 +36,8 @@ final class DriftCatalogPreferencesRepository
   Future<void> recordUse(String definitionId) async {
     _validate(definitionId);
     await database.transaction(() async {
-      final rows = await database
-          .select(database.componentCatalogPreferences)
-          .get();
+      final rows =
+          await database.select(database.componentCatalogPreferences).get();
       final next =
           rows.fold<int>(
             0,
@@ -53,18 +52,17 @@ final class DriftCatalogPreferencesRepository
             ),
             mode: InsertMode.insertOrIgnore,
           );
-      await (database.update(database.componentCatalogPreferences)
-            ..where((row) => row.definitionId.equals(definitionId)))
-          .write(ComponentCatalogPreferencesCompanion(useOrder: Value(next)));
+      await (database.update(database.componentCatalogPreferences)..where(
+        (row) => row.definitionId.equals(definitionId),
+      )).write(ComponentCatalogPreferencesCompanion(useOrder: Value(next)));
       final ordered =
           await (database.select(database.componentCatalogPreferences)
                 ..where((row) => row.useOrder.isNotNull())
                 ..orderBy([(row) => OrderingTerm.desc(row.useOrder)]))
               .get();
       for (final row in ordered.skip(recentLimit)) {
-        await (database.update(
-          database.componentCatalogPreferences,
-        )..where((item) => item.definitionId.equals(row.definitionId))).write(
+        await (database.update(database.componentCatalogPreferences)
+          ..where((item) => item.definitionId.equals(row.definitionId))).write(
           const ComponentCatalogPreferencesCompanion(useOrder: Value(null)),
         );
       }
@@ -83,11 +81,9 @@ final class DriftCatalogPreferencesRepository
             ),
             mode: InsertMode.insertOrIgnore,
           );
-      await (database.update(
-        database.componentCatalogPreferences,
-      )..where((row) => row.definitionId.equals(definitionId))).write(
-        ComponentCatalogPreferencesCompanion(favorite: Value(favorite)),
-      );
+      await (database.update(database.componentCatalogPreferences)..where(
+        (row) => row.definitionId.equals(definitionId),
+      )).write(ComponentCatalogPreferencesCompanion(favorite: Value(favorite)));
     });
   }
 }

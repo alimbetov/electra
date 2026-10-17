@@ -20,11 +20,12 @@ ReferenceDiscipline? paletteDiscipline(
   EngineeringSystem system,
   Iterable<EngineeringSystemFamily> families,
 ) {
-  final family = families
-      .where(
-        (f) => f.id == system.familyId && f.version == system.familyVersion,
-      )
-      .firstOrNull;
+  final family =
+      families
+          .where(
+            (f) => f.id == system.familyId && f.version == system.familyVersion,
+          )
+          .firstOrNull;
   return switch (family?.code) {
     'CCTV' => ReferenceDiscipline.cctv,
     'LAN' => ReferenceDiscipline.lan,
@@ -40,9 +41,10 @@ List<CanonicalProfileChoice> canonicalPaletteChoices(
   String systemId,
 ) {
   if (snapshot.systems.project?.id != projectId) return [];
-  final system = snapshot.systems.systems
-      .where((s) => s.id == systemId && s.projectId == projectId)
-      .firstOrNull;
+  final system =
+      snapshot.systems.systems
+          .where((s) => s.id == systemId && s.projectId == projectId)
+          .firstOrNull;
   if (system == null) return [];
   final discipline = paletteDiscipline(system, snapshot.systems.families);
   if (discipline == null) return [];

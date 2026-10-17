@@ -2,7 +2,8 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('authority manifest deterministically covers all 27 process contracts', () {
+  test('authority manifest deterministically covers all 27 process contracts',
+      () {
     const manifest = Elv5FoundationAuthorityManifest.instance;
     final canonical = manifest.toCanonicalValue();
     final processes = canonical['processes']! as List<Object?>;
@@ -20,7 +21,8 @@ void main() {
     expect(processVersions, hasLength(27));
   });
 
-  test('qualification identity requires exact source and authority SHA-256', () {
+  test('qualification identity requires exact source and authority SHA-256',
+      () {
     final descriptor = Elv5ProcessCatalog.require(Elv5ProcessCode.cctv01);
     final authority = Elv5FoundationAuthorityManifest.instance.fingerprint();
     final sourceSha = List<String>.filled(64, 'a').join();

@@ -32,7 +32,11 @@ void main() {
   test('all exact section capabilities pass selected mode', () {
     final result = const Lan04PathCompatibilityKernel().evaluate(Lan04Input(
       linkId: 'link-1',
-      orderedSections: [section('cable'), section('patch-a'), section('patch-b')],
+      orderedSections: [
+        section('cable'),
+        section('patch-a'),
+        section('patch-b')
+      ],
       requiredMode: mode,
     ));
     expect(result.status, Lan04AssessmentStatus.pass);

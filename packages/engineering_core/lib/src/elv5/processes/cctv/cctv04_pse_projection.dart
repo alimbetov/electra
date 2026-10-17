@@ -25,13 +25,16 @@ final class Cctv04Pwr06Evidence {
     required this.governingCaseId,
     required this.contributors,
   }) {
-    if (pseId.isEmpty || closureFingerprint.isEmpty || governingCaseId.isEmpty) {
+    if (pseId.isEmpty ||
+        closureFingerprint.isEmpty ||
+        governingCaseId.isEmpty) {
       throw ArgumentError('CCTV04 evidence identity must not be empty.');
     }
     final seen = <String>{};
     for (final contributor in contributors) {
       if (!seen.add(contributor.loadId)) {
-        throw ArgumentError('CCTV04 duplicate contributor loadId: ${contributor.loadId}');
+        throw ArgumentError(
+            'CCTV04 duplicate contributor loadId: ${contributor.loadId}');
       }
     }
   }
@@ -96,7 +99,8 @@ final class Cctv04PseProjectionKernel {
     }
 
     final byId = <String, Cctv04Pwr06Contributor>{
-      for (final contributor in evidence.contributors) contributor.loadId: contributor,
+      for (final contributor in evidence.contributors)
+        contributor.loadId: contributor,
     };
     if (!byId.keys.toSet().containsAll(input.cctvLoadIds)) {
       return _blocked(input, 'CCTV04_CCTV_CONTRIBUTOR_EVIDENCE_INCOMPLETE');

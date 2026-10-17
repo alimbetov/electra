@@ -33,8 +33,7 @@ final class Cctv01Vec3 {
       Cctv01Vec3(x - other.x, y - other.y, z - other.z);
   Cctv01Vec3 scale(Elv5Rational factor) =>
       Cctv01Vec3(x * factor, y * factor, z * factor);
-  Elv5Rational dot(Cctv01Vec3 other) =>
-      x * other.x + y * other.y + z * other.z;
+  Elv5Rational dot(Cctv01Vec3 other) => x * other.x + y * other.y + z * other.z;
   Cctv01Vec3 cross(Cctv01Vec3 other) => Cctv01Vec3(
         y * other.z - z * other.y,
         z * other.x - x * other.z,
@@ -83,7 +82,9 @@ final class Cctv01ResolvedOrientation {
     required this.right,
     required this.up,
   }) {
-    if (forward.squaredNorm.isZero || right.squaredNorm.isZero || up.squaredNorm.isZero) {
+    if (forward.squaredNorm.isZero ||
+        right.squaredNorm.isZero ||
+        up.squaredNorm.isZero) {
       throw ArgumentError('CCTV01 orientation basis vectors must be non-zero.');
     }
   }
@@ -118,7 +119,8 @@ final class Cctv01PinholeIntrinsics {
     if (sensorWidth.value <= Elv5Rational.zero ||
         sensorHeight.value <= Elv5Rational.zero ||
         focalLength.value <= Elv5Rational.zero) {
-      throw ArgumentError('CCTV01 sensor dimensions/focal length must be positive.');
+      throw ArgumentError(
+          'CCTV01 sensor dimensions/focal length must be positive.');
     }
   }
 
@@ -306,7 +308,8 @@ final class Cctv01GeometryKernel {
         'CCTV01_NONPLANAR_TARGET_UNSUPPORTED',
       );
     }
-    if (input.cameraFrameId != input.targetFrameId && !input.frameTransformResolved) {
+    if (input.cameraFrameId != input.targetFrameId &&
+        !input.frameTransformResolved) {
       return _terminal(
         Cctv01AssessmentStatus.blocked,
         Cctv01GoverningDimension.frameTransform,
@@ -407,7 +410,9 @@ final class Cctv01GeometryKernel {
       verticalHalfFovTangent: vHalfTangent,
       governingDimension: Cctv01GoverningDimension.zoneCoverage,
       limitingCornerIndex: null,
-      reasonCode: margin >= Elv5Rational.zero ? null : 'CCTV01_ZONE_COVERAGE_BELOW_MINIMUM',
+      reasonCode: margin >= Elv5Rational.zero
+          ? null
+          : 'CCTV01_ZONE_COVERAGE_BELOW_MINIMUM',
     );
   }
 
@@ -451,7 +456,8 @@ final class Cctv01GeometryKernel {
         if (_cross2(a, b, c) <= Elv5Rational.zero) continue;
         var containsOther = false;
         for (final candidate in indices) {
-          if (candidate == prev || candidate == curr || candidate == next) continue;
+          if (candidate == prev || candidate == curr || candidate == next)
+            continue;
           if (_pointInTriangleInclusive(vertices[candidate], a, b, c)) {
             containsOther = true;
             break;
@@ -491,7 +497,8 @@ final class Cctv01GeometryKernel {
       var previous = input.last;
       var previousInside = _cross2(edgeA, edgeB, previous) >= Elv5Rational.zero;
       for (final current in input) {
-        final currentInside = _cross2(edgeA, edgeB, current) >= Elv5Rational.zero;
+        final currentInside =
+            _cross2(edgeA, edgeB, current) >= Elv5Rational.zero;
         if (currentInside != previousInside) {
           output.add(_lineIntersection(previous, current, edgeA, edgeB));
         }

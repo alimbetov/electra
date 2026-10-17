@@ -2,6 +2,7 @@ import '../../numeric/quantity.dart';
 import '../../numeric/rational.dart';
 
 enum Lan06AssessmentStatus { pass, fail, unresolved, notAssessed }
+
 enum Lan06CapacityBasis { grossWithExclusions, netUsable }
 
 final class Lan06EquipmentDemand {
@@ -145,7 +146,8 @@ final class Lan06RackCapacityKernel {
     var availableRu = input.capacity.ruCapacity;
     if (input.capacityBasis == Lan06CapacityBasis.grossWithExclusions) {
       for (final exclusion in input.exclusions) {
-        if (!exclusion.alreadyIncludedInNetCapacity) availableRu -= exclusion.ru;
+        if (!exclusion.alreadyIncludedInNetCapacity)
+          availableRu -= exclusion.ru;
       }
     }
     final ruMargin = availableRu - requiredRu;
@@ -176,7 +178,8 @@ final class Lan06RackCapacityKernel {
           : Lan06AssessmentStatus.fail;
     }
 
-    final ruStatus = ruMargin >= 0 ? Lan06AssessmentStatus.pass : Lan06AssessmentStatus.fail;
+    final ruStatus =
+        ruMargin >= 0 ? Lan06AssessmentStatus.pass : Lan06AssessmentStatus.fail;
     final statuses = [ruStatus, weightStatus, depthStatus];
     final overall = statuses.contains(Lan06AssessmentStatus.fail)
         ? Lan06AssessmentStatus.fail

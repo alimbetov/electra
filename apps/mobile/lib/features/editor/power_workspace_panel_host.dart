@@ -77,12 +77,14 @@ final class _PowerWorkspacePanelHostState
       onPreviousCard: () => _run(binding.previousCard),
       onNextCard: () => _run(binding.nextCard),
       onFindingSelected: widget.onFindingSelected,
-      onApplyReviewedRoute: binding.controller.hasReviewedRouteCommand
-          ? () => _run(binding.applyReviewedRoute)
-          : null,
-      onDiscardDraft: binding.state.hasDraft
-          ? () => _run(binding.discardReviewedRoute)
-          : null,
+      onApplyReviewedRoute:
+          binding.controller.hasReviewedRouteCommand
+              ? () => _run(binding.applyReviewedRoute)
+              : null,
+      onDiscardDraft:
+          binding.state.hasDraft
+              ? () => _run(binding.discardReviewedRoute)
+              : null,
       canUndo: canUndo,
       canRedo: canRedo,
       onUndo: canUndo ? () => _run(binding.undo) : null,

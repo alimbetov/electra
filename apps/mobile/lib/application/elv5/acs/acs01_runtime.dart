@@ -136,9 +136,8 @@ final class Acs01PersistedInputResolver
       );
     }
 
-    final capabilityIds = contract.capabilities
-        .map((e) => e.componentId)
-        .toSet();
+    final capabilityIds =
+        contract.capabilities.map((e) => e.componentId).toSet();
     if (componentIds.length != capabilityIds.length ||
         !capabilityIds.containsAll(componentIds)) {
       _blocked(
@@ -205,14 +204,15 @@ final class Acs01PersistedInputResolver
     String policy,
     List<Elv5DependencyMarker> deps,
     Map<String, Object?> evidence,
-  ) => throw Elv5CaptureBlockedException(
-    request: request,
-    reasonCode: reason,
-    inputFingerprint: input,
-    policyFingerprint: policy,
-    dependencies: deps,
-    evidence: evidence,
-  );
+  ) =>
+      throw Elv5CaptureBlockedException(
+        request: request,
+        reasonCode: reason,
+        inputFingerprint: input,
+        policyFingerprint: policy,
+        dependencies: deps,
+        evidence: evidence,
+      );
 
   Elv5DependencyMarker _dependency(
     Elv5CalculationRequest request,
@@ -245,35 +245,40 @@ Elv5PureKernelExecutor<Acs01Input, Acs01Result> buildAcs01Executor({
 }) => Elv5PureKernelExecutor<Acs01Input, Acs01Result>(
   processCode: Elv5ProcessCode.acs01,
   calculate: const Acs01RoleCompletenessKernel().evaluate,
-  encodeOutput: (result) => <String, Object?>{
-    'schema': 'electra.elv5-acs01-output.v1',
-    'status': result.status.name,
-    'governingNodeId': result.governingNodeId,
-    'illegalSharingComponentIds': result.illegalSharingComponentIds,
-    'requirements': <Object?>[
-      for (final row in result.nodeResults)
-        <String, Object?>{
-          'nodeId': row.nodeId,
-          'status': row.status.name,
-          'margin': row.margin,
-          'selectedChildNodeIds': row.selectedChildNodeIds,
-        },
-    ],
-  },
-  encodeEvidence: (captured, _) => <String, Object?>{
-    'schema': 'electra.elv5-acs01-evidence.v1',
-    'source': 'PERSISTED_DOOR_ROLE_ASSIGNMENTS_PLUS_IMMUTABLE_ROLE_PROFILE',
-    'captureRevision': captured.captureRevision,
-  },
+  encodeOutput:
+      (result) => <String, Object?>{
+        'schema': 'electra.elv5-acs01-output.v1',
+        'status': result.status.name,
+        'governingNodeId': result.governingNodeId,
+        'illegalSharingComponentIds': result.illegalSharingComponentIds,
+        'requirements': <Object?>[
+          for (final row in result.nodeResults)
+            <String, Object?>{
+              'nodeId': row.nodeId,
+              'status': row.status.name,
+              'margin': row.margin,
+              'selectedChildNodeIds': row.selectedChildNodeIds,
+            },
+        ],
+      },
+  encodeEvidence:
+      (captured, _) => <String, Object?>{
+        'schema': 'electra.elv5-acs01-evidence.v1',
+        'source': 'PERSISTED_DOOR_ROLE_ASSIGNMENTS_PLUS_IMMUTABLE_ROLE_PROFILE',
+        'captureRevision': captured.captureRevision,
+      },
   executionOf: (_) => Elv5Execution.succeeded,
-  completionOf: (result) => result.status == Acs01AssessmentStatus.unresolved
-      ? Elv5Completion.incomplete
-      : Elv5Completion.complete,
-  assessmentOf: (result) => switch (result.status) {
-    Acs01AssessmentStatus.pass => Elv5Assessment.pass,
-    Acs01AssessmentStatus.fail => Elv5Assessment.fail,
-    Acs01AssessmentStatus.unresolved => Elv5Assessment.unresolved,
-  },
+  completionOf:
+      (result) =>
+          result.status == Acs01AssessmentStatus.unresolved
+              ? Elv5Completion.incomplete
+              : Elv5Completion.complete,
+  assessmentOf:
+      (result) => switch (result.status) {
+        Acs01AssessmentStatus.pass => Elv5Assessment.pass,
+        Acs01AssessmentStatus.fail => Elv5Assessment.fail,
+        Acs01AssessmentStatus.unresolved => Elv5Assessment.unresolved,
+      },
   nowUtc: nowUtc,
 );
 
@@ -282,9 +287,10 @@ Acs01RequirementNode _requirement(Acs01RoleRequirementContract value) {
   if (kind == 'AT_LEAST' || kind == 'EXACTLY') {
     return Acs01RequirementNode.roleCount(
       nodeId: value.nodeId,
-      kind: kind == 'AT_LEAST'
-          ? Acs01RequirementKind.atLeast
-          : Acs01RequirementKind.exactly,
+      kind:
+          kind == 'AT_LEAST'
+              ? Acs01RequirementKind.atLeast
+              : Acs01RequirementKind.exactly,
       role: _role(value.roleCode!),
       count: value.count,
     );

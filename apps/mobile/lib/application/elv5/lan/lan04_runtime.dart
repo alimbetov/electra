@@ -205,14 +205,15 @@ final class Lan04PersistedInputResolver
     String policy,
     List<Elv5DependencyMarker> deps,
     Map<String, Object?> evidence,
-  ) => throw Elv5CaptureBlockedException(
-    request: request,
-    reasonCode: reason,
-    inputFingerprint: input,
-    policyFingerprint: policy,
-    dependencies: deps,
-    evidence: evidence,
-  );
+  ) =>
+      throw Elv5CaptureBlockedException(
+        request: request,
+        reasonCode: reason,
+        inputFingerprint: input,
+        policyFingerprint: policy,
+        dependencies: deps,
+        evidence: evidence,
+      );
   Elv5DependencyMarker _dependency(
     Elv5CalculationRequest request,
     String relation,
@@ -244,40 +245,45 @@ Elv5PureKernelExecutor<Lan04Input, Lan04Result> buildLan04Executor({
 }) => Elv5PureKernelExecutor<Lan04Input, Lan04Result>(
   processCode: Elv5ProcessCode.lan04,
   calculate: const Lan04PathCompatibilityKernel().evaluate,
-  encodeOutput: (r) => <String, Object?>{
-    'schema': 'electra.elv5-lan04-output.v1',
-    'status': r.status.name,
-    'limitingSectionId': r.limitingSectionId,
-    'limitingProperty': r.limitingProperty?.name,
-    'sections': <Object?>[
-      for (final section in r.sections)
-        <String, Object?>{
-          'sectionId': section.sectionId,
-          'status': section.status.name,
-          'statusByProperty': <String, Object?>{
-            for (final entry in section.statusByProperty.entries)
-              entry.key.name: entry.value.name,
-          },
-        },
-    ],
-  },
-  encodeEvidence: (c, _) => <String, Object?>{
-    'schema': 'electra.elv5-lan04-evidence.v1',
-    'source': 'PERSISTED_LINK_COMPOSITION_PLUS_IMMUTABLE_SECTION_CAPABILITIES',
-    'captureRevision': c.captureRevision,
-  },
+  encodeOutput:
+      (r) => <String, Object?>{
+        'schema': 'electra.elv5-lan04-output.v1',
+        'status': r.status.name,
+        'limitingSectionId': r.limitingSectionId,
+        'limitingProperty': r.limitingProperty?.name,
+        'sections': <Object?>[
+          for (final section in r.sections)
+            <String, Object?>{
+              'sectionId': section.sectionId,
+              'status': section.status.name,
+              'statusByProperty': <String, Object?>{
+                for (final entry in section.statusByProperty.entries)
+                  entry.key.name: entry.value.name,
+              },
+            },
+        ],
+      },
+  encodeEvidence:
+      (c, _) => <String, Object?>{
+        'schema': 'electra.elv5-lan04-evidence.v1',
+        'source':
+            'PERSISTED_LINK_COMPOSITION_PLUS_IMMUTABLE_SECTION_CAPABILITIES',
+        'captureRevision': c.captureRevision,
+      },
   executionOf: (_) => Elv5Execution.succeeded,
-  completionOf: (r) =>
-      (r.status == Lan04AssessmentStatus.unresolved ||
-          r.status == Lan04AssessmentStatus.unsupported)
-      ? Elv5Completion.incomplete
-      : Elv5Completion.complete,
-  assessmentOf: (r) => switch (r.status) {
-    Lan04AssessmentStatus.pass => Elv5Assessment.pass,
-    Lan04AssessmentStatus.fail => Elv5Assessment.fail,
-    Lan04AssessmentStatus.unresolved => Elv5Assessment.unresolved,
-    Lan04AssessmentStatus.unsupported => Elv5Assessment.unresolved,
-  },
+  completionOf:
+      (r) =>
+          (r.status == Lan04AssessmentStatus.unresolved ||
+                  r.status == Lan04AssessmentStatus.unsupported)
+              ? Elv5Completion.incomplete
+              : Elv5Completion.complete,
+  assessmentOf:
+      (r) => switch (r.status) {
+        Lan04AssessmentStatus.pass => Elv5Assessment.pass,
+        Lan04AssessmentStatus.fail => Elv5Assessment.fail,
+        Lan04AssessmentStatus.unresolved => Elv5Assessment.unresolved,
+        Lan04AssessmentStatus.unsupported => Elv5Assessment.unresolved,
+      },
   nowUtc: nowUtc,
 );
 

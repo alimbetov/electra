@@ -1,6 +1,7 @@
 import '../../numeric/rational.dart';
 
 enum Lan02AssessmentStatus { pass, fail }
+
 enum Lan02SpareCombiner { max, sum }
 
 final class Lan02PhysicalPort {
@@ -25,7 +26,10 @@ final class Lan02PortAssignment {
     required this.requiredMedia,
     required this.requiredSpeedMbps,
   }) {
-    if (endpointId.isEmpty || portId.isEmpty || requiredMedia.isEmpty || requiredSpeedMbps <= 0) {
+    if (endpointId.isEmpty ||
+        portId.isEmpty ||
+        requiredMedia.isEmpty ||
+        requiredSpeedMbps <= 0) {
       throw ArgumentError('LAN02 invalid port assignment.');
     }
   }
@@ -58,7 +62,8 @@ final class Lan02Input {
     required this.unavailablePortIds,
     required this.sparePolicy,
   }) {
-    if (switchId.isEmpty) throw ArgumentError('LAN02 switchId must not be empty.');
+    if (switchId.isEmpty)
+      throw ArgumentError('LAN02 switchId must not be empty.');
     _unique(ports.map((e) => e.portId), 'port');
     _unique(assignments.map((e) => e.endpointId), 'endpoint');
   }
@@ -71,7 +76,8 @@ final class Lan02Input {
   static void _unique(Iterable<String> values, String label) {
     final seen = <String>{};
     for (final value in values) {
-      if (!seen.add(value)) throw ArgumentError('LAN02 duplicate $label identity: $value');
+      if (!seen.add(value))
+        throw ArgumentError('LAN02 duplicate $label identity: $value');
     }
   }
 }
@@ -97,12 +103,15 @@ final class Lan02PortCapacityKernel {
   const Lan02PortCapacityKernel();
 
   Lan02Result evaluate(Lan02Input input) {
-    final ports = <String, Lan02PhysicalPort>{for (final port in input.ports) port.portId: port};
+    final ports = <String, Lan02PhysicalPort>{
+      for (final port in input.ports) port.portId: port
+    };
     final occupied = <String>{};
     final incompatible = <String>[];
     for (final assignment in input.assignments) {
       final port = ports[assignment.portId];
-      if (port == null || input.unavailablePortIds.contains(assignment.portId)) {
+      if (port == null ||
+          input.unavailablePortIds.contains(assignment.portId)) {
         incompatible.add(assignment.endpointId);
         continue;
       }
@@ -117,7 +126,10 @@ final class Lan02PortCapacityKernel {
     }
     incompatible.sort();
 
-    final ratioSpare = (Elv5Rational.integer(occupied.length) * input.sparePolicy.ratio).ceil().toInt();
+    final ratioSpare =
+        (Elv5Rational.integer(occupied.length) * input.sparePolicy.ratio)
+            .ceil()
+            .toInt();
     final requiredSpare = switch (input.sparePolicy.combiner) {
       Lan02SpareCombiner.max => ratioSpare > input.sparePolicy.absoluteMinimum
           ? ratioSpare

@@ -25,13 +25,16 @@ final class Lan03Pwr06Evidence {
     required this.governingCaseId,
     required this.contributors,
   }) {
-    if (pseId.isEmpty || closureFingerprint.isEmpty || governingCaseId.isEmpty) {
+    if (pseId.isEmpty ||
+        closureFingerprint.isEmpty ||
+        governingCaseId.isEmpty) {
       throw ArgumentError('LAN03 evidence identity must not be empty.');
     }
     final seen = <String>{};
     for (final contributor in contributors) {
       if (!seen.add(contributor.loadId)) {
-        throw ArgumentError('LAN03 duplicate contributor loadId: ${contributor.loadId}');
+        throw ArgumentError(
+            'LAN03 duplicate contributor loadId: ${contributor.loadId}');
       }
     }
   }
@@ -96,7 +99,8 @@ final class Lan03PoeProjectionKernel {
     }
 
     final byId = <String, Lan03Pwr06Contributor>{
-      for (final contributor in evidence.contributors) contributor.loadId: contributor,
+      for (final contributor in evidence.contributors)
+        contributor.loadId: contributor,
     };
     if (!byId.keys.toSet().containsAll(input.lanLoadIds)) {
       return _blocked(input, 'LAN03_LAN_CONTRIBUTOR_EVIDENCE_INCOMPLETE');

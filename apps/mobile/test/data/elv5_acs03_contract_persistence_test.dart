@@ -67,23 +67,25 @@ void main() {
         Elv5Rational.parseDecimal('0.35'),
       );
 
-      final evidenceRows = await db
-          .customSelect(
-            "SELECT evidence_ref, payload_sha256 FROM elv_revision_aggregate_evidence_records "
-            "WHERE aggregate_kind = 'ACS03_ELECTRICAL_CONTRACT' ORDER BY evidence_ref",
-          )
-          .get();
+      final evidenceRows =
+          await db
+              .customSelect(
+                "SELECT evidence_ref, payload_sha256 FROM elv_revision_aggregate_evidence_records "
+                "WHERE aggregate_kind = 'ACS03_ELECTRICAL_CONTRACT' ORDER BY evidence_ref",
+              )
+              .get();
       expect(evidenceRows, hasLength(2));
       expect(
         evidenceRows.map((row) => row.read<String>('evidence_ref')),
         contains(firstEvidenceRef),
       );
 
-      final revision = await db
-          .customSelect(
-            "SELECT revision FROM project_design_revisions WHERE id = 'd'",
-          )
-          .getSingle();
+      final revision =
+          await db
+              .customSelect(
+                "SELECT revision FROM project_design_revisions WHERE id = 'd'",
+              )
+              .getSingle();
       expect(revision.read<int>('revision'), 3);
     },
   );

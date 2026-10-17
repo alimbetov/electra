@@ -29,12 +29,11 @@ final class DriftElvCableRunRepository implements ElvCableRunRepository {
   ) async {
     final rows =
         await (database.select(database.canonicalCableRuns)..where(
-              (row) =>
-                  row.projectId.equals(projectId) &
-                  row.designRevisionId.equals(designRevisionId) &
-                  row.deletedAt.isNull(),
-            ))
-            .get();
+          (row) =>
+              row.projectId.equals(projectId) &
+              row.designRevisionId.equals(designRevisionId) &
+              row.deletedAt.isNull(),
+        )).get();
     return rows.map(_runFromRow).toList(growable: false);
   }
 
@@ -46,13 +45,12 @@ final class DriftElvCableRunRepository implements ElvCableRunRepository {
   ) async {
     final row =
         await (database.select(database.canonicalCableRuns)..where(
-              (candidate) =>
-                  candidate.projectId.equals(projectId) &
-                  candidate.designRevisionId.equals(designRevisionId) &
-                  candidate.id.equals(cableRunId) &
-                  candidate.deletedAt.isNull(),
-            ))
-            .getSingleOrNull();
+          (candidate) =>
+              candidate.projectId.equals(projectId) &
+              candidate.designRevisionId.equals(designRevisionId) &
+              candidate.id.equals(cableRunId) &
+              candidate.deletedAt.isNull(),
+        )).getSingleOrNull();
     return row == null ? null : _runFromRow(row);
   }
 
@@ -98,13 +96,12 @@ final class DriftElvCableRunRepository implements ElvCableRunRepository {
     }
     final cable =
         await (database.select(database.elvCables)..where(
-              (row) =>
-                  row.projectId.equals(command.projectId) &
-                  row.id.equals(command.cableId) &
-                  row.lifecycleState.equals('ACTIVE') &
-                  row.deletedAt.isNull(),
-            ))
-            .getSingleOrNull();
+          (row) =>
+              row.projectId.equals(command.projectId) &
+              row.id.equals(command.cableId) &
+              row.lifecycleState.equals('ACTIVE') &
+              row.deletedAt.isNull(),
+        )).getSingleOrNull();
     if (cable == null) {
       return elvRuntimeFailure(
         'ELV_RUN_CABLE_NOT_FOUND',
@@ -113,13 +110,12 @@ final class DriftElvCableRunRepository implements ElvCableRunRepository {
     }
     final allocation =
         await (database.select(database.cableAllocations)..where(
-              (row) =>
-                  row.projectId.equals(command.projectId) &
-                  row.cableId.equals(command.cableId) &
-                  row.lifecycleState.equals('ACTIVE') &
-                  row.deletedAt.isNull(),
-            ))
-            .getSingleOrNull();
+          (row) =>
+              row.projectId.equals(command.projectId) &
+              row.cableId.equals(command.cableId) &
+              row.lifecycleState.equals('ACTIVE') &
+              row.deletedAt.isNull(),
+        )).getSingleOrNull();
     if (allocation == null) {
       return elvRuntimeFailure(
         'ELV_RUN_ALLOCATION_REQUIRED',
@@ -209,12 +205,11 @@ final class DriftElvCableRunRepository implements ElvCableRunRepository {
     if (replay != null) return replay;
     final row =
         await (database.select(database.canonicalCableRuns)..where(
-              (candidate) =>
-                  candidate.projectId.equals(command.projectId) &
-                  candidate.id.equals(command.cableRunId) &
-                  candidate.deletedAt.isNull(),
-            ))
-            .getSingleOrNull();
+          (candidate) =>
+              candidate.projectId.equals(command.projectId) &
+              candidate.id.equals(command.cableRunId) &
+              candidate.deletedAt.isNull(),
+        )).getSingleOrNull();
     if (row == null) {
       return elvRuntimeFailure(
         'ELV_RUN_NOT_FOUND',
@@ -248,15 +243,13 @@ final class DriftElvCableRunRepository implements ElvCableRunRepository {
         details: {'errors': errors},
       );
     }
-    await (database.delete(
-      database.cableRunTraversals,
-    )..where((item) => item.cableRunId.equals(row.id))).go();
+    await (database.delete(database.cableRunTraversals)
+      ..where((item) => item.cableRunId.equals(row.id))).go();
     await failureProbe.hit(ElvFailurePoints.p3RerouteAfterDeleteOldChain);
     final instant = _now();
     await _insertTraversalChain(row.id, command.traversals, instant);
-    await (database.update(
-      database.canonicalCableRuns,
-    )..where((candidate) => candidate.id.equals(row.id))).write(
+    await (database.update(database.canonicalCableRuns)
+      ..where((candidate) => candidate.id.equals(row.id))).write(
       CanonicalCableRunsCompanion(
         revision: Value(row.revision + 1),
         updatedAt: Value(instant),
@@ -327,12 +320,11 @@ final class DriftElvCableRunRepository implements ElvCableRunRepository {
   }) => database.transaction(() async {
     final row =
         await (database.select(database.canonicalCableRuns)..where(
-              (candidate) =>
-                  candidate.projectId.equals(projectId) &
-                  candidate.id.equals(cableRunId) &
-                  candidate.deletedAt.isNull(),
-            ))
-            .getSingleOrNull();
+          (candidate) =>
+              candidate.projectId.equals(projectId) &
+              candidate.id.equals(cableRunId) &
+              candidate.deletedAt.isNull(),
+        )).getSingleOrNull();
     if (row == null) {
       return elvRuntimeFailure(
         'ELV_RUN_NOT_FOUND',
@@ -354,9 +346,8 @@ final class DriftElvCableRunRepository implements ElvCableRunRepository {
       );
     }
     final instant = _now();
-    await (database.update(
-      database.canonicalCableRuns,
-    )..where((candidate) => candidate.id.equals(row.id))).write(
+    await (database.update(database.canonicalCableRuns)
+      ..where((candidate) => candidate.id.equals(row.id))).write(
       CanonicalCableRunsCompanion(
         lifecycleState: Value(to),
         revision: Value(row.revision + 1),
@@ -398,13 +389,12 @@ final class DriftElvCableRunRepository implements ElvCableRunRepository {
     String designRevisionId,
   ) =>
       (database.select(database.projectDesignRevisions)..where(
-            (row) =>
-                row.projectId.equals(projectId) &
-                row.id.equals(designRevisionId) &
-                row.state.equals('WORKING') &
-                row.deletedAt.isNull(),
-          ))
-          .getSingleOrNull();
+        (row) =>
+            row.projectId.equals(projectId) &
+            row.id.equals(designRevisionId) &
+            row.state.equals('WORKING') &
+            row.deletedAt.isNull(),
+      )).getSingleOrNull();
 
   Future<bool> _segmentsBelongToProject(
     String projectId,
@@ -413,28 +403,23 @@ final class DriftElvCableRunRepository implements ElvCableRunRepository {
     for (final segmentId in segmentIds.toSet()) {
       final segment =
           await (database.select(database.cableRouteSegments)..where(
-                (row) => row.id.equals(segmentId) & row.deletedAt.isNull(),
-              ))
-              .getSingleOrNull();
+            (row) => row.id.equals(segmentId) & row.deletedAt.isNull(),
+          )).getSingleOrNull();
       if (segment == null) return false;
       final route =
           await (database.select(database.cableRoutes)..where(
-                (row) =>
-                    row.id.equals(segment.routeId) & row.deletedAt.isNull(),
-              ))
-              .getSingleOrNull();
+            (row) => row.id.equals(segment.routeId) & row.deletedAt.isNull(),
+          )).getSingleOrNull();
       if (route == null) return false;
       final room =
           await (database.select(database.rooms)..where(
-                (row) => row.id.equals(route.roomId) & row.deletedAt.isNull(),
-              ))
-              .getSingleOrNull();
+            (row) => row.id.equals(route.roomId) & row.deletedAt.isNull(),
+          )).getSingleOrNull();
       if (room == null) return false;
       final floor =
           await (database.select(database.floors)..where(
-                (row) => row.id.equals(room.floorId) & row.deletedAt.isNull(),
-              ))
-              .getSingleOrNull();
+            (row) => row.id.equals(room.floorId) & row.deletedAt.isNull(),
+          )).getSingleOrNull();
       if (floor == null || floor.projectId != projectId) return false;
     }
     return true;
@@ -445,8 +430,8 @@ final class DriftElvCableRunRepository implements ElvCableRunRepository {
     Iterable<CableRunTraversal> traversals,
     DateTime instant,
   ) async {
-    final ordered = traversals.toList()
-      ..sort((a, b) => a.sequence.compareTo(b.sequence));
+    final ordered =
+        traversals.toList()..sort((a, b) => a.sequence.compareTo(b.sequence));
     for (final traversal in ordered) {
       await database
           .into(database.cableRunTraversals)

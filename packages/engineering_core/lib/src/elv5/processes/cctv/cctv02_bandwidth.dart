@@ -64,7 +64,8 @@ final class Cctv02MulticastTree {
     required Iterable<String> directedEdges,
   }) : directedEdges = Set.unmodifiable(directedEdges) {
     if (streamId.isEmpty || multicastGroupId.isEmpty) {
-      throw ArgumentError('CCTV02 multicast tree identifiers must be non-empty.');
+      throw ArgumentError(
+          'CCTV02 multicast tree identifiers must be non-empty.');
     }
     if (this.directedEdges.isEmpty) {
       throw ArgumentError('CCTV02 multicast tree must contain edges.');
@@ -85,10 +86,10 @@ final class Cctv02Input {
     required Iterable<Cctv02Subscription> subscriptions,
     Iterable<Cctv02MulticastTree> multicastTrees = const [],
     Map<String, BitRate> capacities = const {},
-  }) : streams = List.unmodifiable(streams),
-       subscriptions = List.unmodifiable(subscriptions),
-       multicastTrees = List.unmodifiable(multicastTrees),
-       capacities = Map.unmodifiable(capacities) {
+  })  : streams = List.unmodifiable(streams),
+        subscriptions = List.unmodifiable(subscriptions),
+        multicastTrees = List.unmodifiable(multicastTrees),
+        capacities = Map.unmodifiable(capacities) {
     for (final entry in this.capacities.entries) {
       if (entry.key.isEmpty) {
         throw ArgumentError('CCTV02 capacity edge id must be non-empty.');
@@ -117,7 +118,8 @@ final class Cctv02TrafficValue {
   final BitRate? capacity;
 
   BitRate? get margin => capacity == null ? null : capacity! - load;
-  bool? get withinCapacity => margin == null ? null : margin!.value >= Elv5Rational.zero;
+  bool? get withinCapacity =>
+      margin == null ? null : margin!.value >= Elv5Rational.zero;
 }
 
 final class Cctv02EdgeTraffic {
@@ -138,8 +140,8 @@ final class Cctv02Result {
   Cctv02Result({
     required Map<String, Cctv02EdgeTraffic> edges,
     required Map<String, Cctv02IngressTraffic> recorderIngress,
-  }) : edges = Map.unmodifiable(edges),
-       recorderIngress = Map.unmodifiable(recorderIngress);
+  })  : edges = Map.unmodifiable(edges),
+        recorderIngress = Map.unmodifiable(recorderIngress);
 
   final Map<String, Cctv02EdgeTraffic> edges;
   final Map<String, Cctv02IngressTraffic> recorderIngress;
@@ -211,7 +213,8 @@ final class Cctv02BandwidthKernel {
       ...peakEdges.keys,
       ...peakIncompleteEdges,
       ...input.capacities.keys,
-    }.toList()..sort();
+    }.toList()
+      ..sort();
     final edges = <String, Cctv02EdgeTraffic>{};
     for (final edgeId in edgeIds) {
       edges[edgeId] = Cctv02EdgeTraffic(
@@ -232,7 +235,8 @@ final class Cctv02BandwidthKernel {
       ...expectedIngress.keys,
       ...peakIngress.keys,
       ...peakIncompleteIngress,
-    }.toList()..sort();
+    }.toList()
+      ..sort();
     final ingress = <String, Cctv02IngressTraffic>{};
     for (final recorderId in recorderIds) {
       ingress[recorderId] = Cctv02IngressTraffic(

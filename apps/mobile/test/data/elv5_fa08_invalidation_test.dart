@@ -192,11 +192,12 @@ Future<void> _expectPointer(
   required String freshness,
   required int generation,
 }) async {
-  final row = await db
-      .customSelect(
-        "SELECT freshness, generation FROM discipline_evaluation_pointers WHERE project_id = 'p' AND design_revision_id = 'd'",
-      )
-      .getSingle();
+  final row =
+      await db
+          .customSelect(
+            "SELECT freshness, generation FROM discipline_evaluation_pointers WHERE project_id = 'p' AND design_revision_id = 'd'",
+          )
+          .getSingle();
   expect(row.read<String>('freshness'), freshness);
   expect(row.read<int>('generation'), generation);
 }

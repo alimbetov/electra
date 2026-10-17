@@ -157,7 +157,8 @@ Elv4CurrentEvaluationSnapshot _pwr06(
     },
     'consumedFacts': <Object?>[
       <String, Object?>{
-        'key': '["elv4-dep-v1","project","revision","GROUP_MEMBERSHIP","pse-1","POE_MEMBERSHIP"]',
+        'key':
+            '["elv4-dep-v1","project","revision","GROUP_MEMBERSHIP","pse-1","POE_MEMBERSHIP"]',
         'valueSchema': 'electra.elv4.poe-membership.v1',
         'canonicalValueJson': canonicalEngineeringJsonV1(members),
         'presence': 'PRESENT',

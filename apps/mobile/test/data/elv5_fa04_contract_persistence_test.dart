@@ -56,12 +56,13 @@ void main() {
       expect(second!.bindingRevision, 2);
       expect(second.evidenceRef, isNot(firstEvidence));
 
-      final evidence = await db
-          .customSelect(
-            "SELECT evidence_ref FROM elv_revision_aggregate_evidence_records "
-            "WHERE aggregate_kind = 'FA04_SOURCE_REQUIREMENT_SET'",
-          )
-          .get();
+      final evidence =
+          await db
+              .customSelect(
+                "SELECT evidence_ref FROM elv_revision_aggregate_evidence_records "
+                "WHERE aggregate_kind = 'FA04_SOURCE_REQUIREMENT_SET'",
+              )
+              .get();
       expect(evidence, hasLength(2));
     },
   );

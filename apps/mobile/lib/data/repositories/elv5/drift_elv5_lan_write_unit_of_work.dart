@@ -155,17 +155,18 @@ final class _Store implements Elv5LanMutationStore {
     );
     if (root == null) return null;
     final binding = root.read<String>('id');
-    final rows = await database
-        .customSelect(
-          'SELECT ordinal, realized_section_id, section_role FROM link_section_assignments '
-          'WHERE project_id = ? AND design_revision_id = ? AND binding_id = ? ORDER BY ordinal',
-          variables: [
-            Variable.withString(p),
-            Variable.withString(r),
-            Variable.withString(binding),
-          ],
-        )
-        .get();
+    final rows =
+        await database
+            .customSelect(
+              'SELECT ordinal, realized_section_id, section_role FROM link_section_assignments '
+              'WHERE project_id = ? AND design_revision_id = ? AND binding_id = ? ORDER BY ordinal',
+              variables: [
+                Variable.withString(p),
+                Variable.withString(r),
+                Variable.withString(binding),
+              ],
+            )
+            .get();
     return Elv5LanAggregateSnapshot(
       aggregateKind: 'LAN_LINK_COMPOSITION',
       aggregateId: binding,
@@ -201,17 +202,18 @@ final class _Store implements Elv5LanMutationStore {
     );
     if (root == null) return null;
     final binding = root.read<String>('id');
-    final rows = await database
-        .customSelect(
-          'SELECT endpoint_id, port_id, selected_mode FROM port_capacity_assignments '
-          'WHERE project_id = ? AND design_revision_id = ? AND binding_id = ? ORDER BY port_id',
-          variables: [
-            Variable.withString(p),
-            Variable.withString(r),
-            Variable.withString(binding),
-          ],
-        )
-        .get();
+    final rows =
+        await database
+            .customSelect(
+              'SELECT endpoint_id, port_id, selected_mode FROM port_capacity_assignments '
+              'WHERE project_id = ? AND design_revision_id = ? AND binding_id = ? ORDER BY port_id',
+              variables: [
+                Variable.withString(p),
+                Variable.withString(r),
+                Variable.withString(binding),
+              ],
+            )
+            .get();
     return Elv5LanAggregateSnapshot(
       aggregateKind: 'LAN_PORT_CAPACITY',
       aggregateId: binding,
@@ -249,17 +251,18 @@ final class _Store implements Elv5LanMutationStore {
     );
     if (root == null) return null;
     final binding = root.read<String>('id');
-    final rows = await database
-        .customSelect(
-          'SELECT event_id, event_kind, loss_interval_json FROM optical_loss_events '
-          'WHERE project_id = ? AND design_revision_id = ? AND binding_id = ? ORDER BY ordinal, event_id',
-          variables: [
-            Variable.withString(p),
-            Variable.withString(r),
-            Variable.withString(binding),
-          ],
-        )
-        .get();
+    final rows =
+        await database
+            .customSelect(
+              'SELECT event_id, event_kind, loss_interval_json FROM optical_loss_events '
+              'WHERE project_id = ? AND design_revision_id = ? AND binding_id = ? ORDER BY ordinal, event_id',
+              variables: [
+                Variable.withString(p),
+                Variable.withString(r),
+                Variable.withString(binding),
+              ],
+            )
+            .get();
     List<Map<String, Object?>> events(String kind) => [
       for (final row in rows.where((e) => e.read<String>('event_kind') == kind))
         {
@@ -297,17 +300,18 @@ final class _Store implements Elv5LanMutationStore {
     );
     if (root == null) return null;
     final binding = root.read<String>('id');
-    final rows = await database
-        .customSelect(
-          'SELECT panel_port_id, endpoint_id, destination_ref_json FROM patch_panel_assignments '
-          'WHERE project_id = ? AND design_revision_id = ? AND binding_id = ? ORDER BY panel_port_id',
-          variables: [
-            Variable.withString(p),
-            Variable.withString(r),
-            Variable.withString(binding),
-          ],
-        )
-        .get();
+    final rows =
+        await database
+            .customSelect(
+              'SELECT panel_port_id, endpoint_id, destination_ref_json FROM patch_panel_assignments '
+              'WHERE project_id = ? AND design_revision_id = ? AND binding_id = ? ORDER BY panel_port_id',
+              variables: [
+                Variable.withString(p),
+                Variable.withString(r),
+                Variable.withString(binding),
+              ],
+            )
+            .get();
     return Elv5LanAggregateSnapshot(
       aggregateKind: 'LAN_PATCH_PANEL',
       aggregateId: binding,
@@ -319,12 +323,12 @@ final class _Store implements Elv5LanMutationStore {
           for (final row in rows)
             {
               'panelPortId': row.read<String>('panel_port_id'),
-              'terminationId': _object(
-                row.read<String>('destination_ref_json'),
-              )['terminationId'],
-              'linkId': _object(
-                row.read<String>('destination_ref_json'),
-              )['linkId'],
+              'terminationId':
+                  _object(
+                    row.read<String>('destination_ref_json'),
+                  )['terminationId'],
+              'linkId':
+                  _object(row.read<String>('destination_ref_json'))['linkId'],
             },
         ],
         'sparePolicyRef': jsonDecode(
@@ -341,17 +345,18 @@ final class _Store implements Elv5LanMutationStore {
     String r,
     String id,
     String extra,
-  ) => database
-      .customSelect(
-        'SELECT id, revision, $extra FROM $table WHERE project_id = ? '
-        'AND design_revision_id = ? AND $subjectColumn = ? AND deleted_at IS NULL',
-        variables: [
-          Variable.withString(p),
-          Variable.withString(r),
-          Variable.withString(id),
-        ],
-      )
-      .getSingleOrNull();
+  ) =>
+      database
+          .customSelect(
+            'SELECT id, revision, $extra FROM $table WHERE project_id = ? '
+            'AND design_revision_id = ? AND $subjectColumn = ? AND deleted_at IS NULL',
+            variables: [
+              Variable.withString(p),
+              Variable.withString(r),
+              Variable.withString(id),
+            ],
+          )
+          .getSingleOrNull();
 
   Future<void> _replaceLink(
     String p,
@@ -474,7 +479,8 @@ final class _Store implements Elv5LanMutationStore {
         Variable.withString(reverse),
         Variable<String>(null),
       ],
-      updateSet: 'forward_optics_json = ?, reverse_optics_json = ?, policy_ref_json = ?',
+      updateSet:
+          'forward_optics_json = ?, reverse_optics_json = ?, policy_ref_json = ?',
       updateValues: [
         Variable.withString(forward),
         Variable.withString(reverse),

@@ -85,7 +85,9 @@ void main() {
       expect(r.status, Acs04AssessmentStatus.blocked);
     });
 
-    test('does not invent cross-unit governing margin on mixed passing dimensions', () {
+    test(
+        'does not invent cross-unit governing margin on mixed passing dimensions',
+        () {
       final input = Acs04Input(
         sourceId: 'psu-1',
         expectedGlobalDemandFingerprint: 'global',

@@ -10,8 +10,9 @@ void main() {
     'captures absolute UTC recording facts and sizes storage exactly',
     () async {
       final store = _FakeCctvStore(pool: _pool(recurrence: false));
-      final captured = await Cctv03PersistedInputResolver(store: store)
-          .capture(_request());
+      final captured = await Cctv03PersistedInputResolver(
+        store: store,
+      ).capture(_request());
       final result = const Cctv03StorageKernel().evaluate(captured.value);
 
       expect(captured.captureRevision, 3);
@@ -93,15 +94,20 @@ Elv5CctvAggregateSnapshot _pool({required bool recurrence}) =>
           <String, Object?>{
             'scheduleProfileId': 'always',
             'segmentId': 's1',
-            'absoluteWindow': recurrence
-                ? null
-                : <String, Object?>{
-                    'startUtc': '2026-01-01T00:00:00.000Z',
-                    'endUtc': '2026-01-01T01:00:00.000Z',
-                  },
-            'recurrence': recurrence
-                ? <String, Object?>{'rule': 'FREQ=DAILY', 'timeZoneLocal': true}
-                : null,
+            'absoluteWindow':
+                recurrence
+                    ? null
+                    : <String, Object?>{
+                      'startUtc': '2026-01-01T00:00:00.000Z',
+                      'endUtc': '2026-01-01T01:00:00.000Z',
+                    },
+            'recurrence':
+                recurrence
+                    ? <String, Object?>{
+                      'rule': 'FREQ=DAILY',
+                      'timeZoneLocal': true,
+                    }
+                    : null,
           },
         ],
         'sizingBasis': 'EXPECTED_ESTIMATE',

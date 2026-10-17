@@ -42,12 +42,13 @@ final class DriftElectricalLoadRepository implements ElectricalLoadRepository {
 
   SimpleSelectStatement<$ConsumptionGroupsTable, ConsumptionGroupRow> _groups(
     String roomId,
-  ) => database.select(database.consumptionGroups)
-    ..where((row) => row.roomId.equals(roomId) & row.deletedAt.isNull())
-    ..orderBy([
-      (row) => OrderingTerm.asc(row.name),
-      (row) => OrderingTerm.asc(row.id),
-    ]);
+  ) =>
+      database.select(database.consumptionGroups)
+        ..where((row) => row.roomId.equals(roomId) & row.deletedAt.isNull())
+        ..orderBy([
+          (row) => OrderingTerm.asc(row.name),
+          (row) => OrderingTerm.asc(row.id),
+        ]);
 
   List<RoomConsumptionGroup> _mapGroups(List<ConsumptionGroupRow> rows) => rows
       .map(
@@ -74,13 +75,12 @@ final class DriftElectricalLoadRepository implements ElectricalLoadRepository {
     await database.transaction(() async {
       final room =
           await (database.select(database.rooms)..where(
-                (row) => row.id.equals(group.roomId) & row.deletedAt.isNull(),
-              ))
-              .getSingleOrNull();
+            (row) => row.id.equals(group.roomId) & row.deletedAt.isNull(),
+          )).getSingleOrNull();
       if (room == null) throw StateError('Group room is not active.');
-      final existing = await (database.select(
-        database.consumptionGroups,
-      )..where((row) => row.id.equals(group.id))).getSingleOrNull();
+      final existing =
+          await (database.select(database.consumptionGroups)
+            ..where((row) => row.id.equals(group.id))).getSingleOrNull();
       if (existing != null && existing.roomId != group.roomId)
         throw StateError('Cannot move a group between rooms.');
       final now = DateTime.now().toUtc();
@@ -112,27 +112,23 @@ final class DriftElectricalLoadRepository implements ElectricalLoadRepository {
     await database.transaction(() async {
       final component =
           await (database.select(database.componentInstances)..where(
-                (row) =>
-                    row.id.equals(load.componentInstanceId) &
-                    row.deletedAt.isNull(),
-              ))
-              .getSingleOrNull();
+            (row) =>
+                row.id.equals(load.componentInstanceId) &
+                row.deletedAt.isNull(),
+          )).getSingleOrNull();
       if (component == null)
         throw StateError('Equipment instance is not active.');
       final room =
           await (database.select(database.rooms)..where(
-                (row) =>
-                    row.id.equals(component.roomId) & row.deletedAt.isNull(),
-              ))
-              .getSingleOrNull();
+            (row) => row.id.equals(component.roomId) & row.deletedAt.isNull(),
+          )).getSingleOrNull();
       if (room == null) throw StateError('Equipment room is not active.');
       final groupId = load.consumptionGroupId;
       if (groupId != null) {
         final group =
             await (database.select(database.consumptionGroups)..where(
-                  (row) => row.id.equals(groupId) & row.deletedAt.isNull(),
-                ))
-                .getSingleOrNull();
+              (row) => row.id.equals(groupId) & row.deletedAt.isNull(),
+            )).getSingleOrNull();
         if (group == null || group.roomId != component.roomId)
           throw StateError(
             'Consumption group must belong to the equipment room.',
@@ -140,10 +136,8 @@ final class DriftElectricalLoadRepository implements ElectricalLoadRepository {
       }
       final existing =
           await (database.select(database.equipmentElectricalLoads)..where(
-                (row) =>
-                    row.componentInstanceId.equals(load.componentInstanceId),
-              ))
-              .getSingleOrNull();
+            (row) => row.componentInstanceId.equals(load.componentInstanceId),
+          )).getSingleOrNull();
       final now = DateTime.now().toUtc();
       await database
           .into(database.equipmentElectricalLoads)
@@ -183,16 +177,18 @@ final class DriftElectricalLoadRepository implements ElectricalLoadRepository {
       EquipmentElectricalLoad(
         componentInstanceId: row.componentInstanceId,
         consumptionGroupId: row.consumptionGroupId,
-        powerBasis: row.powerBasis == null
-            ? null
-            : ElectricalPowerBasis.values.byName(row.powerBasis!),
+        powerBasis:
+            row.powerBasis == null
+                ? null
+                : ElectricalPowerBasis.values.byName(row.powerBasis!),
         profile: ElectricalLoadProfile(
           nominalVoltageV: row.nominalVoltageV,
           phases: row.phases,
           supplySystem: SupplySystem.values.byName(row.supplySystem),
-          phaseConfiguration: row.phaseConfiguration == null
-              ? null
-              : PhaseConfiguration.values.byName(row.phaseConfiguration!),
+          phaseConfiguration:
+              row.phaseConfiguration == null
+                  ? null
+                  : PhaseConfiguration.values.byName(row.phaseConfiguration!),
           frequencyHz: row.frequencyHz,
           ratedPowerW: row.ratedPowerW,
           ratedCurrentA: row.ratedCurrentA,

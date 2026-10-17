@@ -71,8 +71,9 @@ final class ReplaceLan05SectionEvidenceCommand {
   static List<Lan05AttenuationProfileDraft> _normalize(
     Iterable<Lan05AttenuationProfileDraft> values,
   ) {
-    final result = values.toList()
-      ..sort((a, b) => a.wavelengthNm.compareTo(b.wavelengthNm));
+    final result =
+        values.toList()
+          ..sort((a, b) => a.wavelengthNm.compareTo(b.wavelengthNm));
     for (var i = 1; i < result.length; i++) {
       if (result[i - 1].wavelengthNm == result[i].wavelengthNm) {
         throw ArgumentError('LAN05 duplicate attenuation wavelength.');

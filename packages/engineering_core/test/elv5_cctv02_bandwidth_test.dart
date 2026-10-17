@@ -145,7 +145,9 @@ void main() {
       expect(failed.edges['E1']!.peak.withinCapacity, isFalse);
     });
 
-    test('keeps expected complete but peak unresolved when peak bitrate is missing', () {
+    test(
+        'keeps expected complete but peak unresolved when peak bitrate is missing',
+        () {
       final input = Cctv02Input(
         streams: <Cctv02Stream>[
           Cctv02Stream(streamId: 'stream-1', expectedBitRate: _mbps(4)),

@@ -39,14 +39,15 @@ void main() {
         ),
       );
 
-      final section = await db
-          .customSelect(
-            "SELECT evidence_json FROM link_section_assignments WHERE binding_id = 'link-binding-1'",
-          )
-          .getSingle();
-      final evidence = jsonDecode(
-        section.read<String>('evidence_json'),
-      ) as Map<String, dynamic>;
+      final section =
+          await db
+              .customSelect(
+                "SELECT evidence_json FROM link_section_assignments WHERE binding_id = 'link-binding-1'",
+              )
+              .getSingle();
+      final evidence =
+          jsonDecode(section.read<String>('evidence_json'))
+              as Map<String, dynamic>;
       expect(evidence['schema'], 'electra.elv5-optical-fiber-evidence.v1');
       final profile =
           (evidence['attenuationProfiles'] as List).single
@@ -64,16 +65,18 @@ void main() {
         'numerator': '7',
       });
 
-      final link = await db
-          .customSelect(
-            "SELECT revision FROM link_composition_bindings WHERE id = 'link-binding-1'",
-          )
-          .getSingle();
-      final revision = await db
-          .customSelect(
-            "SELECT revision FROM project_design_revisions WHERE id = 'd'",
-          )
-          .getSingle();
+      final link =
+          await db
+              .customSelect(
+                "SELECT revision FROM link_composition_bindings WHERE id = 'link-binding-1'",
+              )
+              .getSingle();
+      final revision =
+          await db
+              .customSelect(
+                "SELECT revision FROM project_design_revisions WHERE id = 'd'",
+              )
+              .getSingle();
       expect(link.read<int>('revision'), 2);
       expect(revision.read<int>('revision'), 2);
     },
@@ -110,11 +113,12 @@ void main() {
       throwsStateError,
     );
 
-    final section = await db
-        .customSelect(
-          "SELECT evidence_json FROM link_section_assignments WHERE binding_id = 'link-binding-1'",
-        )
-        .getSingle();
+    final section =
+        await db
+            .customSelect(
+              "SELECT evidence_json FROM link_section_assignments WHERE binding_id = 'link-binding-1'",
+            )
+            .getSingle();
     expect(section.read<String>('evidence_json'), '{}');
   });
 }

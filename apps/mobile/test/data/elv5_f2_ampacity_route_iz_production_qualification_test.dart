@@ -110,14 +110,15 @@ void main() {
       expect(current!.bindingRevision, 2);
       expect(current.evidenceRef, isNot(firstEvidenceRef));
 
-      final evidenceCount = await restartedDb
-          .customSelect(
-            "SELECT COUNT(*) AS c FROM elv_revision_aggregate_evidence_records "
-            "WHERE project_id = 'p' AND design_revision_id = 'd' "
-            "AND aggregate_kind = 'ELV5_AMPACITY_SECTION_CONTRACT' "
-            "AND aggregate_id = 'section-1'",
-          )
-          .getSingle();
+      final evidenceCount =
+          await restartedDb
+              .customSelect(
+                "SELECT COUNT(*) AS c FROM elv_revision_aggregate_evidence_records "
+                "WHERE project_id = 'p' AND design_revision_id = 'd' "
+                "AND aggregate_kind = 'ELV5_AMPACITY_SECTION_CONTRACT' "
+                "AND aggregate_id = 'section-1'",
+              )
+              .getSingle();
       expect(evidenceCount.read<int>('c'), 2);
 
       // Q8: freeze makes the historical selector read-only while preserving the

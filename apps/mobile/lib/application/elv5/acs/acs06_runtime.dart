@@ -202,10 +202,11 @@ final class Acs06PersistedInputResolver
           <String, Object?>{'causeCode': causeCode},
         );
       }
-      final requiredRoles = _strings(
-        row['requiredEvidenceRoles'],
-        'requiredEvidenceRoles',
-      ).map((e) => e.toUpperCase()).toSet();
+      final requiredRoles =
+          _strings(
+            row['requiredEvidenceRoles'],
+            'requiredEvidenceRoles',
+          ).map((e) => e.toUpperCase()).toSet();
       final missingRoles = requiredRoles.difference(roleCodes);
       if (missingRoles.isNotEmpty) {
         _blocked(
@@ -281,8 +282,8 @@ final class Acs06PersistedInputResolver
       safetyMode: _safetyMode(_text(payload, 'safetyMode')),
       projectDefinedPowerFailureOutcome:
           contract.projectDefinedPowerFailureOutcomeCode == null
-          ? null
-          : _outcome(contract.projectDefinedPowerFailureOutcomeCode!),
+              ? null
+              : _outcome(contract.projectDefinedPowerFailureOutcomeCode!),
     );
 
     final inputFingerprint = _encoder.sha256(<String, Object?>{
@@ -309,14 +310,15 @@ final class Acs06PersistedInputResolver
     String policyFingerprint,
     List<Elv5DependencyMarker> dependencies,
     Map<String, Object?> evidence,
-  ) => throw Elv5CaptureBlockedException(
-    request: request,
-    reasonCode: reasonCode,
-    inputFingerprint: inputFingerprint,
-    policyFingerprint: policyFingerprint,
-    dependencies: dependencies,
-    evidence: evidence,
-  );
+  ) =>
+      throw Elv5CaptureBlockedException(
+        request: request,
+        reasonCode: reasonCode,
+        inputFingerprint: inputFingerprint,
+        policyFingerprint: policyFingerprint,
+        dependencies: dependencies,
+        evidence: evidence,
+      );
 
   Elv5DependencyMarker _dependency(
     Elv5CalculationRequest request,
@@ -349,37 +351,44 @@ Elv5PureKernelExecutor<Acs06Input, Acs06Result> buildAcs06Executor({
 }) => Elv5PureKernelExecutor<Acs06Input, Acs06Result>(
   processCode: Elv5ProcessCode.acs06,
   calculate: const Acs06DoorTopologyKernel().evaluate,
-  encodeOutput: (result) => <String, Object?>{
-    'schema': 'electra.elv5-acs06-output.v1',
-    'status': result.status.name,
-    'governingCause': result.governingCause?.name,
-    'causes': <String, Object?>{
-      for (final entry in result.causes.entries)
-        entry.key.name: <String, Object?>{
-          'status': entry.value.status.name,
-          'expectedOutcome': entry.value.expectedOutcome.name,
-          'modeledOutcome': entry.value.modeledOutcome?.name,
-          'failedRequirementId': entry.value.failedRequirementId,
-          'reason': entry.value.reason,
+  encodeOutput:
+      (result) => <String, Object?>{
+        'schema': 'electra.elv5-acs06-output.v1',
+        'status': result.status.name,
+        'governingCause': result.governingCause?.name,
+        'causes': <String, Object?>{
+          for (final entry in result.causes.entries)
+            entry.key.name: <String, Object?>{
+              'status': entry.value.status.name,
+              'expectedOutcome': entry.value.expectedOutcome.name,
+              'modeledOutcome': entry.value.modeledOutcome?.name,
+              'failedRequirementId': entry.value.failedRequirementId,
+              'reason': entry.value.reason,
+            },
         },
-    },
-  },
-  encodeEvidence: (captured, _) => <String, Object?>{
-    'schema': 'electra.elv5-acs06-evidence.v1',
-    'source': 'PERSISTED_DOOR_ROLES_TRUTH_PLUS_IMMUTABLE_TOPOLOGY_CONTRACT',
-    'captureRevision': captured.captureRevision,
-  },
-  executionOf: (result) => result.status == Acs06AssessmentStatus.blocked
-      ? Elv5Execution.blocked
-      : Elv5Execution.succeeded,
-  completionOf: (result) => result.status == Acs06AssessmentStatus.blocked
-      ? Elv5Completion.incomplete
-      : Elv5Completion.complete,
-  assessmentOf: (result) => switch (result.status) {
-    Acs06AssessmentStatus.pass => Elv5Assessment.pass,
-    Acs06AssessmentStatus.fail => Elv5Assessment.fail,
-    Acs06AssessmentStatus.blocked => Elv5Assessment.unresolved,
-  },
+      },
+  encodeEvidence:
+      (captured, _) => <String, Object?>{
+        'schema': 'electra.elv5-acs06-evidence.v1',
+        'source': 'PERSISTED_DOOR_ROLES_TRUTH_PLUS_IMMUTABLE_TOPOLOGY_CONTRACT',
+        'captureRevision': captured.captureRevision,
+      },
+  executionOf:
+      (result) =>
+          result.status == Acs06AssessmentStatus.blocked
+              ? Elv5Execution.blocked
+              : Elv5Execution.succeeded,
+  completionOf:
+      (result) =>
+          result.status == Acs06AssessmentStatus.blocked
+              ? Elv5Completion.incomplete
+              : Elv5Completion.complete,
+  assessmentOf:
+      (result) => switch (result.status) {
+        Acs06AssessmentStatus.pass => Elv5Assessment.pass,
+        Acs06AssessmentStatus.fail => Elv5Assessment.fail,
+        Acs06AssessmentStatus.blocked => Elv5Assessment.unresolved,
+      },
   nowUtc: nowUtc,
 );
 
@@ -398,13 +407,14 @@ Acs06LockOutcome _outcome(String code) => switch (code.trim().toUpperCase()) {
   _ => throw StateError('ACS06_UNSUPPORTED_LOCK_OUTCOME:$code'),
 };
 
-Acs06LockSafetyMode _safetyMode(String code) =>
-    switch (code.trim().toUpperCase()) {
-      'FAIL_SAFE' => Acs06LockSafetyMode.failSafe,
-      'FAIL_SECURE' => Acs06LockSafetyMode.failSecure,
-      'PROJECT_DEFINED' => Acs06LockSafetyMode.projectDefined,
-      _ => throw StateError('ACS06_UNSUPPORTED_SAFETY_MODE:$code'),
-    };
+Acs06LockSafetyMode _safetyMode(String code) => switch (code
+    .trim()
+    .toUpperCase()) {
+  'FAIL_SAFE' => Acs06LockSafetyMode.failSafe,
+  'FAIL_SECURE' => Acs06LockSafetyMode.failSecure,
+  'PROJECT_DEFINED' => Acs06LockSafetyMode.projectDefined,
+  _ => throw StateError('ACS06_UNSUPPORTED_SAFETY_MODE:$code'),
+};
 
 Acs06EdgeKind _edgeKind(String code) => switch (code.trim().toUpperCase()) {
   'DATA' => Acs06EdgeKind.data,

@@ -75,24 +75,26 @@ final class Cctv02PersistedInputResolver
               _requiredDecimalText(stream, 'expectedBitrateBps'),
             ),
           ),
-          peakBitRate: stream['peakBitrateBps'] == null
-              ? null
-              : BitRate(
-                  Elv5Rational.parseDecimal(
-                    _requiredDecimalText(stream, 'peakBitrateBps'),
+          peakBitRate:
+              stream['peakBitrateBps'] == null
+                  ? null
+                  : BitRate(
+                    Elv5Rational.parseDecimal(
+                      _requiredDecimalText(stream, 'peakBitrateBps'),
+                    ),
                   ),
-                ),
         ),
       );
     }
 
-    final explicitAssignments = recorderAssignments == null
-        ? const <CctvRecorderAssignmentRef>[]
-        : await recorderAssignments!.loadForCamera(
-            projectId: request.projectId,
-            designRevisionId: request.designRevisionId,
-            cameraId: cameraId,
-          );
+    final explicitAssignments =
+        recorderAssignments == null
+            ? const <CctvRecorderAssignmentRef>[]
+            : await recorderAssignments!.loadForCamera(
+              projectId: request.projectId,
+              designRevisionId: request.designRevisionId,
+              cameraId: cameraId,
+            );
     final recorderIdsByStream = <String, Set<String>>{};
     for (final assignment in explicitAssignments) {
       (recorderIdsByStream[assignment.encodedStreamId] ??= <String>{}).add(
@@ -108,16 +110,14 @@ final class Cctv02PersistedInputResolver
       final receiverId = _requiredText(subscription, 'receiverId');
       final assignedRecorders =
           recorderIdsByStream[streamId] ?? const <String>{};
-      final recorderId = assignedRecorders.contains(receiverId)
-          ? receiverId
-          : null;
+      final recorderId =
+          assignedRecorders.contains(receiverId) ? receiverId : null;
       final modeText = _requiredText(subscription, 'deliveryMode');
       final mode = switch (modeText) {
         'UNICAST' => Cctv02DeliveryMode.unicast,
         'MULTICAST' => Cctv02DeliveryMode.multicast,
-        _ => throw FormatException(
-          'Unsupported CCTV-02 deliveryMode: $modeText',
-        ),
+        _ =>
+          throw FormatException('Unsupported CCTV-02 deliveryMode: $modeText'),
       };
       final groupId = subscription['multicastGroupId'] as String?;
       final path = _requiredStringList(subscription, 'orderedNetworkEdgeIds');
@@ -273,17 +273,18 @@ Elv5PureKernelExecutor<Cctv02Input, Cctv02Result> buildCctv02Executor({
   processCode: Elv5ProcessCode.cctv02,
   calculate: const Cctv02BandwidthKernel().evaluate,
   encodeOutput: _encodeCctv02Output,
-  encodeEvidence: (captured, output) => <String, Object?>{
-    'schema': 'electra.elv5-cctv02-evidence.v2',
-    'source':
-        'ELV5_PERSISTED_CAMERA_STREAMS_PLUS_EXPLICIT_RECORDER_ASSIGNMENTS',
-    'captureRevision': captured.captureRevision,
-    'dependencyKeySha256s': [
-      for (final dependency in captured.dependencies)
-        dependency.dependencyKeySha256,
-    ]..sort(),
-    'recorderRoleEvidence': 'EXPLICIT_ASSIGNMENT_AND_RECEIVER_ID_V1',
-  },
+  encodeEvidence:
+      (captured, output) => <String, Object?>{
+        'schema': 'electra.elv5-cctv02-evidence.v2',
+        'source':
+            'ELV5_PERSISTED_CAMERA_STREAMS_PLUS_EXPLICIT_RECORDER_ASSIGNMENTS',
+        'captureRevision': captured.captureRevision,
+        'dependencyKeySha256s': [
+          for (final dependency in captured.dependencies)
+            dependency.dependencyKeySha256,
+        ]..sort(),
+        'recorderRoleEvidence': 'EXPLICIT_ASSIGNMENT_AND_RECEIVER_ID_V1',
+      },
   executionOf: (_) => Elv5Execution.succeeded,
   completionOf: (output) {
     final peakComplete =

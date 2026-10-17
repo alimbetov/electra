@@ -265,8 +265,8 @@ abstract interface class Lan06RackBasisContractWriter {
 List<Lan06EquipmentBasisContract> _equipment(
   Iterable<Lan06EquipmentBasisContract> input,
 ) {
-  final values = input.toList()
-    ..sort((a, b) => a.equipmentId.compareTo(b.equipmentId));
+  final values =
+      input.toList()..sort((a, b) => a.equipmentId.compareTo(b.equipmentId));
   if (values.isEmpty) throw ArgumentError('LAN06 equipment must not be empty.');
   final seen = <String>{};
   for (final item in values) {

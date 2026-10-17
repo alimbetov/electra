@@ -2,7 +2,9 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('LAN-07 counts distinct physical ports and preserves mapping completeness', () {
+  test(
+      'LAN-07 counts distinct physical ports and preserves mapping completeness',
+      () {
     final result = const Lan07PatchPanelKernel().evaluate(
       Lan07Input(
         panelId: 'panel-1',
@@ -114,7 +116,8 @@ void main() {
     expect(result.status, Lan07AssessmentStatus.unresolved);
   });
 
-  test('multiple destinations for one required source fail mapping cardinality', () {
+  test('multiple destinations for one required source fail mapping cardinality',
+      () {
     final result = const Lan07PatchPanelKernel().evaluate(
       Lan07Input(
         panelId: 'panel-1',

@@ -70,12 +70,13 @@ final class Elv5LanRackMutationService {
     }
     return _runner.run(
       command,
-      prepare: (session, value) => _prepare(
-        session,
-        projectId: value.projectId,
-        designRevisionId: value.designRevisionId,
-        payload: value.payload,
-      ),
+      prepare:
+          (session, value) => _prepare(
+            session,
+            projectId: value.projectId,
+            designRevisionId: value.designRevisionId,
+            payload: value.payload,
+          ),
       apply: _apply,
     );
   }
@@ -94,9 +95,10 @@ final class Elv5LanRackMutationService {
     );
     final aggregateId =
         previous?.aggregateId ?? 'ELV5:LAN_RACK_CAPACITY:$rackId';
-    final oldDeps = previous == null
-        ? const <Map<String, Object?>>[]
-        : _dependencies(previous.payload);
+    final oldDeps =
+        previous == null
+            ? const <Map<String, Object?>>[]
+            : _dependencies(previous.payload);
     final newDeps = _dependencies(payload);
     final keyHashes = <String>{
       for (final value in oldDeps) _encoder.sha256(value),
@@ -135,9 +137,8 @@ final class Elv5LanRackMutationService {
       'capturedRackProfile': previous?.capturedRackProfile,
     };
     return Elv5PreparedReplacement(
-      actualRowRevisions: previous == null
-          ? const {}
-          : {aggregateId: previous.revision},
+      actualRowRevisions:
+          previous == null ? const {} : {aggregateId: previous.revision},
       reviewedImpactFingerprint: fingerprint,
       staleNodeKeySha256s: stale,
       affectedIds: {
@@ -159,9 +160,10 @@ final class Elv5LanRackMutationService {
     Elv5PreparedReplacement prepared,
   ) async {
     final rackId = command.payload['rackId']! as String;
-    final bindingId = prepared.actualRowRevisions.keys.isEmpty
-        ? 'ELV5:LAN_RACK_CAPACITY:$rackId'
-        : prepared.actualRowRevisions.keys.single;
+    final bindingId =
+        prepared.actualRowRevisions.keys.isEmpty
+            ? 'ELV5:LAN_RACK_CAPACITY:$rackId'
+            : prepared.actualRowRevisions.keys.single;
     await session.racks.replaceRack(
       projectId: command.projectId,
       designRevisionId: command.designRevisionId,

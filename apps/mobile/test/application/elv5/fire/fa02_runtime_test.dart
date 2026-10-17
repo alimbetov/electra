@@ -106,12 +106,13 @@ final class _PowerFacts implements Elv4OperatingFactSource {
     required String projectId,
     required String designRevisionId,
     required Set<String> componentIds,
-  }) async => <Elv4ExactDcLoadFact>[
-    _load('panel-1', 'panel-load', 'STANDBY', '0.02'),
-    _load('panel-1', 'panel-load', 'ALARM', '0.02'),
-    _load('det-1', 'det-1-load', 'STANDBY', '0.02'),
-    _load('det-1', 'det-1-load', 'ALARM', '0.06'),
-  ].where((value) => componentIds.contains(value.componentId)).toList();
+  }) async =>
+      <Elv4ExactDcLoadFact>[
+        _load('panel-1', 'panel-load', 'STANDBY', '0.02'),
+        _load('panel-1', 'panel-load', 'ALARM', '0.02'),
+        _load('det-1', 'det-1-load', 'STANDBY', '0.02'),
+        _load('det-1', 'det-1-load', 'ALARM', '0.06'),
+      ].where((value) => componentIds.contains(value.componentId)).toList();
 
   @override
   Future<List<Elv4ScenarioSegmentFact>> loadScenarioSegments({

@@ -10,9 +10,11 @@ import 'package:engineering_core/engineering_core.dart';
 EngineeringReferenceCatalog paletteCatalog() =>
     EngineeringReferenceCatalog.fromMap(
       jsonDecode(
-        File('../../docs/examples/elv2-reference-catalog.json')
-            .readAsStringSync(),
-      ) as Map<String, dynamic>,
+            File(
+              '../../docs/examples/elv2-reference-catalog.json',
+            ).readAsStringSync(),
+          )
+          as Map<String, dynamic>,
     );
 final paletteProject = ProjectRecord(
   id: 'p1',
@@ -76,9 +78,10 @@ ProjectEngineeringReferences paletteSnapshot({
               projectId: 'p1',
               code: code,
               name: code,
-              familyId: bundledEngineeringSystemFamilies
-                  .singleWhere((f) => f.code == code)
-                  .id,
+              familyId:
+                  bundledEngineeringSystemFamilies
+                      .singleWhere((f) => f.code == code)
+                      .id,
               familyVersion: '1',
             ),
         ],
@@ -93,20 +96,23 @@ PlacementCandidateContext knownCandidate(String code) =>
       projectId: 'p1',
       roomId: 'r1',
       surfaceId: 'wall-1',
-      installationSurface: code == 'DETECTOR'
-          ? InstallationSurface.ceiling
-          : InstallationSurface.wall,
+      installationSurface:
+          code == 'DETECTOR'
+              ? InstallationSurface.ceiling
+              : InstallationSurface.wall,
       mountingMethod: switch (code) {
         'CAMERA' => MountingMethod.bracket,
         'OUTLET' => MountingMethod.flush,
         _ => MountingMethod.surface,
       },
-      environmentExposure: code == 'READER'
-          ? EnvironmentExposure.protectedOutdoor
-          : EnvironmentExposure.indoor,
-      environmentClimate: code == 'READER'
-          ? EnvironmentClimate.unconditioned
-          : EnvironmentClimate.conditioned,
+      environmentExposure:
+          code == 'READER'
+              ? EnvironmentExposure.protectedOutdoor
+              : EnvironmentExposure.indoor,
+      environmentClimate:
+          code == 'READER'
+              ? EnvironmentClimate.unconditioned
+              : EnvironmentClimate.conditioned,
       ambientTemperatureC: 20,
       actualIpRating: IpProtectionClass.parse(
         code == 'CAMERA'
@@ -117,8 +123,7 @@ PlacementCandidateContext knownCandidate(String code) =>
       ),
       availableClearanceMm: 50,
       hasEnclosure: false,
-      topologyShape: code == 'DETECTOR'
-          ? TopologyShape.loop
-          : TopologyShape.star,
+      topologyShape:
+          code == 'DETECTOR' ? TopologyShape.loop : TopologyShape.star,
       topologyRole: TopologyParticipation.endpoint,
     );

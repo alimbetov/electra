@@ -36,20 +36,23 @@ void main() {
     },
   );
 
-  test('ACS02 duplicate physical relay assignment fails without borrowing reader capacity', () async {
-    final payload = _payload(duplicateRelay: true);
-    final resolver = Acs02PersistedInputResolver(
-      acsStore: _Store(payload),
-      contractSource: _Contracts(_contract(payload)),
-    );
+  test(
+    'ACS02 duplicate physical relay assignment fails without borrowing reader capacity',
+    () async {
+      final payload = _payload(duplicateRelay: true);
+      final resolver = Acs02PersistedInputResolver(
+        acsStore: _Store(payload),
+        contractSource: _Contracts(_contract(payload)),
+      );
 
-    final result = await buildAcs02Executor().execute(
-      await resolver.capture(_request()),
-    );
+      final result = await buildAcs02Executor().execute(
+        await resolver.capture(_request()),
+      );
 
-    expect(result.assessment, Elv5Assessment.fail);
-    expect(result.output['conflictingAssignmentIds'], isNotEmpty);
-  });
+      expect(result.assessment, Elv5Assessment.fail);
+      expect(result.output['conflictingAssignmentIds'], isNotEmpty);
+    },
+  );
 
   test('ACS02 stale reserve policy identity is capture BLOCKED', () async {
     final payload = _payload();

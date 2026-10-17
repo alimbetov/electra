@@ -78,12 +78,15 @@ void main() {
       expect(result.status, Acs03AssessmentStatus.pass);
       expect(result.governingCaseId, 'startup');
       expect(
-        result.cases.firstWhere((e) => e.eventId == 'startup').minimumVoltageMargin,
+        result.cases
+            .firstWhere((e) => e.eventId == 'startup')
+            .minimumVoltageMargin,
         _v('0'),
       );
     });
 
-    test('short startup event fails when upstream terminal evidence is low', () {
+    test('short startup event fails when upstream terminal evidence is low',
+        () {
       final input = Acs03Input(
         doorId: 'door-1',
         lockId: 'lock-1',

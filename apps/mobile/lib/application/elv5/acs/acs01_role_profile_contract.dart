@@ -226,8 +226,8 @@ abstract interface class Acs01RoleProfileContractSource {
 List<Acs01ComponentCapabilityContract> _capabilities(
   Iterable<Acs01ComponentCapabilityContract> values,
 ) {
-  final out = values.toList()
-    ..sort((a, b) => a.componentId.compareTo(b.componentId));
+  final out =
+      values.toList()..sort((a, b) => a.componentId.compareTo(b.componentId));
   final ids = <String>{};
   for (final value in out) {
     if (!ids.add(value.componentId)) {

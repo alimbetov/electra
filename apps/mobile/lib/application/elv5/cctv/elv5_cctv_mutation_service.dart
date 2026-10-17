@@ -152,9 +152,10 @@ final class Elv5CctvMutationService {
       throw FormatException('Unsupported CCTV operation: $operation.');
     }
 
-    final oldDependencies = previous == null
-        ? const <Map<String, Object?>>[]
-        : _dependencies(operation, previous.payload);
+    final oldDependencies =
+        previous == null
+            ? const <Map<String, Object?>>[]
+            : _dependencies(operation, previous.payload);
     final newDependencies = _dependencies(operation, payload);
     final dependencyHashes = <String>{
       for (final dependency in oldDependencies) _encoder.sha256(dependency),
@@ -194,9 +195,10 @@ final class Elv5CctvMutationService {
     };
     final inverseJson = _canonicalJson(inverse);
     return Elv5PreparedReplacement(
-      actualRowRevisions: previous == null
-          ? const {}
-          : {previous.aggregateId: previous.revision},
+      actualRowRevisions:
+          previous == null
+              ? const {}
+              : {previous.aggregateId: previous.revision},
       reviewedImpactFingerprint: impactFingerprint,
       staleNodeKeySha256s: staleNodes,
       affectedIds: {subjectId, aggregateId},
@@ -214,9 +216,10 @@ final class Elv5CctvMutationService {
     Elv5PreparedReplacement prepared,
   ) async {
     final cameraId = command.payload['cameraId']! as String;
-    final bindingId = prepared.actualRowRevisions.keys.isEmpty
-        ? _cameraBindingId(cameraId)
-        : prepared.actualRowRevisions.keys.single;
+    final bindingId =
+        prepared.actualRowRevisions.keys.isEmpty
+            ? _cameraBindingId(cameraId)
+            : prepared.actualRowRevisions.keys.single;
     await session.cctv.replaceCameraStreams(
       projectId: command.projectId,
       designRevisionId: command.designRevisionId,
@@ -242,9 +245,10 @@ final class Elv5CctvMutationService {
     Elv5PreparedReplacement prepared,
   ) async {
     final poolId = command.payload['poolId']! as String;
-    final bindingId = prepared.actualRowRevisions.keys.isEmpty
-        ? _recordingBindingId(poolId)
-        : prepared.actualRowRevisions.keys.single;
+    final bindingId =
+        prepared.actualRowRevisions.keys.isEmpty
+            ? _recordingBindingId(poolId)
+            : prepared.actualRowRevisions.keys.single;
     await session.cctv.replaceRecordingPool(
       projectId: command.projectId,
       designRevisionId: command.designRevisionId,

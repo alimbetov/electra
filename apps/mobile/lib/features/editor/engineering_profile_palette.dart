@@ -23,14 +23,15 @@ class EngineeringProfilePalette extends StatefulWidget {
     context: context,
     isScrollControlled: true,
     showDragHandle: true,
-    builder: (_) => FractionallySizedBox(
-      heightFactor: .86,
-      child: EngineeringProfilePalette(
-        snapshot: snapshot,
-        projectId: projectId,
-        initialSystemId: initialSystemId,
-      ),
-    ),
+    builder:
+        (_) => FractionallySizedBox(
+          heightFactor: .86,
+          child: EngineeringProfilePalette(
+            snapshot: snapshot,
+            projectId: projectId,
+            initialSystemId: initialSystemId,
+          ),
+        ),
   );
   @override
   State<EngineeringProfilePalette> createState() =>
@@ -49,26 +50,35 @@ class _EngineeringProfilePaletteState extends State<EngineeringProfilePalette> {
 
   @override
   Widget build(BuildContext context) {
-    final systems = widget.snapshot.systems.project?.id == widget.projectId
-        ? widget.snapshot.systems.systems
-              .where((s) => s.projectId == widget.projectId)
-              .toList()
-        : <EngineeringSystem>[];
+    final systems =
+        widget.snapshot.systems.project?.id == widget.projectId
+            ? widget.snapshot.systems.systems
+                .where((s) => s.projectId == widget.projectId)
+                .toList()
+            : <EngineeringSystem>[];
     final system = systems.where((s) => s.id == systemId).firstOrNull;
-    final all = system == null
-        ? <CanonicalProfileChoice>[]
-        : canonicalPaletteChoices(widget.snapshot, widget.projectId, system.id);
-    final classes = all.map((c) => c.profile.engineeringClass).toSet().toList()
-      ..sort((a, b) => a.name.compareTo(b.name));
-    final values = all
-        .where(
-          (c) =>
-              (category == null || c.profile.engineeringClass == category) &&
-              '${c.profile.label} ${c.profile.code} ${c.catalog.code} ${c.catalog.version}'
-                  .toLowerCase()
-                  .contains(query.trim().toLowerCase()),
-        )
-        .toList();
+    final all =
+        system == null
+            ? <CanonicalProfileChoice>[]
+            : canonicalPaletteChoices(
+              widget.snapshot,
+              widget.projectId,
+              system.id,
+            );
+    final classes =
+        all.map((c) => c.profile.engineeringClass).toSet().toList()
+          ..sort((a, b) => a.name.compareTo(b.name));
+    final values =
+        all
+            .where(
+              (c) =>
+                  (category == null ||
+                      c.profile.engineeringClass == category) &&
+                  '${c.profile.label} ${c.profile.code} ${c.catalog.code} ${c.catalog.version}'
+                      .toLowerCase()
+                      .contains(query.trim().toLowerCase()),
+            )
+            .toList();
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -100,10 +110,11 @@ class _EngineeringProfilePaletteState extends State<EngineeringProfilePalette> {
                     ),
                   ),
               ],
-              onChanged: (v) => setState(() {
-                systemId = v;
-                category = null;
-              }),
+              onChanged:
+                  (v) => setState(() {
+                    systemId = v;
+                    category = null;
+                  }),
             ),
             if (system != null)
               Text(
@@ -138,81 +149,92 @@ class _EngineeringProfilePaletteState extends State<EngineeringProfilePalette> {
             ],
             const SizedBox(height: 8),
             Expanded(
-              child: values.isEmpty
-                  ? Center(
-                      child: Text(
-                        systems.isEmpty
-                            ? 'No active engineering systems in this project.'
-                            : system == null
-                            ? 'Select a system first.'
-                            : all.isEmpty
-                            ? 'No canonical profiles for this exact system family. Import a matching catalog in Engineering reference catalogs.'
-                            : 'No matching profiles.',
-                      ),
-                    )
-                  : ListView.builder(
-                      itemCount: values.length,
-                      itemBuilder: (context, index) {
-                        final choice = values[index];
-                        final p = choice.profile;
-                        return Card(
-                          child: ListTile(
-                            key: ValueKey(
-                              'palette-profile-${choice.catalog.id}-${p.code}',
-                            ),
-                            leading: Icon(switch (p.discipline) {
-                              ReferenceDiscipline.cctv =>
-                                Icons.videocam_outlined,
-                              ReferenceDiscipline.lan => Icons.lan_outlined,
-                              ReferenceDiscipline.acs =>
-                                Icons.sensor_door_outlined,
-                              ReferenceDiscipline.fire =>
-                                Icons.local_fire_department_outlined,
-                            }),
-                            title: Text(p.label),
-                            subtitle: Text(
-                              '${p.engineeringClass.name} · ${p.code}\n${choice.catalog.code} / ${choice.catalog.version}${p.deprecated
-                                  ? '\nDeprecated'
-                                  : p.constraintsState == ProfileConstraintsState.legacyUnspecified
-                                  ? '\nLegacy constraints unspecified'
-                                  : ''}',
-                            ),
-                            trailing: const Icon(Icons.chevron_right),
-                            onTap: () async {
-                              final use = await showDialog<bool>(
-                                context: context,
-                                builder: (_) => AlertDialog(
-                                  title: Text(p.label),
-                                  content: SizedBox(
-                                    width: 600,
-                                    child: SingleChildScrollView(
-                                      child: CanonicalProfileDetails(
-                                        choice: choice,
+              child:
+                  values.isEmpty
+                      ? Center(
+                        child: Text(
+                          systems.isEmpty
+                              ? 'No active engineering systems in this project.'
+                              : system == null
+                              ? 'Select a system first.'
+                              : all.isEmpty
+                              ? 'No canonical profiles for this exact system family. Import a matching catalog in Engineering reference catalogs.'
+                              : 'No matching profiles.',
+                        ),
+                      )
+                      : ListView.builder(
+                        itemCount: values.length,
+                        itemBuilder: (context, index) {
+                          final choice = values[index];
+                          final p = choice.profile;
+                          return Card(
+                            child: ListTile(
+                              key: ValueKey(
+                                'palette-profile-${choice.catalog.id}-${p.code}',
+                              ),
+                              leading: Icon(switch (p.discipline) {
+                                ReferenceDiscipline.cctv =>
+                                  Icons.videocam_outlined,
+                                ReferenceDiscipline.lan => Icons.lan_outlined,
+                                ReferenceDiscipline.acs =>
+                                  Icons.sensor_door_outlined,
+                                ReferenceDiscipline.fire =>
+                                  Icons.local_fire_department_outlined,
+                              }),
+                              title: Text(p.label),
+                              subtitle: Text(
+                                '${p.engineeringClass.name} · ${p.code}\n${choice.catalog.code} / ${choice.catalog.version}${p.deprecated
+                                    ? '\nDeprecated'
+                                    : p.constraintsState == ProfileConstraintsState.legacyUnspecified
+                                    ? '\nLegacy constraints unspecified'
+                                    : ''}',
+                              ),
+                              trailing: const Icon(Icons.chevron_right),
+                              onTap: () async {
+                                final use = await showDialog<bool>(
+                                  context: context,
+                                  builder:
+                                      (_) => AlertDialog(
+                                        title: Text(p.label),
+                                        content: SizedBox(
+                                          width: 600,
+                                          child: SingleChildScrollView(
+                                            child: CanonicalProfileDetails(
+                                              choice: choice,
+                                            ),
+                                          ),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed:
+                                                () => Navigator.pop(
+                                                  context,
+                                                  false,
+                                                ),
+                                            child: const Text('Back'),
+                                          ),
+                                          FilledButton(
+                                            onPressed:
+                                                p.deprecated
+                                                    ? null
+                                                    : () => Navigator.pop(
+                                                      context,
+                                                      true,
+                                                    ),
+                                            child: const Text(
+                                              'Preview on surface',
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.pop(context, false),
-                                      child: const Text('Back'),
-                                    ),
-                                    FilledButton(
-                                      onPressed: p.deprecated
-                                          ? null
-                                          : () => Navigator.pop(context, true),
-                                      child: const Text('Preview on surface'),
-                                    ),
-                                  ],
-                                ),
-                              );
-                              if (use == true && context.mounted)
-                                Navigator.pop(context, choice);
-                            },
-                          ),
-                        );
-                      },
-                    ),
+                                );
+                                if (use == true && context.mounted)
+                                  Navigator.pop(context, choice);
+                              },
+                            ),
+                          );
+                        },
+                      ),
             ),
           ],
         ),
@@ -316,15 +338,16 @@ class CanonicalProfileDetails extends StatelessWidget {
   ) {
     final code = profile.portInterfaceCodes[template.code];
     try {
-      final port = code == null
-          ? template
-          : catalog.vocabulary.resolve(
-              template,
-              code,
-              catalogId: catalog.id,
-              version: catalog.version,
-              newInstantiation: false,
-            );
+      final port =
+          code == null
+              ? template
+              : catalog.vocabulary.resolve(
+                template,
+                code,
+                catalogId: catalog.id,
+                version: catalog.version,
+                newInstantiation: false,
+              );
       return ListTile(
         dense: true,
         contentPadding: EdgeInsets.zero,

@@ -44,7 +44,8 @@ final class Elv5RouteAmpacityInput {
     final seen = <String>{};
     for (final section in this.orderedSections) {
       if (!seen.add(section.sectionId)) {
-        throw ArgumentError('Duplicate ampacity route section: ${section.sectionId}');
+        throw ArgumentError(
+            'Duplicate ampacity route section: ${section.sectionId}');
       }
     }
   }

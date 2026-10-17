@@ -244,8 +244,8 @@ abstract interface class Acs02ResourceContractWriter {
 List<Acs02ResourceContractItem> _resources(
   Iterable<Acs02ResourceContractItem> values,
 ) {
-  final out = values.toList()
-    ..sort((a, b) => a.resourceId.compareTo(b.resourceId));
+  final out =
+      values.toList()..sort((a, b) => a.resourceId.compareTo(b.resourceId));
   final ids = <String>{};
   for (final value in out) {
     if (!ids.add(value.resourceId)) {
@@ -260,8 +260,9 @@ List<Acs02ResourceContractItem> _resources(
 List<Acs02SpareRuleContract> _spareRules(
   Iterable<Acs02SpareRuleContract> values,
 ) {
-  final out = values.toList()
-    ..sort((a, b) => a.resourceKindCode.compareTo(b.resourceKindCode));
+  final out =
+      values.toList()
+        ..sort((a, b) => a.resourceKindCode.compareTo(b.resourceKindCode));
   final kinds = <String>{};
   for (final value in out) {
     if (!kinds.add(value.resourceKindCode)) {

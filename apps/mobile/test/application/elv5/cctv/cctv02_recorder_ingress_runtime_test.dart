@@ -6,59 +6,62 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('explicit recorder assignment enables recorder ingress without receiver inference', () async {
-    final store = _Store(
-      Elv5CctvAggregateSnapshot(
-        aggregateKind: 'CCTV_CAMERA_STREAMS',
-        aggregateId: 'a',
-        subjectId: 'cam-1',
-        revision: 2,
-        payload: <String, Object?>{
-          'cameraId': 'cam-1',
-          'streams': <Object?>[
-            <String, Object?>{
-              'encodedStreamId': 'main',
-              'codecProfileRef': 'H264',
-              'expectedBitrateBps': '8000000',
-              'peakBitrateBps': '12000000',
-              'expectedRateEvidence': <String, Object?>{},
-              'peakRateEvidence': <String, Object?>{},
-            },
-          ],
-          'subscriptions': <Object?>[
-            <String, Object?>{
-              'subscriptionId': 'rec-feed',
-              'encodedStreamId': 'main',
-              'receiverId': 'rec-1',
-              'deliveryMode': 'UNICAST',
-              'orderedNetworkEdgeIds': <String>['edge-1'],
-              'multicastGroupId': null,
-              'multicastTree': null,
-            },
-          ],
-          'transportOverheadModelRef': null,
-        },
-      ),
-    );
-    final resolver = Cctv02PersistedInputResolver(
-      store: store,
-      recorderAssignments: const _Assignments(),
-    );
-    final captured = await resolver.capture(_request());
-    final result = const Cctv02BandwidthKernel().evaluate(captured.value);
-    expect(result.recorderIngress.keys, contains('rec-1'));
-    expect(result.recorderIngress['rec-1']!.peak.complete, isTrue);
-    expect(
-      result.recorderIngress['rec-1']!.peak.load.value,
-      Elv5Rational.integer(12000000),
-    );
-    expect(
-      captured.dependencies.any(
-        (d) => d.dependencyKey.contains('CCTV_RECORDER_ASSIGNMENT'),
-      ),
-      isTrue,
-    );
-  });
+  test(
+    'explicit recorder assignment enables recorder ingress without receiver inference',
+    () async {
+      final store = _Store(
+        Elv5CctvAggregateSnapshot(
+          aggregateKind: 'CCTV_CAMERA_STREAMS',
+          aggregateId: 'a',
+          subjectId: 'cam-1',
+          revision: 2,
+          payload: <String, Object?>{
+            'cameraId': 'cam-1',
+            'streams': <Object?>[
+              <String, Object?>{
+                'encodedStreamId': 'main',
+                'codecProfileRef': 'H264',
+                'expectedBitrateBps': '8000000',
+                'peakBitrateBps': '12000000',
+                'expectedRateEvidence': <String, Object?>{},
+                'peakRateEvidence': <String, Object?>{},
+              },
+            ],
+            'subscriptions': <Object?>[
+              <String, Object?>{
+                'subscriptionId': 'rec-feed',
+                'encodedStreamId': 'main',
+                'receiverId': 'rec-1',
+                'deliveryMode': 'UNICAST',
+                'orderedNetworkEdgeIds': <String>['edge-1'],
+                'multicastGroupId': null,
+                'multicastTree': null,
+              },
+            ],
+            'transportOverheadModelRef': null,
+          },
+        ),
+      );
+      final resolver = Cctv02PersistedInputResolver(
+        store: store,
+        recorderAssignments: const _Assignments(),
+      );
+      final captured = await resolver.capture(_request());
+      final result = const Cctv02BandwidthKernel().evaluate(captured.value);
+      expect(result.recorderIngress.keys, contains('rec-1'));
+      expect(result.recorderIngress['rec-1']!.peak.complete, isTrue);
+      expect(
+        result.recorderIngress['rec-1']!.peak.load.value,
+        Elv5Rational.integer(12000000),
+      );
+      expect(
+        captured.dependencies.any(
+          (d) => d.dependencyKey.contains('CCTV_RECORDER_ASSIGNMENT'),
+        ),
+        isTrue,
+      );
+    },
+  );
 }
 
 Elv5CalculationRequest _request() => Elv5CalculationRequest(

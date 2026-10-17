@@ -79,9 +79,8 @@ void main() {
       expect(Elv5ProcessCode.values, hasLength(27));
       expect(Elv5ProcessCatalog.all, hasLength(27));
       expect(Elv5ProcessCatalog.byCode, hasLength(27));
-      final wireCodes = Elv5ProcessCode.values
-          .map((code) => code.wireCode)
-          .toSet();
+      final wireCodes =
+          Elv5ProcessCode.values.map((code) => code.wireCode).toSet();
       expect(wireCodes, hasLength(27));
       expect(
         wireCodes,

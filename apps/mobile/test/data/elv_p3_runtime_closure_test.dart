@@ -93,18 +93,16 @@ void main() {
         ),
       );
       expect(frozen, isA<ElvCommandSuccess<ProjectDesignRevision>>());
-      final before = await db
-          .select(db.designRevisionPhysicalSnapshots)
-          .getSingle();
+      final before =
+          await db.select(db.designRevisionPhysicalSnapshots).getSingle();
       expect(before.payloadSha256, isNotEmpty);
       expect(jsonDecode(before.payloadJson), {'runs': []});
       await db.close();
 
       db = AppDatabase(NativeDatabase(file));
       addTearDown(db.close);
-      final after = await db
-          .select(db.designRevisionPhysicalSnapshots)
-          .getSingle();
+      final after =
+          await db.select(db.designRevisionPhysicalSnapshots).getSingle();
       expect(after.designRevisionId, before.designRevisionId);
       expect(after.payloadJson, before.payloadJson);
       expect(after.payloadSha256, before.payloadSha256);
@@ -148,9 +146,9 @@ void main() {
     final context = await repo.context('project-1');
     expect(context.workingDesignRevisionId, 'REV-2');
     expect(context.latestFrozenRevisionId, 'REV-1');
-    final old = await (db.select(
-      db.projectDesignRevisions,
-    )..where((row) => row.id.equals('REV-1'))).getSingle();
+    final old =
+        await (db.select(db.projectDesignRevisions)
+          ..where((row) => row.id.equals('REV-1'))).getSingle();
     expect(old.state, 'FROZEN');
   });
   test(
@@ -215,49 +213,52 @@ void main() {
     },
   );
 
-  test('create-next rejects altered snapshot payload before inserting revision', () async {
-    final db = AppDatabase(NativeDatabase.memory());
-    addTearDown(db.close);
-    await _seedProject(db);
-    final repo = _repository(db);
-    await repo.bootstrap(
-      const BootstrapProjectDesignRevisionCommand(
-        commandId: 'b',
-        projectId: 'project-1',
-        revisionId: 'R1',
-        code: 'R1',
-      ),
-    );
-    await repo.freeze(
-      const FreezeProjectDesignRevisionCommand(
-        commandId: 'f1',
-        projectId: 'project-1',
-        designRevisionId: 'R1',
-        expectedRevision: 1,
-      ),
-    );
-    // Deliberately corrupt historical input while retaining both stored hashes.
-    await db.customStatement(
-      "UPDATE design_revision_physical_snapshots SET payload_json = '{\"runs\":[],\"tampered\":true}' WHERE design_revision_id = 'R1'",
-    );
-    final result = await repo.createNext(
-      const CreateNextWorkingDesignRevisionCommand(
-        commandId: 'n2',
-        projectId: 'project-1',
-        newRevisionId: 'R2',
-        code: 'R2',
-        basedOnRevisionId: 'R1',
-      ),
-    );
-    expect(
-      result,
-      isA<ElvCommandFailureResult<ProjectDesignRevision>>().having(
-        (value) => value.failure.code,
-        'code',
-        'ELV_DESIGN_REVISION_SNAPSHOT_INVALID',
-      ),
-    );
-    expect(await db.select(db.projectDesignRevisions).get(), hasLength(1));
-    expect((await repo.context('project-1')).workingDesignRevisionId, isNull);
-  });
+  test(
+    'create-next rejects altered snapshot payload before inserting revision',
+    () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      await _seedProject(db);
+      final repo = _repository(db);
+      await repo.bootstrap(
+        const BootstrapProjectDesignRevisionCommand(
+          commandId: 'b',
+          projectId: 'project-1',
+          revisionId: 'R1',
+          code: 'R1',
+        ),
+      );
+      await repo.freeze(
+        const FreezeProjectDesignRevisionCommand(
+          commandId: 'f1',
+          projectId: 'project-1',
+          designRevisionId: 'R1',
+          expectedRevision: 1,
+        ),
+      );
+      // Deliberately corrupt historical input while retaining both stored hashes.
+      await db.customStatement(
+        "UPDATE design_revision_physical_snapshots SET payload_json = '{\"runs\":[],\"tampered\":true}' WHERE design_revision_id = 'R1'",
+      );
+      final result = await repo.createNext(
+        const CreateNextWorkingDesignRevisionCommand(
+          commandId: 'n2',
+          projectId: 'project-1',
+          newRevisionId: 'R2',
+          code: 'R2',
+          basedOnRevisionId: 'R1',
+        ),
+      );
+      expect(
+        result,
+        isA<ElvCommandFailureResult<ProjectDesignRevision>>().having(
+          (value) => value.failure.code,
+          'code',
+          'ELV_DESIGN_REVISION_SNAPSHOT_INVALID',
+        ),
+      );
+      expect(await db.select(db.projectDesignRevisions).get(), hasLength(1));
+      expect((await repo.context('project-1')).workingDesignRevisionId, isNull);
+    },
+  );
 }

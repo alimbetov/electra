@@ -74,13 +74,14 @@ final class Elv5FireMutationService {
     }
     return _runner.run(
       command,
-      prepare: (session, value) => _prepare(
-        session,
-        projectId: value.projectId,
-        designRevisionId: value.designRevisionId,
-        operation: value.operation,
-        payload: value.payload,
-      ),
+      prepare:
+          (session, value) => _prepare(
+            session,
+            projectId: value.projectId,
+            designRevisionId: value.designRevisionId,
+            operation: value.operation,
+            payload: value.payload,
+          ),
       apply: _apply,
     );
   }
@@ -92,22 +93,25 @@ final class Elv5FireMutationService {
     required String operation,
     required Map<String, Object?> payload,
   }) async {
-    final subjectId = operation == 'REPLACE_FIRE_LOOP_ASSIGNMENTS'
-        ? payload['loopId']! as String
-        : payload['circuitId']! as String;
+    final subjectId =
+        operation == 'REPLACE_FIRE_LOOP_ASSIGNMENTS'
+            ? payload['loopId']! as String
+            : payload['circuitId']! as String;
     final previous = await session.fire.load(
       projectId: projectId,
       designRevisionId: designRevisionId,
       operation: operation,
       subjectId: subjectId,
     );
-    final kind = operation == 'REPLACE_FIRE_LOOP_ASSIGNMENTS'
-        ? 'FIRE_LOOP'
-        : 'FIRE_NOTIFICATION_CIRCUIT';
+    final kind =
+        operation == 'REPLACE_FIRE_LOOP_ASSIGNMENTS'
+            ? 'FIRE_LOOP'
+            : 'FIRE_NOTIFICATION_CIRCUIT';
     final aggregateId = previous?.aggregateId ?? 'ELV5:$kind:$subjectId';
-    final oldDeps = previous == null
-        ? const <Map<String, Object?>>[]
-        : _dependencies(operation, previous.payload);
+    final oldDeps =
+        previous == null
+            ? const <Map<String, Object?>>[]
+            : _dependencies(operation, previous.payload);
     final newDeps = _dependencies(operation, payload);
     final hashes = <String>{
       for (final item in oldDeps) _encoder.sha256(item),
@@ -139,9 +143,8 @@ final class Elv5FireMutationService {
       'payload': previous?.payload,
     };
     return Elv5PreparedReplacement(
-      actualRowRevisions: previous == null
-          ? const {}
-          : {aggregateId: previous.revision},
+      actualRowRevisions:
+          previous == null ? const {} : {aggregateId: previous.revision},
       reviewedImpactFingerprint: fingerprint,
       staleNodeKeySha256s: stale,
       affectedIds: {subjectId, aggregateId},
@@ -163,15 +166,18 @@ final class Elv5FireMutationService {
     Elv5WireCommandEnvelope command,
     Elv5PreparedReplacement prepared,
   ) async {
-    final subjectId = command.operation == 'REPLACE_FIRE_LOOP_ASSIGNMENTS'
-        ? command.payload['loopId']! as String
-        : command.payload['circuitId']! as String;
-    final kind = command.operation == 'REPLACE_FIRE_LOOP_ASSIGNMENTS'
-        ? 'FIRE_LOOP'
-        : 'FIRE_NOTIFICATION_CIRCUIT';
-    final bindingId = prepared.actualRowRevisions.keys.isEmpty
-        ? 'ELV5:$kind:$subjectId'
-        : prepared.actualRowRevisions.keys.single;
+    final subjectId =
+        command.operation == 'REPLACE_FIRE_LOOP_ASSIGNMENTS'
+            ? command.payload['loopId']! as String
+            : command.payload['circuitId']! as String;
+    final kind =
+        command.operation == 'REPLACE_FIRE_LOOP_ASSIGNMENTS'
+            ? 'FIRE_LOOP'
+            : 'FIRE_NOTIFICATION_CIRCUIT';
+    final bindingId =
+        prepared.actualRowRevisions.keys.isEmpty
+            ? 'ELV5:$kind:$subjectId'
+            : prepared.actualRowRevisions.keys.single;
     await session.fire.replace(
       projectId: command.projectId,
       designRevisionId: command.designRevisionId,

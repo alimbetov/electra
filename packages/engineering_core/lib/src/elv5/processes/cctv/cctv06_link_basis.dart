@@ -19,7 +19,8 @@ final class Cctv06Section {
     required this.shieldContinuity,
   }) {
     if (sectionId.isEmpty || interfaceKind.isEmpty || categoryToken.isEmpty) {
-      throw ArgumentError('CCTV06 section identity/capability must not be empty.');
+      throw ArgumentError(
+          'CCTV06 section identity/capability must not be empty.');
     }
     if (length.lower.value < Elv5Rational.zero) {
       throw ArgumentError('CCTV06 installed length must be nonnegative.');
@@ -59,7 +60,8 @@ final class Cctv06PowerEvidence {
     required this.evidencedSegmentIds,
   }) {
     if (pathFingerprint.isEmpty) {
-      throw ArgumentError('CCTV06 power evidence fingerprint must not be empty.');
+      throw ArgumentError(
+          'CCTV06 power evidence fingerprint must not be empty.');
     }
   }
 
@@ -79,9 +81,11 @@ final class Cctv06Input {
     required this.powerEvidence,
   }) {
     if (linkId.isEmpty || pathFingerprint.isEmpty) {
-      throw ArgumentError('CCTV06 link identity/fingerprint must not be empty.');
+      throw ArgumentError(
+          'CCTV06 link identity/fingerprint must not be empty.');
     }
-    if (sections.isEmpty) throw ArgumentError('CCTV06 realized path must not be empty.');
+    if (sections.isEmpty)
+      throw ArgumentError('CCTV06 realized path must not be empty.');
     final seen = <String>{};
     for (final section in sections) {
       if (!seen.add(section.sectionId)) {
@@ -152,9 +156,10 @@ final class Cctv06LinkBasisKernel {
     for (final section in input.sections) {
       length = length + section.length;
       final properties = <Cctv06PropertyCode, Cctv06AssessmentStatus>{
-        Cctv06PropertyCode.medium: input.policy.allowedMedia.contains(section.medium)
-            ? Cctv06AssessmentStatus.pass
-            : Cctv06AssessmentStatus.fail,
+        Cctv06PropertyCode.medium:
+            input.policy.allowedMedia.contains(section.medium)
+                ? Cctv06AssessmentStatus.pass
+                : Cctv06AssessmentStatus.fail,
         Cctv06PropertyCode.interfaceKind:
             input.policy.allowedInterfaceKinds.contains(section.interfaceKind)
                 ? Cctv06AssessmentStatus.pass
@@ -205,7 +210,8 @@ final class Cctv06LinkBasisKernel {
       } else if (evidence.pathFingerprint != input.pathFingerprint) {
         powerStatus = Cctv06AssessmentStatus.blocked;
         blockingReason = 'CCTV06_PWR06_PATH_FINGERPRINT_MISMATCH';
-      } else if (!evidence.evidencedSegmentIds.containsAll(evidence.requiredSegmentIds)) {
+      } else if (!evidence.evidencedSegmentIds
+          .containsAll(evidence.requiredSegmentIds)) {
         powerStatus = Cctv06AssessmentStatus.blocked;
         blockingReason = 'CCTV06_PWR06_SEGMENT_CLOSURE_INCOMPLETE';
       } else {

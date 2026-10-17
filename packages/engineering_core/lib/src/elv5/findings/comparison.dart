@@ -45,7 +45,8 @@ Elv5FoundationStatusProjection projectElv5FoundationStatus({
 
   final foundationCompletion = switch (execution) {
     Elv5Execution.blocked => Elv5FoundationCompletion.blocked,
-    Elv5Execution.succeeded || Elv5Execution.failed =>
+    Elv5Execution.succeeded ||
+    Elv5Execution.failed =>
       completion == Elv5Completion.complete
           ? Elv5FoundationCompletion.complete
           : Elv5FoundationCompletion.partial,

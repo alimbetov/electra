@@ -19,12 +19,11 @@ final class DriftElvCableAllocationRepository
   ) async {
     final row =
         await (database.select(database.cableAllocations)..where(
-              (candidate) =>
-                  candidate.projectId.equals(projectId) &
-                  candidate.id.equals(allocationId) &
-                  candidate.deletedAt.isNull(),
-            ))
-            .getSingleOrNull();
+          (candidate) =>
+              candidate.projectId.equals(projectId) &
+              candidate.id.equals(allocationId) &
+              candidate.deletedAt.isNull(),
+        )).getSingleOrNull();
     return row == null ? null : _allocation(row);
   }
 
@@ -32,18 +31,17 @@ final class DriftElvCableAllocationRepository
   Future<List<CableAllocation>> loadCableAllocations(
     String projectId,
     String cableId,
-  ) async =>
-      (await (database.select(database.cableAllocations)
-                ..where(
-                  (row) =>
-                      row.projectId.equals(projectId) &
-                      row.cableId.equals(cableId) &
-                      row.deletedAt.isNull(),
-                )
-                ..orderBy([(row) => OrderingTerm.asc(row.id)]))
-              .get())
-          .map(_allocation)
-          .toList(growable: false);
+  ) async => (await (database.select(database.cableAllocations)
+            ..where(
+              (row) =>
+                  row.projectId.equals(projectId) &
+                  row.cableId.equals(cableId) &
+                  row.deletedAt.isNull(),
+            )
+            ..orderBy([(row) => OrderingTerm.asc(row.id)]))
+          .get())
+      .map(_allocation)
+      .toList(growable: false);
 
   @override
   Future<CableAllocationResourceSelectionEvidence?> loadSelectionEvidence(
@@ -53,10 +51,9 @@ final class DriftElvCableAllocationRepository
     if (await findAllocation(projectId, allocationId) == null) return null;
     final row =
         await (database.select(database.cableAllocationResourceSelections)
-              ..where(
-                (candidate) => candidate.allocationId.equals(allocationId),
-              ))
-            .getSingleOrNull();
+          ..where(
+            (candidate) => candidate.allocationId.equals(allocationId),
+          )).getSingleOrNull();
     if (row == null) return null;
     return CableAllocationResourceSelectionEvidence(
       allocationId: row.allocationId,

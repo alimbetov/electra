@@ -28,19 +28,20 @@ final class DriftAcs06TopologyContractStore
     required String designRevisionId,
     required String doorId,
   }) async {
-    final rows = await database
-        .customSelect(
-          'SELECT id, revision, definition_ref_json FROM discipline_policy_bindings '
-          'WHERE project_id = ? AND design_revision_id = ? AND subject_kind = ? '
-          'AND subject_id = ? AND deleted_at IS NULL ORDER BY id',
-          variables: <Variable>[
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            Variable.withString('DOOR'),
-            Variable.withString(doorId),
-          ],
-        )
-        .get();
+    final rows =
+        await database
+            .customSelect(
+              'SELECT id, revision, definition_ref_json FROM discipline_policy_bindings '
+              'WHERE project_id = ? AND design_revision_id = ? AND subject_kind = ? '
+              'AND subject_id = ? AND deleted_at IS NULL ORDER BY id',
+              variables: <Variable>[
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                Variable.withString('DOOR'),
+                Variable.withString(doorId),
+              ],
+            )
+            .get();
 
     final matching = <QueryRow>[];
     for (final row in rows) {
@@ -65,21 +66,22 @@ final class DriftAcs06TopologyContractStore
     final evidenceRef = _text(definition, 'editionId');
     final contentHash = _text(definition, 'contentHash');
 
-    final evidence = await database
-        .customSelect(
-          'SELECT canonical_payload_json, payload_sha256 '
-          'FROM elv_revision_aggregate_evidence_records '
-          'WHERE evidence_ref = ? AND project_id = ? AND design_revision_id = ? '
-          'AND aggregate_kind = ? AND aggregate_id = ?',
-          variables: <Variable>[
-            Variable.withString(evidenceRef),
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            Variable.withString('ACS06_TOPOLOGY_CONTRACT'),
-            Variable.withString(doorId),
-          ],
-        )
-        .getSingleOrNull();
+    final evidence =
+        await database
+            .customSelect(
+              'SELECT canonical_payload_json, payload_sha256 '
+              'FROM elv_revision_aggregate_evidence_records '
+              'WHERE evidence_ref = ? AND project_id = ? AND design_revision_id = ? '
+              'AND aggregate_kind = ? AND aggregate_id = ?',
+              variables: <Variable>[
+                Variable.withString(evidenceRef),
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                Variable.withString('ACS06_TOPOLOGY_CONTRACT'),
+                Variable.withString(doorId),
+              ],
+            )
+            .getSingleOrNull();
     if (evidence == null) {
       throw StateError('ACS06_CONTRACT_EVIDENCE_MISSING:$evidenceRef');
     }
@@ -112,16 +114,17 @@ final class DriftAcs06TopologyContractStore
     ReplaceAcs06TopologyContractCommand command,
   ) => database.transaction(() async {
     final now = _nowUtc().toUtc();
-    final revision = await database
-        .customSelect(
-          'SELECT state, revision FROM project_design_revisions '
-          'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
-          variables: <Variable>[
-            Variable.withString(command.projectId),
-            Variable.withString(command.designRevisionId),
-          ],
-        )
-        .getSingleOrNull();
+    final revision =
+        await database
+            .customSelect(
+              'SELECT state, revision FROM project_design_revisions '
+              'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
+              variables: <Variable>[
+                Variable.withString(command.projectId),
+                Variable.withString(command.designRevisionId),
+              ],
+            )
+            .getSingleOrNull();
     if (revision == null) {
       throw StateError('ACS06_DESIGN_REVISION_NOT_FOUND');
     }
@@ -135,13 +138,14 @@ final class DriftAcs06TopologyContractStore
     final payload = command.contract.toCanonicalValue();
     final hash = _encoder.sha256(payload);
     final evidenceRef = 'ACS06:${command.contract.doorId}:$hash';
-    final existing = await database
-        .customSelect(
-          'SELECT payload_sha256 FROM elv_revision_aggregate_evidence_records '
-          'WHERE evidence_ref = ?',
-          variables: <Variable>[Variable.withString(evidenceRef)],
-        )
-        .getSingleOrNull();
+    final existing =
+        await database
+            .customSelect(
+              'SELECT payload_sha256 FROM elv_revision_aggregate_evidence_records '
+              'WHERE evidence_ref = ?',
+              variables: <Variable>[Variable.withString(evidenceRef)],
+            )
+            .getSingleOrNull();
     if (existing == null) {
       await runRawStatement(
         database,
@@ -175,19 +179,20 @@ final class DriftAcs06TopologyContractStore
     };
 
     if (command.expectedBindingRevision == null) {
-      final rows = await database
-          .customSelect(
-            'SELECT id, definition_ref_json FROM discipline_policy_bindings '
-            'WHERE project_id = ? AND design_revision_id = ? AND subject_kind = ? '
-            'AND subject_id = ? AND deleted_at IS NULL',
-            variables: <Variable>[
-              Variable.withString(command.projectId),
-              Variable.withString(command.designRevisionId),
-              Variable.withString('DOOR'),
-              Variable.withString(command.contract.doorId),
-            ],
-          )
-          .get();
+      final rows =
+          await database
+              .customSelect(
+                'SELECT id, definition_ref_json FROM discipline_policy_bindings '
+                'WHERE project_id = ? AND design_revision_id = ? AND subject_kind = ? '
+                'AND subject_id = ? AND deleted_at IS NULL',
+                variables: <Variable>[
+                  Variable.withString(command.projectId),
+                  Variable.withString(command.designRevisionId),
+                  Variable.withString('DOOR'),
+                  Variable.withString(command.contract.doorId),
+                ],
+              )
+              .get();
       for (final row in rows) {
         final decoded = jsonDecode(row.read<String>('definition_ref_json'));
         if (decoded is Map &&

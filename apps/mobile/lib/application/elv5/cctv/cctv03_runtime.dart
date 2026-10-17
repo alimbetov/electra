@@ -132,13 +132,14 @@ final class Cctv03PersistedInputResolver
         Elv5Rational.parseDecimal(_decimal(assignment, 'expectedBitrateBps')),
       );
       final upperText = assignment['upperBoundBitrateBps'];
-      final upper = upperText == null
-          ? null
-          : BitRate(
-              Elv5Rational.parseDecimal(
-                _decimal(assignment, 'upperBoundBitrateBps'),
-              ),
-            );
+      final upper =
+          upperText == null
+              ? null
+              : BitRate(
+                Elv5Rational.parseDecimal(
+                  _decimal(assignment, 'upperBoundBitrateBps'),
+                ),
+              );
       final candidate = Cctv03StreamRate(
         streamId: streamId,
         expectedBitRate: expected,
@@ -168,22 +169,22 @@ final class Cctv03PersistedInputResolver
     }
 
     final redundancyRaw = payload['redundancyModel'];
-    final redundancy = redundancyRaw == null
-        ? null
-        : Cctv03RedundancyModel(
-            usableFraction: Elv5Rational.parseDecimal(
-              _decimal(
-                _map(redundancyRaw, 'redundancyModel'),
-                'usableFraction',
+    final redundancy =
+        redundancyRaw == null
+            ? null
+            : Cctv03RedundancyModel(
+              usableFraction: Elv5Rational.parseDecimal(
+                _decimal(
+                  _map(redundancyRaw, 'redundancyModel'),
+                  'usableFraction',
+                ),
               ),
-            ),
-          );
+            );
     final sizingBasis = switch (_text(payload, 'sizingBasis')) {
       'EXPECTED_ESTIMATE' => Cctv03SizingBasis.expectedEstimate,
       'GUARANTEED_UPPER_BOUND' => Cctv03SizingBasis.guaranteedUpperBound,
-      final value => throw FormatException(
-        'Unsupported CCTV03 sizingBasis: $value',
-      ),
+      final value =>
+        throw FormatException('Unsupported CCTV03 sizingBasis: $value'),
     };
 
     final input = Cctv03Input(
@@ -267,23 +268,25 @@ Elv5PureKernelExecutor<Cctv03Input, Cctv03Result> buildCctv03Executor({
 }) => Elv5PureKernelExecutor<Cctv03Input, Cctv03Result>(
   processCode: Elv5ProcessCode.cctv03,
   calculate: const Cctv03StorageKernel().evaluate,
-  encodeOutput: (result) => <String, Object?>{
-    'schema': 'electra.elv5-cctv03-output.v1',
-    'poolId': result.poolId,
-    'sizingBasis': result.sizingBasis.name,
-    'exactBaseBytes': result.exactBaseBytes.toMap(),
-    'exactReservedBytes': result.exactReservedBytes.toMap(),
-    'recordedMicroseconds': result.recordedMicroseconds.toString(),
-    'usable': _capacity(result.usable),
-    'raw': result.raw == null ? null : _capacity(result.raw!),
-  },
-  encodeEvidence: (captured, _) => <String, Object?>{
-    'schema': 'electra.elv5-cctv03-evidence.v1',
-    'source': 'ELV5_PERSISTED_RECORDING_POOL',
-    'captureRevision': captured.captureRevision,
-    'temporalRulesHash': captured.value.temporalPolicy.rulesHash,
-    'recurrenceExpansion': 'ABSOLUTE_UTC_ONLY_V1',
-  },
+  encodeOutput:
+      (result) => <String, Object?>{
+        'schema': 'electra.elv5-cctv03-output.v1',
+        'poolId': result.poolId,
+        'sizingBasis': result.sizingBasis.name,
+        'exactBaseBytes': result.exactBaseBytes.toMap(),
+        'exactReservedBytes': result.exactReservedBytes.toMap(),
+        'recordedMicroseconds': result.recordedMicroseconds.toString(),
+        'usable': _capacity(result.usable),
+        'raw': result.raw == null ? null : _capacity(result.raw!),
+      },
+  encodeEvidence:
+      (captured, _) => <String, Object?>{
+        'schema': 'electra.elv5-cctv03-evidence.v1',
+        'source': 'ELV5_PERSISTED_RECORDING_POOL',
+        'captureRevision': captured.captureRevision,
+        'temporalRulesHash': captured.value.temporalPolicy.rulesHash,
+        'recurrenceExpansion': 'ABSOLUTE_UTC_ONLY_V1',
+      },
   executionOf: (_) => Elv5Execution.succeeded,
   completionOf: (_) => Elv5Completion.complete,
   assessmentOf: (result) {

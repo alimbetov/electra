@@ -90,10 +90,8 @@ final class Lan03PersistedInputResolver
     final actualDeliveries = <String>{
       for (final value in group) value.nodeKey.subjectId,
     };
-    final expectedDeliveries = contract
-        .expectedInputFingerprintByDeliveryId
-        .keys
-        .toSet();
+    final expectedDeliveries =
+        contract.expectedInputFingerprintByDeliveryId.keys.toSet();
     if (actualDeliveries.length != expectedDeliveries.length ||
         !actualDeliveries.containsAll(expectedDeliveries)) {
       _blocked(
@@ -339,14 +337,15 @@ final class Lan03PersistedInputResolver
     String policy,
     List<Elv5DependencyMarker> dependencies,
     Map<String, Object?> evidence,
-  ) => throw Elv5CaptureBlockedException(
-    request: request,
-    reasonCode: reason,
-    inputFingerprint: input,
-    policyFingerprint: policy,
-    dependencies: dependencies,
-    evidence: evidence,
-  );
+  ) =>
+      throw Elv5CaptureBlockedException(
+        request: request,
+        reasonCode: reason,
+        inputFingerprint: input,
+        policyFingerprint: policy,
+        dependencies: dependencies,
+        evidence: evidence,
+      );
 
   Elv5DependencyMarker _dependency(
     Elv5CalculationRequest request,
@@ -379,32 +378,39 @@ Elv5PureKernelExecutor<Lan03Input, Lan03Result> buildLan03Executor({
 }) => Elv5PureKernelExecutor<Lan03Input, Lan03Result>(
   processCode: Elv5ProcessCode.lan03,
   calculate: const Lan03PoeProjectionKernel().evaluate,
-  encodeOutput: (r) => <String, Object?>{
-    'schema': 'electra.elv5-lan03-output.v1',
-    'status': r.status.name,
-    'globalDemandW': r.globalDemand.value.toMap(),
-    'availableCapabilityW': r.availableCapability.value.toMap(),
-    'globalMarginW': r.globalMargin.value.toMap(),
-    'lanContributionW': r.lanContribution.value.toMap(),
-    'governingCaseId': r.governingCaseId,
-    'blockingReason': r.blockingReason,
-  },
-  encodeEvidence: (c, _) => <String, Object?>{
-    'schema': 'electra.elv5-lan03-evidence.v1',
-    'source': 'VERIFIED_CURRENT_PWR06_GROUP_CLOSURE',
-    'upstreamPointerGenerations': c.upstreamPointerGenerations,
-  },
-  executionOf: (r) => r.status == Lan03AssessmentStatus.blocked
-      ? Elv5Execution.blocked
-      : Elv5Execution.succeeded,
-  completionOf: (r) => r.status == Lan03AssessmentStatus.blocked
-      ? Elv5Completion.incomplete
-      : Elv5Completion.complete,
-  assessmentOf: (r) => switch (r.status) {
-    Lan03AssessmentStatus.pass => Elv5Assessment.pass,
-    Lan03AssessmentStatus.fail => Elv5Assessment.fail,
-    Lan03AssessmentStatus.blocked => Elv5Assessment.unresolved,
-  },
+  encodeOutput:
+      (r) => <String, Object?>{
+        'schema': 'electra.elv5-lan03-output.v1',
+        'status': r.status.name,
+        'globalDemandW': r.globalDemand.value.toMap(),
+        'availableCapabilityW': r.availableCapability.value.toMap(),
+        'globalMarginW': r.globalMargin.value.toMap(),
+        'lanContributionW': r.lanContribution.value.toMap(),
+        'governingCaseId': r.governingCaseId,
+        'blockingReason': r.blockingReason,
+      },
+  encodeEvidence:
+      (c, _) => <String, Object?>{
+        'schema': 'electra.elv5-lan03-evidence.v1',
+        'source': 'VERIFIED_CURRENT_PWR06_GROUP_CLOSURE',
+        'upstreamPointerGenerations': c.upstreamPointerGenerations,
+      },
+  executionOf:
+      (r) =>
+          r.status == Lan03AssessmentStatus.blocked
+              ? Elv5Execution.blocked
+              : Elv5Execution.succeeded,
+  completionOf:
+      (r) =>
+          r.status == Lan03AssessmentStatus.blocked
+              ? Elv5Completion.incomplete
+              : Elv5Completion.complete,
+  assessmentOf:
+      (r) => switch (r.status) {
+        Lan03AssessmentStatus.pass => Elv5Assessment.pass,
+        Lan03AssessmentStatus.fail => Elv5Assessment.fail,
+        Lan03AssessmentStatus.blocked => Elv5Assessment.unresolved,
+      },
   nowUtc: nowUtc,
 );
 

@@ -96,14 +96,17 @@ final class Elv5EvidenceDescriptor {
         confidenceBasis = _nullableText(confidenceBasis, 'confidenceBasis'),
         assumption = assumption {
     if (state == Elv5EvidenceState.assumed && assumption == null) {
-      throw ArgumentError('ASSUMED evidence requires an assumption descriptor.');
+      throw ArgumentError(
+          'ASSUMED evidence requires an assumption descriptor.');
     }
     if (state != Elv5EvidenceState.assumed && assumption != null) {
-      throw ArgumentError('Only ASSUMED evidence may carry assumption metadata.');
+      throw ArgumentError(
+          'Only ASSUMED evidence may carry assumption metadata.');
     }
     if (state == Elv5EvidenceState.unknown &&
         sourceType == Elv5EvidenceSourceType.engineeringAssumption) {
-      throw ArgumentError('UNKNOWN evidence cannot masquerade as an assumption.');
+      throw ArgumentError(
+          'UNKNOWN evidence cannot masquerade as an assumption.');
     }
   }
 

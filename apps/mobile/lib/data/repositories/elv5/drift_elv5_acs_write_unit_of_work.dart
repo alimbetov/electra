@@ -64,9 +64,10 @@ final class _Store implements Elv5AcsMutationStore {
     required String designRevisionId,
     required String operation,
     required String subjectId,
-  }) => operation == 'REPLACE_DOOR_ROLE_ASSIGNMENTS'
-      ? _loadDoor(projectId, designRevisionId, subjectId)
-      : _loadController(projectId, designRevisionId, subjectId);
+  }) =>
+      operation == 'REPLACE_DOOR_ROLE_ASSIGNMENTS'
+          ? _loadDoor(projectId, designRevisionId, subjectId)
+          : _loadController(projectId, designRevisionId, subjectId);
 
   @override
   Future<void> replace({
@@ -78,67 +79,71 @@ final class _Store implements Elv5AcsMutationStore {
     required int? expectedRootRevision,
     required Map<String, Object?> payload,
     required DateTime updatedAtUtc,
-  }) => operation == 'REPLACE_DOOR_ROLE_ASSIGNMENTS'
-      ? _replaceDoor(
-          projectId,
-          designRevisionId,
-          subjectId,
-          bindingId,
-          expectedRootRevision,
-          payload,
-          updatedAtUtc,
-        )
-      : _replaceController(
-          projectId,
-          designRevisionId,
-          subjectId,
-          bindingId,
-          expectedRootRevision,
-          payload,
-          updatedAtUtc,
-        );
+  }) =>
+      operation == 'REPLACE_DOOR_ROLE_ASSIGNMENTS'
+          ? _replaceDoor(
+            projectId,
+            designRevisionId,
+            subjectId,
+            bindingId,
+            expectedRootRevision,
+            payload,
+            updatedAtUtc,
+          )
+          : _replaceController(
+            projectId,
+            designRevisionId,
+            subjectId,
+            bindingId,
+            expectedRootRevision,
+            payload,
+            updatedAtUtc,
+          );
 
   Future<Elv5AcsAggregateSnapshot?> _loadDoor(
     String p,
     String r,
     String id,
   ) async {
-    final root = await database
-        .customSelect(
-          'SELECT id, revision, topology_profile_ref_json, safety_mode FROM door_calculation_bindings '
-          'WHERE project_id = ? AND design_revision_id = ? AND door_assembly_id = ? AND deleted_at IS NULL',
-          variables: [
-            Variable.withString(p),
-            Variable.withString(r),
-            Variable.withString(id),
-          ],
-        )
-        .getSingleOrNull();
+    final root =
+        await database
+            .customSelect(
+              'SELECT id, revision, topology_profile_ref_json, safety_mode FROM door_calculation_bindings '
+              'WHERE project_id = ? AND design_revision_id = ? AND door_assembly_id = ? AND deleted_at IS NULL',
+              variables: [
+                Variable.withString(p),
+                Variable.withString(r),
+                Variable.withString(id),
+              ],
+            )
+            .getSingleOrNull();
     if (root == null) return null;
     final b = root.read<String>('id');
-    final roles = await database
-        .customSelect(
-          'SELECT role_code, slot, component_id FROM door_role_assignments WHERE project_id = ? '
-          'AND design_revision_id = ? AND binding_id = ? ORDER BY role_code, slot',
-          variables: [
-            Variable.withString(p),
-            Variable.withString(r),
-            Variable.withString(b),
-          ],
-        )
-        .get();
-    final truth = await database
-        .customSelect(
-          'SELECT cause_code, expected_outcome_code, required_evidence_roles_json '
-          'FROM door_release_truth_rows WHERE project_id = ? AND design_revision_id = ? '
-          'AND binding_id = ? ORDER BY cause_code',
-          variables: [
-            Variable.withString(p),
-            Variable.withString(r),
-            Variable.withString(b),
-          ],
-        )
-        .get();
+    final roles =
+        await database
+            .customSelect(
+              'SELECT role_code, slot, component_id FROM door_role_assignments WHERE project_id = ? '
+              'AND design_revision_id = ? AND binding_id = ? ORDER BY role_code, slot',
+              variables: [
+                Variable.withString(p),
+                Variable.withString(r),
+                Variable.withString(b),
+              ],
+            )
+            .get();
+    final truth =
+        await database
+            .customSelect(
+              'SELECT cause_code, expected_outcome_code, required_evidence_roles_json '
+              'FROM door_release_truth_rows WHERE project_id = ? AND design_revision_id = ? '
+              'AND binding_id = ? ORDER BY cause_code',
+              variables: [
+                Variable.withString(p),
+                Variable.withString(r),
+                Variable.withString(b),
+              ],
+            )
+            .get();
     return Elv5AcsAggregateSnapshot(
       aggregateKind: 'ACS_DOOR_CALCULATION',
       aggregateId: b,
@@ -177,30 +182,32 @@ final class _Store implements Elv5AcsMutationStore {
     String r,
     String id,
   ) async {
-    final root = await database
-        .customSelect(
-          'SELECT id, revision, reserve_policy_ref_json FROM controller_resource_bindings '
-          'WHERE project_id = ? AND design_revision_id = ? AND controller_id = ? AND deleted_at IS NULL',
-          variables: [
-            Variable.withString(p),
-            Variable.withString(r),
-            Variable.withString(id),
-          ],
-        )
-        .getSingleOrNull();
+    final root =
+        await database
+            .customSelect(
+              'SELECT id, revision, reserve_policy_ref_json FROM controller_resource_bindings '
+              'WHERE project_id = ? AND design_revision_id = ? AND controller_id = ? AND deleted_at IS NULL',
+              variables: [
+                Variable.withString(p),
+                Variable.withString(r),
+                Variable.withString(id),
+              ],
+            )
+            .getSingleOrNull();
     if (root == null) return null;
     final b = root.read<String>('id');
-    final rows = await database
-        .customSelect(
-          'SELECT resource_id, resource_kind, role_code, subject_id FROM controller_resource_assignments '
-          'WHERE project_id = ? AND design_revision_id = ? AND binding_id = ? ORDER BY resource_id, role_code',
-          variables: [
-            Variable.withString(p),
-            Variable.withString(r),
-            Variable.withString(b),
-          ],
-        )
-        .get();
+    final rows =
+        await database
+            .customSelect(
+              'SELECT resource_id, resource_kind, role_code, subject_id FROM controller_resource_assignments '
+              'WHERE project_id = ? AND design_revision_id = ? AND binding_id = ? ORDER BY resource_id, role_code',
+              variables: [
+                Variable.withString(p),
+                Variable.withString(r),
+                Variable.withString(b),
+              ],
+            )
+            .get();
     return Elv5AcsAggregateSnapshot(
       aggregateKind: 'ACS_CONTROLLER_RESOURCES',
       aggregateId: b,
@@ -397,16 +404,17 @@ final class _Store implements Elv5AcsMutationStore {
     String projectId,
     String componentId,
   ) async {
-    final row = await database
-        .customSelect(
-          'SELECT 1 AS found FROM component_reference_bindings WHERE project_id = ? '
-          'AND component_id = ? AND deleted_at IS NULL',
-          variables: [
-            Variable.withString(projectId),
-            Variable.withString(componentId),
-          ],
-        )
-        .getSingleOrNull();
+    final row =
+        await database
+            .customSelect(
+              'SELECT 1 AS found FROM component_reference_bindings WHERE project_id = ? '
+              'AND component_id = ? AND deleted_at IS NULL',
+              variables: [
+                Variable.withString(projectId),
+                Variable.withString(componentId),
+              ],
+            )
+            .getSingleOrNull();
     if (row == null)
       throw StateError(
         'ELV5_COMPONENT_REFERENCE_BINDING_NOT_FOUND:$componentId',

@@ -216,9 +216,10 @@ final class Fa03PersistedInputResolver
 
       final rawTerminals = _objects(pwr03.output['terminals'], 'terminals');
       for (final mapping in caseContract.terminalLoadIdByTerminalId.entries) {
-        final matching = rawTerminals
-            .where((row) => row['loadId'] == mapping.value)
-            .toList();
+        final matching =
+            rawTerminals
+                .where((row) => row['loadId'] == mapping.value)
+                .toList();
         if (matching.length != 1) {
           _blocked(
             request,
@@ -278,10 +279,11 @@ final class Fa03PersistedInputResolver
       'contractContentHash': contractSnapshot.contentHash,
       'contractScopeFingerprint': contract.scopeFingerprint,
       'physicalScopeFingerprint': physicalScopeFingerprint,
-      'upstream': upstreamBasis
-        ..sort(
-          (a, b) => (a['caseId']! as String).compareTo(b['caseId']! as String),
-        ),
+      'upstream':
+          upstreamBasis..sort(
+            (a, b) =>
+                (a['caseId']! as String).compareTo(b['caseId']! as String),
+          ),
     });
     return Elv5CapturedInput<Fa03Input>(
       request: request,
@@ -343,43 +345,50 @@ Elv5PureKernelExecutor<Fa03Input, Fa03Result> buildFa03Executor({
 }) => Elv5PureKernelExecutor<Fa03Input, Fa03Result>(
   processCode: Elv5ProcessCode.fa03,
   calculate: const Fa03TerminalVoltageKernel().evaluate,
-  encodeOutput: (result) => <String, Object?>{
-    'schema': 'electra.elv5-fa03-output.v1',
-    'status': result.status.name,
-    'governingTerminalId': result.governingTerminalId,
-    'governingCaseId': result.governingCaseId,
-    'blockingReason': result.blockingReason,
-    'terminals': <Object?>[
-      for (final item in result.terminals)
-        <String, Object?>{
-          'terminalId': item.terminalId,
-          'caseId': item.caseId,
-          'voltageLowerV': item.voltage.lower.value.toMap(),
-          'voltageUpperV': item.voltage.upper.value.toMap(),
-          'lowMarginV': item.lowMargin.value.toMap(),
-          'highMarginV': item.highMargin.value.toMap(),
-          'status': item.status.name,
-        },
-    ],
-  },
-  encodeEvidence: (captured, _) => <String, Object?>{
-    'schema': 'electra.elv5-fa03-evidence.v1',
-    'source': 'IMMUTABLE_FA03_CONTRACT_PLUS_VERIFIED_CURRENT_PWR03',
-    'captureRevision': captured.captureRevision,
-    'upstreamPointerGenerations': captured.upstreamPointerGenerations,
-    'physicalScopeFingerprint': captured.value.expectedScopeFingerprint,
-  },
-  executionOf: (result) => result.status == Fa03AssessmentStatus.blocked
-      ? Elv5Execution.blocked
-      : Elv5Execution.succeeded,
-  completionOf: (result) => result.status == Fa03AssessmentStatus.blocked
-      ? Elv5Completion.incomplete
-      : Elv5Completion.complete,
-  assessmentOf: (result) => switch (result.status) {
-    Fa03AssessmentStatus.pass => Elv5Assessment.pass,
-    Fa03AssessmentStatus.fail => Elv5Assessment.fail,
-    Fa03AssessmentStatus.blocked => Elv5Assessment.unresolved,
-  },
+  encodeOutput:
+      (result) => <String, Object?>{
+        'schema': 'electra.elv5-fa03-output.v1',
+        'status': result.status.name,
+        'governingTerminalId': result.governingTerminalId,
+        'governingCaseId': result.governingCaseId,
+        'blockingReason': result.blockingReason,
+        'terminals': <Object?>[
+          for (final item in result.terminals)
+            <String, Object?>{
+              'terminalId': item.terminalId,
+              'caseId': item.caseId,
+              'voltageLowerV': item.voltage.lower.value.toMap(),
+              'voltageUpperV': item.voltage.upper.value.toMap(),
+              'lowMarginV': item.lowMargin.value.toMap(),
+              'highMarginV': item.highMargin.value.toMap(),
+              'status': item.status.name,
+            },
+        ],
+      },
+  encodeEvidence:
+      (captured, _) => <String, Object?>{
+        'schema': 'electra.elv5-fa03-evidence.v1',
+        'source': 'IMMUTABLE_FA03_CONTRACT_PLUS_VERIFIED_CURRENT_PWR03',
+        'captureRevision': captured.captureRevision,
+        'upstreamPointerGenerations': captured.upstreamPointerGenerations,
+        'physicalScopeFingerprint': captured.value.expectedScopeFingerprint,
+      },
+  executionOf:
+      (result) =>
+          result.status == Fa03AssessmentStatus.blocked
+              ? Elv5Execution.blocked
+              : Elv5Execution.succeeded,
+  completionOf:
+      (result) =>
+          result.status == Fa03AssessmentStatus.blocked
+              ? Elv5Completion.incomplete
+              : Elv5Completion.complete,
+  assessmentOf:
+      (result) => switch (result.status) {
+        Fa03AssessmentStatus.pass => Elv5Assessment.pass,
+        Fa03AssessmentStatus.fail => Elv5Assessment.fail,
+        Fa03AssessmentStatus.blocked => Elv5Assessment.unresolved,
+      },
   nowUtc: nowUtc,
 );
 

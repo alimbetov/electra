@@ -590,9 +590,10 @@ final class DefaultElvCableAllocationService
         );
         continue;
       }
-      final expectedPort = mapping.end == CableTerminationEnd.a
-          ? connection.fromPortId as String
-          : connection.toPortId as String;
+      final expectedPort =
+          mapping.end == CableTerminationEnd.a
+              ? connection.fromPortId as String
+              : connection.toPortId as String;
       if (mapping.endpointPortId != expectedPort) {
         errors.add(
           'Termination endpoint does not match connection ${mapping.end.name} end.',
@@ -611,9 +612,12 @@ final class DefaultElvCableAllocationService
       }
     }
     if (requireComplete) {
-      final keys = mappings
-          .map((mapping) => '${mapping.resourceIdentity}|${mapping.end.name}')
-          .toSet();
+      final keys =
+          mappings
+              .map(
+                (mapping) => '${mapping.resourceIdentity}|${mapping.end.name}',
+              )
+              .toSet();
       for (final identity in obligations) {
         final resource = byId[identity]!;
         final policy = resource.terminationPolicy.mode;
@@ -675,9 +679,8 @@ final class DefaultElvCableAllocationService
       'ELV_ALLOC_STORAGE_CONFLICT',
       ElvFailureCategory.storage,
     ),
-    ElvAllocationMutationOutcome.success => throw StateError(
-      'Unexpected success',
-    ),
+    ElvAllocationMutationOutcome.success =>
+      throw StateError('Unexpected success'),
   };
 
   ElvCommandFailureResult<CableAllocation> _failure(
@@ -718,8 +721,9 @@ final class DefaultElvCableAllocationService
         category: ElvFailureCategory.values.byName(
           decoded['category'] as String,
         ),
-        details: (decoded['details'] as Map<String, dynamic>? ?? const {})
-            .cast<String, Object?>(),
+        details:
+            (decoded['details'] as Map<String, dynamic>? ?? const {})
+                .cast<String, Object?>(),
       ),
     );
   }

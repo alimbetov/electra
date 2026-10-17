@@ -143,9 +143,10 @@ final class Acs04PersistedInputResolver
         );
       }
 
-      final pwr01Complete = sourceCase.dimension == Acs04SourceDimension.watt
-          ? pwr01Output['completeW'] == true
-          : pwr01Output['completeA'] == true;
+      final pwr01Complete =
+          sourceCase.dimension == Acs04SourceDimension.watt
+              ? pwr01Output['completeW'] == true
+              : pwr01Output['completeA'] == true;
       if (!pwr01Complete) {
         _blocked(
           request,
@@ -285,12 +286,12 @@ final class Acs04PersistedInputResolver
       'contractEvidenceRef': contractSnapshot.evidenceRef,
       'contractContentHash': contractSnapshot.contentHash,
       'requirementSetFingerprint': requirementSetFingerprint,
-      'upstream': upstreamBasis
-        ..sort(
-          (a, b) => (a['evaluationId']! as String).compareTo(
-            b['evaluationId']! as String,
+      'upstream':
+          upstreamBasis..sort(
+            (a, b) => (a['evaluationId']! as String).compareTo(
+              b['evaluationId']! as String,
+            ),
           ),
-        ),
     });
 
     return Elv5CapturedInput<Acs04Input>(
@@ -346,10 +347,9 @@ final class Acs04PersistedInputResolver
   }
 
   String _demandFingerprint(List<Map<String, Object?>> values) {
-    final canonical = [...values]
-      ..sort(
-        (a, b) => (a['caseId']! as String).compareTo(b['caseId']! as String),
-      );
+    final canonical = [...values]..sort(
+      (a, b) => (a['caseId']! as String).compareTo(b['caseId']! as String),
+    );
     return _encoder.sha256(<String, Object?>{
       'schema': 'electra.elv5-acs04-global-demand-closure.v1',
       'cases': canonical,
@@ -405,57 +405,65 @@ Elv5PureKernelExecutor<Acs04Input, Acs04Result> buildAcs04Executor({
 }) => Elv5PureKernelExecutor<Acs04Input, Acs04Result>(
   processCode: Elv5ProcessCode.acs04,
   calculate: const Acs04SourceRequirementKernel().evaluate,
-  encodeOutput: (result) => <String, Object?>{
-    'schema': 'electra.elv5-acs04-output.v1',
-    'status': result.status.name,
-    'governingCaseId': result.governingCaseId,
-    'governingDimension': result.governingDimension?.name,
-    'blockingReason': result.blockingReason,
-    'requirementContributors': result.requirementContributors,
-    'powerCases': [
-      for (final item in result.powerCases)
-        <String, Object?>{
-          'caseId': item.caseId,
-          'globalDemandW': item.globalDemand.value.toMap(),
-          'requiredW': item.requiredCapability.value.toMap(),
-          'availableW': item.availableCapability.value.toMap(),
-          'marginW': item.margin.value.toMap(),
-          'status': item.status.name,
-        },
-    ],
-    'currentCases': [
-      for (final item in result.currentCases)
-        <String, Object?>{
-          'caseId': item.caseId,
-          'globalDemandA': item.globalDemand.value.toMap(),
-          'requiredA': item.requiredCapability.value.toMap(),
-          'availableA': item.availableCapability.value.toMap(),
-          'marginA': item.margin.value.toMap(),
-          'status': item.status.name,
-        },
-    ],
-  },
-  encodeEvidence: (captured, _) => <String, Object?>{
-    'schema': 'electra.elv5-acs04-evidence.v1',
-    'source':
-        'VERIFIED_CURRENT_PWR01_PWR02_PLUS_EXACT_REQUIREMENT_SET_CONTRACT',
-    'captureRevision': captured.captureRevision,
-    'upstreamPointerGenerations': captured.upstreamPointerGenerations,
-    'requirementSetFingerprint':
-        captured.value.expectedRequirementSetFingerprint,
-    'globalDemandFingerprint': captured.value.expectedGlobalDemandFingerprint,
-  },
-  executionOf: (result) => result.status == Acs04AssessmentStatus.blocked
-      ? Elv5Execution.blocked
-      : Elv5Execution.succeeded,
-  completionOf: (result) => result.status == Acs04AssessmentStatus.blocked
-      ? Elv5Completion.incomplete
-      : Elv5Completion.complete,
-  assessmentOf: (result) => switch (result.status) {
-    Acs04AssessmentStatus.pass => Elv5Assessment.pass,
-    Acs04AssessmentStatus.fail => Elv5Assessment.fail,
-    Acs04AssessmentStatus.blocked => Elv5Assessment.unresolved,
-  },
+  encodeOutput:
+      (result) => <String, Object?>{
+        'schema': 'electra.elv5-acs04-output.v1',
+        'status': result.status.name,
+        'governingCaseId': result.governingCaseId,
+        'governingDimension': result.governingDimension?.name,
+        'blockingReason': result.blockingReason,
+        'requirementContributors': result.requirementContributors,
+        'powerCases': [
+          for (final item in result.powerCases)
+            <String, Object?>{
+              'caseId': item.caseId,
+              'globalDemandW': item.globalDemand.value.toMap(),
+              'requiredW': item.requiredCapability.value.toMap(),
+              'availableW': item.availableCapability.value.toMap(),
+              'marginW': item.margin.value.toMap(),
+              'status': item.status.name,
+            },
+        ],
+        'currentCases': [
+          for (final item in result.currentCases)
+            <String, Object?>{
+              'caseId': item.caseId,
+              'globalDemandA': item.globalDemand.value.toMap(),
+              'requiredA': item.requiredCapability.value.toMap(),
+              'availableA': item.availableCapability.value.toMap(),
+              'marginA': item.margin.value.toMap(),
+              'status': item.status.name,
+            },
+        ],
+      },
+  encodeEvidence:
+      (captured, _) => <String, Object?>{
+        'schema': 'electra.elv5-acs04-evidence.v1',
+        'source':
+            'VERIFIED_CURRENT_PWR01_PWR02_PLUS_EXACT_REQUIREMENT_SET_CONTRACT',
+        'captureRevision': captured.captureRevision,
+        'upstreamPointerGenerations': captured.upstreamPointerGenerations,
+        'requirementSetFingerprint':
+            captured.value.expectedRequirementSetFingerprint,
+        'globalDemandFingerprint':
+            captured.value.expectedGlobalDemandFingerprint,
+      },
+  executionOf:
+      (result) =>
+          result.status == Acs04AssessmentStatus.blocked
+              ? Elv5Execution.blocked
+              : Elv5Execution.succeeded,
+  completionOf:
+      (result) =>
+          result.status == Acs04AssessmentStatus.blocked
+              ? Elv5Completion.incomplete
+              : Elv5Completion.complete,
+  assessmentOf:
+      (result) => switch (result.status) {
+        Acs04AssessmentStatus.pass => Elv5Assessment.pass,
+        Acs04AssessmentStatus.fail => Elv5Assessment.fail,
+        Acs04AssessmentStatus.blocked => Elv5Assessment.unresolved,
+      },
   nowUtc: nowUtc,
 );
 

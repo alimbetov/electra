@@ -25,18 +25,19 @@ final class DriftLan05OpticalSectionEvidenceWriter
   Future<void> replace(
     ReplaceLan05SectionEvidenceCommand command,
   ) => database.transaction(() async {
-    final root = await database
-        .customSelect(
-          'SELECT id, revision FROM link_composition_bindings '
-          'WHERE project_id = ? AND design_revision_id = ? AND link_id = ? '
-          'AND deleted_at IS NULL',
-          variables: <Variable>[
-            Variable.withString(command.projectId),
-            Variable.withString(command.designRevisionId),
-            Variable.withString(command.linkId),
-          ],
-        )
-        .getSingleOrNull();
+    final root =
+        await database
+            .customSelect(
+              'SELECT id, revision FROM link_composition_bindings '
+              'WHERE project_id = ? AND design_revision_id = ? AND link_id = ? '
+              'AND deleted_at IS NULL',
+              variables: <Variable>[
+                Variable.withString(command.projectId),
+                Variable.withString(command.designRevisionId),
+                Variable.withString(command.linkId),
+              ],
+            )
+            .getSingleOrNull();
     if (root == null) {
       throw StateError('LAN05_LINK_COMPOSITION_NOT_FOUND:${command.linkId}');
     }
@@ -48,19 +49,20 @@ final class DriftLan05OpticalSectionEvidenceWriter
       );
     }
 
-    final sections = await database
-        .customSelect(
-          'SELECT ordinal FROM link_section_assignments '
-          'WHERE project_id = ? AND design_revision_id = ? AND binding_id = ? '
-          'AND realized_section_id = ?',
-          variables: <Variable>[
-            Variable.withString(command.projectId),
-            Variable.withString(command.designRevisionId),
-            Variable.withString(bindingId),
-            Variable.withString(command.realizedSectionId),
-          ],
-        )
-        .get();
+    final sections =
+        await database
+            .customSelect(
+              'SELECT ordinal FROM link_section_assignments '
+              'WHERE project_id = ? AND design_revision_id = ? AND binding_id = ? '
+              'AND realized_section_id = ?',
+              variables: <Variable>[
+                Variable.withString(command.projectId),
+                Variable.withString(command.designRevisionId),
+                Variable.withString(bindingId),
+                Variable.withString(command.realizedSectionId),
+              ],
+            )
+            .get();
     if (sections.length != 1) {
       throw StateError(
         'LAN05_REALIZED_SECTION_MEMBERSHIP_INVALID:'

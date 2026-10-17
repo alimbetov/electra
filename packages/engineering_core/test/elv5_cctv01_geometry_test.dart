@@ -5,7 +5,8 @@ void main() {
   Elv5Rational q(String value) => Elv5Rational.parseDecimal(value);
   Length m(String value) => Length(q(value));
   Cctv01Point2 p2(String x, String y) => Cctv01Point2(q(x), q(y));
-  Cctv01Point3 p3(String x, String y, String z) => Cctv01Point3(q(x), q(y), q(z));
+  Cctv01Point3 p3(String x, String y, String z) =>
+      Cctv01Point3(q(x), q(y), q(z));
   Cctv01Vec3 v3(String x, String y, String z) => Cctv01Vec3(q(x), q(y), q(z));
 
   final down = Cctv01ResolvedOrientation(
@@ -46,17 +47,21 @@ void main() {
         orientation: orientation ?? down,
         intrinsics: cameraIntrinsics ?? intrinsics,
         targetPlane: floor,
-        targetZone: zone ?? Cctv01Polygon2([
-          p2('-1.5', '-1'),
-          p2('1.5', '-1'),
-          p2('1.5', '1'),
-          p2('-1.5', '1'),
-        ]),
+        targetZone: zone ??
+            Cctv01Polygon2([
+              p2('-1.5', '-1'),
+              p2('1.5', '-1'),
+              p2('1.5', '1'),
+              p2('-1.5', '1'),
+            ]),
         minimumCoverageRatio: minimum,
       );
 
-  test('reference normal camera projects exact 3x2 m footprint and full coverage', () {
-    final result = const Cctv01GeometryKernel().evaluate(input(minimum: q('1')));
+  test(
+      'reference normal camera projects exact 3x2 m footprint and full coverage',
+      () {
+    final result =
+        const Cctv01GeometryKernel().evaluate(input(minimum: q('1')));
 
     expect(result.status, Cctv01AssessmentStatus.pass);
     expect(result.footprint!.area, q('6'));
@@ -65,7 +70,8 @@ void main() {
     expect(result.coverageRatio, q('1'));
     expect(result.coverageMargin, q('0'));
     expect(result.horizontalHalfFovTangent, q('0.5'));
-    expect(result.verticalHalfFovTangent, Elv5Rational(BigInt.one, BigInt.from(3)));
+    expect(result.verticalHalfFovTangent,
+        Elv5Rational(BigInt.one, BigInt.from(3)));
   });
 
   test('coverage policy fails with exact signed ratio margin', () {
@@ -113,7 +119,8 @@ void main() {
       right: v3('0', '1', '0'),
       up: v3('1', '1', '0'),
     );
-    final result = const Cctv01GeometryKernel().evaluate(input(orientation: parallel));
+    final result =
+        const Cctv01GeometryKernel().evaluate(input(orientation: parallel));
 
     expect(result.status, Cctv01AssessmentStatus.unresolved);
     expect(result.governingDimension, Cctv01GoverningDimension.rayIntersection);
@@ -122,7 +129,8 @@ void main() {
   });
 
   test('unsupported lens model never falls back to pinhole', () {
-    final result = const Cctv01GeometryKernel().evaluate(input(supported: false));
+    final result =
+        const Cctv01GeometryKernel().evaluate(input(supported: false));
     expect(result.status, Cctv01AssessmentStatus.unsupported);
     expect(result.reasonCode, 'CCTV01_UNSUPPORTED_CAMERA_MODEL');
   });
@@ -133,7 +141,8 @@ void main() {
     expect(result.reasonCode, 'CCTV01_NONPLANAR_TARGET_UNSUPPORTED');
   });
 
-  test('simple concave target is triangulated and clipped deterministically', () {
+  test('simple concave target is triangulated and clipped deterministically',
+      () {
     final concave = Cctv01Polygon2([
       p2('-1', '-1'),
       p2('1', '-1'),

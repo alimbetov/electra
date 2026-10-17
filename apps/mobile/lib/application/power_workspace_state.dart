@@ -160,9 +160,9 @@ final class PowerWorkspaceState {
   bool get hasDraft => draft.isNotEmpty;
   PowerWorkspaceLoadMode get effectiveLoadMode =>
       loadMode == PowerWorkspaceLoadMode.selectedComponent &&
-          selectedComponentId == null
-      ? PowerWorkspaceLoadMode.all
-      : loadMode;
+              selectedComponentId == null
+          ? PowerWorkspaceLoadMode.all
+          : loadMode;
 
   PowerWorkspaceState select({String? componentId, String? portId}) {
     final normalizedComponent = _nullableText(componentId, 'componentId');
@@ -346,24 +346,25 @@ final class PowerWorkspaceState {
     scope: scope ?? this.scope,
     loadMode: loadMode ?? this.loadMode,
     cardIndex: cardIndex ?? this.cardIndex,
-    selectedComponentId: clearSelection
-        ? null
-        : selectedComponentId ?? this.selectedComponentId,
-    selectedPortId: clearSelection || clearPortSelection
-        ? null
-        : selectedPortId ?? this.selectedPortId,
+    selectedComponentId:
+        clearSelection ? null : selectedComponentId ?? this.selectedComponentId,
+    selectedPortId:
+        clearSelection || clearPortSelection
+            ? null
+            : selectedPortId ?? this.selectedPortId,
     overlayMode: overlayMode ?? this.overlayMode,
-    querySnapshot: clearQuerySnapshot
-        ? null
-        : querySnapshot ?? this.querySnapshot,
+    querySnapshot:
+        clearQuerySnapshot ? null : querySnapshot ?? this.querySnapshot,
     draft: draft ?? this.draft,
-    previewFingerprint: clearPreviewFingerprint
-        ? null
-        : previewFingerprint ?? this.previewFingerprint,
+    previewFingerprint:
+        clearPreviewFingerprint
+            ? null
+            : previewFingerprint ?? this.previewFingerprint,
     operationState: operationState ?? this.operationState,
-    operationErrorCode: clearOperationErrorCode
-        ? null
-        : operationErrorCode ?? this.operationErrorCode,
+    operationErrorCode:
+        clearOperationErrorCode
+            ? null
+            : operationErrorCode ?? this.operationErrorCode,
     findings: findings ?? this.findings,
     pointerStates: pointerStates ?? this.pointerStates,
     unsavedDraftWarning: unsavedDraftWarning ?? this.unsavedDraftWarning,

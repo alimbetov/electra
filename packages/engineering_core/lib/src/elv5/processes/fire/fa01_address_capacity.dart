@@ -7,7 +7,9 @@ final class Fa01AddressKey {
 
   @override
   bool operator ==(Object other) =>
-      other is Fa01AddressKey && other.domainId == domainId && other.address == address;
+      other is Fa01AddressKey &&
+      other.domainId == domainId &&
+      other.address == address;
 
   @override
   int get hashCode => Object.hash(domainId, address);
@@ -26,7 +28,8 @@ final class Fa01DeviceAssignment {
       throw ArgumentError('FA01 invalid device assignment.');
     }
     if (addresses.length != expectedConsumption) {
-      throw ArgumentError('FA01 address expansion cardinality mismatch for $deviceId.');
+      throw ArgumentError(
+          'FA01 address expansion cardinality mismatch for $deviceId.');
     }
   }
   final String deviceId;
@@ -121,13 +124,16 @@ final class Fa01AddressCapacityKernel {
         return d != 0 ? d : a.key.address.compareTo(b.key.address);
       });
 
-    final deviceHeadroom =
-        input.policy.deviceLimit - deviceCount - input.policy.requiredDeviceSpare;
-    final addressHeadroom =
-        input.policy.addressLimit - addressCount - input.policy.requiredAddressSpare;
-    final status = collisions.isEmpty && deviceHeadroom >= 0 && addressHeadroom >= 0
-        ? Fa01AssessmentStatus.pass
-        : Fa01AssessmentStatus.fail;
+    final deviceHeadroom = input.policy.deviceLimit -
+        deviceCount -
+        input.policy.requiredDeviceSpare;
+    final addressHeadroom = input.policy.addressLimit -
+        addressCount -
+        input.policy.requiredAddressSpare;
+    final status =
+        collisions.isEmpty && deviceHeadroom >= 0 && addressHeadroom >= 0
+            ? Fa01AssessmentStatus.pass
+            : Fa01AssessmentStatus.fail;
     return Fa01Result(
       status: status,
       deviceCount: deviceCount,

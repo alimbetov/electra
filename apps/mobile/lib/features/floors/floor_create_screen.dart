@@ -90,9 +90,11 @@ class _FloorCreateScreenState extends ConsumerState<FloorCreateScreen> {
                 TextFormField(
                   controller: nameController,
                   decoration: const InputDecoration(labelText: 'Floor name'),
-                  validator: (value) => value == null || value.trim().isEmpty
-                      ? 'Floor name is required'
-                      : null,
+                  validator:
+                      (value) =>
+                          value == null || value.trim().isEmpty
+                              ? 'Floor name is required'
+                              : null,
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
@@ -104,9 +106,11 @@ class _FloorCreateScreenState extends ConsumerState<FloorCreateScreen> {
                   controller: orderController,
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(labelText: 'Sort order'),
-                  validator: (value) => positiveInt(value ?? '') == null
-                      ? 'Enter a positive order'
-                      : null,
+                  validator:
+                      (value) =>
+                          positiveInt(value ?? '') == null
+                              ? 'Enter a positive order'
+                              : null,
                 ),
                 const SizedBox(height: 12),
                 TextFormField(

@@ -35,12 +35,11 @@ final class DriftElvPathwayRepository implements ElvPathwayRepository {
   ) async {
     final row =
         await (database.select(database.pathwayContexts)..where(
-              (candidate) =>
-                  candidate.projectId.equals(projectId) &
-                  candidate.id.equals(contextId) &
-                  candidate.deletedAt.isNull(),
-            ))
-            .getSingleOrNull();
+          (candidate) =>
+              candidate.projectId.equals(projectId) &
+              candidate.id.equals(contextId) &
+              candidate.deletedAt.isNull(),
+        )).getSingleOrNull();
     return row == null ? null : _decodeRow(row);
   }
 
@@ -177,9 +176,8 @@ final class DriftElvPathwayRepository implements ElvPathwayRepository {
       );
     }
     final host = _encodeHost(next.host);
-    await (database.update(
-      database.pathwayContexts,
-    )..where((row) => row.id.equals(next.id))).write(
+    await (database.update(database.pathwayContexts)
+      ..where((row) => row.id.equals(next.id))).write(
       PathwayContextsCompanion(
         kind: Value(next.kind.name.toUpperCase()),
         hostType: Value(host.$1),
@@ -216,12 +214,11 @@ final class DriftElvPathwayRepository implements ElvPathwayRepository {
     }
     final activeCarrier =
         await (database.select(database.physicalCarriers)..where(
-              (row) =>
-                  row.pathwayContextId.equals(command.contextId) &
-                  row.lifecycleState.equals('ACTIVE') &
-                  row.deletedAt.isNull(),
-            ))
-            .getSingleOrNull();
+          (row) =>
+              row.pathwayContextId.equals(command.contextId) &
+              row.lifecycleState.equals('ACTIVE') &
+              row.deletedAt.isNull(),
+        )).getSingleOrNull();
     if (activeCarrier != null) {
       return elvRuntimeFailure(
         'ELV_PATHWAY_CONTEXT_IN_USE',
@@ -229,9 +226,8 @@ final class DriftElvPathwayRepository implements ElvPathwayRepository {
         entityId: command.contextId,
       );
     }
-    await (database.update(
-      database.pathwayContexts,
-    )..where((row) => row.id.equals(command.contextId))).write(
+    await (database.update(database.pathwayContexts)
+      ..where((row) => row.id.equals(command.contextId))).write(
       PathwayContextsCompanion(
         lifecycleState: const Value('ARCHIVED'),
         revision: Value(current.revision + 1),
@@ -261,29 +257,26 @@ Map<String, Object?> _encode(PathwayContext context) {
   };
 }
 
-(String, Map<String, Object?>) _encodeHost(PathwayContextHost host) =>
-    switch (host) {
-      RoomHost(:final roomId) => ('ROOM', {'roomId': roomId}),
-      FloorHost(:final floorId) => ('FLOOR', {'floorId': floorId}),
-      SurfaceVoidHost(:final floorId, :final spatialFeatureId) => (
-        'SURFACE_VOID',
-        {'floorId': floorId, 'spatialFeatureId': spatialFeatureId},
-      ),
-      VerticalHost(
-        :final fromFloorId,
-        :final toFloorId,
-        :final spatialFeatureId,
-      ) =>
-        (
-          'VERTICAL',
-          {
-            'fromFloorId': fromFloorId,
-            'toFloorId': toFloorId,
-            'spatialFeatureId': spatialFeatureId,
-          },
-        ),
-      ProjectHost(:final projectId) => ('PROJECT', {'projectId': projectId}),
-    };
+(String, Map<String, Object?>) _encodeHost(
+  PathwayContextHost host,
+) => switch (host) {
+  RoomHost(:final roomId) => ('ROOM', {'roomId': roomId}),
+  FloorHost(:final floorId) => ('FLOOR', {'floorId': floorId}),
+  SurfaceVoidHost(:final floorId, :final spatialFeatureId) => (
+    'SURFACE_VOID',
+    {'floorId': floorId, 'spatialFeatureId': spatialFeatureId},
+  ),
+  VerticalHost(:final fromFloorId, :final toFloorId, :final spatialFeatureId) =>
+    (
+      'VERTICAL',
+      {
+        'fromFloorId': fromFloorId,
+        'toFloorId': toFloorId,
+        'spatialFeatureId': spatialFeatureId,
+      },
+    ),
+  ProjectHost(:final projectId) => ('PROJECT', {'projectId': projectId}),
+};
 
 PathwayContextHost _decodeHost(String type, Map<String, dynamic> map) =>
     switch (type) {

@@ -17,18 +17,19 @@ final class Elv5FoundationAuthorityManifest implements Elv5CanonicalValue {
 
   @override
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-    'schema': schema,
-    'rulesetVersion': rulesetVersion,
-    'canonicalEncoderVersion': Elv5RuntimeContract.canonicalEncoderVersion,
-    'processes': <Object?>[
-      for (final code in Elv5ProcessCode.values)
-        _processEntry(Elv5ProcessCatalog.require(code)),
-    ],
-  };
+        'schema': schema,
+        'rulesetVersion': rulesetVersion,
+        'canonicalEncoderVersion': Elv5RuntimeContract.canonicalEncoderVersion,
+        'processes': <Object?>[
+          for (final code in Elv5ProcessCode.values)
+            _processEntry(Elv5ProcessCatalog.require(code)),
+        ],
+      };
 
   String fingerprint({
     Elv5CanonicalEncoder encoder = const Elv5CanonicalJsonV1(),
-  }) => encoder.sha256(toCanonicalValue());
+  }) =>
+      encoder.sha256(toCanonicalValue());
 
   Map<String, Object?> _processEntry(Elv5ProcessDescriptor descriptor) {
     final versions = descriptor.versions;

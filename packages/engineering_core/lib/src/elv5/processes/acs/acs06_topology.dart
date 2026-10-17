@@ -40,10 +40,12 @@ final class Acs06PathRequirement {
     required this.allowedKinds,
   }) {
     if (requirementId.isEmpty || fromNodeId.isEmpty || toNodeId.isEmpty) {
-      throw ArgumentError('ACS06 path requirement identities must not be empty.');
+      throw ArgumentError(
+          'ACS06 path requirement identities must not be empty.');
     }
     if (allowedKinds.isEmpty) {
-      throw ArgumentError('ACS06 path requirement must allow at least one edge kind.');
+      throw ArgumentError(
+          'ACS06 path requirement must allow at least one edge kind.');
     }
   }
 
@@ -99,7 +101,8 @@ final class Acs06Input {
     _requireCompleteCauses(truthTable.map((e) => e.cause), 'truth row');
     if (safetyMode == Acs06LockSafetyMode.projectDefined &&
         projectDefinedPowerFailureOutcome == null) {
-      throw ArgumentError('ACS06 project-defined safety mode requires power-failure outcome.');
+      throw ArgumentError(
+          'ACS06 project-defined safety mode requires power-failure outcome.');
     }
   }
 
@@ -123,7 +126,8 @@ final class Acs06Input {
     }
     if (seen.length != Acs06ReleaseCause.values.length ||
         !seen.containsAll(Acs06ReleaseCause.values)) {
-      throw ArgumentError('ACS06 requires exactly five canonical $label values.');
+      throw ArgumentError(
+          'ACS06 requires exactly five canonical $label values.');
     }
   }
 }
@@ -170,7 +174,9 @@ final class Acs06DoorTopologyKernel {
     };
     final adjacency = <String, List<Acs06GraphEdge>>{};
     for (final edge in input.edges) {
-      adjacency.putIfAbsent(edge.fromNodeId, () => <Acs06GraphEdge>[]).add(edge);
+      adjacency
+          .putIfAbsent(edge.fromNodeId, () => <Acs06GraphEdge>[])
+          .add(edge);
     }
     for (final list in adjacency.values) {
       list.sort((a, b) => a.edgeId.compareTo(b.edgeId));
@@ -209,7 +215,8 @@ final class Acs06DoorTopologyKernel {
     Acs06LockOutcome expected,
     Map<String, List<Acs06GraphEdge>> adjacency,
   ) {
-    if (profile.requiresConductiveFeed && !_hasIncomingFeed(input.lockNodeId, input.edges)) {
+    if (profile.requiresConductiveFeed &&
+        !_hasIncomingFeed(input.lockNodeId, input.edges)) {
       return Acs06CauseResult(
         cause: profile.cause,
         status: Acs06AssessmentStatus.fail,
@@ -218,7 +225,8 @@ final class Acs06DoorTopologyKernel {
         reason: 'ACS06_LOCK_HAS_NO_CONDUCTIVE_POWER_FEED',
       );
     }
-    if (profile.requiresSupervision && !_hasIncomingMonitor(input.lockNodeId, input.edges)) {
+    if (profile.requiresSupervision &&
+        !_hasIncomingMonitor(input.lockNodeId, input.edges)) {
       return Acs06CauseResult(
         cause: profile.cause,
         status: Acs06AssessmentStatus.fail,
@@ -263,17 +271,22 @@ final class Acs06DoorTopologyKernel {
     );
   }
 
-  static Acs06LockOutcome _powerFailureOutcome(Acs06Input input) => switch (input.safetyMode) {
+  static Acs06LockOutcome _powerFailureOutcome(Acs06Input input) =>
+      switch (input.safetyMode) {
         Acs06LockSafetyMode.failSafe => Acs06LockOutcome.released,
         Acs06LockSafetyMode.failSecure => Acs06LockOutcome.secured,
-        Acs06LockSafetyMode.projectDefined => input.projectDefinedPowerFailureOutcome!,
+        Acs06LockSafetyMode.projectDefined =>
+          input.projectDefinedPowerFailureOutcome!,
       };
 
   static bool _hasIncomingFeed(String lockNodeId, List<Acs06GraphEdge> edges) =>
-      edges.any((e) => e.toNodeId == lockNodeId && e.kind == Acs06EdgeKind.powerFeed);
+      edges.any(
+          (e) => e.toNodeId == lockNodeId && e.kind == Acs06EdgeKind.powerFeed);
 
-  static bool _hasIncomingMonitor(String lockNodeId, List<Acs06GraphEdge> edges) =>
-      edges.any((e) => e.toNodeId == lockNodeId && e.kind == Acs06EdgeKind.monitor);
+  static bool _hasIncomingMonitor(
+          String lockNodeId, List<Acs06GraphEdge> edges) =>
+      edges.any(
+          (e) => e.toNodeId == lockNodeId && e.kind == Acs06EdgeKind.monitor);
 
   static bool _reachable(
     String source,

@@ -13,11 +13,12 @@ void main() {
       final backend = _RecordingBackend();
       final adapter = Elv4WireSemanticAdapter<String>(
         codecs: createElv4WireRuntimeCodecs(backend),
-        resolveImpact: (_) async => Elv4ResolvedWireImpact(
-          verifiedRows: const {},
-          changedDependencyRefs: const ['server-reviewed-dependency'],
-          reviewedImpactFingerprint: fingerprint,
-        ),
+        resolveImpact:
+            (_) async => Elv4ResolvedWireImpact(
+              verifiedRows: const {},
+              changedDependencyRefs: const ['server-reviewed-dependency'],
+              reviewedImpactFingerprint: fingerprint,
+            ),
       );
 
       for (final entry in _payloads.entries) {
@@ -25,9 +26,10 @@ void main() {
           entry.key,
         );
         final actual = await adapter.dispatchMap({
-          'schema': revision
-              ? Elv4WireCommandEnvelope.revisionCommandSchema
-              : Elv4WireCommandEnvelope.powerCommandSchema,
+          'schema':
+              revision
+                  ? Elv4WireCommandEnvelope.revisionCommandSchema
+                  : Elv4WireCommandEnvelope.powerCommandSchema,
           'operation': entry.key,
           'payloadSchemaVersion': revision ? 2 : 1,
           'projectId': 'project-1',
@@ -56,11 +58,12 @@ void main() {
     final backend = _RecordingBackend();
     final adapter = Elv4WireSemanticAdapter<String>(
       codecs: createElv4WireRuntimeCodecs(backend),
-      resolveImpact: (_) async => Elv4ResolvedWireImpact(
-        verifiedRows: const {},
-        changedDependencyRefs: const [],
-        reviewedImpactFingerprint: fingerprint,
-      ),
+      resolveImpact:
+          (_) async => Elv4ResolvedWireImpact(
+            verifiedRows: const {},
+            changedDependencyRefs: const [],
+            reviewedImpactFingerprint: fingerprint,
+          ),
     );
 
     await expectLater(

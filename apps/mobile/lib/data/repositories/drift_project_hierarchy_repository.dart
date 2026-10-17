@@ -15,9 +15,10 @@ final class DriftProjectHierarchyRepository
 
   @override
   Stream<List<ProjectRecord>> watchProjects() {
-    final query = database.select(database.projects)
-      ..where((row) => row.deletedAt.isNull())
-      ..orderBy([(row) => OrderingTerm.desc(row.updatedAt)]);
+    final query =
+        database.select(database.projects)
+          ..where((row) => row.deletedAt.isNull())
+          ..orderBy([(row) => OrderingTerm.desc(row.updatedAt)]);
     return query.watch().map(
       (rows) => rows.map(_projectFromRow).toList(growable: false),
     );
@@ -66,9 +67,9 @@ final class DriftProjectHierarchyRepository
   @override
   Future<void> deleteProject(String projectId) =>
       database.transaction(() async {
-        final row = await (database.select(
-          database.projects,
-        )..where((item) => item.id.equals(projectId))).getSingleOrNull();
+        final row =
+            await (database.select(database.projects)
+              ..where((item) => item.id.equals(projectId))).getSingleOrNull();
         if (row == null) return;
         await guardHierarchyElvPorts(
           database,
@@ -76,9 +77,8 @@ final class DriftProjectHierarchyRepository
           projectId,
         );
         final now = DateTime.now().toUtc();
-        await (database.update(
-          database.projects,
-        )..where((item) => item.id.equals(projectId))).write(
+        await (database.update(database.projects)
+          ..where((item) => item.id.equals(projectId))).write(
           ProjectsCompanion(
             revision: Value(row.revision + 1),
             updatedAt: Value(now),
@@ -89,12 +89,15 @@ final class DriftProjectHierarchyRepository
 
   @override
   Stream<List<FloorRecord>> watchFloors(String projectId) {
-    final query = database.select(database.floors)
-      ..where((row) => row.projectId.equals(projectId) & row.deletedAt.isNull())
-      ..orderBy([
-        (row) => OrderingTerm.asc(row.sortOrder),
-        (row) => OrderingTerm.asc(row.name),
-      ]);
+    final query =
+        database.select(database.floors)
+          ..where(
+            (row) => row.projectId.equals(projectId) & row.deletedAt.isNull(),
+          )
+          ..orderBy([
+            (row) => OrderingTerm.asc(row.sortOrder),
+            (row) => OrderingTerm.asc(row.name),
+          ]);
     return query.watch().map(
       (rows) => rows.map(_floorFromRow).toList(growable: false),
     );
@@ -143,15 +146,14 @@ final class DriftProjectHierarchyRepository
 
   @override
   Future<void> deleteFloor(String floorId) => database.transaction(() async {
-    final row = await (database.select(
-      database.floors,
-    )..where((item) => item.id.equals(floorId))).getSingleOrNull();
+    final row =
+        await (database.select(database.floors)
+          ..where((item) => item.id.equals(floorId))).getSingleOrNull();
     if (row == null) return;
     await guardHierarchyElvPorts(database, HierarchyElvScope.floor, floorId);
     final now = DateTime.now().toUtc();
-    await (database.update(
-      database.floors,
-    )..where((item) => item.id.equals(floorId))).write(
+    await (database.update(database.floors)
+      ..where((item) => item.id.equals(floorId))).write(
       FloorsCompanion(
         revision: Value(row.revision + 1),
         updatedAt: Value(now),
@@ -162,9 +164,10 @@ final class DriftProjectHierarchyRepository
 
   @override
   Stream<List<RoomRecord>> watchRooms(String floorId) {
-    final query = database.select(database.rooms)
-      ..where((row) => row.floorId.equals(floorId) & row.deletedAt.isNull())
-      ..orderBy([(row) => OrderingTerm.asc(row.name)]);
+    final query =
+        database.select(database.rooms)
+          ..where((row) => row.floorId.equals(floorId) & row.deletedAt.isNull())
+          ..orderBy([(row) => OrderingTerm.asc(row.name)]);
     return query.watch().map(
       (rows) => rows.map(_roomFromRow).toList(growable: false),
     );
@@ -215,15 +218,14 @@ final class DriftProjectHierarchyRepository
 
   @override
   Future<void> deleteRoom(String roomId) => database.transaction(() async {
-    final row = await (database.select(
-      database.rooms,
-    )..where((item) => item.id.equals(roomId))).getSingleOrNull();
+    final row =
+        await (database.select(database.rooms)
+          ..where((item) => item.id.equals(roomId))).getSingleOrNull();
     if (row == null) return;
     await guardHierarchyElvPorts(database, HierarchyElvScope.room, roomId);
     final now = DateTime.now().toUtc();
-    await (database.update(
-      database.rooms,
-    )..where((item) => item.id.equals(roomId))).write(
+    await (database.update(database.rooms)
+      ..where((item) => item.id.equals(roomId))).write(
       RoomsCompanion(
         revision: Value(row.revision + 1),
         updatedAt: Value(now),

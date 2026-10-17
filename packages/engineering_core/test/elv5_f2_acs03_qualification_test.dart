@@ -5,8 +5,12 @@ import 'support/elv5_foundation_qualification_support.dart';
 
 void main() {
   group('F2 ACS-03 electrical', () {
-    test('Q0 contract inventory separates feed, control, events and PWR evidence', () {
-      final input = _input(<Acs03OperatingEvent>[_event('holding')], <Acs03PwrEvidence>[
+    test(
+        'Q0 contract inventory separates feed, control, events and PWR evidence',
+        () {
+      final input = _input(<Acs03OperatingEvent>[
+        _event('holding')
+      ], <Acs03PwrEvidence>[
         _evidence('holding', '23.51', '24.10'),
       ]);
 
@@ -19,9 +23,12 @@ void main() {
       expect(input.maximumTerminalVoltage!.value, Elv5Rational.integer(26));
     });
 
-    test('Q1 canonical reference vector is 23.51 V with +1.51 V low margin', () {
+    test('Q1 canonical reference vector is 23.51 V with +1.51 V low margin',
+        () {
       final result = const Acs03ElectricalKernel().evaluate(
-        _input(<Acs03OperatingEvent>[_event('holding')], <Acs03PwrEvidence>[
+        _input(<Acs03OperatingEvent>[
+          _event('holding')
+        ], <Acs03PwrEvidence>[
           _evidence('holding', '23.51', '24.10'),
         ]),
       );
@@ -29,13 +36,20 @@ void main() {
       expect(result.status, Acs03AssessmentStatus.pass);
       expect(result.governingCaseId, 'holding');
       final value = result.cases.single;
-      expect(value.terminalVoltage!.lower.value, Elv5Rational.parseDecimal('23.51'));
-      expect(value.minimumVoltageMargin!.value, Elv5Rational.parseDecimal('1.51'));
-      expect(value.maximumVoltageMargin!.value, Elv5Rational.parseDecimal('1.90'));
+      expect(value.terminalVoltage!.lower.value,
+          Elv5Rational.parseDecimal('23.51'));
+      expect(
+          value.minimumVoltageMargin!.value, Elv5Rational.parseDecimal('1.51'));
+      expect(
+          value.maximumVoltageMargin!.value, Elv5Rational.parseDecimal('1.90'));
     });
 
-    test('Q2 independent oracle reproduces +1.51 V without production kernel math', () {
-      final input = _input(<Acs03OperatingEvent>[_event('holding')], <Acs03PwrEvidence>[
+    test(
+        'Q2 independent oracle reproduces +1.51 V without production kernel math',
+        () {
+      final input = _input(<Acs03OperatingEvent>[
+        _event('holding')
+      ], <Acs03PwrEvidence>[
         _evidence('holding', '23.51', '24.10'),
       ]);
       final production = const Acs03ElectricalKernel().evaluate(input);
@@ -59,7 +73,9 @@ void main() {
         for (final lower in values.values)
           const Acs03ElectricalKernel()
               .evaluate(
-                _input(<Acs03OperatingEvent>[_event('holding')], <Acs03PwrEvidence>[
+                _input(<Acs03OperatingEvent>[
+                  _event('holding')
+                ], <Acs03PwrEvidence>[
                   _evidence('holding', lower, '25'),
                 ]),
               )
@@ -74,12 +90,16 @@ void main() {
 
     test('Q3 source-current margin exact zero passes, negative fails', () {
       final exact = const Acs03ElectricalKernel().evaluate(
-        _input(<Acs03OperatingEvent>[_event('holding')], <Acs03PwrEvidence>[
+        _input(<Acs03OperatingEvent>[
+          _event('holding')
+        ], <Acs03PwrEvidence>[
           _evidence('holding', '23', '24', currentMarginLower: '0'),
         ]),
       );
       final negative = const Acs03ElectricalKernel().evaluate(
-        _input(<Acs03OperatingEvent>[_event('holding')], <Acs03PwrEvidence>[
+        _input(<Acs03OperatingEvent>[
+          _event('holding')
+        ], <Acs03PwrEvidence>[
           _evidence('holding', '23', '24', currentMarginLower: '-0.000001'),
         ]),
       );
@@ -98,7 +118,8 @@ void main() {
         _evidence('release', '22.4', '24.8'),
         _evidence('holding', '23.5', '24.2'),
       ];
-      final left = const Acs03ElectricalKernel().evaluate(_input(events, evidence));
+      final left =
+          const Acs03ElectricalKernel().evaluate(_input(events, evidence));
       final right = const Acs03ElectricalKernel().evaluate(
         _input(events.reversed.toList(), evidence.reversed.toList()),
       );
@@ -117,12 +138,16 @@ void main() {
 
     test('Q4 lowering terminal voltage cannot improve assessment', () {
       final good = const Acs03ElectricalKernel().evaluate(
-        _input(<Acs03OperatingEvent>[_event('holding')], <Acs03PwrEvidence>[
+        _input(<Acs03OperatingEvent>[
+          _event('holding')
+        ], <Acs03PwrEvidence>[
           _evidence('holding', '23', '24'),
         ]),
       );
       final worse = const Acs03ElectricalKernel().evaluate(
-        _input(<Acs03OperatingEvent>[_event('holding')], <Acs03PwrEvidence>[
+        _input(<Acs03OperatingEvent>[
+          _event('holding')
+        ], <Acs03PwrEvidence>[
           _evidence('holding', '21.9', '24'),
         ]),
       );
@@ -135,8 +160,10 @@ void main() {
         _input(
           <Acs03OperatingEvent>[
             _event('holding'),
-            _event('startup', state: Acs03StateCode.startupInrush, durationUs: 250000),
-            _event('release', state: Acs03StateCode.activeRelease, durationUs: 1500000),
+            _event('startup',
+                state: Acs03StateCode.startupInrush, durationUs: 250000),
+            _event('release',
+                state: Acs03StateCode.activeRelease, durationUs: 1500000),
           ],
           <Acs03PwrEvidence>[
             _evidence('holding', '23.8', '24.4'),
@@ -151,12 +178,16 @@ void main() {
       expect(result.limitingReason, 'ACS03_MINIMUM_TERMINAL_VOLTAGE');
     });
 
-    test('Q5 missing evidence is unresolved and membership mismatch is blocked', () {
+    test('Q5 missing evidence is unresolved and membership mismatch is blocked',
+        () {
       final unresolved = const Acs03ElectricalKernel().evaluate(
-        _input(<Acs03OperatingEvent>[_event('holding')], const <Acs03PwrEvidence>[]),
+        _input(<Acs03OperatingEvent>[_event('holding')],
+            const <Acs03PwrEvidence>[]),
       );
       final blocked = const Acs03ElectricalKernel().evaluate(
-        _input(<Acs03OperatingEvent>[_event('holding')], <Acs03PwrEvidence>[
+        _input(<Acs03OperatingEvent>[
+          _event('holding')
+        ], <Acs03PwrEvidence>[
           _evidence('holding', '23', '24', membership: _otherMembership),
         ]),
       );
@@ -164,7 +195,8 @@ void main() {
       expect(unresolved.status, Acs03AssessmentStatus.unresolved);
       expect(unresolved.cases.single.reason, 'ACS03_PWR_EVIDENCE_MISSING');
       expect(blocked.status, Acs03AssessmentStatus.blocked);
-      expect(blocked.limitingReason, 'ACS03_SHARED_MEMBERSHIP_CLOSURE_MISMATCH');
+      expect(
+          blocked.limitingReason, 'ACS03_SHARED_MEMBERSHIP_CLOSURE_MISMATCH');
     });
 
     test('Q9 bounded 256-event sequence is deterministic', () {
@@ -199,27 +231,29 @@ void main() {
 Acs03Input _input(
   List<Acs03OperatingEvent> events,
   List<Acs03PwrEvidence> evidence,
-) => Acs03Input(
-  doorId: 'door-1',
-  lockId: 'lock-1',
-  conductiveFeedPathId: 'feed-1',
-  controlPathId: 'control-1',
-  requiredMembershipFingerprint: _membership,
-  events: events,
-  evidence: evidence,
-  minimumTerminalVoltage: Voltage(Elv5Rational.integer(22)),
-  maximumTerminalVoltage: Voltage(Elv5Rational.integer(26)),
-);
+) =>
+    Acs03Input(
+      doorId: 'door-1',
+      lockId: 'lock-1',
+      conductiveFeedPathId: 'feed-1',
+      controlPathId: 'control-1',
+      requiredMembershipFingerprint: _membership,
+      events: events,
+      evidence: evidence,
+      minimumTerminalVoltage: Voltage(Elv5Rational.integer(22)),
+      maximumTerminalVoltage: Voltage(Elv5Rational.integer(26)),
+    );
 
 Acs03OperatingEvent _event(
   String id, {
   Acs03StateCode state = Acs03StateCode.holding,
   int durationUs = 1000000,
-}) => Acs03OperatingEvent(
-  eventId: id,
-  state: state,
-  durationMicroseconds: BigInt.from(durationUs),
-);
+}) =>
+    Acs03OperatingEvent(
+      eventId: id,
+      state: state,
+      durationMicroseconds: BigInt.from(durationUs),
+    );
 
 Acs03PwrEvidence _evidence(
   String eventId,
@@ -227,22 +261,23 @@ Acs03PwrEvidence _evidence(
   String upperV, {
   String currentMarginLower = '1',
   String membership = _membership,
-}) => Acs03PwrEvidence(
-  eventId: eventId,
-  membershipFingerprint: membership,
-  terminalVoltage: Elv5Interval<VoltageDim>(
-    Voltage(Elv5Rational.parseDecimal(lowerV)),
-    Voltage(Elv5Rational.parseDecimal(upperV)),
-  ),
-  sharedTrunkCurrent: Elv5Interval<CurrentDim>(
-    Current(Elv5Rational.parseDecimal('0.3')),
-    Current(Elv5Rational.parseDecimal('0.4')),
-  ),
-  sourceCurrentMargin: Elv5Interval<CurrentDim>(
-    Current(Elv5Rational.parseDecimal(currentMarginLower)),
-    Current(Elv5Rational.parseDecimal('2')),
-  ),
-);
+}) =>
+    Acs03PwrEvidence(
+      eventId: eventId,
+      membershipFingerprint: membership,
+      terminalVoltage: Elv5Interval<VoltageDim>(
+        Voltage(Elv5Rational.parseDecimal(lowerV)),
+        Voltage(Elv5Rational.parseDecimal(upperV)),
+      ),
+      sharedTrunkCurrent: Elv5Interval<CurrentDim>(
+        Current(Elv5Rational.parseDecimal('0.3')),
+        Current(Elv5Rational.parseDecimal('0.4')),
+      ),
+      sourceCurrentMargin: Elv5Interval<CurrentDim>(
+        Current(Elv5Rational.parseDecimal(currentMarginLower)),
+        Current(Elv5Rational.parseDecimal('2')),
+      ),
+    );
 
 bool _sameCases(List<Acs03CaseResult> left, List<Acs03CaseResult> right) {
   if (left.length != right.length) return false;
@@ -265,5 +300,7 @@ bool _sameCases(List<Acs03CaseResult> left, List<Acs03CaseResult> right) {
   return true;
 }
 
-const _membership = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
-const _otherMembership = 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
+const _membership =
+    'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+const _otherMembership =
+    'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';

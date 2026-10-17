@@ -18,7 +18,8 @@ ByteCapacity _bytes(int value) => ByteCapacity(Elv5Rational.integer(value));
 
 void main() {
   group('ELV5 CCTV-03 storage kernel', () {
-    test('integrates continuous 8 Mbps for 30 days with reserve and mirror', () {
+    test('integrates continuous 8 Mbps for 30 days with reserve and mirror',
+        () {
       final start = DateTime.utc(2026, 1, 1);
       final end = start.add(const Duration(days: 30));
       final input = Cctv03Input(
@@ -104,7 +105,8 @@ void main() {
       expect(result.usable.withinCapacity, isTrue);
     });
 
-    test('unions overlapping schedule intervals for one recording identity', () {
+    test('unions overlapping schedule intervals for one recording identity',
+        () {
       final start = DateTime.utc(2026, 1, 1);
       final result = const Cctv03StorageKernel().evaluate(
         Cctv03Input(
@@ -234,16 +236,16 @@ void main() {
     test('rejects duplicate stream-pool-copy recording identity', () {
       final start = DateTime.utc(2026, 1, 1);
       Cctv03RecordingAssignment assignment() => Cctv03RecordingAssignment(
-        streamId: 'stream-1',
-        poolId: 'pool-a',
-        copyRole: 'PRIMARY',
-        intervals: <Cctv03UtcInterval>[
-          Cctv03UtcInterval(
-            startUtc: start,
-            endUtc: start.add(const Duration(seconds: 1)),
-          ),
-        ],
-      );
+            streamId: 'stream-1',
+            poolId: 'pool-a',
+            copyRole: 'PRIMARY',
+            intervals: <Cctv03UtcInterval>[
+              Cctv03UtcInterval(
+                startUtc: start,
+                endUtc: start.add(const Duration(seconds: 1)),
+              ),
+            ],
+          );
       final input = Cctv03Input(
         poolId: 'pool-a',
         horizonStartUtc: start,

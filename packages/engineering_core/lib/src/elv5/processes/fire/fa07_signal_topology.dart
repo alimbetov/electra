@@ -48,7 +48,8 @@ final class Fa07Input {
     required this.faultScenarios,
   }) {
     if (loopId.isEmpty || sourceNodeId.isEmpty || returnNodeId.isEmpty) {
-      throw ArgumentError('FA07 loop/source/return identities must not be empty.');
+      throw ArgumentError(
+          'FA07 loop/source/return identities must not be empty.');
     }
     if (maxBranchNodes < 0) {
       throw ArgumentError('FA07 maxBranchNodes must be nonnegative.');
@@ -62,7 +63,8 @@ final class Fa07Input {
     final faultTypes = <Fa07TopologyCase>{};
     for (final scenario in faultScenarios) {
       if (!faultTypes.add(scenario.caseType)) {
-        throw ArgumentError('FA07 duplicate fault scenario: ${scenario.caseType}');
+        throw ArgumentError(
+            'FA07 duplicate fault scenario: ${scenario.caseType}');
       }
       if (!edgeIds.containsAll(scenario.removedEdgeIds)) {
         throw ArgumentError('FA07 fault scenario references unknown edge.');
@@ -202,7 +204,8 @@ final class Fa07SignalTopologyKernel {
               toNodeId: e.fromNodeId,
             ))
         .toList();
-    final canReachReturn = _reachableFrom(input.returnNodeId, reverse, const <String>{});
+    final canReachReturn =
+        _reachableFrom(input.returnNodeId, reverse, const <String>{});
     if (!canReachReturn.containsAll(input.deviceNodeIds)) {
       return Fa07CaseResult(
         caseType: Fa07TopologyCase.normal,
@@ -214,7 +217,8 @@ final class Fa07SignalTopologyKernel {
 
     final outDegree = <String, int>{};
     for (final edge in input.edges) {
-      outDegree.update(edge.fromNodeId, (value) => value + 1, ifAbsent: () => 1);
+      outDegree.update(edge.fromNodeId, (value) => value + 1,
+          ifAbsent: () => 1);
     }
     final branchNodes = outDegree.entries
         .where((entry) => entry.value > 1)
@@ -247,7 +251,8 @@ final class Fa07SignalTopologyKernel {
       scenario.removedEdgeIds,
     );
     final reachableDevices = input.deviceNodeIds.intersection(reachable);
-    final pass = _sameSet(reachableDevices, scenario.expectedReachableDeviceIds);
+    final pass =
+        _sameSet(reachableDevices, scenario.expectedReachableDeviceIds);
     return Fa07CaseResult(
       caseType: scenario.caseType,
       status: pass ? Fa07AssessmentStatus.pass : Fa07AssessmentStatus.fail,
@@ -264,7 +269,9 @@ final class Fa07SignalTopologyKernel {
     final adjacency = <String, List<String>>{};
     for (final edge in edges) {
       if (removedEdgeIds.contains(edge.edgeId)) continue;
-      adjacency.putIfAbsent(edge.fromNodeId, () => <String>[]).add(edge.toNodeId);
+      adjacency
+          .putIfAbsent(edge.fromNodeId, () => <String>[])
+          .add(edge.toNodeId);
     }
     final visited = <String>{source};
     final queue = <String>[source];

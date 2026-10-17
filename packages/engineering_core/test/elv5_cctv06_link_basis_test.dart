@@ -51,7 +51,9 @@ void main() {
     expect(result.powerStatus, Cctv06AssessmentStatus.pass);
   });
 
-  test('upper length bound above limit fails even when display could round to 30', () {
+  test(
+      'upper length bound above limit fails even when display could round to 30',
+      () {
     final result = const Cctv06LinkBasisKernel().evaluate(Cctv06Input(
       linkId: 'link',
       pathFingerprint: 'path-v1',

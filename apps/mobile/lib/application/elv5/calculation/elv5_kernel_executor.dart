@@ -4,10 +4,8 @@ import 'elv5_calculation_runtime.dart';
 
 typedef Elv5KernelCalculate<I, O> = O Function(I input);
 typedef Elv5KernelEncodeOutput<O> = Map<String, Object?> Function(O output);
-typedef Elv5KernelEncodeEvidence<I, O> = Map<String, Object?> Function(
-  Elv5CapturedInput<I> captured,
-  O output,
-);
+typedef Elv5KernelEncodeEvidence<I, O> =
+    Map<String, Object?> Function(Elv5CapturedInput<I> captured, O output);
 typedef Elv5KernelAssessment<O> = Elv5Assessment Function(O output);
 typedef Elv5KernelExecution<O> = Elv5Execution Function(O output);
 typedef Elv5KernelCompletion<O> = Elv5Completion Function(O output);

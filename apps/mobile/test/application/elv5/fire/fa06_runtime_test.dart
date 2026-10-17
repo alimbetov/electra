@@ -228,15 +228,16 @@ final class _EvidenceSource implements Elv4CurrentEvidenceSource {
     String? scopeId,
     String? subjectKind,
     String? subjectId,
-  }) async => values.where((value) {
-    final key = value.nodeKey;
-    return key.processCode == processCode &&
-        (scenarioId == null || key.scenarioId == scenarioId) &&
-        (scopeKind == null || key.scopeKind == scopeKind) &&
-        (scopeId == null || key.scopeId == scopeId) &&
-        (subjectKind == null || key.subjectKind == subjectKind) &&
-        (subjectId == null || key.subjectId == subjectId);
-  }).toList();
+  }) async =>
+      values.where((value) {
+        final key = value.nodeKey;
+        return key.processCode == processCode &&
+            (scenarioId == null || key.scenarioId == scenarioId) &&
+            (scopeKind == null || key.scopeKind == scopeKind) &&
+            (scopeId == null || key.scopeId == scopeId) &&
+            (subjectKind == null || key.subjectKind == subjectKind) &&
+            (subjectId == null || key.subjectId == subjectId);
+      }).toList();
 }
 
 Elv4CurrentEvaluationSnapshot _pwr01({

@@ -54,11 +54,12 @@ void main() {
       );
       final adapter = Elv4WireSemanticAdapter<Object?>(
         codecs: createElv4WireRuntimeCodecs<Object?>(backend),
-        resolveImpact: (envelope) async => Elv4ResolvedWireImpact(
-          verifiedRows: envelope.expectedRows,
-          changedDependencyRefs: [dependency.encode()],
-          reviewedImpactFingerprint: reviewedFingerprint,
-        ),
+        resolveImpact:
+            (envelope) async => Elv4ResolvedWireImpact(
+              verifiedRows: envelope.expectedRows,
+              changedDependencyRefs: [dependency.encode()],
+              reviewedImpactFingerprint: reviewedFingerprint,
+            ),
       );
 
       final result = await adapter.dispatchMap({
@@ -87,29 +88,31 @@ void main() {
       });
 
       expect(result, isNotNull);
-      final load = await db
-          .customSelect(
-            'SELECT id, origin_id FROM power_load_bindings '
-            'WHERE design_revision_id = ? AND deleted_at IS NULL',
-            variables: [Variable.withString(builder.revisionId)],
-          )
-          .getSingle();
+      final load =
+          await db
+              .customSelect(
+                'SELECT id, origin_id FROM power_load_bindings '
+                'WHERE design_revision_id = ? AND deleted_at IS NULL',
+                variables: [Variable.withString(builder.revisionId)],
+              )
+              .getSingle();
       expect(load.read<String>('id'), 'load-1');
       expect(load.read<String>('origin_id'), 'wire-origin');
 
       final revision = await db.select(db.projectDesignRevisions).getSingle();
       expect(revision.revision, 2);
-      final ledger = await db
-          .customSelect(
-            'SELECT command_type, payload_schema, status FROM power_operation_records '
-            'WHERE project_id = ? AND design_revision_id = ? AND operation_id = ?',
-            variables: [
-              Variable.withString(builder.projectId),
-              Variable.withString(builder.revisionId),
-              Variable.withString('wire-set-loads'),
-            ],
-          )
-          .getSingle();
+      final ledger =
+          await db
+              .customSelect(
+                'SELECT command_type, payload_schema, status FROM power_operation_records '
+                'WHERE project_id = ? AND design_revision_id = ? AND operation_id = ?',
+                variables: [
+                  Variable.withString(builder.projectId),
+                  Variable.withString(builder.revisionId),
+                  Variable.withString('wire-set-loads'),
+                ],
+              )
+              .getSingle();
       expect(ledger.read<String>('command_type'), 'SET_POWER_LOAD_PROFILE');
       expect(
         ledger.read<String>('payload_schema'),

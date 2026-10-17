@@ -119,12 +119,11 @@ final class Elv5AmpacityRouteResolver {
           'ELV5_AMPACITY_TEMPERATURE_EVIDENCE_SCOPE_MISMATCH',
           <String, Object?>{
             'routeSectionId': traversal.routeSegmentId,
-            'profileMaximumC': environment.binding.profile.temperatureC.maximum
-                .toMap(),
-            'correctionTemperatureC': evidence
-                .temperatureCorrection
-                .actualAmbientTemperatureC
-                .toMap(),
+            'profileMaximumC':
+                environment.binding.profile.temperatureC.maximum.toMap(),
+            'correctionTemperatureC':
+                evidence.temperatureCorrection.actualAmbientTemperatureC
+                    .toMap(),
           },
         );
       }

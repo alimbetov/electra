@@ -137,17 +137,16 @@ final class Acs02PersistedInputResolver
     final resourcesById = <String, Acs02ResourceContractItem>{
       for (final value in contract.resources) value.resourceId: value,
     };
-    final assignmentRows =
-        _objects(payload['resourceAssignments'], 'resourceAssignments')..sort((
-          a,
-          b,
-        ) {
-          final left =
-              '${_text(a, 'resourceId')}:${_text(a, 'assignmentRole')}:${_text(a, 'subjectId')}';
-          final right =
-              '${_text(b, 'resourceId')}:${_text(b, 'assignmentRole')}:${_text(b, 'subjectId')}';
-          return left.compareTo(right);
-        });
+    final assignmentRows = _objects(
+      payload['resourceAssignments'],
+      'resourceAssignments',
+    )..sort((a, b) {
+      final left =
+          '${_text(a, 'resourceId')}:${_text(a, 'assignmentRole')}:${_text(a, 'subjectId')}';
+      final right =
+          '${_text(b, 'resourceId')}:${_text(b, 'assignmentRole')}:${_text(b, 'subjectId')}';
+      return left.compareTo(right);
+    });
     final assignments = <Acs02Assignment>[];
     for (var i = 0; i < assignmentRows.length; i++) {
       final row = assignmentRows[i];
@@ -231,14 +230,15 @@ final class Acs02PersistedInputResolver
     String policy,
     List<Elv5DependencyMarker> dependencies,
     Map<String, Object?> evidence,
-  ) => throw Elv5CaptureBlockedException(
-    request: request,
-    reasonCode: reason,
-    inputFingerprint: input,
-    policyFingerprint: policy,
-    dependencies: dependencies,
-    evidence: evidence,
-  );
+  ) =>
+      throw Elv5CaptureBlockedException(
+        request: request,
+        reasonCode: reason,
+        inputFingerprint: input,
+        policyFingerprint: policy,
+        dependencies: dependencies,
+        evidence: evidence,
+      );
 
   Elv5DependencyMarker _dependency(
     Elv5CalculationRequest request,
@@ -271,34 +271,39 @@ Elv5PureKernelExecutor<Acs02Input, Acs02Result> buildAcs02Executor({
 }) => Elv5PureKernelExecutor<Acs02Input, Acs02Result>(
   processCode: Elv5ProcessCode.acs02,
   calculate: const Acs02ResourceCapacityKernel().evaluate,
-  encodeOutput: (result) => <String, Object?>{
-    'schema': 'electra.elv5-acs02-output.v1',
-    'status': result.status.name,
-    'conflictingAssignmentIds': result.conflictingAssignmentIds,
-    'pools': <Object?>[
-      for (final entry
-          in result.pools.entries.toList()
-            ..sort((a, b) => a.key.name.compareTo(b.key.name)))
-        <String, Object?>{
-          'resourceKind': entry.key.name,
-          'available': entry.value.available,
-          'occupied': entry.value.occupied,
-          'requiredSpare': entry.value.requiredSpare,
-          'headroom': entry.value.headroom,
-          'status': entry.value.status.name,
-        },
-    ],
-  },
-  encodeEvidence: (captured, _) => <String, Object?>{
-    'schema': 'electra.elv5-acs02-evidence.v1',
-    'source': 'PERSISTED_CONTROLLER_ASSIGNMENTS_PLUS_IMMUTABLE_RESOURCE_INVENTORY_AND_SPARE_POLICY',
-    'captureRevision': captured.captureRevision,
-  },
+  encodeOutput:
+      (result) => <String, Object?>{
+        'schema': 'electra.elv5-acs02-output.v1',
+        'status': result.status.name,
+        'conflictingAssignmentIds': result.conflictingAssignmentIds,
+        'pools': <Object?>[
+          for (final entry
+              in result.pools.entries.toList()
+                ..sort((a, b) => a.key.name.compareTo(b.key.name)))
+            <String, Object?>{
+              'resourceKind': entry.key.name,
+              'available': entry.value.available,
+              'occupied': entry.value.occupied,
+              'requiredSpare': entry.value.requiredSpare,
+              'headroom': entry.value.headroom,
+              'status': entry.value.status.name,
+            },
+        ],
+      },
+  encodeEvidence:
+      (captured, _) => <String, Object?>{
+        'schema': 'electra.elv5-acs02-evidence.v1',
+        'source':
+            'PERSISTED_CONTROLLER_ASSIGNMENTS_PLUS_IMMUTABLE_RESOURCE_INVENTORY_AND_SPARE_POLICY',
+        'captureRevision': captured.captureRevision,
+      },
   executionOf: (_) => Elv5Execution.succeeded,
   completionOf: (_) => Elv5Completion.complete,
-  assessmentOf: (result) => result.status == Acs02AssessmentStatus.pass
-      ? Elv5Assessment.pass
-      : Elv5Assessment.fail,
+  assessmentOf:
+      (result) =>
+          result.status == Acs02AssessmentStatus.pass
+              ? Elv5Assessment.pass
+              : Elv5Assessment.fail,
   nowUtc: nowUtc,
 );
 

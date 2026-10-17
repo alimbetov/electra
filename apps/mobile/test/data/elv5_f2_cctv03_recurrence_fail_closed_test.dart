@@ -55,17 +55,18 @@ void main() {
       final result = await runtime.service.execute(command);
       expect(result.replayed, isFalse);
 
-      final evaluation = await db
-          .customSelect(
-            'SELECT execution, completion, assessment, output_json, evidence_json '
-            'FROM discipline_evaluation_records '
-            'WHERE project_id = ? AND logical_node_key_sha256 = ?',
-            variables: <Variable>[
-              Variable.withString('p'),
-              Variable.withString(_nodeSha()),
-            ],
-          )
-          .getSingle();
+      final evaluation =
+          await db
+              .customSelect(
+                'SELECT execution, completion, assessment, output_json, evidence_json '
+                'FROM discipline_evaluation_records '
+                'WHERE project_id = ? AND logical_node_key_sha256 = ?',
+                variables: <Variable>[
+                  Variable.withString('p'),
+                  Variable.withString(_nodeSha()),
+                ],
+              )
+              .getSingle();
       expect(evaluation.read<String>('execution'), 'BLOCKED');
       expect(evaluation.read<String>('completion'), 'INCOMPLETE');
       expect(evaluation.read<String>('assessment'), 'UNRESOLVED');
@@ -84,17 +85,18 @@ void main() {
       expect(evidence['tzdbVersion'], '2026a');
       expect(evidence['temporalRulesHash'], isA<String>());
 
-      final pointer = await db
-          .customSelect(
-            'SELECT freshness, generation, evaluation_id '
-            'FROM discipline_evaluation_pointers '
-            'WHERE project_id = ? AND logical_node_key_sha256 = ?',
-            variables: <Variable>[
-              Variable.withString('p'),
-              Variable.withString(_nodeSha()),
-            ],
-          )
-          .getSingle();
+      final pointer =
+          await db
+              .customSelect(
+                'SELECT freshness, generation, evaluation_id '
+                'FROM discipline_evaluation_pointers '
+                'WHERE project_id = ? AND logical_node_key_sha256 = ?',
+                variables: <Variable>[
+                  Variable.withString('p'),
+                  Variable.withString(_nodeSha()),
+                ],
+              )
+              .getSingle();
       expect(pointer.read<String>('freshness'), 'CURRENT');
       expect(pointer.read<int>('generation'), 1);
       expect(pointer.readNullable<String>('evaluation_id'), isNotNull);

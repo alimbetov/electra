@@ -387,9 +387,10 @@ Fa08CablePolicyContract _policy(String minimumIz) => Fa08CablePolicyContract(
 );
 
 Future<int> _count(AppDatabase db, String table, String where) async {
-  final row = await db
-      .customSelect('SELECT COUNT(*) AS c FROM $table WHERE $where')
-      .getSingle();
+  final row =
+      await db
+          .customSelect('SELECT COUNT(*) AS c FROM $table WHERE $where')
+          .getSingle();
   return row.read<int>('c');
 }
 

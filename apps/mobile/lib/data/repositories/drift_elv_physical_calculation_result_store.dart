@@ -68,12 +68,11 @@ final class DriftElvPhysicalCalculationResultStore
   ) async {
     final row =
         await (database.select(database.projectDerivedResults)..where(
-              (candidate) =>
-                  candidate.projectId.equals(projectId) &
-                  candidate.nodeKey.equals(nodeKey) &
-                  candidate.deletedAt.isNull(),
-            ))
-            .getSingleOrNull();
+          (candidate) =>
+              candidate.projectId.equals(projectId) &
+              candidate.nodeKey.equals(nodeKey) &
+              candidate.deletedAt.isNull(),
+        )).getSingleOrNull();
     if (row == null) return null;
 
     final map = jsonDecode(row.resultJson) as Map<String, dynamic>;
@@ -102,17 +101,16 @@ final class DriftElvPhysicalCalculationResultStore
     if (keys.isEmpty) return;
 
     await (database.update(database.projectDerivedResults)..where(
-          (row) =>
-              row.projectId.equals(projectId) &
-              row.nodeKey.isIn(keys) &
-              row.deletedAt.isNull(),
-        ))
-        .write(
-          ProjectDerivedResultsCompanion(
-            state: const Value('STALE'),
-            updatedAt: Value(DateTime.now().toUtc()),
-            originDeviceId: Value(originDeviceId),
-          ),
-        );
+      (row) =>
+          row.projectId.equals(projectId) &
+          row.nodeKey.isIn(keys) &
+          row.deletedAt.isNull(),
+    )).write(
+      ProjectDerivedResultsCompanion(
+        state: const Value('STALE'),
+        updatedAt: Value(DateTime.now().toUtc()),
+        originDeviceId: Value(originDeviceId),
+      ),
+    );
   }
 }

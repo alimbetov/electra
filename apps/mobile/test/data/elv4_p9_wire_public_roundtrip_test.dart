@@ -48,11 +48,12 @@ void main() {
           'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
       final adapter = Elv4WireSemanticAdapter<Object?>(
         codecs: createElv4WireRuntimeCodecs(backend),
-        resolveImpact: (_) async => Elv4ResolvedWireImpact(
-          verifiedRows: const {},
-          changedDependencyRefs: const [],
-          reviewedImpactFingerprint: fingerprint,
-        ),
+        resolveImpact:
+            (_) async => Elv4ResolvedWireImpact(
+              verifiedRows: const {},
+              changedDependencyRefs: const [],
+              reviewedImpactFingerprint: fingerprint,
+            ),
       );
       final demand = DcConstantPowerDemand(PowerRational.integer(12)).toMap();
       final envelope = <String, Object?>{
@@ -82,13 +83,14 @@ void main() {
 
       final first = await adapter.dispatchMap(envelope);
       expect(first, isA<Object?>());
-      final persisted = await db
-          .customSelect(
-            'SELECT id, origin_id, typed_demand_json FROM power_load_bindings '
-            'WHERE design_revision_id = ? AND deleted_at IS NULL',
-            variables: [Variable.withString(builder.revisionId)],
-          )
-          .getSingle();
+      final persisted =
+          await db
+              .customSelect(
+                'SELECT id, origin_id, typed_demand_json FROM power_load_bindings '
+                'WHERE design_revision_id = ? AND deleted_at IS NULL',
+                variables: [Variable.withString(builder.revisionId)],
+              )
+              .getSingle();
       expect(persisted.read<String>('id'), 'public-load');
       expect(persisted.read<String>('origin_id'), 'canonical-origin');
       expect(
@@ -102,17 +104,18 @@ void main() {
         (await db.select(db.projectDesignRevisions).getSingle()).revision,
         2,
       );
-      final ledger = await db
-          .customSelect(
-            'SELECT command_type, payload_schema, status FROM power_operation_records '
-            'WHERE project_id = ? AND design_revision_id = ? AND operation_id = ?',
-            variables: [
-              Variable.withString(builder.projectId),
-              Variable.withString(builder.revisionId),
-              Variable.withString('public-load-1'),
-            ],
-          )
-          .getSingle();
+      final ledger =
+          await db
+              .customSelect(
+                'SELECT command_type, payload_schema, status FROM power_operation_records '
+                'WHERE project_id = ? AND design_revision_id = ? AND operation_id = ?',
+                variables: [
+                  Variable.withString(builder.projectId),
+                  Variable.withString(builder.revisionId),
+                  Variable.withString('public-load-1'),
+                ],
+              )
+              .getSingle();
       expect(ledger.read<String>('command_type'), 'SET_POWER_LOAD_PROFILE');
       expect(
         ledger.read<String>('payload_schema'),
@@ -126,7 +129,8 @@ void main() {
 
 final class _UnusedDelegate implements Elv4WireRuntimeBackend<Object?> {
   @override
-  dynamic noSuchMethod(Invocation invocation) => throw StateError(
-    'Unexpected delegated wire operation: ${invocation.memberName}',
-  );
+  dynamic noSuchMethod(Invocation invocation) =>
+      throw StateError(
+        'Unexpected delegated wire operation: ${invocation.memberName}',
+      );
 }

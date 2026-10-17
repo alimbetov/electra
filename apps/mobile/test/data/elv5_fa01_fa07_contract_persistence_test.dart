@@ -94,17 +94,19 @@ void main() {
     expect(topo2!.bindingRevision, 2);
     expect(topo2.evidenceRef, isNot(topoRef));
 
-    final revision = await db
-        .customSelect(
-          "SELECT revision FROM project_design_revisions WHERE id = 'd'",
-        )
-        .getSingle();
+    final revision =
+        await db
+            .customSelect(
+              "SELECT revision FROM project_design_revisions WHERE id = 'd'",
+            )
+            .getSingle();
     expect(revision.read<int>('revision'), 5);
-    final evidence = await db
-        .customSelect(
-          "SELECT evidence_ref FROM elv_revision_aggregate_evidence_records WHERE aggregate_id = 'loop-1'",
-        )
-        .get();
+    final evidence =
+        await db
+            .customSelect(
+              "SELECT evidence_ref FROM elv_revision_aggregate_evidence_records WHERE aggregate_id = 'loop-1'",
+            )
+            .get();
     expect(evidence, hasLength(4));
   });
 }

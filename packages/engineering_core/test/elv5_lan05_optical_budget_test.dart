@@ -117,7 +117,8 @@ void main() {
       expect(result.passes, isFalse);
     });
 
-    test('missing TxMax leaves overload unresolved but sensitivity assessable', () {
+    test('missing TxMax leaves overload unresolved but sensitivity assessable',
+        () {
       final direction = Lan05DirectionInput(
         wavelengthNm: _r('1310'),
         txMin: _dbm('-3'),
@@ -173,8 +174,16 @@ void main() {
 
       final kernel = const Lan05OpticalBudgetKernel();
       expect(
-        kernel.evaluate(Lan05Input(aToB: first, bToA: first)).aToB.physicalLoss.upper,
-        kernel.evaluate(Lan05Input(aToB: second, bToA: second)).aToB.physicalLoss.upper,
+        kernel
+            .evaluate(Lan05Input(aToB: first, bToA: first))
+            .aToB
+            .physicalLoss
+            .upper,
+        kernel
+            .evaluate(Lan05Input(aToB: second, bToA: second))
+            .aToB
+            .physicalLoss
+            .upper,
       );
     });
 

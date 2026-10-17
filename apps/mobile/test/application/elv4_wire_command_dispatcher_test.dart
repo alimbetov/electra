@@ -30,8 +30,8 @@ void main() {
       '../../docs/product/elv4-implementation/schemas/power-command.schema.json',
     );
     expect(file.existsSync(), isTrue);
-    final root = (jsonDecode(file.readAsStringSync()) as Map)
-        .cast<String, Object?>();
+    final root =
+        (jsonDecode(file.readAsStringSync()) as Map).cast<String, Object?>();
     final oneOf = (root['oneOf'] as List<Object?>).cast<Map<String, Object?>>();
     final schemaKeys = <String>{};
     for (final branch in oneOf) {
@@ -125,10 +125,10 @@ void main() {
   test('missing, extra and malformed envelope fields are rejected', () {
     final missing = command()..remove('commandId');
     final extra = command()..['unexpected'] = true;
-    final badRows = command()
-      ..['expectedRows'] = <String, Object?>{'LOAD-1': -1};
-    final badFingerprint = command()
-      ..['reviewedImpactFingerprint'] = 'NOT-A-SHA';
+    final badRows =
+        command()..['expectedRows'] = <String, Object?>{'LOAD-1': -1};
+    final badFingerprint =
+        command()..['reviewedImpactFingerprint'] = 'NOT-A-SHA';
 
     expect(
       () => Elv4WireCommandEnvelope.fromMap(missing),

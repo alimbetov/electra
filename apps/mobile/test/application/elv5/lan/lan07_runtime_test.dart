@@ -62,41 +62,43 @@ void main() {
     );
   });
 
-  test('LAN07 duplicate physical port assignments fail instead of creating capacity', () async {
-    final assignments = _assignments(4)
-      ..add(<String, Object?>{
+  test(
+    'LAN07 duplicate physical port assignments fail instead of creating capacity',
+    () async {
+      final assignments = _assignments(4)..add(<String, Object?>{
         'panelPortId': 'p1',
         'terminationId': 'term-5',
         'linkId': 'link-5',
       });
-    final payload = _payload(assignments);
-    final resolver = Lan07PersistedInputResolver(
-      lanStore: _Store(payload),
-      contractSource: _Contracts(
-        _contract(
-          payload,
-          requiredSources: const <String>{
-            'term-1',
-            'term-2',
-            'term-3',
-            'term-4',
-            'term-5',
-          },
+      final payload = _payload(assignments);
+      final resolver = Lan07PersistedInputResolver(
+        lanStore: _Store(payload),
+        contractSource: _Contracts(
+          _contract(
+            payload,
+            requiredSources: const <String>{
+              'term-1',
+              'term-2',
+              'term-3',
+              'term-4',
+              'term-5',
+            },
+          ),
         ),
-      ),
-    );
+      );
 
-    final result = await buildLan07Executor().execute(
-      await resolver.capture(_request()),
-    );
+      final result = await buildLan07Executor().execute(
+        await resolver.capture(_request()),
+      );
 
-    expect(result.assessment, Elv5Assessment.fail);
-    expect(result.output['occupied'], 4);
-    expect(
-      (result.output['conflictingAssignmentIds']! as List<Object?>),
-      hasLength(2),
-    );
-  });
+      expect(result.assessment, Elv5Assessment.fail);
+      expect(result.output['occupied'], 4);
+      expect(
+        (result.output['conflictingAssignmentIds']! as List<Object?>),
+        hasLength(2),
+      );
+    },
+  );
 }
 
 Elv5CalculationRequest _request() => Elv5CalculationRequest(

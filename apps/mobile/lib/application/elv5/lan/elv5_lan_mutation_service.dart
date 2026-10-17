@@ -76,13 +76,14 @@ final class Elv5LanMutationService {
     }
     return _runner.run(
       command,
-      prepare: (session, value) => _prepare(
-        session,
-        projectId: value.projectId,
-        designRevisionId: value.designRevisionId,
-        operation: value.operation,
-        payload: value.payload,
-      ),
+      prepare:
+          (session, value) => _prepare(
+            session,
+            projectId: value.projectId,
+            designRevisionId: value.designRevisionId,
+            operation: value.operation,
+            payload: value.payload,
+          ),
       apply: _apply,
     );
   }
@@ -103,9 +104,10 @@ final class Elv5LanMutationService {
     );
     final aggregateId =
         previous?.aggregateId ?? _bindingId(operation, subjectId);
-    final oldDependencies = previous == null
-        ? const <Map<String, Object?>>[]
-        : _dependencies(operation, previous.payload);
+    final oldDependencies =
+        previous == null
+            ? const <Map<String, Object?>>[]
+            : _dependencies(operation, previous.payload);
     final newDependencies = _dependencies(operation, payload);
     final keys = <String>{
       for (final item in oldDependencies) _encoder.sha256(item),
@@ -138,9 +140,8 @@ final class Elv5LanMutationService {
       'payload': previous?.payload,
     };
     return Elv5PreparedReplacement(
-      actualRowRevisions: previous == null
-          ? const {}
-          : {aggregateId: previous.revision},
+      actualRowRevisions:
+          previous == null ? const {} : {aggregateId: previous.revision},
       reviewedImpactFingerprint: fingerprint,
       staleNodeKeySha256s: stale,
       affectedIds: {subjectId, aggregateId},
@@ -163,9 +164,10 @@ final class Elv5LanMutationService {
     Elv5PreparedReplacement prepared,
   ) async {
     final subjectId = _subject(command.operation, command.payload);
-    final bindingId = prepared.actualRowRevisions.keys.isEmpty
-        ? _bindingId(command.operation, subjectId)
-        : prepared.actualRowRevisions.keys.single;
+    final bindingId =
+        prepared.actualRowRevisions.keys.isEmpty
+            ? _bindingId(command.operation, subjectId)
+            : prepared.actualRowRevisions.keys.single;
     await session.lan.replace(
       projectId: command.projectId,
       designRevisionId: command.designRevisionId,

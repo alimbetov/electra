@@ -9,9 +9,10 @@ void main() {
   final originVersion = int.tryParse(
     Platform.environment['ELV4_HISTORICAL_VERSION'] ?? '',
   );
-  final skipReason = fixturePath == null || originVersion == null
-      ? 'Executed by scripts/ci/run-elv4-historical-migration-matrix.sh.'
-      : false;
+  final skipReason =
+      fixturePath == null || originVersion == null
+          ? 'Executed by scripts/ci/run-elv4-historical-migration-matrix.sh.'
+          : false;
 
   test('real historical origin migrates to v23 without inventing power facts', () async {
     final source = File(fixturePath!);
@@ -35,26 +36,29 @@ void main() {
     expect(userVersion, 23);
     expect(db.schemaVersion, 23);
 
-    final project = await db
-        .customSelect("SELECT name FROM projects WHERE id = 'hist-project'")
-        .getSingle();
+    final project =
+        await db
+            .customSelect("SELECT name FROM projects WHERE id = 'hist-project'")
+            .getSingle();
     expect(project.read<String>('name'), 'Historical project');
 
-    final revision = await db
-        .customSelect(
-          "SELECT code, sequence, state, revision FROM project_design_revisions WHERE id = 'hist-revision'",
-        )
-        .getSingle();
+    final revision =
+        await db
+            .customSelect(
+              "SELECT code, sequence, state, revision FROM project_design_revisions WHERE id = 'hist-revision'",
+            )
+            .getSingle();
     expect(revision.read<String>('code'), 'R-HIST');
     expect(revision.read<int>('sequence'), 1);
     expect(revision.read<String>('state'), 'WORKING');
     expect(revision.read<int>('revision'), 7);
 
-    final physical = await db
-        .customSelect(
-          "SELECT schema_version, payload_json, payload_sha256 FROM design_revision_physical_snapshots WHERE design_revision_id = 'hist-revision'",
-        )
-        .getSingle();
+    final physical =
+        await db
+            .customSelect(
+              "SELECT schema_version, payload_json, payload_sha256 FROM design_revision_physical_snapshots WHERE design_revision_id = 'hist-revision'",
+            )
+            .getSingle();
     expect(physical.read<int>('schema_version'), 9);
     expect(physical.read<String>('payload_json'), '{"legacy":"stable"}');
     expect(
@@ -62,11 +66,12 @@ void main() {
       'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
     );
 
-    final legacyResult = await db
-        .customSelect(
-          "SELECT fingerprint, result_json, state, revision FROM project_derived_results WHERE project_id = 'hist-project' AND node_key = 'legacy-result'",
-        )
-        .getSingle();
+    final legacyResult =
+        await db
+            .customSelect(
+              "SELECT fingerprint, result_json, state, revision FROM project_derived_results WHERE project_id = 'hist-project' AND node_key = 'legacy-result'",
+            )
+            .getSingle();
     expect(
       legacyResult.read<String>('fingerprint'),
       'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
@@ -86,11 +91,12 @@ void main() {
     } else {
       expect(originVersion, 22);
       expect(scenarioCount, 1);
-      final scenario = await db
-          .customSelect(
-            "SELECT role, revision, policy_refs_json FROM power_operating_scenarios WHERE design_revision_id = 'hist-revision' AND id = 'HIST-NORMAL'",
-          )
-          .getSingle();
+      final scenario =
+          await db
+              .customSelect(
+                "SELECT role, revision, policy_refs_json FROM power_operating_scenarios WHERE design_revision_id = 'hist-revision' AND id = 'HIST-NORMAL'",
+              )
+              .getSingle();
       expect(scenario.read<String>('role'), 'NORMAL');
       expect(scenario.read<int>('revision'), 3);
       expect(scenario.read<String>('policy_refs_json'), '[]');

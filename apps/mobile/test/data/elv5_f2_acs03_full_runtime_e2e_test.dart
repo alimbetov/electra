@@ -17,181 +17,193 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('F2 ACS-03 Q6/Q7/Q8 qualifies persisted door, real PWR CURRENT evidence, publication, restart and freeze replay', () async {
-    final directory = await Directory.systemTemp.createTemp(
-      'electra-f2-acs03-full-runtime-',
-    );
-    final file = File('${directory.path}/qualification.sqlite');
-    addTearDown(() async {
-      if (directory.existsSync()) {
-        await directory.delete(recursive: true);
+  test(
+    'F2 ACS-03 Q6/Q7/Q8 qualifies persisted door, real PWR CURRENT evidence, publication, restart and freeze replay',
+    () async {
+      final directory = await Directory.systemTemp.createTemp(
+        'electra-f2-acs03-full-runtime-',
+      );
+      final file = File('${directory.path}/qualification.sqlite');
+      addTearDown(() async {
+        if (directory.existsSync()) {
+          await directory.delete(recursive: true);
+        }
+      });
+
+      var db = AppDatabase(NativeDatabase(file));
+      await _seedProjectAndLockReference(db);
+      await _persistDoorFacts(db);
+
+      final contractStore = DriftAcs03ElectricalContractStore(
+        db,
+        originDeviceId: 'f2-acs03',
+        nowUtc: _now,
+      );
+      await contractStore.replace(
+        ReplaceAcs03ElectricalContractCommand(
+          projectId: 'p',
+          designRevisionId: 'd',
+          bindingId: 'acs03-contract',
+          expectedBindingRevision: null,
+          expectedDesignRevision: 1,
+          contract: _contract(),
+        ),
+      );
+
+      final powerRuntime = DriftPowerPublicationRuntime(
+        db,
+        originDeviceId: 'f2-acs03-power',
+        now: _now,
+      );
+      for (final event in _events) {
+        await _publishPwr01(
+          powerRuntime,
+          event: event,
+          generationSeed: 'initial',
+        );
+        await _publishPwr03(
+          powerRuntime,
+          event: event,
+          generationSeed: 'initial',
+        );
       }
-    });
 
-    var db = AppDatabase(NativeDatabase(file));
-    await _seedProjectAndLockReference(db);
-    await _persistDoorFacts(db);
-
-    final contractStore = DriftAcs03ElectricalContractStore(
-      db,
-      originDeviceId: 'f2-acs03',
-      nowUtc: _now,
-    );
-    await contractStore.replace(
-      ReplaceAcs03ElectricalContractCommand(
-        projectId: 'p',
-        designRevisionId: 'd',
-        bindingId: 'acs03-contract',
-        expectedBindingRevision: null,
-        expectedDesignRevision: 1,
-        contract: _contract(),
-      ),
-    );
-
-    final powerRuntime = DriftPowerPublicationRuntime(
-      db,
-      originDeviceId: 'f2-acs03-power',
-      now: _now,
-    );
-    for (final event in _events) {
-      await _publishPwr01(
-        powerRuntime,
-        event: event,
-        generationSeed: 'initial',
+      // Q6: run the complete production ELV5 path. ACS-03 capture reads the
+      // persisted door aggregate, immutable electrical contract and verified
+      // ELV4 PWR01/PWR03 CURRENT pointers before publishing its own evaluation.
+      var runtime = DriftElv5CalculationRuntime.create(
+        db,
+        originDeviceId: 'f2-acs03',
+        nowUtc: _now,
       );
-      await _publishPwr03(
-        powerRuntime,
-        event: event,
-        generationSeed: 'initial',
+      final command = _calculationCommand(
+        commandId: 'acs03-calc-1',
+        expectedPointerGeneration: 0,
+        expectedDesignRevision: 2,
       );
-    }
+      final first = await runtime.service.execute(command);
+      expect(first.replayed, isFalse);
 
-    // Q6: run the complete production ELV5 path. ACS-03 capture reads the
-    // persisted door aggregate, immutable electrical contract and verified
-    // ELV4 PWR01/PWR03 CURRENT pointers before publishing its own evaluation.
-    var runtime = DriftElv5CalculationRuntime.create(
-      db,
-      originDeviceId: 'f2-acs03',
-      nowUtc: _now,
-    );
-    final command = _calculationCommand(
-      commandId: 'acs03-calc-1',
-      expectedPointerGeneration: 0,
-      expectedDesignRevision: 2,
-    );
-    final first = await runtime.service.execute(command);
-    expect(first.replayed, isFalse);
+      final pointerBeforeRestart = await _acsPointer(db);
+      expect(pointerBeforeRestart.freshness, 'CURRENT');
+      expect(pointerBeforeRestart.generation, 1);
+      expect(pointerBeforeRestart.evaluationId, isNotNull);
 
-    final pointerBeforeRestart = await _acsPointer(db);
-    expect(pointerBeforeRestart.freshness, 'CURRENT');
-    expect(pointerBeforeRestart.generation, 1);
-    expect(pointerBeforeRestart.evaluationId, isNotNull);
+      final persisted = await _acsEvaluation(
+        db,
+        pointerBeforeRestart.evaluationId!,
+      );
+      expect(persisted.execution, 'SUCCEEDED');
+      expect(persisted.completion, 'COMPLETE');
+      expect(persisted.assessment, 'PASS');
+      expect(persisted.inputFingerprint, hasLength(64));
+      expect(persisted.outputSha256, hasLength(64));
 
-    final persisted = await _acsEvaluation(
-      db,
-      pointerBeforeRestart.evaluationId!,
-    );
-    expect(persisted.execution, 'SUCCEEDED');
-    expect(persisted.completion, 'COMPLETE');
-    expect(persisted.assessment, 'PASS');
-    expect(persisted.inputFingerprint, hasLength(64));
-    expect(persisted.outputSha256, hasLength(64));
-
-    final dependencyRows = await db
-        .customSelect(
-          'SELECT dependency_key FROM discipline_dependency_index '
-          'WHERE project_id = ? AND design_revision_id = ? '
-          'AND logical_node_key_sha256 = ? ORDER BY dependency_key',
-          variables: <Variable>[
-            Variable.withString('p'),
-            Variable.withString('d'),
-            Variable.withString(_acsNodeSha()),
-          ],
-        )
-        .get();
-    final dependencyJson = dependencyRows
-        .map((row) => jsonDecode(row.read<String>('dependency_key')))
-        .whereType<Map>()
-        .map((value) => Map<String, Object?>.from(value))
-        .toList();
-    expect(
-      dependencyJson.where((value) => value['domain'] == 'ELV4_PWR01_CURRENT'),
-      hasLength(_events.length),
-    );
-    expect(
-      dependencyJson.where((value) => value['domain'] == 'ELV4_PWR03_CURRENT'),
-      hasLength(_events.length),
-    );
-
-    // Q7 restart: rebuild registry, resolvers, evidence readers and
-    // publication stores from the durable file. Replay must happen before
-    // recapture and preserve the exact logical result.
-    final logicalBeforeRestart = first.logicalResultJson;
-    await db.close();
-    db = AppDatabase(NativeDatabase(file));
-    runtime = DriftElv5CalculationRuntime.create(
-      db,
-      originDeviceId: 'f2-acs03-restarted',
-      nowUtc: _now,
-    );
-    final replay = await runtime.service.execute(command);
-    expect(replay.replayed, isTrue);
-    expect(replay.logicalResultJson, logicalBeforeRestart);
-    final pointerAfterRestart = await _acsPointer(db);
-    expect(pointerAfterRestart.generation, 1);
-    expect(pointerAfterRestart.evaluationId, pointerBeforeRestart.evaluationId);
-
-    // Q7 competing publication: a stale writer still expects generation 0.
-    // The durable CURRENT generation is already 1, so publication fails closed.
-    await expectLater(
-      runtime.service.execute(
-        _calculationCommand(
-          commandId: 'acs03-stale-writer',
-          expectedPointerGeneration: 0,
-          expectedDesignRevision: 2,
+      final dependencyRows =
+          await db
+              .customSelect(
+                'SELECT dependency_key FROM discipline_dependency_index '
+                'WHERE project_id = ? AND design_revision_id = ? '
+                'AND logical_node_key_sha256 = ? ORDER BY dependency_key',
+                variables: <Variable>[
+                  Variable.withString('p'),
+                  Variable.withString('d'),
+                  Variable.withString(_acsNodeSha()),
+                ],
+              )
+              .get();
+      final dependencyJson =
+          dependencyRows
+              .map((row) => jsonDecode(row.read<String>('dependency_key')))
+              .whereType<Map>()
+              .map((value) => Map<String, Object?>.from(value))
+              .toList();
+      expect(
+        dependencyJson.where(
+          (value) => value['domain'] == 'ELV4_PWR01_CURRENT',
         ),
-      ),
-      throwsA(
-        isA<Elv5ReplacementCommandException>().having(
-          (error) => error.code,
-          'code',
-          'ELV5_POINTER_GENERATION_CONFLICT',
+        hasLength(_events.length),
+      );
+      expect(
+        dependencyJson.where(
+          (value) => value['domain'] == 'ELV4_PWR03_CURRENT',
         ),
-      ),
-    );
+        hasLength(_events.length),
+      );
 
-    // Q8: freeze preserves historical replay, while new calculations are
-    // forbidden even when the caller supplies the latest pointer generation.
-    await db.customUpdate(
-      "UPDATE project_design_revisions SET state = 'FROZEN', revision = 3 "
-      "WHERE project_id = 'p' AND id = 'd'",
-    );
-    final frozenReplay = await runtime.service.execute(command);
-    expect(frozenReplay.replayed, isTrue);
-    expect(frozenReplay.logicalResultJson, logicalBeforeRestart);
+      // Q7 restart: rebuild registry, resolvers, evidence readers and
+      // publication stores from the durable file. Replay must happen before
+      // recapture and preserve the exact logical result.
+      final logicalBeforeRestart = first.logicalResultJson;
+      await db.close();
+      db = AppDatabase(NativeDatabase(file));
+      runtime = DriftElv5CalculationRuntime.create(
+        db,
+        originDeviceId: 'f2-acs03-restarted',
+        nowUtc: _now,
+      );
+      final replay = await runtime.service.execute(command);
+      expect(replay.replayed, isTrue);
+      expect(replay.logicalResultJson, logicalBeforeRestart);
+      final pointerAfterRestart = await _acsPointer(db);
+      expect(pointerAfterRestart.generation, 1);
+      expect(
+        pointerAfterRestart.evaluationId,
+        pointerBeforeRestart.evaluationId,
+      );
 
-    await expectLater(
-      runtime.service.execute(
-        _calculationCommand(
-          commandId: 'acs03-after-freeze',
-          expectedPointerGeneration: 1,
-          expectedDesignRevision: 3,
+      // Q7 competing publication: a stale writer still expects generation 0.
+      // The durable CURRENT generation is already 1, so publication fails closed.
+      await expectLater(
+        runtime.service.execute(
+          _calculationCommand(
+            commandId: 'acs03-stale-writer',
+            expectedPointerGeneration: 0,
+            expectedDesignRevision: 2,
+          ),
         ),
-      ),
-      throwsA(
-        isA<Elv5ReplacementCommandException>().having(
-          (error) => error.code,
-          'code',
-          'ELV5_DESIGN_REVISION_READ_ONLY',
+        throwsA(
+          isA<Elv5ReplacementCommandException>().having(
+            (error) => error.code,
+            'code',
+            'ELV5_POINTER_GENERATION_CONFLICT',
+          ),
         ),
-      ),
-    );
+      );
 
-    final frozenPointer = await _acsPointer(db);
-    expect(frozenPointer.generation, 1);
-    expect(frozenPointer.evaluationId, pointerBeforeRestart.evaluationId);
-    await db.close();
-  });
+      // Q8: freeze preserves historical replay, while new calculations are
+      // forbidden even when the caller supplies the latest pointer generation.
+      await db.customUpdate(
+        "UPDATE project_design_revisions SET state = 'FROZEN', revision = 3 "
+        "WHERE project_id = 'p' AND id = 'd'",
+      );
+      final frozenReplay = await runtime.service.execute(command);
+      expect(frozenReplay.replayed, isTrue);
+      expect(frozenReplay.logicalResultJson, logicalBeforeRestart);
+
+      await expectLater(
+        runtime.service.execute(
+          _calculationCommand(
+            commandId: 'acs03-after-freeze',
+            expectedPointerGeneration: 1,
+            expectedDesignRevision: 3,
+          ),
+        ),
+        throwsA(
+          isA<Elv5ReplacementCommandException>().having(
+            (error) => error.code,
+            'code',
+            'ELV5_DESIGN_REVISION_READ_ONLY',
+          ),
+        ),
+      );
+
+      final frozenPointer = await _acsPointer(db);
+      expect(frozenPointer.generation, 1);
+      expect(frozenPointer.evaluationId, pointerBeforeRestart.evaluationId);
+      await db.close();
+    },
+  );
 }
 
 final _events = <_AcsEventFixture>[
@@ -462,19 +474,20 @@ String _acsNodeSha() => const Elv5CanonicalJsonV1().sha256(
 );
 
 Future<_PointerRow> _acsPointer(AppDatabase db) async {
-  final row = await db
-      .customSelect(
-        'SELECT freshness, generation, evaluation_id '
-        'FROM discipline_evaluation_pointers '
-        'WHERE project_id = ? AND design_revision_id = ? '
-        'AND logical_node_key_sha256 = ?',
-        variables: <Variable>[
-          Variable.withString('p'),
-          Variable.withString('d'),
-          Variable.withString(_acsNodeSha()),
-        ],
-      )
-      .getSingle();
+  final row =
+      await db
+          .customSelect(
+            'SELECT freshness, generation, evaluation_id '
+            'FROM discipline_evaluation_pointers '
+            'WHERE project_id = ? AND design_revision_id = ? '
+            'AND logical_node_key_sha256 = ?',
+            variables: <Variable>[
+              Variable.withString('p'),
+              Variable.withString('d'),
+              Variable.withString(_acsNodeSha()),
+            ],
+          )
+          .getSingle();
   return _PointerRow(
     freshness: row.read<String>('freshness'),
     generation: row.read<int>('generation'),
@@ -486,17 +499,18 @@ Future<_EvaluationRow> _acsEvaluation(
   AppDatabase db,
   String evaluationId,
 ) async {
-  final row = await db
-      .customSelect(
-        'SELECT execution, completion, assessment, input_fingerprint, output_sha256 '
-        'FROM discipline_evaluation_records '
-        'WHERE project_id = ? AND evaluation_id = ?',
-        variables: <Variable>[
-          Variable.withString('p'),
-          Variable.withString(evaluationId),
-        ],
-      )
-      .getSingle();
+  final row =
+      await db
+          .customSelect(
+            'SELECT execution, completion, assessment, input_fingerprint, output_sha256 '
+            'FROM discipline_evaluation_records '
+            'WHERE project_id = ? AND evaluation_id = ?',
+            variables: <Variable>[
+              Variable.withString('p'),
+              Variable.withString(evaluationId),
+            ],
+          )
+          .getSingle();
   return _EvaluationRow(
     execution: row.read<String>('execution'),
     completion: row.read<String>('completion'),

@@ -95,9 +95,13 @@ final class Cctv01GeometryContract {
          geometryModelContentHash,
          'geometryModelContentHash',
        ),
-       expectedHostSurfacePatchId = expectedHostSurfacePatchId == null
-           ? null
-           : _text(expectedHostSurfacePatchId, 'expectedHostSurfacePatchId') {
+       expectedHostSurfacePatchId =
+           expectedHostSurfacePatchId == null
+               ? null
+               : _text(
+                 expectedHostSurfacePatchId,
+                 'expectedHostSurfacePatchId',
+               ) {
     if (expectedDefinitionVersion < 1) {
       throw ArgumentError.value(
         expectedDefinitionVersion,
@@ -286,11 +290,12 @@ final class Cctv01GeometryContract {
       forward: Cctv01ExactVec3Contract.fromMap(_map(map['forward'], 'forward')),
       right: Cctv01ExactVec3Contract.fromMap(_map(map['right'], 'right')),
       up: Cctv01ExactVec3Contract.fromMap(_map(map['up'], 'up')),
-      minimumCoverageRatio: map['minimumCoverageRatio'] == null
-          ? null
-          : Elv5Rational.fromMap(
-              _map(map['minimumCoverageRatio'], 'minimumCoverageRatio'),
-            ),
+      minimumCoverageRatio:
+          map['minimumCoverageRatio'] == null
+              ? null
+              : Elv5Rational.fromMap(
+                _map(map['minimumCoverageRatio'], 'minimumCoverageRatio'),
+              ),
       expectedHostSurfacePatchId: expectedHostSurfacePatchId,
       hostSurfaceFrame: hostSurfaceFrame,
       targetSurfaceFrame: targetSurfaceFrame,

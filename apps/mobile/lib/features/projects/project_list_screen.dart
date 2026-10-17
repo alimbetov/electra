@@ -23,8 +23,9 @@ class ProjectListScreen extends ConsumerWidget {
               constraints: BoxConstraints(maxWidth: maxWidth),
               child: projects.when(
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (error, stackTrace) =>
-                    Center(child: Text('Unable to load projects: $error')),
+                error:
+                    (error, stackTrace) =>
+                        Center(child: Text('Unable to load projects: $error')),
                 data: (items) {
                   if (items.isEmpty) {
                     return const Center(

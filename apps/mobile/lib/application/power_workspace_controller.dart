@@ -274,22 +274,24 @@ final class PowerWorkspaceController {
       );
     }
 
-    final executionCommandId = undo
-        ? (_pendingUndoCommandId ??= historyCommandIds.next())
-        : (_pendingRedoCommandId ??= historyCommandIds.next());
+    final executionCommandId =
+        undo
+            ? (_pendingUndoCommandId ??= historyCommandIds.next())
+            : (_pendingRedoCommandId ??= historyCommandIds.next());
     _state = state.startOperation();
     final context = state.context;
-    final result = undo
-        ? await history.undo(
-            projectId: context.projectId,
-            designRevisionId: context.designRevisionId,
-            executionCommandId: executionCommandId,
-          )
-        : await history.redo(
-            projectId: context.projectId,
-            designRevisionId: context.designRevisionId,
-            executionCommandId: executionCommandId,
-          );
+    final result =
+        undo
+            ? await history.undo(
+              projectId: context.projectId,
+              designRevisionId: context.designRevisionId,
+              executionCommandId: executionCommandId,
+            )
+            : await history.redo(
+              projectId: context.projectId,
+              designRevisionId: context.designRevisionId,
+              executionCommandId: executionCommandId,
+            );
     switch (result) {
       case ElvCommandSuccess<Object?>():
         _clearPendingHistoryCommands();

@@ -66,10 +66,12 @@ final class Acs04Input {
         pwr02GlobalDemandFingerprint.isEmpty ||
         expectedRequirementSetFingerprint.isEmpty ||
         pwr02RequirementSetFingerprint.isEmpty) {
-      throw ArgumentError('ACS04 fingerprints and source identity must not be empty.');
+      throw ArgumentError(
+          'ACS04 fingerprints and source identity must not be empty.');
     }
     if (powerCases.isEmpty && currentCases.isEmpty) {
-      throw ArgumentError('ACS04 requires at least one source capability dimension.');
+      throw ArgumentError(
+          'ACS04 requires at least one source capability dimension.');
     }
     _requireUnique(powerCases.map((e) => 'P:${e.caseId}'));
     _requireUnique(currentCases.map((e) => 'I:${e.caseId}'));
@@ -159,11 +161,14 @@ final class Acs04SourceRequirementKernel {
     if (input.requirementConflict) {
       return _blocked(input, 'ACS04_REQUIREMENT_SEMANTICS_CONFLICT');
     }
-    if (input.pwr01GlobalDemandFingerprint != input.expectedGlobalDemandFingerprint ||
-        input.pwr02GlobalDemandFingerprint != input.expectedGlobalDemandFingerprint) {
+    if (input.pwr01GlobalDemandFingerprint !=
+            input.expectedGlobalDemandFingerprint ||
+        input.pwr02GlobalDemandFingerprint !=
+            input.expectedGlobalDemandFingerprint) {
       return _blocked(input, 'ACS04_GLOBAL_DEMAND_CLOSURE_MISMATCH');
     }
-    if (input.pwr02RequirementSetFingerprint != input.expectedRequirementSetFingerprint) {
+    if (input.pwr02RequirementSetFingerprint !=
+        input.expectedRequirementSetFingerprint) {
       return _blocked(input, 'ACS04_REQUIREMENT_SET_FINGERPRINT_MISMATCH');
     }
 
@@ -212,8 +217,7 @@ final class Acs04SourceRequirementKernel {
       for (final result in currentResults)
         if (result.status == Acs04AssessmentStatus.fail)
           _FailureRef(result.caseId, Acs04GoverningDimension.current),
-    ]
-      ..sort((a, b) {
+    ]..sort((a, b) {
         final byCase = a.caseId.compareTo(b.caseId);
         if (byCase != 0) return byCase;
         return a.dimension.index.compareTo(b.dimension.index);
@@ -224,7 +228,8 @@ final class Acs04SourceRequirementKernel {
         status: Acs04AssessmentStatus.fail,
         powerCases: List.unmodifiable(powerResults),
         currentCases: List.unmodifiable(currentResults),
-        requirementContributors: List.unmodifiable(input.requirementContributors),
+        requirementContributors:
+            List.unmodifiable(input.requirementContributors),
         governingCaseId: governing.caseId,
         governingDimension: governing.dimension,
       );
@@ -255,7 +260,8 @@ final class Acs04SourceRequirementKernel {
         status: Acs04AssessmentStatus.blocked,
         powerCases: const [],
         currentCases: const [],
-        requirementContributors: List.unmodifiable(input.requirementContributors),
+        requirementContributors:
+            List.unmodifiable(input.requirementContributors),
         blockingReason: reason,
       );
 

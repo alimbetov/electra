@@ -29,18 +29,19 @@ final class DriftElv5DependencyInvalidator {
     if (hashes.isEmpty) return 0;
     final ordered = hashes.toList()..sort();
     final placeholders = List.filled(ordered.length, '?').join(',');
-    final rows = await database
-        .customSelect(
-          'SELECT DISTINCT logical_node_key_sha256 FROM discipline_dependency_index '
-          'WHERE project_id = ? AND design_revision_id = ? '
-          'AND dependency_key_sha256 IN ($placeholders)',
-          variables: <Variable>[
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            ...ordered.map(Variable.withString),
-          ],
-        )
-        .get();
+    final rows =
+        await database
+            .customSelect(
+              'SELECT DISTINCT logical_node_key_sha256 FROM discipline_dependency_index '
+              'WHERE project_id = ? AND design_revision_id = ? '
+              'AND dependency_key_sha256 IN ($placeholders)',
+              variables: <Variable>[
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                ...ordered.map(Variable.withString),
+              ],
+            )
+            .get();
     final nodeHashes = <String>{
       for (final row in rows) row.read<String>('logical_node_key_sha256'),
     };

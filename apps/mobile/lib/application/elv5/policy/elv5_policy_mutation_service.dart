@@ -82,13 +82,14 @@ final class Elv5PolicyMutationService {
     }
     return _runner.run(
       command,
-      prepare: (session, value) => _prepare(
-        session,
-        projectId: value.projectId,
-        designRevisionId: value.designRevisionId,
-        operation: value.operation,
-        payload: value.payload,
-      ),
+      prepare:
+          (session, value) => _prepare(
+            session,
+            projectId: value.projectId,
+            designRevisionId: value.designRevisionId,
+            operation: value.operation,
+            payload: value.payload,
+          ),
       apply: _apply,
     );
   }
@@ -151,12 +152,14 @@ final class Elv5PolicyMutationService {
       }
     }
 
-    final oldDependencies = previous == null
-        ? const <Map<String, Object?>>[]
-        : _dependencies(previous.payload);
-    final newDependencies = candidate == null
-        ? const <Map<String, Object?>>[]
-        : _dependencies(candidate);
+    final oldDependencies =
+        previous == null
+            ? const <Map<String, Object?>>[]
+            : _dependencies(previous.payload);
+    final newDependencies =
+        candidate == null
+            ? const <Map<String, Object?>>[]
+            : _dependencies(candidate);
     final hashes = <String>{
       for (final dependency in oldDependencies) _encoder.sha256(dependency),
       for (final dependency in newDependencies) _encoder.sha256(dependency),
@@ -192,9 +195,8 @@ final class Elv5PolicyMutationService {
       affected.add(subject['id']! as String);
     }
     return Elv5PreparedReplacement(
-      actualRowRevisions: previous == null
-          ? const {}
-          : {bindingId: previous.revision},
+      actualRowRevisions:
+          previous == null ? const {} : {bindingId: previous.revision},
       reviewedImpactFingerprint: fingerprint,
       staleNodeKeySha256s: stale,
       affectedIds: affected,
@@ -253,13 +255,14 @@ final class Elv5PolicyMutationService {
         );
         afterPayload = null;
     }
-    final afterSnapshot = afterPayload == null
-        ? null
-        : await session.policies.loadByBindingId(
-            projectId: command.projectId,
-            designRevisionId: command.designRevisionId,
-            bindingId: bindingId,
-          );
+    final afterSnapshot =
+        afterPayload == null
+            ? null
+            : await session.policies.loadByBindingId(
+              projectId: command.projectId,
+              designRevisionId: command.designRevisionId,
+              bindingId: bindingId,
+            );
     final result = {
       'operation': command.operation,
       'bindingId': bindingId,

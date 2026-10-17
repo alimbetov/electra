@@ -107,9 +107,8 @@ final class Fa04SourceCaseContract {
     final dimension = switch (_mapText(map, 'dimension')) {
       'WATT' => Fa04SourceDimension.watt,
       'CURRENT' => Fa04SourceDimension.current,
-      final value => throw FormatException(
-        'Unsupported FA04 dimension: $value',
-      ),
+      final value =>
+        throw FormatException('Unsupported FA04 dimension: $value'),
     };
     return Fa04SourceCaseContract(
       caseId: _mapText(map, 'caseId'),
@@ -244,8 +243,9 @@ abstract interface class Fa04SourceRequirementContractSource {
 List<Fa04RequirementContributorRef> _contributors(
   Iterable<Fa04RequirementContributorRef> values,
 ) {
-  final result = values.toList()
-    ..sort((a, b) => a.contributorId.compareTo(b.contributorId));
+  final result =
+      values.toList()
+        ..sort((a, b) => a.contributorId.compareTo(b.contributorId));
   final ids = <String>{};
   for (final value in result) {
     if (!ids.add(value.contributorId)) {

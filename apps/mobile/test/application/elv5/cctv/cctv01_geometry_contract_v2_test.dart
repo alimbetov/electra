@@ -55,12 +55,13 @@ void main() {
     'legacy v1 edition remains readable but is not exact-frame qualified',
     () {
       final v2 = contractV2().toCanonicalValue();
-      final legacy = Map<String, Object?>.from(v2)
-        ..['schema'] = Cctv01GeometryContract.legacySchema
-        ..remove('expectedHostSurfacePatchId')
-        ..remove('hostSurfaceFrame')
-        ..remove('targetSurfaceFrame')
-        ..remove('legacyFrameAxisTolerance');
+      final legacy =
+          Map<String, Object?>.from(v2)
+            ..['schema'] = Cctv01GeometryContract.legacySchema
+            ..remove('expectedHostSurfacePatchId')
+            ..remove('hostSurfaceFrame')
+            ..remove('targetSurfaceFrame')
+            ..remove('legacyFrameAxisTolerance');
 
       final decoded = Cctv01GeometryContract.fromMap(legacy);
       expect(decoded.effectiveSchema, Cctv01GeometryContract.legacySchema);

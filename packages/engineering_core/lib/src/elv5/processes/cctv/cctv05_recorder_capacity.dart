@@ -2,8 +2,11 @@ import '../../numeric/quantity.dart';
 import '../../numeric/rational.dart';
 
 enum Cctv05AssessmentStatus { pass, fail, unresolved, blocked }
+
 enum Cctv05ChannelAccountingBasis { device, encodedStream, licenseChannel }
+
 enum Cctv05StorageClaimBasis { expectedEstimate, guaranteedUpperBound }
+
 enum Cctv05GoverningDimension { channel, ingress, codec, storage }
 
 final class Cctv05RecorderCapability {
@@ -34,7 +37,10 @@ final class Cctv05RecorderAssignment {
     required this.licenseChannelId,
     required this.codecProfile,
   }) {
-    if (assignmentId.isEmpty || deviceId.isEmpty || encodedStreamId.isEmpty || licenseChannelId.isEmpty) {
+    if (assignmentId.isEmpty ||
+        deviceId.isEmpty ||
+        encodedStreamId.isEmpty ||
+        licenseChannelId.isEmpty) {
       throw ArgumentError('CCTV05 assignment identities must not be empty.');
     }
   }
@@ -91,12 +97,14 @@ final class Cctv05Input {
     if (recorderId.isEmpty ||
         expectedIngressScopeFingerprint.isEmpty ||
         expectedStorageScopeFingerprint.isEmpty) {
-      throw ArgumentError('CCTV05 recorder/scope identities must not be empty.');
+      throw ArgumentError(
+          'CCTV05 recorder/scope identities must not be empty.');
     }
     final seen = <String>{};
     for (final assignment in assignments) {
       if (!seen.add(assignment.assignmentId)) {
-        throw ArgumentError('CCTV05 duplicate assignmentId: ${assignment.assignmentId}');
+        throw ArgumentError(
+            'CCTV05 duplicate assignmentId: ${assignment.assignmentId}');
       }
     }
   }
@@ -152,14 +160,17 @@ final class Cctv05RecorderCapacityKernel {
   const Cctv05RecorderCapacityKernel();
 
   Cctv05Result evaluate(Cctv05Input input) {
-    if (input.ingressEvidence.scopeFingerprint != input.expectedIngressScopeFingerprint) {
+    if (input.ingressEvidence.scopeFingerprint !=
+        input.expectedIngressScopeFingerprint) {
       return _blocked(input, 'CCTV05_INGRESS_SCOPE_MISMATCH');
     }
-    if (input.storageEvidence.scopeFingerprint != input.expectedStorageScopeFingerprint) {
+    if (input.storageEvidence.scopeFingerprint !=
+        input.expectedStorageScopeFingerprint) {
       return _blocked(input, 'CCTV05_STORAGE_SCOPE_MISMATCH');
     }
     if (input.requireGuaranteedStorage &&
-        input.storageEvidence.basis != Cctv05StorageClaimBasis.guaranteedUpperBound) {
+        input.storageEvidence.basis !=
+            Cctv05StorageClaimBasis.guaranteedUpperBound) {
       return _blocked(input, 'CCTV05_GUARANTEED_STORAGE_CLAIM_REQUIRED');
     }
 
@@ -167,14 +178,18 @@ final class Cctv05RecorderCapacityKernel {
     for (final assignment in input.assignments) {
       units.add(switch (input.accountingBasis) {
         Cctv05ChannelAccountingBasis.device => assignment.deviceId,
-        Cctv05ChannelAccountingBasis.encodedStream => assignment.encodedStreamId,
-        Cctv05ChannelAccountingBasis.licenseChannel => assignment.licenseChannelId,
+        Cctv05ChannelAccountingBasis.encodedStream =>
+          assignment.encodedStreamId,
+        Cctv05ChannelAccountingBasis.licenseChannel =>
+          assignment.licenseChannelId,
       });
     }
     final consumedChannels = units.length;
     final channelMargin = input.capability.channelLimit - consumedChannels;
-    final ingressMargin = input.capability.peakIngressCapacity - input.ingressEvidence.peakIngress;
-    final storageMargin = input.capability.usableStorageCapacity - input.storageEvidence.requiredUsable;
+    final ingressMargin = input.capability.peakIngressCapacity -
+        input.ingressEvidence.peakIngress;
+    final storageMargin = input.capability.usableStorageCapacity -
+        input.storageEvidence.requiredUsable;
 
     final assignments = [...input.assignments]
       ..sort((a, b) => a.encodedStreamId.compareTo(b.encodedStreamId));
@@ -192,30 +207,67 @@ final class Cctv05RecorderCapacityKernel {
     }
 
     if (channelMargin < 0) {
-      return _result(input, consumedChannels, channelMargin, ingressMargin, storageMargin,
-          codecResults, Cctv05AssessmentStatus.fail, Cctv05GoverningDimension.channel);
+      return _result(
+          input,
+          consumedChannels,
+          channelMargin,
+          ingressMargin,
+          storageMargin,
+          codecResults,
+          Cctv05AssessmentStatus.fail,
+          Cctv05GoverningDimension.channel);
     }
     if (ingressMargin.value < Elv5Rational.zero) {
-      return _result(input, consumedChannels, channelMargin, ingressMargin, storageMargin,
-          codecResults, Cctv05AssessmentStatus.fail, Cctv05GoverningDimension.ingress);
+      return _result(
+          input,
+          consumedChannels,
+          channelMargin,
+          ingressMargin,
+          storageMargin,
+          codecResults,
+          Cctv05AssessmentStatus.fail,
+          Cctv05GoverningDimension.ingress);
     }
-    final codecFail = codecResults.any((e) => e.status == Cctv05AssessmentStatus.fail);
+    final codecFail =
+        codecResults.any((e) => e.status == Cctv05AssessmentStatus.fail);
     if (codecFail) {
-      return _result(input, consumedChannels, channelMargin, ingressMargin, storageMargin,
-          codecResults, Cctv05AssessmentStatus.fail, Cctv05GoverningDimension.codec);
+      return _result(
+          input,
+          consumedChannels,
+          channelMargin,
+          ingressMargin,
+          storageMargin,
+          codecResults,
+          Cctv05AssessmentStatus.fail,
+          Cctv05GoverningDimension.codec);
     }
     if (storageMargin.value < Elv5Rational.zero) {
-      return _result(input, consumedChannels, channelMargin, ingressMargin, storageMargin,
-          codecResults, Cctv05AssessmentStatus.fail, Cctv05GoverningDimension.storage);
+      return _result(
+          input,
+          consumedChannels,
+          channelMargin,
+          ingressMargin,
+          storageMargin,
+          codecResults,
+          Cctv05AssessmentStatus.fail,
+          Cctv05GoverningDimension.storage);
     }
-    final codecUnresolved = codecResults.any((e) => e.status == Cctv05AssessmentStatus.unresolved);
+    final codecUnresolved =
+        codecResults.any((e) => e.status == Cctv05AssessmentStatus.unresolved);
     if (codecUnresolved) {
-      return _result(input, consumedChannels, channelMargin, ingressMargin, storageMargin,
-          codecResults, Cctv05AssessmentStatus.unresolved, Cctv05GoverningDimension.codec);
+      return _result(
+          input,
+          consumedChannels,
+          channelMargin,
+          ingressMargin,
+          storageMargin,
+          codecResults,
+          Cctv05AssessmentStatus.unresolved,
+          Cctv05GoverningDimension.codec);
     }
 
-    return _result(input, consumedChannels, channelMargin, ingressMargin, storageMargin,
-        codecResults, Cctv05AssessmentStatus.pass, null);
+    return _result(input, consumedChannels, channelMargin, ingressMargin,
+        storageMargin, codecResults, Cctv05AssessmentStatus.pass, null);
   }
 
   Cctv05Result _result(
@@ -246,9 +298,11 @@ final class Cctv05RecorderCapacityKernel {
         consumedChannels: 0,
         channelMargin: input.capability.channelLimit,
         peakIngress: input.ingressEvidence.peakIngress,
-        ingressMargin: input.capability.peakIngressCapacity - input.ingressEvidence.peakIngress,
+        ingressMargin: input.capability.peakIngressCapacity -
+            input.ingressEvidence.peakIngress,
         requiredUsable: input.storageEvidence.requiredUsable,
-        storageMargin: input.capability.usableStorageCapacity - input.storageEvidence.requiredUsable,
+        storageMargin: input.capability.usableStorageCapacity -
+            input.storageEvidence.requiredUsable,
         codecResults: const [],
         governingDimension: null,
         blockingReason: reason,

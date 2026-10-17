@@ -54,8 +54,9 @@ void main() {
         expectedPointerGeneration: 0,
       );
 
-      final captured = await Cctv02PersistedInputResolver(store: store)
-          .capture(request);
+      final captured = await Cctv02PersistedInputResolver(
+        store: store,
+      ).capture(request);
       final candidate = await buildCctv02Executor(
         nowUtc: () => DateTime.utc(2026, 10, 16),
       ).execute(captured);

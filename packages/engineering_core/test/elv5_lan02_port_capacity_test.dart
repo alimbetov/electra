@@ -47,8 +47,16 @@ void main() {
           Lan02PhysicalPort(portId: 'p2', media: 'copper', maxSpeedMbps: 1000),
         ],
         assignments: [
-          Lan02PortAssignment(endpointId: 'e1', portId: 'p1', requiredMedia: 'copper', requiredSpeedMbps: 1000),
-          Lan02PortAssignment(endpointId: 'e2', portId: 'p1', requiredMedia: 'copper', requiredSpeedMbps: 1000),
+          Lan02PortAssignment(
+              endpointId: 'e1',
+              portId: 'p1',
+              requiredMedia: 'copper',
+              requiredSpeedMbps: 1000),
+          Lan02PortAssignment(
+              endpointId: 'e2',
+              portId: 'p1',
+              requiredMedia: 'copper',
+              requiredSpeedMbps: 1000),
         ],
         unavailablePortIds: {},
         sparePolicy: Lan02SparePolicy(

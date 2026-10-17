@@ -25,23 +25,26 @@ void main() {
     expect(result.powerCases.single.margin.value, Elv5Rational.integer(4));
   });
 
-  test('blocks Fire projection when PWR-02 input belongs to another requirement set', () async {
-    final resolver = Fa04PersistedInputResolver(
-      contractSource: _ContractSource(_contract(_hash('a'))),
-      powerEvidence: _PowerEvidence(_hash('e')),
-    );
+  test(
+    'blocks Fire projection when PWR-02 input belongs to another requirement set',
+    () async {
+      final resolver = Fa04PersistedInputResolver(
+        contractSource: _ContractSource(_contract(_hash('a'))),
+        powerEvidence: _PowerEvidence(_hash('e')),
+      );
 
-    await expectLater(
-      resolver.capture(_request()),
-      throwsA(
-        isA<Elv5CaptureBlockedException>().having(
-          (value) => value.reasonCode,
-          'reasonCode',
-          'FA04_PWR02_REQUIREMENT_SET_INPUT_MISMATCH',
+      await expectLater(
+        resolver.capture(_request()),
+        throwsA(
+          isA<Elv5CaptureBlockedException>().having(
+            (value) => value.reasonCode,
+            'reasonCode',
+            'FA04_PWR02_REQUIREMENT_SET_INPUT_MISMATCH',
+          ),
         ),
-      ),
-    );
-  });
+      );
+    },
+  );
 }
 
 Elv5CalculationRequest _request() => Elv5CalculationRequest(

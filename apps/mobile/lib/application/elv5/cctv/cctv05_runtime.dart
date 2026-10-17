@@ -314,9 +314,10 @@ final class Cctv05PersistedInputResolver
       final currentBasis = switch (current.output['sizingBasis']) {
         'expectedEstimate' => Cctv05StorageClaimBasis.expectedEstimate,
         'guaranteedUpperBound' => Cctv05StorageClaimBasis.guaranteedUpperBound,
-        final value => throw FormatException(
-          'Unsupported CCTV03 sizingBasis for CCTV05: $value',
-        ),
+        final value =>
+          throw FormatException(
+            'Unsupported CCTV03 sizingBasis for CCTV05: $value',
+          ),
       };
       storageBasis ??= currentBasis;
       if (storageBasis != currentBasis)
@@ -355,9 +356,8 @@ final class Cctv05PersistedInputResolver
       'DEVICE' => Cctv05ChannelAccountingBasis.device,
       'ENCODED_STREAM' => Cctv05ChannelAccountingBasis.encodedStream,
       'LICENSE_CHANNEL' => Cctv05ChannelAccountingBasis.licenseChannel,
-      final value => throw FormatException(
-        'Unsupported CCTV05 accountingBasis: $value',
-      ),
+      final value =>
+        throw FormatException('Unsupported CCTV05 accountingBasis: $value'),
     };
     upstream.sort(
       (a, b) => (a['evaluationId']! as String).compareTo(
@@ -453,14 +453,15 @@ final class Cctv05PersistedInputResolver
     String policy,
     List<Elv5DependencyMarker> deps,
     Map<String, Object?> evidence,
-  ) => throw Elv5CaptureBlockedException(
-    request: request,
-    reasonCode: reason,
-    inputFingerprint: input,
-    policyFingerprint: policy,
-    dependencies: deps,
-    evidence: evidence,
-  );
+  ) =>
+      throw Elv5CaptureBlockedException(
+        request: request,
+        reasonCode: reason,
+        inputFingerprint: input,
+        policyFingerprint: policy,
+        dependencies: deps,
+        evidence: evidence,
+      );
   Elv5DependencyMarker _dependency(
     Elv5CalculationRequest request,
     String relation,
@@ -514,39 +515,46 @@ Elv5PureKernelExecutor<Cctv05Input, Cctv05Result> buildCctv05Executor({
 }) => Elv5PureKernelExecutor<Cctv05Input, Cctv05Result>(
   processCode: Elv5ProcessCode.cctv05,
   calculate: const Cctv05RecorderCapacityKernel().evaluate,
-  encodeOutput: (r) => <String, Object?>{
-    'schema': 'electra.elv5-cctv05-output.v1',
-    'status': r.status.name,
-    'consumedChannels': r.consumedChannels,
-    'channelMargin': r.channelMargin,
-    'peakIngressBps': r.peakIngress.value.toMap(),
-    'ingressMarginBps': r.ingressMargin.value.toMap(),
-    'requiredUsableBytes': r.requiredUsable.value.toMap(),
-    'storageMarginBytes': r.storageMargin.value.toMap(),
-    'codecResults': <Object?>[
-      for (final v in r.codecResults)
-        <String, Object?>{'streamId': v.streamId, 'status': v.status.name},
-    ],
-    'governingDimension': r.governingDimension?.name,
-    'blockingReason': r.blockingReason,
-  },
-  encodeEvidence: (c, _) => <String, Object?>{
-    'schema': 'electra.elv5-cctv05-evidence.v1',
-    'source': 'CURRENT_CCTV02_RECORDER_INGRESS_PLUS_CURRENT_CCTV03_STORAGE',
-    'upstreamPointerGenerations': c.upstreamPointerGenerations,
-  },
-  executionOf: (r) => r.status == Cctv05AssessmentStatus.blocked
-      ? Elv5Execution.blocked
-      : Elv5Execution.succeeded,
-  completionOf: (r) => r.status == Cctv05AssessmentStatus.blocked
-      ? Elv5Completion.incomplete
-      : Elv5Completion.complete,
-  assessmentOf: (r) => switch (r.status) {
-    Cctv05AssessmentStatus.pass => Elv5Assessment.pass,
-    Cctv05AssessmentStatus.fail => Elv5Assessment.fail,
-    Cctv05AssessmentStatus.unresolved => Elv5Assessment.unresolved,
-    Cctv05AssessmentStatus.blocked => Elv5Assessment.unresolved,
-  },
+  encodeOutput:
+      (r) => <String, Object?>{
+        'schema': 'electra.elv5-cctv05-output.v1',
+        'status': r.status.name,
+        'consumedChannels': r.consumedChannels,
+        'channelMargin': r.channelMargin,
+        'peakIngressBps': r.peakIngress.value.toMap(),
+        'ingressMarginBps': r.ingressMargin.value.toMap(),
+        'requiredUsableBytes': r.requiredUsable.value.toMap(),
+        'storageMarginBytes': r.storageMargin.value.toMap(),
+        'codecResults': <Object?>[
+          for (final v in r.codecResults)
+            <String, Object?>{'streamId': v.streamId, 'status': v.status.name},
+        ],
+        'governingDimension': r.governingDimension?.name,
+        'blockingReason': r.blockingReason,
+      },
+  encodeEvidence:
+      (c, _) => <String, Object?>{
+        'schema': 'electra.elv5-cctv05-evidence.v1',
+        'source': 'CURRENT_CCTV02_RECORDER_INGRESS_PLUS_CURRENT_CCTV03_STORAGE',
+        'upstreamPointerGenerations': c.upstreamPointerGenerations,
+      },
+  executionOf:
+      (r) =>
+          r.status == Cctv05AssessmentStatus.blocked
+              ? Elv5Execution.blocked
+              : Elv5Execution.succeeded,
+  completionOf:
+      (r) =>
+          r.status == Cctv05AssessmentStatus.blocked
+              ? Elv5Completion.incomplete
+              : Elv5Completion.complete,
+  assessmentOf:
+      (r) => switch (r.status) {
+        Cctv05AssessmentStatus.pass => Elv5Assessment.pass,
+        Cctv05AssessmentStatus.fail => Elv5Assessment.fail,
+        Cctv05AssessmentStatus.unresolved => Elv5Assessment.unresolved,
+        Cctv05AssessmentStatus.blocked => Elv5Assessment.unresolved,
+      },
   nowUtc: nowUtc,
 );
 

@@ -19,30 +19,31 @@ final class DriftElv3RealizedLinkFactSource
     required String designRevisionId,
     required String realizedSectionId,
   }) async {
-    final rows = await database
-        .customSelect(
-          'SELECT t.id AS traversal_id, t.route_segment_id, t.cable_run_id, '
-          'r.revision AS run_revision, r.reserve_percent, '
-          'r.termination_allowance_mm, '
-          'n1.world_xmm AS x1, n1.world_ymm AS y1, n1.world_zmm AS z1, '
-          'n2.world_xmm AS x2, n2.world_ymm AS y2, n2.world_zmm AS z2, '
-          '(SELECT COUNT(*) FROM cable_run_traversals tx '
-          ' WHERE tx.cable_run_id = r.id AND tx.deleted_at IS NULL) AS run_member_count '
-          'FROM cable_run_traversals t '
-          'JOIN canonical_cable_runs r ON r.id = t.cable_run_id '
-          'JOIN cable_route_segments s ON s.id = t.route_segment_id '
-          'JOIN cable_route_nodes n1 ON n1.id = s.from_node_id '
-          'JOIN cable_route_nodes n2 ON n2.id = s.to_node_id '
-          'WHERE r.project_id = ? AND r.design_revision_id = ? '
-          'AND t.id = ? AND r.deleted_at IS NULL AND t.deleted_at IS NULL '
-          'AND s.deleted_at IS NULL AND n1.deleted_at IS NULL AND n2.deleted_at IS NULL',
-          variables: <Variable>[
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            Variable.withString(realizedSectionId),
-          ],
-        )
-        .get();
+    final rows =
+        await database
+            .customSelect(
+              'SELECT t.id AS traversal_id, t.route_segment_id, t.cable_run_id, '
+              'r.revision AS run_revision, r.reserve_percent, '
+              'r.termination_allowance_mm, '
+              'n1.world_xmm AS x1, n1.world_ymm AS y1, n1.world_zmm AS z1, '
+              'n2.world_xmm AS x2, n2.world_ymm AS y2, n2.world_zmm AS z2, '
+              '(SELECT COUNT(*) FROM cable_run_traversals tx '
+              ' WHERE tx.cable_run_id = r.id AND tx.deleted_at IS NULL) AS run_member_count '
+              'FROM cable_run_traversals t '
+              'JOIN canonical_cable_runs r ON r.id = t.cable_run_id '
+              'JOIN cable_route_segments s ON s.id = t.route_segment_id '
+              'JOIN cable_route_nodes n1 ON n1.id = s.from_node_id '
+              'JOIN cable_route_nodes n2 ON n2.id = s.to_node_id '
+              'WHERE r.project_id = ? AND r.design_revision_id = ? '
+              'AND t.id = ? AND r.deleted_at IS NULL AND t.deleted_at IS NULL '
+              'AND s.deleted_at IS NULL AND n1.deleted_at IS NULL AND n2.deleted_at IS NULL',
+              variables: <Variable>[
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                Variable.withString(realizedSectionId),
+              ],
+            )
+            .get();
     if (rows.isEmpty) {
       throw StateError('ELV3_REALIZED_SECTION_NOT_FOUND:$realizedSectionId');
     }
@@ -75,12 +76,10 @@ final class DriftElv3RealizedLinkFactSource
     final dz = BigInt.from(row.read<int>('z2') - row.read<int>('z1'));
     final squareMm = dx * dx + dy * dy + dz * dz;
     final floorMm = _integerSqrt(squareMm);
-    final ceilMm = floorMm * floorMm == squareMm
-        ? floorMm
-        : floorMm + BigInt.one;
-    final allowance = memberCount == 1
-        ? BigInt.from(terminationMm)
-        : BigInt.zero;
+    final ceilMm =
+        floorMm * floorMm == squareMm ? floorMm : floorMm + BigInt.one;
+    final allowance =
+        memberCount == 1 ? BigInt.from(terminationMm) : BigInt.zero;
 
     final lower = Length(Elv5Rational(floorMm + allowance, BigInt.from(1000)));
     final upper = Length(Elv5Rational(ceilMm + allowance, BigInt.from(1000)));

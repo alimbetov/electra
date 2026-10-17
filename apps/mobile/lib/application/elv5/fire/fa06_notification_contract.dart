@@ -57,9 +57,8 @@ final class Fa06CaseContract {
     final operatingCase = switch (_mapText(map, 'operatingCase')) {
       'ACTIVE_NOTIFICATION' => Fa06ContractCase.activeNotification,
       'STARTUP_INRUSH' => Fa06ContractCase.startupInrush,
-      final value => throw FormatException(
-        'Unsupported FA06 operatingCase: $value',
-      ),
+      final value =>
+        throw FormatException('Unsupported FA06 operatingCase: $value'),
     };
     return Fa06CaseContract(
       operatingCase: operatingCase,
@@ -344,8 +343,10 @@ abstract interface class Fa06NotificationContractSource {
 }
 
 List<Fa06CaseContract> _cases(Iterable<Fa06CaseContract> values) {
-  final result = values.toList()
-    ..sort((a, b) => a.operatingCase.index.compareTo(b.operatingCase.index));
+  final result =
+      values.toList()..sort(
+        (a, b) => a.operatingCase.index.compareTo(b.operatingCase.index),
+      );
   final seen = <Fa06ContractCase>{};
   for (final value in result) {
     if (!seen.add(value.operatingCase)) {
@@ -360,8 +361,8 @@ List<Fa06CaseContract> _cases(Iterable<Fa06CaseContract> values) {
 List<Fa06SupervisionFaultResult> _faultResults(
   Iterable<Fa06SupervisionFaultResult> values,
 ) {
-  final result = values.toList()
-    ..sort((a, b) => a.faultCode.compareTo(b.faultCode));
+  final result =
+      values.toList()..sort((a, b) => a.faultCode.compareTo(b.faultCode));
   final codes = <String>{};
   for (final value in result) {
     if (!codes.add(value.faultCode)) {

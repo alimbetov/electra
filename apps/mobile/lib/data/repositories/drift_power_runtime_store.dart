@@ -58,18 +58,19 @@ final class DriftPowerRuntimeStore {
     required Future<String> Function() execute,
   }) => database.transaction(() async {
     final fingerprint = _sha256(commandFingerprint, 'commandFingerprint');
-    final existing = await database
-        .customSelect(
-          'SELECT command_type, payload_schema, command_fingerprint, status, result_json '
-          'FROM power_operation_records '
-          'WHERE project_id = ? AND design_revision_id = ? AND operation_id = ?',
-          variables: [
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            Variable.withString(operationId),
-          ],
-        )
-        .getSingleOrNull();
+    final existing =
+        await database
+            .customSelect(
+              'SELECT command_type, payload_schema, command_fingerprint, status, result_json '
+              'FROM power_operation_records '
+              'WHERE project_id = ? AND design_revision_id = ? AND operation_id = ?',
+              variables: [
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                Variable.withString(operationId),
+              ],
+            )
+            .getSingleOrNull();
     if (existing != null) {
       final storedFingerprint = existing.read<String>('command_fingerprint');
       if (storedFingerprint != fingerprint ||
@@ -156,18 +157,19 @@ final class DriftPowerRuntimeStore {
       });
     }
     final nodeSha = evidence.nodeKey.sha256;
-    final existing = await database
-        .customSelect(
-          'SELECT evidence_sha256 FROM power_evaluation_records '
-          'WHERE design_revision_id = ? AND logical_node_key_sha256 = ? '
-          'AND evaluation_id = ?',
-          variables: [
-            Variable.withString(designRevisionId),
-            Variable.withString(nodeSha),
-            Variable.withString(evidence.evaluationId),
-          ],
-        )
-        .getSingleOrNull();
+    final existing =
+        await database
+            .customSelect(
+              'SELECT evidence_sha256 FROM power_evaluation_records '
+              'WHERE design_revision_id = ? AND logical_node_key_sha256 = ? '
+              'AND evaluation_id = ?',
+              variables: [
+                Variable.withString(designRevisionId),
+                Variable.withString(nodeSha),
+                Variable.withString(evidence.evaluationId),
+              ],
+            )
+            .getSingleOrNull();
     if (existing != null) {
       if (existing.read<String>('evidence_sha256') == evidence.evidenceSha256) {
         return;
@@ -350,17 +352,18 @@ final class DriftPowerRuntimeStore {
     required String designRevisionId,
     required PowerNodeKeyV2 nodeKey,
   }) async {
-    final row = await database
-        .customSelect(
-          'SELECT logical_node_key_json, state, generation, evaluation_id, '
-          'evidence_sha256 FROM power_evaluation_pointers '
-          'WHERE design_revision_id = ? AND logical_node_key_sha256 = ?',
-          variables: [
-            Variable.withString(designRevisionId),
-            Variable.withString(nodeKey.sha256),
-          ],
-        )
-        .getSingleOrNull();
+    final row =
+        await database
+            .customSelect(
+              'SELECT logical_node_key_json, state, generation, evaluation_id, '
+              'evidence_sha256 FROM power_evaluation_pointers '
+              'WHERE design_revision_id = ? AND logical_node_key_sha256 = ?',
+              variables: [
+                Variable.withString(designRevisionId),
+                Variable.withString(nodeKey.sha256),
+              ],
+            )
+            .getSingleOrNull();
     if (row == null) return null;
     final storedNodeKey = PowerNodeKeyV2.decode(
       row.read<String>('logical_node_key_json'),
@@ -373,9 +376,10 @@ final class DriftPowerRuntimeStore {
       state: switch (row.read<String>('state')) {
         'CURRENT' => PowerPointerState.current,
         'STALE' => PowerPointerState.stale,
-        _ => throw const PowerRuntimeStorageException(
-          'ELV4_POINTER_STATE_CORRUPT',
-        ),
+        _ =>
+          throw const PowerRuntimeStorageException(
+            'ELV4_POINTER_STATE_CORRUPT',
+          ),
       },
       generation: row.read<int>('generation'),
       evaluationId: row.readNullable<String>('evaluation_id'),
@@ -388,18 +392,19 @@ final class DriftPowerRuntimeStore {
     required String designRevisionId,
     required PowerEvaluationEvidence evidence,
   }) async {
-    final row = await database
-        .customSelect(
-          'SELECT project_id, evidence_sha256 FROM power_evaluation_records '
-          'WHERE design_revision_id = ? AND logical_node_key_sha256 = ? '
-          'AND evaluation_id = ?',
-          variables: [
-            Variable.withString(designRevisionId),
-            Variable.withString(evidence.nodeKey.sha256),
-            Variable.withString(evidence.evaluationId),
-          ],
-        )
-        .getSingleOrNull();
+    final row =
+        await database
+            .customSelect(
+              'SELECT project_id, evidence_sha256 FROM power_evaluation_records '
+              'WHERE design_revision_id = ? AND logical_node_key_sha256 = ? '
+              'AND evaluation_id = ?',
+              variables: [
+                Variable.withString(designRevisionId),
+                Variable.withString(evidence.nodeKey.sha256),
+                Variable.withString(evidence.evaluationId),
+              ],
+            )
+            .getSingleOrNull();
     if (row == null ||
         row.read<String>('project_id') != projectId ||
         row.read<String>('evidence_sha256') != evidence.evidenceSha256) {
@@ -414,16 +419,17 @@ final class DriftPowerRuntimeStore {
     required String designRevisionId,
     required bool requireWorking,
   }) async {
-    final row = await database
-        .customSelect(
-          'SELECT state FROM project_design_revisions '
-          'WHERE id = ? AND project_id = ? AND deleted_at IS NULL',
-          variables: [
-            Variable.withString(designRevisionId),
-            Variable.withString(projectId),
-          ],
-        )
-        .getSingleOrNull();
+    final row =
+        await database
+            .customSelect(
+              'SELECT state FROM project_design_revisions '
+              'WHERE id = ? AND project_id = ? AND deleted_at IS NULL',
+              variables: [
+                Variable.withString(designRevisionId),
+                Variable.withString(projectId),
+              ],
+            )
+            .getSingleOrNull();
     if (row == null) {
       throw const PowerRuntimeStorageException('ELV4_REVISION_NOT_FOUND');
     }

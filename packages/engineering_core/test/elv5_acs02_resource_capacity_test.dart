@@ -66,8 +66,10 @@ void main() {
       Acs02Input(
         controllerId: 'ctrl-1',
         resources: [
-          Acs02Resource(resourceId: 'i1', kind: Acs02ResourceKind.supervisedInput),
-          Acs02Resource(resourceId: 'i2', kind: Acs02ResourceKind.supervisedInput),
+          Acs02Resource(
+              resourceId: 'i1', kind: Acs02ResourceKind.supervisedInput),
+          Acs02Resource(
+              resourceId: 'i2', kind: Acs02ResourceKind.supervisedInput),
         ],
         assignments: [
           Acs02Assignment(assignmentId: 'input-a', resourceId: 'i1'),

@@ -4,7 +4,13 @@ import '../../numeric/rational.dart';
 
 enum Acs03AssessmentStatus { pass, fail, unresolved, blocked }
 
-enum Acs03StateCode { holding, activeRelease, startupInrush, fireRelease, powerFailure }
+enum Acs03StateCode {
+  holding,
+  activeRelease,
+  startupInrush,
+  fireRelease,
+  powerFailure
+}
 
 final class Acs03OperatingEvent {
   Acs03OperatingEvent({
@@ -13,7 +19,8 @@ final class Acs03OperatingEvent {
     required this.durationMicroseconds,
     this.lockCurrent,
   }) {
-    if (eventId.isEmpty) throw ArgumentError('ACS03 eventId must not be empty.');
+    if (eventId.isEmpty)
+      throw ArgumentError('ACS03 eventId must not be empty.');
     if (durationMicroseconds <= BigInt.zero) {
       throw ArgumentError('ACS03 event duration must be positive.');
     }
@@ -63,10 +70,13 @@ final class Acs03Input {
     this.minimumTerminalVoltage,
     this.maximumTerminalVoltage,
   }) {
-    if (doorId.isEmpty || lockId.isEmpty || requiredMembershipFingerprint.isEmpty) {
+    if (doorId.isEmpty ||
+        lockId.isEmpty ||
+        requiredMembershipFingerprint.isEmpty) {
       throw ArgumentError('ACS03 required identity must not be empty.');
     }
-    if (events.isEmpty) throw ArgumentError('ACS03 requires at least one event.');
+    if (events.isEmpty)
+      throw ArgumentError('ACS03 requires at least one event.');
     final ids = <String>{};
     for (final event in events) {
       if (!ids.add(event.eventId)) {
@@ -76,10 +86,12 @@ final class Acs03Input {
     final evidenceIds = <String>{};
     for (final item in evidence) {
       if (!evidenceIds.add(item.eventId)) {
-        throw ArgumentError('ACS03 duplicate evidence eventId: ${item.eventId}');
+        throw ArgumentError(
+            'ACS03 duplicate evidence eventId: ${item.eventId}');
       }
     }
-    if (minimumTerminalVoltage != null && maximumTerminalVoltage != null &&
+    if (minimumTerminalVoltage != null &&
+        maximumTerminalVoltage != null &&
         minimumTerminalVoltage! > maximumTerminalVoltage!) {
       throw ArgumentError('ACS03 voltage requirements are reversed.');
     }
@@ -140,7 +152,8 @@ final class Acs03ElectricalKernel {
   const Acs03ElectricalKernel();
 
   Acs03Result evaluate(Acs03Input input) {
-    if (input.conductiveFeedPathId == null || input.conductiveFeedPathId!.isEmpty) {
+    if (input.conductiveFeedPathId == null ||
+        input.conductiveFeedPathId!.isEmpty) {
       return const Acs03Result(
         status: Acs03AssessmentStatus.blocked,
         cases: <Acs03CaseResult>[],
@@ -168,7 +181,8 @@ final class Acs03ElectricalKernel {
     final evidenceByEvent = <String, Acs03PwrEvidence>{
       for (final item in input.evidence) item.eventId: item,
     };
-    final orderedEvents = [...input.events]..sort((a, b) => a.eventId.compareTo(b.eventId));
+    final orderedEvents = [...input.events]
+      ..sort((a, b) => a.eventId.compareTo(b.eventId));
     final results = <Acs03CaseResult>[];
 
     for (final event in orderedEvents) {
@@ -188,7 +202,8 @@ final class Acs03ElectricalKernel {
         ));
         continue;
       }
-      if (evidence.membershipFingerprint != input.requiredMembershipFingerprint) {
+      if (evidence.membershipFingerprint !=
+          input.requiredMembershipFingerprint) {
         results.add(Acs03CaseResult(
           eventId: event.eventId,
           state: event.state,

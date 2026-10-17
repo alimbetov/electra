@@ -31,20 +31,21 @@ final class DriftAcs04SourceRequirementContractStore
     required String designRevisionId,
     required String sourceId,
   }) async {
-    final rows = await database
-        .customSelect(
-          'SELECT id, revision, process_codes_json, definition_ref_json '
-          'FROM discipline_policy_bindings WHERE project_id = ? '
-          'AND design_revision_id = ? AND subject_kind = ? AND subject_id = ? '
-          'AND deleted_at IS NULL ORDER BY id',
-          variables: <Variable>[
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            Variable.withString('POWER_SOURCE'),
-            Variable.withString(sourceId),
-          ],
-        )
-        .get();
+    final rows =
+        await database
+            .customSelect(
+              'SELECT id, revision, process_codes_json, definition_ref_json '
+              'FROM discipline_policy_bindings WHERE project_id = ? '
+              'AND design_revision_id = ? AND subject_kind = ? AND subject_id = ? '
+              'AND deleted_at IS NULL ORDER BY id',
+              variables: <Variable>[
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                Variable.withString('POWER_SOURCE'),
+                Variable.withString(sourceId),
+              ],
+            )
+            .get();
     final matching = <QueryRow>[];
     for (final row in rows) {
       final rawCodes = jsonDecode(row.read<String>('process_codes_json'));
@@ -75,21 +76,22 @@ final class DriftAcs04SourceRequirementContractStore
     final contentHash = _requiredText(definition, 'contentHash');
     _requireSha(contentHash, 'ACS04_DEFINITION_HASH_INVALID:$sourceId');
 
-    final evidence = await database
-        .customSelect(
-          'SELECT canonical_payload_json, payload_sha256 FROM '
-          'elv_revision_aggregate_evidence_records WHERE evidence_ref = ? '
-          'AND project_id = ? AND design_revision_id = ? AND aggregate_kind = ? '
-          'AND aggregate_id = ?',
-          variables: <Variable>[
-            Variable.withString(evidenceRef),
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            Variable.withString('ACS04_SOURCE_REQUIREMENT_SET'),
-            Variable.withString(sourceId),
-          ],
-        )
-        .getSingleOrNull();
+    final evidence =
+        await database
+            .customSelect(
+              'SELECT canonical_payload_json, payload_sha256 FROM '
+              'elv_revision_aggregate_evidence_records WHERE evidence_ref = ? '
+              'AND project_id = ? AND design_revision_id = ? AND aggregate_kind = ? '
+              'AND aggregate_id = ?',
+              variables: <Variable>[
+                Variable.withString(evidenceRef),
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                Variable.withString('ACS04_SOURCE_REQUIREMENT_SET'),
+                Variable.withString(sourceId),
+              ],
+            )
+            .getSingleOrNull();
     if (evidence == null) {
       throw StateError('ACS04_CONTRACT_EVIDENCE_MISSING:$evidenceRef');
     }
@@ -124,16 +126,17 @@ final class DriftAcs04SourceRequirementContractStore
     ReplaceAcs04SourceRequirementContractCommand command,
   ) => database.transaction(() async {
     final now = _nowUtc().toUtc();
-    final revision = await database
-        .customSelect(
-          'SELECT state, revision FROM project_design_revisions '
-          'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
-          variables: <Variable>[
-            Variable.withString(command.projectId),
-            Variable.withString(command.designRevisionId),
-          ],
-        )
-        .getSingleOrNull();
+    final revision =
+        await database
+            .customSelect(
+              'SELECT state, revision FROM project_design_revisions '
+              'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
+              variables: <Variable>[
+                Variable.withString(command.projectId),
+                Variable.withString(command.designRevisionId),
+              ],
+            )
+            .getSingleOrNull();
     if (revision == null) {
       throw StateError(
         'ACS04_DESIGN_REVISION_NOT_FOUND:${command.designRevisionId}',
@@ -153,13 +156,14 @@ final class DriftAcs04SourceRequirementContractStore
       _encoder.encode(payload),
       allowMalformed: false,
     );
-    final existingEvidence = await database
-        .customSelect(
-          'SELECT payload_sha256 FROM elv_revision_aggregate_evidence_records '
-          'WHERE evidence_ref = ?',
-          variables: <Variable>[Variable.withString(evidenceRef)],
-        )
-        .getSingleOrNull();
+    final existingEvidence =
+        await database
+            .customSelect(
+              'SELECT payload_sha256 FROM elv_revision_aggregate_evidence_records '
+              'WHERE evidence_ref = ?',
+              variables: <Variable>[Variable.withString(evidenceRef)],
+            )
+            .getSingleOrNull();
     if (existingEvidence == null) {
       await runRawStatement(
         database,
@@ -195,19 +199,20 @@ final class DriftAcs04SourceRequirementContractStore
     final processCodes = <String>['ACS-04'];
 
     if (command.expectedBindingRevision == null) {
-      final currentRows = await database
-          .customSelect(
-            'SELECT id, process_codes_json FROM discipline_policy_bindings '
-            'WHERE project_id = ? AND design_revision_id = ? '
-            'AND subject_kind = ? AND subject_id = ? AND deleted_at IS NULL',
-            variables: <Variable>[
-              Variable.withString(command.projectId),
-              Variable.withString(command.designRevisionId),
-              Variable.withString('POWER_SOURCE'),
-              Variable.withString(command.contract.sourceId),
-            ],
-          )
-          .get();
+      final currentRows =
+          await database
+              .customSelect(
+                'SELECT id, process_codes_json FROM discipline_policy_bindings '
+                'WHERE project_id = ? AND design_revision_id = ? '
+                'AND subject_kind = ? AND subject_id = ? AND deleted_at IS NULL',
+                variables: <Variable>[
+                  Variable.withString(command.projectId),
+                  Variable.withString(command.designRevisionId),
+                  Variable.withString('POWER_SOURCE'),
+                  Variable.withString(command.contract.sourceId),
+                ],
+              )
+              .get();
       for (final row in currentRows) {
         final codes = jsonDecode(row.read<String>('process_codes_json'));
         if (codes is List && codes.contains('ACS-04')) {

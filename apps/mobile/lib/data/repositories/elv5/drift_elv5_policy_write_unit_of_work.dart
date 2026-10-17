@@ -114,19 +114,20 @@ final class _DriftElv5PolicyMutationStore implements Elv5PolicyMutationStore {
     required String whereSql,
     required List<Variable> whereVariables,
   }) async {
-    final row = await database
-        .customSelect(
-          'SELECT id, revision, subject_kind, subject_id, process_codes_json, '
-          'definition_ref_json, applicability_json FROM discipline_policy_bindings '
-          'WHERE project_id = ? AND design_revision_id = ? AND $whereSql '
-          'AND deleted_at IS NULL',
-          variables: [
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            ...whereVariables,
-          ],
-        )
-        .getSingleOrNull();
+    final row =
+        await database
+            .customSelect(
+              'SELECT id, revision, subject_kind, subject_id, process_codes_json, '
+              'definition_ref_json, applicability_json FROM discipline_policy_bindings '
+              'WHERE project_id = ? AND design_revision_id = ? AND $whereSql '
+              'AND deleted_at IS NULL',
+              variables: [
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                ...whereVariables,
+              ],
+            )
+            .getSingleOrNull();
     if (row == null) return null;
     return Elv5PolicyBindingSnapshot(
       bindingId: row.read<String>('id'),

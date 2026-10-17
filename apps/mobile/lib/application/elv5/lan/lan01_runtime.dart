@@ -110,8 +110,8 @@ final class Lan01PersistedInputResolver
               'realizedSectionId': id,
               'requiredCapability':
                   reasonCode == 'ELV3_REALIZED_SECTION_EXACT_RESERVE_REQUIRED'
-                  ? 'EXACT_RESERVE_EVIDENCE'
-                  : 'SECTION_ALLOWANCE_PROVENANCE',
+                      ? 'EXACT_RESERVE_EVIDENCE'
+                      : 'SECTION_ALLOWANCE_PROVENANCE',
             },
           );
         }
@@ -122,9 +122,8 @@ final class Lan01PersistedInputResolver
         'PERMANENT' => Lan01SectionClass.permanent,
         'PATCH' => Lan01SectionClass.patch,
         'OTHER_EXPLICIT' => Lan01SectionClass.otherExplicit,
-        final value => throw StateError(
-          'LAN01_SECTION_CLASS_UNSUPPORTED:$value',
-        ),
+        final value =>
+          throw StateError('LAN01_SECTION_CLASS_UNSUPPORTED:$value'),
       };
       sections.add(
         Lan01RealizedSection(
@@ -211,20 +210,22 @@ Elv5PureKernelExecutor<Lan01Input, Lan01Result> buildLan01Executor({
 }) => Elv5PureKernelExecutor<Lan01Input, Lan01Result>(
   processCode: Elv5ProcessCode.lan01,
   calculate: const Lan01PathLengthKernel().evaluate,
-  encodeOutput: (result) => <String, Object?>{
-    'schema': 'electra.elv5-lan01-output.v1',
-    'linkId': result.linkId,
-    'permanent': _lengthAssessment(result.permanent),
-    'channel': _lengthAssessment(result.channel),
-    'governingDimension': result.governingDimension?.name,
-  },
-  encodeEvidence: (captured, _) => <String, Object?>{
-    'schema': 'electra.elv5-lan01-evidence.v1',
-    'source': 'ELV5_LINK_COMPOSITION_PLUS_ELV3_INTEGER_GEOMETRY',
-    'captureRevision': captured.captureRevision,
-    'numericPolicy': 'CONSERVATIVE_INTEGER_MM_SQRT_INTERVAL_V1',
-    'numericThresholdPolicy': 'NOT_RESOLVED_V1',
-  },
+  encodeOutput:
+      (result) => <String, Object?>{
+        'schema': 'electra.elv5-lan01-output.v1',
+        'linkId': result.linkId,
+        'permanent': _lengthAssessment(result.permanent),
+        'channel': _lengthAssessment(result.channel),
+        'governingDimension': result.governingDimension?.name,
+      },
+  encodeEvidence:
+      (captured, _) => <String, Object?>{
+        'schema': 'electra.elv5-lan01-evidence.v1',
+        'source': 'ELV5_LINK_COMPOSITION_PLUS_ELV3_INTEGER_GEOMETRY',
+        'captureRevision': captured.captureRevision,
+        'numericPolicy': 'CONSERVATIVE_INTEGER_MM_SQRT_INTERVAL_V1',
+        'numericThresholdPolicy': 'NOT_RESOLVED_V1',
+      },
   executionOf: (_) => Elv5Execution.succeeded,
   completionOf: (_) => Elv5Completion.complete,
   assessmentOf: (result) {

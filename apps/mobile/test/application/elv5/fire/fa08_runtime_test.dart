@@ -12,48 +12,51 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('FA-08 passes exact Iz/environment policy but leaves compliance not assessed', () async {
-    final env = _resolvedEnvironment();
-    final resolver = Fa08PersistedInputResolver(
-      policySource: _PolicySource(),
-      ampacityResolver: Elv5AmpacityRouteResolver(
-        cableRuns: _Runs(),
-        environments: _Environments(env),
-        sectionEvidence: _AmpacityEvidence(env),
-      ),
-      routeCableFacts: _CableFacts(),
-      nowUtc: () => DateTime.utc(2026, 10, 17),
-    );
+  test(
+    'FA-08 passes exact Iz/environment policy but leaves compliance not assessed',
+    () async {
+      final env = _resolvedEnvironment();
+      final resolver = Fa08PersistedInputResolver(
+        policySource: _PolicySource(),
+        ampacityResolver: Elv5AmpacityRouteResolver(
+          cableRuns: _Runs(),
+          environments: _Environments(env),
+          sectionEvidence: _AmpacityEvidence(env),
+        ),
+        routeCableFacts: _CableFacts(),
+        nowUtc: () => DateTime.utc(2026, 10, 17),
+      );
 
-    final captured = await resolver.capture(_request());
-    final candidate = await buildFa08Executor().execute(captured);
+      final captured = await resolver.capture(_request());
+      final candidate = await buildFa08Executor().execute(captured);
 
-    expect(candidate.assessment, Elv5Assessment.pass);
-    expect(candidate.output['technicalPolicyMatch'], 'pass');
-    expect(candidate.output['verifiedCompliance'], 'notAssessed');
-    final results = <Map<String, Object?>>[
-      for (final row in candidate.output['policyResults']! as List)
-        Map<String, Object?>.from(row as Map),
-    ];
-    expect(results, hasLength(3));
-    expect(results.every((row) => row['status'] == 'pass'), isTrue);
+      expect(candidate.assessment, Elv5Assessment.pass);
+      expect(candidate.output['technicalPolicyMatch'], 'pass');
+      expect(candidate.output['verifiedCompliance'], 'notAssessed');
+      final results = <Map<String, Object?>>[
+        for (final row in candidate.output['policyResults']! as List)
+          Map<String, Object?>.from(row as Map),
+      ];
+      expect(results, hasLength(3));
+      expect(results.every((row) => row['status'] == 'pass'), isTrue);
 
-    final byCode = <String, Map<String, Object?>>{
-      for (final row in results) row['requirementCode']! as String: row,
-    };
-    expect(
-      Map<String, Object?>.from(byCode['MIN_IZ']!['numericMargin']! as Map),
-      <String, Object?>{'numerator': '4', 'denominator': '1'},
-    );
-    expect(
-      Map<String, Object?>.from(byCode['MAX_TEMP']!['numericMargin']! as Map),
-      <String, Object?>{'numerator': '5', 'denominator': '1'},
-    );
-    expect(
-      Map<String, Object?>.from(byCode['MAX_RH']!['numericMargin']! as Map),
-      <String, Object?>{'numerator': '10', 'denominator': '1'},
-    );
-  });
+      final byCode = <String, Map<String, Object?>>{
+        for (final row in results) row['requirementCode']! as String: row,
+      };
+      expect(
+        Map<String, Object?>.from(byCode['MIN_IZ']!['numericMargin']! as Map),
+        <String, Object?>{'numerator': '4', 'denominator': '1'},
+      );
+      expect(
+        Map<String, Object?>.from(byCode['MAX_TEMP']!['numericMargin']! as Map),
+        <String, Object?>{'numerator': '5', 'denominator': '1'},
+      );
+      expect(
+        Map<String, Object?>.from(byCode['MAX_RH']!['numericMargin']! as Map),
+        <String, Object?>{'numerator': '10', 'denominator': '1'},
+      );
+    },
+  );
 
   test(
     'FA-08 missing explicit environment remains durable capture BLOCKED',

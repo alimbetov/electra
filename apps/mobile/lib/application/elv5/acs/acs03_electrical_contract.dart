@@ -162,22 +162,24 @@ final class Acs03ElectricalContract {
       lockId: _mapText(map, 'lockId'),
       conductiveFeedPathId: _mapText(map, 'conductiveFeedPathId'),
       controlPathId: _mapText(map, 'controlPathId'),
-      minimumTerminalVoltage: map['minimumTerminalVoltageV'] == null
-          ? null
-          : Voltage(
-              _rational(
-                map['minimumTerminalVoltageV'],
-                'minimumTerminalVoltageV',
+      minimumTerminalVoltage:
+          map['minimumTerminalVoltageV'] == null
+              ? null
+              : Voltage(
+                _rational(
+                  map['minimumTerminalVoltageV'],
+                  'minimumTerminalVoltageV',
+                ),
               ),
-            ),
-      maximumTerminalVoltage: map['maximumTerminalVoltageV'] == null
-          ? null
-          : Voltage(
-              _rational(
-                map['maximumTerminalVoltageV'],
-                'maximumTerminalVoltageV',
+      maximumTerminalVoltage:
+          map['maximumTerminalVoltageV'] == null
+              ? null
+              : Voltage(
+                _rational(
+                  map['maximumTerminalVoltageV'],
+                  'maximumTerminalVoltageV',
+                ),
               ),
-            ),
       events: <Acs03ElectricalEventContract>[
         for (final raw in rawEvents)
           Acs03ElectricalEventContract.fromMap(_object(raw, 'ACS03 event')),
@@ -213,8 +215,8 @@ abstract interface class Acs03ElectricalContractSource {
 List<Acs03ElectricalEventContract> _normalizeEvents(
   Iterable<Acs03ElectricalEventContract> values,
 ) {
-  final result = values.toList()
-    ..sort((a, b) => a.eventId.compareTo(b.eventId));
+  final result =
+      values.toList()..sort((a, b) => a.eventId.compareTo(b.eventId));
   if (result.isEmpty) throw ArgumentError('ACS03 requires operating events.');
   final ids = <String>{};
   for (final event in result) {

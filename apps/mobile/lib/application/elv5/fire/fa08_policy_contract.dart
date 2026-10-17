@@ -21,9 +21,8 @@ final class Fa08CablePolicyContract {
     'cableRunId': cableRunId,
     'policyId': policy.policyId,
     'requirements': <Object?>[
-      for (final item in [
-        ...policy.requirements,
-      ]..sort((a, b) => a.code.compareTo(b.code)))
+      for (final item in [...policy.requirements]
+        ..sort((a, b) => a.code.compareTo(b.code)))
         _requirementToMap(item),
     ],
   };
@@ -134,8 +133,11 @@ Fa08Requirement _requirementFromMap(Map<String, Object?> map) {
   final kindName = _mapText(map, 'kind');
   final kind = Fa08RequirementKind.values.firstWhere(
     (value) => value.name == kindName,
-    orElse: () =>
-        throw FormatException('Unsupported FA08 requirement kind: $kindName'),
+    orElse:
+        () =>
+            throw FormatException(
+              'Unsupported FA08 requirement kind: $kindName',
+            ),
   );
   final code = _mapText(map, 'code');
   switch (kind) {

@@ -22,21 +22,23 @@ final class DriftElv5ReplacementWriteUnitOfWork
   @override
   Future<T> run<T>(
     Future<T> Function(Elv5ReplacementWriteSession session) action,
-  ) => DriftElv5RuntimeWriteUnitOfWork(database, originDeviceId: originDeviceId)
-      .run((runtime) async {
-        final session = _DriftElv5ReplacementWriteSession(
-          runtime,
-          revisions: _DriftElv5RevisionMutationStore(
-            database,
-            originDeviceId: originDeviceId,
-          ),
-          history: _DriftElv5RevisionHistoryStore(
-            database,
-            originDeviceId: originDeviceId,
-          ),
-        );
-        return action(session);
-      });
+  ) => DriftElv5RuntimeWriteUnitOfWork(
+    database,
+    originDeviceId: originDeviceId,
+  ).run((runtime) async {
+    final session = _DriftElv5ReplacementWriteSession(
+      runtime,
+      revisions: _DriftElv5RevisionMutationStore(
+        database,
+        originDeviceId: originDeviceId,
+      ),
+      history: _DriftElv5RevisionHistoryStore(
+        database,
+        originDeviceId: originDeviceId,
+      ),
+    );
+    return action(session);
+  });
 }
 
 final class _DriftElv5ReplacementWriteSession
@@ -83,16 +85,17 @@ final class _DriftElv5RevisionMutationStore
     required String projectId,
     required String designRevisionId,
   }) async {
-    final row = await database
-        .customSelect(
-          'SELECT project_id, id, state, revision FROM project_design_revisions '
-          'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
-          variables: [
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-          ],
-        )
-        .getSingleOrNull();
+    final row =
+        await database
+            .customSelect(
+              'SELECT project_id, id, state, revision FROM project_design_revisions '
+              'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
+              variables: [
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+              ],
+            )
+            .getSingleOrNull();
     if (row == null) return null;
     return Elv5RevisionSnapshot(
       projectId: row.read<String>('project_id'),
@@ -138,17 +141,18 @@ final class _DriftElv5RevisionHistoryStore implements Elv5RevisionHistoryStore {
 
   @override
   Future<void> appendOriginal(Elv5HistoryAppend append) async {
-    final cursor = await database
-        .customSelect(
-          'SELECT generation, head_sequence, branch_id '
-          'FROM elv_revision_command_history_cursors '
-          'WHERE project_id = ? AND design_revision_id = ?',
-          variables: [
-            Variable.withString(append.projectId),
-            Variable.withString(append.designRevisionId),
-          ],
-        )
-        .getSingleOrNull();
+    final cursor =
+        await database
+            .customSelect(
+              'SELECT generation, head_sequence, branch_id '
+              'FROM elv_revision_command_history_cursors '
+              'WHERE project_id = ? AND design_revision_id = ?',
+              variables: [
+                Variable.withString(append.projectId),
+                Variable.withString(append.designRevisionId),
+              ],
+            )
+            .getSingleOrNull();
     final currentGeneration = cursor?.read<int>('generation') ?? 0;
     final currentHead = cursor?.read<int>('head_sequence') ?? 0;
     final branchId = append.originalCommandId;
@@ -169,17 +173,18 @@ final class _DriftElv5RevisionHistoryStore implements Elv5RevisionHistoryStore {
       );
     }
 
-    final maxRow = await database
-        .customSelect(
-          'SELECT COALESCE(MAX(sequence), 0) AS max_sequence '
-          'FROM elv_revision_command_history_operations '
-          'WHERE project_id = ? AND design_revision_id = ?',
-          variables: [
-            Variable.withString(append.projectId),
-            Variable.withString(append.designRevisionId),
-          ],
-        )
-        .getSingle();
+    final maxRow =
+        await database
+            .customSelect(
+              'SELECT COALESCE(MAX(sequence), 0) AS max_sequence '
+              'FROM elv_revision_command_history_operations '
+              'WHERE project_id = ? AND design_revision_id = ?',
+              variables: [
+                Variable.withString(append.projectId),
+                Variable.withString(append.designRevisionId),
+              ],
+            )
+            .getSingle();
     final sequence = maxRow.read<int>('max_sequence') + 1;
     final nextGeneration = currentGeneration + 1;
     final beforeRef = _evidenceRef(append, 'BEFORE');

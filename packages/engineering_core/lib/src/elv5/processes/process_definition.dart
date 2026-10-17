@@ -41,10 +41,10 @@ final class Elv5ScopeRef implements Elv5CanonicalValue {
 
   @override
   Object? toCanonicalValue() => <String, Object?>{
-    'kind': kind.name.toUpperCase(),
-    'scopeId': scopeId,
-    'scenarioKey': scenarioKey,
-  };
+        'kind': kind.name.toUpperCase(),
+        'scopeId': scopeId,
+        'scenarioKey': scenarioKey,
+      };
 }
 
 final class Elv5EngineeringNodeKeyV3 implements Elv5CanonicalValue {
@@ -66,16 +66,16 @@ final class Elv5EngineeringNodeKeyV3 implements Elv5CanonicalValue {
 
   @override
   Object? toCanonicalValue() => <Object?>[
-    'engineering-node-v3',
-    'ELV5',
-    designRevisionId,
-    scope.scenarioKey,
-    scope.kind.name.toUpperCase(),
-    scope.scopeId,
-    processCode.wireCode,
-    subject.kind,
-    subject.id,
-  ];
+        'engineering-node-v3',
+        'ELV5',
+        designRevisionId,
+        scope.scenarioKey,
+        scope.kind.name.toUpperCase(),
+        scope.scopeId,
+        processCode.wireCode,
+        subject.kind,
+        subject.id,
+      ];
 }
 
 abstract interface class Elv5TypedProcessDefinition<I, O> {

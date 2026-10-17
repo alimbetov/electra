@@ -20,7 +20,8 @@ final class Lan01LengthInterval {
   final Length upper;
 
   Lan01LengthInterval operator +(Lan01LengthInterval other) =>
-      Lan01LengthInterval(lower: lower + other.lower, upper: upper + other.upper);
+      Lan01LengthInterval(
+          lower: lower + other.lower, upper: upper + other.upper);
 
   static Lan01LengthInterval get zero => Lan01LengthInterval.exact(
         Length(Elv5Rational.zero),
@@ -55,7 +56,8 @@ final class Lan01ExplicitAllowance {
       throw ArgumentError('LAN01 allowanceId must not be empty.');
     }
     if (!appliesToPermanent && !appliesToChannel) {
-      throw ArgumentError('LAN01 allowance must target at least one aggregate.');
+      throw ArgumentError(
+          'LAN01 allowance must target at least one aggregate.');
     }
   }
 

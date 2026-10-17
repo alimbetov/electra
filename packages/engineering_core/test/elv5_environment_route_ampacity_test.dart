@@ -10,7 +10,8 @@ void main() {
     required String maxTemperature,
     required String minHumidity,
     required String maxHumidity,
-  }) => Elv5EnvironmentProfile(
+  }) =>
+      Elv5EnvironmentProfile(
         profileId: id,
         editionId: edition,
         profileCode: id,
@@ -48,7 +49,8 @@ void main() {
     required Elv5EnvironmentProfile env,
     required String temperatureFactor,
     required String groupingFactor,
-  }) => Elv5RouteAmpacitySectionInput(
+  }) =>
+      Elv5RouteAmpacitySectionInput(
         sectionId: sectionId,
         environmentBinding: Elv5EnvironmentScopeBinding(
           bindingId: 'binding-$sectionId',
@@ -89,7 +91,8 @@ void main() {
 
     expect(decoded.profileId, original.profileId);
     expect(decoded.temperatureC.maximum, Elv5Rational.parseDecimal('32'));
-    expect(decoded.relativeHumidityPercent.maximum, Elv5Rational.parseDecimal('80'));
+    expect(decoded.relativeHumidityPercent.maximum,
+        Elv5Rational.parseDecimal('80'));
     expect(decoded.condensationRisk, Elv5CondensationRisk.possible);
   });
 

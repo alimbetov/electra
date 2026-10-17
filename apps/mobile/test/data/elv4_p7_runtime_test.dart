@@ -51,14 +51,15 @@ void main() {
         projectId: 'project',
         designRevisionId: 'rev-working',
         oldClosure: [sourceFact],
-        applyMutation: () => db.customUpdate(
-          'UPDATE project_design_revisions '
-          'SET revision = revision + 1, updated_at = ? WHERE id = ?',
-          variables: [
-            Variable<DateTime>(_now.add(const Duration(minutes: 1))),
-            Variable.withString('rev-working'),
-          ],
-        ),
+        applyMutation:
+            () => db.customUpdate(
+              'UPDATE project_design_revisions '
+              'SET revision = revision + 1, updated_at = ? WHERE id = ?',
+              variables: [
+                Variable<DateTime>(_now.add(const Duration(minutes: 1))),
+                Variable.withString('rev-working'),
+              ],
+            ),
         captureNewClosure: () async => [sourceFact],
       );
 
@@ -72,12 +73,13 @@ void main() {
       expect(await _pointerState(db, pwr02.evidence.nodeKey), 'STALE');
       expect(await _pointerState(db, unrelated.evidence.nodeKey), 'CURRENT');
 
-      final indexedNodes = await db
-          .customSelect(
-            'SELECT DISTINCT logical_node_key_sha256 '
-            'FROM power_dependency_index_records',
-          )
-          .get();
+      final indexedNodes =
+          await db
+              .customSelect(
+                'SELECT DISTINCT logical_node_key_sha256 '
+                'FROM power_dependency_index_records',
+              )
+              .get();
       expect(
         indexedNodes.map((row) => row.read<String>('logical_node_key_sha256')),
         contains(unrelated.evidence.nodeKey.sha256),
@@ -88,14 +90,16 @@ void main() {
       );
       expect(await _count(db, 'power_evaluation_records'), 3);
 
-      final stored = await db
-          .customSelect(
-            'SELECT evidence_json FROM power_evaluation_records '
-            "WHERE evaluation_id = 'eval-pwr01'",
-          )
-          .getSingle();
-      final envelope = (jsonDecode(stored.read<String>('evidence_json')) as Map)
-          .cast<String, Object?>();
+      final stored =
+          await db
+              .customSelect(
+                'SELECT evidence_json FROM power_evaluation_records '
+                "WHERE evaluation_id = 'eval-pwr01'",
+              )
+              .getSingle();
+      final envelope =
+          (jsonDecode(stored.read<String>('evidence_json')) as Map)
+              .cast<String, Object?>();
       expect(envelope['schema'], 'electra.elv4-published-evaluation.v1');
       expect(envelope['consumedInput'], isA<Map>());
       expect((envelope['dependencyKeys'] as List), isNotEmpty);
@@ -380,9 +384,10 @@ void main() {
         projectId: 'project',
         designRevisionId: 'rev-working',
         oldClosure: const [],
-        applyMutation: () => db.customUpdate(
-          "UPDATE p7_fixture SET value = 'new' WHERE id = 'x'",
-        ),
+        applyMutation:
+            () => db.customUpdate(
+              "UPDATE p7_fixture SET value = 'new' WHERE id = 'x'",
+            ),
         captureNewClosure: () async => const [],
       ),
       throwsA(
@@ -393,9 +398,10 @@ void main() {
         ),
       ),
     );
-    final value = await db
-        .customSelect("SELECT value FROM p7_fixture WHERE id = 'x'")
-        .getSingle();
+    final value =
+        await db
+            .customSelect("SELECT value FROM p7_fixture WHERE id = 'x'")
+            .getSingle();
     expect(value.read<String>('value'), 'old');
   });
 }
@@ -506,24 +512,26 @@ PowerNodeKeyV2 _node(PowerProcessCode process, String subjectId) =>
     );
 
 Future<String?> _pointerState(AppDatabase db, PowerNodeKeyV2 node) async {
-  final row = await db
-      .customSelect(
-        'SELECT state FROM power_evaluation_pointers '
-        'WHERE logical_node_key_sha256 = ?',
-        variables: [Variable.withString(node.sha256)],
-      )
-      .getSingleOrNull();
+  final row =
+      await db
+          .customSelect(
+            'SELECT state FROM power_evaluation_pointers '
+            'WHERE logical_node_key_sha256 = ?',
+            variables: [Variable.withString(node.sha256)],
+          )
+          .getSingleOrNull();
   return row?.read<String>('state');
 }
 
 Future<int?> _pointerGeneration(AppDatabase db, PowerNodeKeyV2 node) async {
-  final row = await db
-      .customSelect(
-        'SELECT generation FROM power_evaluation_pointers '
-        'WHERE logical_node_key_sha256 = ?',
-        variables: [Variable.withString(node.sha256)],
-      )
-      .getSingleOrNull();
+  final row =
+      await db
+          .customSelect(
+            'SELECT generation FROM power_evaluation_pointers '
+            'WHERE logical_node_key_sha256 = ?',
+            variables: [Variable.withString(node.sha256)],
+          )
+          .getSingleOrNull();
   return row?.read<int>('generation');
 }
 

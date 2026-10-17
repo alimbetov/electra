@@ -24,21 +24,20 @@ final class DriftElv5CctvRecorderWriteUnitOfWork
   @override
   Future<T> run<T>(
     Future<T> Function(Elv5CctvRecorderWriteSession session) action,
-  ) =>
-      DriftElv5ReplacementWriteUnitOfWork(
-        database,
-        originDeviceId: originDeviceId,
-      ).run((replacement) async {
-        return action(
-          _DriftElv5CctvRecorderWriteSession(
-            replacement,
-            recorder: _DriftElv5CctvRecorderMutationStore(
-              database,
-              originDeviceId: originDeviceId,
-            ),
-          ),
-        );
-      });
+  ) => DriftElv5ReplacementWriteUnitOfWork(
+    database,
+    originDeviceId: originDeviceId,
+  ).run((replacement) async {
+    return action(
+      _DriftElv5CctvRecorderWriteSession(
+        replacement,
+        recorder: _DriftElv5CctvRecorderMutationStore(
+          database,
+          originDeviceId: originDeviceId,
+        ),
+      ),
+    );
+  });
 }
 
 final class _DriftElv5CctvRecorderWriteSession
@@ -90,33 +89,35 @@ final class _DriftElv5CctvRecorderMutationStore
     required String designRevisionId,
     required String recorderId,
   }) async {
-    final root = await database
-        .customSelect(
-          'SELECT id, revision, accounting_basis, recorder_definition_ref_json, '
-          'recorder_definition_sha256 FROM recorder_capacity_bindings '
-          'WHERE project_id = ? AND design_revision_id = ? AND recorder_id = ? '
-          'AND deleted_at IS NULL',
-          variables: [
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            Variable.withString(recorderId),
-          ],
-        )
-        .getSingleOrNull();
+    final root =
+        await database
+            .customSelect(
+              'SELECT id, revision, accounting_basis, recorder_definition_ref_json, '
+              'recorder_definition_sha256 FROM recorder_capacity_bindings '
+              'WHERE project_id = ? AND design_revision_id = ? AND recorder_id = ? '
+              'AND deleted_at IS NULL',
+              variables: [
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                Variable.withString(recorderId),
+              ],
+            )
+            .getSingleOrNull();
     if (root == null) return null;
     final bindingId = root.read<String>('id');
-    final rows = await database
-        .customSelect(
-          'SELECT assignment_id, camera_id, encoded_stream_id, license_channel_id, '
-          'storage_pool_id FROM recorder_assignments WHERE project_id = ? '
-          'AND design_revision_id = ? AND binding_id = ? ORDER BY ordinal, assignment_id',
-          variables: [
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            Variable.withString(bindingId),
-          ],
-        )
-        .get();
+    final rows =
+        await database
+            .customSelect(
+              'SELECT assignment_id, camera_id, encoded_stream_id, license_channel_id, '
+              'storage_pool_id FROM recorder_assignments WHERE project_id = ? '
+              'AND design_revision_id = ? AND binding_id = ? ORDER BY ordinal, assignment_id',
+              variables: [
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                Variable.withString(bindingId),
+              ],
+            )
+            .get();
     return Elv5CctvRecorderSnapshot(
       aggregateId: bindingId,
       recorderId: recorderId,
@@ -154,13 +155,14 @@ final class _DriftElv5CctvRecorderMutationStore
     required Map<String, Object?> payload,
     required DateTime updatedAtUtc,
   }) async {
-    final component = await database
-        .customSelect(
-          'SELECT definition_id, definition_version FROM component_instances '
-          'WHERE id = ? AND deleted_at IS NULL',
-          variables: [Variable.withString(recorderId)],
-        )
-        .getSingleOrNull();
+    final component =
+        await database
+            .customSelect(
+              'SELECT definition_id, definition_version FROM component_instances '
+              'WHERE id = ? AND deleted_at IS NULL',
+              variables: [Variable.withString(recorderId)],
+            )
+            .getSingleOrNull();
     if (component == null) {
       throw StateError('ELV5_RECORDER_COMPONENT_NOT_FOUND');
     }

@@ -18,17 +18,17 @@ class CircuitProtectionView {
   bool get stale => checkpoint?.fingerprint != fingerprint;
   String get status =>
       reviewedFingerprint != null && reviewedFingerprint != fingerprint
-      ? 'Review required'
-      : stale
-      ? 'Recalculate'
-      : checkpoint?.proposal.values['proposalState'] != 'proposed'
-      ? (checkpoint?.proposal.values['proposalState'] as String? ??
-            'Needs input')
-      : checkpoint?.state != EngineeringDerivedState.current
-      ? 'Review required'
-      : reviewedFingerprint == fingerprint
-      ? 'Confirmed requirement'
-      : 'Proposed';
+          ? 'Review required'
+          : stale
+          ? 'Recalculate'
+          : checkpoint?.proposal.values['proposalState'] != 'proposed'
+          ? (checkpoint?.proposal.values['proposalState'] as String? ??
+              'Needs input')
+          : checkpoint?.state != EngineeringDerivedState.current
+          ? 'Review required'
+          : reviewedFingerprint == fingerprint
+          ? 'Confirmed requirement'
+          : 'Proposed';
 }
 
 class ProjectProtectionSnapshot {

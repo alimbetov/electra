@@ -86,7 +86,9 @@ void main() {
     expect(result.status, Lan06AssessmentStatus.fail);
   });
 
-  test('net usable capacity does not subtract already-included reservation again', () {
+  test(
+      'net usable capacity does not subtract already-included reservation again',
+      () {
     final result = const Lan06RackCapacityKernel().evaluate(Lan06Input(
       rackId: 'rack-1',
       equipment: [

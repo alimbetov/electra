@@ -11,10 +11,10 @@ final class Elv5PhysicalSectionEvidence {
     required this.shieldContinuity,
     required String evidenceRef,
     required String evidenceContentHash,
-  }) : sectionId = _text(sectionId, 'sectionId'),
-       mediumCode = _medium(mediumCode),
-       evidenceRef = _text(evidenceRef, 'evidenceRef'),
-       evidenceContentHash = _sha(evidenceContentHash, 'evidenceContentHash') {
+  })  : sectionId = _text(sectionId, 'sectionId'),
+        mediumCode = _medium(mediumCode),
+        evidenceRef = _text(evidenceRef, 'evidenceRef'),
+        evidenceContentHash = _sha(evidenceContentHash, 'evidenceContentHash') {
     if (!shieldContinuityKnown && shieldContinuity) {
       throw ArgumentError(
         'Unknown physical shield continuity cannot assert true.',
@@ -32,14 +32,14 @@ final class Elv5PhysicalSectionEvidence {
   final String evidenceContentHash;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-    'schema': schema,
-    'sectionId': sectionId,
-    'mediumCode': mediumCode,
-    'shieldContinuityKnown': shieldContinuityKnown,
-    'shieldContinuity': shieldContinuity,
-    'evidenceRef': evidenceRef,
-    'evidenceContentHash': evidenceContentHash,
-  };
+        'schema': schema,
+        'sectionId': sectionId,
+        'mediumCode': mediumCode,
+        'shieldContinuityKnown': shieldContinuityKnown,
+        'shieldContinuity': shieldContinuity,
+        'evidenceRef': evidenceRef,
+        'evidenceContentHash': evidenceContentHash,
+      };
 
   factory Elv5PhysicalSectionEvidence.fromMap(Map<String, Object?> map) {
     _exact(
@@ -55,12 +55,14 @@ final class Elv5PhysicalSectionEvidence {
       },
     );
     if (map['schema'] != schema) {
-      throw const FormatException('Unsupported physical section evidence schema.');
+      throw const FormatException(
+          'Unsupported physical section evidence schema.');
     }
     final known = map['shieldContinuityKnown'];
     final continuity = map['shieldContinuity'];
     if (known is! bool || continuity is! bool) {
-      throw const FormatException('Physical section shield fields must be boolean.');
+      throw const FormatException(
+          'Physical section shield fields must be boolean.');
     }
     return Elv5PhysicalSectionEvidence(
       sectionId: _mapText(map, 'sectionId'),

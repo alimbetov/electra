@@ -147,9 +147,8 @@ final class Acs05PersistedInputResolver
     }
 
     final persistedDurations = _pwr04SequenceDurations(pwr04.evidence);
-    final contractSegmentIds = contract.segments
-        .map((value) => value.segmentId)
-        .toSet();
+    final contractSegmentIds =
+        contract.segments.map((value) => value.segmentId).toSet();
     if (!_sameSet(persistedDurations.keys.toSet(), contractSegmentIds)) {
       _blocked(
         request,
@@ -223,13 +222,14 @@ final class Acs05PersistedInputResolver
     final segmentBasis = <Map<String, Object?>>[];
 
     for (final segment in contract.segments) {
-      final matches = consumedRefs.where((ref) {
-        final key = ref.nodeKey;
-        return key.processCode == PowerProcessCode.pwr01 &&
-            key.scenarioId == contract.scenarioId &&
-            key.scopeKind == PowerEvaluationScopeKind.segment &&
-            key.scopeId == segment.segmentId;
-      }).toList();
+      final matches =
+          consumedRefs.where((ref) {
+            final key = ref.nodeKey;
+            return key.processCode == PowerProcessCode.pwr01 &&
+                key.scenarioId == contract.scenarioId &&
+                key.scopeKind == PowerEvaluationScopeKind.segment &&
+                key.scopeId == segment.segmentId;
+          }).toList();
       if (matches.length != 1) {
         _blocked(
           request,
@@ -489,37 +489,44 @@ Elv5PureKernelExecutor<Acs05Input, Acs05Result> buildAcs05Executor({
 }) => Elv5PureKernelExecutor<Acs05Input, Acs05Result>(
   processCode: Elv5ProcessCode.acs05,
   calculate: const Acs05AutonomyProjectionKernel().evaluate,
-  encodeOutput: (result) => <String, Object?>{
-    'schema': 'electra.elv5-acs05-output.v1',
-    'status': result.status.name,
-    'globalRequiredEnergyWh': result.globalRequiredEnergy.value.toMap(),
-    'availableEnergyWh': result.availableEnergy.value.toMap(),
-    'energyMarginWh': result.energyMargin.value.toMap(),
-    'acsContributionEnergyWh': result.acsContributionEnergy.value.toMap(),
-    'governingDimension': result.governingDimension.name,
-    'governingSegmentId': result.governingSegmentId,
-    'blockingReason': result.blockingReason,
-  },
-  encodeEvidence: (captured, _) => <String, Object?>{
-    'schema': 'electra.elv5-acs05-evidence.v1',
-    'source': 'VERIFIED_CURRENT_PWR04_PLUS_CONSUMED_CURRENT_PWR01',
-    'captureRevision': captured.captureRevision,
-    'upstreamPointerGenerations': captured.upstreamPointerGenerations,
-    'sequenceFingerprint': captured.value.expectedSequenceFingerprint,
-    'protectedLoadSetFingerprint':
-        captured.value.expectedProtectedLoadSetFingerprint,
-  },
-  executionOf: (result) => result.status == Acs05AssessmentStatus.blocked
-      ? Elv5Execution.blocked
-      : Elv5Execution.succeeded,
-  completionOf: (result) => result.status == Acs05AssessmentStatus.blocked
-      ? Elv5Completion.incomplete
-      : Elv5Completion.complete,
-  assessmentOf: (result) => switch (result.status) {
-    Acs05AssessmentStatus.pass => Elv5Assessment.pass,
-    Acs05AssessmentStatus.fail => Elv5Assessment.fail,
-    Acs05AssessmentStatus.blocked => Elv5Assessment.unresolved,
-  },
+  encodeOutput:
+      (result) => <String, Object?>{
+        'schema': 'electra.elv5-acs05-output.v1',
+        'status': result.status.name,
+        'globalRequiredEnergyWh': result.globalRequiredEnergy.value.toMap(),
+        'availableEnergyWh': result.availableEnergy.value.toMap(),
+        'energyMarginWh': result.energyMargin.value.toMap(),
+        'acsContributionEnergyWh': result.acsContributionEnergy.value.toMap(),
+        'governingDimension': result.governingDimension.name,
+        'governingSegmentId': result.governingSegmentId,
+        'blockingReason': result.blockingReason,
+      },
+  encodeEvidence:
+      (captured, _) => <String, Object?>{
+        'schema': 'electra.elv5-acs05-evidence.v1',
+        'source': 'VERIFIED_CURRENT_PWR04_PLUS_CONSUMED_CURRENT_PWR01',
+        'captureRevision': captured.captureRevision,
+        'upstreamPointerGenerations': captured.upstreamPointerGenerations,
+        'sequenceFingerprint': captured.value.expectedSequenceFingerprint,
+        'protectedLoadSetFingerprint':
+            captured.value.expectedProtectedLoadSetFingerprint,
+      },
+  executionOf:
+      (result) =>
+          result.status == Acs05AssessmentStatus.blocked
+              ? Elv5Execution.blocked
+              : Elv5Execution.succeeded,
+  completionOf:
+      (result) =>
+          result.status == Acs05AssessmentStatus.blocked
+              ? Elv5Completion.incomplete
+              : Elv5Completion.complete,
+  assessmentOf:
+      (result) => switch (result.status) {
+        Acs05AssessmentStatus.pass => Elv5Assessment.pass,
+        Acs05AssessmentStatus.fail => Elv5Assessment.fail,
+        Acs05AssessmentStatus.blocked => Elv5Assessment.unresolved,
+      },
   nowUtc: nowUtc,
 );
 

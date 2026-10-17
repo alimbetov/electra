@@ -218,12 +218,10 @@ final class Elv4QualificationBuilder {
       maxV: PowerRational.integer(
         currentKind == PowerCurrentKind.ac ? 260 : 60,
       ),
-      frequencyMinHz: currentKind == PowerCurrentKind.ac
-          ? PowerRational.integer(50)
-          : null,
-      frequencyMaxHz: currentKind == PowerCurrentKind.ac
-          ? PowerRational.integer(50)
-          : null,
+      frequencyMinHz:
+          currentKind == PowerCurrentKind.ac ? PowerRational.integer(50) : null,
+      frequencyMaxHz:
+          currentKind == PowerCurrentKind.ac ? PowerRational.integer(50) : null,
     ),
     terminalRoles: const ['POWER'],
     ownership: PowerProjectionOwnership([

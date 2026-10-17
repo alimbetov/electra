@@ -107,9 +107,8 @@ final class Acs04SourceCaseContract {
     final dimension = switch (_mapText(map, 'dimension')) {
       'WATT' => Acs04SourceDimension.watt,
       'CURRENT' => Acs04SourceDimension.current,
-      final value => throw FormatException(
-        'Unsupported ACS04 dimension: $value',
-      ),
+      final value =>
+        throw FormatException('Unsupported ACS04 dimension: $value'),
     };
     return Acs04SourceCaseContract(
       caseId: _mapText(map, 'caseId'),
@@ -244,8 +243,9 @@ abstract interface class Acs04SourceRequirementContractSource {
 List<Acs04RequirementContributorRef> _contributors(
   Iterable<Acs04RequirementContributorRef> values,
 ) {
-  final result = values.toList()
-    ..sort((a, b) => a.contributorId.compareTo(b.contributorId));
+  final result =
+      values.toList()
+        ..sort((a, b) => a.contributorId.compareTo(b.contributorId));
   final ids = <String>{};
   for (final value in result) {
     if (!ids.add(value.contributorId)) {

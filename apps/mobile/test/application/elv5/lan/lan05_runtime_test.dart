@@ -166,15 +166,16 @@ final class _OpticalEvidence implements Lan05OpticalSectionEvidenceSource {
     required String designRevisionId,
     required String realizedSectionId,
     required Elv5Rational wavelengthNm,
-  }) async => missing
-      ? null
-      : Lan05OpticalSectionEvidence(
-          realizedSectionId: realizedSectionId,
-          wavelengthNm: wavelengthNm,
-          attenuationDbPerKm: Lan05LossInterval.exact(
-            LossDb(Elv5Rational.parseDecimal('2.5')),
-          ),
-          evidenceFingerprint: List.filled(64, 'b').join(),
-          evidenceRef: 'catalog:fiber-fixture:v1',
-        );
+  }) async =>
+      missing
+          ? null
+          : Lan05OpticalSectionEvidence(
+            realizedSectionId: realizedSectionId,
+            wavelengthNm: wavelengthNm,
+            attenuationDbPerKm: Lan05LossInterval.exact(
+              LossDb(Elv5Rational.parseDecimal('2.5')),
+            ),
+            evidenceFingerprint: List.filled(64, 'b').join(),
+            evidenceRef: 'catalog:fiber-fixture:v1',
+          );
 }

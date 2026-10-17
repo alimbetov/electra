@@ -10,84 +10,90 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('F2 FA-03 Q6/Q7/Q8 qualifies publication CAS, restart and frozen replay', () async {
-    final db = AppDatabase(NativeDatabase.memory());
-    addTearDown(db.close);
-    await _seed(db);
+  test(
+    'F2 FA-03 Q6/Q7/Q8 qualifies publication CAS, restart and frozen replay',
+    () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      await _seed(db);
 
-    final firstAdapter = _Fa03FixtureAdapter();
-    final firstService = _service(db, firstAdapter);
-    final command = _command(commandId: 'cmd-fa03-1', expectedGeneration: 0);
+      final firstAdapter = _Fa03FixtureAdapter();
+      final firstService = _service(db, firstAdapter);
+      final command = _command(commandId: 'cmd-fa03-1', expectedGeneration: 0);
 
-    final first = await firstService.execute(command);
-    expect(first.replayed, isFalse);
-    expect(firstAdapter.captureCount, 1);
+      final first = await firstService.execute(command);
+      expect(first.replayed, isFalse);
+      expect(firstAdapter.captureCount, 1);
 
-    final uow = DriftElv5CalculationWriteUnitOfWork(
-      db,
-      originDeviceId: 'f2-fa03-q7',
-    );
-    final persistedPointers = await uow.run(
-      (session) => session.pointers.loadPointersBulk(
-        projectId: 'project-1',
-        designRevisionId: 'rev-1',
-        logicalNodeKeySha256s: <String>{_nodeSha()},
-      ),
-    );
-    final published = persistedPointers[_nodeSha()]!;
-    expect(published.freshness, Elv5PointerFreshness.current);
-    expect(published.generation, 1);
-    expect(published.evaluationId, isNotNull);
-    expect(published.outputSha256, isNotNull);
-
-    // Q7: another writer that captured generation 0 cannot overwrite CURRENT.
-    final competing = _command(commandId: 'cmd-fa03-2', expectedGeneration: 0);
-    await expectLater(
-      firstService.execute(competing),
-      throwsA(
-        isA<Elv5ReplacementCommandException>().having(
-          (value) => value.code,
-          'code',
-          'ELV5_POINTER_GENERATION_CONFLICT',
+      final uow = DriftElv5CalculationWriteUnitOfWork(
+        db,
+        originDeviceId: 'f2-fa03-q7',
+      );
+      final persistedPointers = await uow.run(
+        (session) => session.pointers.loadPointersBulk(
+          projectId: 'project-1',
+          designRevisionId: 'rev-1',
+          logicalNodeKeySha256s: <String>{_nodeSha()},
         ),
-      ),
-    );
+      );
+      final published = persistedPointers[_nodeSha()]!;
+      expect(published.freshness, Elv5PointerFreshness.current);
+      expect(published.generation, 1);
+      expect(published.evaluationId, isNotNull);
+      expect(published.outputSha256, isNotNull);
 
-    // Freeze the exact historical revision after the successful publication.
-    await db.customUpdate(
-      "UPDATE project_design_revisions SET state = 'FROZEN', revision = revision + 1 "
-      "WHERE project_id = 'project-1' AND id = 'rev-1'",
-    );
-
-    // Q8/restart: a fresh service over the same durable DB replays the historical
-    // command before any recapture and therefore preserves the exact result.
-    final restartedAdapter = _Fa03FixtureAdapter();
-    final restartedService = _service(db, restartedAdapter);
-    final replay = await restartedService.execute(command);
-    expect(replay.replayed, isTrue);
-    expect(replay.logicalResultJson, first.logicalResultJson);
-    expect(restartedAdapter.captureCount, 0);
-
-    // A new calculation on the frozen revision is forbidden even when it knows
-    // the latest pointer generation. Historical replay and new mutation are kept
-    // deliberately separate.
-    await expectLater(
-      restartedService.execute(
-        _command(
-          commandId: 'cmd-fa03-after-freeze',
-          expectedGeneration: 1,
-          expectedDesignRowRevision: 2,
+      // Q7: another writer that captured generation 0 cannot overwrite CURRENT.
+      final competing = _command(
+        commandId: 'cmd-fa03-2',
+        expectedGeneration: 0,
+      );
+      await expectLater(
+        firstService.execute(competing),
+        throwsA(
+          isA<Elv5ReplacementCommandException>().having(
+            (value) => value.code,
+            'code',
+            'ELV5_POINTER_GENERATION_CONFLICT',
+          ),
         ),
-      ),
-      throwsA(
-        isA<Elv5ReplacementCommandException>().having(
-          (value) => value.code,
-          'code',
-          'ELV5_DESIGN_REVISION_READ_ONLY',
+      );
+
+      // Freeze the exact historical revision after the successful publication.
+      await db.customUpdate(
+        "UPDATE project_design_revisions SET state = 'FROZEN', revision = revision + 1 "
+        "WHERE project_id = 'project-1' AND id = 'rev-1'",
+      );
+
+      // Q8/restart: a fresh service over the same durable DB replays the historical
+      // command before any recapture and therefore preserves the exact result.
+      final restartedAdapter = _Fa03FixtureAdapter();
+      final restartedService = _service(db, restartedAdapter);
+      final replay = await restartedService.execute(command);
+      expect(replay.replayed, isTrue);
+      expect(replay.logicalResultJson, first.logicalResultJson);
+      expect(restartedAdapter.captureCount, 0);
+
+      // A new calculation on the frozen revision is forbidden even when it knows
+      // the latest pointer generation. Historical replay and new mutation are kept
+      // deliberately separate.
+      await expectLater(
+        restartedService.execute(
+          _command(
+            commandId: 'cmd-fa03-after-freeze',
+            expectedGeneration: 1,
+            expectedDesignRowRevision: 2,
+          ),
         ),
-      ),
-    );
-  });
+        throwsA(
+          isA<Elv5ReplacementCommandException>().having(
+            (value) => value.code,
+            'code',
+            'ELV5_DESIGN_REVISION_READ_ONLY',
+          ),
+        ),
+      );
+    },
+  );
 }
 
 Elv5CalculationService _service(AppDatabase db, _Fa03FixtureAdapter adapter) =>

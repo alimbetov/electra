@@ -121,9 +121,10 @@ final class Elv5ProcessEvaluationCandidate {
   final Elv5QualificationIdentity? qualificationIdentity;
 
   bool get isQualificationAddressed => qualificationIdentity != null;
-  String get evaluationIdentitySchema => qualificationIdentity == null
-      ? 'electra.elv5-evaluation-identity.v1'
-      : 'electra.elv5-evaluation-identity.v2';
+  String get evaluationIdentitySchema =>
+      qualificationIdentity == null
+          ? 'electra.elv5-evaluation-identity.v1'
+          : 'electra.elv5-evaluation-identity.v2';
 
   String get nodeKeyJson => _canonicalJson(nodeKey.toCanonicalValue());
   String get nodeKeySha256 => _encoder.sha256(nodeKey.toCanonicalValue());

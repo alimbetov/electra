@@ -34,10 +34,11 @@ void main() {
         processCode: Elv5ProcessCode.cctv01,
         calculate: (input) => input * 2,
         encodeOutput: (output) => {'value': output},
-        encodeEvidence: (captured, output) => {
-          'captureRevision': captured.captureRevision,
-          'outputEcho': output,
-        },
+        encodeEvidence:
+            (captured, output) => {
+              'captureRevision': captured.captureRevision,
+              'outputEcho': output,
+            },
         assessmentOf: (_) => Elv5Assessment.pass,
         executionOf: (_) => Elv5Execution.succeeded,
         completionOf: (_) => Elv5Completion.complete,

@@ -3,7 +3,12 @@ import '../../numeric/rational.dart';
 
 enum Fa08AssessmentStatus { pass, fail, blocked, notAssessed }
 
-enum Fa08RequirementKind { cableClassEquals, environmentTagPresent, numericMinimum, numericMaximum }
+enum Fa08RequirementKind {
+  cableClassEquals,
+  environmentTagPresent,
+  numericMinimum,
+  numericMaximum
+}
 
 final class Fa08NumericFact {
   Fa08NumericFact({
@@ -32,12 +37,14 @@ final class Fa08RouteSection {
     this.ampacityInput,
   }) {
     if (sectionId.isEmpty || cableEditionId.isEmpty) {
-      throw ArgumentError('FA08 section/cable edition identity must not be empty.');
+      throw ArgumentError(
+          'FA08 section/cable edition identity must not be empty.');
     }
     final seen = <String>{};
     for (final fact in numericFacts) {
       if (!seen.add(fact.propertyCode)) {
-        throw ArgumentError('FA08 duplicate numeric property: ${fact.propertyCode}');
+        throw ArgumentError(
+            'FA08 duplicate numeric property: ${fact.propertyCode}');
       }
       if (fact.propertyCode == ampacityIzPropertyCode) {
         throw ArgumentError(
@@ -71,17 +78,20 @@ final class Fa08Requirement {
         unitCode = null,
         threshold = null {
     _validateCode(code);
-    if (expectedClass.isEmpty) throw ArgumentError('FA08 expected class must not be empty.');
+    if (expectedClass.isEmpty)
+      throw ArgumentError('FA08 expected class must not be empty.');
   }
 
-  Fa08Requirement.environmentTag({required this.code, required String requiredTag})
+  Fa08Requirement.environmentTag(
+      {required this.code, required String requiredTag})
       : kind = Fa08RequirementKind.environmentTagPresent,
         expectedToken = requiredTag,
         propertyCode = null,
         unitCode = null,
         threshold = null {
     _validateCode(code);
-    if (requiredTag.isEmpty) throw ArgumentError('FA08 environment tag must not be empty.');
+    if (requiredTag.isEmpty)
+      throw ArgumentError('FA08 environment tag must not be empty.');
   }
 
   Fa08Requirement.numeric({
@@ -96,10 +106,14 @@ final class Fa08Requirement {
         kind != Fa08RequirementKind.numericMaximum) {
       throw ArgumentError('FA08 numeric requirement kind is invalid.');
     }
-    if (propertyCode == null || propertyCode!.isEmpty || unitCode == null || unitCode!.isEmpty) {
+    if (propertyCode == null ||
+        propertyCode!.isEmpty ||
+        unitCode == null ||
+        unitCode!.isEmpty) {
       throw ArgumentError('FA08 numeric requirement property/unit is invalid.');
     }
-    if (propertyCode == Fa08RouteSection.ampacityIzPropertyCode && unitCode != 'A') {
+    if (propertyCode == Fa08RouteSection.ampacityIzPropertyCode &&
+        unitCode != 'A') {
       throw ArgumentError('FA08 ampacity Iz requirement must use unit A.');
     }
   }
@@ -112,13 +126,15 @@ final class Fa08Requirement {
   final Elv5Rational? threshold;
 
   static void _validateCode(String code) {
-    if (code.isEmpty) throw ArgumentError('FA08 requirement code must not be empty.');
+    if (code.isEmpty)
+      throw ArgumentError('FA08 requirement code must not be empty.');
   }
 }
 
 final class Fa08Policy {
   Fa08Policy({required this.policyId, required this.requirements}) {
-    if (policyId.isEmpty) throw ArgumentError('FA08 policyId must not be empty.');
+    if (policyId.isEmpty)
+      throw ArgumentError('FA08 policyId must not be empty.');
     final seen = <String>{};
     for (final req in requirements) {
       if (!seen.add(req.code)) {
@@ -142,7 +158,8 @@ final class Fa08Input {
     required this.policy,
     required this.complianceEvidence,
   }) {
-    if (orderedSections.isEmpty) throw ArgumentError('FA08 route must not be empty.');
+    if (orderedSections.isEmpty)
+      throw ArgumentError('FA08 route must not be empty.');
     final seen = <String>{};
     for (final section in orderedSections) {
       if (!seen.add(section.sectionId)) {
@@ -260,11 +277,12 @@ final class Fa08CablePolicyKernel {
       }
     }
 
-    final technical = results.any((e) => e.status == Fa08AssessmentStatus.blocked)
-        ? Fa08AssessmentStatus.blocked
-        : (results.any((e) => e.status == Fa08AssessmentStatus.fail)
-            ? Fa08AssessmentStatus.fail
-            : Fa08AssessmentStatus.pass);
+    final technical =
+        results.any((e) => e.status == Fa08AssessmentStatus.blocked)
+            ? Fa08AssessmentStatus.blocked
+            : (results.any((e) => e.status == Fa08AssessmentStatus.fail)
+                ? Fa08AssessmentStatus.fail
+                : Fa08AssessmentStatus.pass);
     final compliance = input.complianceEvidence == null
         ? Fa08AssessmentStatus.notAssessed
         : (input.complianceEvidence!.verifiedCompliant

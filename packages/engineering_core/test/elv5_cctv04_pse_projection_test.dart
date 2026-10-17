@@ -4,7 +4,8 @@ import 'package:test/test.dart';
 void main() {
   Power w(String value) => Power(Elv5Rational.parseDecimal(value));
 
-  Cctv04Pwr06Evidence evidence({String closure = 'closure-v1', String margin = '5'}) =>
+  Cctv04Pwr06Evidence evidence(
+          {String closure = 'closure-v1', String margin = '5'}) =>
       Cctv04Pwr06Evidence(
         pseId: 'pse-1',
         closureFingerprint: closure,

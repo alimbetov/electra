@@ -18,8 +18,8 @@ void main() {
         processVersion: descriptor.versions.processVersion,
         rulesetVersion: Elv5FoundationAuthorityManifest.rulesetVersion,
         sourceSha: _hash('a'),
-        authorityFingerprint: Elv5FoundationAuthorityManifest.instance
-            .fingerprint(),
+        authorityFingerprint:
+            Elv5FoundationAuthorityManifest.instance.fingerprint(),
       );
       final base = Elv5ProcessEvaluationCandidate(
         nodeKey: Elv5EngineeringNodeKeyV3(

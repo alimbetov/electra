@@ -22,9 +22,8 @@ void main() {
         PowerPortRole.consumer,
         expectedRevision: 1,
       );
-      final original = (await builder.topology.load(builder.projectId))
-          .ports
-          .single;
+      final original =
+          (await builder.topology.load(builder.projectId)).ports.single;
       // Exact replay/no-op is allowed and does not advance canonical row state.
       await builder.topology.savePort(builder.projectId, original);
       final changed = EngineeringPort.fromMap({
@@ -75,67 +74,69 @@ void main() {
     },
   );
 
-  test('ELV1 port writer blocks indirect load ownership without power-port binding', () async {
-    final db = AppDatabase(NativeDatabase.memory());
-    addTearDown(db.close);
-    final builder = Elv4QualificationBuilder(db);
-    await builder.createStructuralBaseline();
-    final port = builder.powerPort('load', 'IN');
-    await builder.addComponent('load', ports: [port]);
+  test(
+    'ELV1 port writer blocks indirect load ownership without power-port binding',
+    () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      final builder = Elv4QualificationBuilder(db);
+      await builder.createStructuralBaseline();
+      final port = builder.powerPort('load', 'IN');
+      await builder.addComponent('load', ports: [port]);
 
-    final receipt = await builder.power.execute(
-      SetPowerLoadCommand(
-        operationId: 'set-indirect-load',
-        projectId: builder.projectId,
-        designRevisionId: builder.revisionId,
-        expectedRevision: 1,
-        changedDependencies: [builder.dependency('LOAD-indirect')],
-        contribution: PowerOwnLoadContribution(
-          id: 'LOAD-indirect',
-          componentId: 'load',
-          inputPortId: port.id,
-          accountingKind: PowerAccountingKind.consumerInput,
-          stateCode: 'NORMAL',
-          demand: DcConstantPowerDemand(PowerRational.integer(12)),
+      final receipt = await builder.power.execute(
+        SetPowerLoadCommand(
+          operationId: 'set-indirect-load',
+          projectId: builder.projectId,
+          designRevisionId: builder.revisionId,
+          expectedRevision: 1,
+          changedDependencies: [builder.dependency('LOAD-indirect')],
+          contribution: PowerOwnLoadContribution(
+            id: 'LOAD-indirect',
+            componentId: 'load',
+            inputPortId: port.id,
+            accountingKind: PowerAccountingKind.consumerInput,
+            stateCode: 'NORMAL',
+            demand: DcConstantPowerDemand(PowerRational.integer(12)),
+          ),
         ),
-      ),
-    );
-    expect(await db.select(db.powerPortBindings).get(), isEmpty);
-    expect(await db.select(db.powerLoadBindings).get(), hasLength(1));
+      );
+      expect(await db.select(db.powerPortBindings).get(), isEmpty);
+      expect(await db.select(db.powerLoadBindings).get(), hasLength(1));
 
-    final original = (await builder.topology.load(builder.projectId))
-        .ports
-        .single;
-    final changed = EngineeringPort.fromMap({
-      ...original.toMap(),
-      'code': 'INDIRECT-EDIT',
-    });
-    final owned = throwsA(
-      isA<StateError>().having(
-        (error) => error.message,
-        'message',
-        contains('ELV4_POWER_PORT_OWNED'),
-      ),
-    );
+      final original =
+          (await builder.topology.load(builder.projectId)).ports.single;
+      final changed = EngineeringPort.fromMap({
+        ...original.toMap(),
+        'code': 'INDIRECT-EDIT',
+      });
+      final owned = throwsA(
+        isA<StateError>().having(
+          (error) => error.message,
+          'message',
+          contains('ELV4_POWER_PORT_OWNED'),
+        ),
+      );
 
-    await expectLater(
-      builder.topology.savePort(builder.projectId, changed),
-      owned,
-    );
-    await expectLater(
-      builder.topology.archive(
-        builder.projectId,
-        TopologyObjectKind.port,
-        port.id,
-      ),
-      owned,
-    );
-    expect(
-      (await builder.topology.load(builder.projectId)).ports.single.toMap(),
-      original.toMap(),
-    );
-    final revision = await (db.select(db.projectDesignRevisions)).getSingle();
-    expect(revision.revision, receipt.currentRevision);
-    expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
-  });
+      await expectLater(
+        builder.topology.savePort(builder.projectId, changed),
+        owned,
+      );
+      await expectLater(
+        builder.topology.archive(
+          builder.projectId,
+          TopologyObjectKind.port,
+          port.id,
+        ),
+        owned,
+      );
+      expect(
+        (await builder.topology.load(builder.projectId)).ports.single.toMap(),
+        original.toMap(),
+      );
+      final revision = await (db.select(db.projectDesignRevisions)).getSingle();
+      expect(revision.revision, receipt.currentRevision);
+      expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
+    },
+  );
 }

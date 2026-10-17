@@ -30,30 +30,29 @@ final class DriftFa08RouteCableFactSource implements Fa08RouteCableFactSource {
       return const [];
     final cable =
         await (database.select(database.elvCables)..where(
-              (row) =>
-                  row.projectId.equals(projectId) &
-                  row.id.equals(run.cableId) &
-                  row.lifecycleState.equals('ACTIVE') &
-                  row.deletedAt.isNull(),
-            ))
-            .getSingleOrNull();
+          (row) =>
+              row.projectId.equals(projectId) &
+              row.id.equals(run.cableId) &
+              row.lifecycleState.equals('ACTIVE') &
+              row.deletedAt.isNull(),
+        )).getSingleOrNull();
     if (cable == null) return const [];
 
-    final ref = CableDefinitionRef(
-      catalogId: cable.definitionCatalogId,
-      catalogVersion: cable.definitionCatalogVersion,
-      definitionCode: cable.definitionCode,
-      definitionContentHash: cable.definitionContentHash,
-    ).normalized();
+    final ref =
+        CableDefinitionRef(
+          catalogId: cable.definitionCatalogId,
+          catalogVersion: cable.definitionCatalogVersion,
+          definitionCode: cable.definitionCode,
+          definitionContentHash: cable.definitionContentHash,
+        ).normalized();
     final catalogRow =
         await (database.select(database.engineeringReferenceCatalogs)..where(
-              (row) =>
-                  row.projectId.equals(projectId) &
-                  row.id.equals(ref.catalogId) &
-                  row.catalogVersion.equals(ref.catalogVersion) &
-                  row.deletedAt.isNull(),
-            ))
-            .getSingleOrNull();
+          (row) =>
+              row.projectId.equals(projectId) &
+              row.id.equals(ref.catalogId) &
+              row.catalogVersion.equals(ref.catalogVersion) &
+              row.deletedAt.isNull(),
+        )).getSingleOrNull();
     if (catalogRow == null) {
       throw StateError('FA08_CABLE_CATALOG_EDITION_MISSING:${ref.catalogId}');
     }

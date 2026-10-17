@@ -365,9 +365,8 @@ final class DriftPowerPublicationRuntime {
       );
       final oldKeys = oldClosure.map((value) => value.encode()).toSet();
       await applyMutation();
-      final newKeys = (await captureNewClosure())
-          .map((value) => value.encode())
-          .toSet();
+      final newKeys =
+          (await captureNewClosure()).map((value) => value.encode()).toSet();
       final after = await _requireRevision(
         projectId: projectId,
         designRevisionId: designRevisionId,
@@ -403,17 +402,18 @@ final class DriftPowerPublicationRuntime {
       requireWorking: false,
     );
     if (revision.state == 'WORKING') {
-      final rows = await database
-          .customSelect(
-            'SELECT logical_node_key_json, state FROM power_evaluation_pointers '
-            'WHERE project_id = ? AND design_revision_id = ? '
-            'ORDER BY logical_node_key_json',
-            variables: [
-              Variable.withString(projectId),
-              Variable.withString(designRevisionId),
-            ],
-          )
-          .get();
+      final rows =
+          await database
+              .customSelect(
+                'SELECT logical_node_key_json, state FROM power_evaluation_pointers '
+                'WHERE project_id = ? AND design_revision_id = ? '
+                'ORDER BY logical_node_key_json',
+                variables: [
+                  Variable.withString(projectId),
+                  Variable.withString(designRevisionId),
+                ],
+              )
+              .get();
       final states = <String, PowerPointerState>{};
       for (final row in rows) {
         states[row.read<String>('logical_node_key_json')] = _pointerState(
@@ -430,16 +430,17 @@ final class DriftPowerPublicationRuntime {
       );
     }
 
-    final snapshot = await database
-        .customSelect(
-          'SELECT payload_json, power_sha256, physical_sha256 FROM design_revision_power_snapshots '
-          'WHERE project_id = ? AND design_revision_id = ?',
-          variables: [
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-          ],
-        )
-        .getSingleOrNull();
+    final snapshot =
+        await database
+            .customSelect(
+              'SELECT payload_json, power_sha256, physical_sha256 FROM design_revision_power_snapshots '
+              'WHERE project_id = ? AND design_revision_id = ?',
+              variables: [
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+              ],
+            )
+            .getSingleOrNull();
     if (snapshot == null) {
       return PowerRevisionReadSnapshot(
         kind: PowerRevisionReadKind.notCaptured,
@@ -456,16 +457,17 @@ final class DriftPowerPublicationRuntime {
         'ELV4_FROZEN_POWER_SNAPSHOT_HASH_MISMATCH',
       );
     }
-    final manifest = await database
-        .customSelect(
-          'SELECT manifest_sha256, physical_sha256, power_sha256 FROM design_revision_snapshot_manifests '
-          'WHERE project_id = ? AND design_revision_id = ?',
-          variables: [
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-          ],
-        )
-        .getSingleOrNull();
+    final manifest =
+        await database
+            .customSelect(
+              'SELECT manifest_sha256, physical_sha256, power_sha256 FROM design_revision_snapshot_manifests '
+              'WHERE project_id = ? AND design_revision_id = ?',
+              variables: [
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+              ],
+            )
+            .getSingleOrNull();
     if (manifest == null ||
         manifest.read<String>('power_sha256') !=
             snapshot.read<String>('power_sha256') ||
@@ -488,18 +490,19 @@ final class DriftPowerPublicationRuntime {
       designRevisionId,
       snapshot.read<String>('physical_sha256'),
     );
-    final payload = (jsonDecode(snapshot.read<String>('payload_json')) as Map)
-        .cast<String, Object?>();
+    final payload =
+        (jsonDecode(snapshot.read<String>('payload_json')) as Map)
+            .cast<String, Object?>();
     final pointerValues = payload['pointers'];
     final pointers = pointerValues is List ? pointerValues : const <Object?>[];
     return PowerRevisionReadSnapshot(
       kind:
           pointers.isEmpty &&
-              !powerAspectTables.any(
-                (table) => capturedPowerRows(payload, table).isNotEmpty,
-              )
-          ? PowerRevisionReadKind.capturedEmpty
-          : PowerRevisionReadKind.captured,
+                  !powerAspectTables.any(
+                    (table) => capturedPowerRows(payload, table).isNotEmpty,
+                  )
+              ? PowerRevisionReadKind.capturedEmpty
+              : PowerRevisionReadKind.captured,
       lifecycleState: revision.state,
       mutationAllowed: false,
       pointerStates: const {},
@@ -526,32 +529,35 @@ final class DriftPowerPublicationRuntime {
       throw const PowerRuntimeStorageException('ELV4_STALE_PRECONDITION');
     }
     await _verifyPhysicalSection(projectId, designRevisionId, physicalSha256);
-    final existing = await database
-        .customSelect(
-          'SELECT power_sha256 FROM design_revision_power_snapshots '
-          'WHERE design_revision_id = ?',
-          variables: [Variable.withString(designRevisionId)],
-        )
-        .getSingleOrNull();
+    final existing =
+        await database
+            .customSelect(
+              'SELECT power_sha256 FROM design_revision_power_snapshots '
+              'WHERE design_revision_id = ?',
+              variables: [Variable.withString(designRevisionId)],
+            )
+            .getSingleOrNull();
     if (existing != null) {
       return existing.read<String>('power_sha256');
     }
-    final pointerRows = await database
-        .customSelect(
-          'SELECT logical_node_key_json, state, generation, evaluation_id, '
-          'evidence_sha256 FROM power_evaluation_pointers '
-          'WHERE project_id = ? AND design_revision_id = ? '
-          'ORDER BY logical_node_key_json',
-          variables: [
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-          ],
-        )
-        .get();
+    final pointerRows =
+        await database
+            .customSelect(
+              'SELECT logical_node_key_json, state, generation, evaluation_id, '
+              'evidence_sha256 FROM power_evaluation_pointers '
+              'WHERE project_id = ? AND design_revision_id = ? '
+              'ORDER BY logical_node_key_json',
+              variables: [
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+              ],
+            )
+            .get();
     final payload = <String, Object?>{
       'schema': 'electra.elv4-power-freeze-section.v2',
-      'facts': await DriftPowerSnapshotFacts(database)
-          .capture(projectId, designRevisionId),
+      'facts': await DriftPowerSnapshotFacts(
+        database,
+      ).capture(projectId, designRevisionId),
       'revisionToken': expectedRevisionToken,
       'pointers': [
         for (final row in pointerRows)
@@ -623,11 +629,10 @@ final class DriftPowerPublicationRuntime {
   ) async {
     final row =
         await (database.select(database.designRevisionPhysicalSnapshots)..where(
-              (r) =>
-                  r.projectId.equals(projectId) &
-                  r.designRevisionId.equals(revisionId),
-            ))
-            .getSingleOrNull();
+          (r) =>
+              r.projectId.equals(projectId) &
+              r.designRevisionId.equals(revisionId),
+        )).getSingleOrNull();
     if (row == null || row.payloadSha256 != expectedSha) {
       throw const PowerRuntimeStorageException(
         'ELV4_FROZEN_PHYSICAL_SNAPSHOT_HASH_MISMATCH',
@@ -663,19 +668,20 @@ final class DriftPowerPublicationRuntime {
     final queue = <PowerNodeKeyV2>[];
 
     Future<void> discover(PowerDependencyRef ref) async {
-      final rows = await database
-          .customSelect(
-            'SELECT logical_node_key_json FROM power_dependency_index_records '
-            'WHERE project_id = ? AND design_revision_id = ? '
-            'AND dependency_ref_type = ? AND dependency_ref_sha256 = ?',
-            variables: [
-              Variable.withString(projectId),
-              Variable.withString(designRevisionId),
-              Variable.withString(_dependencyRefType(ref.type)),
-              Variable.withString(ref.sha256),
-            ],
-          )
-          .get();
+      final rows =
+          await database
+              .customSelect(
+                'SELECT logical_node_key_json FROM power_dependency_index_records '
+                'WHERE project_id = ? AND design_revision_id = ? '
+                'AND dependency_ref_type = ? AND dependency_ref_sha256 = ?',
+                variables: [
+                  Variable.withString(projectId),
+                  Variable.withString(designRevisionId),
+                  Variable.withString(_dependencyRefType(ref.type)),
+                  Variable.withString(ref.sha256),
+                ],
+              )
+              .get();
       for (final row in rows) {
         final key = PowerNodeKeyV2.decode(
           row.read<String>('logical_node_key_json'),
@@ -798,18 +804,19 @@ final class DriftPowerPublicationRuntime {
     required String operationId,
     required String commandFingerprint,
   }) async {
-    final row = await database
-        .customSelect(
-          'SELECT command_fingerprint, status, result_json '
-          'FROM power_operation_records WHERE project_id = ? '
-          'AND design_revision_id = ? AND operation_id = ?',
-          variables: [
-            Variable.withString(capture.projectId),
-            Variable.withString(capture.designRevisionId),
-            Variable.withString(_text(operationId, 'operationId')),
-          ],
-        )
-        .getSingleOrNull();
+    final row =
+        await database
+            .customSelect(
+              'SELECT command_fingerprint, status, result_json '
+              'FROM power_operation_records WHERE project_id = ? '
+              'AND design_revision_id = ? AND operation_id = ?',
+              variables: [
+                Variable.withString(capture.projectId),
+                Variable.withString(capture.designRevisionId),
+                Variable.withString(_text(operationId, 'operationId')),
+              ],
+            )
+            .getSingleOrNull();
     if (row == null) return null;
     if (row.read<String>('command_fingerprint') != commandFingerprint) {
       throw const PowerRuntimeStorageException(
@@ -919,18 +926,19 @@ final class DriftPowerPublicationRuntime {
     required String storedJson,
     required String storedSha256,
   }) async {
-    final existing = await database
-        .customSelect(
-          'SELECT evidence_sha256 FROM power_evaluation_records '
-          'WHERE design_revision_id = ? AND logical_node_key_sha256 = ? '
-          'AND evaluation_id = ?',
-          variables: [
-            Variable.withString(designRevisionId),
-            Variable.withString(evidence.nodeKey.sha256),
-            Variable.withString(evidence.evaluationId),
-          ],
-        )
-        .getSingleOrNull();
+    final existing =
+        await database
+            .customSelect(
+              'SELECT evidence_sha256 FROM power_evaluation_records '
+              'WHERE design_revision_id = ? AND logical_node_key_sha256 = ? '
+              'AND evaluation_id = ?',
+              variables: [
+                Variable.withString(designRevisionId),
+                Variable.withString(evidence.nodeKey.sha256),
+                Variable.withString(evidence.evaluationId),
+              ],
+            )
+            .getSingleOrNull();
     if (existing != null) {
       if (existing.read<String>('evidence_sha256') == storedSha256) return;
       throw const PowerRuntimeStorageException(
@@ -974,23 +982,24 @@ final class DriftPowerPublicationRuntime {
     required String expectedEvaluationId,
     required String expectedInputFingerprint,
   }) async {
-    final row = await database
-        .customSelect(
-          'SELECT p.state, p.generation, p.evaluation_id, r.input_fingerprint '
-          'FROM power_evaluation_pointers p '
-          'JOIN power_evaluation_records r '
-          'ON r.design_revision_id = p.design_revision_id '
-          'AND r.logical_node_key_sha256 = p.logical_node_key_sha256 '
-          'AND r.evaluation_id = p.evaluation_id '
-          'WHERE p.project_id = ? AND p.design_revision_id = ? '
-          'AND p.logical_node_key_sha256 = ?',
-          variables: [
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            Variable.withString(nodeKey.sha256),
-          ],
-        )
-        .getSingleOrNull();
+    final row =
+        await database
+            .customSelect(
+              'SELECT p.state, p.generation, p.evaluation_id, r.input_fingerprint '
+              'FROM power_evaluation_pointers p '
+              'JOIN power_evaluation_records r '
+              'ON r.design_revision_id = p.design_revision_id '
+              'AND r.logical_node_key_sha256 = p.logical_node_key_sha256 '
+              'AND r.evaluation_id = p.evaluation_id '
+              'WHERE p.project_id = ? AND p.design_revision_id = ? '
+              'AND p.logical_node_key_sha256 = ?',
+              variables: [
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                Variable.withString(nodeKey.sha256),
+              ],
+            )
+            .getSingleOrNull();
     if (row == null ||
         row.read<String>('state') != 'CURRENT' ||
         row.readNullable<String>('evaluation_id') != expectedEvaluationId ||
@@ -1010,18 +1019,19 @@ final class DriftPowerPublicationRuntime {
     required String designRevisionId,
     required PowerNodeKeyV2 nodeKey,
   }) async {
-    final row = await database
-        .customSelect(
-          'SELECT logical_node_key_json, state, generation, evaluation_id '
-          'FROM power_evaluation_pointers WHERE project_id = ? '
-          'AND design_revision_id = ? AND logical_node_key_sha256 = ?',
-          variables: [
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            Variable.withString(nodeKey.sha256),
-          ],
-        )
-        .getSingleOrNull();
+    final row =
+        await database
+            .customSelect(
+              'SELECT logical_node_key_json, state, generation, evaluation_id '
+              'FROM power_evaluation_pointers WHERE project_id = ? '
+              'AND design_revision_id = ? AND logical_node_key_sha256 = ?',
+              variables: [
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                Variable.withString(nodeKey.sha256),
+              ],
+            )
+            .getSingleOrNull();
     if (row == null) return null;
     final decoded = PowerNodeKeyV2.decode(
       row.read<String>('logical_node_key_json'),
@@ -1042,16 +1052,17 @@ final class DriftPowerPublicationRuntime {
     required bool requireWorking,
     bool inputChangedOnMismatch = false,
   }) async {
-    final row = await database
-        .customSelect(
-          'SELECT state, revision FROM project_design_revisions '
-          'WHERE id = ? AND project_id = ? AND deleted_at IS NULL',
-          variables: [
-            Variable.withString(designRevisionId),
-            Variable.withString(projectId),
-          ],
-        )
-        .getSingleOrNull();
+    final row =
+        await database
+            .customSelect(
+              'SELECT state, revision FROM project_design_revisions '
+              'WHERE id = ? AND project_id = ? AND deleted_at IS NULL',
+              variables: [
+                Variable.withString(designRevisionId),
+                Variable.withString(projectId),
+              ],
+            )
+            .getSingleOrNull();
     if (row == null) {
       if (inputChangedOnMismatch) _inputChanged('REVISION_MISSING');
       throw const PowerRuntimeStorageException('ELV4_REVISION_NOT_FOUND');
@@ -1123,10 +1134,10 @@ void _requireNodeRevision(PowerNodeKeyV2 nodeKey, String designRevisionId) {
   }
 }
 
-Never _inputChanged(String reason) => throw PowerRuntimeStorageException(
-  'ELV4_RESULT_INPUT_CHANGED',
-  {'reason': reason},
-);
+Never _inputChanged(String reason) =>
+    throw PowerRuntimeStorageException('ELV4_RESULT_INPUT_CHANGED', {
+      'reason': reason,
+    });
 
 PowerPointerState _pointerState(String value) => switch (value) {
   'CURRENT' => PowerPointerState.current,

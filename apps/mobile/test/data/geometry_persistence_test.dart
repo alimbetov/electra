@@ -253,9 +253,10 @@ void main() {
     final hierarchy = DriftProjectHierarchyRepository(database);
     final restoredRoom = await hierarchy.findRoom(roomId);
 
-    final tables = await database
-        .customSelect("SELECT name FROM sqlite_master WHERE type = 'table'")
-        .get();
+    final tables =
+        await database
+            .customSelect("SELECT name FROM sqlite_master WHERE type = 'table'")
+            .get();
     final names = tables.map((row) => row.read<String>('name')).toSet();
 
     expect(restoredRoom?.name, 'Workshop');

@@ -60,17 +60,18 @@ void main() {
     expect(await _count(db, 'power_evaluation_records'), 2);
     expect(await _count(db, 'power_operation_records'), 1);
 
-    final dependencyEdge = await db
-        .customSelect(
-          'SELECT COUNT(*) AS c FROM power_dependency_index_records '
-          "WHERE dependency_ref_type = 'EVALUATION' "
-          'AND dependency_ref_sha256 = ? AND logical_node_key_sha256 = ?',
-          variables: [
-            Variable.withString(sha256HexUtf8(leafNode.encode())),
-            Variable.withString(capabilityNode.sha256),
-          ],
-        )
-        .getSingle();
+    final dependencyEdge =
+        await db
+            .customSelect(
+              'SELECT COUNT(*) AS c FROM power_dependency_index_records '
+              "WHERE dependency_ref_type = 'EVALUATION' "
+              'AND dependency_ref_sha256 = ? AND logical_node_key_sha256 = ?',
+              variables: [
+                Variable.withString(sha256HexUtf8(leafNode.encode())),
+                Variable.withString(capabilityNode.sha256),
+              ],
+            )
+            .getSingle();
     expect(dependencyEdge.read<int>('c'), 1);
   });
 
@@ -113,11 +114,12 @@ void main() {
         projectId: 'project',
         designRevisionId: 'rev-working',
         oldClosure: [sourceFact],
-        applyMutation: () => db.customUpdate(
-          'UPDATE project_design_revisions SET revision = revision + 1 '
-          'WHERE id = ?',
-          variables: [Variable.withString('rev-working')],
-        ),
+        applyMutation:
+            () => db.customUpdate(
+              'UPDATE project_design_revisions SET revision = revision + 1 '
+              'WHERE id = ?',
+              variables: [Variable.withString('rev-working')],
+            ),
         captureNewClosure: () async => [sourceFact],
       );
       expect(await _pointerState(db, leafNode), 'STALE');
@@ -160,19 +162,21 @@ void main() {
 
       expect(await _pointerState(db, leafNode), 'STALE');
       expect(await _pointerState(db, capabilityNode), 'STALE');
-      final newEvaluations = await db
-          .customSelect(
-            "SELECT COUNT(*) AS c FROM power_evaluation_records "
-            "WHERE evaluation_id IN ('eval-leaf-2','eval-capability-2')",
-          )
-          .getSingle();
+      final newEvaluations =
+          await db
+              .customSelect(
+                "SELECT COUNT(*) AS c FROM power_evaluation_records "
+                "WHERE evaluation_id IN ('eval-leaf-2','eval-capability-2')",
+              )
+              .getSingle();
       expect(newEvaluations.read<int>('c'), 0);
-      final secondLedger = await db
-          .customSelect(
-            "SELECT COUNT(*) AS c FROM power_operation_records "
-            "WHERE operation_id = 'op-second'",
-          )
-          .getSingle();
+      final secondLedger =
+          await db
+              .customSelect(
+                "SELECT COUNT(*) AS c FROM power_operation_records "
+                "WHERE operation_id = 'op-second'",
+              )
+              .getSingle();
       expect(secondLedger.read<int>('c'), 0);
     },
   );
@@ -345,24 +349,26 @@ DriftPowerBatchPublicationRuntime _batchRuntime(AppDatabase db) =>
     );
 
 Future<String?> _pointerState(AppDatabase db, PowerNodeKeyV2 node) async {
-  final row = await db
-      .customSelect(
-        'SELECT state FROM power_evaluation_pointers '
-        'WHERE logical_node_key_sha256 = ?',
-        variables: [Variable.withString(node.sha256)],
-      )
-      .getSingleOrNull();
+  final row =
+      await db
+          .customSelect(
+            'SELECT state FROM power_evaluation_pointers '
+            'WHERE logical_node_key_sha256 = ?',
+            variables: [Variable.withString(node.sha256)],
+          )
+          .getSingleOrNull();
   return row?.read<String>('state');
 }
 
 Future<int?> _pointerGeneration(AppDatabase db, PowerNodeKeyV2 node) async {
-  final row = await db
-      .customSelect(
-        'SELECT generation FROM power_evaluation_pointers '
-        'WHERE logical_node_key_sha256 = ?',
-        variables: [Variable.withString(node.sha256)],
-      )
-      .getSingleOrNull();
+  final row =
+      await db
+          .customSelect(
+            'SELECT generation FROM power_evaluation_pointers '
+            'WHERE logical_node_key_sha256 = ?',
+            variables: [Variable.withString(node.sha256)],
+          )
+          .getSingleOrNull();
   return row?.read<int>('generation');
 }
 

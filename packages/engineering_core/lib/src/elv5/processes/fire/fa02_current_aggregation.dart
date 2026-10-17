@@ -11,7 +11,8 @@ final class Fa02LoadOrigin {
     required this.originId,
     required this.currents,
   }) {
-    if (originId.isEmpty) throw ArgumentError('FA02 originId must not be empty.');
+    if (originId.isEmpty)
+      throw ArgumentError('FA02 originId must not be empty.');
     for (final entry in currents.entries) {
       if (entry.value.lower.value < Elv5Rational.zero ||
           entry.value.upper.value < Elv5Rational.zero) {
@@ -50,7 +51,8 @@ final class Fa02Input {
     required this.origins,
     required this.cases,
   }) {
-    if (segmentId.isEmpty) throw ArgumentError('FA02 segmentId must not be empty.');
+    if (segmentId.isEmpty)
+      throw ArgumentError('FA02 segmentId must not be empty.');
     final originIds = <String>{};
     for (final origin in origins) {
       if (!originIds.add(origin.originId)) {
@@ -60,7 +62,8 @@ final class Fa02Input {
     final caseIds = <Fa02OperatingCase>{};
     for (final item in cases) {
       if (!caseIds.add(item.operatingCase)) {
-        throw ArgumentError('FA02 duplicate operating case: ${item.operatingCase}');
+        throw ArgumentError(
+            'FA02 duplicate operating case: ${item.operatingCase}');
       }
       for (final id in item.selectedOriginIds) {
         if (!originIds.contains(id)) {
@@ -176,7 +179,8 @@ final class Fa02CurrentAggregationKernel {
       Fa02CaseResult? highest;
       for (final value in results.values) {
         if (!value.complete) continue;
-        if (highest == null || value.knownSubtotal.upper > highest.knownSubtotal.upper) {
+        if (highest == null ||
+            value.knownSubtotal.upper > highest.knownSubtotal.upper) {
           highest = value;
         }
       }

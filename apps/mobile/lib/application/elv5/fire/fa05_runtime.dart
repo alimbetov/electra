@@ -185,13 +185,14 @@ final class Fa05PersistedInputResolver
     final segmentBasis = <Map<String, Object?>>[];
 
     for (final segment in contract.segments) {
-      final matches = consumedRefs.where((ref) {
-        final key = ref.nodeKey;
-        return key.processCode == PowerProcessCode.pwr01 &&
-            key.scenarioId == contract.scenarioId &&
-            key.scopeKind == PowerEvaluationScopeKind.segment &&
-            key.scopeId == segment.segmentId;
-      }).toList();
+      final matches =
+          consumedRefs.where((ref) {
+            final key = ref.nodeKey;
+            return key.processCode == PowerProcessCode.pwr01 &&
+                key.scenarioId == contract.scenarioId &&
+                key.scopeKind == PowerEvaluationScopeKind.segment &&
+                key.scopeId == segment.segmentId;
+          }).toList();
       if (matches.length != 1) {
         _blocked(
           request,
@@ -524,37 +525,44 @@ Elv5PureKernelExecutor<Fa05Input, Fa05Result> buildFa05Executor({
 }) => Elv5PureKernelExecutor<Fa05Input, Fa05Result>(
   processCode: Elv5ProcessCode.fa05,
   calculate: const Fa05AutonomyProjectionKernel().evaluate,
-  encodeOutput: (result) => <String, Object?>{
-    'schema': 'electra.elv5-fa05-output.v1',
-    'status': result.status.name,
-    'globalRequiredEnergyWh': result.globalRequiredEnergy.value.toMap(),
-    'availableEnergyWh': result.availableEnergy.value.toMap(),
-    'energyMarginWh': result.energyMargin.value.toMap(),
-    'fireContributionEnergyWh': result.fireContributionEnergy.value.toMap(),
-    'governingDimension': result.governingDimension.name,
-    'governingSegmentId': result.governingSegmentId,
-    'blockingReason': result.blockingReason,
-  },
-  encodeEvidence: (captured, _) => <String, Object?>{
-    'schema': 'electra.elv5-fa05-evidence.v1',
-    'source': 'VERIFIED_CURRENT_PWR04_PLUS_CONSUMED_CURRENT_PWR01',
-    'captureRevision': captured.captureRevision,
-    'upstreamPointerGenerations': captured.upstreamPointerGenerations,
-    'sequenceFingerprint': captured.value.expectedSequenceFingerprint,
-    'protectedLoadSetFingerprint':
-        captured.value.expectedProtectedLoadSetFingerprint,
-  },
-  executionOf: (result) => result.status == Fa05AssessmentStatus.blocked
-      ? Elv5Execution.blocked
-      : Elv5Execution.succeeded,
-  completionOf: (result) => result.status == Fa05AssessmentStatus.blocked
-      ? Elv5Completion.incomplete
-      : Elv5Completion.complete,
-  assessmentOf: (result) => switch (result.status) {
-    Fa05AssessmentStatus.pass => Elv5Assessment.pass,
-    Fa05AssessmentStatus.fail => Elv5Assessment.fail,
-    Fa05AssessmentStatus.blocked => Elv5Assessment.unresolved,
-  },
+  encodeOutput:
+      (result) => <String, Object?>{
+        'schema': 'electra.elv5-fa05-output.v1',
+        'status': result.status.name,
+        'globalRequiredEnergyWh': result.globalRequiredEnergy.value.toMap(),
+        'availableEnergyWh': result.availableEnergy.value.toMap(),
+        'energyMarginWh': result.energyMargin.value.toMap(),
+        'fireContributionEnergyWh': result.fireContributionEnergy.value.toMap(),
+        'governingDimension': result.governingDimension.name,
+        'governingSegmentId': result.governingSegmentId,
+        'blockingReason': result.blockingReason,
+      },
+  encodeEvidence:
+      (captured, _) => <String, Object?>{
+        'schema': 'electra.elv5-fa05-evidence.v1',
+        'source': 'VERIFIED_CURRENT_PWR04_PLUS_CONSUMED_CURRENT_PWR01',
+        'captureRevision': captured.captureRevision,
+        'upstreamPointerGenerations': captured.upstreamPointerGenerations,
+        'sequenceFingerprint': captured.value.expectedSequenceFingerprint,
+        'protectedLoadSetFingerprint':
+            captured.value.expectedProtectedLoadSetFingerprint,
+      },
+  executionOf:
+      (result) =>
+          result.status == Fa05AssessmentStatus.blocked
+              ? Elv5Execution.blocked
+              : Elv5Execution.succeeded,
+  completionOf:
+      (result) =>
+          result.status == Fa05AssessmentStatus.blocked
+              ? Elv5Completion.incomplete
+              : Elv5Completion.complete,
+  assessmentOf:
+      (result) => switch (result.status) {
+        Fa05AssessmentStatus.pass => Elv5Assessment.pass,
+        Fa05AssessmentStatus.fail => Elv5Assessment.fail,
+        Fa05AssessmentStatus.blocked => Elv5Assessment.unresolved,
+      },
   nowUtc: nowUtc,
 );
 

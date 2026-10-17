@@ -8,24 +8,27 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('CCTV05 consumes current CCTV02 ingress and CCTV03 storage without reapplying reserve', () async {
-    final resolver = Cctv05PersistedInputResolver(
-      recorderStore: const _Recorder(),
-      cctvStore: const _Cctv(),
-      contractSource: _Contract(_contract()),
-      currentEvaluations: const _Current(),
-    );
-    final candidate = await buildCctv05Executor().execute(
-      await resolver.capture(_request()),
-    );
-    expect(candidate.assessment, Elv5Assessment.pass);
-    expect(candidate.output['consumedChannels'], 1);
-    expect(candidate.output['channelMargin'], 1);
-    expect(candidate.output['peakIngressBps'], _r(12000000));
-    expect(candidate.output['ingressMarginBps'], _r(8000000));
-    expect(candidate.output['requiredUsableBytes'], _r(800));
-    expect(candidate.output['storageMarginBytes'], _r(200));
-  });
+  test(
+    'CCTV05 consumes current CCTV02 ingress and CCTV03 storage without reapplying reserve',
+    () async {
+      final resolver = Cctv05PersistedInputResolver(
+        recorderStore: const _Recorder(),
+        cctvStore: const _Cctv(),
+        contractSource: _Contract(_contract()),
+        currentEvaluations: const _Current(),
+      );
+      final candidate = await buildCctv05Executor().execute(
+        await resolver.capture(_request()),
+      );
+      expect(candidate.assessment, Elv5Assessment.pass);
+      expect(candidate.output['consumedChannels'], 1);
+      expect(candidate.output['channelMargin'], 1);
+      expect(candidate.output['peakIngressBps'], _r(12000000));
+      expect(candidate.output['ingressMarginBps'], _r(8000000));
+      expect(candidate.output['requiredUsableBytes'], _r(800));
+      expect(candidate.output['storageMarginBytes'], _r(200));
+    },
+  );
 }
 
 Elv5CalculationRequest _request() => Elv5CalculationRequest(

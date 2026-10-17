@@ -358,14 +358,15 @@ final class Cctv01PersistedInputResolver
     String policy,
     List<Elv5DependencyMarker> dependencies,
     Map<String, Object?> evidence,
-  ) => throw Elv5CaptureBlockedException(
-    request: request,
-    reasonCode: reason,
-    inputFingerprint: input,
-    policyFingerprint: policy,
-    dependencies: dependencies,
-    evidence: evidence,
-  );
+  ) =>
+      throw Elv5CaptureBlockedException(
+        request: request,
+        reasonCode: reason,
+        inputFingerprint: input,
+        policyFingerprint: policy,
+        dependencies: dependencies,
+        evidence: evidence,
+      );
 
   Elv5DependencyMarker _dependency(
     Elv5CalculationRequest request,
@@ -398,47 +399,56 @@ Elv5PureKernelExecutor<Cctv01Input, Cctv01Result> buildCctv01Executor({
 }) => Elv5PureKernelExecutor<Cctv01Input, Cctv01Result>(
   processCode: Elv5ProcessCode.cctv01,
   calculate: const Cctv01GeometryKernel().evaluate,
-  encodeOutput: (r) => <String, Object?>{
-    'schema': 'electra.elv5-cctv01-output.v1',
-    'status': r.status.name,
-    'footprint': r.footprint == null
-        ? null
-        : <Object?>[
-            for (final p in r.footprint!.vertices)
-              <String, Object?>{'xMm': p.x.toMap(), 'yMm': p.y.toMap()},
-          ],
-    'coveredAreaMm2': r.coveredArea?.toMap(),
-    'targetAreaMm2': r.targetArea?.toMap(),
-    'coverageRatio': r.coverageRatio?.toMap(),
-    'coverageMargin': r.coverageMargin?.toMap(),
-    'horizontalHalfFovTangent': r.horizontalHalfFovTangent?.toMap(),
-    'verticalHalfFovTangent': r.verticalHalfFovTangent?.toMap(),
-    'governingDimension': r.governingDimension?.name,
-    'limitingCornerIndex': r.limitingCornerIndex,
-    'reasonCode': r.reasonCode,
-  },
-  encodeEvidence: (c, _) => <String, Object?>{
-    'schema': 'electra.elv5-cctv01-evidence.v2',
-    'source': 'ELV3_COMPONENT_AND_INTEGER_ORIGINS_PLUS_IMMUTABLE_EXACT_CCTV01_SURFACE_FRAMES',
-    'surfaceFrameBasis': 'IMMUTABLE_EXACT_SURFACE_FRAME_CONTRACT_V2',
-    'legacyElv3FrameRole': 'COMPATIBILITY_WITNESS_ONLY',
-    'cameraOrientationBasis': 'IMMUTABLE_EXACT_ORTHONORMAL_CONTRACT',
-    'captureRevision': c.captureRevision,
-  },
-  executionOf: (r) => r.status == Cctv01AssessmentStatus.blocked
-      ? Elv5Execution.blocked
-      : Elv5Execution.succeeded,
-  completionOf: (r) => r.status == Cctv01AssessmentStatus.blocked
-      ? Elv5Completion.incomplete
-      : Elv5Completion.complete,
-  assessmentOf: (r) => switch (r.status) {
-    Cctv01AssessmentStatus.pass => Elv5Assessment.pass,
-    Cctv01AssessmentStatus.fail => Elv5Assessment.fail,
-    Cctv01AssessmentStatus.unresolved => Elv5Assessment.unresolved,
-    Cctv01AssessmentStatus.blocked => Elv5Assessment.unresolved,
-    Cctv01AssessmentStatus.unsupported => Elv5Assessment.notAssessed,
-    Cctv01AssessmentStatus.notAssessed => Elv5Assessment.notAssessed,
-  },
+  encodeOutput:
+      (r) => <String, Object?>{
+        'schema': 'electra.elv5-cctv01-output.v1',
+        'status': r.status.name,
+        'footprint':
+            r.footprint == null
+                ? null
+                : <Object?>[
+                  for (final p in r.footprint!.vertices)
+                    <String, Object?>{'xMm': p.x.toMap(), 'yMm': p.y.toMap()},
+                ],
+        'coveredAreaMm2': r.coveredArea?.toMap(),
+        'targetAreaMm2': r.targetArea?.toMap(),
+        'coverageRatio': r.coverageRatio?.toMap(),
+        'coverageMargin': r.coverageMargin?.toMap(),
+        'horizontalHalfFovTangent': r.horizontalHalfFovTangent?.toMap(),
+        'verticalHalfFovTangent': r.verticalHalfFovTangent?.toMap(),
+        'governingDimension': r.governingDimension?.name,
+        'limitingCornerIndex': r.limitingCornerIndex,
+        'reasonCode': r.reasonCode,
+      },
+  encodeEvidence:
+      (c, _) => <String, Object?>{
+        'schema': 'electra.elv5-cctv01-evidence.v2',
+        'source':
+            'ELV3_COMPONENT_AND_INTEGER_ORIGINS_PLUS_IMMUTABLE_EXACT_CCTV01_SURFACE_FRAMES',
+        'surfaceFrameBasis': 'IMMUTABLE_EXACT_SURFACE_FRAME_CONTRACT_V2',
+        'legacyElv3FrameRole': 'COMPATIBILITY_WITNESS_ONLY',
+        'cameraOrientationBasis': 'IMMUTABLE_EXACT_ORTHONORMAL_CONTRACT',
+        'captureRevision': c.captureRevision,
+      },
+  executionOf:
+      (r) =>
+          r.status == Cctv01AssessmentStatus.blocked
+              ? Elv5Execution.blocked
+              : Elv5Execution.succeeded,
+  completionOf:
+      (r) =>
+          r.status == Cctv01AssessmentStatus.blocked
+              ? Elv5Completion.incomplete
+              : Elv5Completion.complete,
+  assessmentOf:
+      (r) => switch (r.status) {
+        Cctv01AssessmentStatus.pass => Elv5Assessment.pass,
+        Cctv01AssessmentStatus.fail => Elv5Assessment.fail,
+        Cctv01AssessmentStatus.unresolved => Elv5Assessment.unresolved,
+        Cctv01AssessmentStatus.blocked => Elv5Assessment.unresolved,
+        Cctv01AssessmentStatus.unsupported => Elv5Assessment.notAssessed,
+        Cctv01AssessmentStatus.notAssessed => Elv5Assessment.notAssessed,
+      },
   nowUtc: nowUtc,
 );
 

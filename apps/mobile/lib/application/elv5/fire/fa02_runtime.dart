@@ -162,9 +162,8 @@ final class Fa02PersistedInputResolver
       (Fa02OperatingCase.alarm, PowerScenarioRole.alarm),
       (Fa02OperatingCase.startupInrush, PowerScenarioRole.startup),
     ]) {
-      final matching = scenarios
-          .where((segment) => segment.role == entry.$2)
-          .toList();
+      final matching =
+          scenarios.where((segment) => segment.role == entry.$2).toList();
       if (matching.isEmpty) continue;
       Map<String, PowerDeviceState>? canonical;
       for (final segment in matching) {
@@ -222,16 +221,16 @@ final class Fa02PersistedInputResolver
         continue;
       }
       for (final originId in originIds.toList()..sort()) {
-        final originFacts = componentFacts
-            .where((value) => value.originId == originId)
-            .toList();
+        final originFacts =
+            componentFacts
+                .where((value) => value.originId == originId)
+                .toList();
         final currents = <Fa02OperatingCase, Elv5Interval<CurrentDim>>{};
         for (final entry in stateByCase.entries) {
           final state = entry.value[componentId]!;
           final stateCode = state.name.toUpperCase();
-          final matching = originFacts
-              .where((fact) => fact.stateCode == stateCode)
-              .toList();
+          final matching =
+              originFacts.where((fact) => fact.stateCode == stateCode).toList();
           if (matching.length > 1) {
             throw StateError(
               'FA02_DUPLICATE_ORIGIN_STATE:$originId:$stateCode',
@@ -297,48 +296,48 @@ Elv5PureKernelExecutor<Fa02Input, Fa02Result> buildFa02Executor({
 }) => Elv5PureKernelExecutor<Fa02Input, Fa02Result>(
   processCode: Elv5ProcessCode.fa02,
   calculate: const Fa02CurrentAggregationKernel().evaluate,
-  encodeOutput: (result) => <String, Object?>{
-    'schema': 'electra.elv5-fa02-output.v1',
-    'status': result.status.name,
-    'governingCase': result.governingCase?.name,
-    'cases': <String, Object?>{
-      for (final operatingCase in Fa02OperatingCase.values)
-        if (result.cases.containsKey(operatingCase))
-          operatingCase.name: <String, Object?>{
-            'knownSubtotalLowerA': result
-                .cases[operatingCase]!
-                .knownSubtotal
-                .lower
-                .value
-                .toMap(),
-            'knownSubtotalUpperA': result
-                .cases[operatingCase]!
-                .knownSubtotal
-                .upper
-                .value
-                .toMap(),
-            'missingOriginIds': result.cases[operatingCase]!.missingOriginIds,
-            'status': result.cases[operatingCase]!.status.name,
-            'marginA': result.cases[operatingCase]!.margin?.value.toMap(),
-          },
-    },
-  },
-  encodeEvidence: (captured, _) => <String, Object?>{
-    'schema': 'electra.elv5-fa02-evidence.v1',
-    'source': 'ELV5_FIRE_MEMBERSHIP_PLUS_ELV4_EXACT_DC_LOADS',
-    'captureRevision': captured.captureRevision,
-    'stateSelection': 'ELV4_OPERATING_SCENARIOS_V1',
-    'explicitCapacityLimit': 'NOT_CAPTURED_V1',
-  },
+  encodeOutput:
+      (result) => <String, Object?>{
+        'schema': 'electra.elv5-fa02-output.v1',
+        'status': result.status.name,
+        'governingCase': result.governingCase?.name,
+        'cases': <String, Object?>{
+          for (final operatingCase in Fa02OperatingCase.values)
+            if (result.cases.containsKey(operatingCase))
+              operatingCase.name: <String, Object?>{
+                'knownSubtotalLowerA':
+                    result.cases[operatingCase]!.knownSubtotal.lower.value
+                        .toMap(),
+                'knownSubtotalUpperA':
+                    result.cases[operatingCase]!.knownSubtotal.upper.value
+                        .toMap(),
+                'missingOriginIds':
+                    result.cases[operatingCase]!.missingOriginIds,
+                'status': result.cases[operatingCase]!.status.name,
+                'marginA': result.cases[operatingCase]!.margin?.value.toMap(),
+              },
+        },
+      },
+  encodeEvidence:
+      (captured, _) => <String, Object?>{
+        'schema': 'electra.elv5-fa02-evidence.v1',
+        'source': 'ELV5_FIRE_MEMBERSHIP_PLUS_ELV4_EXACT_DC_LOADS',
+        'captureRevision': captured.captureRevision,
+        'stateSelection': 'ELV4_OPERATING_SCENARIOS_V1',
+        'explicitCapacityLimit': 'NOT_CAPTURED_V1',
+      },
   executionOf: (_) => Elv5Execution.succeeded,
-  completionOf: (result) => result.status == Fa02AssessmentStatus.unresolved
-      ? Elv5Completion.incomplete
-      : Elv5Completion.complete,
-  assessmentOf: (result) => switch (result.status) {
-    Fa02AssessmentStatus.fail => Elv5Assessment.fail,
-    Fa02AssessmentStatus.unresolved => Elv5Assessment.unresolved,
-    Fa02AssessmentStatus.complete => Elv5Assessment.notAssessed,
-  },
+  completionOf:
+      (result) =>
+          result.status == Fa02AssessmentStatus.unresolved
+              ? Elv5Completion.incomplete
+              : Elv5Completion.complete,
+  assessmentOf:
+      (result) => switch (result.status) {
+        Fa02AssessmentStatus.fail => Elv5Assessment.fail,
+        Fa02AssessmentStatus.unresolved => Elv5Assessment.unresolved,
+        Fa02AssessmentStatus.complete => Elv5Assessment.notAssessed,
+      },
   nowUtc: nowUtc,
 );
 

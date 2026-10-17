@@ -3,6 +3,7 @@ import '../../numeric/quantity.dart';
 import '../../numeric/rational.dart';
 
 enum Fa03AssessmentStatus { pass, fail, blocked }
+
 enum Fa03ElectricalModel { radialDc, declaredOneControlPointDc, unsupported }
 
 final class Fa03TerminalEvidence {
@@ -45,7 +46,8 @@ final class Fa03Input {
     if (circuitId.isEmpty || expectedScopeFingerprint.isEmpty) {
       throw ArgumentError('FA03 circuit/scope identity must not be empty.');
     }
-    if (terminals.isEmpty) throw ArgumentError('FA03 requires terminal evidence.');
+    if (terminals.isEmpty)
+      throw ArgumentError('FA03 requires terminal evidence.');
     final seen = <String>{};
     for (final terminal in terminals) {
       final key = '${terminal.caseId}|${terminal.terminalId}';
@@ -79,7 +81,8 @@ final class Fa03TerminalResult {
   final Voltage highMargin;
   final Fa03AssessmentStatus status;
 
-  Voltage get governingMargin => lowMargin <= highMargin ? lowMargin : highMargin;
+  Voltage get governingMargin =>
+      lowMargin <= highMargin ? lowMargin : highMargin;
 }
 
 final class Fa03Result {
@@ -123,8 +126,7 @@ final class Fa03TerminalVoltageKernel {
       }
     }
 
-    final evidence = [...input.terminals]
-      ..sort((a, b) {
+    final evidence = [...input.terminals]..sort((a, b) {
         final byTerminal = a.terminalId.compareTo(b.terminalId);
         return byTerminal != 0 ? byTerminal : a.caseId.compareTo(b.caseId);
       });
@@ -138,15 +140,17 @@ final class Fa03TerminalVoltageKernel {
         voltage: terminal.voltage,
         lowMargin: low,
         highMargin: high,
-        status: low.value >= Elv5Rational.zero && high.value >= Elv5Rational.zero
-            ? Fa03AssessmentStatus.pass
-            : Fa03AssessmentStatus.fail,
+        status:
+            low.value >= Elv5Rational.zero && high.value >= Elv5Rational.zero
+                ? Fa03AssessmentStatus.pass
+                : Fa03AssessmentStatus.fail,
       ));
     }
 
     Fa03TerminalResult governing = results.first;
     for (final result in results.skip(1)) {
-      if (result.governingMargin < governing.governingMargin) governing = result;
+      if (result.governingMargin < governing.governingMargin)
+        governing = result;
     }
     final overall = results.any((e) => e.status == Fa03AssessmentStatus.fail)
         ? Fa03AssessmentStatus.fail

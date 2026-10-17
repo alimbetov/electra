@@ -17,8 +17,9 @@ class ProjectRecalculationScreen extends ConsumerWidget {
         .watch(projectRecalculationProvider(projectId))
         .when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, _) =>
-              Center(child: Text('Unable to load calculations: $error')),
+          error:
+              (error, _) =>
+                  Center(child: Text('Unable to load calculations: $error')),
           data: (snapshot) {
             if (snapshot.project == null)
               return const Center(child: Text('Project is unavailable.'));
@@ -28,17 +29,17 @@ class ProjectRecalculationScreen extends ConsumerWidget {
             return RecalculationWorkspace(
               snapshot: snapshot,
               onRecalculate: () => repository.recalculate(projectId),
-              onManualDecision: (key, value, reason) =>
-                  repository.saveManualDecision(
+              onManualDecision:
+                  (key, value, reason) => repository.saveManualDecision(
                     projectId: projectId,
                     key: key,
                     value: value,
                     reason: reason,
                   ),
-              onReviewManual: (key) =>
-                  repository.reviewManualDecision(projectId, key),
-              onClearManual: (key) =>
-                  repository.clearManualDecision(projectId, key),
+              onReviewManual:
+                  (key) => repository.reviewManualDecision(projectId, key),
+              onClearManual:
+                  (key) => repository.clearManualDecision(projectId, key),
             );
           },
         ),
@@ -83,40 +84,44 @@ class _RecalculationWorkspaceState extends State<RecalculationWorkspace> {
 
   Future<void> manual(String key, RecalculationCache entry) => showDialog<void>(
     context: context,
-    builder: (_) => _ManualDecisionDialog(
-      value: entry.manualValue ?? '',
-      reason: entry.manualReason ?? '',
-      onSave: (value, reason) => widget.onManualDecision(key, value, reason),
-    ),
+    builder:
+        (_) => _ManualDecisionDialog(
+          value: entry.manualValue ?? '',
+          reason: entry.manualReason ?? '',
+          onSave:
+              (value, reason) => widget.onManualDecision(key, value, reason),
+        ),
   );
-  String value(Object? value) => value == null
-      ? '—'
-      : value is String
-      ? value
-      : jsonEncode(value);
+  String value(Object? value) =>
+      value == null
+          ? '—'
+          : value is String
+          ? value
+          : jsonEncode(value);
   @override
   Widget build(BuildContext context) {
     final snapshot = widget.snapshot,
         session = snapshot.session,
         affected = session.affectedKeys;
-    final keys = session.order
-        .where(
-          (key) =>
-              (showSources ||
-                  [
-                    'circuit:',
-                    'cable:',
-                    'route:',
-                    'protection:',
-                    'panel:',
-                  ].any(key.startsWith)) &&
-              (!affectedOnly ||
-                  affected.contains(key) ||
-                  session.state(key) ==
-                      EngineeringDerivedState.reviewRequired ||
-                  session.state(key) == EngineeringDerivedState.error),
-        )
-        .toList();
+    final keys =
+        session.order
+            .where(
+              (key) =>
+                  (showSources ||
+                      [
+                        'circuit:',
+                        'cable:',
+                        'route:',
+                        'protection:',
+                        'panel:',
+                      ].any(key.startsWith)) &&
+                  (!affectedOnly ||
+                      affected.contains(key) ||
+                      session.state(key) ==
+                          EngineeringDerivedState.reviewRequired ||
+                      session.state(key) == EngineeringDerivedState.error),
+            )
+            .toList();
     return ListView(
       padding: const EdgeInsets.all(12),
       children: [
@@ -128,12 +133,13 @@ class _RecalculationWorkspaceState extends State<RecalculationWorkspace> {
           '${affected.length} affected nodes · ${session.removedKeys.length} removed records',
         ),
         FilledButton.icon(
-          onPressed: busy
-              ? null
-              : () => run(() async {
-                  final changed = await widget.onRecalculate();
-                  if (mounted) setState(() => recalculated = changed.length);
-                }),
+          onPressed:
+              busy
+                  ? null
+                  : () => run(() async {
+                    final changed = await widget.onRecalculate();
+                    if (mounted) setState(() => recalculated = changed.length);
+                  }),
           icon: const Icon(Icons.calculate),
           label: Text(busy ? 'Recalculating…' : 'Recalculate affected'),
         ),
@@ -189,11 +195,13 @@ class _RecalculationWorkspaceState extends State<RecalculationWorkspace> {
         entry = session.cache[key],
         state = session.state(key);
     final stale = entry?.fingerprint != session.fingerprints[key];
-    final changes = stale
-        ? session.changes(key)
-        : entry == null
-        ? <Map<String, dynamic>>[]
-        : (jsonDecode(entry.changesJson) as List).cast<Map<String, dynamic>>();
+    final changes =
+        stale
+            ? session.changes(key)
+            : entry == null
+            ? <Map<String, dynamic>>[]
+            : (jsonDecode(entry.changesJson) as List)
+                .cast<Map<String, dynamic>>();
     return Card(
       child: ExpansionTile(
         key: ValueKey(key),
@@ -246,15 +254,15 @@ class _RecalculationWorkspaceState extends State<RecalculationWorkspace> {
               spacing: 8,
               children: [
                 TextButton(
-                  onPressed: busy || stale
-                      ? null
-                      : () => run(() => widget.onReviewManual(key)),
+                  onPressed:
+                      busy || stale
+                          ? null
+                          : () => run(() => widget.onReviewManual(key)),
                   child: const Text('Review manual decision'),
                 ),
                 TextButton(
-                  onPressed: busy
-                      ? null
-                      : () => run(() => widget.onClearManual(key)),
+                  onPressed:
+                      busy ? null : () => run(() => widget.onClearManual(key)),
                   child: const Text('Clear manual decision'),
                 ),
               ],
@@ -268,9 +276,10 @@ class _RecalculationWorkspaceState extends State<RecalculationWorkspace> {
                 'panel:',
               ].any(key.startsWith))
             TextButton(
-              onPressed: busy || stale || state == EngineeringDerivedState.error
-                  ? null
-                  : () => manual(key, entry),
+              onPressed:
+                  busy || stale || state == EngineeringDerivedState.error
+                      ? null
+                      : () => manual(key, entry),
               child: const Text('Record manual decision'),
             ),
         ],

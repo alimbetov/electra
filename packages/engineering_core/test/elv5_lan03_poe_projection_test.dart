@@ -23,7 +23,8 @@ void main() {
         ],
       );
 
-  test('projects LAN contribution without filtering global physical demand', () {
+  test('projects LAN contribution without filtering global physical demand',
+      () {
     final result = const Lan03PoeProjectionKernel().evaluate(Lan03Input(
       pseId: 'pse-1',
       expectedClosureFingerprint: 'closure-v1',

@@ -51,8 +51,10 @@ final class Acs01RequirementNode {
     required this.role,
     required this.count,
   }) : children = const [] {
-    if (kind != Acs01RequirementKind.atLeast && kind != Acs01RequirementKind.exactly) {
-      throw ArgumentError('ACS01 role-count node kind must be atLeast or exactly.');
+    if (kind != Acs01RequirementKind.atLeast &&
+        kind != Acs01RequirementKind.exactly) {
+      throw ArgumentError(
+          'ACS01 role-count node kind must be atLeast or exactly.');
     }
     _validateId(nodeId);
     if (count == null || count! < 0) {
@@ -101,7 +103,8 @@ final class Acs01Input {
       throw ArgumentError('ACS01 door/profile identities must not be empty.');
     }
     _requireUnique(assignments.map((e) => e.assignmentId), 'assignment');
-    _requireUnique(capabilities.map((e) => e.componentId), 'component capability');
+    _requireUnique(
+        capabilities.map((e) => e.componentId), 'component capability');
     _validateRequirementTree(rootRequirement);
   }
 
@@ -115,7 +118,8 @@ final class Acs01Input {
   static void _requireUnique(Iterable<String> values, String label) {
     final seen = <String>{};
     for (final value in values) {
-      if (!seen.add(value)) throw ArgumentError('ACS01 duplicate $label identity: $value');
+      if (!seen.add(value))
+        throw ArgumentError('ACS01 duplicate $label identity: $value');
     }
   }
 
@@ -123,12 +127,14 @@ final class Acs01Input {
     final seen = <String>{};
     void visit(Acs01RequirementNode node) {
       if (!seen.add(node.nodeId)) {
-        throw ArgumentError('ACS01 duplicate/cyclic requirement node: ${node.nodeId}');
+        throw ArgumentError(
+            'ACS01 duplicate/cyclic requirement node: ${node.nodeId}');
       }
       for (final child in node.children) {
         visit(child);
       }
     }
+
     visit(root);
   }
 }
@@ -176,12 +182,17 @@ final class Acs01RoleCompletenessKernel {
       ..sort((a, b) => a.assignmentId.compareTo(b.assignmentId));
     for (final assignment in sortedAssignments) {
       final capability = capabilities[assignment.componentId];
-      if (capability == null || !capability.allowedRoles.contains(assignment.role)) {
+      if (capability == null ||
+          !capability.allowedRoles.contains(assignment.role)) {
         invalidAssignments.add(assignment.componentId);
         continue;
       }
-      eligibleByRole.putIfAbsent(assignment.role, () => <String>{}).add(assignment.componentId);
-      rolesByComponent.putIfAbsent(assignment.componentId, () => <Acs01RoleCode>{}).add(assignment.role);
+      eligibleByRole
+          .putIfAbsent(assignment.role, () => <String>{})
+          .add(assignment.componentId);
+      rolesByComponent
+          .putIfAbsent(assignment.componentId, () => <Acs01RoleCode>{})
+          .add(assignment.role);
     }
 
     final illegalSharing = <String>{...invalidAssignments};
@@ -220,9 +231,12 @@ final class Acs01RoleCompletenessKernel {
         return result;
       }
 
-      final children = [...node.children]..sort((a, b) => a.nodeId.compareTo(b.nodeId));
+      final children = [...node.children]
+        ..sort((a, b) => a.nodeId.compareTo(b.nodeId));
       final childResults = children.map(eval).toList();
-      final passChildren = childResults.where((e) => e.status == Acs01AssessmentStatus.pass).toList();
+      final passChildren = childResults
+          .where((e) => e.status == Acs01AssessmentStatus.pass)
+          .toList();
       final unresolvedChildren = childResults
           .where((e) => e.status == Acs01AssessmentStatus.unresolved)
           .toList();
@@ -232,7 +246,8 @@ final class Acs01RoleCompletenessKernel {
       if (node.kind == Acs01RequirementKind.allOf) {
         status = childResults.any((e) => e.status == Acs01AssessmentStatus.fail)
             ? Acs01AssessmentStatus.fail
-            : (childResults.any((e) => e.status == Acs01AssessmentStatus.unresolved)
+            : (childResults
+                    .any((e) => e.status == Acs01AssessmentStatus.unresolved)
                 ? Acs01AssessmentStatus.unresolved
                 : Acs01AssessmentStatus.pass);
         if (status == Acs01AssessmentStatus.pass) {
@@ -273,10 +288,16 @@ final class Acs01RoleCompletenessKernel {
     }
 
     final root = eval(input.rootRequirement);
-    final overall = illegalSharingSorted.isNotEmpty ? Acs01AssessmentStatus.fail : root.status;
-    final failures = results.where((e) => e.status == Acs01AssessmentStatus.fail).toList()
+    final overall = illegalSharingSorted.isNotEmpty
+        ? Acs01AssessmentStatus.fail
+        : root.status;
+    final failures = results
+        .where((e) => e.status == Acs01AssessmentStatus.fail)
+        .toList()
       ..sort((a, b) => a.nodeId.compareTo(b.nodeId));
-    final unresolved = results.where((e) => e.status == Acs01AssessmentStatus.unresolved).toList()
+    final unresolved = results
+        .where((e) => e.status == Acs01AssessmentStatus.unresolved)
+        .toList()
       ..sort((a, b) => a.nodeId.compareTo(b.nodeId));
     final governingNodeId = illegalSharingSorted.isNotEmpty
         ? 'ACS01_ILLEGAL_ROLE_SHARING'

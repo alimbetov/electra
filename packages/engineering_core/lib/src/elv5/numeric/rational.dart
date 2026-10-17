@@ -53,15 +53,15 @@ final class Elv5Rational implements Comparable<Elv5Rational> {
   bool get isInteger => numerator.remainder(denominator) == BigInt.zero;
 
   Elv5Rational operator +(Elv5Rational other) => Elv5Rational(
-    numerator * other.denominator + other.numerator * denominator,
-    denominator * other.denominator,
-  );
+        numerator * other.denominator + other.numerator * denominator,
+        denominator * other.denominator,
+      );
   Elv5Rational operator -(Elv5Rational other) => this + -other;
   Elv5Rational operator -() => Elv5Rational(-numerator, denominator);
   Elv5Rational operator *(Elv5Rational other) => Elv5Rational(
-    numerator * other.numerator,
-    denominator * other.denominator,
-  );
+        numerator * other.numerator,
+        denominator * other.denominator,
+      );
   Elv5Rational operator /(Elv5Rational other) {
     if (other.isZero) throw ArgumentError('Cannot divide by zero.');
     return Elv5Rational(
@@ -87,9 +87,9 @@ final class Elv5Rational implements Comparable<Elv5Rational> {
   bool operator >=(Elv5Rational other) => compareTo(other) >= 0;
 
   Map<String, Object?> toMap() => <String, Object?>{
-    'numerator': numerator.toString(),
-    'denominator': denominator.toString(),
-  };
+        'numerator': numerator.toString(),
+        'denominator': denominator.toString(),
+      };
 
   @override
   bool operator ==(Object other) =>

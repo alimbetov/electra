@@ -5,7 +5,9 @@ import 'support/elv5_foundation_qualification_support.dart';
 
 void main() {
   group('F2 FA-03 terminal voltage', () {
-    test('Q0 contract inventory preserves model, scope, terminals and voltage policy', () {
+    test(
+        'Q0 contract inventory preserves model, scope, terminals and voltage policy',
+        () {
       final input = _input(<Fa03TerminalEvidence>[
         _terminal('t-1', 'ALARM', '23.5', '24.0'),
       ]);
@@ -112,7 +114,9 @@ void main() {
       ]);
     });
 
-    test('Q4 terminal input permutation cannot change result or governing identity', () {
+    test(
+        'Q4 terminal input permutation cannot change result or governing identity',
+        () {
       final baseline = const Fa03TerminalVoltageKernel().evaluate(
         _input(<Fa03TerminalEvidence>[
           _terminal('t-2', 'ALARM', '22.4', '25.5'),
@@ -174,7 +178,8 @@ void main() {
       expect(governing.lowMargin.value, Elv5Rational.parseDecimal('-0.05'));
     });
 
-    test('Q5 mismatched physical scope blocks instead of producing a verdict', () {
+    test('Q5 mismatched physical scope blocks instead of producing a verdict',
+        () {
       final result = const Fa03TerminalVoltageKernel().evaluate(
         Fa03Input(
           circuitId: 'circuit-1',
@@ -229,32 +234,34 @@ void main() {
 }
 
 Fa03Input _input(List<Fa03TerminalEvidence> terminals) => Fa03Input(
-  circuitId: 'circuit-1',
-  model: Fa03ElectricalModel.radialDc,
-  expectedScopeFingerprint: _scope,
-  terminals: terminals,
-  policy: Fa03VoltagePolicy(
-    minimum: Voltage(Elv5Rational.integer(22)),
-    maximum: Voltage(Elv5Rational.integer(26)),
-  ),
-);
+      circuitId: 'circuit-1',
+      model: Fa03ElectricalModel.radialDc,
+      expectedScopeFingerprint: _scope,
+      terminals: terminals,
+      policy: Fa03VoltagePolicy(
+        minimum: Voltage(Elv5Rational.integer(22)),
+        maximum: Voltage(Elv5Rational.integer(26)),
+      ),
+    );
 
 Fa03TerminalEvidence _terminal(
   String terminalId,
   String caseId,
   String lower,
   String upper,
-) => Fa03TerminalEvidence(
-  terminalId: terminalId,
-  caseId: caseId,
-  scopeFingerprint: _scope,
-  voltage: Elv5Interval<VoltageDim>(
-    Voltage(Elv5Rational.parseDecimal(lower)),
-    Voltage(Elv5Rational.parseDecimal(upper)),
-  ),
-);
+) =>
+    Fa03TerminalEvidence(
+      terminalId: terminalId,
+      caseId: caseId,
+      scopeFingerprint: _scope,
+      voltage: Elv5Interval<VoltageDim>(
+        Voltage(Elv5Rational.parseDecimal(lower)),
+        Voltage(Elv5Rational.parseDecimal(upper)),
+      ),
+    );
 
-bool _resultsEqual(List<Fa03TerminalResult> left, List<Fa03TerminalResult> right) {
+bool _resultsEqual(
+    List<Fa03TerminalResult> left, List<Fa03TerminalResult> right) {
   if (left.length != right.length) return false;
   for (var i = 0; i < left.length; i++) {
     final a = left[i];
@@ -272,5 +279,7 @@ bool _resultsEqual(List<Fa03TerminalResult> left, List<Fa03TerminalResult> right
   return true;
 }
 
-const _scope = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
-const _otherScope = 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
+const _scope =
+    'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+const _otherScope =
+    'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';

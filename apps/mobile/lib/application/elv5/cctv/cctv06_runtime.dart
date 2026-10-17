@@ -234,10 +234,8 @@ final class Cctv06PersistedInputResolver
       final actualDeliveries = <String>{
         for (final value in group) value.nodeKey.subjectId,
       };
-      final expectedDeliveries = contract
-          .expectedPwr06InputFingerprintByDeliveryId
-          .keys
-          .toSet();
+      final expectedDeliveries =
+          contract.expectedPwr06InputFingerprintByDeliveryId.keys.toSet();
       if (!_sameSet(actualDeliveries, expectedDeliveries)) {
         _blocked(
           request,
@@ -347,9 +345,10 @@ final class Cctv06PersistedInputResolver
         allowedInterfaceKinds: contract.allowedInterfaceKinds,
         allowedCategoryTokens: contract.allowedCategoryTokens,
         shieldingRequired: contract.shieldingRequired,
-        maximumLength: contract.maximumLengthM == null
-            ? null
-            : Length(contract.maximumLengthM!),
+        maximumLength:
+            contract.maximumLengthM == null
+                ? null
+                : Length(contract.maximumLengthM!),
       ),
       powered: contract.powered,
       powerEvidence: power,
@@ -383,14 +382,15 @@ final class Cctv06PersistedInputResolver
     String policy,
     List<Elv5DependencyMarker> deps,
     Map<String, Object?> evidence,
-  ) => throw Elv5CaptureBlockedException(
-    request: request,
-    reasonCode: reason,
-    inputFingerprint: input,
-    policyFingerprint: policy,
-    dependencies: deps,
-    evidence: evidence,
-  );
+  ) =>
+      throw Elv5CaptureBlockedException(
+        request: request,
+        reasonCode: reason,
+        inputFingerprint: input,
+        policyFingerprint: policy,
+        dependencies: deps,
+        evidence: evidence,
+      );
 
   Elv5DependencyMarker _dependency(
     Elv5CalculationRequest request,
@@ -423,48 +423,55 @@ Elv5PureKernelExecutor<Cctv06Input, Cctv06Result> buildCctv06Executor({
 }) => Elv5PureKernelExecutor<Cctv06Input, Cctv06Result>(
   processCode: Elv5ProcessCode.cctv06,
   calculate: const Cctv06LinkBasisKernel().evaluate,
-  encodeOutput: (r) => <String, Object?>{
-    'schema': 'electra.elv5-cctv06-output.v1',
-    'status': r.status.name,
-    'realizedLengthM': r.realizedLength.toMap(),
-    'lengthMarginM': r.lengthMargin?.value.toMap(),
-    'powerStatus': r.powerStatus.name,
-    'limitingSectionId': r.limitingSectionId,
-    'limitingProperty': r.limitingProperty?.name,
-    'blockingReason': r.blockingReason,
-    'sections': <Object?>[
-      for (final section in r.sectionResults)
-        <String, Object?>{
-          'sectionId': section.sectionId,
-          'status': section.status.name,
-          'properties': <String, Object?>{
-            for (final entry in section.properties.entries)
-              entry.key.name: entry.value.name,
-          },
-        },
-    ],
-  },
-  encodeEvidence: (c, _) => <String, Object?>{
-    'schema': 'electra.elv5-cctv06-evidence.v1',
-    'source': 'ELV3_REALIZED_PATH_PLUS_IMMUTABLE_SECTION_EVIDENCE_PLUS_CURRENT_PWR06_WHEN_POWERED',
-    'upstreamPointerGenerations': c.upstreamPointerGenerations,
-    'captureRevision': c.captureRevision,
-  },
-  executionOf: (r) => r.status == Cctv06AssessmentStatus.blocked
-      ? Elv5Execution.blocked
-      : Elv5Execution.succeeded,
-  completionOf: (r) =>
-      r.status == Cctv06AssessmentStatus.blocked ||
-          r.status == Cctv06AssessmentStatus.unresolved
-      ? Elv5Completion.incomplete
-      : Elv5Completion.complete,
-  assessmentOf: (r) => switch (r.status) {
-    Cctv06AssessmentStatus.pass => Elv5Assessment.pass,
-    Cctv06AssessmentStatus.fail => Elv5Assessment.fail,
-    Cctv06AssessmentStatus.unresolved => Elv5Assessment.unresolved,
-    Cctv06AssessmentStatus.blocked => Elv5Assessment.unresolved,
-    Cctv06AssessmentStatus.notApplicable => Elv5Assessment.notAssessed,
-  },
+  encodeOutput:
+      (r) => <String, Object?>{
+        'schema': 'electra.elv5-cctv06-output.v1',
+        'status': r.status.name,
+        'realizedLengthM': r.realizedLength.toMap(),
+        'lengthMarginM': r.lengthMargin?.value.toMap(),
+        'powerStatus': r.powerStatus.name,
+        'limitingSectionId': r.limitingSectionId,
+        'limitingProperty': r.limitingProperty?.name,
+        'blockingReason': r.blockingReason,
+        'sections': <Object?>[
+          for (final section in r.sectionResults)
+            <String, Object?>{
+              'sectionId': section.sectionId,
+              'status': section.status.name,
+              'properties': <String, Object?>{
+                for (final entry in section.properties.entries)
+                  entry.key.name: entry.value.name,
+              },
+            },
+        ],
+      },
+  encodeEvidence:
+      (c, _) => <String, Object?>{
+        'schema': 'electra.elv5-cctv06-evidence.v1',
+        'source':
+            'ELV3_REALIZED_PATH_PLUS_IMMUTABLE_SECTION_EVIDENCE_PLUS_CURRENT_PWR06_WHEN_POWERED',
+        'upstreamPointerGenerations': c.upstreamPointerGenerations,
+        'captureRevision': c.captureRevision,
+      },
+  executionOf:
+      (r) =>
+          r.status == Cctv06AssessmentStatus.blocked
+              ? Elv5Execution.blocked
+              : Elv5Execution.succeeded,
+  completionOf:
+      (r) =>
+          r.status == Cctv06AssessmentStatus.blocked ||
+                  r.status == Cctv06AssessmentStatus.unresolved
+              ? Elv5Completion.incomplete
+              : Elv5Completion.complete,
+  assessmentOf:
+      (r) => switch (r.status) {
+        Cctv06AssessmentStatus.pass => Elv5Assessment.pass,
+        Cctv06AssessmentStatus.fail => Elv5Assessment.fail,
+        Cctv06AssessmentStatus.unresolved => Elv5Assessment.unresolved,
+        Cctv06AssessmentStatus.blocked => Elv5Assessment.unresolved,
+        Cctv06AssessmentStatus.notApplicable => Elv5Assessment.notAssessed,
+      },
   nowUtc: nowUtc,
 );
 

@@ -27,19 +27,20 @@ final class DriftAcs02ResourceContractStore
     required String designRevisionId,
     required String controllerId,
   }) async {
-    final rows = await database
-        .customSelect(
-          'SELECT id, revision, definition_ref_json FROM discipline_policy_bindings '
-          'WHERE project_id = ? AND design_revision_id = ? AND subject_kind = ? '
-          'AND subject_id = ? AND deleted_at IS NULL ORDER BY id',
-          variables: <Variable>[
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            Variable.withString('CONTROLLER'),
-            Variable.withString(controllerId),
-          ],
-        )
-        .get();
+    final rows =
+        await database
+            .customSelect(
+              'SELECT id, revision, definition_ref_json FROM discipline_policy_bindings '
+              'WHERE project_id = ? AND design_revision_id = ? AND subject_kind = ? '
+              'AND subject_id = ? AND deleted_at IS NULL ORDER BY id',
+              variables: <Variable>[
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                Variable.withString('CONTROLLER'),
+                Variable.withString(controllerId),
+              ],
+            )
+            .get();
     final matching = <QueryRow>[];
     for (final row in rows) {
       final raw = jsonDecode(row.read<String>('definition_ref_json'));
@@ -59,21 +60,22 @@ final class DriftAcs02ResourceContractStore
     final definition = Map<String, Object?>.from(raw);
     final evidenceRef = _text(definition, 'editionId');
     final contentHash = _text(definition, 'contentHash');
-    final evidence = await database
-        .customSelect(
-          'SELECT canonical_payload_json, payload_sha256 '
-          'FROM elv_revision_aggregate_evidence_records '
-          'WHERE evidence_ref = ? AND project_id = ? AND design_revision_id = ? '
-          'AND aggregate_kind = ? AND aggregate_id = ?',
-          variables: <Variable>[
-            Variable.withString(evidenceRef),
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            Variable.withString('ACS02_RESOURCE_CONTRACT'),
-            Variable.withString(controllerId),
-          ],
-        )
-        .getSingleOrNull();
+    final evidence =
+        await database
+            .customSelect(
+              'SELECT canonical_payload_json, payload_sha256 '
+              'FROM elv_revision_aggregate_evidence_records '
+              'WHERE evidence_ref = ? AND project_id = ? AND design_revision_id = ? '
+              'AND aggregate_kind = ? AND aggregate_id = ?',
+              variables: <Variable>[
+                Variable.withString(evidenceRef),
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                Variable.withString('ACS02_RESOURCE_CONTRACT'),
+                Variable.withString(controllerId),
+              ],
+            )
+            .getSingleOrNull();
     if (evidence == null) {
       throw StateError('ACS02_CONTRACT_EVIDENCE_MISSING:$evidenceRef');
     }
@@ -104,16 +106,17 @@ final class DriftAcs02ResourceContractStore
     ReplaceAcs02ResourceContractCommand command,
   ) => database.transaction(() async {
     final now = _nowUtc().toUtc();
-    final revision = await database
-        .customSelect(
-          'SELECT state, revision FROM project_design_revisions '
-          'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
-          variables: <Variable>[
-            Variable.withString(command.projectId),
-            Variable.withString(command.designRevisionId),
-          ],
-        )
-        .getSingleOrNull();
+    final revision =
+        await database
+            .customSelect(
+              'SELECT state, revision FROM project_design_revisions '
+              'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
+              variables: <Variable>[
+                Variable.withString(command.projectId),
+                Variable.withString(command.designRevisionId),
+              ],
+            )
+            .getSingleOrNull();
     if (revision == null) throw StateError('ACS02_DESIGN_REVISION_NOT_FOUND');
     if (revision.read<String>('state') != 'WORKING') {
       throw StateError('ACS02_DESIGN_REVISION_READ_ONLY');
@@ -125,13 +128,14 @@ final class DriftAcs02ResourceContractStore
     final payload = command.contract.toCanonicalValue();
     final hash = _encoder.sha256(payload);
     final ref = 'ACS02:${command.contract.controllerId}:$hash';
-    final existing = await database
-        .customSelect(
-          'SELECT payload_sha256 FROM elv_revision_aggregate_evidence_records '
-          'WHERE evidence_ref = ?',
-          variables: <Variable>[Variable.withString(ref)],
-        )
-        .getSingleOrNull();
+    final existing =
+        await database
+            .customSelect(
+              'SELECT payload_sha256 FROM elv_revision_aggregate_evidence_records '
+              'WHERE evidence_ref = ?',
+              variables: <Variable>[Variable.withString(ref)],
+            )
+            .getSingleOrNull();
     if (existing == null) {
       await runRawStatement(
         database,
@@ -164,19 +168,20 @@ final class DriftAcs02ResourceContractStore
       'scopeKinds': <String>['DESIGN'],
     };
     if (command.expectedBindingRevision == null) {
-      final rows = await database
-          .customSelect(
-            'SELECT id, definition_ref_json FROM discipline_policy_bindings '
-            'WHERE project_id = ? AND design_revision_id = ? AND subject_kind = ? '
-            'AND subject_id = ? AND deleted_at IS NULL',
-            variables: <Variable>[
-              Variable.withString(command.projectId),
-              Variable.withString(command.designRevisionId),
-              Variable.withString('CONTROLLER'),
-              Variable.withString(command.contract.controllerId),
-            ],
-          )
-          .get();
+      final rows =
+          await database
+              .customSelect(
+                'SELECT id, definition_ref_json FROM discipline_policy_bindings '
+                'WHERE project_id = ? AND design_revision_id = ? AND subject_kind = ? '
+                'AND subject_id = ? AND deleted_at IS NULL',
+                variables: <Variable>[
+                  Variable.withString(command.projectId),
+                  Variable.withString(command.designRevisionId),
+                  Variable.withString('CONTROLLER'),
+                  Variable.withString(command.contract.controllerId),
+                ],
+              )
+              .get();
       for (final row in rows) {
         final value = jsonDecode(row.read<String>('definition_ref_json'));
         if (value is Map && value['policyCode'] == 'ACS02_RESOURCE_CONTRACT') {

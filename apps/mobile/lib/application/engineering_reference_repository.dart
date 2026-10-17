@@ -38,11 +38,12 @@ class ComponentReferenceBinding {
           m['profile'] as Map<String, dynamic>,
         ),
         portIds: (m['portIds'] as List).cast<String>(),
-        placementCommand: m['placementCommand'] == null
-            ? null
-            : PlaceEngineeringProfileCommand.fromMap(
-                m['placementCommand'] as Map<String, dynamic>,
-              ),
+        placementCommand:
+            m['placementCommand'] == null
+                ? null
+                : PlaceEngineeringProfileCommand.fromMap(
+                  m['placementCommand'] as Map<String, dynamic>,
+                ),
       );
 }
 

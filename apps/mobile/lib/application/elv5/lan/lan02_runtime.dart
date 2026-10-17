@@ -196,9 +196,10 @@ final class Lan02PersistedInputResolver
       sparePolicy: Lan02SparePolicy(
         absoluteMinimum: contract.absoluteMinimum,
         ratio: contract.ratio,
-        combiner: contract.combinerCode == 'MAX'
-            ? Lan02SpareCombiner.max
-            : Lan02SpareCombiner.sum,
+        combiner:
+            contract.combinerCode == 'MAX'
+                ? Lan02SpareCombiner.max
+                : Lan02SpareCombiner.sum,
       ),
     );
     final inputFingerprint = _encoder.sha256(<String, Object?>{
@@ -225,14 +226,15 @@ final class Lan02PersistedInputResolver
     String policy,
     List<Elv5DependencyMarker> deps,
     Map<String, Object?> evidence,
-  ) => throw Elv5CaptureBlockedException(
-    request: request,
-    reasonCode: reason,
-    inputFingerprint: input,
-    policyFingerprint: policy,
-    dependencies: deps,
-    evidence: evidence,
-  );
+  ) =>
+      throw Elv5CaptureBlockedException(
+        request: request,
+        reasonCode: reason,
+        inputFingerprint: input,
+        policyFingerprint: policy,
+        dependencies: deps,
+        evidence: evidence,
+      );
 
   Elv5DependencyMarker _dependency(
     Elv5CalculationRequest request,
@@ -265,25 +267,30 @@ Elv5PureKernelExecutor<Lan02Input, Lan02Result> buildLan02Executor({
 }) => Elv5PureKernelExecutor<Lan02Input, Lan02Result>(
   processCode: Elv5ProcessCode.lan02,
   calculate: const Lan02PortCapacityKernel().evaluate,
-  encodeOutput: (r) => <String, Object?>{
-    'schema': 'electra.elv5-lan02-output.v1',
-    'status': r.status.name,
-    'occupied': r.occupied,
-    'requiredSpare': r.requiredSpare,
-    'available': r.available,
-    'headroomPorts': r.headroomPorts,
-    'incompatibleEndpointIds': r.incompatibleEndpointIds,
-  },
-  encodeEvidence: (c, _) => <String, Object?>{
-    'schema': 'electra.elv5-lan02-evidence.v1',
-    'source': 'PERSISTED_PORT_ASSIGNMENTS_PLUS_IMMUTABLE_PORT_INVENTORY_AND_SPARE_POLICY',
-    'captureRevision': c.captureRevision,
-  },
+  encodeOutput:
+      (r) => <String, Object?>{
+        'schema': 'electra.elv5-lan02-output.v1',
+        'status': r.status.name,
+        'occupied': r.occupied,
+        'requiredSpare': r.requiredSpare,
+        'available': r.available,
+        'headroomPorts': r.headroomPorts,
+        'incompatibleEndpointIds': r.incompatibleEndpointIds,
+      },
+  encodeEvidence:
+      (c, _) => <String, Object?>{
+        'schema': 'electra.elv5-lan02-evidence.v1',
+        'source':
+            'PERSISTED_PORT_ASSIGNMENTS_PLUS_IMMUTABLE_PORT_INVENTORY_AND_SPARE_POLICY',
+        'captureRevision': c.captureRevision,
+      },
   executionOf: (_) => Elv5Execution.succeeded,
   completionOf: (_) => Elv5Completion.complete,
-  assessmentOf: (r) => r.status == Lan02AssessmentStatus.pass
-      ? Elv5Assessment.pass
-      : Elv5Assessment.fail,
+  assessmentOf:
+      (r) =>
+          r.status == Lan02AssessmentStatus.pass
+              ? Elv5Assessment.pass
+              : Elv5Assessment.fail,
   nowUtc: nowUtc,
 );
 

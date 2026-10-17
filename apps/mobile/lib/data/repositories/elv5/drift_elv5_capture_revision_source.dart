@@ -14,16 +14,17 @@ final class DriftElv5CaptureRevisionSource
     required String projectId,
     required String designRevisionId,
   }) async {
-    final row = await database
-        .customSelect(
-          'SELECT state, revision FROM project_design_revisions '
-          'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
-          variables: <Variable>[
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-          ],
-        )
-        .getSingleOrNull();
+    final row =
+        await database
+            .customSelect(
+              'SELECT state, revision FROM project_design_revisions '
+              'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
+              variables: <Variable>[
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+              ],
+            )
+            .getSingleOrNull();
     if (row == null) {
       throw StateError(
         'ELV5_CAPTURE_DESIGN_REVISION_NOT_FOUND:$designRevisionId',

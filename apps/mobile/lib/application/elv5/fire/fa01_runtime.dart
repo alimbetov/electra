@@ -304,32 +304,37 @@ Elv5PureKernelExecutor<Fa01Input, Fa01Result> buildFa01Executor({
 }) => Elv5PureKernelExecutor<Fa01Input, Fa01Result>(
   processCode: Elv5ProcessCode.fa01,
   calculate: const Fa01AddressCapacityKernel().evaluate,
-  encodeOutput: (result) => <String, Object?>{
-    'schema': 'electra.elv5-fa01-output.v1',
-    'status': result.status.name,
-    'deviceCount': result.deviceCount,
-    'addressCount': result.addressCount,
-    'deviceHeadroom': result.deviceHeadroom,
-    'addressHeadroom': result.addressHeadroom,
-    'collisions': [
-      for (final c in result.collisions)
-        <String, Object?>{
-          'domainId': c.key.domainId,
-          'address': c.key.address,
-          'claimants': c.claimants,
-        },
-    ],
-  },
-  encodeEvidence: (captured, _) => <String, Object?>{
-    'schema': 'electra.elv5-fa01-evidence.v1',
-    'source': 'PERSISTED_FIRE_LOOP_ASSIGNMENTS_PLUS_IMMUTABLE_PROFILE_CAPACITY_CONTRACT',
-    'captureRevision': captured.captureRevision,
-  },
+  encodeOutput:
+      (result) => <String, Object?>{
+        'schema': 'electra.elv5-fa01-output.v1',
+        'status': result.status.name,
+        'deviceCount': result.deviceCount,
+        'addressCount': result.addressCount,
+        'deviceHeadroom': result.deviceHeadroom,
+        'addressHeadroom': result.addressHeadroom,
+        'collisions': [
+          for (final c in result.collisions)
+            <String, Object?>{
+              'domainId': c.key.domainId,
+              'address': c.key.address,
+              'claimants': c.claimants,
+            },
+        ],
+      },
+  encodeEvidence:
+      (captured, _) => <String, Object?>{
+        'schema': 'electra.elv5-fa01-evidence.v1',
+        'source':
+            'PERSISTED_FIRE_LOOP_ASSIGNMENTS_PLUS_IMMUTABLE_PROFILE_CAPACITY_CONTRACT',
+        'captureRevision': captured.captureRevision,
+      },
   executionOf: (_) => Elv5Execution.succeeded,
   completionOf: (_) => Elv5Completion.complete,
-  assessmentOf: (result) => result.status == Fa01AssessmentStatus.pass
-      ? Elv5Assessment.pass
-      : Elv5Assessment.fail,
+  assessmentOf:
+      (result) =>
+          result.status == Fa01AssessmentStatus.pass
+              ? Elv5Assessment.pass
+              : Elv5Assessment.fail,
   nowUtc: nowUtc,
 );
 

@@ -20,18 +20,19 @@ final class DriftLan05OpticalSectionEvidenceSource
     required String realizedSectionId,
     required Elv5Rational wavelengthNm,
   }) async {
-    final rows = await database
-        .customSelect(
-          'SELECT evidence_json FROM link_section_assignments '
-          'WHERE project_id = ? AND design_revision_id = ? '
-          'AND realized_section_id = ? ORDER BY binding_id, ordinal',
-          variables: <Variable>[
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            Variable.withString(realizedSectionId),
-          ],
-        )
-        .get();
+    final rows =
+        await database
+            .customSelect(
+              'SELECT evidence_json FROM link_section_assignments '
+              'WHERE project_id = ? AND design_revision_id = ? '
+              'AND realized_section_id = ? ORDER BY binding_id, ordinal',
+              variables: <Variable>[
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                Variable.withString(realizedSectionId),
+              ],
+            )
+            .get();
     if (rows.isEmpty) return null;
 
     Lan05OpticalSectionEvidence? resolved;
@@ -121,16 +122,17 @@ final class DriftLan05OpticalSectionEvidenceWriter
   Future<void> replace(
     ReplaceLan05OpticalSectionEvidenceCommand command,
   ) => database.transaction(() async {
-    final revision = await database
-        .customSelect(
-          'SELECT state, revision FROM project_design_revisions '
-          'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
-          variables: <Variable>[
-            Variable.withString(command.projectId),
-            Variable.withString(command.designRevisionId),
-          ],
-        )
-        .getSingleOrNull();
+    final revision =
+        await database
+            .customSelect(
+              'SELECT state, revision FROM project_design_revisions '
+              'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
+              variables: <Variable>[
+                Variable.withString(command.projectId),
+                Variable.withString(command.designRevisionId),
+              ],
+            )
+            .getSingleOrNull();
     if (revision == null) {
       throw StateError('LAN05_DESIGN_REVISION_NOT_FOUND');
     }
@@ -141,18 +143,19 @@ final class DriftLan05OpticalSectionEvidenceWriter
       throw StateError('LAN05_DESIGN_REVISION_CAS_CONFLICT');
     }
 
-    final binding = await database
-        .customSelect(
-          'SELECT revision FROM link_composition_bindings '
-          'WHERE project_id = ? AND design_revision_id = ? AND id = ? '
-          'AND deleted_at IS NULL',
-          variables: <Variable>[
-            Variable.withString(command.projectId),
-            Variable.withString(command.designRevisionId),
-            Variable.withString(command.bindingId),
-          ],
-        )
-        .getSingleOrNull();
+    final binding =
+        await database
+            .customSelect(
+              'SELECT revision FROM link_composition_bindings '
+              'WHERE project_id = ? AND design_revision_id = ? AND id = ? '
+              'AND deleted_at IS NULL',
+              variables: <Variable>[
+                Variable.withString(command.projectId),
+                Variable.withString(command.designRevisionId),
+                Variable.withString(command.bindingId),
+              ],
+            )
+            .getSingleOrNull();
     if (binding == null) {
       throw StateError('LAN05_LINK_COMPOSITION_BINDING_NOT_FOUND');
     }
@@ -160,19 +163,20 @@ final class DriftLan05OpticalSectionEvidenceWriter
       throw StateError('LAN05_LINK_COMPOSITION_BINDING_CAS_CONFLICT');
     }
 
-    final rows = await database
-        .customSelect(
-          'SELECT ordinal, evidence_json FROM link_section_assignments '
-          'WHERE project_id = ? AND design_revision_id = ? '
-          'AND binding_id = ? AND realized_section_id = ?',
-          variables: <Variable>[
-            Variable.withString(command.projectId),
-            Variable.withString(command.designRevisionId),
-            Variable.withString(command.bindingId),
-            Variable.withString(command.evidence.realizedSectionId),
-          ],
-        )
-        .get();
+    final rows =
+        await database
+            .customSelect(
+              'SELECT ordinal, evidence_json FROM link_section_assignments '
+              'WHERE project_id = ? AND design_revision_id = ? '
+              'AND binding_id = ? AND realized_section_id = ?',
+              variables: <Variable>[
+                Variable.withString(command.projectId),
+                Variable.withString(command.designRevisionId),
+                Variable.withString(command.bindingId),
+                Variable.withString(command.evidence.realizedSectionId),
+              ],
+            )
+            .get();
     if (rows.length != 1) {
       throw StateError(
         rows.isEmpty
@@ -189,22 +193,24 @@ final class DriftLan05OpticalSectionEvidenceWriter
     );
     if (dependencyHashes.isNotEmpty) {
       final placeholders = List.filled(dependencyHashes.length, '?').join(',');
-      final dependentRows = await database
-          .customSelect(
-            'SELECT DISTINCT logical_node_key_sha256 '
-            'FROM discipline_dependency_index '
-            'WHERE project_id = ? AND design_revision_id = ? '
-            'AND dependency_key_sha256 IN ($placeholders)',
-            variables: <Variable>[
-              Variable.withString(command.projectId),
-              Variable.withString(command.designRevisionId),
-              ...dependencyHashes.map(Variable.withString),
-            ],
-          )
-          .get();
-      final nodeHashes = dependentRows
-          .map((row) => row.read<String>('logical_node_key_sha256'))
-          .toSet();
+      final dependentRows =
+          await database
+              .customSelect(
+                'SELECT DISTINCT logical_node_key_sha256 '
+                'FROM discipline_dependency_index '
+                'WHERE project_id = ? AND design_revision_id = ? '
+                'AND dependency_key_sha256 IN ($placeholders)',
+                variables: <Variable>[
+                  Variable.withString(command.projectId),
+                  Variable.withString(command.designRevisionId),
+                  ...dependencyHashes.map(Variable.withString),
+                ],
+              )
+              .get();
+      final nodeHashes =
+          dependentRows
+              .map((row) => row.read<String>('logical_node_key_sha256'))
+              .toSet();
       if (nodeHashes.isNotEmpty) {
         final nodePlaceholders = List.filled(nodeHashes.length, '?').join(',');
         await database.customUpdate(

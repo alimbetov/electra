@@ -54,7 +54,8 @@ final class Elv5EnvironmentProfile {
         contaminationClassCode = _nullableCode(contaminationClassCode),
         climateClassCode = _nullableCode(climateClassCode),
         evidenceRef = _text(evidenceRef, 'evidenceRef'),
-        evidenceContentHash = _sha256(evidenceContentHash, 'evidenceContentHash') {
+        evidenceContentHash =
+            _sha256(evidenceContentHash, 'evidenceContentHash') {
     final zero = Elv5Rational.zero;
     final hundred = Elv5Rational.integer(100);
     if (relativeHumidityPercent.minimum < zero ||
@@ -121,7 +122,8 @@ final class Elv5EnvironmentProfile {
       profileId: _mapText(map, 'profileId'),
       editionId: _mapText(map, 'editionId'),
       profileCode: _mapText(map, 'profileCode'),
-      temperatureC: Elv5RationalRange.fromMap(_map(map['temperatureC'], 'temperatureC')),
+      temperatureC:
+          Elv5RationalRange.fromMap(_map(map['temperatureC'], 'temperatureC')),
       relativeHumidityPercent: Elv5RationalRange.fromMap(
         _map(map['relativeHumidityPercent'], 'relativeHumidityPercent'),
       ),
@@ -195,7 +197,8 @@ final class Elv5EnvironmentScopeBinding {
       'environment scope binding',
     );
     if (map['schema'] != schema) {
-      throw const FormatException('Unsupported environment scope binding schema.');
+      throw const FormatException(
+          'Unsupported environment scope binding schema.');
     }
     final priority = map['priority'];
     if (priority is! int) {
@@ -263,7 +266,8 @@ T _enumByName<T extends Enum>(List<T> values, String name, String field) {
   throw FormatException('Unsupported $field: $name');
 }
 
-void _exactFields(Map<String, Object?> map, Set<String> expected, String field) {
+void _exactFields(
+    Map<String, Object?> map, Set<String> expected, String field) {
   final actual = map.keys.toSet();
   if (actual.length != expected.length ||
       actual.difference(expected).isNotEmpty ||

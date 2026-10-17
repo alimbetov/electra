@@ -36,7 +36,9 @@ void main() {
     expect(result.status, Fa01AssessmentStatus.pass);
   });
 
-  test('profile physical-device contribution is independent from assignment count', () {
+  test(
+      'profile physical-device contribution is independent from assignment count',
+      () {
     final result = const Fa01AddressCapacityKernel().evaluate(
       Fa01Input(
         loopId: 'loop-1',

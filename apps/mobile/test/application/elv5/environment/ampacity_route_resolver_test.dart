@@ -64,9 +64,10 @@ void main() {
     ),
     temperatureCorrection: Elv5AmpacityTemperatureCorrection(
       actualAmbientTemperatureC: env.binding.profile.temperatureC.maximum,
-      factor: sectionId == 'section-2'
-          ? Elv5Rational.parseDecimal('0.8')
-          : Elv5Rational.one,
+      factor:
+          sectionId == 'section-2'
+              ? Elv5Rational.parseDecimal('0.8')
+              : Elv5Rational.one,
       evidenceRef: 'TEMP:$sectionId',
       evidenceContentHash: hash('c'),
     ),
@@ -115,12 +116,11 @@ void main() {
         'section-1': env1,
         'section-2': env2,
       }),
-      sectionEvidence: _FakeSectionEvidence(
-        <String, Elv5AmpacitySectionEvidence>{
-          'section-1': evidence('section-1', env1),
-          'section-2': evidence('section-2', env2),
-        },
-      ),
+      sectionEvidence:
+          _FakeSectionEvidence(<String, Elv5AmpacitySectionEvidence>{
+            'section-1': evidence('section-1', env1),
+            'section-2': evidence('section-2', env2),
+          }),
     );
 
     final input = await resolver.resolve(

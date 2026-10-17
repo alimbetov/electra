@@ -94,18 +94,20 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: Builder(
-              builder: (context) => TextButton(
-                onPressed: () async {
-                  candidate = await showDialog<PlacementCandidateContext>(
-                    context: context,
-                    builder: (_) => CandidateConditionsDialog(
-                      initial: knownCandidate('CAMERA'),
-                      system: system,
-                    ),
-                  );
-                },
-                child: const Text('Open'),
-              ),
+              builder:
+                  (context) => TextButton(
+                    onPressed: () async {
+                      candidate = await showDialog<PlacementCandidateContext>(
+                        context: context,
+                        builder:
+                            (_) => CandidateConditionsDialog(
+                              initial: knownCandidate('CAMERA'),
+                              system: system,
+                            ),
+                      );
+                    },
+                    child: const Text('Open'),
+                  ),
             ),
           ),
         ),
@@ -134,12 +136,13 @@ void main() {
       );
     },
   );
-  for (final pair in {
-    'CCTV': 'CAMERA',
-    'LAN': 'OUTLET',
-    'ACS': 'READER',
-    'FIRE': 'DETECTOR',
-  }.entries) {
+  for (final pair
+      in {
+        'CCTV': 'CAMERA',
+        'LAN': 'OUTLET',
+        'ACS': 'READER',
+        'FIRE': 'DETECTOR',
+      }.entries) {
     testWidgets(
       'compact ${pair.key} palette inspects exact edition and constraints before selection',
       (tester) async {
@@ -154,17 +157,18 @@ void main() {
           MaterialApp(
             home: Scaffold(
               body: Builder(
-                builder: (context) => TextButton(
-                  onPressed: () async {
-                    selected = await EngineeringProfilePalette.show(
-                      context,
-                      snapshot: snapshot,
-                      projectId: 'p1',
-                      initialSystemId: pair.key,
-                    );
-                  },
-                  child: const Text('Open'),
-                ),
+                builder:
+                    (context) => TextButton(
+                      onPressed: () async {
+                        selected = await EngineeringProfilePalette.show(
+                          context,
+                          snapshot: snapshot,
+                          projectId: 'p1',
+                          initialSystemId: pair.key,
+                        );
+                      },
+                      child: const Text('Open'),
+                    ),
               ),
             ),
           ),
@@ -204,20 +208,22 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: Builder(
-              builder: (context) => TextButton(
-                onPressed: () async {
-                  candidate = await showDialog<PlacementCandidateContext>(
-                    context: context,
-                    builder: (_) => CandidateConditionsDialog(
-                      initial: knownCandidate(pair.value),
-                      system: snapshot.systems.systems.singleWhere(
-                        (s) => s.id == pair.key,
-                      ),
-                    ),
-                  );
-                },
-                child: const Text('Conditions'),
-              ),
+              builder:
+                  (context) => TextButton(
+                    onPressed: () async {
+                      candidate = await showDialog<PlacementCandidateContext>(
+                        context: context,
+                        builder:
+                            (_) => CandidateConditionsDialog(
+                              initial: knownCandidate(pair.value),
+                              system: snapshot.systems.systems.singleWhere(
+                                (s) => s.id == pair.key,
+                              ),
+                            ),
+                      );
+                    },
+                    child: const Text('Conditions'),
+                  ),
             ),
           ),
         ),
@@ -243,25 +249,26 @@ void main() {
           profileCode: 'CAMERA',
           catalogId: 'frozen-catalog',
           catalogVersion: '7',
-          findings: status == PlacementCompatibilityStatus.compatible
-              ? []
-              : [
-                  PlacementFinding(
-                    code: PlacementFindingCode.mountingContextIncomplete,
-                    severity: switch (status) {
-                      PlacementCompatibilityStatus.warning =>
-                        PlacementFindingSeverity.warning,
-                      PlacementCompatibilityStatus.forbidden =>
-                        PlacementFindingSeverity.error,
-                      _ => PlacementFindingSeverity.unresolved,
-                    },
-                    dimension: PlacementFindingDimension.mounting,
-                    explanation: 'Check candidate',
-                    expected: 'wall:bracket',
-                    actual: 'floor:surface',
-                    remediationHint: 'Select a supported location',
-                  ),
-                ],
+          findings:
+              status == PlacementCompatibilityStatus.compatible
+                  ? []
+                  : [
+                    PlacementFinding(
+                      code: PlacementFindingCode.mountingContextIncomplete,
+                      severity: switch (status) {
+                        PlacementCompatibilityStatus.warning =>
+                          PlacementFindingSeverity.warning,
+                        PlacementCompatibilityStatus.forbidden =>
+                          PlacementFindingSeverity.error,
+                        _ => PlacementFindingSeverity.unresolved,
+                      },
+                      dimension: PlacementFindingDimension.mounting,
+                      explanation: 'Check candidate',
+                      expected: 'wall:bracket',
+                      actual: 'floor:surface',
+                      remediationHint: 'Select a supported location',
+                    ),
+                  ],
         );
         await tester.pumpWidget(
           MaterialApp(
@@ -373,20 +380,22 @@ void main() {
       MaterialApp(
         home: Scaffold(
           body: Builder(
-            builder: (context) => TextButton(
-              onPressed: () async {
-                applied =
-                    await showDialog<PlacementCandidateContext>(
-                      context: context,
-                      builder: (_) => CandidateConditionsDialog(
-                        initial: knownCandidate('CAMERA'),
-                        system: paletteSnapshot().systems.systems.first,
-                      ),
-                    ) !=
-                    null;
-              },
-              child: const Text('Open'),
-            ),
+            builder:
+                (context) => TextButton(
+                  onPressed: () async {
+                    applied =
+                        await showDialog<PlacementCandidateContext>(
+                          context: context,
+                          builder:
+                              (_) => CandidateConditionsDialog(
+                                initial: knownCandidate('CAMERA'),
+                                system: paletteSnapshot().systems.systems.first,
+                              ),
+                        ) !=
+                        null;
+                  },
+                  child: const Text('Open'),
+                ),
           ),
         ),
       ),

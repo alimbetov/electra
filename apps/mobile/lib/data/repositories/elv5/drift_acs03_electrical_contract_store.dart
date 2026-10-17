@@ -29,20 +29,21 @@ final class DriftAcs03ElectricalContractStore
     required String designRevisionId,
     required String doorId,
   }) async {
-    final rows = await database
-        .customSelect(
-          'SELECT id, revision, process_codes_json, definition_ref_json '
-          'FROM discipline_policy_bindings WHERE project_id = ? '
-          'AND design_revision_id = ? AND subject_kind = ? AND subject_id = ? '
-          'AND deleted_at IS NULL ORDER BY id',
-          variables: <Variable>[
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            Variable.withString('DOOR'),
-            Variable.withString(doorId),
-          ],
-        )
-        .get();
+    final rows =
+        await database
+            .customSelect(
+              'SELECT id, revision, process_codes_json, definition_ref_json '
+              'FROM discipline_policy_bindings WHERE project_id = ? '
+              'AND design_revision_id = ? AND subject_kind = ? AND subject_id = ? '
+              'AND deleted_at IS NULL ORDER BY id',
+              variables: <Variable>[
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                Variable.withString('DOOR'),
+                Variable.withString(doorId),
+              ],
+            )
+            .get();
     final matching = <QueryRow>[];
     for (final row in rows) {
       final rawCodes = jsonDecode(row.read<String>('process_codes_json'));
@@ -75,21 +76,22 @@ final class DriftAcs03ElectricalContractStore
       throw StateError('ACS03_DEFINITION_HASH_INVALID:$doorId');
     }
 
-    final evidence = await database
-        .customSelect(
-          'SELECT canonical_payload_json, payload_sha256 FROM '
-          'elv_revision_aggregate_evidence_records WHERE evidence_ref = ? '
-          'AND project_id = ? AND design_revision_id = ? AND aggregate_kind = ? '
-          'AND aggregate_id = ?',
-          variables: <Variable>[
-            Variable.withString(evidenceRef),
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            Variable.withString('ACS03_ELECTRICAL_CONTRACT'),
-            Variable.withString(doorId),
-          ],
-        )
-        .getSingleOrNull();
+    final evidence =
+        await database
+            .customSelect(
+              'SELECT canonical_payload_json, payload_sha256 FROM '
+              'elv_revision_aggregate_evidence_records WHERE evidence_ref = ? '
+              'AND project_id = ? AND design_revision_id = ? AND aggregate_kind = ? '
+              'AND aggregate_id = ?',
+              variables: <Variable>[
+                Variable.withString(evidenceRef),
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                Variable.withString('ACS03_ELECTRICAL_CONTRACT'),
+                Variable.withString(doorId),
+              ],
+            )
+            .getSingleOrNull();
     if (evidence == null) {
       throw StateError('ACS03_CONTRACT_EVIDENCE_MISSING:$evidenceRef');
     }
@@ -124,16 +126,17 @@ final class DriftAcs03ElectricalContractStore
     ReplaceAcs03ElectricalContractCommand command,
   ) => database.transaction(() async {
     final now = _nowUtc().toUtc();
-    final revision = await database
-        .customSelect(
-          'SELECT state, revision FROM project_design_revisions '
-          'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
-          variables: <Variable>[
-            Variable.withString(command.projectId),
-            Variable.withString(command.designRevisionId),
-          ],
-        )
-        .getSingleOrNull();
+    final revision =
+        await database
+            .customSelect(
+              'SELECT state, revision FROM project_design_revisions '
+              'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
+              variables: <Variable>[
+                Variable.withString(command.projectId),
+                Variable.withString(command.designRevisionId),
+              ],
+            )
+            .getSingleOrNull();
     if (revision == null) {
       throw StateError(
         'ACS03_DESIGN_REVISION_NOT_FOUND:${command.designRevisionId}',
@@ -146,36 +149,38 @@ final class DriftAcs03ElectricalContractStore
       throw StateError('ACS03_DESIGN_REVISION_CONFLICT');
     }
 
-    final door = await database
-        .customSelect(
-          'SELECT id FROM door_calculation_bindings WHERE project_id = ? '
-          'AND design_revision_id = ? AND door_assembly_id = ? AND deleted_at IS NULL',
-          variables: <Variable>[
-            Variable.withString(command.projectId),
-            Variable.withString(command.designRevisionId),
-            Variable.withString(command.contract.doorId),
-          ],
-        )
-        .getSingleOrNull();
+    final door =
+        await database
+            .customSelect(
+              'SELECT id FROM door_calculation_bindings WHERE project_id = ? '
+              'AND design_revision_id = ? AND door_assembly_id = ? AND deleted_at IS NULL',
+              variables: <Variable>[
+                Variable.withString(command.projectId),
+                Variable.withString(command.designRevisionId),
+                Variable.withString(command.contract.doorId),
+              ],
+            )
+            .getSingleOrNull();
     if (door == null) {
       throw StateError(
         'ACS03_DOOR_CALCULATION_NOT_FOUND:${command.contract.doorId}',
       );
     }
     final doorBindingId = door.read<String>('id');
-    final lockRows = await database
-        .customSelect(
-          'SELECT component_id FROM door_role_assignments WHERE project_id = ? '
-          'AND design_revision_id = ? AND binding_id = ? AND UPPER(role_code) = ? '
-          'ORDER BY component_id',
-          variables: <Variable>[
-            Variable.withString(command.projectId),
-            Variable.withString(command.designRevisionId),
-            Variable.withString(doorBindingId),
-            Variable.withString('LOCK'),
-          ],
-        )
-        .get();
+    final lockRows =
+        await database
+            .customSelect(
+              'SELECT component_id FROM door_role_assignments WHERE project_id = ? '
+              'AND design_revision_id = ? AND binding_id = ? AND UPPER(role_code) = ? '
+              'ORDER BY component_id',
+              variables: <Variable>[
+                Variable.withString(command.projectId),
+                Variable.withString(command.designRevisionId),
+                Variable.withString(doorBindingId),
+                Variable.withString('LOCK'),
+              ],
+            )
+            .get();
     if (lockRows.length != 1 ||
         lockRows.single.read<String>('component_id') !=
             command.contract.lockId) {
@@ -191,13 +196,14 @@ final class DriftAcs03ElectricalContractStore
       _encoder.encode(payload),
       allowMalformed: false,
     );
-    final existingEvidence = await database
-        .customSelect(
-          'SELECT payload_sha256 FROM elv_revision_aggregate_evidence_records '
-          'WHERE evidence_ref = ?',
-          variables: <Variable>[Variable.withString(evidenceRef)],
-        )
-        .getSingleOrNull();
+    final existingEvidence =
+        await database
+            .customSelect(
+              'SELECT payload_sha256 FROM elv_revision_aggregate_evidence_records '
+              'WHERE evidence_ref = ?',
+              variables: <Variable>[Variable.withString(evidenceRef)],
+            )
+            .getSingleOrNull();
     if (existingEvidence == null) {
       await runRawStatement(
         database,
@@ -233,19 +239,20 @@ final class DriftAcs03ElectricalContractStore
     final processCodes = <String>['ACS-03'];
 
     if (command.expectedBindingRevision == null) {
-      final currentRows = await database
-          .customSelect(
-            'SELECT id, process_codes_json FROM discipline_policy_bindings '
-            'WHERE project_id = ? AND design_revision_id = ? '
-            'AND subject_kind = ? AND subject_id = ? AND deleted_at IS NULL',
-            variables: <Variable>[
-              Variable.withString(command.projectId),
-              Variable.withString(command.designRevisionId),
-              Variable.withString('DOOR'),
-              Variable.withString(command.contract.doorId),
-            ],
-          )
-          .get();
+      final currentRows =
+          await database
+              .customSelect(
+                'SELECT id, process_codes_json FROM discipline_policy_bindings '
+                'WHERE project_id = ? AND design_revision_id = ? '
+                'AND subject_kind = ? AND subject_id = ? AND deleted_at IS NULL',
+                variables: <Variable>[
+                  Variable.withString(command.projectId),
+                  Variable.withString(command.designRevisionId),
+                  Variable.withString('DOOR'),
+                  Variable.withString(command.contract.doorId),
+                ],
+              )
+              .get();
       for (final row in currentRows) {
         final codes = jsonDecode(row.read<String>('process_codes_json'));
         if (codes is List && codes.contains('ACS-03')) {

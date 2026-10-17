@@ -2,7 +2,8 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('legacy blocked evaluation projects to succeeded + blocked + unresolved', () {
+  test('legacy blocked evaluation projects to succeeded + blocked + unresolved',
+      () {
     final projected = projectElv5FoundationStatus(
       execution: Elv5Execution.blocked,
       completion: Elv5Completion.incomplete,

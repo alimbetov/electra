@@ -71,28 +71,25 @@ ProjectDesignRevision _success(ElvCommandResult<ProjectDesignRevision> result) {
 }
 
 Future<void> _expectSingleFreezePersistence(AppDatabase db) async {
-  final revision = await (db.select(
-    db.projectDesignRevisions,
-  )..where((row) => row.id.equals(_revisionId))).getSingle();
+  final revision =
+      await (db.select(db.projectDesignRevisions)
+        ..where((row) => row.id.equals(_revisionId))).getSingle();
   expect(revision.state, 'FROZEN');
   expect(revision.revision, 2);
 
   expect(
-    await (db.select(
-      db.designRevisionPhysicalSnapshots,
-    )..where((row) => row.designRevisionId.equals(_revisionId))).get(),
+    await (db.select(db.designRevisionPhysicalSnapshots)
+      ..where((row) => row.designRevisionId.equals(_revisionId))).get(),
     hasLength(1),
   );
   expect(
-    await (db.select(
-      db.designRevisionPowerSnapshots,
-    )..where((row) => row.designRevisionId.equals(_revisionId))).get(),
+    await (db.select(db.designRevisionPowerSnapshots)
+      ..where((row) => row.designRevisionId.equals(_revisionId))).get(),
     hasLength(1),
   );
   expect(
-    await (db.select(
-      db.designRevisionSnapshotManifests,
-    )..where((row) => row.designRevisionId.equals(_revisionId))).get(),
+    await (db.select(db.designRevisionSnapshotManifests)
+      ..where((row) => row.designRevisionId.equals(_revisionId))).get(),
     hasLength(1),
   );
   expect(
@@ -136,12 +133,14 @@ void main() {
                 ..where((row) => row.projectId.equals(_projectId))
                 ..where((row) => row.commandId.equals(_freezeCommandId)))
               .getSingle();
-      final powerBefore = await (db.select(
-        db.designRevisionPowerSnapshots,
-      )..where((row) => row.designRevisionId.equals(_revisionId))).getSingle();
-      final manifestBefore = await (db.select(
-        db.designRevisionSnapshotManifests,
-      )..where((row) => row.designRevisionId.equals(_revisionId))).getSingle();
+      final powerBefore =
+          await (db.select(db.designRevisionPowerSnapshots)..where(
+            (row) => row.designRevisionId.equals(_revisionId),
+          )).getSingle();
+      final manifestBefore =
+          await (db.select(db.designRevisionSnapshotManifests)..where(
+            (row) => row.designRevisionId.equals(_revisionId),
+          )).getSingle();
 
       final replay = _success(await repository.freeze(_freeze));
       _expectSameLogicalRevision(first, replay);
@@ -152,12 +151,14 @@ void main() {
                 ..where((row) => row.projectId.equals(_projectId))
                 ..where((row) => row.commandId.equals(_freezeCommandId)))
               .getSingle();
-      final powerAfter = await (db.select(
-        db.designRevisionPowerSnapshots,
-      )..where((row) => row.designRevisionId.equals(_revisionId))).getSingle();
-      final manifestAfter = await (db.select(
-        db.designRevisionSnapshotManifests,
-      )..where((row) => row.designRevisionId.equals(_revisionId))).getSingle();
+      final powerAfter =
+          await (db.select(db.designRevisionPowerSnapshots)..where(
+            (row) => row.designRevisionId.equals(_revisionId),
+          )).getSingle();
+      final manifestAfter =
+          await (db.select(db.designRevisionSnapshotManifests)..where(
+            (row) => row.designRevisionId.equals(_revisionId),
+          )).getSingle();
 
       expect(ledgerAfter.logicalResultJson, ledgerBefore.logicalResultJson);
       expect(

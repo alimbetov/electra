@@ -24,7 +24,7 @@ final class Elv5Interval<D extends Elv5Dimension> {
       Elv5Interval<D>(lower - other.upper, upper - other.lower);
 
   Map<String, Object?> toMap() => <String, Object?>{
-    'lower': lower.toMap(),
-    'upper': upper.toMap(),
-  };
+        'lower': lower.toMap(),
+        'upper': upper.toMap(),
+      };
 }

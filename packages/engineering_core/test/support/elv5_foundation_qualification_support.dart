@@ -20,7 +20,8 @@ final class Elv5ReferenceVector<I, O> {
     required this.input,
     required this.expected,
     Map<String, Object?> metadata = const <String, Object?>{},
-  }) : id = _text(id, 'id'), metadata = Map.unmodifiable(metadata);
+  })  : id = _text(id, 'id'),
+        metadata = Map.unmodifiable(metadata);
 
   final String id;
   final I input;
@@ -53,11 +54,12 @@ final class Elv5QualificationEvidencePin implements Elv5CanonicalValue {
     required String processVersion,
     required String rulesetVersion,
     required String testId,
-  }) : sourceSha = _sha(sourceSha, 'sourceSha'),
-       authorityFingerprint = _sha(authorityFingerprint, 'authorityFingerprint'),
-       processVersion = _text(processVersion, 'processVersion'),
-       rulesetVersion = _text(rulesetVersion, 'rulesetVersion'),
-       testId = _text(testId, 'testId');
+  })  : sourceSha = _sha(sourceSha, 'sourceSha'),
+        authorityFingerprint =
+            _sha(authorityFingerprint, 'authorityFingerprint'),
+        processVersion = _text(processVersion, 'processVersion'),
+        rulesetVersion = _text(rulesetVersion, 'rulesetVersion'),
+        testId = _text(testId, 'testId');
 
   static const schema = 'electra.elv5-foundation-qualification-evidence-pin.v1';
 
@@ -69,13 +71,13 @@ final class Elv5QualificationEvidencePin implements Elv5CanonicalValue {
 
   @override
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-    'schema': schema,
-    'sourceSha': sourceSha,
-    'authorityFingerprint': authorityFingerprint,
-    'processVersion': processVersion,
-    'rulesetVersion': rulesetVersion,
-    'testId': testId,
-  };
+        'schema': schema,
+        'sourceSha': sourceSha,
+        'authorityFingerprint': authorityFingerprint,
+        'processVersion': processVersion,
+        'rulesetVersion': rulesetVersion,
+        'testId': testId,
+      };
 
   String sha256({Elv5CanonicalEncoder encoder = const Elv5CanonicalJsonV1()}) =>
       encoder.sha256(toCanonicalValue());
@@ -87,8 +89,10 @@ final class Elv5QualificationGateEvidence implements Elv5CanonicalValue {
     required this.pin,
     required Iterable<String> evidenceRefs,
     required Iterable<String> assertions,
-  }) : evidenceRefs = List.unmodifiable(_sortedUnique(evidenceRefs, 'evidenceRefs')),
-       assertions = List.unmodifiable(_sortedUnique(assertions, 'assertions')) {
+  })  : evidenceRefs =
+            List.unmodifiable(_sortedUnique(evidenceRefs, 'evidenceRefs')),
+        assertions =
+            List.unmodifiable(_sortedUnique(assertions, 'assertions')) {
     if (this.evidenceRefs.isEmpty || this.assertions.isEmpty) {
       throw ArgumentError('Qualification gate evidence must not be empty.');
     }
@@ -101,11 +105,11 @@ final class Elv5QualificationGateEvidence implements Elv5CanonicalValue {
 
   @override
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-    'gate': gate.name,
-    'pin': pin.toCanonicalValue(),
-    'evidenceRefs': evidenceRefs,
-    'assertions': assertions,
-  };
+        'gate': gate.name,
+        'pin': pin.toCanonicalValue(),
+        'evidenceRefs': evidenceRefs,
+        'assertions': assertions,
+      };
 }
 
 final class Elv5PilotQualificationMatrix implements Elv5CanonicalValue {
@@ -113,16 +117,17 @@ final class Elv5PilotQualificationMatrix implements Elv5CanonicalValue {
     required String pilotId,
     required Iterable<Elv5QualificationGate> mandatoryGates,
     required Iterable<Elv5QualificationGateEvidence> evidence,
-  }) : pilotId = _text(pilotId, 'pilotId'),
-       mandatoryGates = Set.unmodifiable(mandatoryGates),
-       evidence = List.unmodifiable(evidence) {
+  })  : pilotId = _text(pilotId, 'pilotId'),
+        mandatoryGates = Set.unmodifiable(mandatoryGates),
+        evidence = List.unmodifiable(evidence) {
     if (this.mandatoryGates.isEmpty) {
       throw ArgumentError('Pilot must declare mandatory qualification gates.');
     }
     final byGate = <Elv5QualificationGate, Elv5QualificationGateEvidence>{};
     for (final item in this.evidence) {
       if (byGate.putIfAbsent(item.gate, () => item) != item) {
-        throw ArgumentError('Duplicate qualification evidence for ${item.gate.name}.');
+        throw ArgumentError(
+            'Duplicate qualification evidence for ${item.gate.name}.');
       }
     }
   }
@@ -135,8 +140,8 @@ final class Elv5PilotQualificationMatrix implements Elv5CanonicalValue {
       Set.unmodifiable(evidence.map((value) => value.gate).toSet());
 
   Set<Elv5QualificationGate> get missingMandatoryGates => Set.unmodifiable(
-    mandatoryGates.difference(evidencedGates),
-  );
+        mandatoryGates.difference(evidencedGates),
+      );
 
   bool get allMandatoryGatesSatisfied => missingMandatoryGates.isEmpty;
 
@@ -174,13 +179,15 @@ void requireMetamorphicInvariant<T>({
   required bool Function(T left, T right) invariant,
 }) {
   if (!invariant(baseline, transformed)) {
-    throw StateError('ELV5_METAMORPHIC_INVARIANT_FAILED:${_text(relation, 'relation')}');
+    throw StateError(
+        'ELV5_METAMORPHIC_INVARIANT_FAILED:${_text(relation, 'relation')}');
   }
 }
 
 void requireDeterministicHashes(Iterable<String> hashes) {
   final values = hashes.toList(growable: false);
-  if (values.isEmpty) throw ArgumentError('Determinism sample cannot be empty.');
+  if (values.isEmpty)
+    throw ArgumentError('Determinism sample cannot be empty.');
   for (final value in values) {
     _sha(value, 'hash');
   }

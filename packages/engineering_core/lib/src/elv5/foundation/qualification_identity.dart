@@ -51,16 +51,17 @@ final class Elv5QualificationIdentity implements Elv5CanonicalValue {
 
   @override
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-    'schema': schema,
-    'processVersion': processVersion,
-    'rulesetVersion': rulesetVersion,
-    'sourceSha': sourceSha,
-    'authorityFingerprint': authorityFingerprint,
-  };
+        'schema': schema,
+        'processVersion': processVersion,
+        'rulesetVersion': rulesetVersion,
+        'sourceSha': sourceSha,
+        'authorityFingerprint': authorityFingerprint,
+      };
 
   String canonicalSha256({
     Elv5CanonicalEncoder encoder = const Elv5CanonicalJsonV1(),
-  }) => encoder.sha256(toCanonicalValue());
+  }) =>
+      encoder.sha256(toCanonicalValue());
 }
 
 String _mapText(Map<String, Object?> value, String field) {

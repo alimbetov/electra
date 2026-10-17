@@ -15,22 +15,23 @@ final class DriftCctvRecorderAssignmentSource
     required String designRevisionId,
     required String cameraId,
   }) async {
-    final rows = await database
-        .customSelect(
-          'SELECT r.id AS binding_id, r.revision AS binding_revision, r.recorder_id, '
-          'a.assignment_id, a.camera_id, a.encoded_stream_id, a.license_channel_id, a.storage_pool_id '
-          'FROM recorder_capacity_bindings r JOIN recorder_assignments a '
-          'ON a.project_id = r.project_id AND a.design_revision_id = r.design_revision_id '
-          'AND a.binding_id = r.id WHERE r.project_id = ? AND r.design_revision_id = ? '
-          'AND r.deleted_at IS NULL AND a.camera_id = ? '
-          'ORDER BY r.recorder_id, a.encoded_stream_id, a.assignment_id',
-          variables: <Variable>[
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-            Variable.withString(cameraId),
-          ],
-        )
-        .get();
+    final rows =
+        await database
+            .customSelect(
+              'SELECT r.id AS binding_id, r.revision AS binding_revision, r.recorder_id, '
+              'a.assignment_id, a.camera_id, a.encoded_stream_id, a.license_channel_id, a.storage_pool_id '
+              'FROM recorder_capacity_bindings r JOIN recorder_assignments a '
+              'ON a.project_id = r.project_id AND a.design_revision_id = r.design_revision_id '
+              'AND a.binding_id = r.id WHERE r.project_id = ? AND r.design_revision_id = ? '
+              'AND r.deleted_at IS NULL AND a.camera_id = ? '
+              'ORDER BY r.recorder_id, a.encoded_stream_id, a.assignment_id',
+              variables: <Variable>[
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+                Variable.withString(cameraId),
+              ],
+            )
+            .get();
     return List.unmodifiable(<CctvRecorderAssignmentRef>[
       for (final row in rows)
         CctvRecorderAssignmentRef(

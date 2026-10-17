@@ -100,7 +100,8 @@ final class Lan05DirectionInput {
       throw StateError('LAN05_RESOURCE_LIMIT:path_members');
     }
     if (requiredSensitivityMargin.value < Elv5Rational.zero) {
-      throw ArgumentError('LAN05 required sensitivity margin must be nonnegative.');
+      throw ArgumentError(
+          'LAN05 required sensitivity margin must be nonnegative.');
     }
     if (txMin != null && txMax != null && txMin! > txMax!) {
       throw ArgumentError('LAN05 TxMin must not exceed TxMax.');
@@ -108,7 +109,8 @@ final class Lan05DirectionInput {
     if (rxSensitivity != null &&
         rxOverloadMax != null &&
         rxSensitivity! > rxOverloadMax!) {
-      throw ArgumentError('LAN05 sensitivity must not exceed overload maximum.');
+      throw ArgumentError(
+          'LAN05 sensitivity must not exceed overload maximum.');
     }
   }
 

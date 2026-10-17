@@ -59,7 +59,8 @@ void main() {
             portId: ownedPortId,
             resolvedProfileJson: '{}',
             profileSchema: 'electra.power-port-binding.v1',
-            profileSha256: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            profileSha256:
+                'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           ),
         );
 
@@ -82,9 +83,10 @@ void main() {
     );
 
     expect(await fixture.adoptionState(db, placed.componentId), before);
-    final durablePowerBinding = await (db.select(
-      db.powerPortBindings,
-    )..where((row) => row.id.equals('power-owned-camera-port'))).getSingle();
+    final durablePowerBinding =
+        await (db.select(db.powerPortBindings)..where(
+          (row) => row.id.equals('power-owned-camera-port'),
+        )).getSingle();
     expect(durablePowerBinding.portId, ownedPortId);
     expect(durablePowerBinding.deletedAt, isNull);
     expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);

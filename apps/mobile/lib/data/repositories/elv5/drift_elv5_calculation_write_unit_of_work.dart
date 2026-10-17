@@ -17,12 +17,12 @@ final class DriftElv5CalculationWriteUnitOfWork
   @override
   Future<T> run<T>(
     Future<T> Function(Elv5CalculationWriteSession session) action,
-  ) => DriftElv5RuntimeWriteUnitOfWork(database, originDeviceId: originDeviceId)
-      .run((runtime) async {
-        return action(
-          _Session(runtime, publicationGuards: _GuardStore(database)),
-        );
-      });
+  ) => DriftElv5RuntimeWriteUnitOfWork(
+    database,
+    originDeviceId: originDeviceId,
+  ).run((runtime) async {
+    return action(_Session(runtime, publicationGuards: _GuardStore(database)));
+  });
 }
 
 final class _Session implements Elv5CalculationWriteSession {
@@ -56,16 +56,17 @@ final class _GuardStore implements Elv5CalculationPublicationGuardStore {
     required String projectId,
     required String designRevisionId,
   }) async {
-    final row = await database
-        .customSelect(
-          'SELECT project_id, id, state, revision FROM project_design_revisions '
-          'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
-          variables: [
-            Variable.withString(projectId),
-            Variable.withString(designRevisionId),
-          ],
-        )
-        .getSingleOrNull();
+    final row =
+        await database
+            .customSelect(
+              'SELECT project_id, id, state, revision FROM project_design_revisions '
+              'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
+              variables: [
+                Variable.withString(projectId),
+                Variable.withString(designRevisionId),
+              ],
+            )
+            .getSingleOrNull();
     if (row == null) return null;
     return Elv5CalculationRevisionGuard(
       projectId: row.read<String>('project_id'),

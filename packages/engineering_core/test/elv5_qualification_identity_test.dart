@@ -20,7 +20,9 @@ void main() {
     expect(value.toCanonicalValue()['sourceSha'], _hash('a'));
   });
 
-  test('qualification identity refuses missing or synthetic-looking invalid sha', () {
+  test(
+      'qualification identity refuses missing or synthetic-looking invalid sha',
+      () {
     expect(
       () => Elv5QualificationIdentity(
         processVersion: 'v1',

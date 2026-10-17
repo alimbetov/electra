@@ -243,14 +243,15 @@ final class Fa07PersistedInputResolver
     String policy,
     List<Elv5DependencyMarker> deps,
     Map<String, Object?> evidence,
-  ) => throw Elv5CaptureBlockedException(
-    request: r,
-    reasonCode: reason,
-    inputFingerprint: input,
-    policyFingerprint: policy,
-    dependencies: deps,
-    evidence: evidence,
-  );
+  ) =>
+      throw Elv5CaptureBlockedException(
+        request: r,
+        reasonCode: reason,
+        inputFingerprint: input,
+        policyFingerprint: policy,
+        dependencies: deps,
+        evidence: evidence,
+      );
   Elv5DependencyMarker _dependency(
     Elv5CalculationRequest r,
     String relation,
@@ -282,37 +283,44 @@ Elv5PureKernelExecutor<Fa07Input, Fa07Result> buildFa07Executor({
 }) => Elv5PureKernelExecutor<Fa07Input, Fa07Result>(
   processCode: Elv5ProcessCode.fa07,
   calculate: const Fa07SignalTopologyKernel().evaluate,
-  encodeOutput: (result) => <String, Object?>{
-    'schema': 'electra.elv5-fa07-output.v1',
-    'status': result.status.name,
-    'governingCase': result.governingCase?.name,
-    'reason': result.reason,
-    'cases': <String, Object?>{
-      for (final e in result.cases.entries)
-        e.key.name: <String, Object?>{
-          'status': e.value.status.name,
-          'reachableDeviceIds': e.value.reachableDeviceIds.toList()..sort(),
-          'reason': e.value.reason,
+  encodeOutput:
+      (result) => <String, Object?>{
+        'schema': 'electra.elv5-fa07-output.v1',
+        'status': result.status.name,
+        'governingCase': result.governingCase?.name,
+        'reason': result.reason,
+        'cases': <String, Object?>{
+          for (final e in result.cases.entries)
+            e.key.name: <String, Object?>{
+              'status': e.value.status.name,
+              'reachableDeviceIds': e.value.reachableDeviceIds.toList()..sort(),
+              'reason': e.value.reason,
+            },
         },
-    },
-  },
-  encodeEvidence: (captured, _) => <String, Object?>{
-    'schema': 'electra.elv5-fa07-evidence.v1',
-    'source':
-        'PERSISTED_FA01_MEMBERSHIP_PLUS_IMMUTABLE_SIGNAL_TOPOLOGY_CONTRACT',
-    'captureRevision': captured.captureRevision,
-  },
-  executionOf: (result) => result.status == Fa07AssessmentStatus.blocked
-      ? Elv5Execution.blocked
-      : Elv5Execution.succeeded,
-  completionOf: (result) => result.status == Fa07AssessmentStatus.blocked
-      ? Elv5Completion.incomplete
-      : Elv5Completion.complete,
-  assessmentOf: (result) => switch (result.status) {
-    Fa07AssessmentStatus.pass => Elv5Assessment.pass,
-    Fa07AssessmentStatus.fail => Elv5Assessment.fail,
-    Fa07AssessmentStatus.blocked => Elv5Assessment.unresolved,
-  },
+      },
+  encodeEvidence:
+      (captured, _) => <String, Object?>{
+        'schema': 'electra.elv5-fa07-evidence.v1',
+        'source':
+            'PERSISTED_FA01_MEMBERSHIP_PLUS_IMMUTABLE_SIGNAL_TOPOLOGY_CONTRACT',
+        'captureRevision': captured.captureRevision,
+      },
+  executionOf:
+      (result) =>
+          result.status == Fa07AssessmentStatus.blocked
+              ? Elv5Execution.blocked
+              : Elv5Execution.succeeded,
+  completionOf:
+      (result) =>
+          result.status == Fa07AssessmentStatus.blocked
+              ? Elv5Completion.incomplete
+              : Elv5Completion.complete,
+  assessmentOf:
+      (result) => switch (result.status) {
+        Fa07AssessmentStatus.pass => Elv5Assessment.pass,
+        Fa07AssessmentStatus.fail => Elv5Assessment.fail,
+        Fa07AssessmentStatus.blocked => Elv5Assessment.unresolved,
+      },
   nowUtc: nowUtc,
 );
 

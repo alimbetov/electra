@@ -7,7 +7,8 @@ void main() {
   group('F2 AMPACITY_ROUTE_IZ', () {
     test('Q0 contract/schema inventory is explicit and source-backed', () {
       final input = _routeInput(<_SectionSpec>[
-        _SectionSpec('s1', baseA: 100, temperatureFactor: '0.8', groupingFactor: '0.75'),
+        _SectionSpec('s1',
+            baseA: 100, temperatureFactor: '0.8', groupingFactor: '0.75'),
       ]);
       final section = input.orderedSections.single;
 
@@ -20,12 +21,14 @@ void main() {
         section.environmentBinding.profile.temperatureC.maximum,
       );
       expect(section.ampacityInput.referenceRow.evidenceRef, isNotEmpty);
-      expect(section.ampacityInput.groupingCorrection.evidenceContentHash, _h('3'));
+      expect(section.ampacityInput.groupingCorrection.evidenceContentHash,
+          _h('3'));
     });
 
     test('Q1 reference vector: 100 A * 0.8 * 0.75 = 60 A', () {
       final input = _routeInput(<_SectionSpec>[
-        _SectionSpec('s1', baseA: 100, temperatureFactor: '0.8', groupingFactor: '0.75'),
+        _SectionSpec('s1',
+            baseA: 100, temperatureFactor: '0.8', groupingFactor: '0.75'),
       ]);
       final result = const Elv5RouteAmpacityKernel().evaluate(input);
 
@@ -33,7 +36,8 @@ void main() {
       expect(result.allowableCurrentIzA, Elv5Rational.integer(60));
     });
 
-    test('Q2 independent oracle reproduces Iz without using production kernel', () {
+    test('Q2 independent oracle reproduces Iz without using production kernel',
+        () {
       final input = _routeInput(<_SectionSpec>[
         _SectionSpec(
           's1',
@@ -49,7 +53,8 @@ void main() {
       var oracle = section.referenceRow.baseAllowableCurrentA;
       oracle *= section.temperatureCorrection.factor;
       oracle *= section.groupingCorrection.factor;
-      for (final factor in section.additionalCorrections.map((value) => value.factor)) {
+      for (final factor
+          in section.additionalCorrections.map((value) => value.factor)) {
         oracle *= factor;
       }
 
@@ -63,7 +68,8 @@ void main() {
     test('Q3 below/equal/above Iz boundary is exact and inclusive', () {
       final result = const Elv5RouteAmpacityKernel().evaluate(
         _routeInput(<_SectionSpec>[
-          _SectionSpec('s1', baseA: 100, temperatureFactor: '0.8', groupingFactor: '0.75'),
+          _SectionSpec('s1',
+              baseA: 100, temperatureFactor: '0.8', groupingFactor: '0.75'),
         ]),
       );
       final iz = result.allowableCurrentIzA;
@@ -81,12 +87,16 @@ void main() {
 
     test('Q4 route minimum and section permutation are deterministic', () {
       final first = _routeInput(<_SectionSpec>[
-        _SectionSpec('s-hot', baseA: 100, temperatureFactor: '0.7', groupingFactor: '1'),
-        _SectionSpec('s-cool', baseA: 100, temperatureFactor: '0.9', groupingFactor: '1'),
+        _SectionSpec('s-hot',
+            baseA: 100, temperatureFactor: '0.7', groupingFactor: '1'),
+        _SectionSpec('s-cool',
+            baseA: 100, temperatureFactor: '0.9', groupingFactor: '1'),
       ]);
       final reversed = _routeInput(<_SectionSpec>[
-        _SectionSpec('s-cool', baseA: 100, temperatureFactor: '0.9', groupingFactor: '1'),
-        _SectionSpec('s-hot', baseA: 100, temperatureFactor: '0.7', groupingFactor: '1'),
+        _SectionSpec('s-cool',
+            baseA: 100, temperatureFactor: '0.9', groupingFactor: '1'),
+        _SectionSpec('s-hot',
+            baseA: 100, temperatureFactor: '0.7', groupingFactor: '1'),
       ]);
 
       final left = const Elv5RouteAmpacityKernel().evaluate(first);
@@ -107,12 +117,14 @@ void main() {
     test('Q4 monotonic correction: lower factor cannot improve Iz', () {
       final baseline = const Elv5RouteAmpacityKernel().evaluate(
         _routeInput(<_SectionSpec>[
-          _SectionSpec('s1', baseA: 100, temperatureFactor: '0.9', groupingFactor: '0.8'),
+          _SectionSpec('s1',
+              baseA: 100, temperatureFactor: '0.9', groupingFactor: '0.8'),
         ]),
       );
       final harsher = const Elv5RouteAmpacityKernel().evaluate(
         _routeInput(<_SectionSpec>[
-          _SectionSpec('s1', baseA: 100, temperatureFactor: '0.8', groupingFactor: '0.8'),
+          _SectionSpec('s1',
+              baseA: 100, temperatureFactor: '0.8', groupingFactor: '0.8'),
         ]),
       );
 
@@ -139,7 +151,9 @@ void main() {
           baseA: 38,
           temperatureFactor: '0.87',
           groupingFactor: '0.7',
-          additionalFactors: const <String, String>{'THERMAL_INSULATION': '0.9'},
+          additionalFactors: const <String, String>{
+            'THERMAL_INSULATION': '0.9'
+          },
         ),
         _SectionSpec(
           'plant-room',
@@ -170,7 +184,8 @@ void main() {
       expect(result.allowableCurrentIzA, weakest.value);
     });
 
-    test('Q9 bounded route fold remains deterministic at declared pilot scale', () {
+    test('Q9 bounded route fold remains deterministic at declared pilot scale',
+        () {
       const sectionCount = 256;
       final specs = <_SectionSpec>[
         for (var i = 0; i < sectionCount; i++)

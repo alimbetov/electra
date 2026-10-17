@@ -222,19 +222,21 @@ final class Elv5CalculationService {
       scopeId: scopeMap['scopeId']! as String,
       scenarioKey: scopeMap['scenarioKey']! as String,
     );
-    final processCodes = (command.payload['processCodes']! as List)
-        .cast<String>()
-        .map(Elv5ProcessCode.parse)
-        .toList();
-    final subjects = (command.payload['subjects']! as List)
-        .cast<Map>()
-        .map(
-          (value) => Elv5SubjectRef(
-            kind: value['kind']! as String,
-            id: value['id']! as String,
-          ),
-        )
-        .toList();
+    final processCodes =
+        (command.payload['processCodes']! as List)
+            .cast<String>()
+            .map(Elv5ProcessCode.parse)
+            .toList();
+    final subjects =
+        (command.payload['subjects']! as List)
+            .cast<Map>()
+            .map(
+              (value) => Elv5SubjectRef(
+                kind: value['kind']! as String,
+                id: value['id']! as String,
+              ),
+            )
+            .toList();
     final requests = <Elv5CalculationRequest>[];
     for (final processCode in processCodes) {
       final descriptor = Elv5ProcessCatalog.require(processCode);
@@ -317,8 +319,8 @@ final class Elv5CalculationService {
               'nodeKeySha256': evaluation.nodeKeySha256,
               'evaluationId': evaluation.evaluationId,
               'evaluationIdentitySchema': evaluation.evaluationIdentitySchema,
-              'qualificationIdentitySha256': evaluation.qualificationIdentity
-                  ?.canonicalSha256(),
+              'qualificationIdentitySha256':
+                  evaluation.qualificationIdentity?.canonicalSha256(),
               'outputSha256': evaluation.outputSha256,
               'assessment': evaluation.assessment.name.toUpperCase(),
               'completion': evaluation.completion.name.toUpperCase(),

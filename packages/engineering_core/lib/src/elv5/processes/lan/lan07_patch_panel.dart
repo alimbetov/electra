@@ -52,7 +52,8 @@ final class Lan07Input {
     required this.requiredSourceEndpointIds,
     required this.sparePolicy,
   }) {
-    if (panelId.isEmpty) throw ArgumentError('LAN07 panelId must not be empty.');
+    if (panelId.isEmpty)
+      throw ArgumentError('LAN07 panelId must not be empty.');
     _unique(ports.map((e) => e.portId), 'port');
     _unique(assignments.map((e) => e.assignmentId), 'assignment');
   }
@@ -170,22 +171,19 @@ final class Lan07PatchPanelKernel {
             .ceil()
             .toInt();
     final requiredSpare = switch (input.sparePolicy.combiner) {
-      Lan07SpareCombiner.max =>
-        ratioSpare > input.sparePolicy.absoluteMinimum
-            ? ratioSpare
-            : input.sparePolicy.absoluteMinimum,
-      Lan07SpareCombiner.sum =>
-        ratioSpare + input.sparePolicy.absoluteMinimum,
+      Lan07SpareCombiner.max => ratioSpare > input.sparePolicy.absoluteMinimum
+          ? ratioSpare
+          : input.sparePolicy.absoluteMinimum,
+      Lan07SpareCombiner.sum => ratioSpare + input.sparePolicy.absoluteMinimum,
     };
     final spareHeadroom = free - requiredSpare;
 
-    final status = sortedConflicts.isNotEmpty ||
-            mappingFailure ||
-            spareHeadroom < 0
-        ? Lan07AssessmentStatus.fail
-        : (mappingUnresolved
-            ? Lan07AssessmentStatus.unresolved
-            : Lan07AssessmentStatus.pass);
+    final status =
+        sortedConflicts.isNotEmpty || mappingFailure || spareHeadroom < 0
+            ? Lan07AssessmentStatus.fail
+            : (mappingUnresolved
+                ? Lan07AssessmentStatus.unresolved
+                : Lan07AssessmentStatus.pass);
     return Lan07Result(
       status: status,
       occupied: occupied.length,

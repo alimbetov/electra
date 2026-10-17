@@ -85,10 +85,8 @@ final class DriftElvDesignRevisionRepository
     }
     final project =
         await (database.select(database.projects)..where(
-              (row) =>
-                  row.id.equals(command.projectId) & row.deletedAt.isNull(),
-            ))
-            .getSingleOrNull();
+          (row) => row.id.equals(command.projectId) & row.deletedAt.isNull(),
+        )).getSingleOrNull();
     if (project == null) {
       return elvRuntimeFailure(
         'ELV_PROJECT_NOT_FOUND',
@@ -237,21 +235,20 @@ final class DriftElvDesignRevisionRepository
     );
     await failureProbe.hit(ElvFailurePoints.p3FreezeAfterSnapshotInsert);
     await (database.update(database.projectDesignRevisions)..where(
-          (candidate) =>
-              candidate.id.equals(row.id) &
-              candidate.revision.equals(command.expectedRevision),
-        ))
-        .write(
-          ProjectDesignRevisionsCompanion(
-            state: const Value('FROZEN'),
-            revision: Value(row.revision + 1),
-            snapshotSchemaVersion: Value(snapshot.schemaVersion),
-            snapshotHash: Value(snapshot.contentSha256),
-            frozenAt: Value(instant),
-            updatedAt: Value(instant),
-            originDeviceId: Value(originDeviceId),
-          ),
-        );
+      (candidate) =>
+          candidate.id.equals(row.id) &
+          candidate.revision.equals(command.expectedRevision),
+    )).write(
+      ProjectDesignRevisionsCompanion(
+        state: const Value('FROZEN'),
+        revision: Value(row.revision + 1),
+        snapshotSchemaVersion: Value(snapshot.schemaVersion),
+        snapshotHash: Value(snapshot.contentSha256),
+        frozenAt: Value(instant),
+        updatedAt: Value(instant),
+        originDeviceId: Value(originDeviceId),
+      ),
+    );
     final result = ProjectDesignRevision(
       id: row.id,
       projectId: row.projectId,
@@ -310,9 +307,10 @@ final class DriftElvDesignRevisionRepository
         ElvFailureCategory.lifecycle,
       );
     }
-    final snapshot = await (database.select(
-      database.designRevisionPhysicalSnapshots,
-    )..where((row) => row.designRevisionId.equals(base.id))).getSingleOrNull();
+    final snapshot =
+        await (database.select(database.designRevisionPhysicalSnapshots)..where(
+          (row) => row.designRevisionId.equals(base.id),
+        )).getSingleOrNull();
     if (snapshot == null ||
         snapshot.projectId != command.projectId ||
         snapshot.payloadSha256 != base.snapshotHash ||
@@ -361,8 +359,8 @@ final class DriftElvDesignRevisionRepository
     );
     final physicalIds = <String, String>{};
     final payloadMap = jsonDecode(snapshot.payloadJson) as Map<String, dynamic>;
-    final runs = (payloadMap['runs'] as List? ?? const [])
-        .cast<Map<String, dynamic>>();
+    final runs =
+        (payloadMap['runs'] as List? ?? const []).cast<Map<String, dynamic>>();
     for (final source in runs) {
       final sourceRunId = source['id']! as String;
       final newRunId = '${revision.id}:run:$sourceRunId';
@@ -388,8 +386,9 @@ final class DriftElvDesignRevisionRepository
               originDeviceId: originDeviceId,
             ),
           );
-      final traversals = (source['traversals'] as List? ?? const [])
-          .cast<Map<String, dynamic>>();
+      final traversals =
+          (source['traversals'] as List? ?? const [])
+              .cast<Map<String, dynamic>>();
       for (final traversal in traversals) {
         final sequence = (traversal['sequence'] as num).toInt();
         if (traversal['id'] is String)
@@ -537,9 +536,8 @@ final class DriftElvDesignRevisionRepository
       supersededAt: to == 'SUPERSEDED' ? Value(instant) : const Value.absent(),
       archivedAt: to == 'ARCHIVED' ? Value(instant) : const Value.absent(),
     );
-    await (database.update(
-      database.projectDesignRevisions,
-    )..where((candidate) => candidate.id.equals(row.id))).write(companion);
+    await (database.update(database.projectDesignRevisions)
+      ..where((candidate) => candidate.id.equals(row.id))).write(companion);
     final result = ProjectDesignRevision(
       id: row.id,
       projectId: row.projectId,
@@ -568,12 +566,11 @@ final class DriftElvDesignRevisionRepository
     String revisionId,
   ) =>
       (database.select(database.projectDesignRevisions)..where(
-            (row) =>
-                row.projectId.equals(projectId) &
-                row.id.equals(revisionId) &
-                row.deletedAt.isNull(),
-          ))
-          .getSingleOrNull();
+        (row) =>
+            row.projectId.equals(projectId) &
+            row.id.equals(revisionId) &
+            row.deletedAt.isNull(),
+      )).getSingleOrNull();
 
   Future<DesignRevisionPhysicalSnapshot> _buildP3Snapshot(
     String projectId,

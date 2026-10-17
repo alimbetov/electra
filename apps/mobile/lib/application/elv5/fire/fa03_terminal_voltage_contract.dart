@@ -128,8 +128,8 @@ final class Fa03TerminalVoltageContract {
           'segmentId': c.segmentId,
           'pwr03SubjectKind': c.pwr03SubjectKind,
           'pwr03SubjectId': c.pwr03SubjectId,
-          'terminalLoadIdByTerminalId': c
-              .toCanonicalValue()['terminalLoadIdByTerminalId'],
+          'terminalLoadIdByTerminalId':
+              c.toCanonicalValue()['terminalLoadIdByTerminalId'],
         },
     ],
   });

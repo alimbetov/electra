@@ -2,7 +2,8 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('FA-08 consumes shared Iz and compares it against technical minimum', () {
+  test('FA-08 consumes shared Iz and compares it against technical minimum',
+      () {
     final section = Fa08RouteSection(
       sectionId: 'section-1',
       cableEditionId: 'cable-edition-1',

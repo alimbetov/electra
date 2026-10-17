@@ -111,14 +111,15 @@ void main() {
       expect(current!.bindingRevision, 2);
       expect(current.evidenceRef, isNot(firstEvidenceRef));
 
-      final evidenceCount = await restartedDb
-          .customSelect(
-            "SELECT COUNT(*) AS c FROM elv_revision_aggregate_evidence_records "
-            "WHERE project_id = 'p' AND design_revision_id = 'd' "
-            "AND aggregate_kind = 'ACS03_ELECTRICAL_CONTRACT' "
-            "AND aggregate_id = 'door-1'",
-          )
-          .getSingle();
+      final evidenceCount =
+          await restartedDb
+              .customSelect(
+                "SELECT COUNT(*) AS c FROM elv_revision_aggregate_evidence_records "
+                "WHERE project_id = 'p' AND design_revision_id = 'd' "
+                "AND aggregate_kind = 'ACS03_ELECTRICAL_CONTRACT' "
+                "AND aggregate_id = 'door-1'",
+              )
+              .getSingle();
       expect(evidenceCount.read<int>('c'), 2);
 
       // Q8: freeze preserves the current edition as historical evidence and

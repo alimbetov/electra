@@ -90,11 +90,12 @@ void main() {
 
       final candidate = EngineeringPort.fromMap({
         ...source.toMap(),
-        'voltage': const PortVoltageDomain(
-          currentKind: PortCurrentKind.dc,
-          minimumV: 10,
-          maximumV: 60,
-        ).toMap(),
+        'voltage':
+            const PortVoltageDomain(
+              currentKind: PortCurrentKind.dc,
+              minimumV: 10,
+              maximumV: 60,
+            ).toMap(),
       });
       final binding = builder.portBinding(source.id, PowerPortRole.source);
       final store = DriftPowerCanonicalProjectionWriteStore(
@@ -146,13 +147,14 @@ void main() {
       expect(await _pointerState(db, affectedNode), 'STALE');
       expect(await _pointerState(db, unrelatedNode), 'CURRENT');
 
-      final stored = await db
-          .customSelect(
-            'SELECT revision, payload_json FROM engineering_port_instances '
-            'WHERE id = ?',
-            variables: [Variable.withString(source.id)],
-          )
-          .getSingle();
+      final stored =
+          await db
+              .customSelect(
+                'SELECT revision, payload_json FROM engineering_port_instances '
+                'WHERE id = ?',
+                variables: [Variable.withString(source.id)],
+              )
+              .getSingle();
       expect(stored.read<int>('revision'), 2);
       expect(
         EngineeringPort.fromMap(
@@ -247,12 +249,13 @@ Future<void> _publish(
 }
 
 Future<String> _pointerState(AppDatabase db, PowerNodeKeyV2 node) async {
-  final row = await db
-      .customSelect(
-        'SELECT state FROM power_evaluation_pointers '
-        'WHERE logical_node_key_sha256 = ?',
-        variables: [Variable.withString(node.sha256)],
-      )
-      .getSingle();
+  final row =
+      await db
+          .customSelect(
+            'SELECT state FROM power_evaluation_pointers '
+            'WHERE logical_node_key_sha256 = ?',
+            variables: [Variable.withString(node.sha256)],
+          )
+          .getSingle();
   return row.read<String>('state');
 }
