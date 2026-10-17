@@ -338,6 +338,7 @@ final class _DriftElv5PointerStore implements Elv5PointerStore {
         Variable.withString(write.freshness.name.toUpperCase()),
         Variable<String>(write.evaluationId),
         Variable<String>(write.inputFingerprint),
+        Variable<String>(write.outputSha256),
         Variable<DateTime>(write.updatedAtUtc.toUtc()),
         Variable.withString(originDeviceId),
         Variable.withString(write.projectId),
