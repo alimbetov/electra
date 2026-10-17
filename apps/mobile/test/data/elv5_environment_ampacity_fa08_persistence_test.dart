@@ -296,7 +296,7 @@ void main() {
 Future<AppDatabase> _database({bool withRoute = false}) async {
   final db = AppDatabase(NativeDatabase.memory());
   await db.customStatement('PRAGMA foreign_keys = OFF');
-  final now = _now().toIso8601String();
+  final now = _now().millisecondsSinceEpoch ~/ 1000;
   await db.customStatement(
     "INSERT INTO projects (id,name,reference,measurement_system,default_structural_height_mm,default_finished_ceiling_height_mm,revision,created_at,updated_at,deleted_at,origin_device_id) VALUES ('p','P','','metric',3000,2700,1,'$now','$now',NULL,'test')",
   );

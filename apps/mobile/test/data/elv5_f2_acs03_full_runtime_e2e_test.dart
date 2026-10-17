@@ -579,6 +579,87 @@ Future<void> _seedProjectAndLockReference(AppDatabase db) async {
         ),
       );
   await db
+      .into(db.floors)
+      .insert(
+        FloorsCompanion.insert(
+          id: 'floor-1',
+          projectId: 'p',
+          name: 'Qualification floor',
+          createdAt: _now(),
+          updatedAt: _now(),
+          originDeviceId: 'seed',
+        ),
+      );
+  await db
+      .into(db.rooms)
+      .insert(
+        RoomsCompanion.insert(
+          id: 'room-1',
+          floorId: 'floor-1',
+          name: 'Qualification room',
+          roomType: 'technical',
+          roomCategory: 'technical',
+          widthMm: 4000,
+          depthMm: 4000,
+          createdAt: _now(),
+          updatedAt: _now(),
+          originDeviceId: 'seed',
+        ),
+      );
+  await db
+      .into(db.surfacePatches)
+      .insert(
+        SurfacePatchesCompanion.insert(
+          id: 'patch-1',
+          roomId: 'room-1',
+          surfaceId: 'wall',
+          originXmm: 0,
+          originYmm: 0,
+          originZmm: 0,
+          uAxisX: 1,
+          uAxisY: 0,
+          uAxisZ: 0,
+          vAxisX: 0,
+          vAxisY: 0,
+          vAxisZ: 1,
+          orientation: 'vertical',
+          boundaryJson: '[[0,0],[4000,0],[4000,3000],[0,3000]]',
+          createdAt: _now(),
+          updatedAt: _now(),
+          originDeviceId: 'seed',
+        ),
+      );
+  await db
+      .into(db.componentInstances)
+      .insert(
+        ComponentInstancesCompanion.insert(
+          id: 'lock-1',
+          definitionId: 'lock-def',
+          definitionVersion: 1,
+          roomId: 'room-1',
+          hostSurfacePatchId: 'patch-1',
+          localXmm: 0,
+          localYmm: 0,
+          createdAt: _now(),
+          updatedAt: _now(),
+          originDeviceId: 'seed',
+        ),
+      );
+  await db
+      .into(db.engineeringReferenceCatalogs)
+      .insert(
+        EngineeringReferenceCatalogsCompanion.insert(
+          id: 'fixture-catalog',
+          projectId: 'p',
+          code: 'ACS',
+          catalogVersion: '1',
+          payloadJson: '{}',
+          createdAt: _now(),
+          updatedAt: _now(),
+          originDeviceId: 'seed',
+        ),
+      );
+  await db
       .into(db.componentReferenceBindings)
       .insert(
         ComponentReferenceBindingsCompanion.insert(

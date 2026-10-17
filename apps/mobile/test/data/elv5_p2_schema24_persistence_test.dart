@@ -128,6 +128,9 @@ void main() {
       revisionId: 'rev-a',
       nodeHash: _hash('a'),
     );
+    await db.customUpdate(
+      "UPDATE project_design_revisions SET state = 'FROZEN' WHERE id = 'rev-a'",
+    );
     await _seedRevision(
       db,
       id: 'rev-b',

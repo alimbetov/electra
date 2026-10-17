@@ -199,7 +199,22 @@ final class _WriteOutcome {
 
 Future<void> _seed(AppDatabase db) async {
   await db.customStatement('PRAGMA foreign_keys = OFF');
-  const now = '2026-10-17T00:00:00.000Z';
+  await db
+      .into(db.projects)
+      .insert(
+        ProjectsCompanion.insert(
+          id: 'p',
+          name: 'Qualification project',
+          measurementSystem: 'metric',
+          defaultStructuralHeightMm: 3000,
+          defaultFinishedCeilingHeightMm: 2700,
+          createdAt: DateTime.utc(2026, 10, 17),
+          updatedAt: DateTime.utc(2026, 10, 17),
+          originDeviceId: 'seed',
+        ),
+      );
+
+  final now = DateTime.utc(2026, 10, 17).millisecondsSinceEpoch ~/ 1000;
   await db.customStatement('''
 INSERT INTO project_design_revisions (
   id, project_id, code, sequence, state, revision,

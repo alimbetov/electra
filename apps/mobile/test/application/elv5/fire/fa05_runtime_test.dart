@@ -63,7 +63,7 @@ Elv5CalculationRequest _request() => Elv5CalculationRequest(
   scope: Elv5ScopeRef(
     kind: Elv5ScopeKind.design,
     scopeId: 'd',
-    scenarioKey: 'BACKUP',
+    scenarioKey: 'NONE',
   ),
   processCode: Elv5ProcessCode.fa05,
   subject: Elv5SubjectRef(kind: 'POWER_BANK', id: 'bank-1'),

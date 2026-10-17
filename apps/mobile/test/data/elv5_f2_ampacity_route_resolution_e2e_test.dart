@@ -332,6 +332,21 @@ Elv5AmpacitySectionContract _ampacityContract({
 
 Future<void> _seedTopology(AppDatabase db) async {
   await db.customStatement('PRAGMA foreign_keys = OFF');
+  await db
+      .into(db.projects)
+      .insert(
+        ProjectsCompanion.insert(
+          id: 'p',
+          name: 'Qualification project',
+          measurementSystem: 'metric',
+          defaultStructuralHeightMm: 3000,
+          defaultFinishedCeilingHeightMm: 2700,
+          createdAt: DateTime.utc(2026, 10, 17),
+          updatedAt: DateTime.utc(2026, 10, 17),
+          originDeviceId: 'seed',
+        ),
+      );
+
   final now = DateTime.utc(2026, 10, 17, 12);
 
   await db
@@ -351,15 +366,15 @@ Future<void> _seedTopology(AppDatabase db) async {
       );
   await db.customStatement(
     "INSERT INTO rooms (id,floor_id,name,room_type,room_category,width_mm,depth_mm,structural_height_mm_override,finished_ceiling_height_mm_override,revision,created_at,updated_at,deleted_at,origin_device_id) "
-    "VALUES ('room-1','floor-x','Electrical room','technical','technical',4000,4000,NULL,NULL,1,'${now.toIso8601String()}','${now.toIso8601String()}',NULL,'seed')",
+    "VALUES ('room-1','floor-x','Electrical room','technical','technical',4000,4000,NULL,NULL,1,'${now.millisecondsSinceEpoch ~/ 1000}','${now.millisecondsSinceEpoch ~/ 1000}',NULL,'seed')",
   );
   await db.customStatement(
     "INSERT INTO cable_routes (id,room_id,name,revision,created_at,updated_at,deleted_at,origin_device_id) "
-    "VALUES ('route-1','room-1','Main route',1,'${now.toIso8601String()}','${now.toIso8601String()}',NULL,'seed')",
+    "VALUES ('route-1','room-1','Main route',1,'${now.millisecondsSinceEpoch ~/ 1000}','${now.millisecondsSinceEpoch ~/ 1000}',NULL,'seed')",
   );
   await db.customStatement(
     "INSERT INTO cable_route_segments (id,route_id,sequence,from_node_id,to_node_id,surface_patch_id,laying_method,physical_channel_id,revision,created_at,updated_at,deleted_at,origin_device_id) "
-    "VALUES ('section-1','route-1',1,'node-a','node-b','patch-x','TRAY',NULL,1,'${now.toIso8601String()}','${now.toIso8601String()}',NULL,'seed')",
+    "VALUES ('section-1','route-1',1,'node-a','node-b','patch-x','TRAY',NULL,1,'${now.millisecondsSinceEpoch ~/ 1000}','${now.millisecondsSinceEpoch ~/ 1000}',NULL,'seed')",
   );
   await db
       .into(db.canonicalCableRuns)

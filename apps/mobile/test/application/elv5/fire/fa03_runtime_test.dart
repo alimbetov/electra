@@ -69,7 +69,7 @@ void main() {
       expect(
         first.dependencies.any(
           (value) =>
-              value.relationKind == 'UPSTREAM_EVALUATION' &&
+              value.relationKind == 'EVAL' &&
               value.dependencyKey.contains('ELV4_PWR03_CURRENT'),
         ),
         isTrue,

@@ -40,6 +40,7 @@ final class DriftElv4CurrentEvidenceSource
               'ON p.project_id = e.project_id '
               'AND p.design_revision_id = e.design_revision_id '
               'AND p.logical_node_key_sha256 = e.logical_node_key_sha256 '
+              'AND p.evaluation_id = e.evaluation_id '
               'WHERE e.project_id = ? AND e.design_revision_id = ? '
               'AND e.process_code = ? AND p.state = ?',
               variables: <Variable>[
@@ -84,7 +85,29 @@ final class DriftElv4CurrentEvidenceSource
       if (decoded is! Map) {
         throw StateError('ELV4_CURRENT_EVIDENCE_NOT_OBJECT:$evaluationId');
       }
-      final evidence = decoded.cast<String, Object?>();
+      final stored = decoded.cast<String, Object?>();
+      final Map<String, Object?> evidence;
+      if (stored['schema'] == 'electra.elv4-published-evaluation.v1') {
+        final inner = stored['evidence'];
+        final consumed = stored['consumedInput'];
+        if (inner is! Map ||
+            consumed is! Map ||
+            sha256HexUtf8(canonicalEngineeringJsonV1(consumed)) !=
+                row.read<String>('input_fingerprint')) {
+          throw StateError(
+            'ELV4_CURRENT_PUBLICATION_ENVELOPE_INVALID:$evaluationId',
+          );
+        }
+        evidence = <String, Object?>{
+          ...inner.cast<String, Object?>(),
+          'dependencyKeys': consumed['dependencyKeys'],
+        };
+      } else {
+        evidence = stored;
+      }
+      if (evidence['schema'] != 'electra.elv4-evaluation-evidence.v2') {
+        throw StateError('ELV4_CURRENT_EVIDENCE_SCHEMA_INVALID:$evaluationId');
+      }
       final embeddedNode = evidence['logicalNodeKey'];
       final inputFingerprint = row.read<String>('input_fingerprint');
       if (embeddedNode is! List ||

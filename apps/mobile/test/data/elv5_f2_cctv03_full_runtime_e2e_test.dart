@@ -1,3 +1,4 @@
+import 'package:electra_mobile/application/elv5/commands/elv5_replacement_command_runner.dart';
 import 'dart:io';
 
 import 'package:drift/drift.dart' show Value, Variable;
@@ -135,10 +136,10 @@ void main() {
           ),
         ),
         throwsA(
-          isA<StateError>().having(
-            (error) => error.toString(),
-            'message',
-            contains('ELV5_POINTER_GENERATION_CONFLICT'),
+          isA<Elv5ReplacementCommandException>().having(
+            (error) => error.code,
+            'code',
+            'ELV5_POINTER_GENERATION_CONFLICT',
           ),
         ),
       );
@@ -162,10 +163,10 @@ void main() {
           ),
         ),
         throwsA(
-          isA<StateError>().having(
-            (error) => error.toString(),
-            'message',
-            contains('ELV5_DESIGN_REVISION_READ_ONLY'),
+          isA<Elv5ReplacementCommandException>().having(
+            (error) => error.code,
+            'code',
+            'ELV5_DESIGN_REVISION_READ_ONLY',
           ),
         ),
       );

@@ -1265,14 +1265,27 @@ final class AppDatabase extends _$AppDatabase {
           await migrator.createTable(elvRevisionCommandHistoryExecutions);
         }
         if (from < 24) {
-          await migrator.addColumn(
-            designRevisionSnapshotManifests,
-            designRevisionSnapshotManifests.disciplineSectionSchema,
-          );
-          await migrator.addColumn(
-            designRevisionSnapshotManifests,
-            designRevisionSnapshotManifests.disciplineSha256,
-          );
+          // Earlier upgrades create this table from the current definition,
+          // which already contains the v24 columns. Existing v22/v23 tables
+          // need only the columns that are actually absent.
+          final manifestColumns =
+              (await customSelect(
+                    'PRAGMA table_info(design_revision_snapshot_manifests)',
+                  ).get())
+                  .map((row) => row.read<String>('name'))
+                  .toSet();
+          if (!manifestColumns.contains('discipline_section_schema')) {
+            await migrator.addColumn(
+              designRevisionSnapshotManifests,
+              designRevisionSnapshotManifests.disciplineSectionSchema,
+            );
+          }
+          if (!manifestColumns.contains('discipline_sha256')) {
+            await migrator.addColumn(
+              designRevisionSnapshotManifests,
+              designRevisionSnapshotManifests.disciplineSha256,
+            );
+          }
           await migrator.createTable(disciplinePolicyBindings);
           await migrator.createTable(cameraStreamSetBindings);
           await migrator.createTable(cameraStreamBindings);

@@ -11,7 +11,34 @@ void main() {
     () async {
       final db = AppDatabase(NativeDatabase.memory());
       addTearDown(db.close);
-      await db.customStatement('PRAGMA foreign_keys = OFF');
+      await db
+          .into(db.projects)
+          .insert(
+            ProjectsCompanion.insert(
+              id: 'p',
+              name: 'Qualification project',
+              measurementSystem: 'metric',
+              defaultStructuralHeightMm: 3000,
+              defaultFinishedCeilingHeightMm: 2700,
+              createdAt: DateTime.utc(2026, 10, 17),
+              updatedAt: DateTime.utc(2026, 10, 17),
+              originDeviceId: 'seed',
+            ),
+          );
+      await db
+          .into(db.projectDesignRevisions)
+          .insert(
+            ProjectDesignRevisionsCompanion.insert(
+              id: 'd',
+              projectId: 'p',
+              code: 'R1',
+              sequence: 1,
+              state: 'WORKING',
+              createdAt: DateTime.utc(2026, 10, 17),
+              updatedAt: DateTime.utc(2026, 10, 17),
+              originDeviceId: 'seed',
+            ),
+          );
       final now = DateTime.utc(2026, 10, 17, 13);
       final node = _hash('1');
       final dependency = Elv5InvalidationDependency(
@@ -21,10 +48,10 @@ void main() {
       );
 
       await db.customStatement(
-        "INSERT INTO discipline_evaluation_pointers (project_id,design_revision_id,logical_node_key_json,logical_node_key_sha256,freshness,generation,evaluation_id,input_fingerprint,output_sha256,updated_at,origin_device_id) VALUES ('p','d','{}','$node','CURRENT',1,'eval-old','${_hash('2')}','${_hash('3')}','${now.toIso8601String()}','seed')",
+        "INSERT INTO discipline_evaluation_pointers (project_id,design_revision_id,logical_node_key_json,logical_node_key_sha256,freshness,generation,evaluation_id,input_fingerprint,output_sha256,updated_at,origin_device_id) VALUES ('p','d','{}','$node','CURRENT',1,'eval-old','${_hash('2')}','${_hash('3')}','${now.millisecondsSinceEpoch ~/ 1000}','seed')",
       );
       await db.customStatement(
-        "INSERT INTO discipline_dependency_index (project_id,design_revision_id,dependency_key,dependency_key_sha256,logical_node_key_sha256,relation_kind,updated_at) VALUES ('p','d','${dependency.json.replaceAll("'", "''")}','${dependency.sha256}','$node','SET','${now.toIso8601String()}')",
+        "INSERT INTO discipline_dependency_index (project_id,design_revision_id,dependency_key,dependency_key_sha256,logical_node_key_sha256,relation_kind,updated_at) VALUES ('p','d','${dependency.json.replaceAll("'", "''")}','${dependency.sha256}','$node','SET','${now.millisecondsSinceEpoch ~/ 1000}')",
       );
 
       final invalidator = DriftElv5DependencyInvalidator(
