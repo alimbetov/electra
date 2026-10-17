@@ -15,6 +15,8 @@ void main(){
     ));
     expect(result.status,Fa06AssessmentStatus.pass);
     expect(result.cases[Fa06OperatingCase.activeNotification]!.currentMargin,_a('0.2'));
+    expect(result.governingCase,isNull);
+    expect(result.governingDimension,isNull);
     expect(result.acousticCoverageAssessed,isFalse);
   });
 
@@ -29,6 +31,29 @@ void main(){
     ));
     expect(result.status,Fa06AssessmentStatus.fail);
     expect(result.governingCase,Fa06OperatingCase.startupInrush);
+    expect(result.governingDimension,Fa06GoverningDimension.outputCurrent);
     expect(result.cases[Fa06OperatingCase.startupInrush]!.currentMargin,_a('-0.12'));
+  });
+
+  test('FA06 does not compare failed current and voltage margins across units',(){
+    final result=const Fa06NotificationCapacityKernel().evaluate(Fa06Input(
+      circuitId:'nac-1',deviceIds:['n1'],expectedMembershipFingerprint:'members-v1',deviceLimit:4,
+      cases:[
+        Fa06ElectricalCaseEvidence(
+          operatingCase:Fa06OperatingCase.activeNotification,
+          membershipFingerprint:'members-v1',
+          outputCurrent:_ci('0.6'),
+          terminalVoltage:_vi('21'),
+          outputCurrentLimit:_a('0.5'),
+          minimumTerminalVoltage:_v('22'),
+          maximumTerminalVoltage:_v('26'),
+        ),
+      ],
+      supervision:const Fa06SupervisionEvidence(required:false,modelSupported:false,passed:false),
+    ));
+    expect(result.status,Fa06AssessmentStatus.fail);
+    expect(result.governingCase,Fa06OperatingCase.activeNotification);
+    expect(result.governingDimension,isNull);
+    expect(result.cases[Fa06OperatingCase.activeNotification]!.governingDimension,isNull);
   });
 }
