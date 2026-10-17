@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:drift/drift.dart' show Value;
+import 'package:drift/drift.dart' show Value, Variable;
 import 'package:drift/native.dart';
 import 'package:electra_mobile/application/elv5/lan/lan05_optical_section_evidence.dart';
 import 'package:electra_mobile/application/elv5/wire/elv5_wire_command.dart';
@@ -141,7 +141,10 @@ void main() {
       expect(secondEvaluation.execution, 'SUCCEEDED');
       expect(secondEvaluation.completion, 'COMPLETE');
       expect(secondEvaluation.assessment, 'FAIL');
-      expect(secondEvaluation.inputFingerprint, isNot(firstEvaluation.inputFingerprint));
+      expect(
+        secondEvaluation.inputFingerprint,
+        isNot(firstEvaluation.inputFingerprint),
+      );
 
       // Q7: reconstruct the complete production registry and evidence readers
       // from the durable SQLite file. Ledger replay must not republish.
