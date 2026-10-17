@@ -118,80 +118,79 @@ final class DriftLan05OpticalSectionEvidenceWriter
   static const _encoder = Elv5CanonicalJsonV1();
 
   @override
-  Future<void> replace(ReplaceLan05OpticalSectionEvidenceCommand command) =>
-      database.transaction(() async {
-        final revision = await database
-            .customSelect(
-              'SELECT state, revision FROM project_design_revisions '
-              'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
-              variables: <Variable>[
-                Variable.withString(command.projectId),
-                Variable.withString(command.designRevisionId),
-              ],
-            )
-            .getSingleOrNull();
-        if (revision == null) {
-          throw StateError('LAN05_DESIGN_REVISION_NOT_FOUND');
-        }
-        if (revision.read<String>('state') != 'WORKING') {
-          throw StateError('LAN05_DESIGN_REVISION_READ_ONLY');
-        }
-        if (revision.read<int>('revision') != command.expectedDesignRevision) {
-          throw StateError('LAN05_DESIGN_REVISION_CAS_CONFLICT');
-        }
+  Future<void> replace(
+    ReplaceLan05OpticalSectionEvidenceCommand command,
+  ) => database.transaction(() async {
+    final revision = await database
+        .customSelect(
+          'SELECT state, revision FROM project_design_revisions '
+          'WHERE project_id = ? AND id = ? AND deleted_at IS NULL',
+          variables: <Variable>[
+            Variable.withString(command.projectId),
+            Variable.withString(command.designRevisionId),
+          ],
+        )
+        .getSingleOrNull();
+    if (revision == null) {
+      throw StateError('LAN05_DESIGN_REVISION_NOT_FOUND');
+    }
+    if (revision.read<String>('state') != 'WORKING') {
+      throw StateError('LAN05_DESIGN_REVISION_READ_ONLY');
+    }
+    if (revision.read<int>('revision') != command.expectedDesignRevision) {
+      throw StateError('LAN05_DESIGN_REVISION_CAS_CONFLICT');
+    }
 
-        final binding = await database
-            .customSelect(
-              'SELECT revision FROM link_composition_bindings '
-              'WHERE project_id = ? AND design_revision_id = ? AND id = ? '
-              'AND deleted_at IS NULL',
-              variables: <Variable>[
-                Variable.withString(command.projectId),
-                Variable.withString(command.designRevisionId),
-                Variable.withString(command.bindingId),
-              ],
-            )
-            .getSingleOrNull();
-        if (binding == null) {
-          throw StateError('LAN05_LINK_COMPOSITION_BINDING_NOT_FOUND');
-        }
-        if (binding.read<int>('revision') != command.expectedBindingRevision) {
-          throw StateError('LAN05_LINK_COMPOSITION_BINDING_CAS_CONFLICT');
-        }
+    final binding = await database
+        .customSelect(
+          'SELECT revision FROM link_composition_bindings '
+          'WHERE project_id = ? AND design_revision_id = ? AND id = ? '
+          'AND deleted_at IS NULL',
+          variables: <Variable>[
+            Variable.withString(command.projectId),
+            Variable.withString(command.designRevisionId),
+            Variable.withString(command.bindingId),
+          ],
+        )
+        .getSingleOrNull();
+    if (binding == null) {
+      throw StateError('LAN05_LINK_COMPOSITION_BINDING_NOT_FOUND');
+    }
+    if (binding.read<int>('revision') != command.expectedBindingRevision) {
+      throw StateError('LAN05_LINK_COMPOSITION_BINDING_CAS_CONFLICT');
+    }
 
-        final rows = await database
-            .customSelect(
-              'SELECT ordinal, evidence_json FROM link_section_assignments '
-              'WHERE project_id = ? AND design_revision_id = ? '
-              'AND binding_id = ? AND realized_section_id = ?',
-              variables: <Variable>[
-                Variable.withString(command.projectId),
-                Variable.withString(command.designRevisionId),
-                Variable.withString(command.bindingId),
-                Variable.withString(command.evidence.realizedSectionId),
-              ],
-            )
-            .get();
-        if (rows.length != 1) {
-          throw StateError(
-            rows.isEmpty
-                ? 'LAN05_REALIZED_SECTION_NOT_ASSIGNED'
-                : 'LAN05_REALIZED_SECTION_ASSIGNMENT_AMBIGUOUS',
-          );
-        }
+    final rows = await database
+        .customSelect(
+          'SELECT ordinal, evidence_json FROM link_section_assignments '
+          'WHERE project_id = ? AND design_revision_id = ? '
+          'AND binding_id = ? AND realized_section_id = ?',
+          variables: <Variable>[
+            Variable.withString(command.projectId),
+            Variable.withString(command.designRevisionId),
+            Variable.withString(command.bindingId),
+            Variable.withString(command.evidence.realizedSectionId),
+          ],
+        )
+        .get();
+    if (rows.length != 1) {
+      throw StateError(
+        rows.isEmpty
+            ? 'LAN05_REALIZED_SECTION_NOT_ASSIGNED'
+            : 'LAN05_REALIZED_SECTION_ASSIGNMENT_AMBIGUOUS',
+      );
+    }
 
-        final now = _nowUtc().toUtc();
-        final oldEvidence = rows.single.read<String>('evidence_json');
-        final dependencyHashes = _evidenceDependencyHashes(
-          command.evidence.realizedSectionId,
-          oldEvidence,
-        );
-        if (dependencyHashes.isNotEmpty) {
-          final placeholders = List.filled(
-            dependencyHashes.length,
-            '?',
-          ).join(',');
-          final dependentRows = await database.customSelect(
+    final now = _nowUtc().toUtc();
+    final oldEvidence = rows.single.read<String>('evidence_json');
+    final dependencyHashes = _evidenceDependencyHashes(
+      command.evidence.realizedSectionId,
+      oldEvidence,
+    );
+    if (dependencyHashes.isNotEmpty) {
+      final placeholders = List.filled(dependencyHashes.length, '?').join(',');
+      final dependentRows = await database
+          .customSelect(
             'SELECT DISTINCT logical_node_key_sha256 '
             'FROM discipline_dependency_index '
             'WHERE project_id = ? AND design_revision_id = ? '
@@ -201,93 +200,92 @@ final class DriftLan05OpticalSectionEvidenceWriter
               Variable.withString(command.designRevisionId),
               ...dependencyHashes.map(Variable.withString),
             ],
-          ).get();
-          final nodeHashes = dependentRows
-              .map((row) => row.read<String>('logical_node_key_sha256'))
-              .toSet();
-          if (nodeHashes.isNotEmpty) {
-            final nodePlaceholders = List.filled(nodeHashes.length, '?').join(',');
-            await database.customUpdate(
-              'UPDATE discipline_evaluation_pointers '
-              "SET freshness = 'STALE', generation = generation + 1, "
-              'updated_at = ?, origin_device_id = ? '
-              'WHERE project_id = ? AND design_revision_id = ? '
-              'AND logical_node_key_sha256 IN ($nodePlaceholders) '
-              "AND freshness <> 'STALE'",
-              variables: <Variable>[
-                Variable<DateTime>(now),
-                Variable.withString(originDeviceId),
-                Variable.withString(command.projectId),
-                Variable.withString(command.designRevisionId),
-                ...nodeHashes.map(Variable.withString),
-              ],
-            );
-          }
-        }
-
-        final encoded = utf8.decode(
-          _encoder.encode(command.evidence.toCanonicalValue()),
-          allowMalformed: false,
-        );
-        final evidenceUpdated = await database.customUpdate(
-          'UPDATE link_section_assignments SET evidence_json = ? '
+          )
+          .get();
+      final nodeHashes = dependentRows
+          .map((row) => row.read<String>('logical_node_key_sha256'))
+          .toSet();
+      if (nodeHashes.isNotEmpty) {
+        final nodePlaceholders = List.filled(nodeHashes.length, '?').join(',');
+        await database.customUpdate(
+          'UPDATE discipline_evaluation_pointers '
+          "SET freshness = 'STALE', generation = generation + 1, "
+          'updated_at = ?, origin_device_id = ? '
           'WHERE project_id = ? AND design_revision_id = ? '
-          'AND binding_id = ? AND realized_section_id = ?',
-          variables: <Variable>[
-            Variable.withString(encoded),
-            Variable.withString(command.projectId),
-            Variable.withString(command.designRevisionId),
-            Variable.withString(command.bindingId),
-            Variable.withString(command.evidence.realizedSectionId),
-          ],
-        );
-        if (evidenceUpdated != 1) {
-          throw StateError('LAN05_OPTICAL_EVIDENCE_WRITE_CONFLICT');
-        }
-
-        final bindingUpdated = await database.customUpdate(
-          'UPDATE link_composition_bindings '
-          'SET revision = revision + 1, updated_at = ?, origin_device_id = ? '
-          'WHERE project_id = ? AND design_revision_id = ? AND id = ? '
-          'AND revision = ? AND deleted_at IS NULL',
+          'AND logical_node_key_sha256 IN ($nodePlaceholders) '
+          "AND freshness <> 'STALE'",
           variables: <Variable>[
             Variable<DateTime>(now),
             Variable.withString(originDeviceId),
             Variable.withString(command.projectId),
             Variable.withString(command.designRevisionId),
-            Variable.withString(command.bindingId),
-            Variable<int>(command.expectedBindingRevision),
+            ...nodeHashes.map(Variable.withString),
           ],
         );
-        if (bindingUpdated != 1) {
-          throw StateError('LAN05_LINK_COMPOSITION_BINDING_CAS_CONFLICT');
-        }
+      }
+    }
 
-        final designUpdated = await database.customUpdate(
-          'UPDATE project_design_revisions '
-          'SET revision = revision + 1, updated_at = ?, origin_device_id = ? '
-          'WHERE project_id = ? AND id = ? AND revision = ? '
-          "AND state = 'WORKING' AND deleted_at IS NULL",
-          variables: <Variable>[
-            Variable<DateTime>(now),
-            Variable.withString(originDeviceId),
-            Variable.withString(command.projectId),
-            Variable.withString(command.designRevisionId),
-            Variable<int>(command.expectedDesignRevision),
-          ],
-        );
-        if (designUpdated != 1) {
-          throw StateError('LAN05_DESIGN_REVISION_CAS_CONFLICT');
-        }
-      });
+    final encoded = utf8.decode(
+      _encoder.encode(command.evidence.toCanonicalValue()),
+      allowMalformed: false,
+    );
+    final evidenceUpdated = await database.customUpdate(
+      'UPDATE link_section_assignments SET evidence_json = ? '
+      'WHERE project_id = ? AND design_revision_id = ? '
+      'AND binding_id = ? AND realized_section_id = ?',
+      variables: <Variable>[
+        Variable.withString(encoded),
+        Variable.withString(command.projectId),
+        Variable.withString(command.designRevisionId),
+        Variable.withString(command.bindingId),
+        Variable.withString(command.evidence.realizedSectionId),
+      ],
+    );
+    if (evidenceUpdated != 1) {
+      throw StateError('LAN05_OPTICAL_EVIDENCE_WRITE_CONFLICT');
+    }
+
+    final bindingUpdated = await database.customUpdate(
+      'UPDATE link_composition_bindings '
+      'SET revision = revision + 1, updated_at = ?, origin_device_id = ? '
+      'WHERE project_id = ? AND design_revision_id = ? AND id = ? '
+      'AND revision = ? AND deleted_at IS NULL',
+      variables: <Variable>[
+        Variable<DateTime>(now),
+        Variable.withString(originDeviceId),
+        Variable.withString(command.projectId),
+        Variable.withString(command.designRevisionId),
+        Variable.withString(command.bindingId),
+        Variable<int>(command.expectedBindingRevision),
+      ],
+    );
+    if (bindingUpdated != 1) {
+      throw StateError('LAN05_LINK_COMPOSITION_BINDING_CAS_CONFLICT');
+    }
+
+    final designUpdated = await database.customUpdate(
+      'UPDATE project_design_revisions '
+      'SET revision = revision + 1, updated_at = ?, origin_device_id = ? '
+      'WHERE project_id = ? AND id = ? AND revision = ? '
+      "AND state = 'WORKING' AND deleted_at IS NULL",
+      variables: <Variable>[
+        Variable<DateTime>(now),
+        Variable.withString(originDeviceId),
+        Variable.withString(command.projectId),
+        Variable.withString(command.designRevisionId),
+        Variable<int>(command.expectedDesignRevision),
+      ],
+    );
+    if (designUpdated != 1) {
+      throw StateError('LAN05_DESIGN_REVISION_CAS_CONFLICT');
+    }
+  });
 
   Set<String> _evidenceDependencyHashes(
     String realizedSectionId,
     String encodedEvidence,
   ) {
-    final result = <String>{
-      _dependencyHash(realizedSectionId, null),
-    };
+    final result = <String>{_dependencyHash(realizedSectionId, null)};
     final decoded = jsonDecode(encodedEvidence);
     if (decoded is! Map || decoded.isEmpty) return result;
     final map = Map<String, Object?>.from(decoded);

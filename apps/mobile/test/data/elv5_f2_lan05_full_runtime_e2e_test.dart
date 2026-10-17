@@ -13,233 +13,227 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test(
-    'F2 LAN-05 Q6/Q7/Q8 qualifies exact ELV3 length, optical evidence invalidation, restart and freeze',
-    () async {
-      final directory = await Directory.systemTemp.createTemp(
-        'electra-f2-lan05-full-runtime-',
-      );
-      final file = File('${directory.path}/qualification.sqlite');
-      addTearDown(() async {
-        if (directory.existsSync()) {
-          await directory.delete(recursive: true);
-        }
-      });
+  test('F2 LAN-05 Q6/Q7/Q8 qualifies exact ELV3 length, optical evidence invalidation, restart and freeze', () async {
+    final directory = await Directory.systemTemp.createTemp(
+      'electra-f2-lan05-full-runtime-',
+    );
+    final file = File('${directory.path}/qualification.sqlite');
+    addTearDown(() async {
+      if (directory.existsSync()) {
+        await directory.delete(recursive: true);
+      }
+    });
 
-      var db = AppDatabase(NativeDatabase(file));
-      await _seedProjectAndRealizedSection(db);
-      await _persistLanFacts(db);
+    var db = AppDatabase(NativeDatabase(file));
+    await _seedProjectAndRealizedSection(db);
+    await _persistLanFacts(db);
 
-      var evidenceWriter = _evidenceWriter(db);
-      await evidenceWriter.replace(
-        ReplaceLan05OpticalSectionEvidenceCommand(
-          projectId: 'p',
-          designRevisionId: 'd',
-          bindingId: 'composition-1',
-          expectedBindingRevision: 1,
-          expectedDesignRevision: 1,
-          evidence: _sectionEvidence(
-            forwardDbPerKm: '0.35',
-            reverseDbPerKm: '0.25',
-            edition: 'normal',
-          ),
+    var evidenceWriter = _evidenceWriter(db);
+    await evidenceWriter.replace(
+      ReplaceLan05OpticalSectionEvidenceCommand(
+        projectId: 'p',
+        designRevisionId: 'd',
+        bindingId: 'composition-1',
+        expectedBindingRevision: 1,
+        expectedDesignRevision: 1,
+        evidence: _sectionEvidence(
+          forwardDbPerKm: '0.35',
+          reverseDbPerKm: '0.25',
+          edition: 'normal',
         ),
-      );
+      ),
+    );
 
-      // Q6: production registry captures both persisted LAN aggregates, the
-      // exact/conservative ELV3 realized length and typed attenuation evidence.
-      var runtime = DriftElv5CalculationRuntime.create(
-        db,
-        originDeviceId: 'f2-lan05',
-        nowUtc: _now,
-      );
-      final firstCommand = _calculationCommand(
-        commandId: 'lan05-calc-1',
-        expectedPointerGeneration: 0,
+    // Q6: production registry captures both persisted LAN aggregates, the
+    // exact/conservative ELV3 realized length and typed attenuation evidence.
+    var runtime = DriftElv5CalculationRuntime.create(
+      db,
+      originDeviceId: 'f2-lan05',
+      nowUtc: _now,
+    );
+    final firstCommand = _calculationCommand(
+      commandId: 'lan05-calc-1',
+      expectedPointerGeneration: 0,
+      expectedDesignRevision: 2,
+    );
+    final first = await runtime.service.execute(firstCommand);
+    expect(first.replayed, isFalse);
+
+    final firstPointer = await _pointer(db);
+    expect(firstPointer.freshness, 'CURRENT');
+    expect(firstPointer.generation, 1);
+    expect(firstPointer.evaluationId, isNotNull);
+    final firstEvaluation = await _evaluation(db, firstPointer.evaluationId!);
+    expect(firstEvaluation.execution, 'SUCCEEDED');
+    expect(firstEvaluation.completion, 'COMPLETE');
+    expect(firstEvaluation.assessment, 'PASS');
+    expect(firstEvaluation.inputFingerprint, hasLength(64));
+
+    final dependencyRows = await db
+        .customSelect(
+          'SELECT dependency_key FROM discipline_dependency_index '
+          'WHERE project_id = ? AND design_revision_id = ? '
+          'AND logical_node_key_sha256 = ? ORDER BY dependency_key',
+          variables: <Variable>[
+            Variable.withString('p'),
+            Variable.withString('d'),
+            Variable.withString(_nodeSha()),
+          ],
+        )
+        .get();
+    final dependencies = dependencyRows
+        .map((row) => jsonDecode(row.read<String>('dependency_key')))
+        .whereType<Map>()
+        .map((value) => Map<String, Object?>.from(value))
+        .toList();
+    expect(
+      dependencies.any(
+        (value) => value['domain'] == 'ELV3_REALIZED_LINK_SECTION',
+      ),
+      isTrue,
+    );
+    expect(
+      dependencies
+          .where((value) => value['domain'] == 'LAN_OPTICAL_SECTION_EVIDENCE')
+          .length,
+      2,
+    );
+
+    // Q6 invalidation: replacing authoritative attenuation evidence must make
+    // the already-published CURRENT result stale atomically. High loss then
+    // forces a deterministic FAIL on recalculation rather than retaining PASS.
+    await evidenceWriter.replace(
+      ReplaceLan05OpticalSectionEvidenceCommand(
+        projectId: 'p',
+        designRevisionId: 'd',
+        bindingId: 'composition-1',
+        expectedBindingRevision: 2,
         expectedDesignRevision: 2,
-      );
-      final first = await runtime.service.execute(firstCommand);
-      expect(first.replayed, isFalse);
-
-      final firstPointer = await _pointer(db);
-      expect(firstPointer.freshness, 'CURRENT');
-      expect(firstPointer.generation, 1);
-      expect(firstPointer.evaluationId, isNotNull);
-      final firstEvaluation = await _evaluation(db, firstPointer.evaluationId!);
-      expect(firstEvaluation.execution, 'SUCCEEDED');
-      expect(firstEvaluation.completion, 'COMPLETE');
-      expect(firstEvaluation.assessment, 'PASS');
-      expect(firstEvaluation.inputFingerprint, hasLength(64));
-
-      final dependencyRows = await db.customSelect(
-        'SELECT dependency_key FROM discipline_dependency_index '
-        'WHERE project_id = ? AND design_revision_id = ? '
-        'AND logical_node_key_sha256 = ? ORDER BY dependency_key',
-        variables: <Variable>[
-          Variable.withString('p'),
-          Variable.withString('d'),
-          Variable.withString(_nodeSha()),
-        ],
-      ).get();
-      final dependencies = dependencyRows
-          .map((row) => jsonDecode(row.read<String>('dependency_key')))
-          .whereType<Map>()
-          .map((value) => Map<String, Object?>.from(value))
-          .toList();
-      expect(
-        dependencies.any(
-          (value) => value['domain'] == 'ELV3_REALIZED_LINK_SECTION',
+        evidence: _sectionEvidence(
+          forwardDbPerKm: '200',
+          reverseDbPerKm: '200',
+          edition: 'degraded',
         ),
-        isTrue,
-      );
-      expect(
-        dependencies
-            .where(
-              (value) => value['domain'] == 'LAN_OPTICAL_SECTION_EVIDENCE',
-            )
-            .length,
-        2,
-      );
+      ),
+    );
+    final stale = await _pointer(db);
+    expect(stale.freshness, 'STALE');
+    expect(stale.generation, 2);
+    expect(stale.evaluationId, firstPointer.evaluationId);
 
-      // Q6 invalidation: replacing authoritative attenuation evidence must make
-      // the already-published CURRENT result stale atomically. High loss then
-      // forces a deterministic FAIL on recalculation rather than retaining PASS.
-      await evidenceWriter.replace(
+    final secondCommand = _calculationCommand(
+      commandId: 'lan05-calc-2',
+      expectedPointerGeneration: 2,
+      expectedDesignRevision: 3,
+    );
+    final second = await runtime.service.execute(secondCommand);
+    expect(second.replayed, isFalse);
+    final secondPointer = await _pointer(db);
+    expect(secondPointer.freshness, 'CURRENT');
+    expect(secondPointer.generation, 3);
+    expect(secondPointer.evaluationId, isNot(firstPointer.evaluationId));
+    final secondEvaluation = await _evaluation(db, secondPointer.evaluationId!);
+    expect(secondEvaluation.execution, 'SUCCEEDED');
+    expect(secondEvaluation.completion, 'COMPLETE');
+    expect(secondEvaluation.assessment, 'FAIL');
+    expect(
+      secondEvaluation.inputFingerprint,
+      isNot(firstEvaluation.inputFingerprint),
+    );
+
+    // Q7: reconstruct the complete production registry and evidence readers
+    // from the durable SQLite file. Ledger replay must not republish.
+    final secondLogicalResult = second.logicalResultJson;
+    await db.close();
+    db = AppDatabase(NativeDatabase(file));
+    runtime = DriftElv5CalculationRuntime.create(
+      db,
+      originDeviceId: 'f2-lan05-restarted',
+      nowUtc: _now,
+    );
+    evidenceWriter = _evidenceWriter(db);
+    final replay = await runtime.service.execute(secondCommand);
+    expect(replay.replayed, isTrue);
+    expect(replay.logicalResultJson, secondLogicalResult);
+    final restartedPointer = await _pointer(db);
+    expect(restartedPointer.generation, 3);
+    expect(restartedPointer.evaluationId, secondPointer.evaluationId);
+
+    // Q7 stale writer: a client still holding generation 2 cannot overwrite
+    // the generation-3 CURRENT pointer after restart.
+    await expectLater(
+      runtime.service.execute(
+        _calculationCommand(
+          commandId: 'lan05-stale-writer',
+          expectedPointerGeneration: 2,
+          expectedDesignRevision: 3,
+        ),
+      ),
+      throwsA(
+        isA<StateError>().having(
+          (error) => error.toString(),
+          'message',
+          contains('ELV5_POINTER_GENERATION_CONFLICT'),
+        ),
+      ),
+    );
+
+    // Q8: historical result/command replay remains available after freeze,
+    // while both new calculation and optical evidence mutation fail closed.
+    await db.customUpdate(
+      "UPDATE project_design_revisions SET state = 'FROZEN', revision = 4 "
+      "WHERE project_id = 'p' AND id = 'd'",
+    );
+    final frozenReplay = await runtime.service.execute(secondCommand);
+    expect(frozenReplay.replayed, isTrue);
+    expect(frozenReplay.logicalResultJson, secondLogicalResult);
+
+    await expectLater(
+      runtime.service.execute(
+        _calculationCommand(
+          commandId: 'lan05-after-freeze',
+          expectedPointerGeneration: 3,
+          expectedDesignRevision: 4,
+        ),
+      ),
+      throwsA(
+        isA<StateError>().having(
+          (error) => error.toString(),
+          'message',
+          contains('ELV5_DESIGN_REVISION_READ_ONLY'),
+        ),
+      ),
+    );
+    await expectLater(
+      evidenceWriter.replace(
         ReplaceLan05OpticalSectionEvidenceCommand(
           projectId: 'p',
           designRevisionId: 'd',
           bindingId: 'composition-1',
-          expectedBindingRevision: 2,
-          expectedDesignRevision: 2,
+          expectedBindingRevision: 3,
+          expectedDesignRevision: 4,
           evidence: _sectionEvidence(
-            forwardDbPerKm: '200',
-            reverseDbPerKm: '200',
-            edition: 'degraded',
+            forwardDbPerKm: '0.20',
+            reverseDbPerKm: '0.20',
+            edition: 'forbidden',
           ),
         ),
-      );
-      final stale = await _pointer(db);
-      expect(stale.freshness, 'STALE');
-      expect(stale.generation, 2);
-      expect(stale.evaluationId, firstPointer.evaluationId);
+      ),
+      throwsA(
+        isA<StateError>().having(
+          (error) => error.toString(),
+          'message',
+          contains('LAN05_DESIGN_REVISION_READ_ONLY'),
+        ),
+      ),
+    );
 
-      final secondCommand = _calculationCommand(
-        commandId: 'lan05-calc-2',
-        expectedPointerGeneration: 2,
-        expectedDesignRevision: 3,
-      );
-      final second = await runtime.service.execute(secondCommand);
-      expect(second.replayed, isFalse);
-      final secondPointer = await _pointer(db);
-      expect(secondPointer.freshness, 'CURRENT');
-      expect(secondPointer.generation, 3);
-      expect(secondPointer.evaluationId, isNot(firstPointer.evaluationId));
-      final secondEvaluation = await _evaluation(
-        db,
-        secondPointer.evaluationId!,
-      );
-      expect(secondEvaluation.execution, 'SUCCEEDED');
-      expect(secondEvaluation.completion, 'COMPLETE');
-      expect(secondEvaluation.assessment, 'FAIL');
-      expect(
-        secondEvaluation.inputFingerprint,
-        isNot(firstEvaluation.inputFingerprint),
-      );
-
-      // Q7: reconstruct the complete production registry and evidence readers
-      // from the durable SQLite file. Ledger replay must not republish.
-      final secondLogicalResult = second.logicalResultJson;
-      await db.close();
-      db = AppDatabase(NativeDatabase(file));
-      runtime = DriftElv5CalculationRuntime.create(
-        db,
-        originDeviceId: 'f2-lan05-restarted',
-        nowUtc: _now,
-      );
-      evidenceWriter = _evidenceWriter(db);
-      final replay = await runtime.service.execute(secondCommand);
-      expect(replay.replayed, isTrue);
-      expect(replay.logicalResultJson, secondLogicalResult);
-      final restartedPointer = await _pointer(db);
-      expect(restartedPointer.generation, 3);
-      expect(restartedPointer.evaluationId, secondPointer.evaluationId);
-
-      // Q7 stale writer: a client still holding generation 2 cannot overwrite
-      // the generation-3 CURRENT pointer after restart.
-      await expectLater(
-        runtime.service.execute(
-          _calculationCommand(
-            commandId: 'lan05-stale-writer',
-            expectedPointerGeneration: 2,
-            expectedDesignRevision: 3,
-          ),
-        ),
-        throwsA(
-          isA<StateError>().having(
-            (error) => error.toString(),
-            'message',
-            contains('ELV5_POINTER_GENERATION_CONFLICT'),
-          ),
-        ),
-      );
-
-      // Q8: historical result/command replay remains available after freeze,
-      // while both new calculation and optical evidence mutation fail closed.
-      await db.customUpdate(
-        "UPDATE project_design_revisions SET state = 'FROZEN', revision = 4 "
-        "WHERE project_id = 'p' AND id = 'd'",
-      );
-      final frozenReplay = await runtime.service.execute(secondCommand);
-      expect(frozenReplay.replayed, isTrue);
-      expect(frozenReplay.logicalResultJson, secondLogicalResult);
-
-      await expectLater(
-        runtime.service.execute(
-          _calculationCommand(
-            commandId: 'lan05-after-freeze',
-            expectedPointerGeneration: 3,
-            expectedDesignRevision: 4,
-          ),
-        ),
-        throwsA(
-          isA<StateError>().having(
-            (error) => error.toString(),
-            'message',
-            contains('ELV5_DESIGN_REVISION_READ_ONLY'),
-          ),
-        ),
-      );
-      await expectLater(
-        evidenceWriter.replace(
-          ReplaceLan05OpticalSectionEvidenceCommand(
-            projectId: 'p',
-            designRevisionId: 'd',
-            bindingId: 'composition-1',
-            expectedBindingRevision: 3,
-            expectedDesignRevision: 4,
-            evidence: _sectionEvidence(
-              forwardDbPerKm: '0.20',
-              reverseDbPerKm: '0.20',
-              edition: 'forbidden',
-            ),
-          ),
-        ),
-        throwsA(
-          isA<StateError>().having(
-            (error) => error.toString(),
-            'message',
-            contains('LAN05_DESIGN_REVISION_READ_ONLY'),
-          ),
-        ),
-      );
-
-      final frozenPointer = await _pointer(db);
-      expect(frozenPointer.freshness, 'CURRENT');
-      expect(frozenPointer.generation, 3);
-      expect(frozenPointer.evaluationId, secondPointer.evaluationId);
-      await db.close();
-    },
-  );
+    final frozenPointer = await _pointer(db);
+    expect(frozenPointer.freshness, 'CURRENT');
+    expect(frozenPointer.generation, 3);
+    expect(frozenPointer.evaluationId, secondPointer.evaluationId);
+    await db.close();
+  });
 }
 
 DriftLan05OpticalSectionEvidenceWriter _evidenceWriter(AppDatabase db) =>
@@ -380,17 +374,19 @@ String _nodeSha() => const Elv5CanonicalJsonV1().sha256(
 );
 
 Future<_PointerRow> _pointer(AppDatabase db) async {
-  final row = await db.customSelect(
-    'SELECT freshness, generation, evaluation_id '
-    'FROM discipline_evaluation_pointers '
-    'WHERE project_id = ? AND design_revision_id = ? '
-    'AND logical_node_key_sha256 = ?',
-    variables: <Variable>[
-      Variable.withString('p'),
-      Variable.withString('d'),
-      Variable.withString(_nodeSha()),
-    ],
-  ).getSingle();
+  final row = await db
+      .customSelect(
+        'SELECT freshness, generation, evaluation_id '
+        'FROM discipline_evaluation_pointers '
+        'WHERE project_id = ? AND design_revision_id = ? '
+        'AND logical_node_key_sha256 = ?',
+        variables: <Variable>[
+          Variable.withString('p'),
+          Variable.withString('d'),
+          Variable.withString(_nodeSha()),
+        ],
+      )
+      .getSingle();
   return _PointerRow(
     freshness: row.read<String>('freshness'),
     generation: row.read<int>('generation'),
@@ -399,15 +395,17 @@ Future<_PointerRow> _pointer(AppDatabase db) async {
 }
 
 Future<_EvaluationRow> _evaluation(AppDatabase db, String evaluationId) async {
-  final row = await db.customSelect(
-    'SELECT execution, completion, assessment, input_fingerprint '
-    'FROM discipline_evaluation_records '
-    'WHERE project_id = ? AND evaluation_id = ?',
-    variables: <Variable>[
-      Variable.withString('p'),
-      Variable.withString(evaluationId),
-    ],
-  ).getSingle();
+  final row = await db
+      .customSelect(
+        'SELECT execution, completion, assessment, input_fingerprint '
+        'FROM discipline_evaluation_records '
+        'WHERE project_id = ? AND evaluation_id = ?',
+        variables: <Variable>[
+          Variable.withString('p'),
+          Variable.withString(evaluationId),
+        ],
+      )
+      .getSingle();
   return _EvaluationRow(
     execution: row.read<String>('execution'),
     completion: row.read<String>('completion'),
@@ -444,121 +442,137 @@ final class _EvaluationRow {
 
 Future<void> _seedProjectAndRealizedSection(AppDatabase db) async {
   final now = _now();
-  await db.into(db.projects).insert(
-    ProjectsCompanion.insert(
-      id: 'p',
-      name: 'F2 LAN05 runtime qualification',
-      measurementSystem: 'metric',
-      defaultStructuralHeightMm: 3000,
-      defaultFinishedCeilingHeightMm: 2700,
-      createdAt: now,
-      updatedAt: now,
-      originDeviceId: 'f2-lan05',
-    ),
-  );
-  await db.into(db.projectDesignRevisions).insert(
-    ProjectDesignRevisionsCompanion.insert(
-      id: 'd',
-      projectId: 'p',
-      code: 'R1',
-      sequence: 1,
-      state: 'WORKING',
-      revision: const Value(1),
-      createdAt: now,
-      updatedAt: now,
-      originDeviceId: 'f2-lan05',
-    ),
-  );
+  await db
+      .into(db.projects)
+      .insert(
+        ProjectsCompanion.insert(
+          id: 'p',
+          name: 'F2 LAN05 runtime qualification',
+          measurementSystem: 'metric',
+          defaultStructuralHeightMm: 3000,
+          defaultFinishedCeilingHeightMm: 2700,
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'f2-lan05',
+        ),
+      );
+  await db
+      .into(db.projectDesignRevisions)
+      .insert(
+        ProjectDesignRevisionsCompanion.insert(
+          id: 'd',
+          projectId: 'p',
+          code: 'R1',
+          sequence: 1,
+          state: 'WORKING',
+          revision: const Value(1),
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'f2-lan05',
+        ),
+      );
 
   await db.customStatement('PRAGMA foreign_keys = OFF');
   await db.customStatement(
     "INSERT INTO rooms (id,floor_id,name,room_type,room_category,width_mm,depth_mm,structural_height_mm_override,finished_ceiling_height_mm_override,revision,created_at,updated_at,deleted_at,origin_device_id) "
     "VALUES ('room-1','floor-x','Telecom room','technical','technical',4000,4000,NULL,NULL,1,'${now.toIso8601String()}','${now.toIso8601String()}',NULL,'f2-lan05')",
   );
-  await db.into(db.cableRoutes).insert(
-    CableRoutesCompanion.insert(
-      id: 'route-1',
-      roomId: 'room-1',
-      name: 'Fiber route',
-      createdAt: now,
-      updatedAt: now,
-      originDeviceId: 'f2-lan05',
-    ),
-  );
-  await db.into(db.cableRouteNodes).insert(
-    CableRouteNodesCompanion.insert(
-      id: 'node-a',
-      routeId: 'route-1',
-      sequence: 1,
-      kind: 'POINT',
-      patchId: 'patch-1',
-      localXmm: 0,
-      localYmm: 0,
-      worldXmm: 0,
-      worldYmm: 0,
-      worldZmm: 0,
-      createdAt: now,
-      updatedAt: now,
-      originDeviceId: 'f2-lan05',
-    ),
-  );
-  await db.into(db.cableRouteNodes).insert(
-    CableRouteNodesCompanion.insert(
-      id: 'node-b',
-      routeId: 'route-1',
-      sequence: 2,
-      kind: 'POINT',
-      patchId: 'patch-1',
-      localXmm: 100000,
-      localYmm: 0,
-      worldXmm: 100000,
-      worldYmm: 0,
-      worldZmm: 0,
-      createdAt: now,
-      updatedAt: now,
-      originDeviceId: 'f2-lan05',
-    ),
-  );
-  await db.into(db.cableRouteSegments).insert(
-    CableRouteSegmentsCompanion.insert(
-      id: 'segment-1',
-      routeId: 'route-1',
-      sequence: 1,
-      fromNodeId: 'node-a',
-      toNodeId: 'node-b',
-      surfacePatchId: 'patch-1',
-      layingMethod: 'TRAY',
-      createdAt: now,
-      updatedAt: now,
-      originDeviceId: 'f2-lan05',
-    ),
-  );
-  await db.into(db.canonicalCableRuns).insert(
-    CanonicalCableRunsCompanion.insert(
-      id: 'run-1',
-      projectId: 'p',
-      cableId: 'fiber-1',
-      designRevisionId: 'd',
-      lifecycleState: 'ACTIVE',
-      reservePercent: const Value(0),
-      terminationAllowanceMm: const Value(0),
-      createdAt: now,
-      updatedAt: now,
-      originDeviceId: 'f2-lan05',
-    ),
-  );
-  await db.into(db.cableRunTraversals).insert(
-    CableRunTraversalsCompanion.insert(
-      id: 'traversal-1',
-      cableRunId: 'run-1',
-      sequence: 1,
-      routeSegmentId: 'segment-1',
-      direction: 'FORWARD',
-      createdAt: now,
-      updatedAt: now,
-      originDeviceId: 'f2-lan05',
-    ),
-  );
+  await db
+      .into(db.cableRoutes)
+      .insert(
+        CableRoutesCompanion.insert(
+          id: 'route-1',
+          roomId: 'room-1',
+          name: 'Fiber route',
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'f2-lan05',
+        ),
+      );
+  await db
+      .into(db.cableRouteNodes)
+      .insert(
+        CableRouteNodesCompanion.insert(
+          id: 'node-a',
+          routeId: 'route-1',
+          sequence: 1,
+          kind: 'POINT',
+          patchId: 'patch-1',
+          localXmm: 0,
+          localYmm: 0,
+          worldXmm: 0,
+          worldYmm: 0,
+          worldZmm: 0,
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'f2-lan05',
+        ),
+      );
+  await db
+      .into(db.cableRouteNodes)
+      .insert(
+        CableRouteNodesCompanion.insert(
+          id: 'node-b',
+          routeId: 'route-1',
+          sequence: 2,
+          kind: 'POINT',
+          patchId: 'patch-1',
+          localXmm: 100000,
+          localYmm: 0,
+          worldXmm: 100000,
+          worldYmm: 0,
+          worldZmm: 0,
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'f2-lan05',
+        ),
+      );
+  await db
+      .into(db.cableRouteSegments)
+      .insert(
+        CableRouteSegmentsCompanion.insert(
+          id: 'segment-1',
+          routeId: 'route-1',
+          sequence: 1,
+          fromNodeId: 'node-a',
+          toNodeId: 'node-b',
+          surfacePatchId: 'patch-1',
+          layingMethod: 'TRAY',
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'f2-lan05',
+        ),
+      );
+  await db
+      .into(db.canonicalCableRuns)
+      .insert(
+        CanonicalCableRunsCompanion.insert(
+          id: 'run-1',
+          projectId: 'p',
+          cableId: 'fiber-1',
+          designRevisionId: 'd',
+          lifecycleState: 'ACTIVE',
+          reservePercent: const Value(0),
+          terminationAllowanceMm: const Value(0),
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'f2-lan05',
+        ),
+      );
+  await db
+      .into(db.cableRunTraversals)
+      .insert(
+        CableRunTraversalsCompanion.insert(
+          id: 'traversal-1',
+          cableRunId: 'run-1',
+          sequence: 1,
+          routeSegmentId: 'segment-1',
+          direction: 'FORWARD',
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'f2-lan05',
+        ),
+      );
   await db.customStatement('PRAGMA foreign_keys = ON');
 }
 
