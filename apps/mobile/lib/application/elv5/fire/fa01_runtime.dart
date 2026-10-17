@@ -126,10 +126,11 @@ final class Fa01PersistedInputResolver
         throw StateError('FA01_DUPLICATE_DEVICE_ID:$deviceId');
       }
       final profileRef = _text(row,'profileRef');
-      final expected = contract.profileAddressConsumption[profileRef];
-      if (expected == null) {
+      final expectedAddresses = contract.profileAddressConsumption[profileRef];
+      final deviceContribution = contract.profileDeviceCountContribution[profileRef];
+      if (expectedAddresses == null || deviceContribution == null) {
         _blocked(
-          request,'FA01_PROFILE_CONSUMPTION_EVIDENCE_MISSING',aggregateFingerprint,
+          request,'FA01_PROFILE_RESOURCE_EVIDENCE_MISSING',aggregateFingerprint,
           contractSnapshot.contentHash,dependencies,<String,Object?>{
             'deviceId':deviceId,'profileRef':profileRef,
           },
@@ -139,12 +140,12 @@ final class Fa01PersistedInputResolver
       if (expanded.isEmpty || expanded.toSet().length != expanded.length) {
         throw StateError('FA01_EXPANDED_ADDRESS_SET_INVALID:$deviceId');
       }
-      if (expanded.length != expected) {
+      if (expanded.length != expectedAddresses) {
         _blocked(
           request,'FA01_PROFILE_CONSUMPTION_CARDINALITY_MISMATCH',aggregateFingerprint,
           contractSnapshot.contentHash,dependencies,<String,Object?>{
             'deviceId':deviceId,'profileRef':profileRef,
-            'expectedConsumption':expected,'expandedCount':expanded.length,
+            'expectedConsumption':expectedAddresses,'expandedCount':expanded.length,
           },
         );
       }
@@ -162,9 +163,15 @@ final class Fa01PersistedInputResolver
         keys.add(Fa01AddressKey(domainId:domainId,address:address));
       }
       devices.add(Fa01DeviceAssignment(
-        deviceId:deviceId,addresses:keys,expectedConsumption:expected!,
+        deviceId:deviceId,
+        addresses:keys,
+        expectedConsumption:expectedAddresses!,
+        physicalDeviceCountContribution:deviceContribution!,
       ));
-      dependencies.add(_dependency(request,'FACT','FIRE_DEVICE_PROFILE',profileRef,memberId:deviceId));
+      dependencies.add(_dependency(
+        request,'FACT','FIRE_DEVICE_PROFILE',profileRef,
+        memberId:'$deviceId:$expectedAddresses:$deviceContribution',
+      ));
     }
 
     final input = Fa01Input(
