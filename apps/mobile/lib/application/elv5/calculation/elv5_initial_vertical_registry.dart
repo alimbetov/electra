@@ -1,3 +1,5 @@
+import '../acs/acs01_role_profile_contract.dart';
+import '../acs/acs01_runtime.dart';
 import '../acs/acs03_electrical_contract.dart';
 import '../acs/acs03_runtime.dart';
 import '../acs/acs04_runtime.dart';
@@ -49,6 +51,7 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
   required Elv5FireMutationStore fireStore,
   required Elv3RealizedLinkFactSource elv3LinkFacts,
   required Lan05OpticalSectionEvidenceSource opticalSectionEvidence,
+  required Acs01RoleProfileContractSource acs01Contracts,
   required Acs03ElectricalContractSource acs03Contracts,
   required Acs04SourceRequirementContractSource acs04Contracts,
   required Acs05AutonomyContractSource acs05Contracts,
@@ -109,6 +112,17 @@ Elv5ProcessCalculationRegistry buildElv5InitialVerticalRegistry({
         ),
       ),
       executor: buildLan05Executor(nowUtc: nowUtc),
+      nowUtc: nowUtc,
+    ),
+    Elv5BlockedAwareTypedProcessCalculationAdapter(
+      resolver: guarded(
+        Acs01PersistedInputResolver(
+          acsStore: acsStore,
+          contractSource: acs01Contracts,
+          nowUtc: nowUtc,
+        ),
+      ),
+      executor: buildAcs01Executor(nowUtc: nowUtc),
       nowUtc: nowUtc,
     ),
     Elv5BlockedAwareTypedProcessCalculationAdapter(
