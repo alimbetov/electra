@@ -183,7 +183,11 @@ void main() {
       harness.assertQ7Replay(
         'LAN-05',
         secondSnapshot,
-        _snapshot(restartedPointer, secondEvaluation, replay.logicalResultJson),
+        _snapshot(
+          restartedPointer,
+          await _evaluation(db, restartedPointer.evaluationId!),
+          replay.logicalResultJson,
+        ),
       );
 
       // Q7 stale writer: a client still holding generation 2 cannot overwrite
@@ -213,7 +217,7 @@ void main() {
         secondSnapshot,
         _snapshot(
           frozenReplayPointer,
-          secondEvaluation,
+          await _evaluation(db, frozenReplayPointer.evaluationId!),
           frozenReplay.logicalResultJson,
         ),
       );

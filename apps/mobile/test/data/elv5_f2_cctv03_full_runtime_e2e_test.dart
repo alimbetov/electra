@@ -141,7 +141,11 @@ void main() {
       harness.assertQ7Replay(
         'CCTV-03',
         secondSnapshot,
-        _snapshot(restartedPointer, secondEvaluation, replay.logicalResultJson),
+        _snapshot(
+          restartedPointer,
+          await _evaluation(db, restartedPointer.evaluationId!),
+          replay.logicalResultJson,
+        ),
       );
 
       // Q7 competing publication: a stale client that still owns generation 2
@@ -171,7 +175,7 @@ void main() {
         secondSnapshot,
         _snapshot(
           frozenReplayPointer,
-          secondEvaluation,
+          await _evaluation(db, frozenReplayPointer.evaluationId!),
           frozenReplay.logicalResultJson,
         ),
       );

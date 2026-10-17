@@ -106,3 +106,7 @@ source while CURRENT, require STALE generation 2, then republish a complete
 engineering FAIL at generation 3 (+27 A versus 28 A policy, or 21 A versus
 25 A policy respectively). New bindings invalidate missing-selector route
 closures so previously blocked calculations cannot remain silently CURRENT.
+
+Baseline replay witnesses re-read the evaluation row from SQLite after reopen
+and freeze. Their fingerprint/output identity comparisons must not reuse an
+evaluation object retained in memory from the initial publication.

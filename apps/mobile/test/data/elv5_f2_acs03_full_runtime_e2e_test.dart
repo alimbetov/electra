@@ -162,7 +162,11 @@ void main() {
       harness.assertQ7Replay(
         'ACS-03',
         committedSnapshot,
-        _snapshot(pointerAfterRestart, persisted, replay.logicalResultJson),
+        _snapshot(
+          pointerAfterRestart,
+          await _acsEvaluation(db, pointerAfterRestart.evaluationId!),
+          replay.logicalResultJson,
+        ),
       );
 
       // Q7 competing publication: a stale writer still expects generation 0.
@@ -192,7 +196,7 @@ void main() {
         committedSnapshot,
         _snapshot(
           frozenReplayPointer,
-          persisted,
+          await _acsEvaluation(db, frozenReplayPointer.evaluationId!),
           frozenReplay.logicalResultJson,
         ),
       );
