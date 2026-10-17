@@ -241,8 +241,12 @@ final class Elv5F2ProductionLifecycle {
       var loserError = loser.error!;
       if (_isTransientSqliteBusy(loserError)) {
         final retry = await attempt(loser.database, loser.command);
-        expect(retry.logical, isNull);
-        expect(retry.error, isNotNull);
+        if (retry.logical != null) {
+          fail('SQLite BUSY retry unexpectedly committed a second writer.');
+        }
+        if (retry.error == null) {
+          fail('SQLite BUSY retry did not expose the logical CAS verdict.');
+        }
         loserError = retry.error!;
       }
       expect(
