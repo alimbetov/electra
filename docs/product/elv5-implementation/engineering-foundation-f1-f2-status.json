@@ -35,9 +35,9 @@
         "typedEvidenceReconciliation": "SHARED_PRIMITIVE_IMPLEMENTED_PROCESS_MIGRATION_PENDING",
         "unknownFailClosedAudit": "PARTIAL_TWO_TARGETED_PASSES_ONE_FALSE_PASS_FIXED",
         "provenanceGraph": "PARTIAL_CURRENT_EVALUATION_AND_QUALIFICATION_IDENTITY_PROVENANCE_ADDED_MORE_RECONCILIATION_REQUIRED",
-        "calculationIdentity": "SOURCE_RECONCILED_PROCESS_VERSION_AUTHORITY_MANIFEST_BUILD_SHA_AND_V2_EVALUATION_ID_CI_PENDING",
+        "calculationIdentity": "SOURCE_RECONCILED_PROCESS_VERSION_AUTHORITY_MANIFEST_BUILD_SHA_V2_EVALUATION_ID_AND_SQLITE_REPLAY_CI_PENDING",
         "deterministicCanonicalization": "IMPLEMENTED_CORE_CCTV05_ROW_ORDER_HARDENED_QUALIFICATION_PENDING",
-        "independentStatusAxes": "SOURCE_RECONCILED_BACKWARD_COMPATIBLE_PERSISTED_REPLAY_PROJECTION_CI_PENDING",
+        "independentStatusAxes": "SOURCE_RECONCILED_BACKWARD_COMPATIBLE_SQLITE_REPLAY_PROJECTION_CI_PENDING",
         "governingCasePrimitive": "PARTIAL_PROCESS_SPECIFIC",
         "sharedQualificationSupport": "IMPLEMENTED_TEST_ONLY_EXECUTABLE_Q0_TO_Q9_SUPPORT_CI_PENDING"
       },
@@ -63,22 +63,22 @@
         {
           "id": "F1-HIGH-01",
           "severity": "HIGH",
-          "progress": "SOURCE_RECONCILED_CI_AND_EXACT_SHA_QUALIFICATION_PENDING",
-          "summary": "Qualification builds now require exact ELECTRA_SOURCE_SHA, derive authorityFingerprint from the canonical 27-process authority manifest, bind processVersion/rulesetVersion/sourceSha/authorityFingerprint into evaluation identity v2, and persist the same self-describing identity inside immutable evidence. Dev/historical evaluations remain v1. Exact-head CI and qualification evidence are still required before closure.",
+          "progress": "SOURCE_RECONCILED_TYPED_SQLITE_REPLAY_ADDED_CI_AND_EXACT_SHA_QUALIFICATION_PENDING",
+          "summary": "Qualification builds require exact ELECTRA_SOURCE_SHA, derive authorityFingerprint from the canonical 27-process authority manifest, bind processVersion/rulesetVersion/sourceSha/authorityFingerprint into evaluation identity v2, and persist the same self-describing identity inside immutable evidence. Drift replay now strictly reconstructs and re-hashes the typed qualification identity while remaining compatible with historical v1 evaluations. Exact-head CI and qualification evidence are still required before closure.",
           "acceptanceImpact": "BLOCKS_QUALIFIED_AND_ACCEPTED_PROMOTION_UNTIL_EXACT_SHA_QUALIFICATION"
         },
         {
           "id": "F1-HIGH-02",
           "severity": "HIGH",
-          "progress": "SOURCE_RECONCILED_CI_PENDING",
-          "summary": "Legacy persisted status strings remain replay-compatible while strict read projection maps BLOCKED/INCOMPLETE/UNRESOLVED to Foundation SUCCEEDED/BLOCKED/UNRESOLVED. Unknown persisted vocabulary fails closed. Exact-head replay qualification is still required.",
+          "progress": "SOURCE_RECONCILED_SQLITE_REPLAY_TEST_ADDED_CI_PENDING",
+          "summary": "Legacy persisted status strings remain replay-compatible while strict read projection maps BLOCKED/INCOMPLETE/UNRESOLVED to Foundation SUCCEEDED/BLOCKED/UNRESOLVED. A SQLite replay qualification fixture preserves historical strings and verifies the Foundation projection; unknown persisted vocabulary fails closed. Exact-head CI is still required.",
           "acceptanceImpact": "BLOCKS_F2_QUALIFIED_PROMOTION_UNTIL_EXACT_HEAD_REPLAY_QUALIFICATION"
         },
         {
           "id": "F1-HIGH-03",
           "severity": "HIGH",
           "progress": "SOURCE_RECONCILED_EXACT_CCTV01_FRAME_V2_CI_PENDING",
-          "summary": "CCTV-01 contract v2 now carries exact orthonormal host/target surface axes. Verdict geometry uses only integer-mm origins/local placement plus exact contract axes; inherited ELV3 binary-floating axes are compatibility witnesses checked against an explicit tolerance and cannot drive engineering math. Exact-head qualification is pending.",
+          "summary": "CCTV-01 contract v2 carries exact orthonormal host/target surface axes. Verdict geometry uses only integer-mm origins/local placement plus exact contract axes; inherited ELV3 binary-floating axes are compatibility witnesses checked against an explicit tolerance and cannot drive engineering math. Exact-head qualification is pending.",
           "acceptanceImpact": "BLOCKS_CCTV01_FOUNDATION_QUALIFICATION_UNTIL_EXACT_HEAD_TESTS_PASS"
         },
         {
@@ -103,8 +103,8 @@
       "exitGateSatisfied": false,
       "sharedSupport": "Q0_Q9_TEST_SUPPORT_IMPLEMENTED_CI_PENDING",
       "pilots": [
-        {"id":"AMPACITY_ROUTE_IZ","implementation":"RUNTIME_FOUNDATION_EXISTS","lifecycle":"RUNTIME_INTEGRATED_PARTIAL","qualification":{"Q0":"SOURCE_TEST_ADDED_CI_PENDING","Q1":"SOURCE_TEST_ADDED_CI_PENDING","Q2":"INDEPENDENT_ORACLE_SOURCE_TEST_ADDED_CI_PENDING","Q3":"SOURCE_TEST_ADDED_CI_PENDING","Q4":"METAMORPHIC_SOURCE_TEST_ADDED_CI_PENDING","Q5":"TODO","Q6":"PARTIAL_EXISTING_RUNTIME_EVIDENCE","Q7":"TODO","Q8":"TODO","Q9":"TODO_IF_APPLICABLE"}},
-        {"id":"FA-03","implementation":"PRODUCTION_ADAPTER_PRESENT","lifecycle":"RUNTIME_INTEGRATED","qualification":{"Q0":"PARTIAL","Q1":"PARTIAL","Q2":"TODO","Q3":"PARTIAL","Q4":"TODO","Q5":"TODO","Q6":"PARTIAL","Q7":"TODO","Q8":"TODO","Q9":"TODO_IF_APPLICABLE"}},
+        {"id":"AMPACITY_ROUTE_IZ","implementation":"RUNTIME_FOUNDATION_EXISTS","lifecycle":"RUNTIME_INTEGRATED_PARTIAL","qualification":{"Q0":"SOURCE_TEST_ADDED_CI_PENDING","Q1":"SOURCE_TEST_ADDED_CI_PENDING","Q2":"INDEPENDENT_ORACLE_SOURCE_TEST_ADDED_CI_PENDING","Q3":"SOURCE_TEST_ADDED_CI_PENDING","Q4":"METAMORPHIC_SOURCE_TEST_ADDED_CI_PENDING","Q5":"REALISTIC_MIXED_ROUTE_SOURCE_TEST_ADDED_CI_PENDING","Q6":"PARTIAL_EXISTING_RUNTIME_EVIDENCE_INVALIDATION_OWNERSHIP_RECONCILIATION_REQUIRED","Q7":"OPEN_PRODUCTION_CONCURRENCY_RESTART_FIXTURE_REQUIRED","Q8":"OPEN_FREEZE_HISTORICAL_FIXTURE_REQUIRED","Q9":"BOUNDED_256_SECTION_DETERMINISM_SOURCE_TEST_ADDED_CI_PENDING"}},
+        {"id":"FA-03","implementation":"PRODUCTION_ADAPTER_PRESENT","lifecycle":"RUNTIME_INTEGRATED","qualification":{"Q0":"SOURCE_TEST_ADDED_CI_PENDING","Q1":"EXACT_REFERENCE_VECTOR_SOURCE_TEST_ADDED_CI_PENDING","Q2":"INDEPENDENT_ORACLE_SOURCE_TEST_ADDED_CI_PENDING","Q3":"LOWER_AND_UPPER_BOUNDARY_SOURCE_TESTS_ADDED_CI_PENDING","Q4":"PERMUTATION_AND_MONOTONIC_SOURCE_TESTS_ADDED_CI_PENDING","Q5":"REALISTIC_MULTI_CASE_AND_SCOPE_FAIL_CLOSED_SOURCE_TESTS_ADDED_CI_PENDING","Q6":"UPSTREAM_GENERATION_REPLAY_IDENTITY_SOURCE_TEST_ADDED_PUBLICATION_INVALIDATION_INTEGRATION_PENDING","Q7":"OPEN_PRODUCTION_CONCURRENCY_RESTART_FIXTURE_REQUIRED","Q8":"DETERMINISTIC_CAPTURE_CANDIDATE_REPLAY_SOURCE_TEST_ADDED_FREEZE_HISTORY_INTEGRATION_PENDING","Q9":"BOUNDED_256_TERMINAL_DETERMINISM_SOURCE_TEST_ADDED_CI_PENDING"}},
         {"id":"ACS-03","implementation":"PRODUCTION_ADAPTER_PRESENT","lifecycle":"RUNTIME_INTEGRATED","canonicalOracle":"23.51 V / +1.51 V where applicable","qualification":{"Q0":"PARTIAL","Q1":"PARTIAL","Q2":"TODO_INDEPENDENT","Q3":"PARTIAL","Q4":"TODO","Q5":"TODO","Q6":"PARTIAL","Q7":"TODO","Q8":"TODO","Q9":"TODO_IF_APPLICABLE"}},
         {"id":"CCTV-03","implementation":"PRODUCTION_ADAPTER_PRESENT","lifecycle":"RUNTIME_INTEGRATED","qualification":{"Q0":"PARTIAL","Q1":"PARTIAL","Q2":"TODO","Q3":"PARTIAL","Q4":"TODO","Q5":"TODO","Q6":"PARTIAL","Q7":"TODO","Q8":"TODO","Q9":"TODO_IF_APPLICABLE"}},
         {"id":"LAN-05","implementation":"PRODUCTION_ADAPTER_PRESENT","lifecycle":"RUNTIME_INTEGRATED","qualification":{"Q0":"PARTIAL","Q1":"PARTIAL","Q2":"TODO_INDEPENDENT","Q3":"PARTIAL","Q4":"TODO","Q5":"TODO","Q6":"PARTIAL","Q7":"TODO","Q8":"TODO","Q9":"TODO_IF_APPLICABLE"}}
@@ -119,8 +119,8 @@
       "F1_UNKNOWN_AND_SILENT_DEFAULT_AUDIT_COMPLETE",
       "F1_SECTION_CAPABILITY_EVIDENCE_RECONCILIATION",
       "F1_PROVENANCE_RECONCILIATION",
-      "F2_AMPACITY_ROUTE_IZ_Q5_TO_Q9",
-      "F2_FA-03_Q0_TO_Q9",
+      "F2_AMPACITY_ROUTE_IZ_Q6_TO_Q8_PRODUCTION_PATH",
+      "F2_FA-03_Q6_TO_Q8_PRODUCTION_PATH",
       "F2_ACS-03_Q0_TO_Q9",
       "F2_LAN-05_Q0_TO_Q9",
       "F2_CCTV-03_Q0_TO_Q9",
