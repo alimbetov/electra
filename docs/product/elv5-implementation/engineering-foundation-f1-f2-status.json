@@ -5,16 +5,15 @@
   "acceptanceClaimed": false,
   "runtimeBaseline": {
     "processCount": 27,
-    "productionAdapters": 22,
-    "remainingAdapters": 5,
+    "productionAdapters": 23,
+    "remainingAdapters": 4,
     "byDiscipline": {
       "ACS": {"integrated": 6, "total": 6},
       "FIRE": {"integrated": 8, "total": 8},
-      "LAN": {"integrated": 6, "total": 7},
+      "LAN": {"integrated": 7, "total": 7},
       "CCTV": {"integrated": 2, "total": 6}
     },
     "remaining": [
-      "LAN-07",
       "CCTV-01",
       "CCTV-04",
       "CCTV-05",
@@ -37,13 +36,22 @@
       "workItems": {
         "quantityInventory": "IMPLEMENTED_SHARED_DIMENSIONS_QUALIFICATION_PENDING",
         "typedEvidenceReconciliation": "SHARED_PRIMITIVE_IMPLEMENTED_PROCESS_MIGRATION_PENDING",
-        "unknownFailClosedAudit": "TODO_HIGH_PRIORITY",
+        "unknownFailClosedAudit": "PARTIAL_FIRST_PASS_CRITICAL_PATHS_CLEAN",
         "provenanceGraph": "PARTIAL_EXISTING_PRIMITIVES_TO_RECONCILE",
         "calculationIdentity": "PARTIAL_F1_HIGH_01_OPEN",
         "deterministicCanonicalization": "IMPLEMENTED_CORE_QUALIFICATION_PENDING",
         "independentStatusAxes": "IMPLEMENTED_IN_ELV5_RUNTIME",
         "governingCasePrimitive": "PARTIAL_PROCESS_SPECIFIC",
         "sharedQualificationSupport": "TODO"
+      },
+      "unknownAuditFirstPass": {
+        "inspected": [
+          "AMPACITY_REFERENCE_AND_CORRECTIONS",
+          "ENVIRONMENT_PROFILE_AND_ROUTE_RESOLUTION",
+          "CCTV03_STORAGE_AND_RECURRENCE"
+        ],
+        "falsePassDefaultsFound": 0,
+        "fullRepositoryAuditComplete": false
       },
       "openFindings": [
         {
@@ -94,9 +102,9 @@
     }
   },
   "executionOrder": {
-    "runtimeTrack": ["LAN-07", "CCTV-04", "CCTV-01", "CCTV-05", "CCTV-06"],
+    "runtimeTrack": ["CCTV-04", "CCTV-01", "CCTV-05", "CCTV-06"],
     "foundationTrack": [
-      "F1_UNKNOWN_AND_SILENT_DEFAULT_AUDIT",
+      "F1_UNKNOWN_AND_SILENT_DEFAULT_AUDIT_COMPLETE",
       "F1_CALCULATION_IDENTITY_RECONCILIATION",
       "F1_PROVENANCE_RECONCILIATION",
       "F1_SHARED_QUALIFICATION_SUPPORT",
