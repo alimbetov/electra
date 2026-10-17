@@ -18,6 +18,14 @@ final class Elv5RationalRange {
         'minimum': minimum.toMap(),
         'maximum': maximum.toMap(),
       };
+
+  factory Elv5RationalRange.fromMap(Map<String, Object?> map) {
+    _exactFields(map, const <String>{'minimum', 'maximum'}, 'rational range');
+    return Elv5RationalRange(
+      minimum: Elv5Rational.fromMap(_map(map['minimum'], 'minimum')),
+      maximum: Elv5Rational.fromMap(_map(map['maximum'], 'maximum')),
+    );
+  }
 }
 
 /// Versioned engineering environment evidence.
@@ -55,6 +63,8 @@ final class Elv5EnvironmentProfile {
     }
   }
 
+  static const schema = 'electra.elv5-environment-profile.v1';
+
   final String profileId;
   final String editionId;
   final String profileCode;
@@ -69,7 +79,7 @@ final class Elv5EnvironmentProfile {
   final String evidenceContentHash;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'schema': 'electra.elv5-environment-profile.v1',
+        'schema': schema,
         'profileId': profileId,
         'editionId': editionId,
         'profileCode': profileCode,
@@ -83,6 +93,55 @@ final class Elv5EnvironmentProfile {
         'evidenceRef': evidenceRef,
         'evidenceContentHash': evidenceContentHash,
       };
+
+  factory Elv5EnvironmentProfile.fromMap(Map<String, Object?> map) {
+    _exactFields(
+      map,
+      const <String>{
+        'schema',
+        'profileId',
+        'editionId',
+        'profileCode',
+        'temperatureC',
+        'relativeHumidityPercent',
+        'condensationRisk',
+        'exposure',
+        'moistureClassCode',
+        'contaminationClassCode',
+        'climateClassCode',
+        'evidenceRef',
+        'evidenceContentHash',
+      },
+      'environment profile',
+    );
+    if (map['schema'] != schema) {
+      throw const FormatException('Unsupported environment profile schema.');
+    }
+    return Elv5EnvironmentProfile(
+      profileId: _mapText(map, 'profileId'),
+      editionId: _mapText(map, 'editionId'),
+      profileCode: _mapText(map, 'profileCode'),
+      temperatureC: Elv5RationalRange.fromMap(_map(map['temperatureC'], 'temperatureC')),
+      relativeHumidityPercent: Elv5RationalRange.fromMap(
+        _map(map['relativeHumidityPercent'], 'relativeHumidityPercent'),
+      ),
+      condensationRisk: _enumByName(
+        Elv5CondensationRisk.values,
+        _mapText(map, 'condensationRisk'),
+        'condensationRisk',
+      ),
+      exposure: _enumByName(
+        Elv5EnvironmentExposure.values,
+        _mapText(map, 'exposure'),
+        'exposure',
+      ),
+      moistureClassCode: _nullableMapText(map, 'moistureClassCode'),
+      contaminationClassCode: _nullableMapText(map, 'contaminationClassCode'),
+      climateClassCode: _nullableMapText(map, 'climateClassCode'),
+      evidenceRef: _mapText(map, 'evidenceRef'),
+      evidenceContentHash: _mapText(map, 'evidenceContentHash'),
+    );
+  }
 }
 
 /// Binds a versioned environment profile to a spatial scope.
@@ -105,6 +164,8 @@ final class Elv5EnvironmentScopeBinding {
     }
   }
 
+  static const schema = 'electra.elv5-environment-scope-binding.v1';
+
   final String bindingId;
   final String scopeKind;
   final String scopeId;
@@ -112,13 +173,42 @@ final class Elv5EnvironmentScopeBinding {
   final int priority;
 
   Map<String, Object?> toCanonicalValue() => <String, Object?>{
-        'schema': 'electra.elv5-environment-scope-binding.v1',
+        'schema': schema,
         'bindingId': bindingId,
         'scopeKind': scopeKind,
         'scopeId': scopeId,
         'priority': priority,
         'profile': profile.toCanonicalValue(),
       };
+
+  factory Elv5EnvironmentScopeBinding.fromMap(Map<String, Object?> map) {
+    _exactFields(
+      map,
+      const <String>{
+        'schema',
+        'bindingId',
+        'scopeKind',
+        'scopeId',
+        'priority',
+        'profile',
+      },
+      'environment scope binding',
+    );
+    if (map['schema'] != schema) {
+      throw const FormatException('Unsupported environment scope binding schema.');
+    }
+    final priority = map['priority'];
+    if (priority is! int) {
+      throw const FormatException('priority must be integer.');
+    }
+    return Elv5EnvironmentScopeBinding(
+      bindingId: _mapText(map, 'bindingId'),
+      scopeKind: _mapText(map, 'scopeKind'),
+      scopeId: _mapText(map, 'scopeId'),
+      priority: priority,
+      profile: Elv5EnvironmentProfile.fromMap(_map(map['profile'], 'profile')),
+    );
+  }
 }
 
 String _text(String value, String field) {
@@ -143,4 +233,41 @@ String _sha256(String value, String field) {
     throw ArgumentError.value(value, field, 'Expected lowercase SHA-256.');
   }
   return normalized;
+}
+
+Map<String, Object?> _map(Object? value, String field) {
+  if (value is! Map) throw FormatException('$field must be object.');
+  return Map<String, Object?>.from(value);
+}
+
+String _mapText(Map<String, Object?> map, String field) {
+  final value = map[field];
+  if (value is! String || value.trim().isEmpty) {
+    throw FormatException('$field must be non-empty text.');
+  }
+  return value.trim();
+}
+
+String? _nullableMapText(Map<String, Object?> map, String field) {
+  final value = map[field];
+  if (value == null) return null;
+  if (value is! String) throw FormatException('$field must be text or null.');
+  final normalized = value.trim();
+  return normalized.isEmpty ? null : normalized;
+}
+
+T _enumByName<T extends Enum>(List<T> values, String name, String field) {
+  for (final value in values) {
+    if (value.name == name) return value;
+  }
+  throw FormatException('Unsupported $field: $name');
+}
+
+void _exactFields(Map<String, Object?> map, Set<String> expected, String field) {
+  final actual = map.keys.toSet();
+  if (actual.length != expected.length ||
+      actual.difference(expected).isNotEmpty ||
+      expected.difference(actual).isNotEmpty) {
+    throw FormatException('$field has missing or unknown fields.');
+  }
 }
