@@ -1,6 +1,7 @@
 import '../../../application/elv5/calculation/elv5_calculation_runtime.dart';
 import '../../../application/elv5/calculation/elv5_calculation_service.dart';
 import '../../../application/elv5/calculation/elv5_initial_vertical_registry.dart';
+import '../../../application/elv5/calculation/elv5_qualification_identity_source.dart';
 import '../../../application/elv5/environment/ampacity_route_resolver.dart';
 import '../../database/app_database.dart';
 import '../drift_component_instance_repository.dart';
@@ -53,6 +54,7 @@ final class DriftElv5CalculationRuntime {
     AppDatabase database, {
     String originDeviceId = 'local-device',
     DateTime Function()? nowUtc,
+    Elv5QualificationIdentitySource? qualificationIdentitySource,
   }) {
     final cctvFacts = DriftElv5CctvCalculationFactStore(database, originDeviceId: originDeviceId);
     final cctvRecorderFacts = DriftElv5CctvRecorderFactStore(database, originDeviceId: originDeviceId);
@@ -139,10 +141,13 @@ final class DriftElv5CalculationRuntime {
       captureRevisions: DriftElv5CaptureRevisionSource(database),
       nowUtc: nowUtc,
     );
+    final qualificationSource = qualificationIdentitySource ??
+        Elv5BuildQualificationIdentitySource.tryFromEnvironment();
     final service = Elv5CalculationService(
       registry: registry,
       publicationUnitOfWork: DriftElv5CalculationWriteUnitOfWork(database, originDeviceId: originDeviceId),
       originDeviceId: originDeviceId,
+      qualificationIdentitySource: qualificationSource,
       now: nowUtc,
     );
     return DriftElv5CalculationRuntime._(registry: registry, service: service);
