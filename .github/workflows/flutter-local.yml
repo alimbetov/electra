@@ -192,6 +192,15 @@ jobs:
         shell: bash
         run: flutter test 2>&1 | tee "${RUNNER_TEMP}/mobile-test.log"
 
+      - name: Execute exact-SHA ELV5 lifecycle witnesses
+        working-directory: .
+        shell: bash
+        run: |
+          mapfile -t witness_paths < <(python3 scripts/ci/collect-elv5-f2-witness-matrix.py --paths)
+          test "${#witness_paths[@]}" -eq 27
+          cd apps/mobile
+          flutter test --machine --dart-define=ELECTRA_SOURCE_SHA="${GITHUB_SHA}" "${witness_paths[@]}" 2>&1 | tee "${RUNNER_TEMP}/elv5-f2-machine.jsonl"
+
       - name: Install engineering core dependencies
         working-directory: packages/engineering_core
         run: dart pub get
@@ -211,6 +220,25 @@ jobs:
         working-directory: packages/engineering_core
         shell: bash
         run: dart test 2>&1 | tee "${RUNNER_TEMP}/core-test.log"
+
+      - name: Collect executed ELV5 lifecycle matrix
+        working-directory: .
+        shell: bash
+        run: >-
+          python3 scripts/ci/collect-elv5-f2-witness-matrix.py
+          --machine-log "${RUNNER_TEMP}/elv5-f2-machine.jsonl"
+          --output "${RUNNER_TEMP}/elv5-f2-executed-matrix.json"
+
+      - name: Preserve executed ELV5 lifecycle evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: elv5-f2-executed-witnesses-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/elv5-f2-machine.jsonl
+            ${{ runner.temp }}/elv5-f2-executed-matrix.json
+          if-no-files-found: ignore
+          retention-days: 30
 
       - name: Preserve analyze and test logs
         if: always()
