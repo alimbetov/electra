@@ -34,6 +34,22 @@ class SilentDefaultGuardTest(unittest.TestCase):
         )
         self.assertEqual(findings, [])
 
+    def test_allows_formatter_wrapped_fail_closed_throw(self):
+        source = """
+final selectedRate = rate.guaranteedUpperBoundBitRate ??
+    (throw StateError('required'));
+"""
+        self.assertEqual(self.scan(source), [])
+
+    def test_allows_explicit_structural_zero_identities(self):
+        source = """
+final actual = eligibleByRole[node.role]?.length ?? 0;
+final currentGeneration = cursor?.read<int>('generation') ?? 0;
+final currentHead = cursor?.read<int>('head_sequence') ?? 0;
+load: expectedEdges[edgeId] ?? _zeroRate,
+"""
+        self.assertEqual(self.scan(source), [])
+
     def test_allows_reviewed_authority_backed_default(self):
         findings = self.scan(
             "final voltage = input.voltage ?? 230; "
