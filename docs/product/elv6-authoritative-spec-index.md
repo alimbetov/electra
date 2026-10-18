@@ -171,3 +171,12 @@ All ELV6 P0–P9 runtime packages remain `NOT_STARTED` until that evidence exist
 requirement/evidence, catalogue-adoption, owner-UoW, result-adapter and freeze/report
 contract. It is replicated on the three stage branches with one agreement hash.
 It does not grant runtime support or move product selection into ELV6.
+
+
+## External and hybrid power source contract
+
+[Source-system amendment](elv-integration/source-systems-contract.md) is mandatory
+for generator, PV/inverter, UPS/BESS/battery and transfer integration.
+[Readiness ledger](elv-integration/design-readiness.json) distinguishes the defined
+ELV6 contract from unqualified electrical producer and source-authority gates.
+No runtime or production-compliance readiness is inferred from the design guard.

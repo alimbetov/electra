@@ -33,3 +33,16 @@ These inputs are not a promise of identical source trees. Do not merge stale
 inherited upstream specifications over a current stage branch. Publish coordinated
 contract updates with expected-head leases; if an upstream changes, inspect and
 reconcile rather than resetting its branch to a previously read SHA.
+
+
+## Generator, PV, storage and transfer amendment
+
+[Source-system contract](source-systems-contract.md) defines exact owner roles,
+physical/electrical/normative/selection boundaries and mandatory coverage.
+[Source registry](source-systems-registry.json) adds four proposed electrical
+producer schemas and sixteen mode classes; the original nine stage handoff schemas
+remain unchanged. [Source qualification](source-qualification-plan.json) has
+32 PLANNED oracles. [Authority review](source-authority-review.md) records primary
+metadata discovery without production approval. [Design readiness](design-readiness.json)
+separates defined contracts from blocked upstream/runtime/source-review gates.
+The catalogue now plans 23 families with a distinct PV module product definition.

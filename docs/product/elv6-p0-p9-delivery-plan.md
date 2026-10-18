@@ -517,3 +517,15 @@ layout requirement/evidence adapters; P2 supplies same-UoW owner participants;
 P4/P5 capture catalogue definition hashes and scoped invalidation; P8/P9 qualify
 candidate-versus-committed evidence, shared freeze and all cross-stage oracles.
 These are design obligations; all ELV6 runtime packages remain NOT_STARTED.
+
+
+## Generator / PV / storage / transfer source gates
+
+Apply [the source-system contract](elv-integration/source-systems-contract.md)
+and [readiness ledger](elv-integration/design-readiness.json): P0 binds exact
+canonical electrical producer/commands/schema/domains and legacy compatibility;
+P1/P2 freeze typed source/settings/scenario projections and scoped adoption;
+P3–P5 implement only owner-appropriate rule/adaptor/invalidation behavior;
+P8 executes the 32 source-specific oracles plus inherited/shared regressions;
+P9 requires exact-SHA actual owner evidence before source-mode runtime acceptance.
+Normative source metadata, planned tests and design CI do not satisfy those gates.

@@ -1129,3 +1129,21 @@ frozen project root exists and cannot add a future report hash to that root.
 This branch's inspected schema 23 differs from merged main schema 24. The shared
 binding records this migration/source gap; runtime P0 must reconcile actual
 accepted producers and migration origins rather than reserve schema 24 or 25.
+
+
+## Source-system implementation contract (ELV6)
+
+[Shared source contract](../elv-integration/source-systems-contract.md) defines exact
+mandatory inputs and fail-closed semantics.
+
+Exact source/ATS/inverter/battery adopted definitions provide terminal/phase/
+polarity identity, entry/cable approach, compartment/segregation geometry,
+service/removal/handling, support mass/CoG, operating-point heat/airflow and
+integrity evidence. External sources outside the host map to explicit connection
+interfaces; they do not become fabricated local placements. Four electrical
+source-study projections are consumed with matching configuration/scenario/settings
+hashes and declared generations. Missing heat/mass affects only dependent LAY
+completeness. ELV6 does not size PV strings, calculate generator faults, prove
+source synchronization, switch a neutral by default, or solve roof/fuel/exhaust.
+The 24 LAY processes and 21 commands remain unchanged. Any new execution family
+requires explicit registry change and qualification, not a hidden helper.

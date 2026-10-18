@@ -28,6 +28,89 @@ def unique(values, label):
     require(len(values) == len(set(values)), f'Duplicate {label}')
 
 
+def check_sources():
+    source = read_json(BASE / 'source-systems-registry.json')
+    plan = read_json(BASE / 'source-qualification-plan.json')
+    readiness = read_json(BASE / 'design-readiness.json')
+    require(source['schema'] == 'electra.elv-source-systems-contract.v1' and
+            source['status'] == 'CONTRACT_DEFINED' and source['runtimeReady'] is False and
+            source['qualifiedElectricalProducer'] is False and source['productionVerifiedSourcePacks'] == 0,
+            'Source design cannot grant producer/authority qualification')
+    require(source['newLayProcessesAdded'] == source['newNormativeFamiliesAdded'] == 0,
+            'Source integration must not hide a new execution family')
+    expected = {
+        'SOURCE_CONFIGURATION': 'electra.electrical-source-configuration.v1',
+        'SOURCE_STUDY': 'electra.electrical-source-study.v1',
+        'TRANSFER_SEQUENCE': 'electra.electrical-transfer-sequence.v1',
+        'ENERGY_BALANCE': 'electra.electrical-energy-balance.v1',
+    }
+    projections = source['projections']
+    unique([p['id'] for p in projections], 'electrical source projection IDs')
+    require({p['id']: p['schema'] for p in projections} == expected, 'Four source contracts required')
+    for projection in projections:
+        require(projection['logicalProducer'] == 'CANONICAL_ELECTRICAL_OWNER' and
+                projection['producerBindingStatus'] == 'BLOCKED_UPSTREAM' and
+                projection['qualified'] is False, 'Unqualified source owner cannot become implemented')
+        require({'projectId', 'designRevisionId', 'scenarioIds', 'topologyHash', 'configurationHash',
+                 'consumedRefs', 'generationTokens', 'coverage', 'missingFacts', 'payloadHash'} <=
+                set(projection['requiredEnvelopeFields']), 'Source capture/context incomplete')
+        require(projection['requiredPayloadFields'] and all(projection['requiredPayloadFields'].values()),
+                'Source payload must have typed fields')
+    expected_modes = {
+        'GRID_NORMAL', 'GRID_LOSS', 'GENERATOR_START', 'GENERATOR_SUPPLY', 'GENERATOR_FAILURE',
+        'RETRANSFER_TO_GRID', 'UPS_INVERTER', 'UPS_BYPASS', 'PV_GRID_CONNECTED', 'PV_UNAVAILABLE',
+        'INTENTIONAL_ISLAND', 'STORAGE_CHARGE', 'STORAGE_DISCHARGE', 'STORAGE_DEPLETED',
+        'MAINTENANCE_ISOLATION', 'TRANSFER_CONTROL_FAILURE',
+    }
+    unique([m['id'] for m in source['modes']], 'source mode classes')
+    require({m['id'] for m in source['modes']} == expected_modes, 'Required source mode inventory drift')
+    for mode in source['modes']:
+        require(mode['applicability'] == 'DERIVED_FROM_TOPOLOGY_AND_DECLARED_PURPOSE' and
+                mode['missingRequiredMode'] == 'BLOCKED_NOT_PASS' and mode['obligation'],
+                'Missing mode cannot silently leave the coverage denominator')
+    for field in ('unknownSourceIsUnlimited', 'scenarioLabelSetsState', 'gridFollowingImpliesIslandSupply',
+                  'bidirectionalPortProvesParallelOperation', 'nameplatePvGuaranteesBackup',
+                  'zeroExportSetpointIsProof', 'waiverGreensMandatoryViolation',
+                  'dcPoeEvidenceProvesAcSourceStudy', 'candidateStudyMayBeCopiedCurrent',
+                  'projectStudyMayUseLiveWeather', 'existingSingleSourceSelectorMayEncodeParallelSilently'):
+        require(source['invariants'][field] is False, f'Unsafe source-system inference: {field}')
+    for field in ('sourceAuthorityRequiresEditionAndSiteScope', 'allRequiredModesMustBeCovered',
+                  'sourceStudyHashesMustMatchConfiguration', 'stateChangeInvalidatesScopedConsumers',
+                  'historicalStudyIsOfflineReproducible'):
+        require(source['invariants'][field] is True, f'Missing source-system gate: {field}')
+    require(source['physicalBoundary'] == {'owner': 'ELV6', 'roofStructuralSolarYieldEngineIncluded': False,
+            'fuelExhaustMechanicalEngineIncluded': False, 'claimsNormativeCompliance': False},
+            'ELV6 source scope creep')
+    normative_source = source['baselineRefs']['ELV7']
+    require(re.fullmatch(r'[0-9a-f]{40}', normative_source), 'Invalid normative source pin')
+    raw = subprocess.check_output(['git', 'show', normative_source +
+                                  ':docs/product/elv7-implementation/rule-family-registry.json'], cwd=ROOT)
+    family_ids = {f['id'] for f in json.loads(raw)['families']}
+    unique([r['id'] for r in source['sourceRuleBindings']], 'source rule instance IDs')
+    for rule in source['sourceRuleBindings']:
+        require(rule['normativeFamilies'] and set(rule['normativeFamilies']) <= family_ids and
+                rule['status'] == 'UNQUALIFIED_RULE_INSTANTIATION' and rule['obligation'],
+                'Source rule must map to a real family without fabricating qualification')
+    require(plan['schema'] == 'electra.elv-source-qualification-plan.v1' and
+            plan['evidenceScope'] == 'DESIGN_ONLY' and plan['runtimeAccepted'] is False and
+            len(plan['cases']) == plan['plannedCaseCount'] == 32, 'Source qualification plan drift')
+    unique([c['id'] for c in plan['cases']], 'source oracle IDs')
+    unique([c['scenario'] for c in plan['cases']], 'source oracle scenarios')
+    for case in plan['cases']:
+        require(case['status'] == 'PLANNED' and case['executed'] is False and case['oracle'],
+                'Planned source cases cannot certify runtime')
+    require(readiness['schema'] == 'electra.elv-design-readiness.v1' and
+            readiness['runtimeReady'] is False and readiness['percentageClaim'] is None,
+            'Readiness cannot imply runtime or invent a completeness percentage')
+    unique([i['id'] for i in readiness['items']], 'source readiness gates')
+    gates = {i['id']: i for i in readiness['items']}
+    require(gates['ELECTRICAL_SOURCE_PRODUCER']['state'] == 'BLOCKED_UPSTREAM' and
+            gates['SCHEMA_AND_OWNER_UOW']['state'] == 'BLOCKED_ENTRY' and
+            gates['SOURCE_AUTHORITY']['state'] == 'SOURCE_REVIEW_REQUIRED' and
+            gates['RUNTIME_QUALIFICATION']['state'] == 'NOT_STARTED', 'Source entry blockers hidden')
+    require(all(i['closure'] for i in gates.values()), 'Each readiness gate needs an exact closure condition')
+
+
 def check():
     registry = read_json(BASE / 'interface-registry.json')
     binding = read_json(BASE / 'stage-binding.json')
@@ -113,7 +196,9 @@ def check():
     unique([a['path'] for a in binding['agreementArtifacts']], 'agreement artifact paths')
     require({a['path'] for a in binding['agreementArtifacts']} == {
         'docs/product/elv-integration/' + f for f in
-        ('README.md', 'runtime-handoff-contract.md', 'interface-registry.json', 'qualification-plan.json')},
+        ('README.md', 'runtime-handoff-contract.md', 'interface-registry.json', 'qualification-plan.json',
+         'source-systems-contract.md', 'source-systems-registry.json', 'source-qualification-plan.json',
+         'source-authority-review.md', 'design-readiness.json')},
         'Agreement replica must bind all shared design artifacts')
     for artifact in binding['agreementArtifacts'] + binding['localDocuments']:
         path = artifact['path']
@@ -156,7 +241,9 @@ def check():
         for link in re.findall(r'\]\(([^)]+)\)', doc.read_text()):
             if '://' not in link and not link.startswith('#'):
                 require((doc.parent / link.split('#')[0]).exists(), f'Broken shared agreement link: {link}')
-    print(f'PASS: {binding["stage"]} integration design; 9 proposed schemas; 24 PLANNED oracles; '
+    check_sources()
+    print(f'PASS: {binding["stage"]} integration design; 9 stage + 4 source proposed schemas; '
+          f'24 shared + 32 source PLANNED oracles; '
           f'local schema {local_schema}, pinned main {main["observedDbSchema"]}; runtime NOT READY.')
 
 
