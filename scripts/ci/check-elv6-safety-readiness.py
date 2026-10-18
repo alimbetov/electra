@@ -85,7 +85,7 @@ def main():
         assert forbidden not in contract
 
     for token in [
-        'ELV6 captures exact physical evidence; ELV7 decides jurisdictional applicability and compliance',
+        'ELV6 does not decide whether a cabinet/rack is compliant',
         'Elv6EnclosureIntegrityEvidence',
         'Elv6AirClearanceMeasurement',
         'Elv6CreepagePathMeasurement',
