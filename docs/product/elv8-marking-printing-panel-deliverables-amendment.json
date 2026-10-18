@@ -1,0 +1,31 @@
+{
+  "schema": "electra.elv8-marking-printing-panel-deliverables-amendment.v1",
+  "status": "DESIGN_AMENDMENT_NOT_RUNTIME_NOT_ACCEPTANCE",
+  "authority": "NORMATIVE_FOR_FUTURE_ELV8_RUNTIME_ENTRY",
+  "ownership": {
+    "CANONICAL_IDENTITIES": "UPSTREAM_OWNERS",
+    "PANEL_HIERARCHY_2D_LAYOUT": "ELV6",
+    "NORMATIVE_MARKING_REQUIREMENTS": "ELV7",
+    "EXACT_SKU_SELECTION": "ELV8",
+    "MARKER_PRINT_QR_PROJECTION": "ELV8",
+    "BOM_SCHEDULE_DOSSIER": "ELV8",
+    "ELECTRICAL_STUDY_PHYSICS": "SHARED_ELECTRICAL_PRODUCER"
+  },
+  "markerSubjects": ["CABLE", "CABLE_CORE", "CIRCUIT", "PROTECTIVE_DEVICE", "PANEL", "TERMINAL_BLOCK", "TERMINAL", "DEVICE", "PORT", "PATCH_PANEL_PORT", "IO_CHANNEL", "AUTOMATION_CHANNEL"],
+  "markerTypes": ["CABLE_END_SOURCE", "CABLE_END_DESTINATION", "CABLE_INTERMEDIATE", "CABLE_CORE", "TERMINAL", "TERMINAL_BLOCK", "DEVICE", "PANEL", "PORT", "IO_CHANNEL", "QR_ASSET"],
+  "contracts": ["IdentificationPolicy", "MarkerTemplate", "MarkerProjection", "MarkerBatch", "QrAssetProjection"],
+  "minimumOutputs": ["PDF_LABEL_SHEET", "CSV_XLSX_MARKER_SCHEDULE", "PRINTER_NEUTRAL_MARKER_DATASET", "QR_PAYLOAD_DATASET", "PANEL_FRONT_LAYOUT", "DIN_RAIL_LAYOUT", "CABLE_ENTRY_PLAN", "TERMINAL_PLAN", "WIRING_TERMINATION_SCHEDULE", "PANEL_SCHEDULE", "HIERARCHY_FEEDER_SCHEDULE", "BOM"],
+  "printerVendorAdaptersCanonical": false,
+  "panelHierarchy": {
+    "preserveTemplateInstanceOverride": true,
+    "reports": ["HIERARCHY_TREE", "MAIN_BOARD_FEEDER_SCHEDULE", "FLOOR_PANEL_SCHEDULES", "INSTANCE_COMPARISON", "TEMPLATE_OVERRIDE_REPORT", "AGGREGATED_BOM"]
+  },
+  "catalogPhysicalFacts": ["mountingType", "moduleWidthUnits", "widthMm", "heightMm", "depthMm", "requiredClearanceMm", "heatDissipationW", "terminalLocations", "accessoryZones", "compatibleRailOrMountingSystem", "glandCompatibility"],
+  "electricalStudyBoundary": {
+    "handoff": "elv-integration/electrical-study-handoff-contract.md",
+    "renderOnlyNoRecalculation": true,
+    "staleOrIncompleteVisible": true
+  },
+  "invalidationTriggers": ["IDENTIFIER_CHANGE", "TERMINATION_CHANGE", "CABLE_ENTRY_CHANGE", "ELV6_LAYOUT_HIERARCHY_FINGERPRINT_CHANGE", "ELV7_RULESET_CHANGE", "SKU_REVISION_CHANGE", "STUDY_FINGERPRINT_OR_FRESHNESS_CHANGE", "PROJECT_REVISION_CHANGE"],
+  "deterministicFrozenReplayRequired": true
+}
