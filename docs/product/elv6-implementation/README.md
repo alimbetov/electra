@@ -10,14 +10,17 @@ ELV6 converts exact upstream engineering facts into reproducible physical enclos
 
 1. [`code-level-runtime-contract.md`](code-level-runtime-contract.md) — mandatory Dart/runtime identities, exact µm geometry, evaluation states, replay/CAS/publication, persistence, solver and workspace contracts.
 2. [`mutation-safety-contract.md`](mutation-safety-contract.md) — strict placement-intent wire union, server-derived physical geometry/provenance and fail-closed referenced-member replacement semantics.
-3. [`process-registry.json`](process-registry.json) — closed 24-process layout/evaluation registry.
-4. [`command-registry.json`](command-registry.json) — closed 21-operation public command registry under `electra.elv6-layout-command.v1`.
-5. [`command-examples.json`](command-examples.json) — one canonical design-time valid payload and deterministic missing-field rejection for every registered operation.
-6. [`qualification-manifest.json`](qualification-manifest.json) — 72 process oracles: POS/NEG/BLOCKED for all 24 codes plus cross-cutting constructability/concurrency cases.
-7. [`../elv6-enclosure-layout-design-specification.md`](../elv6-enclosure-layout-design-specification.md) — stage purpose, ownership and package architecture.
-8. [`../elv6-p0-p9-delivery-plan.md`](../elv6-p0-p9-delivery-plan.md) — 80 implementation/acceptance requirements.
-9. [`../../audit/elv6-hard-technical-audit.md`](../../audit/elv6-hard-technical-audit.md) — initial 18 hard engineering/system-architecture findings and remediation.
-10. [`../../audit/elv6-final-architecture-hardening.md`](../../audit/elv6-final-architecture-hardening.md) — findings 19–20: client-derived geometry/provenance and orphaned-reference replacement hazards.
+3. [`normative-safety-evidence-contract.md`](normative-safety-evidence-contract.md) — cross-cutting safety evidence projections for enclosure integrity, clearance/creepage, hazardous access, partitions, environment/profile provenance and freeze/replay.
+4. [`safety-standards-registry.json`](safety-standards-registry.json) — machine-readable IEC/KZ/EU/discipline standards applicability and ELV6 evidence-gap registry. It is a design/readiness registry, not a compliance ruleset.
+5. [`process-registry.json`](process-registry.json) — closed 24-process layout/evaluation registry.
+6. [`command-registry.json`](command-registry.json) — closed 21-operation public command registry under `electra.elv6-layout-command.v1`.
+7. [`command-examples.json`](command-examples.json) — one canonical design-time valid payload and deterministic missing-field rejection for every registered operation.
+8. [`qualification-manifest.json`](qualification-manifest.json) — 72 process oracles: POS/NEG/BLOCKED for all 24 codes plus cross-cutting constructability/concurrency cases.
+9. [`../elv6-enclosure-layout-design-specification.md`](../elv6-enclosure-layout-design-specification.md) — stage purpose, ownership and package architecture.
+10. [`../elv6-p0-p9-delivery-plan.md`](../elv6-p0-p9-delivery-plan.md) — 80 implementation/acceptance requirements.
+11. [`../../audit/elv6-hard-technical-audit.md`](../../audit/elv6-hard-technical-audit.md) — initial 18 hard engineering/system-architecture findings and remediation.
+12. [`../../audit/elv6-final-architecture-hardening.md`](../../audit/elv6-final-architecture-hardening.md) — findings 19–20: client-derived geometry/provenance and orphaned-reference replacement hazards.
+13. [`../../audit/elv6-normative-safety-readiness-audit.md`](../../audit/elv6-normative-safety-readiness-audit.md) — standards-driven readiness audit and eight mandatory normative-evidence gaps.
 
 ## Closed registries
 
@@ -39,6 +42,8 @@ LAY-24      aggregate intrinsic validation
 
 Each process has a mandatory positive, negative and blocked design oracle. For measurement/basis processes a negative case may intentionally be `UNRESOLVED` rather than a fake engineering FAIL.
 
+The standards review does **not** silently add hidden LAY processes. Clearance/creepage, enclosure-integrity, hazardous-access and partition evidence are currently defined as cross-cutting immutable evidence projections. If P0/P1 proves any projection requires independent execution/publication semantics, the 24-process registry must be explicitly reopened and all qualification counts updated together.
+
 ### 21 public command operations
 
 The command registry is exact and fail-closed. Canonical examples mirror its payload-key sets exactly. No widget- or plugin-specific mutation endpoint may bypass it. The public revision lifecycle remains the existing ELV4 revision command family.
@@ -46,6 +51,26 @@ The command registry is exact and fail-closed. Canonical examples mirror its pay
 For placement commands, the wire carries only `placementSpec` intent. Body envelopes, rack/DIN spans, world-space service/protrusion geometry and proposal provenance are server-derived/materialized facts. This prevents a UI/client from forging a smaller collision envelope or impersonating solver provenance.
 
 Set-replacement commands are reference-safe: mounting surfaces and cable entries cannot be removed while active placements/assignments still reference them. There is no client `force` bypass.
+
+## Safety/normative readiness boundary
+
+ELV6 owns exact physical evidence; ELV7 owns jurisdiction/profile applicability and compliance verdicts.
+
+The safety readiness layer requires at least:
+
+```text
+enclosure opening/modification/seal/gland provenance
+clearance measurements
+creepage path measurements
+hazardous-part/barrier access evidence
+partition/separation geometry
+insulation/material/environment context refs
+rack/enclosure mechanical/environmental capability provenance
+national/profile edition/effectivity provenance
+freeze/replay hashes for all evidence projections
+```
+
+A newer IEC/GOST/EN publication must never auto-replace the effective project profile. In particular, the KZ profile distinguishes current national standards from documents that are adopted interstate but not yet introduced nationally.
 
 ## Runtime ownership gate
 
@@ -63,6 +88,8 @@ concurrency CAS
 qualification
 ```
 
+P0 additionally proves canonical ownership for safety evidence inputs such as conductive/live regions, barriers, partitions, enclosure openings/modifications, insulating surfaces/material refs and safety-environment context.
+
 If an accepted panel-layout writer is absent, ELV6 promotes the existing semantic identity into the first revision-scoped runtime owner. A parallel “new generic panel” model is prohibited.
 
 ## Numeric contract
@@ -75,18 +102,19 @@ A physical `FAIL` means an intrinsic constructability/capability violation suppo
 
 ## CI design guards
 
-The main Flutter workflow runs three independent ELV6 design gates before Flutter setup:
+The main Flutter workflow runs four independent ELV6 design gates before Flutter setup:
 
 ```text
 check-elv6-specification.py
+check-elv6-safety-readiness.py
 check-elv6-command-registry.py
 check-elv6-qualification-design.py
 ```
 
-They verify the 24/80/20 counts, dependency DAG and hard engineering boundary tokens; exact 21-command wire/payload registry including server-derived-placement constraints; 21 canonical payload examples; and 72 POS/NEG/BLOCKED process oracles.
+They verify the 24/80/20 counts, dependency DAG and hard engineering boundary tokens; the safety standards/profile registry plus mandatory normative-evidence contract; exact 21-command wire/payload registry including server-derived-placement constraints; 21 canonical payload examples; and 72 POS/NEG/BLOCKED process oracles.
 
-These gates prevent specification drift. They are explicitly **not runtime acceptance**.
+These gates prevent specification drift. They are explicitly **not runtime acceptance or proof of standards compliance**.
 
 ## Runtime status
 
-All ELV6 P0–P9 runtime packages are `NOT_STARTED`. Runtime evidence fields must remain empty until actual source/tests/CI exist.
+All ELV6 P0–P9 runtime packages are `NOT_STARTED`. Runtime evidence fields must remain empty until actual source/tests/CI exist. The normative safety audit identifies mandatory runtime-entry gaps that P0 must resolve before reporting `READY`.
