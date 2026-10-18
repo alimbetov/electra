@@ -1,0 +1,229 @@
+{
+  "schema": "electra.identification-cabinet-entry-fault-simulation-target.v1",
+  "status": "TARGET_NORTH_STAR_NOT_IMPLEMENTATION_NOT_ACCEPTANCE",
+  "parentTarget": "electra-professional-electrical-platform-target.md",
+  "scope": [
+    "ENGINEERING_IDENTIFICATION_AND_MARKING",
+    "CABINET_CABLE_ENTRY_AND_INTERNAL_ROUTING",
+    "ELECTRICAL_DISTURBANCE_AND_FAULT_SIMULATION"
+  ],
+  "relatedCapabilities": [
+    "CAP-05",
+    "CAP-06",
+    "CAP-07",
+    "CAP-08",
+    "CAP-13",
+    "CAP-17",
+    "CAP-19",
+    "CAP-21",
+    "K0",
+    "K3",
+    "K6",
+    "K7"
+  ],
+  "identification": {
+    "canonicalRule": "One canonical engineering identity drives drawings, schedules, physical markers, QR and commissioning views.",
+    "subjects": [
+      "CABLE",
+      "CABLE_CORE",
+      "CIRCUIT",
+      "PROTECTIVE_DEVICE",
+      "PANEL",
+      "TERMINAL_BLOCK",
+      "TERMINAL",
+      "DEVICE",
+      "PORT",
+      "PATCH_PANEL_PORT",
+      "IO_CHANNEL",
+      "AUTOMATION_CHANNEL"
+    ],
+    "markerTypes": [
+      "CABLE_END_SOURCE",
+      "CABLE_END_DESTINATION",
+      "CABLE_INTERMEDIATE",
+      "CABLE_CORE",
+      "TERMINAL",
+      "TERMINAL_BLOCK",
+      "DEVICE",
+      "PANEL",
+      "PORT",
+      "IO_CHANNEL",
+      "QR_ASSET"
+    ],
+    "minimumOutputs": [
+      "PDF_LABEL_SHEET",
+      "CSV_XLSX_MARKER_SCHEDULE",
+      "PRINTER_NEUTRAL_MARKER_DATASET",
+      "QR_PAYLOAD_DATASET"
+    ],
+    "vendorAdaptersDeferred": true,
+    "deterministicProjectionRequired": true
+  },
+  "cabinetCableEntry": {
+    "entrySides": [
+      "TOP",
+      "BOTTOM",
+      "LEFT",
+      "RIGHT",
+      "MIXED",
+      "CUSTOM",
+      "UNSPECIFIED"
+    ],
+    "objects": [
+      "CableEntryZone",
+      "CableEntryAssignment",
+      "GlandPlate",
+      "CabinetInternalCablePath"
+    ],
+    "mandatoryCheckFamiliesWhenEvidenceExists": [
+      "MINIMUM_BEND_RADIUS",
+      "ENTRY_GLAND_COMPATIBILITY",
+      "ENTRY_CAPACITY",
+      "INTERNAL_DUCT_FILL",
+      "SERVICE_SEGREGATION",
+      "TERMINATION_REACHABILITY",
+      "ACCESSIBILITY_MAINTAINABILITY",
+      "SERVICE_LOOP",
+      "SHIELD_PE_TERMINATION_PATH",
+      "RESERVE_ENTRY_CAPACITY",
+      "ROUTE_COLLISION"
+    ],
+    "k0ObjectiveDimensions": [
+      "INTERNAL_CABLE_LENGTH",
+      "ROUTE_COMPLEXITY",
+      "CONGESTION",
+      "THERMAL_CONCENTRATION_WHERE_SUPPORTED",
+      "ACCESSIBILITY",
+      "RESERVE_CAPACITY"
+    ],
+    "editorViews": [
+      "PHYSICAL",
+      "ELECTRICAL",
+      "WIRING"
+    ]
+  },
+  "simulation": {
+    "levels": [
+      {
+        "id": "LEVEL_1_STEADY_STATE",
+        "target": true,
+        "studies": [
+          "LOAD_DEMAND",
+          "VOLTAGE_DROP",
+          "PHASE_BALANCE",
+          "SOURCE_LOADING"
+        ]
+      },
+      {
+        "id": "LEVEL_2_FAULT_STUDIES",
+        "target": true,
+        "studies": [
+          "SHORT_CIRCUIT",
+          "EARTH_FAULT",
+          "NEUTRAL_LOSS_WHERE_SUPPORTED",
+          "PROTECTION_RESPONSE"
+        ]
+      },
+      {
+        "id": "LEVEL_3_DISCRETE_DYNAMIC_SCENARIOS",
+        "target": true,
+        "studies": [
+          "SOURCE_LOSS",
+          "ATS_TRANSFER",
+          "GENERATOR_START",
+          "UPS_RIDE_THROUGH",
+          "LOAD_SHEDDING",
+          "MOTOR_START",
+          "VOLTAGE_DIP"
+        ]
+      },
+      {
+        "id": "LEVEL_4_ELECTROMAGNETIC_TRANSIENTS",
+        "target": false,
+        "deferred": true,
+        "studies": [
+          "LIGHTNING_WAVEFORM",
+          "SWITCHING_TRANSIENT",
+          "DETAILED_INVERTER_EMT"
+        ]
+      }
+    ],
+    "faultClasses": [
+      "THREE_PHASE",
+      "PHASE_PHASE",
+      "PHASE_NEUTRAL",
+      "PHASE_PE_EARTH"
+    ],
+    "disturbanceClasses": [
+      "UNDERVOLTAGE",
+      "OVERVOLTAGE",
+      "VOLTAGE_DIP",
+      "SOURCE_LOSS",
+      "SOURCE_TRANSFER",
+      "LOAD_REJECTION",
+      "NEUTRAL_LOSS",
+      "MOTOR_START"
+    ],
+    "motorStartingMethods": [
+      "DOL",
+      "STAR_DELTA",
+      "SOFT_STARTER",
+      "VFD"
+    ],
+    "sourceLoadStates": [
+      "AVAILABLE",
+      "UNAVAILABLE",
+      "DEGRADED",
+      "UNDERVOLTAGE",
+      "OVERVOLTAGE",
+      "FREQUENCY_LOW",
+      "FREQUENCY_HIGH",
+      "FAULTED",
+      "STARTING",
+      "READY",
+      "TRANSFER_IN_PROGRESS"
+    ],
+    "explicitlyDeferredPrograms": [
+      "WAVEFORM_LEVEL_EMT",
+      "ARC_FLASH",
+      "DETAILED_HARMONICS"
+    ]
+  },
+  "ownership": {
+    "CABLE_IDENTITY_ROUTE": "CAP-06_EXISTING_CABLE_OWNER",
+    "PANEL_PHYSICAL_LAYOUT": "ELV6_CAP-05",
+    "CABINET_ENTRY_INTERNAL_ROUTE": "ELV6_PHYSICAL_EVIDENCE_SPECIALIZATION",
+    "NORMATIVE_ENTRY_SEGREGATION": "ELV7_CAP-15",
+    "CATALOG_SKU": "ELV8_CAP-16",
+    "LABEL_QR_DELIVERABLE": "CAP-19_CAP-21",
+    "AUTO_PANEL_SYNTHESIS": "K0",
+    "FAILURE_PROPAGATION": "K3",
+    "CRITICAL_POWER_TIMELINE": "K6",
+    "FIELD_COMMISSIONING": "K7",
+    "SHORT_CIRCUIT_PROTECTION_PHYSICS": "CAP-07_CAP-08"
+  },
+  "invariants": [
+    "SAME_FROZEN_REVISION_POLICY_TEMPLATE_SAME_MARKER_PROJECTION",
+    "SAME_FROZEN_TOPOLOGY_INPUT_ALGORITHM_RULESET_SAME_SIMULATION_RESULT",
+    "LABEL_CHANGE_INVALIDATES_MARKER_DRAWING_SCHEDULE_PROJECTIONS",
+    "TERMINATION_OR_ENTRY_CHANGE_INVALIDATES_CABINET_ROUTES_AND_DELIVERABLES",
+    "TOPOLOGY_SOURCE_PROTECTION_CHANGE_INVALIDATES_DEPENDENT_STUDIES",
+    "UNKNOWN_MANDATORY_INPUTS_FAIL_VISIBLY",
+    "GRAPHICAL_EDITS_NEVER_BYPASS_VALIDATION",
+    "FROZEN_HISTORY_REMAINS_REPRODUCIBLE"
+  ],
+  "recommendedDeliveryOrder": [
+    "A1_CANONICAL_IDENTIFICATION_LABEL_PROJECTION",
+    "A2_CABLE_CORE_TERMINAL_SCHEDULE_AND_LABEL_EXPORT",
+    "A3_QR_FIELD_IDENTITY_K7",
+    "A4_CABINET_CABLE_ENTRY_ZONE",
+    "A5_INTERNAL_ROUTE_AND_PHYSICAL_VALIDATION",
+    "A6_PANEL_EDITOR_ENTRY_ROUTING_VISUALIZATION",
+    "A7_SHORT_CIRCUIT_ENGINE_MIN_MAX",
+    "A8_PROTECTION_RESPONSE",
+    "A9_VOLTAGE_DISTURBANCE_AND_MOTOR_START",
+    "A10_K3_K6_PROJECT_SCENARIO_MATRIX",
+    "A11_SPD_TRANSIENT_BOUNDARY_CHECKS",
+    "A12_FUTURE_SEPARATE_EMT_ARC_FLASH_HARMONICS_PROGRAMS"
+  ]
+}
