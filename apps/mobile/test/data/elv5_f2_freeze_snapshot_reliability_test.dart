@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:drift/drift.dart' show Variable;
 import 'package:drift/native.dart';
 import 'package:electra_mobile/application/elv_command_result.dart';
 import 'package:electra_mobile/application/elv_design_revision_command.dart';
@@ -89,8 +88,29 @@ void main() {
                   )
                   .getSingle())
               .data;
-      expect(manifest['manifest_schema'], elv5SnapshotManifestSchema);
+      expect(
+        manifest['manifest_schema'],
+        'electra.elv4-snapshot-manifest.v1',
+      );
       expect(manifest['manifest_sha256'], elvSnapshotManifestHash(manifest));
+      expect(manifest['discipline_section_schema'], isNull);
+      expect(manifest['discipline_sha256'], isNull);
+      final discipline =
+          (await db
+                  .customSelect(
+                    "SELECT * FROM design_revision_discipline_snapshots WHERE design_revision_id='d'",
+                  )
+                  .getSingle())
+              .data;
+      expect(discipline['section_schema'], elv5DisciplineSectionSchema);
+      expect(
+        discipline['discipline_sha256'],
+        captured.payload == null
+            ? isNull
+            : const Elv5CanonicalJsonV1().sha256(captured.payload!),
+      );
+      expect(discipline['physical_sha256'], manifest['physical_sha256']);
+      expect(discipline['power_sha256'], manifest['power_sha256']);
       await db.customStatement(
         "UPDATE link_section_assignments SET section_role='PATCH'",
       );
@@ -144,6 +164,7 @@ void main() {
       expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
     },
   );
+
   test(
     'F2 global new empty discipline capture is distinct from legacy ELV5_NOT_CAPTURED',
     () async {
@@ -166,29 +187,10 @@ void main() {
                   )
                   .getSingle())
               .data;
-      final legacy = <String, Object?>{
-        ...row,
-        'manifest_schema': 'electra.elv4-snapshot-manifest.v1',
-        'discipline_section_schema': null,
-        'discipline_sha256': null,
-      };
+      final historical = Map<String, Object?>.from(row);
       await db.customStatement(
         "DELETE FROM design_revision_discipline_snapshots WHERE design_revision_id='d'",
       );
-      await db.customUpdate(
-        "UPDATE design_revision_snapshot_manifests SET manifest_schema=?,manifest_sha256=?,discipline_section_schema=NULL,discipline_sha256=NULL WHERE design_revision_id='d'",
-        variables: [
-          Variable.withString('electra.elv4-snapshot-manifest.v1'),
-          Variable.withString(elvSnapshotManifestHash(legacy)),
-        ],
-      );
-      final historical =
-          (await db
-                  .customSelect(
-                    "SELECT * FROM design_revision_snapshot_manifests WHERE design_revision_id='d'",
-                  )
-                  .getSingle())
-              .data;
       final read = await _store(db).read(projectId: 'p', designRevisionId: 'd');
       expect(read.kind, Elv5FrozenDisciplineReadKind.notCaptured);
       expect(read.reasonCode, 'ELV5_NOT_CAPTURED');
@@ -218,6 +220,7 @@ DriftElv5DisciplineSnapshotStore _store(AppDatabase db) =>
       originDeviceId: 'f2-freeze',
       nowUtc: Elv5F2ProductionLifecycle.now,
     );
+
 DriftElvDesignRevisionRepository _revision(
   AppDatabase db, [
   ElvFailureProbe? probe,
@@ -227,6 +230,7 @@ DriftElvDesignRevisionRepository _revision(
   now: Elv5F2ProductionLifecycle.now,
   failureProbe: probe,
 );
+
 FreezeProjectDesignRevisionCommand _freeze(int expected) =>
     FreezeProjectDesignRevisionCommand(
       commandId: 'freeze',
@@ -239,6 +243,7 @@ final class _FreezeFault implements ElvFailureProbe {
   _FreezeFault(this.db);
   final AppDatabase db;
   bool observedAllSections = false;
+
   @override
   Future<void> hit(String point) async {
     if (point != ElvFailurePoints.p3FreezeAfterSnapshotInsert) return;
@@ -249,15 +254,23 @@ final class _FreezeFault implements ElvFailureProbe {
     ]) {
       expect(await db.customSelect('SELECT * FROM $table').get(), hasLength(1));
     }
-    expect(
-      (await db
-              .customSelect(
-                'SELECT discipline_sha256 FROM design_revision_snapshot_manifests',
-              )
-              .getSingle())
-          .readNullable<String>('discipline_sha256'),
-      isNotNull,
-    );
+    final manifest =
+        (await db
+                .customSelect(
+                  'SELECT * FROM design_revision_snapshot_manifests',
+                )
+                .getSingle())
+            .data;
+    expect(manifest['manifest_schema'], 'electra.elv4-snapshot-manifest.v1');
+    expect(manifest['discipline_sha256'], isNull);
+    final discipline =
+        (await db
+                .customSelect(
+                  'SELECT discipline_sha256 FROM design_revision_discipline_snapshots',
+                )
+                .getSingle())
+            .read<String>('discipline_sha256');
+    expect(discipline, hasLength(64));
     observedAllSections = true;
     throw StateError('F2_FREEZE_FAULT');
   }
