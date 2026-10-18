@@ -1,0 +1,172 @@
+{
+  "schema": "electra.2d-panel-cabinet-editor-target.v1",
+  "status": "TARGET_NORTH_STAR_NOT_IMPLEMENTATION_NOT_ACCEPTANCE",
+  "parentTarget": "electra-professional-electrical-platform-target.md",
+  "name": "2D Panel & Cabinet Editor",
+  "relatedCapabilities": [
+    "CAP-05",
+    "CAP-06",
+    "CAP-16",
+    "CAP-17",
+    "CAP-19",
+    "CAP-21",
+    "ELV6",
+    "ELV8",
+    "K0",
+    "K2",
+    "K7"
+  ],
+  "principle": "The editor modifies typed engineering placement and routing facts; drawing pixels are never an independent engineering source of truth.",
+  "panelClasses": [
+    "DISTRIBUTION_BOARD",
+    "FLOOR_DISTRIBUTION_BOARD",
+    "MCC",
+    "AUTOMATION_PANEL",
+    "PLC_PANEL",
+    "MIXED_CONTROL_POWER_PANEL",
+    "CUSTOM_PANEL"
+  ],
+  "coordinateModel": {
+    "canonicalUnit": "MILLIMETRE",
+    "dinPlacementAuthoritativeWhenApplicable": true,
+    "screenTransformIsPresentationOnly": true,
+    "deterministicSnappingRequired": true
+  },
+  "primitives": [
+    "Panel2DLayout",
+    "CabinetSection2D",
+    "MountingSurface2D",
+    "DinRailPlacement2D",
+    "DevicePlacement2D",
+    "TerminalBlockPlacement2D",
+    "BusbarPlacement2D",
+    "NeutralBarPlacement2D",
+    "PeBarPlacement2D",
+    "WiringDuctPlacement2D",
+    "CableEntryZonePlacement2D",
+    "GlandPlatePlacement2D",
+    "LabelPlacement2D"
+  ],
+  "views": [
+    "PHYSICAL",
+    "ELECTRICAL",
+    "WIRING",
+    "CABLE_ENTRY_ROUTING",
+    "VALIDATION"
+  ],
+  "p0Interactions": [
+    "SELECT_SINGLE_MULTI",
+    "PAN_ZOOM",
+    "DRAG_DEVICE",
+    "DETERMINISTIC_DIN_SNAP",
+    "MOVE_BETWEEN_COMPATIBLE_RAILS",
+    "REORDER_ON_RAIL",
+    "PLACE_MOVE_TERMINAL_BLOCK",
+    "PLACE_MOVE_CABLE_ENTRY_ZONE",
+    "PLACE_MOVE_WIRING_DUCT",
+    "RESERVE_FREE_MODULES_OR_ZONES",
+    "LOCK_PLACEMENT",
+    "UNDO_REDO_WORKING_REVISION",
+    "COMPARE_CANDIDATE_WITH_CURRENT",
+    "ACCEPT_REJECT_K0_CANDIDATE"
+  ],
+  "mandatoryValidationFamiliesWhenEvidenceExists": [
+    "ENCLOSURE_BOUNDARY_FIT",
+    "DIN_MODULE_OCCUPANCY",
+    "PLACEMENT_OVERLAP",
+    "MOUNTING_COMPATIBILITY",
+    "MANDATORY_ADJACENCY",
+    "PHYSICAL_CLEARANCE",
+    "RESERVE_POLICY",
+    "TERMINAL_CAPACITY",
+    "CABLE_ENTRY_CAPACITY",
+    "WIRING_DUCT_CAPACITY",
+    "CABLE_BEND_RADIUS",
+    "SERVICE_SEGREGATION",
+    "NEUTRAL_PE_TERMINATION_AVAILABILITY",
+    "ACCESSIBILITY_MAINTAINABILITY",
+    "INTERNAL_ROUTE_FEASIBILITY",
+    "CATALOG_COMPATIBILITY",
+    "APPLICABLE_NORMATIVE_FINDINGS"
+  ],
+  "k0Workflow": [
+    "CIRCUITS_REQUIREMENTS",
+    "K0_SYNTHESIS",
+    "VALIDATED_CANDIDATE_SET",
+    "2D_PREVIEW",
+    "MANUAL_EDIT",
+    "LIVE_REVALIDATION",
+    "ACCEPT_OR_REGENERATE_OR_REJECT"
+  ],
+  "selectionModes": [
+    "AUTO_SELECTED",
+    "USER_SELECTED",
+    "USER_OVERRIDE"
+  ],
+  "catalogPhysicalFacts": [
+    "mountingType",
+    "moduleWidthUnits",
+    "widthMm",
+    "heightMm",
+    "depthMm",
+    "requiredClearanceMm",
+    "heatDissipationW",
+    "terminalLocations",
+    "accessoryZones",
+    "compatibleRailOrMountingSystem"
+  ],
+  "outputs": [
+    "PANEL_FRONT_LAYOUT",
+    "DIN_RAIL_LAYOUT",
+    "CABLE_ENTRY_PLAN",
+    "TERMINAL_PLAN",
+    "WIRING_TERMINATION_SCHEDULE",
+    "CABLE_CORE_DEVICE_LABELS",
+    "PANEL_SCHEDULE",
+    "BOM_REFERENCES",
+    "COMMISSIONING_REFERENCE_IDS",
+    "DETERMINISTIC_PDF_LAYOUT"
+  ],
+  "invariants": [
+    "SAME_FROZEN_REVISION_LAYOUT_CATALOG_RULESET_SAME_2D_FINGERPRINT",
+    "GRAPHICAL_EDIT_MUTATES_TYPED_MODEL_NOT_FREEHAND_TRUTH",
+    "MANUAL_OVERRIDE_REVALIDATES_DEPENDENCIES",
+    "SLD_AND_2D_PANEL_SHARE_ONE_CANONICAL_MODEL",
+    "LABELS_AND_TERMINALS_REUSE_CANONICAL_IDENTITIES",
+    "FROZEN_LAYOUTS_IMMUTABLE",
+    "UI_EDIT_CANNOT_BYPASS_HARD_CONSTRAINTS"
+  ],
+  "deliveryOrder": [
+    "PANEL2D-01_CANONICAL_GEOMETRY_PLACEMENT_CONTRACTS",
+    "PANEL2D-02_ENCLOSURE_DIN_GENERIC_DEVICE_RENDERING",
+    "PANEL2D-03_DRAG_SNAP_REORDER_UNDO_REDO",
+    "PANEL2D-04_TERMINAL_NEUTRAL_PE_BUSBAR_DUCT_PLACEMENT",
+    "PANEL2D-05_CABLE_ENTRY_INTERNAL_ROUTE_VISUALIZATION",
+    "PANEL2D-06_LIVE_PHYSICAL_VALIDATION_OVERLAYS",
+    "PANEL2D-07_K0_CANDIDATE_PREVIEW_COMPARE_APPLY",
+    "PANEL2D-08_LABEL_QR_TERMINAL_CABLE_PROJECTIONS",
+    "PANEL2D-09_ELV8_EXACT_SKU_GEOMETRY_ACCESSORIES",
+    "PANEL2D-10_QUALIFICATION_REPLAY_HISTORY_PERFORMANCE"
+  ],
+  "firstProfessionalWorkflowP0": [
+    "FRONT_VIEW_2D_ENCLOSURE",
+    "DIN_RAILS",
+    "BREAKERS_AND_DEVICES",
+    "TERMINALS",
+    "NEUTRAL_PE_BARS",
+    "WIRING_DUCTS",
+    "CABLE_ENTRY_ZONES",
+    "DETERMINISTIC_DRAG_SNAP",
+    "CAPACITY_OVERLAP_FIT_VALIDATION",
+    "K0_PREVIEW_EDIT_REVALIDATE",
+    "DETERMINISTIC_PDF_EXPORT"
+  ],
+  "deferred": [
+    "FULL_GENERAL_PURPOSE_CAD",
+    "PHOTOREALISTIC_RENDERING",
+    "FULL_3D_CABINET_AUTHORING",
+    "MECHANICAL_FABRICATION_DRAWINGS",
+    "THERMAL_CFD",
+    "MANUFACTURER_EDITOR_LOCK_IN"
+  ]
+}
