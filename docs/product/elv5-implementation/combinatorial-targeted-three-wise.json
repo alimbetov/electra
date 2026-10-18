@@ -1,0 +1,97 @@
+{
+  "schema": "electra.elv5-combinatorial-targeted-three-wise.v1",
+  "status": "DESIGN_HARDENED_RUNTIME_NOT_STARTED",
+  "appliesToPriorityProcesses": [
+    "CCTV-02", "CCTV-03", "LAN-01", "LAN-05", "ACS-03", "ACS-04",
+    "ACS-05", "FA-02", "FA-04", "FA-05", "FA-06"
+  ],
+  "policy": {
+    "templateCount": 30,
+    "templatesPerFamily": 6,
+    "familyCount": 5,
+    "requiredProcessTargetCount": 30,
+    "requiredGlobalTargetCount": 330,
+    "coverageRule": "Every listed target tuple MUST appear in at least one executable scenario for every listed priority process.",
+    "substitutionRule": "A scenario may cover more than one target tuple, but target inventory entries may not be deleted or weakened to satisfy the count."
+  },
+  "families": [
+    {
+      "id": "T3-CARD-COMP-SHARED",
+      "factors": ["cardinality", "composition", "sharedResourceContext"],
+      "engineeringPurpose": "Expose cardinality/composition/shared-physical-resource interactions including shared trunks and cross-discipline totals.",
+      "targets": [
+        {"id":"T3-001","values":["TWO","SHARED_TRUNK","SAME_DISCIPLINE_SHARED"]},
+        {"id":"T3-002","values":["SMALL_MANY","BRANCHED","SAME_DISCIPLINE_SHARED"]},
+        {"id":"T3-003","values":["LIMIT_MINUS_1","HETEROGENEOUS","GLOBAL_SOURCE_OR_BANK"]},
+        {"id":"T3-004","values":["LIMIT","HOMOGENEOUS","GLOBAL_SOURCE_OR_BANK"]},
+        {"id":"T3-005","values":["LIMIT_PLUS_1","CROSS_DISCIPLINE_SHARED","CROSS_DISCIPLINE_SHARED"]},
+        {"id":"T3-006","values":["SMALL_MANY","MULTI_ROLE","CROSS_DISCIPLINE_SHARED"]}
+      ]
+    },
+    {
+      "id": "T3-ORDER-MUTATION-EVIDENCE",
+      "factors": ["orderMode", "mutationState", "evidenceQuality"],
+      "engineeringPurpose": "Prove canonical reorder invariance, ordered-path significance, rewiring invalidation and stale/evidence interactions.",
+      "targets": [
+        {"id":"T3-007","values":["ORDER_INVARIANT","REORDER_OR_REWIRE","GUARANTEED_COMPLETE"]},
+        {"id":"T3-008","values":["ORDER_SIGNIFICANT","REORDER_OR_REWIRE","GUARANTEED_COMPLETE"]},
+        {"id":"T3-009","values":["TOPOLOGY_MUTATED","ADD_REMOVE_MEMBER","GUARANTEED_COMPLETE"]},
+        {"id":"T3-010","values":["TOPOLOGY_MUTATED","REVISION_REPLAY_OR_STALE","MISSING_OR_PARTIAL"]},
+        {"id":"T3-011","values":["ORDER_INVARIANT","REVISION_REPLAY_OR_STALE","TYPICAL_OR_ESTIMATED"]},
+        {"id":"T3-012","values":["ORDER_SIGNIFICANT","BASELINE","UNSUPPORTED_MODEL"]}
+      ]
+    },
+    {
+      "id": "T3-VECTOR-EVIDENCE-SHARED",
+      "factors": ["vectorClass", "evidenceQuality", "sharedResourceContext"],
+      "engineeringPurpose": "Prevent false PASS when evidence quality changes inside shared-source and cross-discipline scenarios.",
+      "targets": [
+        {"id":"T3-013","values":["POSITIVE","GUARANTEED_COMPLETE","NONE"]},
+        {"id":"T3-014","values":["BOUNDARY","GUARANTEED_COMPLETE","GLOBAL_SOURCE_OR_BANK"]},
+        {"id":"T3-015","values":["NEGATIVE_OR_UNSUPPORTED","MISSING_OR_PARTIAL","SAME_DISCIPLINE_SHARED"]},
+        {"id":"T3-016","values":["NEGATIVE_OR_UNSUPPORTED","UNSUPPORTED_MODEL","CROSS_DISCIPLINE_SHARED"]},
+        {"id":"T3-017","values":["ADVERSARIAL","TYPICAL_OR_ESTIMATED","GLOBAL_SOURCE_OR_BANK"]},
+        {"id":"T3-018","values":["CROSS_DISCIPLINE","GUARANTEED_COMPLETE","CROSS_DISCIPLINE_SHARED"]}
+      ]
+    },
+    {
+      "id": "T3-CARD-MUTATION-SCALE",
+      "factors": ["cardinality", "mutationState", "projectScale"],
+      "engineeringPurpose": "Exercise boundary cardinality and dependency invalidation as project scale and revision state change.",
+      "targets": [
+        {"id":"T3-019","values":["ZERO","BASELINE","SMALL"]},
+        {"id":"T3-020","values":["ONE","ADD_REMOVE_MEMBER","MEDIUM"]},
+        {"id":"T3-021","values":["TWO","REORDER_OR_REWIRE","LARGE"]},
+        {"id":"T3-022","values":["SMALL_MANY","REVISION_REPLAY_OR_STALE","CAMPUS"]},
+        {"id":"T3-023","values":["LIMIT","ADD_REMOVE_MEMBER","LARGE"]},
+        {"id":"T3-024","values":["LIMIT_PLUS_1","REVISION_REPLAY_OR_STALE","CAMPUS"]}
+      ]
+    },
+    {
+      "id": "T3-COMP-ORDER-SCALE",
+      "factors": ["composition", "orderMode", "projectScale"],
+      "engineeringPurpose": "Stress homogeneous/heterogeneous/shared/branched/multi-role composition under order-sensitive topology at increasing scale.",
+      "targets": [
+        {"id":"T3-025","values":["HOMOGENEOUS","ORDER_INVARIANT","SMALL"]},
+        {"id":"T3-026","values":["HETEROGENEOUS","ORDER_INVARIANT","MEDIUM"]},
+        {"id":"T3-027","values":["SHARED_TRUNK","ORDER_SIGNIFICANT","LARGE"]},
+        {"id":"T3-028","values":["BRANCHED","TOPOLOGY_MUTATED","CAMPUS"]},
+        {"id":"T3-029","values":["MULTI_ROLE","ORDER_SIGNIFICANT","MEDIUM"]},
+        {"id":"T3-030","values":["CROSS_DISCIPLINE_SHARED","TOPOLOGY_MUTATED","CAMPUS"]}
+      ]
+    }
+  ],
+  "processRiskBindings": {
+    "CCTV-02": ["stream fanout/multicast copy accounting", "shared path load", "payload versus wire rate"],
+    "CCTV-03": ["schedule union/integration", "retention boundary", "reserve/redundancy ownership"],
+    "LAN-01": ["ordered realized path", "section duplication", "length boundary"],
+    "LAN-05": ["bidirectional optical sensitivity/overload", "connector/splice composition", "reach claim isolation"],
+    "ACS-03": ["shared trunk drop", "branch current", "startup/inrush governing case"],
+    "ACS-04": ["global physical source demand", "reserve/derating ownership", "non-ACS shared load"],
+    "ACS-05": ["ordered bank sequence", "energy/current/EOD dimensions", "shared bank load"],
+    "FA-02": ["standby/alarm/startup load origin", "missing current evidence", "simultaneity"],
+    "FA-04": ["global fire/non-fire source total", "reserve/derating ownership", "auxiliary load"],
+    "FA-05": ["ordered standby/alarm sequence", "battery applicability", "energy/current boundary"],
+    "FA-06": ["device cardinality", "startup/output current", "terminal-voltage boundary"]
+  }
+}

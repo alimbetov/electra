@@ -1,0 +1,250 @@
+{
+  "schema": "electra.elv5-diff-review-checks.v1",
+  "sourceSha": "61534ea13a37245cff563da3603ea8f9c7358e02",
+  "runtimeAcceptanceVerified": false,
+  "results": [
+    {
+      "command": [
+        "python3",
+        "scripts/ci/check-elv5-calculation-engine.py"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS: ELV5 unified calculation engine — 27/27 process mappings, solver families, operating cases, governing rules, margins and limiting factors",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/ci/check-elv5-command-examples.py"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS: 16 ELV5 example payload key sets and 114 executed negative key-set probes; nested semantic codecs and runtime commands NOT EXECUTED",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/ci/check-elv5-command-registry.py"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS: exact ELV5 command schema, 16 operations, hardened payload keys and implemented ELV4 revision boundary",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/ci/check-elv5-engineering-hardening.py"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS: ELV5 engineering hardening guard — 14 findings SPEC_RESOLVED, 27 typed process APIs, schema 24, 16 hardened command payloads/handlers, production source blueprint and L0-L6 qualification contract; no runtime claim",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/ci/check-elv5-fifth-pass-closure.py"
+      ],
+      "exitCode": 0,
+      "stdout": "ELV5 fifth-pass specification closure PASS\nfindings=8 resolved=8 open=0 high=6 medium=2\npairwise=16011/16011 targeted3Wise=330/330 baseRows=42 systemWide=36 target=1500\nruntimeStatus=NOT_STARTED",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/ci/check-elv5-implementation-bindings.py"
+      ],
+      "exitCode": 0,
+      "stdout": "ELV5 implementation binding/performance contract PASS\nprocesses=27 commands=16 repoMethods=23 priority=11 sixthOpen=0\nbulkOnly=1 nPlusOneForbidden=1 kernelDbAccess=0 mediumLargeUi=0 deterministicParallel=1",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/ci/check-elv5-market-p0-p9-bindings.py"
+      ],
+      "exitCode": 0,
+      "stdout": "ELV5 market simulation P0-P9 bindings PASS\npackages=10 baseRequirements=80 marketRequirements=12 scenarioMatrix=450",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/ci/check-elv5-market-simulation.py"
+      ],
+      "exitCode": 0,
+      "stdout": "ELV5 market simulation matrix PASS\nscenarios=450 processes=27 packages=P0-P9 vectorClasses=5 allStressAxes=covered marketRequirements=12\nvendorFact=277 marketEnvelope=43 syntheticFixture=130\nerrorClassesCovered=20 matrixFingerprintSha256=e7d7f5accbf103b3bcc7c0511048c7f3b4d0ccaaf4c3d4ce2eb8e645297c6288\nclaim=DESIGN_SIMULATION_ONLY_RUNTIME_NOT_EXECUTED",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/ci/check-elv5-normative-requirements.py"
+      ],
+      "exitCode": 0,
+      "stdout": "ELV5 normative requirements registry PASS\nbaseRequirements=80 packages=10 obligations=42 processes=27 sectionsPerProcess=25 vectors=135 findingsResolved=56\nACS-03 oracle terminalVoltage=23.51V lowMargin=+1.51V",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/ci/check-elv5-process-code-level-specs.py"
+      ],
+      "exitCode": 0,
+      "stdout": "ELV5 process code-level specification PASS\nprocesses=27 sectionsPerProcess=25 vectorClasses=5\nfourthPassFindings=19 high=15 medium=4 runtimeImplemented=0\nacs03CorrectedTerminalVoltage=23.51V",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/ci/check-elv5-project-alignment.py"
+      ],
+      "exitCode": 0,
+      "stdout": "ELV5 seventh-pass project alignment PASS\nfindings=10 resolved=10 open=0 downstreamReconciliationRequired=1\nacs03=23.51V/+1.51V resolverOwnership=application schema=24 authorityHandoff=exact-fingerprint adr031=verified",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/ci/check-elv5-specification.py"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS: 27 processes, 80 requirements, 8 specification resolutions, 281 local links; no runtime claim",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/ci/check-elv5-third-pass-hardening.py"
+      ],
+      "exitCode": 0,
+      "stdout": "ELV5 third-pass hardening guard PASS\nprocesses=27 commands=16 requirements=80 findings=15",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts/ci",
+        "-p",
+        "test_elv5_*.py"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ".....................\n----------------------------------------------------------------------\nRan 21 tests in 0.255s\n\nOK"
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/ci/check-elv4-specification.py"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS: 14 specification checks, 80 requirements, 15 specification resolutions, 143 links; no runtime claim",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts/ci",
+        "-p",
+        "test_elv4_closure.py"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ".....\n----------------------------------------------------------------------\nRan 5 tests in 0.009s\n\nOK"
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/ci/check-elv5-market-simulation.py",
+        "--output",
+        "/tmp/elv5-audited-market.json"
+      ],
+      "exitCode": 0,
+      "stdout": "ELV5 market simulation matrix PASS\nscenarios=450 processes=27 packages=P0-P9 vectorClasses=5 allStressAxes=covered marketRequirements=12\nvendorFact=277 marketEnvelope=43 syntheticFixture=130\nerrorClassesCovered=20 matrixFingerprintSha256=e7d7f5accbf103b3bcc7c0511048c7f3b4d0ccaaf4c3d4ce2eb8e645297c6288\nclaim=DESIGN_SIMULATION_ONLY_RUNTIME_NOT_EXECUTED",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/ci/generate-elv5-contract-manifest.py",
+        "--output",
+        "/tmp/elv5-audited-manifest.json"
+      ],
+      "exitCode": 0,
+      "stdout": "ELV5 contract manifest generated: /tmp/elv5-audited-manifest.json\nsourceSha=61534ea13a37245cff563da3603ea8f9c7358e02\nauthorityFingerprintSha256=d18e9512ada9d72c5d30ec37d70324dcb12abeca53894d50627143e82ffa2c65\nprocesses=27 algorithms=27 commands=16 requirements=80 obligations=42 market=450 combinatorial=1500 pairs=16011 targeted3Wise=330 implementationBindings=27 repoMethods=23 fifthOpen=0 sixthOpen=0 seventhOpen=0 downstreamReconciliationRequired=1 authorityArtifacts=82",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/ci/generate-elv5-combinatorial-1500.py",
+        "--authority-manifest",
+        "/tmp/elv5-audited-manifest.json",
+        "--output",
+        "/tmp/elv5-audited-matrix.json"
+      ],
+      "exitCode": 0,
+      "stdout": "ELV5 deterministic 1500-case combinatorial matrix PASS\nscenarios=1500 processSubtotal=1464 systemWide=36 priority=11x72 regular=16x42\npairwise=16011/16011=100% targeted3Wise=330/330\nmatrixFingerprintSha256=1c9a5d508cbd8be38beee8f10ca4d66fa2f981e37b6ee6f2e3187aa2985b54cc\nruntimeExecuted=0",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "flutter",
+        "pub",
+        "get",
+        "--enforce-lockfile"
+      ],
+      "exitCode": 127,
+      "stdout": "",
+      "stderr": "[Errno 2] No such file or directory: 'flutter'"
+    },
+    {
+      "command": [
+        "flutter",
+        "analyze"
+      ],
+      "exitCode": 127,
+      "stdout": "",
+      "stderr": "[Errno 2] No such file or directory: 'flutter'"
+    },
+    {
+      "command": [
+        "dart",
+        "format",
+        "--output=none",
+        "--set-exit-if-changed",
+        "lib",
+        "test"
+      ],
+      "exitCode": 127,
+      "stdout": "",
+      "stderr": "[Errno 2] No such file or directory: 'dart'"
+    },
+    {
+      "command": [
+        "flutter",
+        "test"
+      ],
+      "exitCode": 127,
+      "stdout": "",
+      "stderr": "[Errno 2] No such file or directory: 'flutter'"
+    }
+  ]
+}

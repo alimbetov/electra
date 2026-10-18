@@ -1,0 +1,180 @@
+{
+  "schema": "electra.elv5-implemented-baseline.v1",
+  "reconciledOn": "2026-10-16",
+  "acceptedElv4SourceSha": "31581aa6c396d5ebd6cdf1985c53719d9d05e12a",
+  "mergedMainSha": "d2b059d4c11a284cdd32965140f6df3c40020c8d",
+  "pullRequest": 11,
+  "databaseSchemaVersion": 23,
+  "elv5RuntimeStatus": "NOT_STARTED",
+  "resultStorage": {
+    "legacy": "ProjectDerivedResults",
+    "power": [
+      "PowerEvaluationRecords",
+      "PowerEvaluationPointers"
+    ],
+    "disciplineProposed": [
+      "DisciplineEvaluationRecords",
+      "DisciplineEvaluationPointers"
+    ],
+    "copyExistingResults": false
+  },
+  "migrationOrigins": [
+    {
+      "version": 21,
+      "sourceSha": "74c61f6443c3beaf98e69f0d5f21af3f09474c5c"
+    },
+    {
+      "version": 22,
+      "sourceSha": "b5e3dc94ba026ecb76e3b6e1b17853bf0f63ccb4"
+    }
+  ],
+  "requiredNewMigrationOrigin": {
+    "version": 23,
+    "sourceSha": "d2b059d4c11a284cdd32965140f6df3c40020c8d"
+  },
+  "inheritedAcceptance": {
+    "sourceSha": "31581aa6c396d5ebd6cdf1985c53719d9d05e12a",
+    "workflowRunId": 38859878752,
+    "url": "https://github.com/alimbetov/electra/actions/runs/38859878752",
+    "technicalJobId": 116839507912,
+    "runtimeAcceptanceJobId": 116842014688,
+    "technicalResult": "PASS",
+    "runtimeAcceptanceResult": "PASS",
+    "technicalArtifactId": 12028684477,
+    "runtimeAcceptedArtifactId": 12029280234
+  },
+  "entryObligations": [
+    {
+      "id": "ELV5-BASE-01",
+      "status": "EVIDENCED_INHERITED",
+      "scope": "Accepted ELV4 runtime prerequisites; not new discipline processes"
+    },
+    {
+      "id": "ELV5-BASE-02",
+      "status": "RECONCILED_INHERITED",
+      "scope": "Canonical boundaries, snapshots and v21/v22 migration origins; new ELV5 compatibility must be tested"
+    },
+    {
+      "id": "ELV5-BASE-03",
+      "status": "OPEN_ELV5_EXTENSION",
+      "scope": "Isolated discipline stores, dispatch, cross-owner consumers"
+    },
+    {
+      "id": "ELV5-BASE-04",
+      "status": "OPEN_ELV5_EXTENSION",
+      "scope": "Strict discipline codecs and full executable qualification"
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "numeric-kernels",
+      "sourcePaths": [
+        "packages/engineering_core/lib/src/power_numeric.dart"
+      ],
+      "testPaths": [
+        "packages/engineering_core/test/power_numeric_test.dart"
+      ],
+      "inheritedSourceSha": "31581aa6c396d5ebd6cdf1985c53719d9d05e12a"
+    },
+    {
+      "id": "power-results",
+      "sourcePaths": [
+        "apps/mobile/lib/data/database/power_database_tables.dart"
+      ],
+      "testPaths": [
+        "apps/mobile/test/data/elv4_p7_runtime_test.dart"
+      ],
+      "inheritedSourceSha": "31581aa6c396d5ebd6cdf1985c53719d9d05e12a"
+    },
+    {
+      "id": "reviewed-canonical-writer",
+      "sourcePaths": [
+        "apps/mobile/lib/data/repositories/drift_power_canonical_projection_write_store.dart"
+      ],
+      "testPaths": [
+        "apps/mobile/test/data/elv4_p9_reviewed_power_projection_test.dart"
+      ],
+      "inheritedSourceSha": "31581aa6c396d5ebd6cdf1985c53719d9d05e12a"
+    },
+    {
+      "id": "legacy-writer-guards",
+      "sourcePaths": [
+        "apps/mobile/lib/data/elv_deletion_guards.dart"
+      ],
+      "testPaths": [
+        "apps/mobile/test/data/elv4_p9_membership_guard_test.dart"
+      ],
+      "inheritedSourceSha": "31581aa6c396d5ebd6cdf1985c53719d9d05e12a"
+    },
+    {
+      "id": "freeze-materialization",
+      "sourcePaths": [
+        "apps/mobile/lib/data/repositories/drift_power_snapshot_facts.dart"
+      ],
+      "testPaths": [
+        "apps/mobile/test/data/elv4_p9_snapshot_materialization_test.dart"
+      ],
+      "inheritedSourceSha": "31581aa6c396d5ebd6cdf1985c53719d9d05e12a"
+    },
+    {
+      "id": "historical-workspace",
+      "sourcePaths": [
+        "apps/mobile/lib/data/repositories/drift_power_workspace_repository.dart"
+      ],
+      "testPaths": [
+        "apps/mobile/test/data/elv4_p8_freeze_historical_invariance_test.dart"
+      ],
+      "inheritedSourceSha": "31581aa6c396d5ebd6cdf1985c53719d9d05e12a"
+    },
+    {
+      "id": "strict-wire-aggregates",
+      "sourcePaths": [
+        "apps/mobile/lib/data/repositories/drift_elv4_wire_aggregate_service.dart"
+      ],
+      "testPaths": [
+        "apps/mobile/test/data/elv4_p9_wire_aggregate_runtime_test.dart"
+      ],
+      "inheritedSourceSha": "31581aa6c396d5ebd6cdf1985c53719d9d05e12a"
+    },
+    {
+      "id": "durable-replay-rejection",
+      "sourcePaths": [
+        "apps/mobile/lib/data/repositories/drift_power_command_service.dart"
+      ],
+      "testPaths": [
+        "apps/mobile/test/data/elv4_p8_command_outcome_durability_test.dart"
+      ],
+      "inheritedSourceSha": "31581aa6c396d5ebd6cdf1985c53719d9d05e12a"
+    },
+    {
+      "id": "historical-migrations",
+      "sourcePaths": [
+        "scripts/ci/run-elv4-historical-migration-matrix.sh"
+      ],
+      "testPaths": [
+        "apps/mobile/test/data/elv4_p9_historical_migration_matrix_test.dart"
+      ],
+      "inheritedSourceSha": "31581aa6c396d5ebd6cdf1985c53719d9d05e12a"
+    },
+    {
+      "id": "seven-case-qualification",
+      "sourcePaths": [
+        "docs/product/elv4-implementation/qualification.json"
+      ],
+      "testPaths": [
+        "apps/mobile/test/data/elv4_p9_runtime_qualification_test.dart"
+      ],
+      "inheritedSourceSha": "31581aa6c396d5ebd6cdf1985c53719d9d05e12a"
+    },
+    {
+      "id": "exact-head-gate",
+      "sourcePaths": [
+        "scripts/ci/run-elv4-exact-head.sh"
+      ],
+      "testPaths": [
+        "scripts/ci/test_elv4_closure.py"
+      ],
+      "inheritedSourceSha": "31581aa6c396d5ebd6cdf1985c53719d9d05e12a"
+    }
+  ]
+}

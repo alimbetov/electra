@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:drift/native.dart';
 import 'package:electra_mobile/application/elv_command_result.dart';
 import 'package:electra_mobile/application/elv_design_revision_command.dart';
@@ -11,6 +12,7 @@ import 'package:electra_mobile/data/repositories/drift_power_snapshot_facts.dart
 import 'package:electra_mobile/data/repositories/drift_power_workspace_repository.dart';
 import 'package:engineering_core/engineering_core.dart';
 import 'package:flutter_test/flutter_test.dart';
+
 import '../support/elv4_power_qualification_builder.dart';
 
 void main() {

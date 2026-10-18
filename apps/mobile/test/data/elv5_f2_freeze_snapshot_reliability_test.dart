@@ -1,0 +1,443 @@
+import 'dart:io';
+import 'package:drift/native.dart';
+import 'package:electra_mobile/application/elv_command_result.dart';
+import 'package:electra_mobile/application/elv_design_revision_command.dart';
+import 'package:electra_mobile/application/elv_failure_probe.dart';
+import 'package:electra_mobile/data/database/app_database.dart';
+import 'package:electra_mobile/data/repositories/drift_elv_design_revision_repository.dart';
+import 'package:electra_mobile/data/repositories/drift_power_publication_runtime.dart';
+import 'package:electra_mobile/data/repositories/elv5/drift_elv5_discipline_snapshot_store.dart';
+import 'package:engineering_core/engineering_core.dart';
+import 'package:engineering_core/engineering_core_elv5.dart';
+import 'package:flutter_test/flutter_test.dart';
+import '../support/elv5_f2_fire_sources.dart';
+import '../support/elv5_f2_lan_sources.dart';
+import '../support/elv5_f2_production_lifecycle.dart';
+
+void main() {
+  test(
+    'F2 create-next remaps captured ELV5 physical assignments and leaves R1 immutable',
+    () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      await seedF2LanTopology(db);
+      await seedF2LanRoute(db);
+      await replaceF2LanAggregate(
+        db,
+        operation: 'REPLACE_LINK_COMPOSITION',
+        commandId: 'seed-link',
+        payload: {
+          'linkId': 'link-1',
+          'orderedSections': [
+            {
+              'ordinal': 0,
+              'realizedSectionId': 'traversal-1',
+              'classification': 'PERMANENT',
+            },
+          ],
+          'policyBindingId': 'unresolved-policy',
+        },
+      );
+
+      // A deleted mutable root may legitimately retain its old children.
+      // New-revision restoration must preserve that state without bypassing
+      // the normal active-parent insertion guard.
+      final deletedAt =
+          Elv5F2ProductionLifecycle.now().millisecondsSinceEpoch ~/ 1000;
+      await db.customStatement(
+        "UPDATE link_composition_bindings SET deleted_at=? WHERE design_revision_id='d'",
+        [deletedAt],
+      );
+      expect(
+        await _revision(db).freeze(_freeze(2)),
+        isA<ElvCommandSuccess<ProjectDesignRevision>>(),
+      );
+      final before =
+          (await _store(
+            db,
+          ).read(projectId: 'p', designRevisionId: 'd')).payload;
+      await db.customStatement(
+        "CREATE TEMP TRIGGER fail_discipline_clone BEFORE INSERT ON link_section_assignments WHEN NEW.design_revision_id='d2' BEGIN SELECT RAISE(ABORT,'ELV5_CLONE_ROLLBACK'); END",
+      );
+      await expectLater(
+        _revision(db).createNext(
+          const CreateNextWorkingDesignRevisionCommand(
+            commandId: 'next',
+            projectId: 'p',
+            newRevisionId: 'd2',
+            code: 'R2',
+            basedOnRevisionId: 'd',
+          ),
+        ),
+        throwsA(predicate((e) => e.toString().contains('ELV5_CLONE_ROLLBACK'))),
+      );
+      for (final table in [
+        'project_design_revisions',
+        'canonical_cable_runs',
+        'link_composition_bindings',
+      ]) {
+        final column =
+            table == 'project_design_revisions' ? 'id' : 'design_revision_id';
+        expect(
+          await db
+              .customSelect("SELECT * FROM $table WHERE $column='d2'")
+              .get(),
+          isEmpty,
+        );
+      }
+      expect(
+        await db
+            .customSelect(
+              "SELECT * FROM command_execution_records WHERE command_id='next'",
+            )
+            .get(),
+        isEmpty,
+      );
+      await db.customStatement('DROP TRIGGER fail_discipline_clone');
+      expect(
+        await _revision(db).createNext(
+          const CreateNextWorkingDesignRevisionCommand(
+            commandId: 'next',
+            projectId: 'p',
+            newRevisionId: 'd2',
+            code: 'R2',
+            basedOnRevisionId: 'd',
+          ),
+        ),
+        isA<ElvCommandSuccess<ProjectDesignRevision>>(),
+      );
+      final root =
+          await db
+              .customSelect(
+                "SELECT * FROM link_composition_bindings WHERE design_revision_id='d2'",
+              )
+              .getSingle();
+      final assignment =
+          await db
+              .customSelect(
+                "SELECT * FROM link_section_assignments WHERE design_revision_id='d2'",
+              )
+              .getSingle();
+      expect(assignment.read<String>('binding_id'), root.read<String>('id'));
+      expect(root.read<int>('deleted_at'), deletedAt);
+      final traversal =
+          await db
+              .customSelect(
+                "SELECT t.id FROM cable_run_traversals t JOIN canonical_cable_runs r ON r.id=t.cable_run_id WHERE r.design_revision_id='d2'",
+              )
+              .getSingle();
+      expect(
+        assignment.read<String>('realized_section_id'),
+        traversal.read<String>('id'),
+      );
+      expect(
+        (await _store(db).read(projectId: 'p', designRevisionId: 'd')).payload,
+        before,
+      );
+      expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
+    },
+  );
+
+  test(
+    'F2 global real freeze rolls back all sections and preserves captured discipline across restart and live-source changes',
+    () async {
+      final dir = await Directory.systemTemp.createTemp('f2-freeze-sections-');
+      final file = File('${dir.path}/database.sqlite');
+      var db = AppDatabase(NativeDatabase(file));
+      addTearDown(() async {
+        await db.close();
+        await dir.delete(recursive: true);
+      });
+      await seedF2LanTopology(db);
+      await seedF2LanRoute(db);
+      await replaceF2LanAggregate(
+        db,
+        operation: 'REPLACE_LINK_COMPOSITION',
+        commandId: 'seed-link',
+        payload: {
+          'linkId': 'link-1',
+          'orderedSections': [
+            {
+              'ordinal': 0,
+              'realizedSectionId': 'traversal-1',
+              'classification': 'PERMANENT',
+            },
+          ],
+          'policyBindingId': 'unresolved-policy',
+        },
+      );
+      final life = Elv5F2ProductionLifecycle(
+        process: Elv5ProcessCode.lan01,
+        subjectKind: 'LINK',
+        subjectId: 'link-1',
+      )..db = db;
+      final command = life.command('first', 2, 0);
+      final logical =
+          (await life.runtime(db).service.execute(command)).logicalResultJson;
+      final before = (await life.evaluation()).data;
+      final probe = _FreezeFault(db);
+      await expectLater(
+        _revision(db, probe).freeze(_freeze(2)),
+        throwsA(predicate((e) => e.toString().contains('F2_FREEZE_FAULT'))),
+      );
+      expect(probe.observedAllSections, true);
+      await db.close();
+      db = AppDatabase(NativeDatabase(file));
+      life.db = db;
+      for (final table in [
+        'design_revision_physical_snapshots',
+        'design_revision_power_snapshots',
+        'design_revision_discipline_snapshots',
+        'design_revision_snapshot_manifests',
+      ]) {
+        expect(await db.customSelect('SELECT * FROM $table').get(), isEmpty);
+      }
+      expect(await life.revision(), 2);
+      expect((await life.evaluation()).data, before);
+      final result = await _revision(db).freeze(_freeze(2));
+      expect(result, isA<ElvCommandSuccess<ProjectDesignRevision>>());
+      final captured = await _store(
+        db,
+      ).read(projectId: 'p', designRevisionId: 'd');
+      expect(captured.kind, Elv5FrozenDisciplineReadKind.captured);
+      expect(
+        (captured.payload!['facts'] as Map)['link_section_assignments'],
+        isNotEmpty,
+      );
+      final manifest =
+          (await db
+                  .customSelect(
+                    "SELECT * FROM design_revision_snapshot_manifests WHERE design_revision_id='d'",
+                  )
+                  .getSingle())
+              .data;
+      expect(manifest['manifest_schema'], 'electra.elv4-snapshot-manifest.v1');
+      expect(manifest['manifest_sha256'], elvSnapshotManifestHash(manifest));
+      expect(manifest['discipline_section_schema'], isNull);
+      expect(manifest['discipline_sha256'], isNull);
+      final discipline =
+          (await db
+                  .customSelect(
+                    "SELECT * FROM design_revision_discipline_snapshots WHERE design_revision_id='d'",
+                  )
+                  .getSingle())
+              .data;
+      expect(discipline['section_schema'], elv5DisciplineSectionSchema);
+      expect(
+        discipline['discipline_sha256'],
+        captured.payload == null
+            ? isNull
+            : const Elv5CanonicalJsonV1().sha256(captured.payload!),
+      );
+      expect(discipline['physical_sha256'], manifest['physical_sha256']);
+      expect(discipline['power_sha256'], manifest['power_sha256']);
+      await db.customStatement(
+        "UPDATE link_section_assignments SET section_role='PATCH'",
+      );
+      await db.customStatement(
+        "UPDATE surface_patches SET boundary_json='[[0,0],[1,0],[1,1],[0,1]]'",
+      );
+      await db.close();
+      db = AppDatabase(NativeDatabase(file));
+      life.db = db;
+      expect(
+        (await _store(db).read(projectId: 'p', designRevisionId: 'd')).payload,
+        captured.payload,
+      );
+      expect(
+        (await life.runtime(db).service.execute(command)).logicalResultJson,
+        logical,
+      );
+      expect((await life.evaluation()).data, before);
+      expect(
+        (await DriftPowerPublicationRuntime(
+          db,
+          originDeviceId: 'f2',
+        ).readRevision(projectId: 'p', designRevisionId: 'd')).mutationAllowed,
+        false,
+      );
+      final snapshot = (await db
+              .customSelect(
+                "SELECT payload_json FROM design_revision_discipline_snapshots WHERE design_revision_id='d'",
+              )
+              .getSingle())
+          .read<String>('payload_json');
+      await expectLater(
+        db.customStatement(
+          "UPDATE design_revision_discipline_snapshots SET payload_json='{}' WHERE design_revision_id='d'",
+        ),
+        throwsA(
+          predicate((e) => e.toString().contains('ELV5_IMMUTABLE_EVIDENCE')),
+        ),
+      );
+      // Model offline file damage, distinct from a supported production write.
+      await _offlineSnapshotFixture(db, () async {
+        await db.customStatement(
+          "UPDATE design_revision_discipline_snapshots SET payload_json='{}' WHERE design_revision_id='d'",
+        );
+        await expectLater(
+          _store(db).read(projectId: 'p', designRevisionId: 'd'),
+          throwsA(
+            predicate(
+              (e) => e.toString().contains('ELV5_FROZEN_SECTION_HASH_MISMATCH'),
+            ),
+          ),
+        );
+        await db.customStatement(
+          "UPDATE design_revision_discipline_snapshots SET payload_json=? WHERE design_revision_id='d'",
+          [snapshot],
+        );
+      });
+      expect(
+        (await _store(db).read(projectId: 'p', designRevisionId: 'd')).payload,
+        captured.payload,
+      );
+      expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
+    },
+  );
+
+  test(
+    'F2 global new empty discipline capture is distinct from legacy ELV5_NOT_CAPTURED',
+    () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      await seedF2FireTopology(db);
+      expect(
+        await _revision(db).freeze(_freeze(1)),
+        isA<ElvCommandSuccess<ProjectDesignRevision>>(),
+      );
+      final captured = await _store(
+        db,
+      ).read(projectId: 'p', designRevisionId: 'd');
+      expect(captured.kind, Elv5FrozenDisciplineReadKind.capturedEmpty);
+      expect(captured.reasonCode, isNull);
+      final row =
+          (await db
+                  .customSelect(
+                    "SELECT * FROM design_revision_snapshot_manifests WHERE design_revision_id='d'",
+                  )
+                  .getSingle())
+              .data;
+      final historical = Map<String, Object?>.from(row);
+      await expectLater(
+        db.customStatement(
+          "DELETE FROM design_revision_discipline_snapshots WHERE design_revision_id='d'",
+        ),
+        throwsA(
+          predicate((e) => e.toString().contains('ELV5_IMMUTABLE_EVIDENCE')),
+        ),
+      );
+      // Historical fixture predates the ELV5 extension; production deletion is
+      // forbidden and was asserted above. Restore both guards afterwards.
+      await _offlineSnapshotFixture(
+        db,
+        () => db.customStatement(
+          "DELETE FROM design_revision_discipline_snapshots WHERE design_revision_id='d'",
+        ),
+      );
+      final read = await _store(db).read(projectId: 'p', designRevisionId: 'd');
+      expect(read.kind, Elv5FrozenDisciplineReadKind.notCaptured);
+      expect(read.reasonCode, 'ELV5_NOT_CAPTURED');
+      expect(
+        (await DriftPowerPublicationRuntime(
+          db,
+          originDeviceId: 'f2',
+        ).readRevision(projectId: 'p', designRevisionId: 'd')).mutationAllowed,
+        false,
+      );
+      expect(
+        (await db
+                .customSelect(
+                  "SELECT * FROM design_revision_snapshot_manifests WHERE design_revision_id='d'",
+                )
+                .getSingle())
+            .data,
+        historical,
+      );
+    },
+  );
+}
+
+DriftElv5DisciplineSnapshotStore _store(AppDatabase db) =>
+    DriftElv5DisciplineSnapshotStore(
+      db,
+      originDeviceId: 'f2-freeze',
+      nowUtc: Elv5F2ProductionLifecycle.now,
+    );
+
+DriftElvDesignRevisionRepository _revision(
+  AppDatabase db, [
+  ElvFailureProbe? probe,
+]) => DriftElvDesignRevisionRepository(
+  db,
+  originDeviceId: 'f2-freeze',
+  now: Elv5F2ProductionLifecycle.now,
+  failureProbe: probe,
+);
+
+FreezeProjectDesignRevisionCommand _freeze(int expected) =>
+    FreezeProjectDesignRevisionCommand(
+      commandId: 'freeze',
+      projectId: 'p',
+      designRevisionId: 'd',
+      expectedRevision: expected,
+    );
+
+final class _FreezeFault implements ElvFailureProbe {
+  _FreezeFault(this.db);
+  final AppDatabase db;
+  bool observedAllSections = false;
+
+  @override
+  Future<void> hit(String point) async {
+    if (point != ElvFailurePoints.p3FreezeAfterSnapshotInsert) return;
+    for (final table in [
+      'design_revision_physical_snapshots',
+      'design_revision_power_snapshots',
+      'design_revision_discipline_snapshots',
+    ]) {
+      expect(await db.customSelect('SELECT * FROM $table').get(), hasLength(1));
+    }
+    final manifest =
+        (await db
+                .customSelect(
+                  'SELECT * FROM design_revision_snapshot_manifests',
+                )
+                .getSingle())
+            .data;
+    expect(manifest['manifest_schema'], 'electra.elv4-snapshot-manifest.v1');
+    expect(manifest['discipline_sha256'], isNull);
+    final discipline = (await db
+            .customSelect(
+              'SELECT discipline_sha256 FROM design_revision_discipline_snapshots',
+            )
+            .getSingle())
+        .read<String>('discipline_sha256');
+    expect(discipline, hasLength(64));
+    observedAllSections = true;
+    throw StateError('F2_FREEZE_FAULT');
+  }
+}
+
+Future<void> _offlineSnapshotFixture(
+  AppDatabase db,
+  Future<void> Function() edit,
+) async {
+  final triggers =
+      await db
+          .customSelect(
+            "SELECT name,sql FROM sqlite_master WHERE type='trigger' AND name IN ('trg_elv5_design_revision_discipline_snapshots_immutable_update','trg_elv5_design_revision_discipline_snapshots_immutable_delete') ORDER BY name",
+          )
+          .get();
+  expect(triggers, hasLength(2));
+  for (final trigger in triggers) {
+    await db.customStatement('DROP TRIGGER ${trigger.read<String>('name')}');
+  }
+  try {
+    await edit();
+  } finally {
+    for (final trigger in triggers) {
+      await db.customStatement(trigger.read<String>('sql'));
+    }
+  }
+}

@@ -8,6 +8,7 @@ import 'package:drift_flutter/drift_flutter.dart';
 part 'app_database.g.dart';
 part 'power_database_tables.dart';
 part 'elv_history_database_tables.dart';
+part 'discipline_database_tables.dart';
 
 class Projects extends Table {
   TextColumn get id => text()();
@@ -1082,6 +1083,39 @@ class TraversalCarrierAssignments extends Table with GeometryAuditColumns {
     ElvRevisionCommandHistoryOperations,
     ElvRevisionCommandHistoryCursors,
     ElvRevisionCommandHistoryExecutions,
+    DisciplinePolicyBindings,
+    CameraStreamSetBindings,
+    CameraStreamBindings,
+    CameraStreamSubscriptions,
+    RecordingPoolBindings,
+    RecordingAssignments,
+    RecordingScheduleSegments,
+    RecorderCapacityBindings,
+    RecorderAssignments,
+    LinkCompositionBindings,
+    LinkSectionAssignments,
+    PortCapacityBindings,
+    PortCapacityAssignments,
+    OpticalLinkBindings,
+    OpticalLossEvents,
+    RackCapacityBindings,
+    RackEquipmentMemberships,
+    PatchPanelBindings,
+    PatchPanelAssignments,
+    DoorCalculationBindings,
+    DoorRoleAssignments,
+    DoorReleaseTruthRows,
+    ControllerResourceBindings,
+    ControllerResourceAssignments,
+    FireLoopBindings,
+    FireLoopDeviceAssignments,
+    FireAddressClaims,
+    NotificationCircuitBindings,
+    NotificationCircuitAssignments,
+    DisciplineEvaluationRecords,
+    DisciplineEvaluationPointers,
+    DisciplineDependencyIndex,
+    DesignRevisionDisciplineSnapshots,
   ],
 )
 final class AppDatabase extends _$AppDatabase {
@@ -1089,7 +1123,7 @@ final class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'electra'));
 
   @override
-  int get schemaVersion => 23;
+  int get schemaVersion => 24;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -1230,15 +1264,81 @@ final class AppDatabase extends _$AppDatabase {
           await migrator.createTable(elvRevisionCommandHistoryCursors);
           await migrator.createTable(elvRevisionCommandHistoryExecutions);
         }
+        if (from < 24) {
+          // Earlier upgrades create this table from the current definition,
+          // which already contains the v24 columns. Existing v22/v23 tables
+          // need only the columns that are actually absent.
+          final manifestColumns =
+              (await customSelect(
+                    'PRAGMA table_info(design_revision_snapshot_manifests)',
+                  ).get())
+                  .map((row) => row.read<String>('name'))
+                  .toSet();
+          if (!manifestColumns.contains('discipline_section_schema')) {
+            await migrator.addColumn(
+              designRevisionSnapshotManifests,
+              designRevisionSnapshotManifests.disciplineSectionSchema,
+            );
+          }
+          if (!manifestColumns.contains('discipline_sha256')) {
+            await migrator.addColumn(
+              designRevisionSnapshotManifests,
+              designRevisionSnapshotManifests.disciplineSha256,
+            );
+          }
+          await migrator.createTable(disciplinePolicyBindings);
+          await migrator.createTable(cameraStreamSetBindings);
+          await migrator.createTable(cameraStreamBindings);
+          await migrator.createTable(cameraStreamSubscriptions);
+          await migrator.createTable(recordingPoolBindings);
+          await migrator.createTable(recordingAssignments);
+          await migrator.createTable(recordingScheduleSegments);
+          await migrator.createTable(recorderCapacityBindings);
+          await migrator.createTable(recorderAssignments);
+          await migrator.createTable(linkCompositionBindings);
+          await migrator.createTable(linkSectionAssignments);
+          await migrator.createTable(portCapacityBindings);
+          await migrator.createTable(portCapacityAssignments);
+          await migrator.createTable(opticalLinkBindings);
+          await migrator.createTable(opticalLossEvents);
+          await migrator.createTable(rackCapacityBindings);
+          await migrator.createTable(rackEquipmentMemberships);
+          await migrator.createTable(patchPanelBindings);
+          await migrator.createTable(patchPanelAssignments);
+          await migrator.createTable(doorCalculationBindings);
+          await migrator.createTable(doorRoleAssignments);
+          await migrator.createTable(doorReleaseTruthRows);
+          await migrator.createTable(controllerResourceBindings);
+          await migrator.createTable(controllerResourceAssignments);
+          await migrator.createTable(fireLoopBindings);
+          await migrator.createTable(fireLoopDeviceAssignments);
+          await migrator.createTable(fireAddressClaims);
+          await migrator.createTable(notificationCircuitBindings);
+          await migrator.createTable(notificationCircuitAssignments);
+          await migrator.createTable(disciplineEvaluationRecords);
+          await migrator.createTable(disciplineEvaluationPointers);
+          await migrator.createTable(disciplineDependencyIndex);
+          await migrator.createTable(designRevisionDisciplineSnapshots);
+        }
       }
       await _createIndexes();
       await _createPowerIntegrityGuards();
+      await _createDisciplineIndexesAndGuards();
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');
       await _createPowerIntegrityGuards();
+      await _createDisciplineIndexesAndGuards();
       final now = DateTime.now().toUtc();
+      // Reopening an initialized catalog must remain read-only. INSERT OR
+      // IGNORE still requests a SQLite writer lock and can deadlock against
+      // another connection upgrading its active domain transaction.
+      final existingFamilies =
+          (await select(engineeringFamilyDefinitions).get())
+              .map((row) => row.id)
+              .toSet();
       for (final family in bundledEngineeringSystemFamilies) {
+        if (existingFamilies.contains(family.id)) continue;
         await into(engineeringFamilyDefinitions).insert(
           EngineeringFamilyDefinitionsCompanion.insert(
             id: family.id,
@@ -1252,7 +1352,10 @@ final class AppDatabase extends _$AppDatabase {
           mode: InsertMode.insertOrIgnore,
         );
       }
+      final existingDocuments =
+          (await select(normativeDocuments).get()).map((row) => row.id).toSet();
       for (final doc in bundledNormativeDocuments) {
+        if (existingDocuments.contains(doc.id)) continue;
         await into(normativeDocuments).insert(
           NormativeDocumentsCompanion.insert(
             id: doc.id,
@@ -1582,6 +1685,193 @@ final class AppDatabase extends _$AppDatabase {
       "WHERE h.project_id = NEW.project_id AND h.design_revision_id = NEW.design_revision_id "
       "AND h.sequence = NEW.history_sequence) "
       "BEGIN SELECT RAISE(ABORT, 'ELV4_HISTORY_OPERATION_NOT_FOUND'); END",
+    );
+  }
+
+  Future<void> _createDisciplineIndexesAndGuards() async {
+    const activeRootIndexes = <String, String>{
+      'camera_stream_set_bindings': 'camera_id',
+      'recording_pool_bindings': 'pool_id',
+      'recorder_capacity_bindings': 'recorder_id',
+      'link_composition_bindings': 'link_id',
+      'port_capacity_bindings': 'switch_id',
+      'optical_link_bindings': 'link_id',
+      'rack_capacity_bindings': 'rack_id',
+      'patch_panel_bindings': 'panel_id',
+      'door_calculation_bindings': 'door_assembly_id',
+      'controller_resource_bindings': 'controller_id',
+      'fire_loop_bindings': 'loop_id',
+      'notification_circuit_bindings': 'circuit_id',
+    };
+    for (final entry in activeRootIndexes.entries) {
+      await customStatement(
+        'CREATE UNIQUE INDEX IF NOT EXISTS ux_elv5_${entry.key}_active_subject '
+        'ON ${entry.key}(design_revision_id, ${entry.value}) '
+        'WHERE deleted_at IS NULL',
+      );
+    }
+
+    const indexes = <String>[
+      'CREATE INDEX IF NOT EXISTS idx_elv5_policy_subject ON discipline_policy_bindings(project_id, design_revision_id, subject_kind, subject_id)',
+      'CREATE INDEX IF NOT EXISTS idx_elv5_camera_stream ON camera_stream_bindings(project_id, design_revision_id, camera_id, encoded_stream_id)',
+      'CREATE INDEX IF NOT EXISTS idx_elv5_camera_subscription_stream ON camera_stream_subscriptions(project_id, design_revision_id, encoded_stream_id, receiver_id)',
+      'CREATE UNIQUE INDEX IF NOT EXISTS ux_elv5_recording_schedule_ordinal ON recording_schedule_segments(design_revision_id, binding_id, schedule_profile_id, ordinal)',
+      'CREATE INDEX IF NOT EXISTS idx_elv5_recording_assignment_profile ON recording_assignments(project_id, design_revision_id, binding_id, schedule_profile_id)',
+      'CREATE UNIQUE INDEX IF NOT EXISTS ux_elv5_link_section_identity ON link_section_assignments(design_revision_id, binding_id, realized_section_id)',
+      'CREATE INDEX IF NOT EXISTS idx_elv5_evaluation_process ON discipline_evaluation_records(project_id, design_revision_id, process_code)',
+      'CREATE INDEX IF NOT EXISTS idx_elv5_evaluation_subject ON discipline_evaluation_records(project_id, design_revision_id, subject_kind, subject_id)',
+      'CREATE INDEX IF NOT EXISTS idx_elv5_evaluation_input ON discipline_evaluation_records(input_fingerprint)',
+      'CREATE INDEX IF NOT EXISTS idx_elv5_evaluation_output ON discipline_evaluation_records(output_sha256)',
+      'CREATE INDEX IF NOT EXISTS idx_elv5_pointer_scope ON discipline_evaluation_pointers(project_id, design_revision_id, logical_node_key_sha256)',
+      'CREATE INDEX IF NOT EXISTS idx_elv5_dependency_reverse ON discipline_dependency_index(project_id, design_revision_id, dependency_key_sha256)',
+    ];
+    for (final sql in indexes) {
+      await customStatement(sql);
+    }
+
+    const scopedTables = <String>[
+      'discipline_policy_bindings',
+      'camera_stream_set_bindings',
+      'camera_stream_bindings',
+      'camera_stream_subscriptions',
+      'recording_pool_bindings',
+      'recording_assignments',
+      'recording_schedule_segments',
+      'recorder_capacity_bindings',
+      'recorder_assignments',
+      'link_composition_bindings',
+      'link_section_assignments',
+      'port_capacity_bindings',
+      'port_capacity_assignments',
+      'optical_link_bindings',
+      'optical_loss_events',
+      'rack_capacity_bindings',
+      'rack_equipment_memberships',
+      'patch_panel_bindings',
+      'patch_panel_assignments',
+      'door_calculation_bindings',
+      'door_role_assignments',
+      'door_release_truth_rows',
+      'controller_resource_bindings',
+      'controller_resource_assignments',
+      'fire_loop_bindings',
+      'fire_loop_device_assignments',
+      'fire_address_claims',
+      'notification_circuit_bindings',
+      'notification_circuit_assignments',
+      'discipline_evaluation_records',
+      'discipline_evaluation_pointers',
+      'discipline_dependency_index',
+      'design_revision_discipline_snapshots',
+    ];
+    for (final table in scopedTables) {
+      await customStatement(
+        'CREATE TRIGGER IF NOT EXISTS trg_elv5_${table}_scope_insert '
+        'BEFORE INSERT ON $table FOR EACH ROW '
+        'WHEN NOT EXISTS ('
+        'SELECT 1 FROM project_design_revisions r '
+        'WHERE r.id = NEW.design_revision_id '
+        'AND r.project_id = NEW.project_id '
+        'AND r.deleted_at IS NULL) '
+        "BEGIN SELECT RAISE(ABORT, 'ELV5_SCOPE_REVISION_PROJECT_MISMATCH'); END",
+      );
+      await customStatement(
+        'CREATE TRIGGER IF NOT EXISTS trg_elv5_${table}_scope_update '
+        'BEFORE UPDATE ON $table FOR EACH ROW '
+        'WHEN NOT EXISTS ('
+        'SELECT 1 FROM project_design_revisions r '
+        'WHERE r.id = NEW.design_revision_id '
+        'AND r.project_id = NEW.project_id '
+        'AND r.deleted_at IS NULL) '
+        "BEGIN SELECT RAISE(ABORT, 'ELV5_SCOPE_REVISION_PROJECT_MISMATCH'); END",
+      );
+    }
+
+    const childRoots = <String, String>{
+      'recording_assignments': 'recording_pool_bindings',
+      'recording_schedule_segments': 'recording_pool_bindings',
+      'recorder_assignments': 'recorder_capacity_bindings',
+      'link_section_assignments': 'link_composition_bindings',
+      'port_capacity_assignments': 'port_capacity_bindings',
+      'optical_loss_events': 'optical_link_bindings',
+      'rack_equipment_memberships': 'rack_capacity_bindings',
+      'patch_panel_assignments': 'patch_panel_bindings',
+      'door_role_assignments': 'door_calculation_bindings',
+      'door_release_truth_rows': 'door_calculation_bindings',
+      'controller_resource_assignments': 'controller_resource_bindings',
+      'fire_loop_device_assignments': 'fire_loop_bindings',
+      'notification_circuit_assignments': 'notification_circuit_bindings',
+    };
+    for (final entry in childRoots.entries) {
+      await customStatement(
+        'CREATE TRIGGER IF NOT EXISTS trg_elv5_${entry.key}_root_insert '
+        'BEFORE INSERT ON ${entry.key} FOR EACH ROW '
+        'WHEN NOT EXISTS ('
+        'SELECT 1 FROM ${entry.value} r '
+        'WHERE r.project_id = NEW.project_id '
+        'AND r.design_revision_id = NEW.design_revision_id '
+        'AND r.id = NEW.binding_id '
+        'AND r.deleted_at IS NULL) '
+        "BEGIN SELECT RAISE(ABORT, 'ELV5_BINDING_SCOPE_MISMATCH'); END",
+      );
+    }
+
+    for (final table in const <String>[
+      'camera_stream_bindings',
+      'camera_stream_subscriptions',
+    ]) {
+      await customStatement(
+        'CREATE TRIGGER IF NOT EXISTS trg_elv5_${table}_root_insert '
+        'BEFORE INSERT ON $table FOR EACH ROW '
+        'WHEN NOT EXISTS ('
+        'SELECT 1 FROM camera_stream_set_bindings r '
+        'WHERE r.project_id = NEW.project_id '
+        'AND r.design_revision_id = NEW.design_revision_id '
+        'AND r.id = NEW.binding_id '
+        'AND r.camera_id = NEW.camera_id '
+        'AND r.deleted_at IS NULL) '
+        "BEGIN SELECT RAISE(ABORT, 'ELV5_CAMERA_BINDING_SCOPE_MISMATCH'); END",
+      );
+    }
+
+    await customStatement(
+      'CREATE TRIGGER IF NOT EXISTS trg_elv5_fire_claim_membership_insert '
+      'BEFORE INSERT ON fire_address_claims FOR EACH ROW '
+      'WHEN NEW.address < 0 OR NOT EXISTS ('
+      'SELECT 1 FROM fire_loop_device_assignments d '
+      'WHERE d.project_id = NEW.project_id '
+      'AND d.design_revision_id = NEW.design_revision_id '
+      'AND d.binding_id = NEW.binding_id '
+      'AND d.device_id = NEW.device_id) '
+      "BEGIN SELECT RAISE(ABORT, 'ELV5_FIRE_ADDRESS_MEMBERSHIP_INVALID'); END",
+    );
+
+    for (final table in const <String>[
+      'discipline_evaluation_records',
+      'design_revision_discipline_snapshots',
+    ]) {
+      await customStatement(
+        'CREATE TRIGGER IF NOT EXISTS trg_elv5_${table}_immutable_update '
+        'BEFORE UPDATE ON $table '
+        "BEGIN SELECT RAISE(ABORT, 'ELV5_IMMUTABLE_EVIDENCE'); END",
+      );
+      await customStatement(
+        'CREATE TRIGGER IF NOT EXISTS trg_elv5_${table}_immutable_delete '
+        'BEFORE DELETE ON $table '
+        "BEGIN SELECT RAISE(ABORT, 'ELV5_IMMUTABLE_EVIDENCE'); END",
+      );
+    }
+    await customStatement(
+      'CREATE TRIGGER IF NOT EXISTS trg_elv5_pointer_generation_insert '
+      'BEFORE INSERT ON discipline_evaluation_pointers FOR EACH ROW '
+      'WHEN NEW.generation < 0 '
+      "BEGIN SELECT RAISE(ABORT, 'ELV5_POINTER_GENERATION_INVALID'); END",
+    );
+    await customStatement(
+      'CREATE TRIGGER IF NOT EXISTS trg_elv5_pointer_generation_monotonic '
+      'BEFORE UPDATE ON discipline_evaluation_pointers FOR EACH ROW '
+      'WHEN NEW.generation < OLD.generation '
+      "BEGIN SELECT RAISE(ABORT, 'ELV5_POINTER_GENERATION_REGRESSION'); END",
     );
   }
 }

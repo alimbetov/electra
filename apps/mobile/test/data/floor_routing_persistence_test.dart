@@ -399,7 +399,7 @@ void main() {
       snapshot = await floorRepository.load(floor.id);
       expect(snapshot.graph().runs.length, 2);
       expect(snapshot.panels, isEmpty);
-      expect(database.schemaVersion, 23);
+      expect(database.schemaVersion, 24);
       await DriftProjectHierarchyRepository(database).deleteProject(project.id);
       expect((await floorRepository.load(floor.id)).floor, isNull);
       await database.close();

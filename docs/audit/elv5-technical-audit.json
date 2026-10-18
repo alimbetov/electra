@@ -1,0 +1,897 @@
+{
+  "schema": "electra.elv5-design-audit.v1",
+  "date": "2026-10-15",
+  "auditedDraftCommit": "4421346799b32a5fe41a62729480713947723b51",
+  "localDraftCommit": "510fc06",
+  "auditedTree": "3aa26291a50d3247ffa2c8075e399e67cb124a24",
+  "scope": "Design/source-boundary review of all 80 requirements and 27 processes; no app tests or normative validation",
+  "originalSeverityCounts": {
+    "HIGH": 6,
+    "MEDIUM": 2
+  },
+  "findings": [
+    {
+      "id": "ELV5-AUD-01",
+      "severity": "HIGH",
+      "title": "Округление целочисленной ёмкости хранилища",
+      "processCodes": [
+        "CCTV-03"
+      ],
+      "requirements": [
+        "ELV5-P1-005",
+        "ELV5-P3-003",
+        "ELV5-P8-002",
+        "ELV5-P8-008",
+        "ELV5-P9-003"
+      ],
+      "originalIssue": "Формула выдаёт рациональные bytes без правила технического округления; округление каждого потока завышает общий pool, округление вниз занижает требование.",
+      "resolution": "Сначала суммировать точные rational bytes всех уникальных recording assignments в одном storage pool/horizon, затем применить reserve один раз и ceil до целого usable byte. Raw basis=ceil(rounded usable/redundancy fraction). UI rounding не меняет ни один verdict.",
+      "acceptanceOracle": "Two assignments of1bit/s for1s -> exact .25B total ->1 required usable B, not2 or0. Noninteger raw requirement rounds upward once per pool.",
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED",
+      "auditedDraftCommit": "4421346799b32a5fe41a62729480713947723b51",
+      "originalContractExcerpts": {
+        "CCTV-03": "For each unique recording assignment integrate bitrateBitsPerSecond * uniqueRecordedSeconds / 8; sum and apply declared reserve once. Daily recurrence is expanded with pinned timezone/rules, then overlaps are unioned; do not multiply total horizon seconds by retentionDays again. Raw estimate=usableRequired/redundancyUsableFraction only if explicit model applies; no product selection."
+      }
+    },
+    {
+      "id": "ELV5-AUD-02",
+      "severity": "HIGH",
+      "title": "Оценка VBR storage не равна гарантии retention",
+      "processCodes": [
+        "CCTV-03",
+        "CCTV-05"
+      ],
+      "requirements": [
+        "ELV5-P1-002",
+        "ELV5-P1-004",
+        "ELV5-P3-003",
+        "ELV5-P3-005",
+        "ELV5-P8-002",
+        "ELV5-P9-006"
+      ],
+      "originalIssue": "Expected bitrate sizing может пройти selected capacity check, но не гарантирует срок хранения при VBR; scope гарантии не был отдельным входом/выходом.",
+      "resolution": "Явный sizingBasis EXPECTED_ESTIMATE либо GUARANTEED_UPPER_BOUND. Для guarantee интегрировать подтверждённый upper-bound bitrate/schedule model; missing bound ->UNRESOLVED. Estimate может пройти только estimate-capacity и всегда retentionGuarantee=NOT_ASSESSED. Recording identity=(streamId,poolId,copyRole); duplicate identity rejected; two deliberate pools/copies counted explicitly.",
+      "acceptanceOracle": "1Mbps expected for3600s=450MB,4Mbps upper=1.8GB;500MB pool passes estimate but fails guaranteed upper-bound sizing. No guarantee from a generic1.1 reserve.",
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED",
+      "auditedDraftCommit": "4421346799b32a5fe41a62729480713947723b51",
+      "originalContractExcerpts": {
+        "CCTV-03": "For each unique recording assignment integrate bitrateBitsPerSecond * uniqueRecordedSeconds / 8; sum and apply declared reserve once. Daily recurrence is expanded with pinned timezone/rules, then overlaps are unioned; do not multiply total horizon seconds by retentionDays again. Raw estimate=usableRequired/redundancyUsableFraction only if explicit model applies; no product selection.",
+        "CCTV-05": "Check distinct recorded channel count, peak ingress, declared stream compatibility and required usable storage independently. Selected usable capacity is not raw disk sum. Capacity failure is a completed FAIL, not an execution error."
+      }
+    },
+    {
+      "id": "ELV5-AUD-03",
+      "severity": "HIGH",
+      "title": "Запас оптического бюджета не является физическим затуханием",
+      "processCodes": [
+        "LAN-05"
+      ],
+      "requirements": [
+        "ELV5-P1-002",
+        "ELV5-P4-005",
+        "ELV5-P8-002",
+        "ELV5-P8-008",
+        "ELV5-P9-003"
+      ],
+      "originalIssue": "Не разделены physical loss minimum и design reserve. Вычитание запаса из RxMax может скрыть перегрузку приёмника.",
+      "resolution": "Physical loss interval excludes reserve. Sensitivity check: TxMin-lossMax >= sensitivity+requiredSensitivityMargin. Overload: TxMax-lossMin <= receiverMax; no reserve is added to lossMin. Both directions pin separate optics/wavelength/path facts.",
+      "acceptanceOracle": "TxMax=-1dBm,physicalLossMin=0,receiverMax=-3,reserve2dB ->overload FAIL (-1>-3), never PASS from artificial Rx=-3.",
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED",
+      "auditedDraftCommit": "4421346799b32a5fe41a62729480713947723b51",
+      "originalContractExcerpts": {
+        "LAN-05": "For each optical direction compute loss interval=sum(alpha_dB_per_km*length_m/1000 + matedPairLoss + spliceLoss + declared loss terms). RxMin=TxMin-lossMax must meet sensitivity; RxMax=TxMax-lossMin must not exceed overload. Signed dBm is allowed; dB losses nonnegative. Evaluate both directions with their exact optics."
+      }
+    },
+    {
+      "id": "ELV5-AUD-04",
+      "severity": "HIGH",
+      "title": "Подсчёт адресов должен проверять полные множества ресурсов",
+      "processCodes": [
+        "FA-01",
+        "FA-07"
+      ],
+      "requirements": [
+        "ELV5-P1-004",
+        "ELV5-P6-001",
+        "ELV5-P6-007",
+        "ELV5-P8-002",
+        "ELV5-P8-008"
+      ],
+      "originalIssue": "Count/addressConsumption не задаёт однозначно все занятые адреса многоканального модуля и может не обнаружить пересечение диапазонов.",
+      "resolution": "Assignments store explicit address set or versioned deterministic expansion with loop/panel address domain; expanded cardinality must equal profile consumption. Uniqueness is checked on full(domain,address) set including reserved resources, not just start address. Noncontiguous sets allowed only by selected profile.",
+      "acceptanceOracle": "ModuleA=[1,2],moduleB=[2,3],capacity5 ->counts4 fit, but overlap address2 gives FAIL; not silently union3 addresses.",
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED",
+      "auditedDraftCommit": "4421346799b32a5fe41a62729480713947723b51",
+      "originalContractExcerpts": {
+        "FA-01": "Count physical devices and consumed addresses separately, including modules occupying multiple addresses. Enforce declared uniqueness and scoped address domain. Compare independent device/address/panel limits.",
+        "FA-07": "Validate the selected directed/loop topology, required return closure, illegal branches and declared isolator placement policy on the signal layer. Isolator behavior/short-circuit survivability needs an explicit supported model; mere component presence is not proof."
+      }
+    },
+    {
+      "id": "ELV5-AUD-05",
+      "severity": "HIGH",
+      "title": "Ключ подсчёта NVR/VMS channels/licences",
+      "processCodes": [
+        "CCTV-05"
+      ],
+      "requirements": [
+        "ELV5-P1-004",
+        "ELV5-P3-002",
+        "ELV5-P3-005",
+        "ELV5-P8-002",
+        "ELV5-P9-003"
+      ],
+      "originalIssue": "Количество encoded streams не всегда соответствует определённому профилем количеству recorder channels/licenses; ключ группировки не был обязательным.",
+      "resolution": "Recorder profile explicitly selects accounting basis DEVICE, ENCODED_STREAM or LICENSE_CHANNEL with exact assignments. Enforce each declared channel/license capacity separately. Sum actual ingress and recordings independently of channel grouping. Missing accounting basis ->BLOCKED.",
+      "acceptanceOracle": "One camera/main4Mbps+sub1Mbps,DEVICE basis,limit1 ->1 channel PASS,ingress5Mbps. ENCODED_STREAM basis/limit1 ->2 channels FAIL. Storage still counts selected distinct recordings.",
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED",
+      "auditedDraftCommit": "4421346799b32a5fe41a62729480713947723b51",
+      "originalContractExcerpts": {
+        "CCTV-05": "Check distinct recorded channel count, peak ingress, declared stream compatibility and required usable storage independently. Selected usable capacity is not raw disk sum. Capacity failure is a completed FAIL, not an execution error."
+      }
+    },
+    {
+      "id": "ELV5-AUD-06",
+      "severity": "MEDIUM",
+      "title": "Машинные зависимости нельзя выводить из поясняющих строк",
+      "processCodes": [
+        "CCTV-06",
+        "FA-06"
+      ],
+      "requirements": [
+        "ELV5-P1-001",
+        "ELV5-P1-008",
+        "ELV5-P7-001",
+        "ELV5-P7-003",
+        "ELV5-P8-008",
+        "ELV5-P9-001"
+      ],
+      "originalIssue": "Registry dependencies смешивали notes и коды вроде ELV-PWR-01/03; машинный DAG и scope binding нельзя проверить однозначно.",
+      "resolution": "Keep notes separately; add typed upstreamProcesses(processCode,scopeBinding,subjectBinding,when), plus registered factKinds. Only registered code-owned bindings/conditions accepted; no free-text parsing or executable expressions. Validate known codes and DAG; external ELV3/ELV4 codes use explicit adapter contracts.",
+      "acceptanceOracle": "FA-06 has separate ELV-PWR-01 and03 edges. Unknown code, unresolved scope binder and cycle are rejected before registry publication.",
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED",
+      "auditedDraftCommit": "4421346799b32a5fe41a62729480713947723b51",
+      "originalContractExcerpts": {
+        "CCTV-06": "Check medium/interface/category and installed link composition against explicit policy limits. If powered, reference matching scoped PWR-06 result; preserve per-segment power applicability. Never use room distance or duplicate cable allocations.",
+        "FA-06": "Check distinct active devices, output current limit, peak applicability and terminal voltage using shared PWR evidence. Respect declared simultaneous notification policy; do not infer sound pressure/acoustic coverage."
+      }
+    },
+    {
+      "id": "ELV5-AUD-07",
+      "severity": "MEDIUM",
+      "title": "Gross versus already-usable rack capacity basis",
+      "processCodes": [
+        "LAN-06"
+      ],
+      "requirements": [
+        "ELV5-P1-004",
+        "ELV5-P4-006",
+        "ELV5-P8-002",
+        "ELV5-P9-007"
+      ],
+      "originalIssue": "Available RU не указывает, были ли резервы/неиспользуемые зоны уже исключены; повторное вычитание даёт неправильный margin.",
+      "resolution": "Capacity basis is GROSS_WITH_EXCLUSIONS or NET_USABLE. Gross subtracts explicit unavailable/reserved set once; net never subtracts those again and records their provenance. Equipment demand is distinct from excluded reserve. Actual slot/depth/thermal fit stays NOT_ASSESSED until ELV6.",
+      "acceptanceOracle": "Gross6RU,reserved1RU,equipment3RU ->free2RU. Net usable5RU with same reservation already excluded ->free2RU, not1RU.",
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED",
+      "auditedDraftCommit": "4421346799b32a5fe41a62729480713947723b51",
+      "originalContractExcerpts": {
+        "LAN-06": "Sum demand from distinct equipment; report RU/weight/depth requirements and comparison only for explicit available limits. No slot placement, clearance, thermal-layout or cabinet-fit certification; those belong to ELV6."
+      }
+    },
+    {
+      "id": "ELV5-AUD-08",
+      "severity": "HIGH",
+      "title": "Полнота угловых размерностей CCTV coverage",
+      "processCodes": [
+        "CCTV-01"
+      ],
+      "requirements": [
+        "ELV5-P1-005",
+        "ELV5-P3-001",
+        "ELV5-P8-002",
+        "ELV5-P8-008",
+        "ELV5-P9-006"
+      ],
+      "originalIssue": "Первичный контракт разрешал квалифицировать footprint при недоступных FOV angles, хотя полный camera coverage process обещает углы обзора.",
+      "resolution": "Горизонтальный/вертикальный FOV interval обязательны; bounded rational backend, range reduction, alternating series/pi identity и iteration/width limits закреплены. Footprint-only не даёт полного PASS.",
+      "acceptanceOracle": "Sensor6x4mm,focal6mm,height3m ->footprint3x2m; horizontal FOV(.9272952180,.9272952181)rad,vertical(.6435011087,.6435011089)rad. Missing/convergence failure blocks full qualification.",
+      "specificationStatus": "SPEC_RESOLVED",
+      "runtimeStatus": "NOT_IMPLEMENTED",
+      "auditedDraftCommit": "4421346799b32a5fe41a62729480713947723b51",
+      "originalContractExcerpts": {
+        "CCTV-01": "Cast sensor corner rays through captured calibrated pinhole frame; intersect t=(planeOffset-dot(normal,origin))/dot(normal,direction), require positive finite intersection and supported model. Clip ordered footprint to zone. FOV=2*atan(sensorDimension/(2*focalLength)) uses separately versioned bounded backend; exact rational footprint may qualify independently of an unavailable angle display. Parallel/horizon/uncertain intersections remain unresolved. No DORI or occlusion success inferred."
+      }
+    }
+  ],
+  "requirementReviews": [
+    {
+      "requirementId": "ELV5-P0-001",
+      "package": "P0",
+      "assessment": "BASELINE_GATE_OPEN",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P0-002",
+      "package": "P0",
+      "assessment": "BASELINE_GATE_OPEN",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P0-003",
+      "package": "P0",
+      "assessment": "BASELINE_GATE_OPEN",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P0-004",
+      "package": "P0",
+      "assessment": "BASELINE_GATE_OPEN",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P0-005",
+      "package": "P0",
+      "assessment": "BASELINE_GATE_OPEN",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P0-006",
+      "package": "P0",
+      "assessment": "BASELINE_GATE_OPEN",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P0-007",
+      "package": "P0",
+      "assessment": "BASELINE_GATE_OPEN",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P0-008",
+      "package": "P0",
+      "assessment": "BASELINE_GATE_OPEN",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P1-001",
+      "package": "P1",
+      "assessment": "SPEC_RESOLVED",
+      "findings": [
+        "ELV5-AUD-06"
+      ],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P1-002",
+      "package": "P1",
+      "assessment": "SPEC_RESOLVED",
+      "findings": [
+        "ELV5-AUD-02",
+        "ELV5-AUD-03"
+      ],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P1-003",
+      "package": "P1",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P1-004",
+      "package": "P1",
+      "assessment": "SPEC_RESOLVED",
+      "findings": [
+        "ELV5-AUD-02",
+        "ELV5-AUD-04",
+        "ELV5-AUD-05",
+        "ELV5-AUD-07"
+      ],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P1-005",
+      "package": "P1",
+      "assessment": "SPEC_RESOLVED",
+      "findings": [
+        "ELV5-AUD-01",
+        "ELV5-AUD-08"
+      ],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P1-006",
+      "package": "P1",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P1-007",
+      "package": "P1",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P1-008",
+      "package": "P1",
+      "assessment": "SPEC_RESOLVED",
+      "findings": [
+        "ELV5-AUD-06"
+      ],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P2-001",
+      "package": "P2",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P2-002",
+      "package": "P2",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P2-003",
+      "package": "P2",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P2-004",
+      "package": "P2",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P2-005",
+      "package": "P2",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P2-006",
+      "package": "P2",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P2-007",
+      "package": "P2",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P2-008",
+      "package": "P2",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P3-001",
+      "package": "P3",
+      "assessment": "SPEC_RESOLVED",
+      "findings": [
+        "ELV5-AUD-08"
+      ],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P3-002",
+      "package": "P3",
+      "assessment": "SPEC_RESOLVED",
+      "findings": [
+        "ELV5-AUD-05"
+      ],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P3-003",
+      "package": "P3",
+      "assessment": "SPEC_RESOLVED",
+      "findings": [
+        "ELV5-AUD-01",
+        "ELV5-AUD-02"
+      ],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P3-004",
+      "package": "P3",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P3-005",
+      "package": "P3",
+      "assessment": "SPEC_RESOLVED",
+      "findings": [
+        "ELV5-AUD-02",
+        "ELV5-AUD-05"
+      ],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P3-006",
+      "package": "P3",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P3-007",
+      "package": "P3",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P3-008",
+      "package": "P3",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P4-001",
+      "package": "P4",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P4-002",
+      "package": "P4",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P4-003",
+      "package": "P4",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P4-004",
+      "package": "P4",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P4-005",
+      "package": "P4",
+      "assessment": "SPEC_RESOLVED",
+      "findings": [
+        "ELV5-AUD-03"
+      ],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P4-006",
+      "package": "P4",
+      "assessment": "SPEC_RESOLVED",
+      "findings": [
+        "ELV5-AUD-07"
+      ],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P4-007",
+      "package": "P4",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P4-008",
+      "package": "P4",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P5-001",
+      "package": "P5",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P5-002",
+      "package": "P5",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P5-003",
+      "package": "P5",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P5-004",
+      "package": "P5",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P5-005",
+      "package": "P5",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P5-006",
+      "package": "P5",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P5-007",
+      "package": "P5",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P5-008",
+      "package": "P5",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P6-001",
+      "package": "P6",
+      "assessment": "SPEC_RESOLVED",
+      "findings": [
+        "ELV5-AUD-04"
+      ],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P6-002",
+      "package": "P6",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P6-003",
+      "package": "P6",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P6-004",
+      "package": "P6",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P6-005",
+      "package": "P6",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P6-006",
+      "package": "P6",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P6-007",
+      "package": "P6",
+      "assessment": "SPEC_RESOLVED",
+      "findings": [
+        "ELV5-AUD-04"
+      ],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P6-008",
+      "package": "P6",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P7-001",
+      "package": "P7",
+      "assessment": "SPEC_RESOLVED",
+      "findings": [
+        "ELV5-AUD-06"
+      ],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P7-002",
+      "package": "P7",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P7-003",
+      "package": "P7",
+      "assessment": "SPEC_RESOLVED",
+      "findings": [
+        "ELV5-AUD-06"
+      ],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P7-004",
+      "package": "P7",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P7-005",
+      "package": "P7",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P7-006",
+      "package": "P7",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P7-007",
+      "package": "P7",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P7-008",
+      "package": "P7",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P8-001",
+      "package": "P8",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P8-002",
+      "package": "P8",
+      "assessment": "SPEC_RESOLVED",
+      "findings": [
+        "ELV5-AUD-01",
+        "ELV5-AUD-02",
+        "ELV5-AUD-03",
+        "ELV5-AUD-04",
+        "ELV5-AUD-05",
+        "ELV5-AUD-07",
+        "ELV5-AUD-08"
+      ],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P8-003",
+      "package": "P8",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P8-004",
+      "package": "P8",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P8-005",
+      "package": "P8",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P8-006",
+      "package": "P8",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P8-007",
+      "package": "P8",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P8-008",
+      "package": "P8",
+      "assessment": "SPEC_RESOLVED",
+      "findings": [
+        "ELV5-AUD-01",
+        "ELV5-AUD-03",
+        "ELV5-AUD-04",
+        "ELV5-AUD-06",
+        "ELV5-AUD-08"
+      ],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P9-001",
+      "package": "P9",
+      "assessment": "SPEC_RESOLVED",
+      "findings": [
+        "ELV5-AUD-06"
+      ],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P9-002",
+      "package": "P9",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P9-003",
+      "package": "P9",
+      "assessment": "SPEC_RESOLVED",
+      "findings": [
+        "ELV5-AUD-01",
+        "ELV5-AUD-03",
+        "ELV5-AUD-05"
+      ],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P9-004",
+      "package": "P9",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P9-005",
+      "package": "P9",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P9-006",
+      "package": "P9",
+      "assessment": "SPEC_RESOLVED",
+      "findings": [
+        "ELV5-AUD-02",
+        "ELV5-AUD-08"
+      ],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P9-007",
+      "package": "P9",
+      "assessment": "SPEC_RESOLVED",
+      "findings": [
+        "ELV5-AUD-07"
+      ],
+      "runtimeStatus": "NOT_STARTED"
+    },
+    {
+      "requirementId": "ELV5-P9-008",
+      "package": "P9",
+      "assessment": "NO_LOCAL_FINDING",
+      "findings": [],
+      "runtimeStatus": "NOT_STARTED"
+    }
+  ],
+  "contractProbes": {
+    "poolCeiling": {
+      "exactBytes": "1/4",
+      "poolCeilBytes": 1,
+      "wrongPerAssignmentCeil": 2
+    },
+    "retentionClaim": {
+      "expectedBytes": 450000000,
+      "guaranteedUpperBytes": 1800000000,
+      "availableBytes": 500000000,
+      "estimateAssessment": "PASS",
+      "guaranteedAssessment": "FAIL"
+    },
+    "opticalReserve": {
+      "actualMaxReceivedDbm": -1,
+      "receiverMaxDbm": -3,
+      "designReserveDb": 2,
+      "correctOverload": "FAIL",
+      "incorrectReserveAsLossWouldReport": "PASS"
+    },
+    "expandedAddresses": {
+      "moduleA": [
+        1,
+        2
+      ],
+      "moduleB": [
+        2,
+        3
+      ],
+      "intersection": [
+        2
+      ],
+      "assessment": "FAIL"
+    },
+    "recorderChannels": {
+      "cameraCount": 1,
+      "streamCount": 2,
+      "deviceBasisChannelCount": 1,
+      "streamBasisChannelCount": 2,
+      "ingressMbps": 5
+    },
+    "rackBasis": {
+      "gross": 6,
+      "excludedReserve": 1,
+      "equipmentDemand": 3,
+      "grossFree": 2,
+      "netUsable": 5,
+      "netFree": 2
+    },
+    "registryStructure": {
+      "processCount": 27,
+      "requirementCount": 80,
+      "externalCodeCount": 7,
+      "upstreamReferencesAreTyped": true
+    }
+  },
+  "runtimeImplemented": false,
+  "currentBaselineRef": "docs/product/elv5-implementation/baseline.json",
+  "baselineReconciledOn": "2026-10-16",
+  "historicalAuditScope": "Original discipline design review retained; inherited platform assumptions superseded by implemented-baseline.md"
+}

@@ -1,3 +1,4 @@
+import 'elv5/drift_elv5_discipline_snapshot_store.dart';
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
@@ -7,6 +8,7 @@ import '../database/app_database.dart';
 import '../database/drift_raw_statement.dart';
 import 'drift_power_runtime_store.dart';
 import 'drift_power_snapshot_facts.dart';
+import 'elv5/drift_elv5_dependency_invalidator.dart';
 
 enum PowerDependencyRefType { fact, evaluation }
 
@@ -307,6 +309,24 @@ final class DriftPowerPublicationRuntime {
         evidence: evidence,
         storedSha256: envelopeSha256,
       );
+      // ELV5 projections consume exact ELV4 CURRENT generations. Advancing
+      // this pointer must invalidate those consumers in this same transaction,
+      // including an advance that reuses an immutable evaluation identity.
+      final previousEvaluationId = capture.targetEvaluationId;
+      if (previousEvaluationId != null) {
+        await DriftElv5DependencyInvalidator(
+          database,
+          originDeviceId: originDeviceId,
+          nowUtc: now,
+        ).invalidateSubject(
+          projectId: capture.projectId,
+          designRevisionId: capture.designRevisionId,
+          relationKind: 'EVAL',
+          domain:
+              'ELV4_${evidence.nodeKey.processCode.name.toUpperCase()}_CURRENT',
+          subjectId: previousEvaluationId,
+        );
+      }
       await _replaceReverseIndex(
         projectId: capture.projectId,
         designRevisionId: capture.designRevisionId,
@@ -345,6 +365,43 @@ final class DriftPowerPublicationRuntime {
       return receipt;
     });
   }
+
+  /// Propagates a power pointer transition to exact ELV5 consumers. Both ELV4
+  /// mutation implementations call this within their source transaction.
+  Future<int> invalidateDisciplineConsumersForNode({
+    required String projectId,
+    required String designRevisionId,
+    required PowerNodeKeyV2 nodeKey,
+  }) => database.transaction(() async {
+    await _requireRevision(
+      projectId: projectId,
+      designRevisionId: designRevisionId,
+      requireWorking: true,
+    );
+    final pointer = await _loadPointer(
+      projectId: projectId,
+      designRevisionId: designRevisionId,
+      nodeKey: nodeKey,
+    );
+    if (pointer == null) return 0;
+    final evaluationId = pointer.evaluationId;
+    if (evaluationId == null) {
+      throw const PowerRuntimeStorageException(
+        'ELV4_POINTER_EVALUATION_ID_MISSING',
+      );
+    }
+    return DriftElv5DependencyInvalidator(
+      database,
+      originDeviceId: originDeviceId,
+      nowUtc: now,
+    ).invalidateSubject(
+      projectId: projectId,
+      designRevisionId: designRevisionId,
+      relationKind: 'EVAL',
+      domain: 'ELV4_${nodeKey.processCode.name.toUpperCase()}_CURRENT',
+      subjectId: evaluationId,
+    );
+  });
 
   /// Executes the canonical edit and invalidation in one transaction. The edit
   /// must advance the WORKING design revision token exactly once. [oldClosure]
@@ -460,7 +517,7 @@ final class DriftPowerPublicationRuntime {
     final manifest =
         await database
             .customSelect(
-              'SELECT manifest_sha256, physical_sha256, power_sha256 FROM design_revision_snapshot_manifests '
+              'SELECT * FROM design_revision_snapshot_manifests '
               'WHERE project_id = ? AND design_revision_id = ?',
               variables: [
                 Variable.withString(projectId),
@@ -473,14 +530,7 @@ final class DriftPowerPublicationRuntime {
             snapshot.read<String>('power_sha256') ||
         manifest.read<String>('physical_sha256') !=
             snapshot.read<String>('physical_sha256') ||
-        sha256HexUtf8(
-              canonicalEngineeringJsonV1({
-                'schema': 'electra.elv4-snapshot-manifest.v1',
-                'physicalSha256': manifest.read<String>('physical_sha256'),
-                'powerSha256': manifest.read<String>('power_sha256'),
-              }),
-            ) !=
-            manifest.read<String>('manifest_sha256')) {
+        !_validRevisionManifest(manifest.data)) {
       throw const PowerRuntimeStorageException(
         'ELV4_FROZEN_MANIFEST_HASH_MISMATCH',
       );
@@ -490,6 +540,21 @@ final class DriftPowerPublicationRuntime {
       designRevisionId,
       snapshot.read<String>('physical_sha256'),
     );
+    if (manifest.read<String>('manifest_schema') ==
+        elv5SnapshotManifestSchema) {
+      try {
+        await DriftElv5DisciplineSnapshotStore(
+          database,
+          originDeviceId: originDeviceId,
+          nowUtc: now,
+        ).read(projectId: projectId, designRevisionId: designRevisionId);
+      } on StateError {
+        throw const PowerRuntimeStorageException(
+          'ELV4_FROZEN_MANIFEST_HASH_MISMATCH',
+        );
+      }
+    }
+
     final payload =
         (jsonDecode(snapshot.read<String>('payload_json')) as Map)
             .cast<String, Object?>();
@@ -731,7 +796,14 @@ final class DriftPowerPublicationRuntime {
           Variable.withString('CURRENT'),
         ],
       );
-      if (updated == 1) actuallyInvalidated.add(key);
+      if (updated == 1) {
+        actuallyInvalidated.add(key);
+        await invalidateDisciplineConsumersForNode(
+          projectId: projectId,
+          designRevisionId: designRevisionId,
+          nodeKey: key,
+        );
+      }
       await database.customUpdate(
         'DELETE FROM power_dependency_index_records '
         'WHERE project_id = ? AND design_revision_id = ? '
@@ -1173,4 +1245,12 @@ String _sha256(String value, String field) {
     throw ArgumentError.value(value, field, 'Expected lowercase SHA-256.');
   }
   return normalized;
+}
+
+bool _validRevisionManifest(Map<String, Object?> row) {
+  try {
+    return elvSnapshotManifestHash(row) == row['manifest_sha256'];
+  } on StateError {
+    return false;
+  }
 }

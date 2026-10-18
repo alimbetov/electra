@@ -14,7 +14,7 @@ void main() {
           ? 'Executed by scripts/ci/run-elv4-historical-migration-matrix.sh.'
           : false;
 
-  test('real historical origin migrates to v23 without inventing power facts', () async {
+  test('real historical origin migrates to v24 without inventing power facts', () async {
     final source = File(fixturePath!);
     expect(source.existsSync(), isTrue);
     final working = File(
@@ -34,7 +34,7 @@ void main() {
         .getSingle()
         .then((row) => row.read<int>('user_version'));
     expect(userVersion, 23);
-    expect(db.schemaVersion, 23);
+    expect(db.schemaVersion, 24);
 
     final project =
         await db

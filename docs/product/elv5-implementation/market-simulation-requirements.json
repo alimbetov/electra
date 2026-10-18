@@ -1,0 +1,19 @@
+{
+  "schema": "electra.elv5-market-simulation-requirements.v1",
+  "status": "DESIGN_HARDENED_RUNTIME_NOT_STARTED",
+  "scenarioMatrixTarget": 450,
+  "requirements": [
+    {"id":"ELV5-MKT-001","severity":"MUST","title":"Current market evidence snapshot","requirement":"Market simulation archetypes must be anchored to current manufacturer documentation where factual product characteristics are used, with retrieval date and source URL recorded."},
+    {"id":"ELV5-MKT-002","severity":"MUST","title":"Exactly 450 deterministic combinations","requirement":"The design simulation must deterministically produce exactly 450 scenario combinations from the tracked source catalog at an exact source SHA."},
+    {"id":"ELV5-MKT-003","severity":"MUST","title":"All 27 processes covered","requirement":"Every ELV5 process CCTV-01..06, LAN-01..07, ACS-01..06 and FA-01..08 must have non-zero market-simulation coverage."},
+    {"id":"ELV5-MKT-004","severity":"MUST","title":"Priority core receives deeper stress","requirement":"CCTV-02, CCTV-03, LAN-01, LAN-05, ACS-03, ACS-04, ACS-05, FA-02, FA-04, FA-05 and FA-06 receive approximately double the scenario density of non-core processes."},
+    {"id":"ELV5-MKT-005","severity":"MUST","title":"All P0-P9 packages represented","requirement":"The generated matrix must demonstrate how scenarios traverse the relevant P0-P9 contracts, and aggregate coverage must include every package P0 through P9."},
+    {"id":"ELV5-MKT-006","severity":"MUST","title":"Five vector classes per process","requirement":"Every process must include POSITIVE, BOUNDARY, NEGATIVE_OR_UNSUPPORTED, ADVERSARIAL and CROSS_DISCIPLINE market scenarios."},
+    {"id":"ELV5-MKT-007","severity":"MUST","title":"Vendor fact versus synthetic fixture separation","requirement":"Manufacturer facts, market-derived envelopes and synthetic test values must be separately labelled; synthetic values may not be represented as vendor specifications."},
+    {"id":"ELV5-MKT-008","severity":"MUST","title":"Engineer error-prevention taxonomy","requirement":"Every generated scenario must identify the primary engineering error class Electra is expected to prevent or expose and the package/process layer that catches it."},
+    {"id":"ELV5-MKT-009","severity":"MUST","title":"Actionable remediation projection","requirement":"Simulation output must identify a stable remediation direction or downstream owner instead of presenting unexplained PASS/FAIL prose."},
+    {"id":"ELV5-MKT-010","severity":"MUST","title":"No normative or procurement overclaim","requirement":"Market simulation validates technical design behavior only; it must not convert current product examples into jurisdictional compliance, certification or ELV8 SKU/BOM procurement decisions."},
+    {"id":"ELV5-MKT-011","severity":"MUST","title":"Deterministic generation version","requirement":"Scenario IDs, distribution, factor selection and expected dispositions must be deterministic under a versioned generation algorithm; random unseeded matrices are prohibited."},
+    {"id":"ELV5-MKT-012","severity":"MUST","title":"Exact-head simulation artifact","requirement":"CI must generate and publish a machine-readable market-simulation artifact with source SHA, authority fingerprint compatibility fields, counts, package coverage, process coverage and error-class coverage."}
+  ]
+}

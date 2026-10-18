@@ -1,3 +1,4 @@
+import 'elv5/drift_elv5_canonical_source_invalidation.dart';
 import '../elv_deletion_guards.dart';
 
 import 'dart:convert';
@@ -61,6 +62,14 @@ final class DriftComponentInstanceRepository
           originDeviceId: Value(originDeviceId),
         ),
       );
+      await invalidateElv5CanonicalSource(
+        database,
+        roomId: row.roomId,
+        domain: 'ELV3_COMPONENT_PLACEMENT',
+        subjectIds: [instanceId],
+        originDeviceId: originDeviceId,
+        now: _clock(),
+      );
     });
   }
 
@@ -101,6 +110,14 @@ final class DriftComponentInstanceRepository
           .insertOnConflictUpdate(
             _companion(instance, now, existing: existing),
           );
+      await invalidateElv5CanonicalSource(
+        database,
+        roomId: instance.roomId,
+        domain: 'ELV3_COMPONENT_PLACEMENT',
+        subjectIds: [instance.id],
+        originDeviceId: originDeviceId,
+        now: _clock(),
+      );
     });
   }
 
@@ -187,6 +204,14 @@ final class DriftComponentInstanceRepository
               _companion(instance, now, existing: existingById[instance.id]),
             );
       }
+      await invalidateElv5CanonicalSource(
+        database,
+        roomId: roomId,
+        domain: 'ELV3_COMPONENT_PLACEMENT',
+        subjectIds: {...existingRows.map((r) => r.id), ...nextIds},
+        originDeviceId: originDeviceId,
+        now: _clock(),
+      );
     });
   }
 

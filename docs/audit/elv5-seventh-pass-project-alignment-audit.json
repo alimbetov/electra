@@ -1,0 +1,84 @@
+{
+  "schema": "electra.elv5-seventh-pass-project-alignment-audit.v1",
+  "status": "ELV5_SPEC_RESOLVED_RUNTIME_NOT_STARTED",
+  "counts": {
+    "high": 5,
+    "medium": 5,
+    "total": 10,
+    "resolved": 10,
+    "open": 0
+  },
+  "downstreamActionRequired": true,
+  "findings": [
+    {
+      "id": "ELV5-SEVENTH-001",
+      "severity": "HIGH",
+      "code": "HUMAN_MACHINE_AUTHORITY_CHAIN_DRIFT",
+      "status": "SPEC_RESOLVED",
+      "resolution": "Project-alignment hardening and authoritative index now expose binding, combinatorial and seventh-pass authority already present in the machine manifest."
+    },
+    {
+      "id": "ELV5-SEVENTH-002",
+      "severity": "HIGH",
+      "code": "RESOLVER_OWNERSHIP_CONTRADICTION",
+      "status": "SPEC_RESOLVED",
+      "resolution": "Typed process API now keeps ProcessDefinition pure and assigns repository-aware resolution exclusively to application-layer InputResolver."
+    },
+    {
+      "id": "ELV5-SEVENTH-003",
+      "severity": "HIGH",
+      "code": "SOURCE_PATH_SEMANTICS_CONTRADICTION",
+      "status": "SPEC_RESOLVED",
+      "resolution": "Public symbols/layers/contracts are normative; filenames are tracked coordinates that may move only with synchronized binding/manifest update."
+    },
+    {
+      "id": "ELV5-SEVENTH-004",
+      "severity": "HIGH",
+      "code": "ACS03_REFERENCE_ORACLE_DRIFT",
+      "status": "SPEC_RESOLVED",
+      "resolution": "Process contract and ACS dossier synchronized to 23.51 V terminal and +1.51 V headroom; CI sentinel forbids the stale oracle in active contracts."
+    },
+    {
+      "id": "ELV5-SEVENTH-005",
+      "severity": "HIGH",
+      "code": "DOWNSTREAM_BASELINE_DRIFT",
+      "status": "ELV5_SPEC_RESOLVED_DOWNSTREAM_RECONCILIATION_REQUIRED",
+      "resolution": "Machine downstream handoff registry blocks ELV6 runtime entry until exact accepted ELV5 source SHA, authority fingerprint and runtime evidence are reconciled; ELV7/ELV8 are transitively blocked."
+    },
+    {
+      "id": "ELV5-SEVENTH-006",
+      "severity": "MEDIUM",
+      "code": "SCHEMA24_PRECEDENCE_AMBIGUITY",
+      "status": "SPEC_RESOLVED",
+      "resolution": "Schema 24 is explicitly frozen and supersedes earlier choose->23 wording."
+    },
+    {
+      "id": "ELV5-SEVENTH-007",
+      "severity": "MEDIUM",
+      "code": "PROJECT_ROADMAP_STATUS_DRIFT",
+      "status": "SPEC_RESOLVED",
+      "resolution": "Project status authority explicitly recognizes merged/runtime-accepted ELV4 and hardened ELV5 design; historical roadmap labels cannot authorize runtime state."
+    },
+    {
+      "id": "ELV5-SEVENTH-008",
+      "severity": "MEDIUM",
+      "code": "LEGACY_DESIGN_VERSION_STATUS_DRIFT",
+      "status": "SPEC_RESOLVED",
+      "resolution": "Legacy DESIGN DRAFT/1-design labels are declared provenance only when superseded by frozen runtime-version registry."
+    },
+    {
+      "id": "ELV5-SEVENTH-009",
+      "severity": "MEDIUM",
+      "code": "ELV5_MODULE_LAYOUT_DECISION_NOT_EXPLICIT",
+      "status": "SPEC_RESOLVED",
+      "resolution": "Nested src/elv5 layout is explicitly accepted as a bounded-context organization inside the existing engineering_core package."
+    },
+    {
+      "id": "ELV5-SEVENTH-010",
+      "severity": "MEDIUM",
+      "code": "DOWNSTREAM_HANDOFF_NOT_MACHINE_OWNED",
+      "status": "SPEC_RESOLVED",
+      "resolution": "Added downstream-handoff-registry.json with exact authority/runtime pin requirements and ELV5/6/7/8 claim boundaries."
+    }
+  ]
+}

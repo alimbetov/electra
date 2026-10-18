@@ -1,0 +1,66 @@
+{
+  "schema": "electra.elv5-environment-profile-contract-registry.v1",
+  "status": "IMPLEMENTATION_AMENDMENT",
+  "processInventoryChange": 0,
+  "databaseSchemaChange": 0,
+  "profileSchema": "electra.elv5-environment-profile.v1",
+  "scopeBindingSchema": "electra.elv5-environment-scope-binding.v1",
+  "profilePolicyCode": "ELV5_ENVIRONMENT_PROFILE",
+  "supportedScopeKinds": [
+    "ROOM",
+    "ROUTE_SECTION"
+  ],
+  "precedence": [
+    "ROUTE_SECTION",
+    "ROOM",
+    "MISSING"
+  ],
+  "roomClassificationIsEngineeringEvidence": false,
+  "requiredProfileDimensions": [
+    "TEMPERATURE_RANGE_C",
+    "RELATIVE_HUMIDITY_RANGE_PERCENT",
+    "CONDENSATION_RISK",
+    "EXPOSURE"
+  ],
+  "fa08ExactNumericProperties": [
+    {"propertyCode": "ENVIRONMENT_TEMP_MIN_C", "unitCode": "C"},
+    {"propertyCode": "ENVIRONMENT_TEMP_MAX_C", "unitCode": "C"},
+    {"propertyCode": "ENVIRONMENT_RH_MIN_PCT", "unitCode": "PCT"},
+    {"propertyCode": "ENVIRONMENT_RH_MAX_PCT", "unitCode": "PCT"}
+  ],
+  "optionalClassDimensions": [
+    "MOISTURE_CLASS",
+    "CONTAMINATION_CLASS",
+    "CLIMATE_CLASS"
+  ],
+  "ampacityTemperatureSelection": "PROFILE_MAXIMUM_AMBIENT",
+  "routeAmpacityEquation": "Iz(run) = min(Iz(section_i))",
+  "humidityDirectAmpacityFactorAllowed": false,
+  "forbiddenDefaults": [
+    "ROOM_TYPE_TO_TEMPERATURE",
+    "ROOM_TYPE_TO_HUMIDITY",
+    "ROOM_CATEGORY_TO_CONDENSATION",
+    "MISSING_PROFILE_TO_30C",
+    "FIRST_ROOM_PROFILE_FOR_WHOLE_ROUTE"
+  ],
+  "persistence": {
+    "evidenceTable": "elv_revision_aggregate_evidence_records",
+    "aggregateKind": "ELV5_ENVIRONMENT_PROFILE",
+    "selectorTable": "discipline_policy_bindings",
+    "bindingCasRequired": true,
+    "designRevisionCasRequired": true
+  },
+  "implementationSymbols": [
+    "Elv5EnvironmentProfile",
+    "Elv5EnvironmentScopeBinding",
+    "Elv5EnvironmentProfileSource",
+    "Elv5EnvironmentProfileWriter",
+    "Elv5EnvironmentScopeResolver",
+    "DriftElv5EnvironmentProfileStore",
+    "DriftElv5EnvironmentScopeResolver",
+    "Elv5RouteAmpacityKernel",
+    "Elv5AmpacityRouteResolver",
+    "DriftElv5AmpacitySectionContractStore",
+    "Fa08PersistedInputResolver"
+  ]
+}

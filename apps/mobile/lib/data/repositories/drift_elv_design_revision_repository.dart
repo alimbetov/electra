@@ -11,6 +11,8 @@ import '../database/app_database.dart';
 import 'drift_elv_runtime_support.dart';
 import 'drift_power_publication_runtime.dart';
 import 'drift_power_snapshot_facts.dart';
+import 'elv5/drift_elv5_discipline_snapshot_store.dart';
+import 'elv5/drift_elv5_snapshot_materializer.dart';
 
 final class DriftElvDesignRevisionRepository
     implements ElvDesignRevisionRepository {
@@ -227,11 +229,23 @@ final class DriftElvDesignRevisionRepository
             originDeviceId: originDeviceId,
           ),
         );
-    await powerRuntime.captureCommittedPowerSectionForFreeze(
+    final powerSha256 = await powerRuntime
+        .captureCommittedPowerSectionForFreeze(
+          projectId: row.projectId,
+          designRevisionId: row.id,
+          expectedRevisionToken: row.revision,
+          physicalSha256: snapshot.contentSha256,
+        );
+    await DriftElv5DisciplineSnapshotStore(
+      database,
+      originDeviceId: originDeviceId,
+      nowUtc: _now,
+    ).capture(
       projectId: row.projectId,
       designRevisionId: row.id,
-      expectedRevisionToken: row.revision,
+      expectedRevision: row.revision,
       physicalSha256: snapshot.contentSha256,
+      powerSha256: powerSha256,
     );
     await failureProbe.hit(ElvFailurePoints.p3FreezeAfterSnapshotInsert);
     await (database.update(database.projectDesignRevisions)..where(
@@ -357,6 +371,11 @@ final class DriftElvDesignRevisionRepository
       projectId: command.projectId,
       designRevisionId: base.id,
     );
+    final discipline = await DriftElv5DisciplineSnapshotStore(
+      database,
+      originDeviceId: originDeviceId,
+      nowUtc: _now,
+    ).read(projectId: command.projectId, designRevisionId: base.id);
     final physicalIds = <String, String>{};
     final payloadMap = jsonDecode(snapshot.payloadJson) as Map<String, dynamic>;
     final runs =
@@ -420,6 +439,16 @@ final class DriftElvDesignRevisionRepository
         projectId: revision.projectId,
         revisionId: revision.id,
         captured: capturedPower.capturedPayload!,
+        physicalIds: physicalIds,
+        now: instant,
+        originDeviceId: originDeviceId,
+      );
+    }
+    if (discipline.payload != null) {
+      await DriftElv5SnapshotMaterializer(database).materialize(
+        projectId: revision.projectId,
+        revisionId: revision.id,
+        captured: discipline.payload!,
         physicalIds: physicalIds,
         now: instant,
         originDeviceId: originDeviceId,

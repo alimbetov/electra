@@ -1,0 +1,1431 @@
+{
+  "schema": "electra.elv5-design-requirements.v1",
+  "designStatus": "DRAFT",
+  "runtimeStatus": "NOT_STARTED",
+  "requirements": [
+    {
+      "requirementId": "ELV5-P0-001",
+      "package": "P0",
+      "summary": "Pin accepted ELV4 source, merge SHA, schema 23 and real v21/v22 migration origins",
+      "designDocument": "p0-baseline.md",
+      "plannedAcceptanceIds": [
+        "P0-T01"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p0"
+    },
+    {
+      "requirementId": "ELV5-P0-002",
+      "package": "P0",
+      "summary": "Reuse implemented ELV4 RM01–RM15 with source/test/CI evidence and recorded architecture deviations",
+      "designDocument": "p0-baseline.md",
+      "plannedAcceptanceIds": [
+        "P0-T02"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p0"
+    },
+    {
+      "requirementId": "ELV5-P0-003",
+      "package": "P0",
+      "summary": "Map all legacy/ELV3/ELV4 result consumers before adding owner ELV5",
+      "designDocument": "p0-baseline.md",
+      "plannedAcceptanceIds": [
+        "P0-T03"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p0"
+    },
+    {
+      "requirementId": "ELV5-P0-004",
+      "package": "P0",
+      "summary": "Inventory canonical equipment/profile/path/assembly editors and snapshot/history writers",
+      "designDocument": "p0-baseline.md",
+      "plannedAcceptanceIds": [
+        "P0-T04"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p0"
+    },
+    {
+      "requirementId": "ELV5-P0-005",
+      "package": "P0",
+      "summary": "Freeze supported technical scope and explicit ELV6/ELV7/ELV8 boundaries for all 27 codes",
+      "designDocument": "p0-baseline.md",
+      "plannedAcceptanceIds": [
+        "P0-T05"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p0"
+    },
+    {
+      "requirementId": "ELV5-P0-006",
+      "package": "P0",
+      "summary": "Identify exact ELV4 evidence reuse/policy composition and required runtime capabilities",
+      "designDocument": "p0-baseline.md",
+      "plannedAcceptanceIds": [
+        "P0-T06"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p0"
+    },
+    {
+      "requirementId": "ELV5-P0-007",
+      "package": "P0",
+      "summary": "Design four-discipline and shared-source public-command qualification fixtures",
+      "designDocument": "p0-baseline.md",
+      "plannedAcceptanceIds": [
+        "P0-T07"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p0"
+    },
+    {
+      "requirementId": "ELV5-P0-008",
+      "package": "P0",
+      "summary": "Record runtime-entry outcome without treating merge or SPEC_RESOLVED as implemented capability",
+      "designDocument": "p0-baseline.md",
+      "plannedAcceptanceIds": [
+        "P0-T08"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p0"
+    },
+    {
+      "requirementId": "ELV5-P1-001",
+      "package": "P1",
+      "summary": "Register exactly 27 stable discipline process codes with algorithm/input/output versions",
+      "designDocument": "p1-profiles-registry.md",
+      "plannedAcceptanceIds": [
+        "P1-T01"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-06"
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p1"
+    },
+    {
+      "requirementId": "ELV5-P1-002",
+      "package": "P1",
+      "summary": "Define typed immutable policy editions with exact applicability, units, source status and hashes",
+      "designDocument": "p1-profiles-registry.md",
+      "plannedAcceptanceIds": [
+        "P1-T02"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-02",
+        "ELV5-AUD-03"
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p1"
+    },
+    {
+      "requirementId": "ELV5-P1-003",
+      "package": "P1",
+      "summary": "Define DESIGN/SEGMENT/SEQUENCE key and process input/output scope compatibility",
+      "designDocument": "p1-profiles-registry.md",
+      "plannedAcceptanceIds": [
+        "P1-T03"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p1"
+    },
+    {
+      "requirementId": "ELV5-P1-004",
+      "package": "P1",
+      "summary": "Model stream/recording, link/port, door/channel and fire/address assignments without duplicate canonical identities",
+      "designDocument": "p1-profiles-registry.md",
+      "plannedAcceptanceIds": [
+        "P1-T04"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-02",
+        "ELV5-AUD-04",
+        "ELV5-AUD-05",
+        "ELV5-AUD-07"
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p1"
+    },
+    {
+      "requirementId": "ELV5-P1-005",
+      "package": "P1",
+      "summary": "Extend exact-decimal/rational quantities with signed coordinates/dBm and versioned bounded geometry output",
+      "designDocument": "p1-profiles-registry.md",
+      "plannedAcceptanceIds": [
+        "P1-T05"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-01",
+        "ELV5-AUD-08"
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p1"
+    },
+    {
+      "requirementId": "ELV5-P1-006",
+      "package": "P1",
+      "summary": "Define shared-source requirement composition without repeated reserves/losses or reduced membership totals",
+      "designDocument": "p1-profiles-registry.md",
+      "plannedAcceptanceIds": [
+        "P1-T06"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p1"
+    },
+    {
+      "requirementId": "ELV5-P1-007",
+      "package": "P1",
+      "summary": "Specify strict new wire schema/codec examples and preserve legacy/ELV4 decoder/hash invariants",
+      "designDocument": "p1-profiles-registry.md",
+      "plannedAcceptanceIds": [
+        "P1-T07"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p1"
+    },
+    {
+      "requirementId": "ELV5-P1-008",
+      "package": "P1",
+      "summary": "Define code-owned dependency/evaluation registry, model-limit outcomes and per-dimension status",
+      "designDocument": "p1-profiles-registry.md",
+      "plannedAcceptanceIds": [
+        "P1-T08"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-06"
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p1"
+    },
+    {
+      "requirementId": "ELV5-P2-001",
+      "package": "P2",
+      "summary": "Add revision-scoped calculation aspects and normalized FK-bearing assignment children",
+      "designDocument": "p2-persistence-commands.md",
+      "plannedAcceptanceIds": [
+        "P2-T01"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p2"
+    },
+    {
+      "requirementId": "ELV5-P2-002",
+      "package": "P2",
+      "summary": "Add isolated discipline records/pointers and schema dispatch preserving legacy and dedicated ELV4 stores",
+      "designDocument": "p2-persistence-commands.md",
+      "plannedAcceptanceIds": [
+        "P2-T02"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p2"
+    },
+    {
+      "requirementId": "ELV5-P2-003",
+      "package": "P2",
+      "summary": "Implement typed mutation commands with replay-first ledger, aggregate CAS and reviewed shared impact",
+      "designDocument": "p2-persistence-commands.md",
+      "plannedAcceptanceIds": [
+        "P2-T03"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p2"
+    },
+    {
+      "requirementId": "ELV5-P2-004",
+      "package": "P2",
+      "summary": "Commit aspect/assignment edits, old+new invalidation, history and ledger atomically",
+      "designDocument": "p2-persistence-commands.md",
+      "plannedAcceptanceIds": [
+        "P2-T04"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p2"
+    },
+    {
+      "requirementId": "ELV5-P2-005",
+      "package": "P2",
+      "summary": "Persist immutable discipline evaluations and guarded DESIGN/SEGMENT/SEQUENCE current pointers",
+      "designDocument": "p2-persistence-commands.md",
+      "plannedAcceptanceIds": [
+        "P2-T05"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p2"
+    },
+    {
+      "requirementId": "ELV5-P2-006",
+      "package": "P2",
+      "summary": "Extend coordinated snapshot manifest with versioned discipline section and legacy NOT_CAPTURED outcome",
+      "designDocument": "p2-persistence-commands.md",
+      "plannedAcceptanceIds": [
+        "P2-T06"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p2"
+    },
+    {
+      "requirementId": "ELV5-P2-007",
+      "package": "P2",
+      "summary": "Materialize create-next with typed physical/assignment remapping and shared revision allocator",
+      "designDocument": "p2-persistence-commands.md",
+      "plannedAcceptanceIds": [
+        "P2-T07"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p2"
+    },
+    {
+      "requirementId": "ELV5-P2-008",
+      "package": "P2",
+      "summary": "Persist complete forward/inverse history with revision-local cursor and restart-safe redo",
+      "designDocument": "p2-persistence-commands.md",
+      "plannedAcceptanceIds": [
+        "P2-T08"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p2"
+    },
+    {
+      "requirementId": "ELV5-P3-001",
+      "package": "P3",
+      "summary": "Implement CCTV-01 explicit rectilinear plane coverage with coordinate/model applicability and numeric bounds",
+      "designDocument": "p3-cctv.md",
+      "plannedAcceptanceIds": [
+        "P3-T01"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-08"
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p3"
+    },
+    {
+      "requirementId": "ELV5-P3-002",
+      "package": "P3",
+      "summary": "Implement CCTV-02 stream/flow identity, expected/peak and exact per-edge copy accounting",
+      "designDocument": "p3-cctv.md",
+      "plannedAcceptanceIds": [
+        "P3-T02"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-05"
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p3"
+    },
+    {
+      "requirementId": "ELV5-P3-003",
+      "package": "P3",
+      "summary": "Implement CCTV-03 unique recording horizon integration and usable/raw requirement distinction",
+      "designDocument": "p3-cctv.md",
+      "plannedAcceptanceIds": [
+        "P3-T03"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-01",
+        "ELV5-AUD-02"
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p3"
+    },
+    {
+      "requirementId": "ELV5-P3-004",
+      "package": "P3",
+      "summary": "Implement CCTV-04 contextual PoE over complete shared physical source evidence",
+      "designDocument": "p3-cctv.md",
+      "plannedAcceptanceIds": [
+        "P3-T04"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p3"
+    },
+    {
+      "requirementId": "ELV5-P3-005",
+      "package": "P3",
+      "summary": "Implement CCTV-05 independent channels/ingress/codec/usable-storage constraints",
+      "designDocument": "p3-cctv.md",
+      "plannedAcceptanceIds": [
+        "P3-T05"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-02",
+        "ELV5-AUD-05"
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p3"
+    },
+    {
+      "requirementId": "ELV5-P3-006",
+      "package": "P3",
+      "summary": "Implement CCTV-06 realized link/power applicability without duplicate path/resource claims",
+      "designDocument": "p3-cctv.md",
+      "plannedAcceptanceIds": [
+        "P3-T06"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p3"
+    },
+    {
+      "requirementId": "ELV5-P3-007",
+      "package": "P3",
+      "summary": "Emit structured step/provenance and exact incremental dependencies for all CCTV outputs",
+      "designDocument": "p3-cctv.md",
+      "plannedAcceptanceIds": [
+        "P3-T07"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p3"
+    },
+    {
+      "requirementId": "ELV5-P3-008",
+      "package": "P3",
+      "summary": "Qualify positive/negative, restart/history and shared LAN/PSE cases through public commands",
+      "designDocument": "p3-cctv.md",
+      "plannedAcceptanceIds": [
+        "P3-T08"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p3"
+    },
+    {
+      "requirementId": "ELV5-P4-001",
+      "package": "P4",
+      "summary": "Implement LAN-01 permanent/channel section unions and nonduplicated installed allowances",
+      "designDocument": "p4-lan.md",
+      "plannedAcceptanceIds": [
+        "P4-T01"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p4"
+    },
+    {
+      "requirementId": "ELV5-P4-002",
+      "package": "P4",
+      "summary": "Implement LAN-02 physical switch assignment and explicit integer spare policy",
+      "designDocument": "p4-lan.md",
+      "plannedAcceptanceIds": [
+        "P4-T02"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p4"
+    },
+    {
+      "requirementId": "ELV5-P4-003",
+      "package": "P4",
+      "summary": "Implement LAN-03 global shared-source PoE context without duplicate electrical calculation",
+      "designDocument": "p4-lan.md",
+      "plannedAcceptanceIds": [
+        "P4-T03"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p4"
+    },
+    {
+      "requirementId": "ELV5-P4-004",
+      "package": "P4",
+      "summary": "Implement LAN-04 complete copper path compatibility against selected profile matrix",
+      "designDocument": "p4-lan.md",
+      "plannedAcceptanceIds": [
+        "P4-T04"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p4"
+    },
+    {
+      "requirementId": "ELV5-P4-005",
+      "package": "P4",
+      "summary": "Implement LAN-05 bidirectional signed optical sensitivity and overload budgets",
+      "designDocument": "p4-lan.md",
+      "plannedAcceptanceIds": [
+        "P4-T05"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-03"
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p4"
+    },
+    {
+      "requirementId": "ELV5-P4-006",
+      "package": "P4",
+      "summary": "Implement LAN-06 demand/capacity basis without ELV6 slot-layout/fit claims",
+      "designDocument": "p4-lan.md",
+      "plannedAcceptanceIds": [
+        "P4-T06"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-07"
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p4"
+    },
+    {
+      "requirementId": "ELV5-P4-007",
+      "package": "P4",
+      "summary": "Implement LAN-07 patch resource counts and mapping completeness",
+      "designDocument": "p4-lan.md",
+      "plannedAcceptanceIds": [
+        "P4-T07"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p4"
+    },
+    {
+      "requirementId": "ELV5-P4-008",
+      "package": "P4",
+      "summary": "Qualify exact boundary, missing/unsupported inputs, independent paths and restart/freeze behavior",
+      "designDocument": "p4-lan.md",
+      "plannedAcceptanceIds": [
+        "P4-T08"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p4"
+    },
+    {
+      "requirementId": "ELV5-P5-001",
+      "package": "P5",
+      "summary": "Implement ACS-01 explicit door-role alternatives/multiplicities with scoped canonical assignments",
+      "designDocument": "p5-acs.md",
+      "plannedAcceptanceIds": [
+        "P5-T01"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p5"
+    },
+    {
+      "requirementId": "ELV5-P5-002",
+      "package": "P5",
+      "summary": "Implement ACS-02 independent controller reader/relay/input resource capacities",
+      "designDocument": "p5-acs.md",
+      "plannedAcceptanceIds": [
+        "P5-T02"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p5"
+    },
+    {
+      "requirementId": "ELV5-P5-003",
+      "package": "P5",
+      "summary": "Implement ACS-03 lock holding/active/startup mode and shared-trunk voltage evidence",
+      "designDocument": "p5-acs.md",
+      "plannedAcceptanceIds": [
+        "P5-T03"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p5"
+    },
+    {
+      "requirementId": "ELV5-P5-004",
+      "package": "P5",
+      "summary": "Implement ACS-04 shared-source requirement composition with reserve/derating once",
+      "designDocument": "p5-acs.md",
+      "plannedAcceptanceIds": [
+        "P5-T04"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p5"
+    },
+    {
+      "requirementId": "ELV5-P5-005",
+      "package": "P5",
+      "summary": "Implement ACS-05 full protected sequence/model policy and global bank evidence",
+      "designDocument": "p5-acs.md",
+      "plannedAcceptanceIds": [
+        "P5-T05"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p5"
+    },
+    {
+      "requirementId": "ELV5-P5-006",
+      "package": "P5",
+      "summary": "Implement ACS-06 independent reader/control/feed/release topology checks",
+      "designDocument": "p5-acs.md",
+      "plannedAcceptanceIds": [
+        "P5-T06"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p5"
+    },
+    {
+      "requirementId": "ELV5-P5-007",
+      "package": "P5",
+      "summary": "Integrate assignment/deletion/adoption guards, findings and consumed dependency projection",
+      "designDocument": "p5-acs.md",
+      "plannedAcceptanceIds": [
+        "P5-T07"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p5"
+    },
+    {
+      "requirementId": "ELV5-P5-008",
+      "package": "P5",
+      "summary": "Qualify door positives/negatives, shared non-ACS loads, restart and historical evidence",
+      "designDocument": "p5-acs.md",
+      "plannedAcceptanceIds": [
+        "P5-T08"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p5"
+    },
+    {
+      "requirementId": "ELV5-P6-001",
+      "package": "P6",
+      "summary": "Implement FA-01 distinct physical-device/address-resource limits and uniqueness",
+      "designDocument": "p6-fire.md",
+      "plannedAcceptanceIds": [
+        "P6-T01"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-04"
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p6"
+    },
+    {
+      "requirementId": "ELV5-P6-002",
+      "package": "P6",
+      "summary": "Implement FA-02 explicit standby/alarm/simultaneous current origins without own-load duplication",
+      "designDocument": "p6-fire.md",
+      "plannedAcceptanceIds": [
+        "P6-T02"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p6"
+    },
+    {
+      "requirementId": "ELV5-P6-003",
+      "package": "P6",
+      "summary": "Implement FA-03 supported electrical basis with explicit unsupported closed-loop/shared-return behavior",
+      "designDocument": "p6-fire.md",
+      "plannedAcceptanceIds": [
+        "P6-T03"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p6"
+    },
+    {
+      "requirementId": "ELV5-P6-004",
+      "package": "P6",
+      "summary": "Implement FA-04 complete panel/loop/notification/auxiliary source requirement set",
+      "designDocument": "p6-fire.md",
+      "plannedAcceptanceIds": [
+        "P6-T04"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p6"
+    },
+    {
+      "requirementId": "ELV5-P6-005",
+      "package": "P6",
+      "summary": "Implement FA-05 explicit standby/alarm sequence and selected bank applicability",
+      "designDocument": "p6-fire.md",
+      "plannedAcceptanceIds": [
+        "P6-T05"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p6"
+    },
+    {
+      "requirementId": "ELV5-P6-006",
+      "package": "P6",
+      "summary": "Implement FA-06 notification count/current/peak/terminal-voltage basis",
+      "designDocument": "p6-fire.md",
+      "plannedAcceptanceIds": [
+        "P6-T06"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p6"
+    },
+    {
+      "requirementId": "ELV5-P6-007",
+      "package": "P6",
+      "summary": "Implement FA-07 closure/branch/isolation/address signal policy and FA-08 cable/evidence policy basis",
+      "designDocument": "p6-fire.md",
+      "plannedAcceptanceIds": [
+        "P6-T07"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-04"
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p6"
+    },
+    {
+      "requirementId": "ELV5-P6-008",
+      "package": "P6",
+      "summary": "Qualify safety-critical missing-policy behavior, technical claim scope and complete restart/history cases",
+      "designDocument": "p6-fire.md",
+      "plannedAcceptanceIds": [
+        "P6-T08"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p6"
+    },
+    {
+      "requirementId": "ELV5-P7-001",
+      "package": "P7",
+      "summary": "Encode owner/scope-aware consumed dependency keys including missing inputs and membership sets",
+      "designDocument": "p7-dependencies-workspace.md",
+      "plannedAcceptanceIds": [
+        "P7-T01"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-06"
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p7"
+    },
+    {
+      "requirementId": "ELV5-P7-002",
+      "package": "P7",
+      "summary": "Invalidate exact old+new closures across discipline/shared-source boundaries",
+      "designDocument": "p7-dependencies-workspace.md",
+      "plannedAcceptanceIds": [
+        "P7-T02"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p7"
+    },
+    {
+      "requirementId": "ELV5-P7-003",
+      "package": "P7",
+      "summary": "Guard publication with lifecycle/token/fingerprint and consumed pointer generation checks",
+      "designDocument": "p7-dependencies-workspace.md",
+      "plannedAcceptanceIds": [
+        "P7-T03"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-06"
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p7"
+    },
+    {
+      "requirementId": "ELV5-P7-004",
+      "package": "P7",
+      "summary": "Implement progressive per-discipline calculation cards with exact revision/scope/source provenance",
+      "designDocument": "p7-dependencies-workspace.md",
+      "plannedAcceptanceIds": [
+        "P7-T04"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p7"
+    },
+    {
+      "requirementId": "ELV5-P7-005",
+      "package": "P7",
+      "summary": "Show full shared-project totals and selected discipline contribution without recalc filtering",
+      "designDocument": "p7-dependencies-workspace.md",
+      "plannedAcceptanceIds": [
+        "P7-T05"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p7"
+    },
+    {
+      "requirementId": "ELV5-P7-006",
+      "package": "P7",
+      "summary": "Route preview/commit/replay/undo/redo and failed-draft retention through application services",
+      "designDocument": "p7-dependencies-workspace.md",
+      "plannedAcceptanceIds": [
+        "P7-T06"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p7"
+    },
+    {
+      "requirementId": "ELV5-P7-007",
+      "package": "P7",
+      "summary": "Implement frozen historical/NOT_CAPTURED comparison and preserve scope-context generation in async reads",
+      "designDocument": "p7-dependencies-workspace.md",
+      "plannedAcceptanceIds": [
+        "P7-T07"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p7"
+    },
+    {
+      "requirementId": "ELV5-P7-008",
+      "package": "P7",
+      "summary": "Cover compact/keyboard/focus/back/finding remediation and stale-versus-failed display",
+      "designDocument": "p7-dependencies-workspace.md",
+      "plannedAcceptanceIds": [
+        "P7-T08"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p7"
+    },
+    {
+      "requirementId": "ELV5-P8-001",
+      "package": "P8",
+      "summary": "Implement one FK-valid public-command fixture per discipline plus shared-source project context",
+      "designDocument": "p8-acceptance.md",
+      "plannedAcceptanceIds": [
+        "P8-T01"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p8"
+    },
+    {
+      "requirementId": "ELV5-P8-002",
+      "package": "P8",
+      "summary": "Exercise all 27 process positive/negative oracles with required dimension/claim-scope manifest",
+      "designDocument": "p8-acceptance.md",
+      "plannedAcceptanceIds": [
+        "P8-T02"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-01",
+        "ELV5-AUD-02",
+        "ELV5-AUD-03",
+        "ELV5-AUD-04",
+        "ELV5-AUD-05",
+        "ELV5-AUD-07",
+        "ELV5-AUD-08"
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p8"
+    },
+    {
+      "requirementId": "ELV5-P8-003",
+      "package": "P8",
+      "summary": "Prove exact snapshots/evaluations/policies/assignments after file-SQLite close/reopen",
+      "designDocument": "p8-acceptance.md",
+      "plannedAcceptanceIds": [
+        "P8-T03"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p8"
+    },
+    {
+      "requirementId": "ELV5-P8-004",
+      "package": "P8",
+      "summary": "Freeze R1, create/remap R2, change profiles/routes/states and prove immutable R1 results",
+      "designDocument": "p8-acceptance.md",
+      "plannedAcceptanceIds": [
+        "P8-T04"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p8"
+    },
+    {
+      "requirementId": "ELV5-P8-005",
+      "package": "P8",
+      "summary": "Inject owned durable failure checkpoints and verify same-open/reopened rollback including history/ledger",
+      "designDocument": "p8-acceptance.md",
+      "plannedAcceptanceIds": [
+        "P8-T05"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p8"
+    },
+    {
+      "requirementId": "ELV5-P8-006",
+      "package": "P8",
+      "summary": "Prove response-loss replay/payload conflict and two-connection edit/publish/freeze/adoption races",
+      "designDocument": "p8-acceptance.md",
+      "plannedAcceptanceIds": [
+        "P8-T06"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p8"
+    },
+    {
+      "requirementId": "ELV5-P8-007",
+      "package": "P8",
+      "summary": "Verify supported migration origins and mixed legacy/ELV3/ELV4/ELV5 result consumer isolation",
+      "designDocument": "p8-acceptance.md",
+      "plannedAcceptanceIds": [
+        "P8-T07"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p8"
+    },
+    {
+      "requirementId": "ELV5-P8-008",
+      "package": "P8",
+      "summary": "Assert affected and unaffected process sets, exact arithmetic/bounds and no false compliance/layout claim",
+      "designDocument": "p8-acceptance.md",
+      "plannedAcceptanceIds": [
+        "P8-T08"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-01",
+        "ELV5-AUD-03",
+        "ELV5-AUD-04",
+        "ELV5-AUD-06",
+        "ELV5-AUD-08"
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p8"
+    },
+    {
+      "requirementId": "ELV5-P9-001",
+      "package": "P9",
+      "summary": "Reconcile all 80 requirements and 27 registry processes to actual source/tests/versions",
+      "designDocument": "p9-closure.md",
+      "plannedAcceptanceIds": [
+        "P9-T01"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-06"
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p9"
+    },
+    {
+      "requirementId": "ELV5-P9-002",
+      "package": "P9",
+      "summary": "Audit all inherited/new mutation and query entry points for owner/scope/replay/transaction behavior",
+      "designDocument": "p9-closure.md",
+      "plannedAcceptanceIds": [
+        "P9-T02"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p9"
+    },
+    {
+      "requirementId": "ELV5-P9-003",
+      "package": "P9",
+      "summary": "Verify no duplicated physical kernels, source budgets, cable length, loads/reserves or storage intervals",
+      "designDocument": "p9-closure.md",
+      "plannedAcceptanceIds": [
+        "P9-T03"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-01",
+        "ELV5-AUD-03",
+        "ELV5-AUD-05"
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p9"
+    },
+    {
+      "requirementId": "ELV5-P9-004",
+      "package": "P9",
+      "summary": "Verify inherited ELV4 acceptance and new ELV5 migration, hash, remapping and historical compatibility",
+      "designDocument": "p9-closure.md",
+      "plannedAcceptanceIds": [
+        "P9-T04"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p9"
+    },
+    {
+      "requirementId": "ELV5-P9-005",
+      "package": "P9",
+      "summary": "Run required generation/format/analyzers/core/mobile/qualification at one exact source SHA",
+      "designDocument": "p9-closure.md",
+      "plannedAcceptanceIds": [
+        "P9-T05"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p9"
+    },
+    {
+      "requirementId": "ELV5-P9-006",
+      "package": "P9",
+      "summary": "Disposition findings and unsupported scope without replacing a positive case by a blocked estimate",
+      "designDocument": "p9-closure.md",
+      "plannedAcceptanceIds": [
+        "P9-T06"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-02",
+        "ELV5-AUD-08"
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p9"
+    },
+    {
+      "requirementId": "ELV5-P9-007",
+      "package": "P9",
+      "summary": "Publish explicit ELV6/ELV7/ELV8 handoff and technical claim limits",
+      "designDocument": "p9-closure.md",
+      "plannedAcceptanceIds": [
+        "P9-T07"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [
+        "ELV5-AUD-07"
+      ],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p9"
+    },
+    {
+      "requirementId": "ELV5-P9-008",
+      "package": "P9",
+      "summary": "Record design/runtime acceptance, merge and CLOSED as separate evidenced events",
+      "designDocument": "p9-closure.md",
+      "plannedAcceptanceIds": [
+        "P9-T08"
+      ],
+      "runtimeStatus": "NOT_STARTED",
+      "sourcePaths": [],
+      "testPaths": [],
+      "testedSha": null,
+      "evidence": [],
+      "specificationResolutions": [],
+      "baselineRef": "baseline.json",
+      "integrationContract": "implemented-baseline.md#p9"
+    }
+  ],
+  "specificationAuditStatus": "8_FINDINGS_RESOLVED_IN_SPEC_ONLY",
+  "baselineRef": "baseline.json"
+}

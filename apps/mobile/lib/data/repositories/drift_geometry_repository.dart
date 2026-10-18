@@ -1,3 +1,4 @@
+import 'elv5/drift_elv5_canonical_source_invalidation.dart';
 import 'package:drift/drift.dart';
 import 'package:engineering_core/engineering_core.dart';
 
@@ -236,6 +237,14 @@ final class DriftGeometryRepository implements GeometryRepository {
               ),
             );
       }
+      await invalidateElv5CanonicalSource(
+        database,
+        roomId: snapshot.roomId,
+        domain: 'ELV3_SURFACE_PATCH',
+        subjectIds: {...existingPatchIds, ...nextPatchIds},
+        originDeviceId: originDeviceId,
+        now: now,
+      );
     });
   }
 

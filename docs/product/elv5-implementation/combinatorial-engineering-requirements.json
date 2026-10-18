@@ -1,0 +1,47 @@
+{
+  "schema": "electra.elv5-combinatorial-engineering-requirements.v1",
+  "status": "DESIGN_HARDENED_RUNTIME_NOT_STARTED",
+  "scenarioTarget": 1500,
+  "priorityProcessMinimum": 72,
+  "regularProcessMinimum": 42,
+  "systemWideScenarioCount": 36,
+  "pairwiseCoverageTarget": "100_PERCENT_LEGAL_PAIRS",
+  "threeWisePolicy": "TARGETED_HIGH_RISK_ONLY",
+  "priorityComputationalCore": [
+    "CCTV-02",
+    "CCTV-03",
+    "LAN-01",
+    "LAN-05",
+    "ACS-03",
+    "ACS-04",
+    "ACS-05",
+    "FA-02",
+    "FA-04",
+    "FA-05",
+    "FA-06"
+  ],
+  "factorModel": {
+    "vectorClass": ["POSITIVE", "BOUNDARY", "NEGATIVE_OR_UNSUPPORTED", "ADVERSARIAL", "CROSS_DISCIPLINE"],
+    "cardinality": ["ZERO", "ONE", "TWO", "SMALL_MANY", "LIMIT_MINUS_1", "LIMIT", "LIMIT_PLUS_1"],
+    "composition": ["HOMOGENEOUS", "HETEROGENEOUS", "SHARED_TRUNK", "BRANCHED", "MULTI_ROLE", "CROSS_DISCIPLINE_SHARED"],
+    "orderMode": ["ORDER_INVARIANT", "ORDER_SIGNIFICANT", "TOPOLOGY_MUTATED"],
+    "sharedResourceContext": ["NONE", "SAME_DISCIPLINE_SHARED", "CROSS_DISCIPLINE_SHARED", "GLOBAL_SOURCE_OR_BANK"],
+    "evidenceQuality": ["GUARANTEED_COMPLETE", "TYPICAL_OR_ESTIMATED", "MISSING_OR_PARTIAL", "UNSUPPORTED_MODEL"],
+    "mutationState": ["BASELINE", "ADD_REMOVE_MEMBER", "REORDER_OR_REWIRE", "REVISION_REPLAY_OR_STALE"],
+    "projectScale": ["SMALL", "MEDIUM", "LARGE", "CAMPUS"]
+  },
+  "requirements": [
+    {"id":"ELV5-COMB-001","severity":"MUST","title":"Exactly 1500 deterministic scenarios","requirement":"P8 combinatorial qualification must execute exactly 1500 deterministic scenarios at one exact source SHA and authority fingerprint."},
+    {"id":"ELV5-COMB-002","severity":"MUST","title":"Per-process lower bound","requirement":"Every one of the 27 process codes must receive at least 42 combinatorial scenarios."},
+    {"id":"ELV5-COMB-003","severity":"MUST","title":"Priority-core density","requirement":"Each of the 11 priority computational processes must receive at least 72 combinatorial scenarios."},
+    {"id":"ELV5-COMB-004","severity":"MUST","title":"System-wide cross-process set","requirement":"Exactly 36 scenarios are reserved for cross-process/system-wide combinations such as shared sources, revision mutation, selector invalidation, stale publication, concurrency and closure behavior."},
+    {"id":"ELV5-COMB-005","severity":"MUST","title":"100 percent legal pairwise coverage","requirement":"Across the declared factor model, every legally compatible factor-value pair must appear in at least one executable scenario; excluded pairs require an explicit machine-readable incompatibility reason."},
+    {"id":"ELV5-COMB-006","severity":"MUST","title":"Targeted high-risk 3-wise coverage","requirement":"High-risk interactions in the priority computational core must include targeted legal 3-wise combinations, especially cardinality x composition x shared-resource, operating-case x evidence x reserve/policy, and topology/order x mutation x upstream-evidence interactions."},
+    {"id":"ELV5-COMB-007","severity":"MUST","title":"Order semantics qualification","requirement":"Order-invariant inputs must produce identical canonical input/output hashes and engineering results under canonical reorderings, while order-significant paths/sequences must change canonical input meaning when the physical order changes."},
+    {"id":"ELV5-COMB-008","severity":"MUST","title":"Boundary cardinality qualification","requirement":"Capacity-oriented processes must include limit-1, exact-limit and limit+1 cardinality scenarios wherever a finite process limit exists; zero/one/two/small-many cardinalities are also required when legally applicable."},
+    {"id":"ELV5-COMB-009","severity":"MUST","title":"Composition identity preservation","requirement":"Homogeneous, heterogeneous, branched, shared-trunk, multi-role and cross-discipline shared compositions must preserve canonical physical identity so aliases or repeated logical roles cannot manufacture or remove capacity/load."},
+    {"id":"ELV5-COMB-010","severity":"MUST","title":"Mutation and invalidation qualification","requirement":"Add/remove/reorder/rewire/revision/replay/stale scenarios must prove exact affected closure, deterministic recomputation, historical immutability and guarded publication."},
+    {"id":"ELV5-COMB-011","severity":"MUST","title":"No random-coverage claim","requirement":"Unseeded random generation cannot satisfy combinatorial acceptance; scenario generation, constraints, pair coverage and targeted 3-wise inventory must be deterministic and versioned."},
+    {"id":"ELV5-COMB-012","severity":"MUST","title":"Separate qualification layer","requirement":"The 1500 combinatorial matrix supplements rather than replaces the 54 primary public verticals, 135 dossier vectors and 450 market-shaped design scenarios."}
+  ]
+}

@@ -1,0 +1,182 @@
+{
+  "schema": "electra.elv5-f2-lifecycle-witness-registry.v1",
+  "scope": "Q6_Q7_Q8_EXECUTION_ONLY_NOT_FULL_QUALIFICATION",
+  "witnesses": [
+    {
+      "processCode": "CCTV-01",
+      "path": "apps/mobile/test/data/elv5_f2_cctv01_full_runtime_e2e_test.dart",
+      "testName": "F2 CCTV-01 production Q6/Q7/Q8 immutable exact surface frames and optical contract survive restart and freeze",
+      "requireRepublished": true
+    },
+    {
+      "processCode": "CCTV-02",
+      "path": "apps/mobile/test/data/elv5_f2_cctv02_full_runtime_e2e_test.dart",
+      "testName": "F2 CCTV-02 production Q6/Q7/Q8 exact recorder ingress follows authoritative stream replacement across restart and freeze",
+      "requireRepublished": true
+    },
+    {
+      "processCode": "CCTV-03",
+      "path": "apps/mobile/test/data/elv5_f2_cctv03_full_runtime_e2e_test.dart",
+      "testName": "F2 CCTV-03 Q6/Q7/Q8 qualifies persisted recording facts, invalidation, restart and freeze",
+      "requireRepublished": true
+    },
+    {
+      "processCode": "CCTV-04",
+      "path": "apps/mobile/test/data/elv5_f2_cctv04_full_runtime_e2e_test.dart",
+      "testName": "F2 CCTV-04 production Q6/Q7/Q8 global PWR06 closure rejects subset budgeting through restart and freeze",
+      "requireRepublished": true
+    },
+    {
+      "processCode": "CCTV-05",
+      "path": "apps/mobile/test/data/elv5_f2_cctv05_full_runtime_e2e_test.dart",
+      "testName": "F2 CCTV-05 production Q6/Q7/Q8 consumes real current CCTV02 and CCTV03 without reapplying reserve across restart and freeze",
+      "requireRepublished": true
+    },
+    {
+      "processCode": "CCTV-06",
+      "path": "apps/mobile/test/data/elv5_f2_cctv06_full_runtime_e2e_test.dart",
+      "testName": "F2 CCTV-06 production Q6/Q7/Q8 exact ELV3 link and policy replacement survive restart and freeze",
+      "requireRepublished": true
+    },
+    {
+      "processCode": "LAN-01",
+      "path": "apps/mobile/test/data/elv5_f2_lan01_full_runtime_e2e_test.dart",
+      "testName": "F2 LAN-01 production Q6/Q7/Q8 exact ELV3 geometry and authoritative composition preserve unassessed policy",
+      "requireRepublished": true
+    },
+    {
+      "processCode": "LAN-02",
+      "path": "apps/mobile/test/data/elv5_f2_lan02_full_runtime_e2e_test.dart",
+      "testName": "F2 LAN-02 production Q6/Q7/Q8 authoritative policy replacement, restart and freeze",
+      "requireRepublished": true
+    },
+    {
+      "processCode": "LAN-03",
+      "path": "apps/mobile/test/data/elv5_f2_lan03_full_runtime_e2e_test.dart",
+      "testName": "F2 LAN-03 production Q6/Q7/Q8 global PWR06 closure rejects subset budgeting through restart and freeze",
+      "requireRepublished": true
+    },
+    {
+      "processCode": "LAN-04",
+      "path": "apps/mobile/test/data/elv5_f2_lan04_full_runtime_e2e_test.dart",
+      "testName": "F2 LAN-04 production Q6/Q7/Q8 authoritative policy replacement, restart and freeze",
+      "requireRepublished": true
+    },
+    {
+      "processCode": "LAN-05",
+      "path": "apps/mobile/test/data/elv5_f2_lan05_full_runtime_e2e_test.dart",
+      "testName": "F2 LAN-05 Q6/Q7/Q8 qualifies exact ELV3 length, optical evidence invalidation, restart and freeze",
+      "requireRepublished": true
+    },
+    {
+      "processCode": "LAN-06",
+      "path": "apps/mobile/test/data/elv5_f2_lan06_full_runtime_e2e_test.dart",
+      "testName": "F2 LAN-06 production Q6/Q7/Q8 authoritative policy replacement, restart and freeze",
+      "requireRepublished": true
+    },
+    {
+      "processCode": "LAN-07",
+      "path": "apps/mobile/test/data/elv5_f2_lan07_full_runtime_e2e_test.dart",
+      "testName": "F2 LAN-07 production Q6/Q7/Q8 authoritative policy replacement, restart and freeze",
+      "requireRepublished": true
+    },
+    {
+      "processCode": "ACS-01",
+      "path": "apps/mobile/test/data/elv5_f2_acs01_full_runtime_e2e_test.dart",
+      "testName": "F2 ACS-01 production Q6/Q7/Q8 immutable role requirements, rollback, restart and freeze",
+      "requireRepublished": true
+    },
+    {
+      "processCode": "ACS-02",
+      "path": "apps/mobile/test/data/elv5_f2_acs02_full_runtime_e2e_test.dart",
+      "testName": "F2 ACS-02 production Q6/Q7/Q8 unavailable assigned relay, restart and freeze",
+      "requireRepublished": true
+    },
+    {
+      "processCode": "ACS-03",
+      "path": "apps/mobile/test/data/elv5_f2_acs03_full_runtime_e2e_test.dart",
+      "testName": "F2 ACS-03 Q6/Q7/Q8 qualifies persisted door, real PWR CURRENT evidence, publication, restart and freeze replay",
+      "requireRepublished": false
+    },
+    {
+      "processCode": "ACS-04",
+      "path": "apps/mobile/test/data/elv5_f2_acs04_full_runtime_e2e_test.dart",
+      "testName": "F2 ACS-04 production Q6/Q7/Q8 ELV4 CURRENT replacement, restart and freeze",
+      "requireRepublished": true
+    },
+    {
+      "processCode": "ACS-05",
+      "path": "apps/mobile/test/data/elv5_f2_acs05_full_runtime_e2e_test.dart",
+      "testName": "F2 ACS-05 production Q6/Q7/Q8 PWR04 consumed sequence and PWR01 provenance survive restart and freeze",
+      "requireRepublished": true
+    },
+    {
+      "processCode": "ACS-06",
+      "path": "apps/mobile/test/data/elv5_f2_acs06_full_runtime_e2e_test.dart",
+      "testName": "F2 ACS-06 production Q6/Q7/Q8 door release paths, fire release failure, restart and freeze",
+      "requireRepublished": true
+    },
+    {
+      "processCode": "FA-01",
+      "path": "apps/mobile/test/data/elv5_f2_fa01_full_runtime_e2e_test.dart",
+      "testName": "F2 FA-01 production Q6/Q7/Q8 contract replacement, independent SQLite race, restart and freeze",
+      "requireRepublished": true
+    },
+    {
+      "processCode": "FA-02",
+      "path": "apps/mobile/test/data/elv5_f2_fa02_full_runtime_e2e_test.dart",
+      "testName": "F2 FA-02 production Q6/Q7/Q8 exact ELV4 DC states, restart and freeze",
+      "requireRepublished": true
+    },
+    {
+      "processCode": "FA-03",
+      "path": "apps/mobile/test/data/elv5_f2_fa03_full_runtime_e2e_test.dart",
+      "testName": "F2 FA-03 production Q6/Q7/Q8 real PWR03 policy invalidation, independent CAS, restart and freeze",
+      "requireRepublished": true
+    },
+    {
+      "processCode": "FA-04",
+      "path": "apps/mobile/test/data/elv5_f2_fa04_full_runtime_e2e_test.dart",
+      "testName": "F2 FA-04 production Q6/Q7/Q8 ELV4 CURRENT replacement, restart and freeze",
+      "requireRepublished": true
+    },
+    {
+      "processCode": "FA-05",
+      "path": "apps/mobile/test/data/elv5_f2_fa05_full_runtime_e2e_test.dart",
+      "testName": "F2 FA-05 production Q6/Q7/Q8 PWR04 consumed sequence and PWR01 provenance survive restart and freeze",
+      "requireRepublished": true
+    },
+    {
+      "processCode": "FA-06",
+      "path": "apps/mobile/test/data/elv5_f2_fa06_full_runtime_e2e_test.dart",
+      "testName": "F2 FA-06 production Q6/Q7/Q8 active and startup PWR01/PWR03, policy rollback, restart and freeze",
+      "requireRepublished": true
+    },
+    {
+      "processCode": "FA-07",
+      "path": "apps/mobile/test/data/elv5_f2_fa07_full_runtime_e2e_test.dart",
+      "testName": "F2 FA-07 production Q6/Q7/Q8 real membership, return loss, restart and freeze",
+      "requireRepublished": true
+    },
+    {
+      "processCode": "FA-08",
+      "path": "apps/mobile/test/data/elv5_f2_fa08_full_runtime_e2e_test.dart",
+      "testName": "F2 FA-08 production Q6/Q7/Q8 survives invalidation, restart and freeze",
+      "requireRepublished": true
+    }
+  ],
+  "globalRegressionWitnesses": [
+    {
+      "path": "apps/mobile/test/data/elv5_f2_cctv05_cascade_reliability_test.dart",
+      "testName": "F2 global CCTV05 source and publication cascades roll back atomically and reject frozen invalidation"
+    },
+    {
+      "path": "apps/mobile/test/data/elv5_f2_freeze_snapshot_reliability_test.dart",
+      "testName": "F2 global real freeze rolls back all sections and preserves captured discipline across restart and live-source changes"
+    },
+    {
+      "path": "apps/mobile/test/data/elv5_f2_freeze_snapshot_reliability_test.dart",
+      "testName": "F2 global new empty discipline capture is distinct from legacy ELV5_NOT_CAPTURED"
+    }
+  ]
+}
