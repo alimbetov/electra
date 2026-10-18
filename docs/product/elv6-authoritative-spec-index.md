@@ -119,7 +119,7 @@ The KZ normative profile must distinguish at minimum `CURRENT_NATIONAL`, `ADOPTE
 - ELV4 revision commands remain the only public freeze/create-next boundary.
 - Historical snapshots return `ELV6_NOT_CAPTURED` when appropriate, never empty-valid/latest fallback.
 - Safety projections participate in the same immutable freeze/replay and stale-publication guards as layout evidence.
-- ELV6 does not pre-allocate database schema 24 while ELV5 runtime migration numbering is still unresolved.
+- ELV6 does not reserve a migration number. This inspected design branch has schema 23; merged main has schema 24. Runtime P0 must reconcile the actual accepted source/migration path before enabling new writers.
 
 ## Closed design registries
 
@@ -163,3 +163,11 @@ If ELV5 runtime is not yet accepted, ELV6 implementation remains blocked while E
 Runtime closure requires public-command/file-SQLite qualification of all 24 processes and all 21 command codecs, migrations, restart, replay, rollback, concurrency races, deterministic solver output, mutation-safety cases, mandatory normative safety evidence projections, freeze/create-next history and stable ELV7/ELV8 projections at one exact source SHA.
 
 All ELV6 P0–P9 runtime packages remain `NOT_STARTED` until that evidence exists.
+
+
+## Coordinated downstream contract
+
+[ELV6–ELV8 integration agreement](elv-integration/README.md) is the shared
+requirement/evidence, catalogue-adoption, owner-UoW, result-adapter and freeze/report
+contract. It is replicated on the three stage branches with one agreement hash.
+It does not grant runtime support or move product selection into ELV6.

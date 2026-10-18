@@ -1,0 +1,188 @@
+{
+  "schema": "electra.elv-integration-qualification-plan.v1",
+  "status": "DESIGN_ONLY",
+  "runtimeAccepted": false,
+  "plannedCaseCount": 24,
+  "cases": [
+    {
+      "id": "INT-01",
+      "scenario": "WIRE_VS_LEDGER",
+      "oracle": "Only FREEZE_DESIGN_REVISION decodes on v2; ledger preserves internal FREEZE_PROJECT_DESIGN_REVISION.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "INT-02",
+      "scenario": "REQUIREMENTS_WITHOUT_SELECTED_PRODUCT",
+      "oracle": "Derive typed constraints without requiring a completed assessment of an absent candidate; unknown mandatory requirements block selection.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "INT-03",
+      "scenario": "CANDIDATE_NOT_CURRENT",
+      "oracle": "Trial host/product IDs, results and hashes cannot alias or be copied into committed CURRENT pointers.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "INT-04",
+      "scenario": "SELF_CONTAINED_ADOPTION",
+      "oracle": "Catalogue disappearance after capture cannot leave partial snapshots or dangling project references.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "INT-05",
+      "scenario": "CROSS_FILE_FAULT",
+      "oracle": "Catalogue publication and project adoption are independent atomic operations; crash rolls back each local boundary.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "INT-06",
+      "scenario": "MULTI_OWNER_FAULT",
+      "oracle": "Fault after any owner write rolls back selection/placement/dependencies/history/receipt in the same UoW.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "INT-07",
+      "scenario": "INDEPENDENT_CONNECTION_CAS",
+      "oracle": "Changed owner/profile/trust/selector generation rejects stale apply/publication even with identical payload bytes.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "INT-08",
+      "scenario": "PRICE_ONLY_CHANGE",
+      "oracle": "Changed offer or FX stales consumed economic proposal/report only; selected technical facts remain identical.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "INT-09",
+      "scenario": "TECHNICAL_SUBSTITUTION",
+      "oracle": "Changed accessory/width/mass/heat/settings revalidates actual affected owners and cannot inherit old-product PASS.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "INT-10",
+      "scenario": "MISSING_SELECTOR_GAIN",
+      "oracle": "Previously absent product/fact/member gain invalidates its captured search/applicability closure.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "INT-11",
+      "scenario": "SOURCE_REVOCATION",
+      "oracle": "Known source revocation or expired review blocks current claims without requiring adoption of a new edition.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "INT-12",
+      "scenario": "WAIVER_NOT_VALIDATED",
+      "oracle": "Approved deviation/USER_OVERRIDE preserves raw mandatory violation; no compliant or validated final publication.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "INT-13",
+      "scenario": "RESULT_VOCABULARY_ADAPTER",
+      "oracle": "UNKNOWN eligibility maps explicitly to UNRESOLVED; raw normative and geometric axes remain distinct.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "INT-14",
+      "scenario": "EMPTY_SCOPE_PROOF",
+      "oracle": "Captured empty with scope proof differs from legacy missing/partial and cannot manufacture full-scope PASS.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "INT-15",
+      "scenario": "SHARED_FREEZE_ATOMIC",
+      "oracle": "Freeze captures all required immutable extension sections or rolls back; no rewrite of ELV4/ELV5 snapshots.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "INT-16",
+      "scenario": "FREEZE_REPORT_HASH_DAG",
+      "oracle": "Frozen root has no future report hash; immutable report references frozen root and section hashes.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "INT-17",
+      "scenario": "ARTIFACT_RETRY_AFTER_FREEZE",
+      "oracle": "Export/retry reads immutable frozen model/template/options; no WORKING-only gate or mutable DB recapture.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "INT-18",
+      "scenario": "AUDIENCE_REDACTION",
+      "oracle": "Redacted package has distinct hash/policy/completeness flags and cannot claim access to withheld evidence.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "INT-19",
+      "scenario": "CREATE_NEXT_REMAP",
+      "oracle": "Typed owner remapping restores mutable configuration while historic IDs/results/receipts/approvals remain historical.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "INT-20",
+      "scenario": "HISTORICAL_WITHOUT_NETWORK",
+      "oracle": "Reopen/replay reproduces declared complete lawful adopted closure without catalogue or network.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "INT-21",
+      "scenario": "LEGACY_ELV4_FL14_REGRESSION",
+      "oracle": "Existing freeze/replay/selection snapshots remain readable and their unchanged regression contracts pass.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "INT-22",
+      "scenario": "BRANCH_BASELINE_GAP",
+      "oracle": "Schema 23 design branches do not claim compatibility with schema 24 main until actual migration/source reconciliation.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "INT-23",
+      "scenario": "ELV6_PARTIAL_EVIDENCE",
+      "oracle": "Unknown mass blocks support/CoG, not independent geometry; every downstream obligation keeps scoped incompleteness.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "INT-24",
+      "scenario": "BOUNDED_SEARCH_REPORTING",
+      "oracle": "First feasible/time-budget result is not a proven optimum or infeasibility; full-BOM cost and price coverage remain visible.",
+      "status": "PLANNED",
+      "executed": false
+    }
+  ],
+  "requiredWitnessFields": [
+    "sourceSha",
+    "testPath",
+    "testName",
+    "nonSkippedResult",
+    "agreementHash",
+    "producerSchemaVersions",
+    "projectRevision",
+    "consumedGenerations",
+    "persistedOutcomeId",
+    "canonicalResultHash"
+  ]
+}

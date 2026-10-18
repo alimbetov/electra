@@ -1099,3 +1099,33 @@ ELV6 may be marked runtime CLOSED only when:
 - ELV7/ELV8 projections are versioned and hash-stable;
 - there are zero open BLOCKER/HIGH findings;
 - unsupported dimensions remain explicit rather than converted into optimistic PASS.
+
+
+## 28. Coordinated requirements, candidate evaluation and frozen evidence
+
+The [shared integration agreement](../elv-integration/README.md) defines
+`electra.elv6-layout-requirements.v1` separately from
+`electra.elv6-layout-evidence.v1`. Requirements expose host/interface/space/locked
+placement and intrinsic constraints before a specific SKU is chosen; actual
+LAY/safety evidence binds adopted definitions and committed owner generations.
+Unknown facts remain scoped blockers. ELV6 consumes catalogue technical/physical
+snapshot bindings through existing ELV2/FL14 identities, not live catalogue rows.
+
+ELV8 may run versioned ELV6 kernels against an immutable CANDIDATE arrangement
+without writing canonical placements. Trial evidence cannot become CURRENT by
+copy. To apply a reviewed whole configuration, ELV6 provides same-project-UoW
+internal mutation participants retaining the public command validations; it does
+not dispatch independent nested commits from ELV8. Without those participants,
+full multi-owner apply is blocked. ELV6 still does not select SKUs, rank prices,
+resize a host silently or claim normative compliance.
+
+The proposed `electra.elv6-layout-freeze-section.v1` captures canonical layout,
+consumed technical closure, LAY/safety evidence and hashes required by consumers.
+Shared `FREEZE_DESIGN_REVISION` v2 remains the only public freeze wire operation;
+its internal ledger name differs. Do not extend its strict payload silently.
+Keep ELV4/ELV5 historical manifests immutable. Report assembly happens after the
+frozen project root exists and cannot add a future report hash to that root.
+
+This branch's inspected schema 23 differs from merged main schema 24. The shared
+binding records this migration/source gap; runtime P0 must reconcile actual
+accepted producers and migration origins rather than reserve schema 24 or 25.

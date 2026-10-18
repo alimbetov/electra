@@ -507,3 +507,13 @@ P0 → P1 → P2 → P3/P4 → P5 → P6 → P7 → P8 → P9
 ```
 
 P5/P6/P7/P8 fixture/interface design starts earlier, but runtime acceptance follows dependency order.
+
+
+## Coordinated ELV6 / ELV7 / catalogue / ELV8 delivery
+
+Use [the shared agreement](elv-integration/README.md) as a mandatory interface
+amendment. P0 reconciles schema/source and exact owner APIs; P1 freezes separate
+layout requirement/evidence adapters; P2 supplies same-UoW owner participants;
+P4/P5 capture catalogue definition hashes and scoped invalidation; P8/P9 qualify
+candidate-versus-committed evidence, shared freeze and all cross-stage oracles.
+These are design obligations; all ELV6 runtime packages remain NOT_STARTED.
