@@ -920,7 +920,14 @@ final class DriftPowerCommandService {
           Variable.withString(key.sha256),
         ],
       );
-      if (changed == 1) invalidated.add(key);
+      if (changed == 1) {
+        invalidated.add(key);
+        await publicationRuntime.invalidateDisciplineConsumersForNode(
+          projectId: command.projectId,
+          designRevisionId: command.designRevisionId,
+          nodeKey: key,
+        );
+      }
       await database.customUpdate(
         'DELETE FROM power_dependency_index_records '
         'WHERE project_id = ? AND design_revision_id = ? AND logical_node_key_sha256 = ?',

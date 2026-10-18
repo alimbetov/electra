@@ -1,0 +1,206 @@
+{
+  "schema": "electra.elv5-market-simulation-catalog.v1",
+  "status": "DESIGN_HARDENED_RUNTIME_NOT_STARTED",
+  "retrievedAt": "2026-10-16",
+  "generationVersion": "electra.elv5-market-sim.v1",
+  "scenarioTarget": 450,
+  "marketEvidencePolicy": {
+    "vendorFact": "Exact fact taken from the cited manufacturer page/document and usable only within that product/source applicability.",
+    "marketEnvelope": "Engineering envelope derived from multiple current-market observations; not a manufacturer guarantee.",
+    "syntheticFixture": "Fictional but market-shaped deterministic test value used only for qualification/simulation.",
+    "rule": "Vendor facts, market envelopes and synthetic fixtures must never be conflated. No market example creates ELV7 compliance or ELV8 procurement selection."
+  },
+  "sources": [
+    {
+      "id": "SRC-AXIS-P3265-LVE",
+      "vendor": "Axis Communications",
+      "kind": "vendorFact",
+      "url": "https://www.axis.com/products/axis-p3265-lve/support",
+      "observedFacts": ["1920x1080 max resolution", "50/60 fps max", "H.264 and H.265", "multiple configurable streams", "PoE Class 3"]
+    },
+    {
+      "id": "SRC-CISCO-C9200",
+      "vendor": "Cisco",
+      "kind": "vendorFact",
+      "url": "https://www.cisco.com/c/en/us/products/collateral/switches/catalyst-9200-series-switches/nb-06-cat9200-ser-data-sheet-cte-en.html",
+      "observedFacts": ["8/12-port compact PoE variants", "24-port PoE variants with 600 W power supply class", "48-port PoE variants with 1000 W power supply class"]
+    },
+    {
+      "id": "SRC-CORNING-OS2-2026",
+      "vendor": "Corning",
+      "kind": "vendorFact",
+      "url": "https://www.corning.com/catalog/coc/documents/product-family-specifications/pfss/i/en-US/indoor-drop-cable_EMEA_AEN.pdf",
+      "observedFacts": ["OS2 single-mode", "1310/1383/1550 nm", "maximum attenuation 0.38/0.38/0.25 dB/km for cited family"]
+    },
+    {
+      "id": "SRC-ASSA-ES2600",
+      "vendor": "ASSA ABLOY",
+      "kind": "vendorFact",
+      "url": "https://www.assaabloy.com/in/en/solutions/products/digital-access-solutions/wired-solutions/electric-strike/trimec/es2600-series-monitored-electric-strike",
+      "observedFacts": ["fail safe/fail secure changeable", "12 or 24 VDC", "175 mA at 12 VDC", "88 mA at 24 VDC"]
+    },
+    {
+      "id": "SRC-ASSA-24-F11",
+      "vendor": "ASSA ABLOY",
+      "kind": "vendorFact",
+      "url": "https://dach.assaabloy.com/de/en/produktkatalog/effeff-p94478-electric-strike-24-f11",
+      "observedFacts": ["24 V AC/DC", "fail-locked", "current consumption 370 mA"]
+    },
+    {
+      "id": "SRC-ASSA-118E13",
+      "vendor": "ASSA ABLOY",
+      "kind": "vendorFact",
+      "url": "https://dach.assaabloy.com/ch/en/product-catalogue/effeff-t95012-p95013-electric-strike-118e-13-a71",
+      "observedFacts": ["24 V AC 500 mA", "24 V DC stabilized 560 mA"]
+    },
+    {
+      "id": "SRC-HID-M1",
+      "vendor": "HID Global",
+      "kind": "vendorFact",
+      "url": "https://www.hidglobal.com/products/m1-transparent-gateway",
+      "observedFacts": ["12 to 24 VDC IO module input", "19.2 W maximum module input", "two transparent HID Signo reader inputs"]
+    },
+    {
+      "id": "SRC-HID-MERCURY-2026",
+      "vendor": "HID Global",
+      "kind": "vendorFact",
+      "url": "https://www.hidglobal.com/certifications",
+      "observedFacts": ["current Mercury MP1501/MP1502/MP2500/MP4502 controller family", "MR52/MR50/MR16 interface families"]
+    },
+    {
+      "id": "SRC-FIRELITE-ES200X",
+      "vendor": "Honeywell Fire-Lite",
+      "kind": "vendorFact",
+      "url": "https://buildings.honeywell.com/my/en/products/by-category/fire-life-safety/control-panels/fire-alarm-control-panels/es-200x-fire-alarm-control-panel-with-communicator",
+      "observedFacts": ["up to 198 addressable devices", "99 detectors and 99 modules"]
+    },
+    {
+      "id": "SRC-FIRELITE-PORTFOLIO",
+      "vendor": "Honeywell Fire-Lite",
+      "kind": "vendorFact",
+      "url": "https://buildings.honeywell.com/us/en/brands/our-brands/firelite",
+      "observedFacts": ["50-point ES-50 class", "198-point ES-200 class", "954-device ES-1000X class"]
+    },
+    {
+      "id": "SRC-FIRELITE-TOOLS",
+      "vendor": "Honeywell Fire-Lite",
+      "kind": "vendorFact",
+      "url": "https://buildings.honeywell.com/us/en/brands/our-brands/firelite/resources/tools",
+      "observedFacts": ["vendor tool suite includes battery calculations", "voltage-drop calculations", "dB line-loss calculations"]
+    }
+  ],
+  "marketArchetypes": [
+    {"id":"CAM-1080P-POE3","discipline":"CCTV","basis":"vendorFact","sourceRefs":["SRC-AXIS-P3265-LVE"],"parameters":{"resolution":"1920x1080","fpsMax":60,"codecs":["H264","H265"],"multipleStreams":true,"poeClass":3}},
+    {"id":"CAM-4K-ANALYTICS","discipline":"CCTV","basis":"marketEnvelope","sourceRefs":["SRC-AXIS-P3265-LVE"],"parameters":{"streamCountRange":[2,4],"expectedBitrateMbpsRange":[4,12],"peakBitrateMbpsRange":[8,24],"powerWRange":[12,30]}},
+    {"id":"CAM-MULTISENSOR","discipline":"CCTV","basis":"syntheticFixture","sourceRefs":[],"parameters":{"sensorCountRange":[2,4],"aggregatePeakMbpsRange":[20,60],"powerWRange":[20,60]}},
+    {"id":"RECORDER-MID","discipline":"CCTV","basis":"syntheticFixture","sourceRefs":[],"parameters":{"channelRange":[16,64],"ingressMbpsRange":[160,640],"usableStorageTbRange":[8,64]}},
+    {"id":"SWITCH-8P-315W","discipline":"LAN","basis":"marketEnvelope","sourceRefs":["SRC-CISCO-C9200"],"parameters":{"ports":8,"poeBudgetClassW":315,"uplinkClass":"10G"}},
+    {"id":"SWITCH-24P-600W","discipline":"LAN","basis":"vendorFact","sourceRefs":["SRC-CISCO-C9200"],"parameters":{"ports":24,"powerSupplyClassW":600,"poe":true}},
+    {"id":"SWITCH-48P-1000W","discipline":"LAN","basis":"vendorFact","sourceRefs":["SRC-CISCO-C9200"],"parameters":{"ports":48,"powerSupplyClassW":1000,"poe":true}},
+    {"id":"OS2-1310-038","discipline":"LAN","basis":"vendorFact","sourceRefs":["SRC-CORNING-OS2-2026"],"parameters":{"fiber":"OS2","wavelengthNm":1310,"attenuationDbPerKmMax":"0.38"}},
+    {"id":"OS2-LONG-LINK","discipline":"LAN","basis":"syntheticFixture","sourceRefs":["SRC-CORNING-OS2-2026"],"parameters":{"lengthMRange":[100,10000],"connectorPairsRange":[2,8],"splicesRange":[0,12]}},
+    {"id":"LOCK-24V-88MA","discipline":"ACS","basis":"vendorFact","sourceRefs":["SRC-ASSA-ES2600"],"parameters":{"voltageV":24,"currentMa":88,"failMode":"CHANGEABLE"}},
+    {"id":"LOCK-24V-370MA","discipline":"ACS","basis":"vendorFact","sourceRefs":["SRC-ASSA-24-F11"],"parameters":{"voltageV":24,"currentMa":370,"failMode":"FAIL_LOCKED"}},
+    {"id":"LOCK-24V-560MA","discipline":"ACS","basis":"vendorFact","sourceRefs":["SRC-ASSA-118E13"],"parameters":{"voltageV":24,"currentMa":560,"failMode":"PRODUCT_SPECIFIC"}},
+    {"id":"ACS-IO-2READER","discipline":"ACS","basis":"vendorFact","sourceRefs":["SRC-HID-M1","SRC-HID-MERCURY-2026"],"parameters":{"readerInputs":2,"supplyVRange":[12,24],"modulePowerMaxW":"19.2"}},
+    {"id":"FACP-50","discipline":"FIRE","basis":"vendorFact","sourceRefs":["SRC-FIRELITE-PORTFOLIO"],"parameters":{"addressableDeviceClass":50}},
+    {"id":"FACP-198","discipline":"FIRE","basis":"vendorFact","sourceRefs":["SRC-FIRELITE-ES200X"],"parameters":{"addressableDevices":198,"detectors":99,"modules":99}},
+    {"id":"FACP-954","discipline":"FIRE","basis":"vendorFact","sourceRefs":["SRC-FIRELITE-PORTFOLIO"],"parameters":{"addressableDeviceClass":954}},
+    {"id":"FIRE-CURRENT-PROFILE","discipline":"FIRE","basis":"syntheticFixture","sourceRefs":["SRC-FIRELITE-TOOLS"],"parameters":{"standbyCurrentMaRange":[20,800],"alarmCurrentMaRange":[100,6000],"notificationOutputCountRange":[1,8]}},
+    {"id":"FIRE-BACKUP-SEQUENCE","discipline":"FIRE","basis":"syntheticFixture","sourceRefs":["SRC-FIRELITE-TOOLS"],"parameters":{"standbyHoursRange":[4,60],"alarmMinutesRange":[5,30],"deratingRange":["1.0","1.3"]}}
+  ],
+  "scales": [
+    {"id":"S1-SMALL","ordinal":1,"cctvDevices":8,"lanEndpoints":24,"acsDoors":4,"firePoints":50},
+    {"id":"S2-MEDIUM","ordinal":2,"cctvDevices":32,"lanEndpoints":96,"acsDoors":16,"firePoints":198},
+    {"id":"S3-LARGE","ordinal":3,"cctvDevices":128,"lanEndpoints":384,"acsDoors":64,"firePoints":500},
+    {"id":"S4-CAMPUS","ordinal":4,"cctvDevices":512,"lanEndpoints":1500,"acsDoors":256,"firePoints":954}
+  ],
+  "processScenarioCounts": {
+    "CCTV-01":12,
+    "CCTV-02":24,
+    "CCTV-03":24,
+    "CCTV-04":12,
+    "CCTV-05":12,
+    "CCTV-06":12,
+    "LAN-01":23,
+    "LAN-02":12,
+    "LAN-03":12,
+    "LAN-04":12,
+    "LAN-05":24,
+    "LAN-06":12,
+    "LAN-07":12,
+    "ACS-01":12,
+    "ACS-02":12,
+    "ACS-03":24,
+    "ACS-04":23,
+    "ACS-05":23,
+    "ACS-06":12,
+    "FA-01":12,
+    "FA-02":23,
+    "FA-03":12,
+    "FA-04":23,
+    "FA-05":24,
+    "FA-06":23,
+    "FA-07":12,
+    "FA-08":12
+  },
+  "processStressAxes": {
+    "CCTV-01":["FOV_LIMIT","FRAME_MISMATCH","PARALLEL_RAY","FISHEYE_UNSUPPORTED","ZONE_CLIP"],
+    "CCTV-02":["UNICAST_FANOUT","MULTICAST_DEDUP","EXPECTED_VS_PEAK","WIRE_OVERHEAD","DUPLICATE_STREAM_ID"],
+    "CCTV-03":["DST_EXPANSION","OVERLAP_UNION","RESERVE_ONCE","BYTE_CEIL_BOUNDARY","EXPECTED_VS_GUARANTEED","REDUNDANCY_FRACTION"],
+    "CCTV-04":["SHARED_PSE_TOTAL","DISCIPLINE_CONTRIBUTION","STALE_PWR06","DOUBLE_RESERVE"],
+    "CCTV-05":["CHANNEL_LIMIT","INGRESS_LIMIT","CODEC_PROFILE","USABLE_STORAGE","LICENSE_ACCOUNTING"],
+    "CCTV-06":["REALIZED_LENGTH","MEDIA_MISMATCH","POE_PATH","MISSING_ROUTE"],
+    "LAN-01":["PERMANENT_LENGTH","CHANNEL_LENGTH","SERVICE_LOOP_DOUBLE_COUNT","DUPLICATE_SECTION","UNKNOWN_LENGTH_BASIS"],
+    "LAN-02":["PORT_COUNT","SPARE_CEIL","PORT_ALIAS_DUPLICATE","MEDIA_SPEED_MISMATCH"],
+    "LAN-03":["SHARED_PSE_TOTAL","DISCIPLINE_FILTER","POLICY_CONFLICT","STALE_PWR06"],
+    "LAN-04":["WEAKEST_SECTION","CONNECTOR_MISMATCH","SHIELD_CONTINUITY","CATEGORY_LABEL_INFERENCE"],
+    "LAN-05":["A_B_SENSITIVITY","A_B_OVERLOAD","B_A_SENSITIVITY","B_A_OVERLOAD","CONNECTOR_DOUBLE_COUNT","REACH_OVERCLAIM"],
+    "LAN-06":["RU_GROSS_NET","WEIGHT_UNKNOWN","DEPTH_UNKNOWN","LAYOUT_OVERCLAIM"],
+    "LAN-07":["PORT_UTILIZATION","SPARE_RESERVE","DUPLICATE_MAPPING","MISSING_DESTINATION"],
+    "ACS-01":["ROLE_ALTERNATIVE","ROLE_MULTIPLICITY","MISSING_RELEASE_ROLE","NAME_INFERENCE"],
+    "ACS-02":["READER_CAPACITY","RELAY_CAPACITY","INPUT_CAPACITY","UNSUPPORTED_MULTIPLEXING"],
+    "ACS-03":["SHARED_TRUNK_DROP","STARTUP_GOVERNING","CONTROL_IS_NOT_FEED","LOW_VOLTAGE_MARGIN","ORACLE_INTEGRITY"],
+    "ACS-04":["GLOBAL_DEMAND","RESERVE_ONCE","DERATING_ONCE","SHARED_NON_ACS_LOAD","POLICY_CONFLICT"],
+    "ACS-05":["ORDERED_SEQUENCE","MISSING_DURATION","PEAK_CURRENT","ENERGY_VS_CURRENT","SHARED_BANK_LOAD"],
+    "ACS-06":["FAIL_SAFE","FAIL_SECURE","FIRE_RELEASE","BREAK_GLASS","POWER_FAILURE","TRUTH_TABLE_COMPLETENESS"],
+    "FA-01":["ADDRESS_COUNT","MULTI_ADDRESS_DEVICE","DUPLICATE_ADDRESS","RESERVED_ADDRESS","PANEL_LIMIT"],
+    "FA-02":["STANDBY_CURRENT","ALARM_CURRENT","SIMULTANEITY","MISSING_DEVICE_CURRENT","OWN_LOAD_DOUBLE_COUNT"],
+    "FA-03":["RADIAL_VOLTAGE_DROP","SUPPORTED_MODEL","DUAL_FEED_UNSUPPORTED","TERMINAL_VOLTAGE"],
+    "FA-04":["GLOBAL_FIRE_LOAD","SHARED_NON_FIRE_LOAD","RESERVE_ONCE","MISSING_AUX_LOAD","DERATING"],
+    "FA-05":["STANDBY_DURATION","ALARM_DURATION","SEQUENCE_ENERGY","BATTERY_MODEL_APPLICABILITY","AH_SHORTCUT"],
+    "FA-06":["DEVICE_COUNT","OUTPUT_CURRENT","STARTUP_CURRENT","TERMINAL_VOLTAGE","ACOUSTIC_OVERCLAIM"],
+    "FA-07":["LOOP_CLOSURE","ILLEGAL_BRANCH","ISOLATOR_MODEL","ADDRESS_TOPOLOGY_MATCH","POWER_SIGNAL_CONFUSION"],
+    "FA-08":["CABLE_CLASS","ROUTE_ENVIRONMENT","MISSING_EVIDENCE","COMPLIANCE_OVERCLAIM"]
+  },
+  "errorTaxonomy": [
+    {"code":"UNIT_DIMENSION_COLLAPSE","preventedBy":["P1","P8"],"engineerImpact":"Prevents dB/dBm, bit/byte, W/Wh and A/Ah mixups."},
+    {"code":"DUPLICATE_PHYSICAL_RESOURCE","preventedBy":["P1","P2","P7"],"engineerImpact":"Prevents counting one cable/port/device/address twice through aliases or graph paths."},
+    {"code":"TYPICAL_AS_GUARANTEED","preventedBy":["P1","P8"],"engineerImpact":"Stops optimistic catalog/estimate values from qualifying guaranteed engineering limits."},
+    {"code":"DOUBLE_RESERVE_OR_DERATING","preventedBy":["P1","P3","P4","P5","P6","P8"],"engineerImpact":"Stops reserve, loss, derating or redundancy from being applied twice at different layers."},
+    {"code":"DISCIPLINE_FILTERED_SHARED_TOTAL","preventedBy":["P3","P4","P5","P6","P7"],"engineerImpact":"Prevents CCTV/LAN/ACS/Fire views from hiding other loads on one real source/PSE/bank."},
+    {"code":"STALE_EVIDENCE_PUBLISH","preventedBy":["P2","P7","P8"],"engineerImpact":"Prevents a calculation made on old project facts from becoming CURRENT after edits/freeze."},
+    {"code":"BITRATE_INFERENCE_FROM_LABEL","preventedBy":["P3"],"engineerImpact":"Prevents storage/network sizing from assuming bitrate solely from codec/resolution labels."},
+    {"code":"MULTICAST_FALSE_DEDUP","preventedBy":["P3"],"engineerImpact":"Prevents undercounting network edge load when multicast distribution evidence is absent."},
+    {"code":"STORAGE_INTERVAL_DOUBLE_COUNT","preventedBy":["P3"],"engineerImpact":"Prevents retention over/under-sizing from overlapping schedule intervals and repeated rounding."},
+    {"code":"PORT_OR_ADDRESS_ALIAS","preventedBy":["P4","P5","P6"],"engineerImpact":"Prevents false spare capacity caused by treating aliases as separate hardware resources."},
+    {"code":"OPTICAL_OVERLOAD_IGNORED","preventedBy":["P4"],"engineerImpact":"Prevents false fiber PASS where receiver sensitivity passes but overload fails."},
+    {"code":"OPTICAL_BUDGET_EQUALS_REACH","preventedBy":["P4","P9"],"engineerImpact":"Prevents claiming reach/dispersion compatibility from power budget alone."},
+    {"code":"RACK_CAPACITY_EQUALS_LAYOUT","preventedBy":["P4","P9"],"engineerImpact":"Keeps RU/weight/depth demand separate from ELV6 physical cabinet fit."},
+    {"code":"CONTROL_PATH_EQUALS_POWER_FEED","preventedBy":["P5"],"engineerImpact":"Prevents a relay/control adjacency from being mistaken for a conductive lock supply path."},
+    {"code":"STARTUP_OR_INRUSH_IGNORED","preventedBy":["P5","P6"],"engineerImpact":"Prevents steady-state sizing from missing short governing peak events."},
+    {"code":"FAIL_SAFE_RELEASE_LOGIC_INCOMPLETE","preventedBy":["P5"],"engineerImpact":"Forces explicit behavior for access, REX, fire release, break-glass and power failure."},
+    {"code":"BATTERY_AH_SHORTCUT","preventedBy":["P5","P6"],"engineerImpact":"Prevents nominal Ah arithmetic from replacing a supported voltage/current/EOD battery model."},
+    {"code":"FIRE_ADDRESS_OVERLAP","preventedBy":["P6"],"engineerImpact":"Detects duplicate/multi-address claims before panel programming and commissioning."},
+    {"code":"SIGNAL_TOPOLOGY_EQUALS_POWER_MODEL","preventedBy":["P6"],"engineerImpact":"Prevents a closed signaling loop from being treated as a solved electrical mesh."},
+    {"code":"TECHNICAL_MATCH_EQUALS_COMPLIANCE","preventedBy":["P6","P9"],"engineerImpact":"Prevents project/profile matches from being presented as jurisdictional certification."},
+    {"code":"N_PLUS_ONE_CAPTURE","preventedBy":["P2","P7","P8"],"engineerImpact":"Prevents correct calculations from becoming unusably slow on real projects."},
+    {"code":"UI_GLOBAL_REBUILD","preventedBy":["P7","P8"],"engineerImpact":"Keeps large engineering workspaces responsive under frequent result updates."}
+  ],
+  "packagePaths": {
+    "CCTV":["P0","P1","P2","P3","P7","P8","P9"],
+    "LAN":["P0","P1","P2","P4","P7","P8","P9"],
+    "ACS":["P0","P1","P2","P5","P7","P8","P9"],
+    "FIRE":["P0","P1","P2","P6","P7","P8","P9"]
+  }
+}

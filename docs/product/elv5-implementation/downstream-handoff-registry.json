@@ -1,0 +1,92 @@
+{
+  "schema": "electra.elv5-downstream-handoff-registry.v1",
+  "status": "DESIGN_FROZEN_RUNTIME_NOT_STARTED",
+  "sourceStage": "ELV5",
+  "runtimeEntryPolicy": {
+    "exactAcceptedElv5SourceShaRequired": true,
+    "exactAuthorityFingerprintRequired": true,
+    "acceptedElv5RuntimeEvidenceRequiredBeforeElv6Runtime": true,
+    "databaseSchemaAtInitialElv5Entry": 24,
+    "historicalDesignShaAloneMayAuthorizeRuntime": false,
+    "downstreamMayRecomputeUpstreamTruth": false
+  },
+  "claimBoundaries": [
+    {
+      "targetStage": "ELV6",
+      "consumes": [
+        "discipline demand basis",
+        "equipment membership/dimensions where exact",
+        "power/battery evidence refs",
+        "stable findings/provenance"
+      ],
+      "owns": [
+        "physical rack/cabinet placement",
+        "constructability",
+        "intrinsic fit",
+        "clearance/service/removal envelopes"
+      ],
+      "forbiddenInference": [
+        "LAN-06 RU basis PASS -> physical rack fit PASS",
+        "ELV5 demand basis -> normative clearance compliance"
+      ]
+    },
+    {
+      "targetStage": "ELV7",
+      "consumes": [
+        "immutable technical calculations",
+        "technical policy evidence",
+        "ELV6 physical evidence"
+      ],
+      "owns": [
+        "jurisdiction applicability",
+        "precedence/conflict resolution",
+        "verified compliance assessment",
+        "normative findings/deviations"
+      ],
+      "forbiddenInference": [
+        "FA-08 technical policy match -> verified compliance",
+        "project policy title -> statutory applicability"
+      ]
+    },
+    {
+      "targetStage": "ELV8",
+      "consumes": [
+        "engineered technical requirements",
+        "ELV6 fit evidence",
+        "ELV7 normative outcomes"
+      ],
+      "owns": [
+        "manufacturer candidate filtering/ranking",
+        "selection snapshots",
+        "BOM/schedules/deliverables"
+      ],
+      "forbiddenInference": [
+        "positive ELV5 margin -> product suitability without exact product facts",
+        "selection -> rewrite historical ELV5 result"
+      ]
+    }
+  ],
+  "knownDownstreamDesignPins": [
+    {
+      "branch": "feat/flutter-elv6-enclosure-layout-design",
+      "knownPinnedElv5DesignSha": "ed7db01adb27ff184b0b8c91a710082fb9eafb9a",
+      "state": "RECONCILIATION_REQUIRED_BEFORE_RUNTIME"
+    },
+    {
+      "branch": "feat/flutter-elv7-normative-validation-design",
+      "state": "TRANSITIVE_RECONCILIATION_REQUIRED_BEFORE_RUNTIME"
+    },
+    {
+      "branch": "feat/flutter-elv8-deliverables-design",
+      "state": "TRANSITIVE_RECONCILIATION_REQUIRED_BEFORE_RUNTIME"
+    }
+  ],
+  "reconciliationEvidenceRequired": [
+    "acceptedElv5SourceSha",
+    "acceptedElv5AuthorityFingerprintSha256",
+    "implementedDatabaseSchemaVersion",
+    "consumedProjectionSchemaVersions",
+    "upstreamRuntimeAcceptanceArtifact",
+    "downstreamP0OwnershipAndCompatibilityAudit"
+  ]
+}

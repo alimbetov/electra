@@ -13,7 +13,7 @@ void main() {
       final db = AppDatabase(NativeDatabase.memory());
       addTearDown(db.close);
 
-      expect(db.schemaVersion, 23);
+      expect(db.schemaVersion, 24);
       final tables =
           (await db
                   .customSelect(

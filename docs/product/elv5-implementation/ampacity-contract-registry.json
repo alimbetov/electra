@@ -1,0 +1,95 @@
+{
+  "schema": "electra.elv5-ampacity-contract-registry.v1",
+  "status": "AUTHORITATIVE_HARDENING_AMENDMENT",
+  "processInventoryChange": 0,
+  "processInventoryRemains": 27,
+  "contractCode": "ELV5-AMPACITY-IZ-V1",
+  "owner": "ELV5_SHARED_ENGINEERING_PRIMITIVE",
+  "initialConsumer": "FA-08",
+  "reservedTechnicalProperty": {
+    "propertyCode": "AMPACITY_IZ_A",
+    "unitCode": "A"
+  },
+  "requiredPhysicalDrivers": [
+    "CONDUCTOR_CROSS_SECTION",
+    "CONDUCTOR_MATERIAL",
+    "AMBIENT_TEMPERATURE",
+    "INSTALLATION_METHOD",
+    "CABLE_OR_CIRCUIT_GROUPING",
+    "LOADED_CONDUCTOR_COUNT"
+  ],
+  "requiredEvidence": [
+    "IMMUTABLE_REFERENCE_ROW",
+    "REFERENCE_ROW_CONTENT_HASH",
+    "BASE_ALLOWABLE_CURRENT_IREF",
+    "TEMPERATURE_CORRECTION_FACTOR",
+    "TEMPERATURE_FACTOR_CONTENT_HASH",
+    "GROUPING_COUNT_AND_ARRANGEMENT",
+    "GROUPING_CORRECTION_FACTOR",
+    "GROUPING_FACTOR_CONTENT_HASH"
+  ],
+  "equation": "Iz = Iref * kT * kG * product(kAdditional)",
+  "numericBackend": "Elv5Rational",
+  "forbiddenDefaults": [
+    "ASSUME_COPPER",
+    "ASSUME_30C",
+    "ASSUME_INSTALLATION_METHOD",
+    "ASSUME_SINGLE_CABLE_OR_KG_1",
+    "ASSUME_LOADED_CONDUCTOR_COUNT",
+    "ASSUME_MISSING_CORRECTION_FACTOR_1"
+  ],
+  "separationRules": [
+    "AMPACITY_DOES_NOT_OWN_CONNECTED_LOAD_IB",
+    "AMPACITY_DOES_NOT_OWN_PROTECTIVE_DEVICE_IN",
+    "AMPACITY_DOES_NOT_OWN_VOLTAGE_DROP",
+    "AMPACITY_DOES_NOT_OWN_SHORT_CIRCUIT_WITHSTAND",
+    "AMPACITY_DOES_NOT_CLAIM_ELV7_COMPLIANCE"
+  ],
+  "canonicalTypes": [
+    "Elv5AmpacityReferenceRow",
+    "Elv5AmpacityTemperatureCorrection",
+    "Elv5AmpacityGroupingCorrection",
+    "Elv5AmpacityAdditionalCorrection",
+    "Elv5AmpacityInput",
+    "Elv5AmpacityResult",
+    "Elv5AmpacityKernel"
+  ],
+  "dependencySelectors": [
+    "CABLE_DEFINITION_EDITION",
+    "CABLE_OR_ROUTE_SECTION",
+    "CONDUCTOR_SECTION_AND_MATERIAL",
+    "INSTALLATION_METHOD",
+    "TEMPERATURE_EVIDENCE",
+    "GROUPING_MEMBERSHIP_SET",
+    "LOADED_CONDUCTOR_PROFILE",
+    "AMPACITY_REFERENCE_EDITION",
+    "CORRECTION_FACTOR_EDITIONS"
+  ],
+  "invalidationRules": [
+    "CROSS_SECTION_CHANGE",
+    "MATERIAL_CHANGE",
+    "TEMPERATURE_EVIDENCE_CHANGE",
+    "INSTALLATION_METHOD_CHANGE",
+    "GROUPING_MEMBERSHIP_CHANGE",
+    "LOADED_CONDUCTOR_COUNT_CHANGE",
+    "REFERENCE_OR_FACTOR_EDITION_CHANGE"
+  ],
+  "fa08Amendment": {
+    "requiredInputsAdd": [
+      "exact ampacity contract when AMPACITY_IZ_A policy dimension is required"
+    ],
+    "requiredDimensionsAdd": [
+      "ampacity-Iz"
+    ],
+    "algorithmAdd": "Resolve exact shared ampacity contract and compare derived Iz against explicit technical policy threshold; raw caller-supplied AMPACITY_IZ_A numeric facts are forbidden.",
+    "missingBehavior": "Missing ampacity driver/evidence blocks only the affected ampacity technical dimension and never defaults a factor.",
+    "complianceBoundary": "Technical ampacity PASS is not VERIFIED_COMPLIANT; ELV7 remains compliance owner."
+  },
+  "qualification": [
+    "EXACT_40A_X_0_91_X_0_80_EQUALS_29_12A",
+    "MISSING_PHYSICAL_DRIVER_BLOCKS",
+    "RAW_RESERVED_AMPACITY_FACT_REJECTED",
+    "GROUPING_CHANGE_INVALIDATES",
+    "CONNECTED_LOAD_AND_VOLTAGE_DROP_REMAIN_INDEPENDENT"
+  ]
+}

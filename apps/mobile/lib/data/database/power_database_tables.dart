@@ -320,6 +320,8 @@ class DesignRevisionSnapshotManifests extends Table {
   TextColumn get manifestSha256 => text()();
   TextColumn get physicalSha256 => text()();
   TextColumn get powerSha256 => text()();
+  TextColumn get disciplineSectionSchema => text().nullable()();
+  TextColumn get disciplineSha256 => text().nullable()();
   DateTimeColumn get createdAt => dateTime()();
   TextColumn get originDeviceId => text()();
 

@@ -31,7 +31,19 @@ def validate_baseline(registry, ledger):
     assert registry['baselineRef'] == ledger['baselineRef'] == 'baseline.json'
     assert baseline['elv5RuntimeStatus'] == ledger['runtimeStatus'] == 'NOT_STARTED'
     assert baseline['databaseSchemaVersion'] == 23
-    assert 'int get schemaVersion => 23;' in (ROOT / 'apps/mobile/lib/data/database/app_database.dart').read_text()
+
+    app_database_source = (ROOT / 'apps/mobile/lib/data/database/app_database.dart').read_text()
+    current_schema_match = re.search(r'int get schemaVersion => (\d+);', app_database_source)
+    assert current_schema_match, 'AppDatabase schemaVersion declaration missing'
+    current_schema_version = int(current_schema_match.group(1))
+    assert current_schema_version in {23, 24}, (
+        'ELV5 implementation may only advance the accepted ELV4 schema 23 baseline '
+        f'to the frozen additive ELV5 schema 24, found {current_schema_version}'
+    )
+    if current_schema_version == 24:
+        assert "if (from < 24)" in app_database_source
+        assert "part 'discipline_database_tables.dart';" in app_database_source
+
     assert [o['version'] for o in baseline['migrationOrigins']] == [21, 22]
     assert baseline['requiredNewMigrationOrigin'] == {'version': 23, 'sourceSha': merged}
     acceptance = baseline['inheritedAcceptance']
@@ -58,7 +70,7 @@ def validate_baseline(registry, ledger):
         assert requirement['integrationContract'] == 'implemented-baseline.md#' + anchor
         assert '## ' + anchor.upper() + '\n' in contract
     # These are structural provenance checks, not a fresh executed CI verdict.
-    return baseline
+    return baseline, current_schema_version
 
 
 def validate_registry(registry):
@@ -120,7 +132,7 @@ def main():
     registry = load(BASE / 'process-registry.json')
     ledger = load(BASE / 'requirements.json')
     requirements = ledger['requirements']
-    baseline = validate_baseline(registry, ledger)
+    baseline, current_schema_version = validate_baseline(registry, ledger)
     validate_registry(registry)
     assert len(requirements) == len({r['requirementId'] for r in requirements}) == 80
     assert Counter(r['package'] for r in requirements) == {f'P{i}': 8 for i in range(10)}
@@ -168,10 +180,42 @@ def main():
             if '://' not in target and not target.startswith('#'):
                 assert (file.parent / target.split('#')[0]).exists(), (str(file), target)
                 links += 1
-    result = {'schema': 'electra.elv5-specification-checks.v1', 'result': 'PASS', 'scope': 'Design contract/registry probes only; not Flutter/Dart/Drift runtime evidence', 'processCount': 27, 'requirementCount': 80, 'specificationFindingsResolved': 8, 'localLinksChecked': links, 'checks': ['implemented baseline provenance, schema and 11 source/test capability references', 'all 80 requirements map to P0-P9 integration contract', 'typed upstream code/scope/subject/condition and acyclic graph', 'unknown upstream and cycle rejection', '80 requirement identity/package/evidence invariants', 'pool-level byte ceiling', 'expected versus guaranteed retention', 'optical reserve not physical loss', 'expanded address overlap', 'camera/stream channel identity', 'gross/net RU equivalence', 'recording horizon/reserve/redundancy arithmetic', 'mandatory pinhole H/V FOV interval oracles'], 'runtimeImplemented': False, 'baselineAcceptedSourceSha': baseline['acceptedElv4SourceSha'], 'baselineMergeSha': baseline['mergedMainSha'], 'baselineCapabilitiesChecked': len(baseline['capabilities'])}
+    result = {
+        'schema': 'electra.elv5-specification-checks.v1',
+        'result': 'PASS',
+        'scope': 'Design contract/registry probes only; not Flutter/Dart/Drift runtime evidence',
+        'processCount': 27,
+        'requirementCount': 80,
+        'specificationFindingsResolved': 8,
+        'localLinksChecked': links,
+        'checks': [
+            'implemented baseline provenance, accepted schema 23 and controlled current schema 23/24 transition',
+            'all 80 requirements map to P0-P9 integration contract',
+            'typed upstream code/scope/subject/condition and acyclic graph',
+            'unknown upstream and cycle rejection',
+            '80 requirement identity/package/evidence invariants',
+            'pool-level byte ceiling',
+            'expected versus guaranteed retention',
+            'optical reserve not physical loss',
+            'expanded address overlap',
+            'camera/stream channel identity',
+            'gross/net RU equivalence',
+            'recording horizon/reserve/redundancy arithmetic',
+            'mandatory pinhole H/V FOV interval oracles',
+        ],
+        'runtimeImplemented': False,
+        'currentApplicationSchemaVersion': current_schema_version,
+        'baselineAcceptedSourceSha': baseline['acceptedElv4SourceSha'],
+        'baselineMergeSha': baseline['mergedMainSha'],
+        'baselineCapabilitiesChecked': len(baseline['capabilities']),
+    }
     if args.output:
         args.output.write_text(json.dumps(result, indent=2) + '\n')
-    print(f'PASS: 27 processes, 80 requirements, 8 specification resolutions, {links} local links; no runtime claim')
+    print(
+        'PASS: 27 processes, 80 requirements, 8 specification resolutions, '
+        f'{links} local links; accepted baseline schema 23, current app schema '
+        f'{current_schema_version}; no runtime acceptance claim'
+    )
 
 
 if __name__ == '__main__':

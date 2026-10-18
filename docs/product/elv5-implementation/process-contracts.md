@@ -318,7 +318,7 @@ Scope: `SEGMENT`; mode: `POWER_WRAPPER`.
 
 **Dependency explanation:** ELV-PWR-01, ELV-PWR-03, lock policy, control/feed separation.
 
-**Positive oracle:** Shared trunk .3+.5A,24V,.5ohm and lock branch .3ohm -> lock23.45V; shared trunk .8A retained.
+**Positive oracle:** Shared trunk .3+.5A=.8A at 24V; trunk .5ohm gives .40V drop, branch origin 23.60V; lock branch .3A*.3ohm=.09V -> lock terminal 23.51V; against 22.00V minimum the headroom is +1.51V; shared trunk .8A retained.
 
 **Negative/unsupported case:** Control-only relay adjacency with no conductive feed -> power path unresolved; do not size by lock branch current alone.
 

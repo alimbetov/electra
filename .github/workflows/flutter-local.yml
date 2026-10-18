@@ -38,6 +38,121 @@ jobs:
         working-directory: .
         run: bash scripts/ci/check-elv3-p7-p9-foundation.sh
 
+      - name: Verify ELV5 process specification
+        working-directory: .
+        run: python3 scripts/ci/check-elv5-specification.py
+
+      - name: Verify ELV5 command registry
+        working-directory: .
+        run: python3 scripts/ci/check-elv5-command-registry.py
+
+      - name: Verify ELV5 canonical command examples
+        working-directory: .
+        run: python3 scripts/ci/check-elv5-command-examples.py
+
+      - name: Reject false ELV5 evidence provenance
+        working-directory: .
+        run: python3 -m unittest discover -s scripts/ci -p 'test_elv5_*.py'
+
+      - name: Reject ELV5 engineering silent defaults
+        working-directory: .
+        run: python3 scripts/ci/check-elv5-silent-defaults.py
+
+      - name: Verify ELV5 engineering hardening
+        working-directory: .
+        run: python3 scripts/ci/check-elv5-engineering-hardening.py
+
+      - name: Verify ELV5 third-pass production hardening
+        working-directory: .
+        run: python3 scripts/ci/check-elv5-third-pass-hardening.py
+
+      - name: Verify ELV5 unified calculation engine
+        working-directory: .
+        run: python3 scripts/ci/check-elv5-calculation-engine.py
+
+      - name: Verify ELV5 process code-level dossiers
+        working-directory: .
+        run: python3 scripts/ci/check-elv5-process-code-level-specs.py
+
+      - name: Verify ELV5 normative requirements registry
+        working-directory: .
+        run: python3 scripts/ci/check-elv5-normative-requirements.py
+
+      - name: Verify ELV5 ampacity Iz contract
+        working-directory: .
+        run: python3 scripts/ci/check-elv5-ampacity-contract.py
+
+      - name: Verify ELV5 environment profile contract
+        working-directory: .
+        run: python3 scripts/ci/check-elv5-environment-profile.py
+
+      - name: Verify ELV5 FA08 invalidation contract
+        working-directory: .
+        run: python3 scripts/ci/check-elv5-fa08-invalidation.py
+
+      - name: Verify ELV5 foundation F1/F2 lifecycle status
+        working-directory: .
+        run: python3 scripts/ci/check-elv5-foundation-f1-f2-status.py
+
+      - name: Verify ELV5 market simulation P0-P9 bindings
+        working-directory: .
+        run: python3 scripts/ci/check-elv5-market-p0-p9-bindings.py
+
+      - name: Generate ELV5 450-case market simulation
+        working-directory: .
+        run: >-
+          python3 scripts/ci/check-elv5-market-simulation.py
+          --output "${RUNNER_TEMP}/elv5-market-simulation.json"
+
+      - name: Publish ELV5 market simulation
+        uses: actions/upload-artifact@v4
+        with:
+          name: elv5-market-simulation-${{ github.sha }}
+          path: ${{ runner.temp }}/elv5-market-simulation.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Verify ELV5 fifth-pass specification closure
+        working-directory: .
+        run: python3 scripts/ci/check-elv5-fifth-pass-closure.py
+
+      - name: Verify ELV5 implementation bindings and performance freeze
+        working-directory: .
+        run: python3 scripts/ci/check-elv5-implementation-bindings.py
+
+      - name: Verify ELV5 project-wide alignment closure
+        working-directory: .
+        run: python3 scripts/ci/check-elv5-project-alignment.py
+
+      - name: Generate ELV5 contract manifest
+        working-directory: .
+        run: >-
+          python3 scripts/ci/generate-elv5-contract-manifest.py
+          --output "${RUNNER_TEMP}/elv5-contract-manifest.json"
+
+      - name: Publish ELV5 contract manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: elv5-contract-manifest-${{ github.sha }}
+          path: ${{ runner.temp }}/elv5-contract-manifest.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Generate ELV5 1500-case combinatorial matrix
+        working-directory: .
+        run: >-
+          python3 scripts/ci/generate-elv5-combinatorial-1500.py
+          --authority-manifest "${RUNNER_TEMP}/elv5-contract-manifest.json"
+          --output "${RUNNER_TEMP}/elv5-combinatorial-1500.json"
+
+      - name: Publish ELV5 combinatorial matrix
+        uses: actions/upload-artifact@v4
+        with:
+          name: elv5-combinatorial-1500-${{ github.sha }}
+          path: ${{ runner.temp }}/elv5-combinatorial-1500.json
+          if-no-files-found: error
+          retention-days: 30
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -54,15 +169,51 @@ jobs:
         run: dart run build_runner build
 
       - name: Verify mobile formatting
+        id: mobile-format
         run: |
           dart format lib test
+          git diff -- lib test > "${RUNNER_TEMP}/mobile-format.diff"
           git diff --exit-code -- lib test
 
+      - name: Preserve mobile formatter diff
+        if: failure() && steps.mobile-format.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-format-diff-${{ github.sha }}
+          path: ${{ runner.temp }}/mobile-format.diff
+          if-no-files-found: error
+          retention-days: 7
+
       - name: Analyze mobile app
-        run: flutter analyze
+        shell: bash
+        run: flutter analyze 2>&1 | tee "${RUNNER_TEMP}/mobile-analyze.log"
 
       - name: Test mobile app
-        run: flutter test
+        shell: bash
+        run: flutter test 2>&1 | tee "${RUNNER_TEMP}/mobile-test.log"
+
+      - name: Verify inherited freeze and snapshot regression contracts together
+        shell: bash
+        run: |
+          flutter test test/data/elv5_f2_freeze_snapshot_reliability_test.dart test/data/elv4_p8_command_outcome_durability_test.dart test/data/elv4_p8_failure_race_acceptance_test.dart test/data/elv4_p8_idempotency_race_acceptance_test.dart test/data/elv_p3_runtime_closure_test.dart test/data/elv4_p8_freeze_historical_invariance_test.dart test/data/elv4_p9_snapshot_materialization_test.dart test/data/elv4_p7_freeze_integration_test.dart test/data/elv4_p8_public_vertical_acceptance_test.dart
+
+      - name: Execute exact-SHA ELV5 lifecycle witnesses
+        working-directory: .
+        shell: bash
+        run: |
+          mapfile -t witness_paths < <(python3 scripts/ci/collect-elv5-f2-witness-matrix.py --paths)
+          test "${#witness_paths[@]}" -eq 27
+          cd apps/mobile
+          flutter test --machine --dart-define=ELECTRA_SOURCE_SHA="${GITHUB_SHA}" "${witness_paths[@]}" 2>&1 | tee "${RUNNER_TEMP}/elv5-f2-machine.jsonl"
+
+      - name: Execute global ELV5 reliability qualification
+        working-directory: .
+        shell: bash
+        run: |
+          mapfile -t witness_paths < <(python3 scripts/ci/collect-elv5-f2-witness-matrix.py --paths --require-global)
+          test "${#witness_paths[@]}" -eq 29
+          cd apps/mobile
+          flutter test --machine --dart-define=ELECTRA_SOURCE_SHA="${GITHUB_SHA}" --dart-define=ELECTRA_F2_GLOBAL_QUALIFICATION=true "${witness_paths[@]}" 2>&1 | tee "${RUNNER_TEMP}/elv5-f2-global-machine.jsonl"
 
       - name: Install engineering core dependencies
         working-directory: packages/engineering_core
@@ -76,8 +227,52 @@ jobs:
 
       - name: Analyze engineering core
         working-directory: packages/engineering_core
-        run: dart analyze
+        shell: bash
+        run: dart analyze 2>&1 | tee "${RUNNER_TEMP}/core-analyze.log"
 
       - name: Test engineering core
         working-directory: packages/engineering_core
-        run: dart test
+        shell: bash
+        run: dart test 2>&1 | tee "${RUNNER_TEMP}/core-test.log"
+
+      - name: Collect executed ELV5 lifecycle matrix
+        working-directory: .
+        shell: bash
+        run: >-
+          python3 scripts/ci/collect-elv5-f2-witness-matrix.py
+          --machine-log "${RUNNER_TEMP}/elv5-f2-machine.jsonl"
+          --output "${RUNNER_TEMP}/elv5-f2-executed-matrix.json"
+
+      - name: Collect global ELV5 reliability matrix
+        working-directory: .
+        shell: bash
+        run: >-
+          python3 scripts/ci/collect-elv5-f2-witness-matrix.py --require-global
+          --machine-log "${RUNNER_TEMP}/elv5-f2-global-machine.jsonl"
+          --output "${RUNNER_TEMP}/elv5-f2-global-matrix.json"
+
+      - name: Preserve executed ELV5 lifecycle evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: elv5-f2-executed-witnesses-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/elv5-f2-machine.jsonl
+            ${{ runner.temp }}/elv5-f2-executed-matrix.json
+            ${{ runner.temp }}/elv5-f2-global-machine.jsonl
+            ${{ runner.temp }}/elv5-f2-global-matrix.json
+          if-no-files-found: ignore
+          retention-days: 30
+
+      - name: Preserve analyze and test logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-verification-logs-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/mobile-analyze.log
+            ${{ runner.temp }}/mobile-test.log
+            ${{ runner.temp }}/core-analyze.log
+            ${{ runner.temp }}/core-test.log
+          if-no-files-found: ignore
+          retention-days: 14

@@ -1,0 +1,197 @@
+{
+  "schema": "electra.elv5-normative-requirements.v1",
+  "status": "DESIGN_HARDENED_RUNTIME_NOT_STARTED",
+  "baseRequirementLedger": "requirements.json",
+  "baseRequirementCount": 80,
+  "packageRequirementCount": 8,
+  "fixedInventories": {
+    "processCount": 27,
+    "algorithmMappingCount": 27,
+    "publicCommandCount": 16,
+    "targetDatabaseSchemaVersion": 24,
+    "dossierSectionsPerProcess": 25,
+    "vectorClassesPerProcess": 5,
+    "primaryProcessVerticalCount": 54,
+    "minimumProcessVectorCount": 135,
+    "designFindingsResolved": 56,
+    "runtimeStatus": "NOT_STARTED"
+  },
+  "processCodes": [
+    "CCTV-01", "CCTV-02", "CCTV-03", "CCTV-04", "CCTV-05", "CCTV-06",
+    "LAN-01", "LAN-02", "LAN-03", "LAN-04", "LAN-05", "LAN-06", "LAN-07",
+    "ACS-01", "ACS-02", "ACS-03", "ACS-04", "ACS-05", "ACS-06",
+    "FA-01", "FA-02", "FA-03", "FA-04", "FA-05", "FA-06", "FA-07", "FA-08"
+  ],
+  "mandatoryDossierSections": [
+    "Physical meaning",
+    "Applicability matrix",
+    "Exact typed inputs",
+    "Evidence requirements",
+    "Operating cases",
+    "Mathematical model",
+    "Equations",
+    "Exact/bounded arithmetic",
+    "Worst-case selection",
+    "Requirement composition",
+    "Comparison equations",
+    "Margin equation",
+    "Governing-case algorithm",
+    "Limiting-factor algorithm",
+    "Missing/unsupported behavior",
+    "Dependency set",
+    "Calculation trace",
+    "Complexity/resource bounds",
+    "Pseudocode",
+    "Dart interfaces",
+    "Positive reference vector",
+    "Boundary vector",
+    "Negative vector",
+    "Adversarial vector",
+    "Cross-discipline vector"
+  ],
+  "vectorClasses": [
+    "POSITIVE",
+    "BOUNDARY",
+    "NEGATIVE_OR_UNSUPPORTED",
+    "ADVERSARIAL",
+    "CROSS_DISCIPLINE"
+  ],
+  "priorityComputationalCore": [
+    "CCTV-02",
+    "CCTV-03",
+    "LAN-01",
+    "LAN-05",
+    "ACS-03",
+    "ACS-04",
+    "ACS-05",
+    "FA-02",
+    "FA-04",
+    "FA-05",
+    "FA-06"
+  ],
+  "packageBindings": [
+    {
+      "package": "P0",
+      "requirementIds": ["ELV5-P0-001", "ELV5-P0-002", "ELV5-P0-003", "ELV5-P0-004", "ELV5-P0-005", "ELV5-P0-006", "ELV5-P0-007", "ELV5-P0-008"],
+      "obligationIds": ["ELV5-NORM-001", "ELV5-NORM-002", "ELV5-NORM-029", "ELV5-NORM-030"],
+      "contractRefs": ["p0-baseline.md", "implemented-baseline.md", "../elv5-authoritative-spec-index.md"]
+    },
+    {
+      "package": "P1",
+      "requirementIds": ["ELV5-P1-001", "ELV5-P1-002", "ELV5-P1-003", "ELV5-P1-004", "ELV5-P1-005", "ELV5-P1-006", "ELV5-P1-007", "ELV5-P1-008"],
+      "obligationIds": ["ELV5-NORM-003", "ELV5-NORM-004", "ELV5-NORM-005", "ELV5-NORM-006", "ELV5-NORM-007", "ELV5-NORM-008", "ELV5-NORM-009", "ELV5-NORM-010"],
+      "contractRefs": ["engineering-primitives-contract.md", "typed-process-api.md", "calculation-engine-contract.md", "process-code-level-specification.md"]
+    },
+    {
+      "package": "P2",
+      "requirementIds": ["ELV5-P2-001", "ELV5-P2-002", "ELV5-P2-003", "ELV5-P2-004", "ELV5-P2-005", "ELV5-P2-006", "ELV5-P2-007", "ELV5-P2-008"],
+      "obligationIds": ["ELV5-NORM-011", "ELV5-NORM-012", "ELV5-NORM-013", "ELV5-NORM-014", "ELV5-NORM-015"],
+      "contractRefs": ["persistence-schema-contract.md", "code-level-runtime-contract.md", "code-level-hardening-amendments.md", "code-level-hardening-v2.md"]
+    },
+    {
+      "package": "P3",
+      "requirementIds": ["ELV5-P3-001", "ELV5-P3-002", "ELV5-P3-003", "ELV5-P3-004", "ELV5-P3-005", "ELV5-P3-006", "ELV5-P3-007", "ELV5-P3-008"],
+      "obligationIds": ["ELV5-NORM-016", "ELV5-NORM-017", "ELV5-NORM-018", "ELV5-NORM-031"],
+      "contractRefs": ["p3-cctv.md", "process-specifications/cctv-processes.md"]
+    },
+    {
+      "package": "P4",
+      "requirementIds": ["ELV5-P4-001", "ELV5-P4-002", "ELV5-P4-003", "ELV5-P4-004", "ELV5-P4-005", "ELV5-P4-006", "ELV5-P4-007", "ELV5-P4-008"],
+      "obligationIds": ["ELV5-NORM-016", "ELV5-NORM-019", "ELV5-NORM-020"],
+      "contractRefs": ["p4-lan.md", "process-specifications/lan-processes.md"]
+    },
+    {
+      "package": "P5",
+      "requirementIds": ["ELV5-P5-001", "ELV5-P5-002", "ELV5-P5-003", "ELV5-P5-004", "ELV5-P5-005", "ELV5-P5-006", "ELV5-P5-007", "ELV5-P5-008"],
+      "obligationIds": ["ELV5-NORM-016", "ELV5-NORM-021", "ELV5-NORM-022", "ELV5-NORM-031"],
+      "contractRefs": ["p5-acs.md", "process-specifications/acs-processes.md", "calculation-oracle-errata-v1.md"]
+    },
+    {
+      "package": "P6",
+      "requirementIds": ["ELV5-P6-001", "ELV5-P6-002", "ELV5-P6-003", "ELV5-P6-004", "ELV5-P6-005", "ELV5-P6-006", "ELV5-P6-007", "ELV5-P6-008"],
+      "obligationIds": ["ELV5-NORM-016", "ELV5-NORM-023", "ELV5-NORM-024"],
+      "contractRefs": ["p6-fire.md", "process-specifications/fire-processes.md"]
+    },
+    {
+      "package": "P7",
+      "requirementIds": ["ELV5-P7-001", "ELV5-P7-002", "ELV5-P7-003", "ELV5-P7-004", "ELV5-P7-005", "ELV5-P7-006", "ELV5-P7-007", "ELV5-P7-008"],
+      "obligationIds": ["ELV5-NORM-025", "ELV5-NORM-026", "ELV5-NORM-027", "ELV5-NORM-028", "ELV5-NORM-032", "ELV5-NORM-033", "ELV5-NORM-034"],
+      "contractRefs": ["p7-dependencies-workspace.md", "flutter-performance-contract.md"]
+    },
+    {
+      "package": "P8",
+      "requirementIds": ["ELV5-P8-001", "ELV5-P8-002", "ELV5-P8-003", "ELV5-P8-004", "ELV5-P8-005", "ELV5-P8-006", "ELV5-P8-007", "ELV5-P8-008"],
+      "obligationIds": ["ELV5-NORM-035", "ELV5-NORM-036", "ELV5-NORM-037", "ELV5-NORM-038", "ELV5-NORM-039", "ELV5-NORM-040"],
+      "contractRefs": ["p8-acceptance.md", "qualification-contract.md", "flutter-performance-contract.md"]
+    },
+    {
+      "package": "P9",
+      "requirementIds": ["ELV5-P9-001", "ELV5-P9-002", "ELV5-P9-003", "ELV5-P9-004", "ELV5-P9-005", "ELV5-P9-006", "ELV5-P9-007", "ELV5-P9-008"],
+      "obligationIds": ["ELV5-NORM-001", "ELV5-NORM-029", "ELV5-NORM-030", "ELV5-NORM-035", "ELV5-NORM-041", "ELV5-NORM-042"],
+      "contractRefs": ["p9-closure.md", "../elv5-p0-p9-delivery-plan.md", "../elv5-authoritative-spec-index.md"]
+    }
+  ],
+  "obligations": [
+    {"id":"ELV5-NORM-001","severity":"MUST","title":"Authority fingerprint","requirement":"Every implementation/qualification claim is tied to the exact active authority fingerprint and tested source SHA; documentation or code drift invalidates affected closure.","acceptance":"P0/P9 exact-head manifest reconciliation."},
+    {"id":"ELV5-NORM-002","severity":"MUST","title":"Inherited ownership","requirement":"ELV5 must reuse ELV3/ELV4 canonical ownership for revisions, cables, ports, components, power sources, battery banks, physical kernels and command/history infrastructure.","acceptance":"P0 ownership audit and P9 duplicate-owner reconciliation."},
+    {"id":"ELV5-NORM-003","severity":"MUST","title":"Strong domain identities","requirement":"Domain/scope/subject/process/evidence identities are closed typed values; semantic identity must not collapse to unvalidated free strings.","acceptance":"P1 type/registry tests."},
+    {"id":"ELV5-NORM-004","severity":"MUST","title":"Explicit field resolution","requirement":"Known, Missing, NotApplicable, Unsupported and Unresolved are explicit semantic states; null must not encode engineering meaning.","acceptance":"P1 primitive and process tests."},
+    {"id":"ELV5-NORM-005","severity":"MUST","title":"Dimension-safe exact quantities","requirement":"Engineering quantities use code-owned legal algebra and exact/bounded arithmetic; dB and dBm, bit/s and byte capacity, power and energy remain distinct types.","acceptance":"P1 L0 arithmetic/type tests."},
+    {"id":"ELV5-NORM-006","severity":"MUST","title":"Evidence and uncertainty","requirement":"Every requirement-affecting value carries source/evidence/applicability and measurement uncertainty where applicable; typical/estimated evidence cannot satisfy guaranteed-bound claims.","acceptance":"P1/P8 evidence-basis tests."},
+    {"id":"ELV5-NORM-007","severity":"MUST","title":"Deterministic time","requirement":"Recurring schedules use captured timezone-rule evidence, explicit DST behavior and half-open intervals; host timezone/tzdb defaults cannot change deterministic results.","acceptance":"P1/CCTV-03/P8 DST and restart tests."},
+    {"id":"ELV5-NORM-008","severity":"MUST","title":"Coordinate-frame provenance","requirement":"Geometry uses explicit frame/transform identity; coordinates in different frames cannot be mixed without a captured transform chain.","acceptance":"P1/CCTV-01 frame mismatch tests."},
+    {"id":"ELV5-NORM-009","severity":"MUST","title":"Deterministic requirement composition","requirement":"Requirement merging, reserve/derating composition and conflict resolution are code-owned and deterministic; no intuitive or UI-selected winner is allowed.","acceptance":"P1 shared-source and conflict tests."},
+    {"id":"ELV5-NORM-010","severity":"MUST","title":"Unified result algebra","requirement":"All 27 processes use common applicability, comparison, positive-headroom margin, governing-case, limiting-factor, dimension-status and deterministic trace semantics.","acceptance":"P1 unified-engine invariants."},
+    {"id":"ELV5-NORM-011","severity":"MUST","title":"Schema 24 additive persistence","requirement":"ELV5 persistence is additive schema 24 with explicit PK/FK/index/active-uniqueness rules and no duplicate physical ownership.","acceptance":"P2/P8 migration, restart and owner-isolation tests."},
+    {"id":"ELV5-NORM-012","severity":"MUST","title":"Exact 16-command wire surface","requirement":"The public discipline command family remains exactly 16 operations with strict schema/payload validation, replay-first behavior and canonical request hashing.","acceptance":"P2/P8 codec, replay and conflict matrix."},
+    {"id":"ELV5-NORM-013","severity":"MUST","title":"Atomic mutation UoW","requirement":"Root/member replacement, old+new invalidation, history and ledger persistence commit atomically and roll back together on failure.","acceptance":"P2/P8 file-SQLite failure injection."},
+    {"id":"ELV5-NORM-014","severity":"MUST","title":"Capture-run-publish separation","requirement":"Calculations use short coherent capture, pure calculation outside DB write transaction and short guarded all-or-nothing publication.","acceptance":"P2/P7/P8 transaction and race tests."},
+    {"id":"ELV5-NORM-015","severity":"MUST","title":"Immutable evaluations and pointers","requirement":"Technical evaluations are immutable; CURRENT/STALE pointer freshness is separate from execution/completion/assessment and guarded by generation/fingerprint revalidation.","acceptance":"P2/P7/P8 replay, stale and freeze tests."},
+    {"id":"ELV5-NORM-016","severity":"MUST","title":"27x25 process dossiers","requirement":"Every one of 27 processes implements exactly the 25 mandatory dossier sections; package summaries may not override equations, boundaries, worst-case, governing, limiting, complexity or vector semantics.","acceptance":"CI dossier guard plus P3-P6 process qualification."},
+    {"id":"ELV5-NORM-017","severity":"MUST","title":"CCTV flow accounting","requirement":"CCTV-02 counts explicit directed stream copies; unicast duplicates by receiver/path, multicast deduplicates only under declared tree/group evidence, and payload bitrate remains separate from physical wire rate.","acceptance":"CCTV-02 five-vector suite."},
+    {"id":"ELV5-NORM-018","severity":"MUST","title":"CCTV storage integration","requirement":"CCTV-03 unions half-open recorded intervals, integrates exact bits/8, applies reserve once, performs process-boundary ceil once and separates expected estimate from guaranteed retention.","acceptance":"CCTV-03 five-vector/DST/rounding suite."},
+    {"id":"ELV5-NORM-019","severity":"MUST","title":"LAN installed path and compatibility","requirement":"LAN path calculations use realized ordered sections exactly once, preserve physical resource identity and let the weakest incompatible path element govern compatibility.","acceptance":"LAN-01/02/04/07 vector suites."},
+    {"id":"ELV5-NORM-020","severity":"MUST","title":"Bidirectional optical budget","requirement":"LAN-05 independently proves sensitivity and overload in both directions using dB loss intervals and dBm optical levels; power budget never implies reach/dispersion without a separate model.","acceptance":"LAN-05 five-vector suite."},
+    {"id":"ELV5-NORM-021","severity":"MUST","title":"ACS transient electrical model","requirement":"ACS-03 distinguishes control path from conductive feed, branch from shared-trunk current and steady from startup/inrush cases; bounded event policy chooses the governing transient.","acceptance":"ACS-03 five-vector suite and corrected oracle."},
+    {"id":"ELV5-NORM-022","severity":"MUST","title":"ACS shared source, autonomy and release","requirement":"ACS-04/05 reuse complete ELV4 source/bank evidence; ACS-06 evaluates canonical five-cause release truth tables for fail-safe/fail-secure/project-defined behavior without claiming legal compliance.","acceptance":"ACS-04/05/06 cross-discipline and release suites."},
+    {"id":"ELV5-NORM-023","severity":"MUST","title":"Fire current/source/autonomy","requirement":"FA-02/04/05 use complete uniquely identified current origins, shared-source requirement composition and explicit ordered standby/alarm sequences with no hidden default durations.","acceptance":"FA-02/04/05 five-vector suites."},
+    {"id":"ELV5-NORM-024","severity":"MUST","title":"Fire circuit/topology/policy limits","requirement":"FA address, electrical, notification, signal-topology and policy dimensions remain separate; unsupported electrical/fault models and technical policy matches cannot become false compliance PASS.","acceptance":"FA-01/03/06/07/08 vector suites."},
+    {"id":"ELV5-NORM-025","severity":"MUST","title":"Typed dependency graph","requirement":"Dependencies include FACT/SET/POLICY/EVAL/POINTER/MISSING plus selector-aware membership markers, with deterministic canonical identity.","acceptance":"P7 dependency key and restart tests."},
+    {"id":"ELV5-NORM-026","severity":"MUST","title":"Old+new selector invalidation","requirement":"Every mutation invalidates union(oldClosure,newClosure), including insertion of newly matching selector members and creation of previously missing evidence.","acceptance":"P7/P8 affected-unaffected tests."},
+    {"id":"ELV5-NORM-027","severity":"MUST","title":"Incremental recomputation","requirement":"Production recalculation operates on the exact affected transitive closure; a generic recalculate-all fallback is not acceptable for normal mutations.","acceptance":"P7/P8 affected-node/recomputed-node evidence."},
+    {"id":"ELV5-NORM-028","severity":"MUST","title":"Atomic coherent batch publish","requirement":"A requested coherent calculation batch either advances all validated target pointers or none; worker failure/cancellation/conflict must never partially publish the batch.","acceptance":"P7/P8 worker/database race tests."},
+    {"id":"ELV5-NORM-029","severity":"MUST","title":"Stable public inventories","requirement":"Runtime must reconcile exactly 80 stable package requirements, 27 process codes, 27 algorithm mappings, 16 public commands and schema 24 at the accepted source SHA.","acceptance":"CI manifest and P9 reconciliation."},
+    {"id":"ELV5-NORM-030","severity":"MUST","title":"Downstream claim boundaries","requirement":"ELV5 must not claim ELV6 cabinet/layout fit, ELV7 jurisdictional compliance/certification or ELV8 commercial SKU/BOM/procurement outcomes.","acceptance":"Cross-discipline vectors and P9 handoff audit."},
+    {"id":"ELV5-NORM-031","severity":"MUST","title":"Reference oracle arithmetic integrity","requirement":"Canonical reference vectors are executable arithmetic oracles; the ACS-03 fixture uses Vterminal=23.51 V and +1.51 V low-voltage headroom for the published inputs, and contradictory golden values are invalid.","acceptance":"CI oracle guard and ACS-03 executable fixture."},
+    {"id":"ELV5-NORM-032","severity":"MUST","title":"Native worker execution","requirement":"Medium/large native engineering workloads execute through Elv5CalculationExecutor outside the Flutter UI isolate using bounded long-lived worker isolate(s)/pool.","acceptance":"P7/P8 executor/threading evidence."},
+    {"id":"ELV5-NORM-033","severity":"MUST","title":"Deterministic parallelism and cache","requirement":"Worker count/completion order cannot change canonical output; semantic cache keys include process/algorithm/schema/numeric/authority/input fingerprints.","acceptance":"workerCount=1 vs N and cache hit/miss proofs."},
+    {"id":"ELV5-NORM-034","severity":"MUST","title":"Cancellation, supersession and backpressure","requirement":"Rapid edits cancel/supersede/coalesce obsolete jobs; stale completion may not advance CURRENT or create an unbounded queue.","acceptance":"P7/P8 epoch/coalescing/stale publish tests."},
+    {"id":"ELV5-NORM-035","severity":"MUST","title":"135 process-vector qualification","requirement":"Qualification includes at least 27 positive, 27 negative/unsupported, 27 boundary, 27 adversarial and 27 cross-discipline process vectors while retaining exactly 54 primary public vertical entries.","acceptance":"P8 qualification manifest and dossier vector mapping."},
+    {"id":"ELV5-NORM-036","severity":"MUST","title":"No-false-PASS sentinels","requirement":"Unsupported/missing/uncertain/typical/stale/what-if/downstream-scope states cannot be promoted to authoritative technical PASS beyond their exact claim scope.","acceptance":"P8 no-false-PASS matrix."},
+    {"id":"ELV5-NORM-037","severity":"MUST","title":"Scale and resource bounds","requirement":"All kernels obey dossier complexity/resource bounds on scale fixtures; pathological quadratic behavior, unbounded exact arithmetic and unbounded diagnostics are closure-blocking.","acceptance":"P8 scale/resource-limit suites."},
+    {"id":"ELV5-NORM-038","severity":"MUST","title":"Bulk indexed persistence","requirement":"Capture/publish uses bounded bulk repository access and required indexes; N+1 query behavior on supported scale fixtures is prohibited.","acceptance":"P8 query-count/query-plan evidence."},
+    {"id":"ELV5-NORM-039","severity":"MUST","title":"Flutter targeted UI projection","requirement":"Engineering math/SQLite must not run in build(); large collections are lazy/virtualized and one result change rebuilds only affected immutable projections.","acceptance":"P8 widget rebuild/virtualization instrumentation."},
+    {"id":"ELV5-NORM-040","severity":"MUST","title":"Profile-mode performance evidence","requirement":"Performance acceptance is measured in Flutter profile mode with source SHA, authority fingerprint, platform/runtime versions, frame metrics, phase timings, memory/cardinalities and worker/cache metrics.","acceptance":"P8 exact-head performance artifact."},
+    {"id":"ELV5-NORM-041","severity":"MUST","title":"Review-result separation","requirement":"Engineer acknowledgement, waiver or workflow review is separate from immutable technical evaluation and cannot rewrite FAIL, outputHash or governing result.","acceptance":"P7/P9 review mutation tests."},
+    {"id":"ELV5-NORM-042","severity":"MUST","title":"Closure event separation","requirement":"Design hardening, runtime implementation, functional qualification, performance qualification, merge and CLOSED are separate evidenced events.","acceptance":"P9 closure ledger."}
+  ],
+  "authorityRefs": [
+    "../elv5-authoritative-spec-index.md",
+    "../elv5-p0-p9-delivery-plan.md",
+    "engineering-primitives-contract.md",
+    "typed-process-api.md",
+    "calculation-engine-contract.md",
+    "process-code-level-specification.md",
+    "process-specifications/cctv-processes.md",
+    "process-specifications/lan-processes.md",
+    "process-specifications/acs-processes.md",
+    "process-specifications/fire-processes.md",
+    "flutter-performance-contract.md",
+    "persistence-schema-contract.md",
+    "code-level-runtime-contract.md",
+    "code-level-hardening-amendments.md",
+    "code-level-hardening-v2.md",
+    "qualification-contract.md",
+    "calculation-oracle-errata-v1.md"
+  ]
+}
