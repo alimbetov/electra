@@ -15,6 +15,7 @@ agreement; branch SHA pins describe inspected inputs, not future runtime support
 | [Interface registry](interface-registry.json) | Nine proposed schemas, result adapters, operation boundaries and invalidation events |
 | [Qualification plan](qualification-plan.json) | Planned cross-stage oracle objectives; no executed runtime claims |
 | [Local stage binding](stage-binding.json) | Local stage/document fingerprints, agreement digest and blocked runtime entry gates |
+| [Electrical study handoff](electrical-study-handoff-contract.md) | Shared immutable references for short-circuit, voltage-disturbance, motor-start and source-transfer studies; ELV6/7/8 are consumers, not competing physics owners |
 
 Run `python3 scripts/ci/check-elv-integration-contract.py` on each branch.
 The check validates local design agreement, schemas, branch adapters, source pins
@@ -34,7 +35,6 @@ inherited upstream specifications over a current stage branch. Publish coordinat
 contract updates with expected-head leases; if an upstream changes, inspect and
 reconcile rather than resetting its branch to a previously read SHA.
 
-
 ## Generator, PV, storage and transfer amendment
 
 [Source-system contract](source-systems-contract.md) defines exact owner roles,
@@ -46,3 +46,15 @@ remain unchanged. [Source qualification](source-qualification-plan.json) has
 metadata discovery without production approval. [Design readiness](design-readiness.json)
 separates defined contracts from blocked upstream/runtime/source-review gates.
 The catalogue now plans 23 families with a distinct PV module product definition.
+
+## Panel hierarchy, 2D editor, cable-entry and study amendment
+
+ELV6 future runtime entry MUST also reconcile to
+[`../elv6-panel-hierarchy-2d-cable-entry-amendment.md`](../elv6-panel-hierarchy-2d-cable-entry-amendment.md)
+and its machine contract. It makes hierarchical MDB/floor/local panels, repeated-floor templates/instances,
+2D millimetre/DIN cabinet editing, TOP/BOTTOM/LEFT/RIGHT/MIXED/CUSTOM entry zones,
+internal cabinet cable routing and K0 physical-route feasibility explicit ELV6 requirements.
+
+Qualified fault/disturbance calculations enter ELV6 only through
+[`electrical-study-handoff-contract.md`](electrical-study-handoff-contract.md).
+The amendment is design authority for future implementation; it does not claim runtime or acceptance.
