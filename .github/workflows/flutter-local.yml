@@ -201,6 +201,15 @@ jobs:
           cd apps/mobile
           flutter test --machine --dart-define=ELECTRA_SOURCE_SHA="${GITHUB_SHA}" "${witness_paths[@]}" 2>&1 | tee "${RUNNER_TEMP}/elv5-f2-machine.jsonl"
 
+      - name: Execute global ELV5 reliability qualification
+        working-directory: .
+        shell: bash
+        run: |
+          mapfile -t witness_paths < <(python3 scripts/ci/collect-elv5-f2-witness-matrix.py --paths --require-global)
+          test "${#witness_paths[@]}" -eq 29
+          cd apps/mobile
+          flutter test --machine --dart-define=ELECTRA_SOURCE_SHA="${GITHUB_SHA}" --dart-define=ELECTRA_F2_GLOBAL_QUALIFICATION=true "${witness_paths[@]}" 2>&1 | tee "${RUNNER_TEMP}/elv5-f2-global-machine.jsonl"
+
       - name: Install engineering core dependencies
         working-directory: packages/engineering_core
         run: dart pub get
@@ -229,6 +238,14 @@ jobs:
           --machine-log "${RUNNER_TEMP}/elv5-f2-machine.jsonl"
           --output "${RUNNER_TEMP}/elv5-f2-executed-matrix.json"
 
+      - name: Collect global ELV5 reliability matrix
+        working-directory: .
+        shell: bash
+        run: >-
+          python3 scripts/ci/collect-elv5-f2-witness-matrix.py --require-global
+          --machine-log "${RUNNER_TEMP}/elv5-f2-global-machine.jsonl"
+          --output "${RUNNER_TEMP}/elv5-f2-global-matrix.json"
+
       - name: Preserve executed ELV5 lifecycle evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -237,6 +254,8 @@ jobs:
           path: |
             ${{ runner.temp }}/elv5-f2-machine.jsonl
             ${{ runner.temp }}/elv5-f2-executed-matrix.json
+            ${{ runner.temp }}/elv5-f2-global-machine.jsonl
+            ${{ runner.temp }}/elv5-f2-global-matrix.json
           if-no-files-found: ignore
           retention-days: 30
 

@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[2]
 REGISTRY = ROOT / 'docs/product/elv5-implementation/f2-lifecycle-witness-registry.json'
 PREFIX = 'ELV5_F2_WITNESS:'
 REQUIRED = {'Q6_INITIAL', 'Q7_CAS_REJECTED', 'Q7_REPLAY', 'Q8_REPLAY', 'Q8_READ_ONLY', 'PERSISTED_IDENTITY'}
+GLOBAL_REQUIRED = {'GLOBAL_PUBLICATION_ROLLBACK','GLOBAL_INDEPENDENT_CAS','GLOBAL_FREEZE_MANIFEST'}
 SHA256 = re.compile(r'[0-9a-f]{64}')
 
 
@@ -40,7 +41,7 @@ def registry():
     return rows
 
 
-def collect(events, witnesses, source_sha):
+def collect(events, witnesses, source_sha, *, require_global=False):
     """Return rows only after all tests, checkpoints and persisted pins agree."""
     require(re.fullmatch(r'(?:[0-9a-f]{40}|[0-9a-f]{64})', source_sha), 'Full Git source SHA required')
     suites, tests, outcomes, checkpoints = {}, {}, {}, {}
@@ -89,10 +90,10 @@ def collect(events, witnesses, source_sha):
         for entry in checkpoints.get(tid, []):
             require(entry.get('processCode') == code, f'{code}: foreign process event')
             stage = entry.get('stage')
-            require(stage in REQUIRED | {'Q6_REPUBLISHED'}, f'{code}: unknown checkpoint')
+            require(stage in REQUIRED | {'Q6_REPUBLISHED'} | (GLOBAL_REQUIRED if require_global else set()), f'{code}: unknown checkpoint')
             require(stage not in stages, f'{code}: duplicate checkpoint {stage}')
             stages[stage] = entry
-        required = REQUIRED | ({'Q6_REPUBLISHED'} if witness['requireRepublished'] else set())
+        required = REQUIRED | ({'Q6_REPUBLISHED'} if witness['requireRepublished'] else set()) | (GLOBAL_REQUIRED if require_global else set())
         require(required <= stages.keys(), f'{code}: missing lifecycle checkpoints {sorted(required - stages.keys())}')
         first, replay, frozen, persisted = [stages[s] for s in ('Q6_INITIAL', 'Q7_REPLAY', 'Q8_REPLAY', 'PERSISTED_IDENTITY')]
         for observed in (first, replay, frozen, persisted):
@@ -123,36 +124,62 @@ def collect(events, witnesses, source_sha):
         require(identity == {'schema':'electra.elv5-foundation-qualification-identity.v1',
                              'sourceSha':source_sha,'processVersion':entries[0]['processVersion'],
                              'rulesetVersion':authority['rulesetVersion'],'authorityFingerprint':digest(authority)}, f'{code}: persisted qualification identity mismatch')
+        if require_global:
+            rollback, race, freeze = [stages[key] for key in ('GLOBAL_PUBLICATION_ROLLBACK','GLOBAL_INDEPENDENT_CAS','GLOBAL_FREEZE_MANIFEST')]
+            require(rollback.get('reopenedAfterEveryFault') is True and set(rollback.get('faultTables', [])) == {'discipline_evaluation_records','discipline_dependency_index','discipline_evaluation_pointers','command_execution_records'} and len(rollback['faultTables']) == 4, f'{code}: incomplete durable publication fault suite')
+            require(race.get('connections') == 2 and race.get('committedWriters') == 1 and race.get('loserCode') == 'ELV5_POINTER_GENERATION_CONFLICT' and race.get('pointerGeneration') == 1, f'{code}: independent CAS witness missing')
+            require(all(freeze.get(key) is True for key in ('publicFreezeApi','faultAfterAllSections','restartReplayIdentical','newCalculationRejected')) and freeze.get('manifestSchema') == 'electra.elv-snapshot-manifest.v2' and freeze.get('sectionSchema') == 'electra.elv5-discipline-freeze-section.v1', f'{code}: incomplete real freeze witness')
         rows.append({'processCode':code,'qualificationIdentity':identity,
                      'witness':{'path':witness['path'],'testName':witness['testName'], 'testID':tid,
                                 'sourceFileSha256':hashlib.sha256((ROOT / witness['path']).read_bytes()).hexdigest()},
                      'lifecycleCheckpoints':stages,
                      'sourceMutationObserved':witness['requireRepublished'],
-                     'lifecycleResult':'PASS_Q6_Q7_Q8', 'fullQualificationResult':'PENDING_Q0_Q5_Q9_AND_GLOBAL_RELIABILITY'})
+                     'lifecycleResult':'PASS_Q6_Q7_Q8', 'globalReliabilityResult':'PASS' if require_global else 'NOT_EXECUTED_IN_THIS_SUITE', 'fullQualificationResult':'PENDING_Q0_Q5_Q9' if require_global else 'PENDING_Q0_Q5_Q9_AND_GLOBAL_RELIABILITY'})
     return sorted(rows, key=lambda row: row['processCode'])
+
+
+def verify_regressions(events, bindings):
+    suites = {e['suite']['id']:e['suite']['path'].replace('\\','/') for e in events if e.get('type') == 'suite'}
+    tests = {e['test']['id']:e['test'] for e in events if e.get('type') == 'testStart'}
+    results = {e['testID']:e for e in events if e.get('type') == 'testDone'}
+    proof = []
+    for binding in bindings:
+        path = binding['path']
+        matches = [tid for tid,t in tests.items() if t['name'] == binding['testName'] and (suites.get(t['suiteID'],'') in {path,path.removeprefix('apps/mobile/')} or suites.get(t['suiteID'],'').endswith('/'+path))]
+        require(len(matches) == 1, 'Missing exact global regression: '+binding['testName'])
+        tid = matches[0]
+        require(results.get(tid,{}).get('result') == 'success' and results[tid].get('skipped') is False, 'Global regression failed or skipped')
+        proof.append({**binding,'testID':tid,'sourceFileSha256':hashlib.sha256((ROOT/path).read_bytes()).hexdigest()})
+    return proof
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--paths', action='store_true')
+    parser.add_argument('--require-global', action='store_true')
     parser.add_argument('--machine-log', type=Path)
     parser.add_argument('--output', type=Path)
     parser.add_argument('--run-id', default=os.environ.get('GITHUB_RUN_ID'))
     args = parser.parse_args()
     witnesses = registry()
+    regressions = json.loads(REGISTRY.read_text()).get('globalRegressionWitnesses', []) if args.require_global else []
+    if args.require_global:
+        require(len(regressions) == 3 and len({(r['path'],r['testName']) for r in regressions}) == 3, 'Three exact global regressions required')
     if args.paths:
-        print('\n'.join(row['path'].removeprefix('apps/mobile/') for row in witnesses))
+        print('\n'.join(dict.fromkeys(row['path'].removeprefix('apps/mobile/') for row in [*witnesses,*regressions])))
         return
     require(args.machine_log and args.output, 'Machine log and output paths are required')
     provenance = source_provenance(ROOT)
     require(args.run_id and str(args.run_id).isdigit(), 'Workflow run id required')
     # Only machine JSON is authoritative. Flutter startup chatter is ignored.
     events = [json.loads(line) for line in args.machine_log.read_text().splitlines() if line.lstrip().startswith('{')]
-    rows = collect(events, witnesses, provenance['sourceSha'])
+    rows = collect(events, witnesses, provenance['sourceSha'], require_global=args.require_global)
+    regression_proof = verify_regressions(events, regressions)
     report = {'schema':'electra.elv5-f2-executed-witness-matrix.v1', **provenance,
               'workflowRunId':int(args.run_id), 'machineLogSha256':hashlib.sha256(args.machine_log.read_bytes()).hexdigest(),
               'registrySha256':hashlib.sha256(REGISTRY.read_bytes()).hexdigest(),
               'processCount':len(rows),'lifecycleCovered':len(rows),'qualified':0,'accepted':False,
+              'globalReliabilityExecuted':args.require_global,'globalRegressionWitnesses':regression_proof,
               'processes':rows}
     report['matrixSha256'] = digest(report)
     args.output.parent.mkdir(parents=True, exist_ok=True)

@@ -96,6 +96,37 @@ class ExecutionWitnessTests(unittest.TestCase):
                 self.assertRaises(ValueError, self.collect)
                 self.events = events
 
+    def add_global_events(self):
+        values = {
+            'GLOBAL_PUBLICATION_ROLLBACK': {'faultTables':['discipline_evaluation_records','discipline_dependency_index','discipline_evaluation_pointers','command_execution_records'],'reopenedAfterEveryFault':True},
+            'GLOBAL_INDEPENDENT_CAS': {'connections':2,'committedWriters':1,'loserCode':'ELV5_POINTER_GENERATION_CONFLICT','pointerGeneration':1},
+            'GLOBAL_FREEZE_MANIFEST': {'publicFreezeApi':True,'faultAfterAllSections':True,'restartReplayIdentical':True,'newCalculationRejected':True,'manifestSchema':'electra.elv-snapshot-manifest.v2','sectionSchema':'electra.elv5-discipline-freeze-section.v1'},
+        }
+        for stage, evidence in values.items():
+            payload = {'schema':'electra.elv5-f2-lifecycle-event.v1','processCode':self.witness['processCode'],'sourceSha':self.source,'stage':stage,**evidence}
+            self.events.insert(-2, {'type':'print','testID':2,'message':m.PREFIX+m.json.dumps(payload)})
+
+    def test_global_suite_requires_every_fault_cas_and_real_freeze_checkpoint(self):
+        self.assertRaises(ValueError,m.collect,self.events,[self.witness],self.source,require_global=True)
+        self.add_global_events()
+        self.assertEqual(m.collect(self.events,[self.witness],self.source,require_global=True)[0]['globalReliabilityResult'],'PASS')
+
+    def test_global_suite_rejects_weak_or_missing_failure_proof(self):
+        self.add_global_events()
+        for stage, field, value in [('GLOBAL_PUBLICATION_ROLLBACK','faultTables',[]),('GLOBAL_INDEPENDENT_CAS','connections',1),('GLOBAL_INDEPENDENT_CAS','committedWriters',2),('GLOBAL_FREEZE_MANIFEST','publicFreezeApi',False),('GLOBAL_FREEZE_MANIFEST','faultAfterAllSections',False)]:
+            with self.subTest(stage=stage,field=field):
+                before=copy.deepcopy(self.events)
+                self.mutate_stage(stage,lambda row:row.update({field:value}))
+                self.assertRaises(ValueError,m.collect,self.events,[self.witness],self.source,require_global=True)
+                self.events=before
+
+    def test_exact_global_regression_must_execute_and_succeed(self):
+        binding={'path':self.witness['path'],'testName':self.witness['testName']}
+        self.assertEqual(len(m.verify_regressions(self.events,[binding])),1)
+        self.assertRaises(ValueError,m.verify_regressions,self.events,[{**binding,'testName':'missing regression'}])
+        self.events[-2]['skipped']=True
+        self.assertRaises(ValueError,m.verify_regressions,self.events,[binding])
+
     def test_missing_or_duplicate_checkpoint_fails(self):
         self.assertRaises(ValueError, self.collect, self.events[:3] + self.events[4:])
         self.assertRaises(ValueError, self.collect, self.events[:4] + [self.events[3]] + self.events[4:])

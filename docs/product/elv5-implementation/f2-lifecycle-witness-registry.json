@@ -164,5 +164,19 @@
       "testName": "F2 FA-08 production Q6/Q7/Q8 survives invalidation, restart and freeze",
       "requireRepublished": true
     }
+  ],
+  "globalRegressionWitnesses": [
+    {
+      "path": "apps/mobile/test/data/elv5_f2_cctv05_cascade_reliability_test.dart",
+      "testName": "F2 global CCTV05 source and publication cascades roll back atomically and reject frozen invalidation"
+    },
+    {
+      "path": "apps/mobile/test/data/elv5_f2_freeze_snapshot_reliability_test.dart",
+      "testName": "F2 global real freeze rolls back all sections and preserves captured discipline across restart and live-source changes"
+    },
+    {
+      "path": "apps/mobile/test/data/elv5_f2_freeze_snapshot_reliability_test.dart",
+      "testName": "F2 global new empty discipline capture is distinct from legacy ELV5_NOT_CAPTURED"
+    }
   ]
 }
