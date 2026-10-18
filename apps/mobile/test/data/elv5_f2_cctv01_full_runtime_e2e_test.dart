@@ -20,6 +20,48 @@ import '../support/elv5_f2_production_lifecycle.dart';
 
 void main() {
   test(
+    'CCTV01 restored missing placement invalidates durable BLOCKED result',
+    () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      await _seedGeometry(db);
+      await db.customStatement(
+        "DELETE FROM component_instances WHERE id='cam-1'",
+      );
+      await _replace(db, 1, null, false);
+      final life = Elv5F2ProductionLifecycle(
+        process: Elv5ProcessCode.cctv01,
+        subjectKind: 'CAMERA',
+        subjectId: 'cam-1',
+      )..db = db;
+      await life
+          .runtime(db)
+          .service
+          .execute(life.command('missing-placement', 2, 0));
+      expect((await life.evaluation()).read<String>('execution'), 'BLOCKED');
+      await DriftComponentInstanceRepository(
+        db,
+        originDeviceId: 'review',
+      ).saveComponent(
+        const ComponentInstance(
+          id: 'cam-1',
+          definitionId: 'fictional-camera',
+          definitionVersion: 1,
+          roomId: 'room-1',
+          hostSurfacePatchId: 'patch-x',
+          localPosition: Point2Mm(2000, 2000),
+        ),
+      );
+      expect((await life.pointer()).read<String>('freshness'), 'STALE');
+      await life
+          .runtime(db)
+          .service
+          .execute(life.command('restored-placement', 3, 2));
+      expect((await life.evaluation()).read<String>('assessment'), 'PASS');
+    },
+  );
+
+  test(
     'CCTV01 create-next restores policy with revision-scoped evidence and no derived history',
     () async {
       final dir = await Directory.systemTemp.createTemp('f2-create-next-');

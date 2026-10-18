@@ -72,6 +72,18 @@ final class Cctv01PersistedInputResolver
       ),
     );
 
+    // Stable selectors must survive early BLOCKED exits as well as successful
+    // captures, so restoring missing placement/geometry invalidates the result.
+    dependencies.addAll([
+      _dependency(request, 'FACT', 'ELV3_COMPONENT_PLACEMENT', cameraId),
+      for (final patchId
+          in {
+            contract.expectedHostSurfacePatchId,
+            contract.targetSurfacePatchId,
+          }.whereType<String>())
+        _dependency(request, 'FACT', 'ELV3_SURFACE_PATCH', patchId),
+    ]);
+
     if (!contract.hasExactSurfaceFrames) {
       _blocked(
         request,

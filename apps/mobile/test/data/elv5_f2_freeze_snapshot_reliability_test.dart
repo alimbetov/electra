@@ -47,6 +47,44 @@ void main() {
           (await _store(
             db,
           ).read(projectId: 'p', designRevisionId: 'd')).payload;
+      await db.customStatement(
+        "CREATE TEMP TRIGGER fail_discipline_clone BEFORE INSERT ON link_section_assignments WHEN NEW.design_revision_id='d2' BEGIN SELECT RAISE(ABORT,'ELV5_CLONE_ROLLBACK'); END",
+      );
+      await expectLater(
+        _revision(db).createNext(
+          const CreateNextWorkingDesignRevisionCommand(
+            commandId: 'next',
+            projectId: 'p',
+            newRevisionId: 'd2',
+            code: 'R2',
+            basedOnRevisionId: 'd',
+          ),
+        ),
+        throwsA(predicate((e) => e.toString().contains('ELV5_CLONE_ROLLBACK'))),
+      );
+      for (final table in [
+        'project_design_revisions',
+        'canonical_cable_runs',
+        'link_composition_bindings',
+      ]) {
+        final column =
+            table == 'project_design_revisions' ? 'id' : 'design_revision_id';
+        expect(
+          await db
+              .customSelect("SELECT * FROM $table WHERE $column='d2'")
+              .get(),
+          isEmpty,
+        );
+      }
+      expect(
+        await db
+            .customSelect(
+              "SELECT * FROM command_execution_records WHERE command_id='next'",
+            )
+            .get(),
+        isEmpty,
+      );
+      await db.customStatement('DROP TRIGGER fail_discipline_clone');
       expect(
         await _revision(db).createNext(
           const CreateNextWorkingDesignRevisionCommand(

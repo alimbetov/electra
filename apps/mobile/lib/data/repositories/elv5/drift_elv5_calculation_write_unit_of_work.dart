@@ -62,28 +62,37 @@ final class _GuardStore implements Elv5CalculationPublicationGuardStore {
     // Both ELV4 and ELV5 nodes are consumed by discipline resolvers. The
     // caller owns the publication transaction, so these checks and writes
     // share one SQLite snapshot/write boundary.
-    for (final entry in generations.entries) {
+    final keys = generations.keys.toList()..sort();
+    for (var offset = 0; offset < keys.length; offset += 400) {
+      final batch = keys.skip(offset).take(400).toList();
+      final placeholders = List.filled(batch.length, '?').join(',');
       final rows =
           await database
               .customSelect(
-                "SELECT generation, freshness AS state FROM discipline_evaluation_pointers "
-                "WHERE project_id=? AND design_revision_id=? AND logical_node_key_sha256=? "
-                "UNION ALL SELECT generation, state FROM power_evaluation_pointers "
-                "WHERE project_id=? AND design_revision_id=? AND logical_node_key_sha256=?",
+                'SELECT logical_node_key_sha256 AS node, generation, freshness AS state FROM discipline_evaluation_pointers '
+                'WHERE project_id=? AND design_revision_id=? AND logical_node_key_sha256 IN ($placeholders) '
+                'UNION ALL SELECT logical_node_key_sha256 AS node, generation, state FROM power_evaluation_pointers '
+                'WHERE project_id=? AND design_revision_id=? AND logical_node_key_sha256 IN ($placeholders)',
                 variables: [
                   Variable.withString(projectId),
                   Variable.withString(designRevisionId),
-                  Variable.withString(entry.key),
+                  ...batch.map(Variable.withString),
                   Variable.withString(projectId),
                   Variable.withString(designRevisionId),
-                  Variable.withString(entry.key),
+                  ...batch.map(Variable.withString),
                 ],
               )
               .get();
-      if (rows.length != 1 ||
-          rows.single.read<String>('state') != 'CURRENT' ||
-          rows.single.read<int>('generation') != entry.value)
+      if (rows.length != batch.length ||
+          rows.map((r) => r.read<String>('node')).toSet().length !=
+              batch.length)
         return false;
+      for (final row in rows) {
+        if (row.read<String>('state') != 'CURRENT' ||
+            row.read<int>('generation') !=
+                generations[row.read<String>('node')])
+          return false;
+      }
     }
     return true;
   }
