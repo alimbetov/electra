@@ -46,6 +46,7 @@ def validate_process_registry(registry):
             assert upstream in by_code, ('unknown ELV6 upstream', row['code'], upstream)
 
     visiting, done = set(), set()
+
     def visit(code):
         assert code not in visiting, ('dependency cycle', code)
         if code in done:
@@ -111,7 +112,7 @@ def validate_boundary_documents():
         'LAY-01',
         'LAY-24',
         'ELV6_NOT_CAPTURED',
-        'capture → pure kernel → guarded publication',
+        'capture → pure kernel/projection → guarded publication',
         'SERVER_DERIVED_GEOMETRY',
         'REFERENCED_MEMBER_REMOVAL',
     ]:
