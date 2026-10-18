@@ -287,9 +287,14 @@
     "APPEND_SOURCE_LIFECYCLE_EVENT"
   ],
   "inheritedRevisionCommands": [
-    "FREEZE_PROJECT_DESIGN_REVISION",
+    "FREEZE_DESIGN_REVISION",
     "CREATE_NEXT_WORKING_DESIGN_REVISION"
   ],
+  "inheritedRevisionWireSchema": "electra.elv4-revision-command.v2",
+  "revisionLedgerMapping": {
+    "FREEZE_DESIGN_REVISION": "FREEZE_PROJECT_DESIGN_REVISION",
+    "CREATE_NEXT_WORKING_DESIGN_REVISION": "CREATE_NEXT_WORKING_DESIGN_REVISION"
+  },
   "forbiddenProjectFields": [
     "verified",
     "compliant",

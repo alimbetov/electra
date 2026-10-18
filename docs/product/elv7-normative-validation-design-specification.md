@@ -532,6 +532,16 @@ A green summary is impossible when mandatory evidence is unresolved.
 
 ELV7 exports immutable validation evidence:
 
+The [shared integration agreement](elv-integration/runtime-handoff-contract.md)
+separates `electra.elv7-normative-requirements.v1` from
+`electra.elv7-normative-assessment.v1`. A preselection requirement export binds
+source/profile/applicability and typed obligations without requiring a completed
+assessment of a not-yet-selected product. Unknown mandatory applicability remains
+blocking. An assessment binds actual committed product/layout evidence and cannot
+be inherited by a replacement. Candidate-sandbox results remain CANDIDATE and
+never become actual CURRENT by copying. Registry schemas are proposed until
+producer/consumer runtime qualification passes.
+
 ```text
 profile edition/hash
 validation run/hash

@@ -202,3 +202,11 @@ Default runtime sequence: P0 → P1 → P2 → P3 → P4/P5 → P6 → P7 → P8
 
 The [implementation package](elv7-implementation/README.md) is mandatory for these
 packages. Planned-case cardinality and structural design CI are not qualification.
+
+## Shared interface delivery obligations
+
+Use [the integration agreement](elv-integration/README.md) in P0–P9. P1/P3 freeze
+separate normative-requirement/assessment adapters; P2 separates public wire from
+ledger names; P4/P5 qualify scoped producer generations and trust invalidation;
+P8 executes the shared cross-stage oracles; P9 supplies immutable assessment and
+coverage evidence to ELV8. Shared design alignment is not runtime acceptance.

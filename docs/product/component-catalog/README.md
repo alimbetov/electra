@@ -30,3 +30,11 @@ Run `python3 scripts/ci/check-elv7-design-contract.py` for design consistency on
 Mobile catalogue extraction, schemas/migrations, product ingestion, price feeds,
 selection algorithms and application UI remain implementation work. The product
 families below are a planned support inventory, not qualified data/checkers.
+
+## Cross-stage agreement
+
+[ELV6–ELV8 integration](../elv-integration/README.md) is the shared protocol
+amendment for this catalogue design: exact technical/offer snapshots, project-local
+adoption, producer-owned layout/normative evidence and immutable report ordering.
+The canonical catalogue dossier is on the ELV7 design branch; ELV6/ELV8 consume
+its pinned source and the replicated agreement, not independently invented stores.

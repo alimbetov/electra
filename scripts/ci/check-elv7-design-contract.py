@@ -182,8 +182,14 @@ def main():
     unique(commands["catalogueAdministration"], "catalogue commands")
     require(not (set(operations) & set(commands["catalogueAdministration"])), "Governance boundary overlap")
     require(set(commands["inheritedRevisionCommands"]) == {
-        "FREEZE_PROJECT_DESIGN_REVISION", "CREATE_NEXT_WORKING_DESIGN_REVISION"},
+        "FREEZE_DESIGN_REVISION", "CREATE_NEXT_WORKING_DESIGN_REVISION"},
         "Use shared revision commands")
+    dispatcher = (ROOT / "apps/mobile/lib/application/elv4_wire_command_dispatcher.dart").read_text()
+    require(commands["inheritedRevisionWireSchema"] == "electra.elv4-revision-command.v2" and
+            all(f"'{operation}'" in dispatcher for operation in commands["inheritedRevisionCommands"]),
+            "Revision operations must match the actual public dispatcher")
+    require(commands["revisionLedgerMapping"]["FREEZE_DESIGN_REVISION"] ==
+            "FREEZE_PROJECT_DESIGN_REVISION", "Wire/ledger identity must stay distinct")
     require({"verified", "compliant", "checkerCode", "trustedDependencyClosure"} <=
             set(commands["forbiddenProjectFields"]), "Client trust boundary weakened")
 

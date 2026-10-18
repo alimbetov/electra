@@ -1,0 +1,54 @@
+{
+  "schema": "electra.elv-integration-stage-binding.v1",
+  "agreementId": "electra.elv6-elv8-integration.v1",
+  "stage": "ELV7",
+  "runtimeReady": false,
+  "observedLocalDbSchema": 24,
+  "schemaReconciliationRequired": false,
+  "agreementArtifacts": [
+    {
+      "path": "docs/product/elv-integration/README.md",
+      "sha256": "b581737e896109517492c3cae499f0fc00ed3b53bb7614daa76bd99218d803a7"
+    },
+    {
+      "path": "docs/product/elv-integration/runtime-handoff-contract.md",
+      "sha256": "293355e5d842646808efffb5c86af5623e792bb87937a7cba73bcb1db4050599"
+    },
+    {
+      "path": "docs/product/elv-integration/interface-registry.json",
+      "sha256": "d7bc2644ebf15f105e761d828b6fe4e39974fe04c0c326617850323dc332583c"
+    },
+    {
+      "path": "docs/product/elv-integration/qualification-plan.json",
+      "sha256": "36a44f095990987b36ead777a6bed2f4468c49676ada8e82b6f6b0eb29875f83"
+    }
+  ],
+  "localDocuments": [
+    {
+      "path": "docs/product/elv7-authoritative-spec-index.md",
+      "sha256": "c3837271d24448d7b84a110192ec1ececee7c46c0fde9ffc44fa15e814c6088e"
+    },
+    {
+      "path": "docs/product/elv7-p0-p9-delivery-plan.md",
+      "sha256": "763e08b8b6ef7e3326d47854be064cc264e20d477d93e9eb64c3bfca4f0fe044"
+    },
+    {
+      "path": "docs/product/elv7-normative-validation-design-specification.md",
+      "sha256": "7ccb116553720cfb60c7ed3eeb337fd099f1dddcb3271448433c1167315cdf8b"
+    },
+    {
+      "path": "docs/product/component-catalog/configuration-and-layout-contract.md",
+      "sha256": "224c6a1b5c0e888b1cc8a3b2efd1af8981ec16cb56a52077799a43a8953552e9"
+    }
+  ],
+  "runtimeEntryBlockers": [
+    "QUALIFIED_PRODUCER_CONTRACTS",
+    "SAME_UOW_OWNER_PARTICIPANTS",
+    "LOCAL_TO_MAIN_SCHEMA_RECONCILIATION",
+    "SOURCE_TRUST_INVALIDATION",
+    "FREEZE_SECTION_READERS",
+    "EXACT_WIRE_CODECS_AND_ADAPTERS"
+  ],
+  "catalogueAuthoritySource": "f32432c8b14134a5961420fb2a219ecbfb2652ce",
+  "note": "Fingerprints prove reviewed design text only; no implemented/qualified/accepted capability is inferred."
+}

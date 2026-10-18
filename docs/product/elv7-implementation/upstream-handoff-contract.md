@@ -77,3 +77,17 @@ ELV4 v1 manifest or ELV5/ELV6 historical evidence. Create-next restores mutable
 configuration only, using the accepted typed allocator/remapping services.
 Qualification includes unchanged ELV4 regression contracts, ELV5 lifecycle,
 ELV6 applicable safety projections and new ELV7 Q0–Q9 witnesses on one SHA.
+
+## Coordinated ELV6–ELV8 agreement
+
+The [shared agreement](../elv-integration/README.md) supplies exact proposed
+requirement/evidence schemas and adapter obligations. ELV7 can derive requirements
+without a completed ELV8 selection; actual assessments require committed owner
+facts. Public freeze uses `FREEZE_DESIGN_REVISION` on
+`electra.elv4-revision-command.v2`; `FREEZE_PROJECT_DESIGN_REVISION` is the
+internal ledger type only. No new stage freeze or strict-v2 payload fields.
+
+ELV6/ELV8 inspected source trees still have schema 23 while merged main/ELV7
+has schema 24. This is a recorded runtime entry reconciliation gate, not proof
+that an ELV6/ELV8 migration supports main already. Pins in earlier manifests
+remain historical audit inputs; the agreement is the cross-stage amendment.

@@ -151,3 +151,13 @@ Create-next restores selected mutable configuration under the existing typed
 remapping protocol, then requalifies CURRENT evidence. It does not copy current
 compliance, quote freshness or historical project receipt IDs as valid new results.
 A reopened historical revision needs neither catalogue file nor remote supplier.
+
+## 7. Shared projection and report ordering
+
+Use the [integration registry](../elv-integration/interface-registry.json) for
+exact proposed snapshot/requirement/evidence schemas. Preselection requirements
+do not depend on actual selected-product PASS. Candidate trial results remain
+in a separate evaluation space; same-UoW owner participants apply reviewed
+changes before committed owner revalidation. Freeze selection/adoption first,
+then assemble reports referencing the frozen root; never hash a future report
+into the source root or rewrite frozen sections after rendering.
