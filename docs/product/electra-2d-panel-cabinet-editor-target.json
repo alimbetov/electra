@@ -4,6 +4,8 @@
   "parentTarget": "electra-professional-electrical-platform-target.md",
   "name": "2D Panel & Cabinet Editor",
   "relatedCapabilities": [
+    "CAP-02",
+    "CAP-04",
     "CAP-05",
     "CAP-06",
     "CAP-16",
@@ -16,8 +18,13 @@
     "K2",
     "K7"
   ],
+  "relatedTargets": [
+    "electra-modular-panel-hierarchy-target.json",
+    "electra-identification-cabinet-entry-fault-simulation-target.json"
+  ],
   "principle": "The editor modifies typed engineering placement and routing facts; drawing pixels are never an independent engineering source of truth.",
   "panelClasses": [
+    "MAIN_DISTRIBUTION_BOARD",
     "DISTRIBUTION_BOARD",
     "FLOOR_DISTRIBUTION_BOARD",
     "MCC",
@@ -54,6 +61,21 @@
     "CABLE_ENTRY_ROUTING",
     "VALIDATION"
   ],
+  "hierarchyNavigator": {
+    "enabled": true,
+    "projectionOnly": true,
+    "features": [
+      "MAIN_TO_FLOOR_TO_LOCAL_PANEL_TREE",
+      "PARENT_FEEDER_BREADCRUMB",
+      "UPSTREAM_DOWNSTREAM_NAVIGATION",
+      "SOURCE_PATH_TRACE",
+      "PANEL_LOAD_RESERVE_SUMMARY",
+      "CHILD_FEEDER_SUMMARY",
+      "REPEATED_FLOOR_INSTANCE_COMPARE",
+      "TEMPLATE_VS_LOCAL_OVERRIDE_VIEW"
+    ],
+    "invariant": "A hierarchy tree node is a projection of real panel/topology objects and never replaces the electrical graph."
+  },
   "p0Interactions": [
     "SELECT_SINGLE_MULTI",
     "PAN_ZOOM",
@@ -68,7 +90,8 @@
     "LOCK_PLACEMENT",
     "UNDO_REDO_WORKING_REVISION",
     "COMPARE_CANDIDATE_WITH_CURRENT",
-    "ACCEPT_REJECT_K0_CANDIDATE"
+    "ACCEPT_REJECT_K0_CANDIDATE",
+    "NAVIGATE_PANEL_HIERARCHY"
   ],
   "mandatoryValidationFamiliesWhenEvidenceExists": [
     "ENCLOSURE_BOUNDARY_FIT",
@@ -123,6 +146,7 @@
     "WIRING_TERMINATION_SCHEDULE",
     "CABLE_CORE_DEVICE_LABELS",
     "PANEL_SCHEDULE",
+    "PANEL_HIERARCHY_NAVIGATION",
     "BOM_REFERENCES",
     "COMMISSIONING_REFERENCE_IDS",
     "DETERMINISTIC_PDF_LAYOUT"
@@ -133,6 +157,7 @@
     "MANUAL_OVERRIDE_REVALIDATES_DEPENDENCIES",
     "SLD_AND_2D_PANEL_SHARE_ONE_CANONICAL_MODEL",
     "LABELS_AND_TERMINALS_REUSE_CANONICAL_IDENTITIES",
+    "PANEL_HIERARCHY_NAVIGATOR_IS_PROJECTION_NOT_TOPOLOGY_AUTHORITY",
     "FROZEN_LAYOUTS_IMMUTABLE",
     "UI_EDIT_CANNOT_BYPASS_HARD_CONSTRAINTS"
   ],
@@ -144,9 +169,10 @@
     "PANEL2D-05_CABLE_ENTRY_INTERNAL_ROUTE_VISUALIZATION",
     "PANEL2D-06_LIVE_PHYSICAL_VALIDATION_OVERLAYS",
     "PANEL2D-07_K0_CANDIDATE_PREVIEW_COMPARE_APPLY",
-    "PANEL2D-08_LABEL_QR_TERMINAL_CABLE_PROJECTIONS",
-    "PANEL2D-09_ELV8_EXACT_SKU_GEOMETRY_ACCESSORIES",
-    "PANEL2D-10_QUALIFICATION_REPLAY_HISTORY_PERFORMANCE"
+    "PANEL2D-08_PANEL_HIERARCHY_NAVIGATOR_AND_FLOOR_INSTANCE_COMPARE",
+    "PANEL2D-09_LABEL_QR_TERMINAL_CABLE_PROJECTIONS",
+    "PANEL2D-10_ELV8_EXACT_SKU_GEOMETRY_ACCESSORIES",
+    "PANEL2D-11_QUALIFICATION_REPLAY_HISTORY_PERFORMANCE"
   ],
   "firstProfessionalWorkflowP0": [
     "FRONT_VIEW_2D_ENCLOSURE",
@@ -159,6 +185,7 @@
     "DETERMINISTIC_DRAG_SNAP",
     "CAPACITY_OVERLAP_FIT_VALIDATION",
     "K0_PREVIEW_EDIT_REVALIDATE",
+    "PANEL_HIERARCHY_NAVIGATION",
     "DETERMINISTIC_PDF_EXPORT"
   ],
   "deferred": [
