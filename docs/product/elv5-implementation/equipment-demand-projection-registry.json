@@ -1,0 +1,212 @@
+{
+  "schema": "electra.elv5-equipment-demand-projection-registry.v1",
+  "status": "DESIGN_HARDENED",
+  "sourceStage": "ELV5",
+  "projectionIsCalculationProcess": false,
+  "fixedElv5ProcessCount": 27,
+  "fixedPublicOperationCount": 16,
+  "projectionSchemaVersion": "1",
+  "ownership": {
+    "sharedPhysicalPowerTruth": "ELV4",
+    "disciplineEngineeringDemand": "ELV5",
+    "physicalFitAndPlacement": "ELV6",
+    "verifiedNormativeQualification": "ELV7",
+    "catalogSelectionAndDeliverables": "ELV8"
+  },
+  "identity": {
+    "demandKey": ["sourceEntityId", "roleCode", "ordinalOrSlot"],
+    "semanticHashExcludes": [
+      "uiState",
+      "refreshTimestamp",
+      "cacheIdentity",
+      "price",
+      "stock",
+      "supplierLeadTime"
+    ]
+  },
+  "diagnosticCodes": [
+    "DEMAND_INPUT_UNKNOWN",
+    "DEMAND_EVIDENCE_STALE",
+    "DEMAND_CONFLICTING_REQUIREMENTS",
+    "DEMAND_UNSUPPORTED_OPERATING_CASE",
+    "DEMAND_NO_GOVERNING_RESULT"
+  ],
+  "compositionRules": {
+    "compatibleConstraints": "MERGE_STRICTER",
+    "independentCapabilities": "DETERMINISTIC_UNION",
+    "reserveApplication": "EXACTLY_ONCE_AT_OWNING_LAYER",
+    "mandatoryConflict": "BLOCK",
+    "missingMandatoryEvidence": "FAIL_CLOSED",
+    "rerunDisciplineFormulaInProjection": false
+  },
+  "processMappings": [
+    {
+      "processCode": "CCTV-01",
+      "mode": "COMPOSITE_CONTRIBUTOR",
+      "roles": ["CAMERA_COVERAGE_CAPABILITY"],
+      "notes": "Selection-facing coverage/lens/camera capability basis only where calculated geometry actually constrains equipment."
+    },
+    {
+      "processCode": "CCTV-02",
+      "mode": "DIRECT_CONTRIBUTOR",
+      "roles": ["NETWORK_THROUGHPUT", "RECORDER_INGRESS"]
+    },
+    {
+      "processCode": "CCTV-03",
+      "mode": "DIRECT_CONTRIBUTOR",
+      "roles": ["RECORDING_STORAGE_CAPACITY", "RETENTION_CLAIM_SCOPE"]
+    },
+    {
+      "processCode": "CCTV-04",
+      "mode": "COMPOSITE_CONTRIBUTOR",
+      "roles": ["POE_PSE_POWER"],
+      "notes": "References shared physical budget evidence and must not duplicate global power demand or reserve."
+    },
+    {
+      "processCode": "CCTV-05",
+      "mode": "DIRECT_CONTRIBUTOR",
+      "roles": ["RECORDER_VMS_CHANNEL_CAPACITY", "RECORDER_VMS_CODEC_CAPABILITY", "RECORDER_VMS_STORAGE_CAPACITY"]
+    },
+    {
+      "processCode": "CCTV-06",
+      "mode": "COMPOSITE_CONTRIBUTOR",
+      "roles": ["MEDIA_LINK_CAPABILITY", "POWERED_LINK_CAPABILITY"]
+    },
+    {
+      "processCode": "LAN-01",
+      "mode": "BASIS_ONLY",
+      "roles": ["INSTALLED_LINK_LENGTH_BASIS"]
+    },
+    {
+      "processCode": "LAN-02",
+      "mode": "DIRECT_CONTRIBUTOR",
+      "roles": ["NETWORK_SWITCH_PORT_CAPACITY", "NETWORK_SWITCH_MEDIA_SPEED", "NETWORK_SWITCH_RESERVE"]
+    },
+    {
+      "processCode": "LAN-03",
+      "mode": "COMPOSITE_CONTRIBUTOR",
+      "roles": ["POE_PSE_POWER"],
+      "notes": "May compose with CCTV-04 over the same shared PSE without duplicate reserve."
+    },
+    {
+      "processCode": "LAN-04",
+      "mode": "DIRECT_CONTRIBUTOR",
+      "roles": ["COPPER_CATEGORY", "COPPER_SHIELDING", "COPPER_CONNECTOR_COMPATIBILITY"]
+    },
+    {
+      "processCode": "LAN-05",
+      "mode": "DIRECT_CONTRIBUTOR",
+      "roles": ["OPTICAL_LINK_BUDGET", "OPTICAL_TRANSCEIVER_CAPABILITY"]
+    },
+    {
+      "processCode": "LAN-06",
+      "mode": "BASIS_ONLY",
+      "roles": ["RACK_CAPACITY_BASIS"],
+      "notes": "Must never imply ELV6 physical fit PASS."
+    },
+    {
+      "processCode": "LAN-07",
+      "mode": "DIRECT_CONTRIBUTOR",
+      "roles": ["PATCH_PANEL_PORT_CAPACITY", "PATCH_PANEL_RESERVE"]
+    },
+    {
+      "processCode": "ACS-01",
+      "mode": "DIRECT_CONTRIBUTOR",
+      "roles": ["DOOR_EQUIPMENT_ROLE", "DOOR_EQUIPMENT_CAPABILITY"]
+    },
+    {
+      "processCode": "ACS-02",
+      "mode": "DIRECT_CONTRIBUTOR",
+      "roles": ["ACCESS_CONTROLLER_READER_CAPACITY", "ACCESS_CONTROLLER_RELAY_CAPACITY", "ACCESS_CONTROLLER_INPUT_CAPACITY"]
+    },
+    {
+      "processCode": "ACS-03",
+      "mode": "COMPOSITE_CONTRIBUTOR",
+      "roles": ["LOCK_ELECTRICAL_ENVELOPE", "LOCK_TERMINAL_VOLTAGE_BASIS"]
+    },
+    {
+      "processCode": "ACS-04",
+      "mode": "DIRECT_CONTRIBUTOR",
+      "roles": ["ACS_PSU_SOURCE_CAPACITY"]
+    },
+    {
+      "processCode": "ACS-05",
+      "mode": "DIRECT_CONTRIBUTOR",
+      "roles": ["ACS_BACKUP_AUTONOMY", "ACS_BATTERY_CAPACITY"]
+    },
+    {
+      "processCode": "ACS-06",
+      "mode": "COMPOSITE_CONTRIBUTOR",
+      "roles": ["ACS_INTERFACE_CAPABILITY", "ACS_TOPOLOGY_RELATIONSHIP"]
+    },
+    {
+      "processCode": "FA-01",
+      "mode": "DIRECT_CONTRIBUTOR",
+      "roles": ["FIRE_LOOP_DEVICE_CAPACITY", "FIRE_ADDRESS_CAPACITY"]
+    },
+    {
+      "processCode": "FA-02",
+      "mode": "COMPOSITE_CONTRIBUTOR",
+      "roles": ["FIRE_STANDBY_CURRENT", "FIRE_ALARM_CURRENT", "FIRE_STARTUP_CURRENT"]
+    },
+    {
+      "processCode": "FA-03",
+      "mode": "BASIS_ONLY",
+      "roles": ["FIRE_TERMINAL_VOLTAGE_BASIS"],
+      "notes": "Only supported electrical models may contribute; signal closure does not solve unsupported power topology."
+    },
+    {
+      "processCode": "FA-04",
+      "mode": "DIRECT_CONTRIBUTOR",
+      "roles": ["FIRE_PSU_SOURCE_CAPACITY"],
+      "notes": "Must preserve complete shared-source contributors and avoid double-counting fire current over complete ELV4 demand."
+    },
+    {
+      "processCode": "FA-05",
+      "mode": "DIRECT_CONTRIBUTOR",
+      "roles": ["FIRE_BACKUP_AUTONOMY", "FIRE_BATTERY_CAPACITY", "FIRE_PROTECTED_SEQUENCE"]
+    },
+    {
+      "processCode": "FA-06",
+      "mode": "DIRECT_CONTRIBUTOR",
+      "roles": ["FIRE_NOTIFICATION_COUNT", "FIRE_NOTIFICATION_ACTIVE_CURRENT", "FIRE_NOTIFICATION_STARTUP_CURRENT", "FIRE_NOTIFICATION_TERMINAL_VOLTAGE"]
+    },
+    {
+      "processCode": "FA-07",
+      "mode": "BASIS_ONLY",
+      "roles": ["FIRE_SIGNAL_TOPOLOGY_CAPABILITY"],
+      "notes": "Signal topology integrity is not survivability or verified compliance by itself."
+    },
+    {
+      "processCode": "FA-08",
+      "mode": "BASIS_ONLY",
+      "roles": ["FIRE_CABLE_TECHNICAL_POLICY", "FIRE_ENVIRONMENT_TECHNICAL_BASIS"],
+      "notes": "Never produces verified jurisdictional compliance; ELV7 owns that verdict."
+    }
+  ],
+  "sourceRoles": [
+    "UTILITY",
+    "GENERATOR",
+    "UPS",
+    "BATTERY_DC",
+    "PV",
+    "INVERTER",
+    "ESS",
+    "ATS",
+    "HYBRID_SOURCE"
+  ],
+  "requiredQualificationFamilies": [
+    "DETERMINISTIC_SAME_INPUT_SAME_HASH",
+    "CROSS_PROCESS_COMPOSITION",
+    "DUPLICATE_RESERVE_PREVENTION",
+    "MISSING_MANDATORY_EVIDENCE_FAIL_CLOSED",
+    "CONTRADICTORY_EVIDENCE_DIAGNOSTIC",
+    "REVISION_ISOLATION",
+    "UNRELATED_EDIT_NEGATIVE_CONTROL",
+    "UTILITY_SOURCE",
+    "GENERATOR_SOURCE",
+    "UPS_SOURCE",
+    "HYBRID_SOURCE",
+    "COMMERCIAL_ONLY_CHANGE_NO_ELV5_INVALIDATION"
+  ]
+}
