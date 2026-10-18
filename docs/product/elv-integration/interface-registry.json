@@ -1,0 +1,368 @@
+{
+  "schema": "electra.elv-integration-interface-registry.v1",
+  "agreementId": "electra.elv6-elv8-integration.v1",
+  "status": "DESIGN_AGREEMENT",
+  "runtimeAccepted": false,
+  "owners": [
+    "ELV6",
+    "ELV7",
+    "EQUIPMENT_CATALOG",
+    "ELV8"
+  ],
+  "interfaces": [
+    {
+      "id": "ELV6_REQUIREMENTS",
+      "schema": "electra.elv6-layout-requirements.v1",
+      "producer": "ELV6",
+      "consumers": [
+        "ELV8"
+      ],
+      "requiredFields": [
+        "hostRefs",
+        "mountingInterfaces",
+        "availableSpaceConstraints",
+        "lockedPlacements",
+        "intrinsicProductLimits",
+        "missingFacts"
+      ],
+      "scope": "PROJECT",
+      "evaluationSpace": "COMMITTED",
+      "runtimeStatus": "NOT_STARTED",
+      "qualified": false
+    },
+    {
+      "id": "ELV6_EVIDENCE",
+      "schema": "electra.elv6-layout-evidence.v1",
+      "producer": "ELV6",
+      "consumers": [
+        "ELV7",
+        "ELV8"
+      ],
+      "requiredFields": [
+        "canonicalLayoutHash",
+        "physicalDefinitionHashes",
+        "layoutEvaluations",
+        "safetyProjections",
+        "consumedRefs",
+        "generationTokens"
+      ],
+      "scope": "PROJECT",
+      "evaluationSpace": "COMMITTED",
+      "runtimeStatus": "NOT_STARTED",
+      "qualified": false
+    },
+    {
+      "id": "ELV7_REQUIREMENTS",
+      "schema": "electra.elv7-normative-requirements.v1",
+      "producer": "ELV7",
+      "consumers": [
+        "ELV8"
+      ],
+      "requiredFields": [
+        "profileEditionHash",
+        "ruleSetHash",
+        "sourceAuthorityHash",
+        "applicabilityProofs",
+        "typedObligations",
+        "coverageManifest",
+        "missingFacts"
+      ],
+      "scope": "PROJECT",
+      "evaluationSpace": "COMMITTED",
+      "runtimeStatus": "NOT_STARTED",
+      "qualified": false
+    },
+    {
+      "id": "ELV7_ASSESSMENT",
+      "schema": "electra.elv7-normative-assessment.v1",
+      "producer": "ELV7",
+      "consumers": [
+        "ELV8"
+      ],
+      "requiredFields": [
+        "profileEditionHash",
+        "runHash",
+        "sourceAuthorityHash",
+        "ruleOutcomes",
+        "scopeVerdict",
+        "coverageManifest",
+        "dispositions",
+        "consumedRefs",
+        "generationTokens"
+      ],
+      "scope": "PROJECT",
+      "evaluationSpace": "COMMITTED",
+      "runtimeStatus": "NOT_STARTED",
+      "qualified": false
+    },
+    {
+      "id": "CATALOGUE_TECHNICAL",
+      "schema": "electra.equipment-catalog-snapshot.v1",
+      "producer": "EQUIPMENT_CATALOG",
+      "consumers": [
+        "ELV6",
+        "ELV7",
+        "ELV8"
+      ],
+      "requiredFields": [
+        "publisherNamespace",
+        "releaseHash",
+        "productEditionHashes",
+        "definitionClosure",
+        "typedCapabilities",
+        "compatibilityEvidence",
+        "trustSnapshot"
+      ],
+      "scope": "CATALOGUE",
+      "evaluationSpace": "IMMUTABLE_SOURCE",
+      "runtimeStatus": "NOT_STARTED",
+      "qualified": false
+    },
+    {
+      "id": "CATALOGUE_OFFERS",
+      "schema": "electra.equipment-offer-snapshot.v1",
+      "producer": "EQUIPMENT_CATALOG",
+      "consumers": [
+        "ELV8"
+      ],
+      "requiredFields": [
+        "offerBookHash",
+        "boundProductEditionHashes",
+        "priceBasis",
+        "quantityTerms",
+        "currencyRef",
+        "taxBasis",
+        "validity",
+        "sourceHash"
+      ],
+      "scope": "CATALOGUE",
+      "evaluationSpace": "IMMUTABLE_SOURCE",
+      "runtimeStatus": "NOT_STARTED",
+      "qualified": false
+    },
+    {
+      "id": "ELV8_PROPOSAL",
+      "schema": "electra.elv8-configuration-proposal.v1",
+      "producer": "ELV8",
+      "consumers": [
+        "ELV6",
+        "ELV7",
+        "ELV8"
+      ],
+      "requiredFields": [
+        "candidateHash",
+        "candidateSubjectMap",
+        "requestHash",
+        "technicalManifestHash",
+        "economicManifestHash",
+        "layoutTrialRefs",
+        "normativeTrialRefs",
+        "objectiveVector",
+        "searchStatus",
+        "reviewedImpactFingerprint"
+      ],
+      "scope": "PROJECT",
+      "evaluationSpace": "CANDIDATE",
+      "runtimeStatus": "NOT_STARTED",
+      "qualified": false
+    },
+    {
+      "id": "ELV8_SELECTION",
+      "schema": "electra.elv8-selection-evidence.v1",
+      "producer": "ELV8",
+      "consumers": [
+        "ELV8"
+      ],
+      "requiredFields": [
+        "decisionId",
+        "selectionSnapshotHash",
+        "adoptionClosureHash",
+        "decisionState",
+        "selectionReason",
+        "consumedRefs",
+        "generationTokens",
+        "remainingBlockers"
+      ],
+      "scope": "PROJECT",
+      "evaluationSpace": "COMMITTED",
+      "runtimeStatus": "NOT_STARTED",
+      "qualified": false
+    },
+    {
+      "id": "ELV8_REPORT",
+      "schema": "electra.elv8-report-bundle-manifest.v1",
+      "producer": "ELV8",
+      "consumers": [
+        "EXPORTER"
+      ],
+      "requiredFields": [
+        "frozenProjectId",
+        "frozenProjectHash",
+        "sectionHashes",
+        "selectionSnapshotHash",
+        "reportModelHash",
+        "templateHash",
+        "audiencePolicyHash",
+        "completenessFlags"
+      ],
+      "scope": "PROJECT",
+      "evaluationSpace": "FROZEN_SOURCE",
+      "runtimeStatus": "NOT_STARTED",
+      "qualified": false
+    }
+  ],
+  "revisionBoundary": {
+    "wireSchema": "electra.elv4-revision-command.v2",
+    "wireOperations": [
+      "FREEZE_DESIGN_REVISION",
+      "CREATE_NEXT_WORKING_DESIGN_REVISION"
+    ],
+    "ledgerMapping": {
+      "FREEZE_DESIGN_REVISION": "FREEZE_PROJECT_DESIGN_REVISION",
+      "CREATE_NEXT_WORKING_DESIGN_REVISION": "CREATE_NEXT_WORKING_DESIGN_REVISION"
+    },
+    "independentStageFreezeAllowed": false,
+    "strictV2PayloadUnchanged": true
+  },
+  "candidateEligibility": {
+    "ELIGIBLE": "ELIGIBLE",
+    "INELIGIBLE": "INELIGIBLE",
+    "UNKNOWN": "UNRESOLVED",
+    "UNRESOLVED": "UNRESOLVED"
+  },
+  "invalidation": [
+    {
+      "event": "TECHNICAL_EDITION_ADOPTED",
+      "consumerDomains": [
+        "TECHNICAL",
+        "LAYOUT",
+        "NORMATIVE",
+        "SELECTION",
+        "ECONOMIC"
+      ],
+      "mayMutateSelectedTechnicalFacts": false,
+      "technicalEvidencePreserved": false,
+      "closurePolicy": "SERVER_DERIVED_OLD_NEW_WITH_MISSING_SELECTORS"
+    },
+    {
+      "event": "PLACEMENT_OR_PHYSICAL_CONTEXT_CHANGED",
+      "consumerDomains": [
+        "LAYOUT",
+        "NORMATIVE",
+        "SELECTION"
+      ],
+      "mayMutateSelectedTechnicalFacts": false,
+      "technicalEvidencePreserved": false,
+      "closurePolicy": "SERVER_DERIVED_OLD_NEW_WITH_MISSING_SELECTORS"
+    },
+    {
+      "event": "PROFILE_RULE_OR_APPLICABILITY_CHANGED",
+      "consumerDomains": [
+        "NORMATIVE",
+        "SELECTION"
+      ],
+      "mayMutateSelectedTechnicalFacts": false,
+      "technicalEvidencePreserved": false,
+      "closurePolicy": "SERVER_DERIVED_OLD_NEW_WITH_MISSING_SELECTORS"
+    },
+    {
+      "event": "SOURCE_TRUST_OR_REVIEW_CHANGED",
+      "consumerDomains": [
+        "NORMATIVE",
+        "SELECTION"
+      ],
+      "mayMutateSelectedTechnicalFacts": false,
+      "technicalEvidencePreserved": false,
+      "closurePolicy": "SERVER_DERIVED_OLD_NEW_WITH_MISSING_SELECTORS"
+    },
+    {
+      "event": "OFFER_STOCK_FX_OR_COST_POLICY_CHANGED",
+      "consumerDomains": [
+        "ECONOMIC"
+      ],
+      "mayMutateSelectedTechnicalFacts": false,
+      "technicalEvidencePreserved": true,
+      "closurePolicy": "SERVER_DERIVED_OLD_NEW_WITH_MISSING_SELECTORS"
+    },
+    {
+      "event": "DISPLAY_LABEL_CHANGED",
+      "consumerDomains": [
+        "PRESENTATION"
+      ],
+      "mayMutateSelectedTechnicalFacts": false,
+      "technicalEvidencePreserved": true,
+      "closurePolicy": "SERVER_DERIVED_OLD_NEW_WITH_MISSING_SELECTORS"
+    },
+    {
+      "event": "MISSING_SELECTOR_OR_MEMBERSHIP_CHANGED",
+      "consumerDomains": [
+        "DECLARED_CONSUMERS"
+      ],
+      "mayMutateSelectedTechnicalFacts": false,
+      "technicalEvidencePreserved": false,
+      "closurePolicy": "SERVER_DERIVED_OLD_NEW_WITH_MISSING_SELECTORS"
+    },
+    {
+      "event": "SAME_HASH_NEW_GENERATION",
+      "consumerDomains": [
+        "DECLARED_CONSUMERS"
+      ],
+      "mayMutateSelectedTechnicalFacts": false,
+      "technicalEvidencePreserved": false,
+      "closurePolicy": "SERVER_DERIVED_OLD_NEW_WITH_MISSING_SELECTORS"
+    }
+  ],
+  "freeze": {
+    "baseManifestSchema": "electra.elv4-snapshot-manifest.v1",
+    "baseManifestImmutable": true,
+    "sectionSchemas": {
+      "ELV5": "electra.elv5-discipline-freeze-section.v1",
+      "ELV6": "electra.elv6-layout-freeze-section.v1",
+      "ELV7": "electra.elv7-normative-freeze-section.v1",
+      "ELV8": "electra.elv8-selection-freeze-section.v1"
+    },
+    "newSectionStatus": "PROPOSED_NOT_QUALIFIED",
+    "catalogueOwnsProjectFreeze": false,
+    "reportAssemblyOrder": "AFTER_FROZEN_PROJECT",
+    "frozenRootContainsFutureReportHash": false
+  },
+  "projectApply": {
+    "sameOwnerUowRequired": true,
+    "crossDatabaseAtomicityAssumed": false,
+    "projectAdoptionSelfContained": true,
+    "trialEvidenceMayBecomeCurrentByCopy": false,
+    "rawViolationMayBecomePassByWaiver": false,
+    "expectedGenerationsRechecked": true,
+    "ledgerReplayBeforePreconditions": true
+  },
+  "baselineInputs": [
+    {
+      "stage": "ELV6",
+      "sourceSha": "ab59bb012689c91f371981ce712c81ba71bdae4f",
+      "observedLocalDbSchema": 23
+    },
+    {
+      "stage": "ELV7",
+      "sourceSha": "f32432c8b14134a5961420fb2a219ecbfb2652ce",
+      "observedLocalDbSchema": 24
+    },
+    {
+      "stage": "ELV8",
+      "sourceSha": "efeba9138dd1b918c1f4451ae878986c799b19e9",
+      "observedLocalDbSchema": 23
+    }
+  ],
+  "mainBaseline": {
+    "sourceSha": "29957ba9288c0bcf0d8d7ca061d46d2cdbf62fbd",
+    "observedDbSchema": 24,
+    "mergeDoesNotInferAcceptance": true
+  },
+  "runtimeEntryBlockers": [
+    "QUALIFIED_PRODUCER_CONTRACTS",
+    "SAME_UOW_OWNER_PARTICIPANTS",
+    "LOCAL_TO_MAIN_SCHEMA_RECONCILIATION",
+    "SOURCE_TRUST_INVALIDATION",
+    "FREEZE_SECTION_READERS",
+    "EXACT_WIRE_CODECS_AND_ADAPTERS"
+  ]
+}

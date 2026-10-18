@@ -1,0 +1,50 @@
+{
+  "schema": "electra.elv-integration-stage-binding.v1",
+  "agreementId": "electra.elv6-elv8-integration.v1",
+  "stage": "ELV8",
+  "runtimeReady": false,
+  "observedLocalDbSchema": 23,
+  "schemaReconciliationRequired": true,
+  "agreementArtifacts": [
+    {
+      "path": "docs/product/elv-integration/README.md",
+      "sha256": "b581737e896109517492c3cae499f0fc00ed3b53bb7614daa76bd99218d803a7"
+    },
+    {
+      "path": "docs/product/elv-integration/runtime-handoff-contract.md",
+      "sha256": "293355e5d842646808efffb5c86af5623e792bb87937a7cba73bcb1db4050599"
+    },
+    {
+      "path": "docs/product/elv-integration/interface-registry.json",
+      "sha256": "d7bc2644ebf15f105e761d828b6fe4e39974fe04c0c326617850323dc332583c"
+    },
+    {
+      "path": "docs/product/elv-integration/qualification-plan.json",
+      "sha256": "36a44f095990987b36ead777a6bed2f4468c49676ada8e82b6f6b0eb29875f83"
+    }
+  ],
+  "localDocuments": [
+    {
+      "path": "docs/product/elv8-authoritative-spec-index.md",
+      "sha256": "38e193aa105bb6aca470fb9033628f709686ba540088ea734badbff993e29dfd"
+    },
+    {
+      "path": "docs/product/elv8-p0-p9-delivery-plan.md",
+      "sha256": "ade4232ceae1f95f45e97bc3c7300610bf7bb622c08d8aa8a28150e89d51bb45"
+    },
+    {
+      "path": "docs/product/elv8-deliverables-design-specification.md",
+      "sha256": "e2b25744ed13cc26a998f790f9c75ee0b59b8b37acfd538fc39b556666ffa511"
+    }
+  ],
+  "runtimeEntryBlockers": [
+    "QUALIFIED_PRODUCER_CONTRACTS",
+    "SAME_UOW_OWNER_PARTICIPANTS",
+    "LOCAL_TO_MAIN_SCHEMA_RECONCILIATION",
+    "SOURCE_TRUST_INVALIDATION",
+    "FREEZE_SECTION_READERS",
+    "EXACT_WIRE_CODECS_AND_ADAPTERS"
+  ],
+  "catalogueAuthoritySource": "f32432c8b14134a5961420fb2a219ecbfb2652ce",
+  "note": "Fingerprints prove reviewed design text only; no implemented/qualified/accepted capability is inferred."
+}

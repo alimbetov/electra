@@ -1,6 +1,6 @@
 # Electra — ELV8 Authoritative Design Index
 
-Status: DESIGN DRAFT / INHERITED FL14 RUNTIME BASELINE PRESENT / ELV8 CLOSURE NOT STARTED
+Status: DESIGN RECONCILED / INHERITED FL14 RUNTIME BASELINE PRESENT / ELV8 CLOSURE NOT STARTED
 Branch: `feat/flutter-elv8-deliverables-design`
 Parent branch: `feat/flutter-elv7-normative-validation-design`
 Pinned parent at branch creation: `6d7aef8349dc04526a3beba16b2e2483bec0009e`
@@ -62,7 +62,7 @@ PDF / CSV / JSON / future exporter adapters
 - Hard requirements are filtered before ranking. Soft score cannot compensate for a hard violation or unknown mandatory fact.
 - “No candidate” is a valid diagnostic result.
 - Product selection that changes dimensions/power/capacity/layout/normative facts enters explicit revalidation; no hidden recursive redesign.
-- A hard noncompliant selection remains visibly noncompliant and requires an owner-appropriate disposition; an ELV7 deviation is only the normative form of that disposition, not a universal substitute for engineering violations.
+- A hard noncompliant selection remains visibly noncompliant. An approved deviation/USER_OVERRIDE cannot grant normal compliant/VALIDATED publication; verified source-authorized alternatives must change applicability explicitly. Owner dispositions do not rewrite raw physical or normative results.
 - Existing ADR-025 `ReportModel` remains the canonical report content model. ELV8 may add an immutable manifest/envelope around it, not a competing report truth.
 - BOM engineering quantity/source traceability remains separate from PriceBook/estimate values. An estimate may be rendered if supplied by its separate layer.
 - Exporters consume an immutable snapshot/report model, never mutable Flutter provider/widget state.
@@ -85,3 +85,14 @@ P0 must pin current upstream heads and produce a source-reality inventory of the
 | P4–P9 | ELV8-specific runtime not started |
 
 Design completion does not qualify the inherited FL14 code as a complete ELV8 vertical.
+
+## Coordinated catalogue and upstream contract
+
+[The shared integration agreement](elv-integration/README.md) supplies separate
+ELV6/ELV7 requirements and committed evidence, exact catalogue/offer snapshots,
+owner-UoW application, result adapters and freeze-before-report ordering.
+The Equipment Catalogue is a separately published local store; adoption and
+selection snapshots remain project-owned. Existing FL14 IDs/codecs/FK anchors
+are preserved through an explicit migration, not a parallel writable catalogue.
+The authoritative catalogue design is pinned to the ELV7 source in the shared
+agreement. It includes the professional CAP/K/SH target mapping, not just breakers.

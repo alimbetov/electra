@@ -1,6 +1,6 @@
 # Electra — ELV8 Equipment Selection and Deliverables Design Specification
 
-Status: DESIGN DRAFT / INHERITED FL14 BASELINE PRESENT / ELV8 CLOSURE NOT STARTED
+Status: DESIGN RECONCILED / INHERITED FL14 BASELINE PRESENT / ELV8 CLOSURE NOT STARTED
 Branch: `feat/flutter-elv8-deliverables-design`
 Pinned upstream ELV7 at branch creation: `6d7aef8349dc04526a3beba16b2e2483bec0009e`
 Entry: [authoritative index](elv8-authoritative-spec-index.md).
@@ -282,7 +282,7 @@ ELV8 repository code may not directly update ELV2–ELV7 tables. Owner changes a
 
 ### 10.1 Soft override
 
-Engineer may select another **hard-eligible** candidate regardless of soft rank. Record reason/actor/time and retain candidate-evaluation evidence. It remains technically compliant.
+Engineer may select another **hard-eligible** candidate regardless of soft rank. Record reason/actor/time and retain candidate-evaluation evidence. It retains its proven hard-eligibility scope; this alone is not a whole-project statutory compliance claim.
 
 ### 10.2 Hard noncompliant selection
 
@@ -300,11 +300,11 @@ ConstraintDispositionRef
 
 Examples:
 
-- ELV7 normative violation → approved ELV7 deviation where legally/project-policy permissible;
+- ELV7 normative violation → raw violation preserved plus an auditable deviation overlay; no automatic compliant/VALIDATED status;
 - engineering requirement from ELV4/5/6 → explicit authoritative engineering override/change workflow if such a workflow exists;
 - unresolved mandatory technical fact with no valid owner disposition → remains blocking.
 
-An ELV7 deviation is **not** a universal mechanism for non-normative engineering violations. A noncompliant selection may appear in draft documents with clear status but cannot be rendered as normal compliant/final without all required dispositions.
+An ELV7 deviation is **not** a universal mechanism for non-normative engineering violations. A noncompliant selection may appear in draft documents with clear blockers. Even an approved disposition cannot turn a mandatory raw violation into a normal compliant/VALIDATED final result. Only a verified source-authorized alternative or exemption encoded in applicability can change the applicable obligation.
 
 ## 11. Catalog import/governance hardening
 
@@ -407,7 +407,7 @@ stable sort key
 
 Aggregation is allowed only while drill-down to contributing project entities remains recoverable.
 
-Engineering quantity is independent from price. PriceBook, currency, material/labor rate, tax, vendor quote and price date belong to the estimate/commercial layer (FL18 boundary). Changing prices must not invalidate engineering selection/geometry/calculations.
+Engineering quantity is independent from price. PriceBook, currency, material/labor rate, tax, vendor quote and price date belong to the estimate/commercial layer (FL18 boundary). Changing prices must not invalidate selected technical facts/geometry/calculations. It does invalidate an economic proposal or estimate that actually consumed that offer/FX/cost policy. Such invalidation cannot silently replace an approved product.
 
 ## 15. Schedules and traceability
 
@@ -483,7 +483,7 @@ Local/server content-equivalence must be contract-tested at the canonical model/
 
 P0 inventories current tables including `manufacturerCatalogs`, `manufacturerProducts`, `manufacturerPolicies`, `circuitProductSelections` and any report/file metadata.
 
-Existing catalog/product/selection rows remain readable/canonical for their current scope. New schema is additive or migration-backed. Potential extensions:
+Existing catalog/product/selection rows remain readable for their historical scope. The coordinated separate catalogue store supersedes the assumption that reusable catalogue truth must remain in AppDatabase forever: preserve IDs/codecs and project FK compatibility anchors through a qualified extraction. After cutover, only the new catalogue store is writable for that catalogue authority; project selections/adoption snapshots remain project-owned. New project schema is additive or migration-backed. Potential extensions:
 
 ```text
 selection_request                       // generic non-circuit subject request
@@ -528,7 +528,7 @@ SelectEquipmentCandidate
 OverrideSoftSelection
 RecordNoncompliantSelection
 RecordSelectionRevalidation
-Freeze/SupersedeSelectionDecision
+SupersedeSelectionDecision
 Create/PublishReportTemplateEdition
 AssembleReportBundle
 ExportReportBundle
@@ -687,3 +687,50 @@ Runtime closure requires at least:
 ELV8 does not own live distributor inventory/price scraping, purchase orders/payment/tax, hidden product substitution, weakening upstream engineering/normative requirements, direct ELV2–ELV7 table mutation, arbitrary executable templates, full BIM/CAD authoring or legal certification beyond ELV7 evidence.
 
 PriceBook/estimate/procurement features remain downstream/separate from the engineering BOM and preserve quantity/source provenance.
+
+## 24. Shared integration amendment and command classes
+
+[ELV6–ELV8 agreement](elv-integration/README.md) refines this specification with
+nine exact proposed handoff schemas. Requirement exports precede SKU selection;
+actual layout/normative assessments follow adopted committed facts. Candidate
+trial results carry CANDIDATE space and never alias project CURRENT results.
+The draft UNKNOWN eligibility vocabulary maps explicitly to shared UNRESOLVED.
+
+Catalogue Import/Publish/Retire runs in the catalogue store's local transaction;
+project Bind/Release/Select/Apply operations copy the complete immutable closure
+inside the existing project UoW. No cross-file FK or ATTACH atomicity is assumed.
+Whole configuration apply needs authoritative owner participants in that same
+UoW; it must not dispatch owner services that commit independent transactions.
+Any unsupported participant blocks full apply. Public owner commands remain
+independent supported use cases. Actual owner revalidation follows apply.
+
+No FreezeSelectionDecision operation is introduced. The shared public revision
+wire is `FREEZE_DESIGN_REVISION` / `CREATE_NEXT_WORKING_DESIGN_REVISION` on
+`electra.elv4-revision-command.v2`; FREEZE_PROJECT_DESIGN_REVISION is an internal
+ledger type. Do not add new strict-v2 payload keys without a codec migration.
+
+The proposed `electra.elv8-selection-freeze-section.v1` contains selection state
+and the adopted product/definition/accessory/compatibility/offer closure. It is
+append-only and cannot rewrite ELV4/ELV5/ELV6/ELV7 frozen evidence. Legacy missing,
+explicit empty, partial and complete capture are distinguishable. Normal final
+dossier publication requires current complete acceptable required sections;
+partial/noncompliant draft snapshots retain their blockers.
+
+Freeze the project first, assemble canonical ReportModel and bundle from that
+immutable root second, then render artifacts. The frozen root never contains a
+future report hash. Assemble/Export jobs can read FROZEN sources and do not use
+WORKING-only engineering-mutation gates. Jobs keep idempotent immutable manifests,
+retry/fault semantics and separately appended artifact metadata. A redacted share
+has its own audience manifest/hash/completeness flags and cannot claim to expose
+withheld commercial/licensed evidence. Canonical report and artifact byte hashes
+are distinct.
+
+Initial automatic configuration uses hard engineering/normative/layout eligibility
+before comparable full-BOM price objectives. Packing/MOQ/tiers/FX/tax/accessories,
+unpriced/expired offers and search termination are explicit. No false optimum.
+The common catalogue dossier maps CAP-01..21, K0..13 and SH-01..10; unsupported
+families/scenario/protocol producers remain visible runtime blockers.
+
+P0 must reconcile this branch's inspected schema 23 with main schema 24 and
+actual upstream acceptance. The old inherited ELV6/ELV7 files on this branch
+are historical snapshots, not authority over their actively maintained branches.

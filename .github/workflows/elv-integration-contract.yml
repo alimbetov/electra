@@ -1,0 +1,41 @@
+name: ELV Integration Contract
+
+on:
+  push:
+    branches:
+      - feat/flutter-elv6-enclosure-layout-design
+      - feat/flutter-elv7-normative-validation-design
+      - feat/flutter-elv8-deliverables-design
+    paths:
+      - 'docs/product/elv-integration/**'
+      - 'docs/product/elv[678]-**'
+      - 'docs/product/elv[678]-implementation/**'
+      - 'docs/product/component-catalog/**'
+      - 'scripts/ci/check-elv-integration-contract.py'
+      - '.github/workflows/elv-integration-contract.yml'
+      - 'apps/mobile/lib/application/elv4_wire_command_dispatcher.dart'
+      - 'apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart'
+      - 'apps/mobile/lib/data/database/app_database.dart'
+  pull_request:
+    paths:
+      - 'docs/product/elv-integration/**'
+      - 'docs/product/elv[678]-**'
+      - 'docs/product/elv[678]-implementation/**'
+      - 'docs/product/component-catalog/**'
+      - 'scripts/ci/check-elv-integration-contract.py'
+      - '.github/workflows/elv-integration-contract.yml'
+      - 'apps/mobile/lib/application/elv4_wire_command_dispatcher.dart'
+      - 'apps/mobile/lib/data/repositories/drift_elv_design_revision_repository.dart'
+      - 'apps/mobile/lib/data/database/app_database.dart'
+
+permissions:
+  contents: read
+
+jobs:
+  shared-design-agreement:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: python3 scripts/ci/check-elv-integration-contract.py

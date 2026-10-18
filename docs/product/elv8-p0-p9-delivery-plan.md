@@ -1,6 +1,6 @@
 # ELV8 — P0–P9 delivery plan
 
-Status: DESIGN DRAFT / INHERITED FL14 BASELINE PRESENT / ELV8 CLOSURE OPEN
+Status: DESIGN RECONCILED / INHERITED FL14 BASELINE PRESENT / ELV8 CLOSURE OPEN
 Branch: `feat/flutter-elv8-deliverables-design`
 Specification: [design](elv8-deliverables-design-specification.md).
 Manufacturer baseline: [ADR-021](../adr/ADR-021-manufacturer-catalog-mapping.md).
@@ -102,11 +102,11 @@ Earlier stages are changed/recalculated only through their authoritative applica
 
 Disposition is owner-specific:
 
-- ELV7 normative violation may reference an approved ELV7 deviation where policy/law allows;
+- ELV7 normative violation retains its raw result; approved deviation is an overlay, never permission for a compliant/VALIDATED final state;
 - ELV4/5/6 engineering requirement needs the authoritative engineering override/change path, if one exists;
 - unresolved hard technical evidence with no valid disposition remains blocking.
 
-An ELV7 deviation is not a universal hard-constraint override.
+An ELV7 deviation is not a universal hard-constraint override. Unresolved mandatory facts remain blocking; a genuine source-authorized alternative changes applicability explicitly.
 
 ## P5 — quantity takeoff, BOM and `ReportModel`
 
@@ -235,3 +235,20 @@ Reconcile ELV8 requirements ↔ inherited/new source ↔ migrations ↔ tests �
 | P9 | DRAFT | NOT_STARTED | — |
 
 Default ELV8 closure sequence: P0 → P1 → P2 → P3 → P4 → P5 → P6 → P7 → P8 → P9. Inherited FL14 capabilities are regression gates from P0 onward and are never counted as new ELV8 proof without exact-SHA evidence.
+
+## Coordinated cross-stage work packages
+
+Apply [the common agreement](elv-integration/README.md) to every package:
+
+- P0: schema 23 → actual main 24 source/migration reconciliation, accepted producer
+  and same-UoW participant inventory; no runtime READY inference from design CI.
+- P1/P2: separate reusable catalogue/offer store, typed snapshot codecs and
+  project-local adoption with legacy FL14 ID/FK/history compatibility.
+- P3: requirement/evidence adapters, CANDIDATE isolation, whole-accessory eligibility
+  and explicit bounded-search/full-BOM economic results.
+- P4: reviewed atomic apply, real committed owner revalidation and no waiver-to-PASS.
+- P5/P6: selection/adoption freeze section, then immutable report assembly and
+  separately retriable artifact jobs; no frozen-root/report hash cycle.
+- P7: expose technical, normative, commercial and search completeness independently.
+- P8/P9: shared cross-stage oracles plus unchanged ELV4/FL14 regressions and exact-SHA
+  production witnesses before any ELV8 acceptance claim.
