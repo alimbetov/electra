@@ -32,6 +32,19 @@
     {"code":"CAP-20","name":"Collaboration and Sharing","priority":"P2","target":"ACCEPTED"},
     {"code":"CAP-21","name":"Field Verification and Commissioning","priority":"P2","target":"ACCEPTED"}
   ],
+  "targetAddenda": [
+    {
+      "id": "TARGET-ADDENDUM-IDENTIFICATION-CABINET-ENTRY-SIMULATION",
+      "document": "electra-identification-cabinet-entry-fault-simulation-target.md",
+      "machineRegistry": "electra-identification-cabinet-entry-fault-simulation-target.json",
+      "scope": [
+        "ENGINEERING_IDENTIFICATION_AND_MARKING",
+        "CABINET_CABLE_ENTRY_AND_INTERNAL_ROUTING",
+        "ELECTRICAL_DISTURBANCE_AND_FAULT_SIMULATION"
+      ],
+      "relatedCapabilities": ["CAP-05","CAP-06","CAP-07","CAP-08","CAP-13","CAP-17","CAP-19","CAP-21","K0","K3","K6","K7"]
+    }
+  ],
   "minimumMarketableProfessionalRelease": [
     "CAP-01",
     "CAP-02",
