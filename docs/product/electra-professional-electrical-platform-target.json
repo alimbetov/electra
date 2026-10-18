@@ -40,9 +40,37 @@
       "scope": [
         "ENGINEERING_IDENTIFICATION_AND_MARKING",
         "CABINET_CABLE_ENTRY_AND_INTERNAL_ROUTING",
+        "TWO_D_PANEL_CABINET_EDITOR",
         "ELECTRICAL_DISTURBANCE_AND_FAULT_SIMULATION"
       ],
-      "relatedCapabilities": ["CAP-05","CAP-06","CAP-07","CAP-08","CAP-13","CAP-17","CAP-19","CAP-21","K0","K3","K6","K7"]
+      "relatedCapabilities": ["CAP-05","CAP-06","CAP-07","CAP-08","CAP-13","CAP-16","CAP-17","CAP-19","CAP-21","K0","K2","K3","K6","K7"]
+    },
+    {
+      "id": "TARGET-ADDENDUM-2D-PANEL-CABINET-EDITOR",
+      "document": "electra-2d-panel-cabinet-editor-target.md",
+      "machineRegistry": "electra-2d-panel-cabinet-editor-target.json",
+      "scope": [
+        "STRUCTURED_2D_PANEL_EDITING",
+        "DIN_LAYOUT",
+        "TERMINALS_BUSBARS_DUCTS",
+        "CABLE_ENTRY_ROUTING_VIEW",
+        "K0_CANDIDATE_PREVIEW_EDIT_REVALIDATE"
+      ],
+      "relatedCapabilities": ["CAP-02","CAP-04","CAP-05","CAP-06","CAP-16","CAP-17","CAP-19","CAP-21","ELV6","ELV8","K0","K2","K7"]
+    },
+    {
+      "id": "TARGET-ADDENDUM-MODULAR-PANEL-HIERARCHY",
+      "document": "electra-modular-panel-hierarchy-target.md",
+      "machineRegistry": "electra-modular-panel-hierarchy-target.json",
+      "scope": [
+        "MAIN_TO_FLOOR_TO_LOCAL_PANEL_HIERARCHY",
+        "EXPLICIT_PARENT_FEEDERS",
+        "BOTTOM_UP_LOAD_ROLLUP",
+        "REUSABLE_FLOOR_PANEL_TEMPLATES",
+        "HIERARCHICAL_K0_SYNTHESIS",
+        "RISER_AND_FEEDER_COORDINATION"
+      ],
+      "relatedCapabilities": ["CAP-02","CAP-04","CAP-05","CAP-06","CAP-07","CAP-08","CAP-13","CAP-17","CAP-18","CAP-19","ELV6","ELV8","K0","K2","K3","K4","K6"]
     }
   ],
   "minimumMarketableProfessionalRelease": [
