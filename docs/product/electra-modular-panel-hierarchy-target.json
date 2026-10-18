@@ -1,0 +1,155 @@
+{
+  "schema": "electra.modular-panel-hierarchy-target.v1",
+  "status": "TARGET_NORTH_STAR_NOT_IMPLEMENTATION_NOT_ACCEPTANCE",
+  "parentTarget": "electra-professional-electrical-platform-target.md",
+  "name": "Modular Panel Hierarchy & Floor Distribution",
+  "relatedCapabilities": [
+    "CAP-02",
+    "CAP-04",
+    "CAP-05",
+    "CAP-06",
+    "CAP-07",
+    "CAP-08",
+    "CAP-13",
+    "CAP-17",
+    "CAP-18",
+    "CAP-19",
+    "ELV6",
+    "ELV8",
+    "K0",
+    "K2",
+    "K3",
+    "K4",
+    "K6"
+  ],
+  "distributionScopes": [
+    "BUILDING",
+    "FLOOR",
+    "ZONE",
+    "ROOM",
+    "SYSTEM",
+    "MACHINE",
+    "TENANT",
+    "PROCESS",
+    "CUSTOM"
+  ],
+  "coreObjects": [
+    "PanelAssembly",
+    "PanelFeederLink",
+    "LoadAggregationResult",
+    "PanelModuleTemplate",
+    "PanelModuleInstance",
+    "PanelHierarchyCandidate"
+  ],
+  "canonicalRules": [
+    "CHILD_PANEL_REQUIRES_REAL_ELECTRICAL_FEEDER",
+    "HIERARCHY_TREE_IS_PROJECTION_NOT_TOPOLOGY_AUTHORITY",
+    "BOTTOM_UP_LOAD_ROLLUP_PRESERVES_PROVENANCE",
+    "DIVERSITY_MUST_NOT_BE_DOUBLE_APPLIED",
+    "TEMPLATE_UPDATE_NEVER_SILENTLY_REWRITES_FROZEN_INSTANCES",
+    "MULTI_SOURCE_TOPOLOGY_REMAINS_GRAPH_EVEN_WHEN_UI_SHOWS_PRIMARY_PARENT"
+  ],
+  "p0Topology": [
+    "MAIN_BOARD",
+    "FLOOR_OR_ZONE_PANEL",
+    "OUTGOING_CIRCUIT",
+    "LOAD"
+  ],
+  "bottomUpRollup": [
+    "CONNECTED_LOAD",
+    "DEMAND_LOAD",
+    "DIVERSITY_SIMULTANEITY",
+    "PHASE_TOTALS",
+    "CRITICAL_LOAD_SUBSET",
+    "NORMAL_ALTERNATE_SOURCE_DEMAND",
+    "GOVERNING_SCENARIO"
+  ],
+  "topDownConstraints": [
+    "SOURCE_CAPACITY",
+    "MAX_FEEDER_RATING",
+    "AVAILABLE_SHORT_CIRCUIT_LEVEL",
+    "VOLTAGE_DROP_BUDGET",
+    "SOURCE_ASSIGNMENT",
+    "PHASE_POLICY",
+    "RESERVE_POLICY",
+    "PATHWAY_CONSTRAINTS",
+    "COMPANY_RULES",
+    "NORMATIVE_RULES"
+  ],
+  "templateSemantics": {
+    "versionedImmutableTemplates": true,
+    "explicitLocalOverrides": true,
+    "silentMassRewriteForbidden": true,
+    "example": "STANDARD_FLOOR_DB_V3 -> FDB-01..FDB-04"
+  },
+  "k0HierarchicalSynthesis": [
+    "GROUP_LOADS",
+    "PROPOSE_LOCAL_PANELS",
+    "SYNTHESIZE_LOCAL_PANELS",
+    "DERIVE_FEEDERS",
+    "ROLL_UP_UPSTREAM_DEMAND",
+    "SYNTHESIZE_MAIN_BOARD",
+    "VALIDATE_SOURCE_AND_PROTECTION_CHAIN",
+    "PROPAGATE_UPSTREAM_CONSTRAINTS_DOWNSTREAM",
+    "RETURN_CONSISTENT_HIERARCHY_CANDIDATE_OR_BLOCKERS"
+  ],
+  "twoDIntegration": [
+    "HIERARCHY_NAVIGATOR",
+    "PARENT_FEEDER_BREADCRUMB",
+    "UPSTREAM_DOWNSTREAM_NAVIGATION",
+    "PANEL_LOAD_RESERVE_SUMMARY",
+    "CHILD_FEEDER_SUMMARY",
+    "SOURCE_PATH_TRACE",
+    "REPEATED_FLOOR_INSTANCE_COMPARE",
+    "TEMPLATE_VS_LOCAL_OVERRIDE_VIEW"
+  ],
+  "riserAndFeederChecks": [
+    "AMPACITY",
+    "VOLTAGE_DROP",
+    "SHORT_CIRCUIT_MIN_MAX",
+    "BREAKING_CAPACITY",
+    "TRIP_SELECTIVITY_WHERE_QUALIFIED",
+    "RISER_PATHWAY_CAPACITY",
+    "PHASE_LOADING",
+    "SEGREGATION_NORMATIVE_FINDINGS",
+    "CABLE_BUSDuct_IDENTIFICATION_LABELING"
+  ],
+  "deliverables": [
+    "MAIN_DISTRIBUTION_SCHEDULE",
+    "PER_FLOOR_PANEL_SCHEDULES",
+    "FEEDER_SCHEDULE",
+    "CABLE_BUSDuct_SCHEDULE",
+    "PANEL_HIERARCHY_RISER_DIAGRAM",
+    "SLD_HIERARCHY_NAVIGATION",
+    "PER_PANEL_2D_LAYOUTS",
+    "TERMINAL_PLANS",
+    "LABELS_QR",
+    "BOM_BY_BUILDING_FLOOR_PANEL_SYSTEM",
+    "LOAD_SUMMARY_BY_LEVEL",
+    "COMMISSIONING_CHECKLIST_BY_PANEL"
+  ],
+  "priority": {
+    "P0": [
+      "EXPLICIT_PARENT_FEEDER",
+      "BOTTOM_UP_LOAD_ROLLUP",
+      "PHASE_TOTALS",
+      "RESERVE_CAPACITY_STATUS",
+      "VOLTAGE_DROP_FAULT_PROTECTION_CHAIN",
+      "HIERARCHY_NAVIGATOR",
+      "PER_PANEL_2D_LAYOUT",
+      "DETERMINISTIC_SCHEDULES"
+    ],
+    "P1": [
+      "REUSABLE_FLOOR_PANEL_TEMPLATES",
+      "TEMPLATE_DIFF_UPDATE_WORKFLOW",
+      "NORMAL_EMERGENCY_DUAL_PATH_VISUALIZATION",
+      "BUILDING_RISER_VISUALIZATION",
+      "MULTI_PANEL_K0_SYNTHESIS"
+    ],
+    "P2": [
+      "ADVANCED_BUS_TIE_RECONFIGURABLE_DISTRIBUTION",
+      "COMPLEX_REDUNDANT_2N_NPLUS1_HIERARCHIES",
+      "MULTI_PANEL_LOCATION_AND_FEEDER_OPTIMIZATION"
+    ]
+  }
+}
