@@ -1,3 +1,4 @@
+import 'drift_elv5_contract_identity.dart';
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
@@ -166,7 +167,13 @@ final class DriftAcs05AutonomyContractStore
 
     final payload = command.contract.toCanonicalValue();
     final contentHash = _encoder.sha256(payload);
-    final evidenceRef = 'ACS05:${command.contract.bankId}:$contentHash';
+    final evidenceRef = elv5ContractEvidenceRef(
+      projectId: command.projectId,
+      designRevisionId: command.designRevisionId,
+      kind: 'ACS05',
+      subjectId: command.contract.bankId,
+      payloadSha256: contentHash,
+    );
     final canonicalPayload = _canonical(payload);
     final existingEvidence =
         await database
@@ -286,6 +293,14 @@ final class DriftAcs05AutonomyContractStore
       }
     }
 
+    await invalidateElv5ContractSelector(
+      database,
+      projectId: command.projectId,
+      designRevisionId: command.designRevisionId,
+      processCode: 'ACS-05',
+      subjectId: command.contract.bankId,
+      originDeviceId: originDeviceId,
+    );
     final changedDesign = await database.customUpdate(
       'UPDATE project_design_revisions SET revision = revision + 1, '
       'updated_at = ?, origin_device_id = ? WHERE project_id = ? AND id = ? '

@@ -1,3 +1,6 @@
+import 'package:electra_mobile/application/elv5/calculation/elv5_calculation_runtime.dart';
+import 'package:electra_mobile/application/elv5/calculation/elv5_calculation_service.dart';
+import 'package:electra_mobile/data/repositories/elv5/drift_elv5_calculation_write_unit_of_work.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:drift/native.dart';
@@ -12,6 +15,108 @@ import '../support/elv5_f2_cctv_sources.dart';
 import '../support/elv5_f2_production_lifecycle.dart';
 
 void main() {
+  test(
+    'CCTV05 rejects upstream republish after capture without partial consumer publication',
+    () async {
+      final dir = await Directory.systemTemp.createTemp('f2-upstream-cas-');
+      final file = File('${dir.path}/db.sqlite');
+      final db = AppDatabase(NativeDatabase(file));
+      final other = AppDatabase(NativeDatabase(file));
+      addTearDown(() async {
+        await other.close();
+        await db.close();
+        await dir.delete(recursive: true);
+      });
+      final fp = await seedF2CctvCurrentDependencies(db);
+      final consumer = Elv5F2ProductionLifecycle(
+        process: Elv5ProcessCode.cctv05,
+        subjectKind: 'RECORDER',
+        subjectId: 'rec-1',
+      )..db = db;
+      final source = Elv5F2ProductionLifecycle(
+        process: Elv5ProcessCode.cctv02,
+        subjectKind: 'CAMERA',
+        subjectId: 'cam-1',
+      )..db = other;
+      await _policy(db, fp.$1, fp.$2, await consumer.revision(), null);
+      final runtime = consumer.runtime(db);
+      final adapter = runtime.registry.require(Elv5ProcessCode.cctv05);
+      final service = Elv5CalculationService(
+        registry: Elv5ProcessCalculationRegistry([
+          _BeforeExecute(adapter, () async {
+            await source
+                .runtime(other)
+                .service
+                .execute(
+                  source.command(
+                    'upstream-during-capture',
+                    await source.revision(),
+                    1,
+                  ),
+                );
+          }),
+        ]),
+        publicationUnitOfWork: DriftElv5CalculationWriteUnitOfWork(
+          db,
+          originDeviceId: 'review',
+        ),
+        originDeviceId: 'review',
+      );
+      await expectLater(
+        service.execute(
+          consumer.command('stale-consumer', await consumer.revision(), 0),
+        ),
+        throwsA(
+          predicate(
+            (e) => e.toString().contains('ELV5_UPSTREAM_GENERATION_CONFLICT'),
+          ),
+        ),
+      );
+      for (final table in [
+        'discipline_evaluation_records',
+        'discipline_evaluation_pointers',
+      ]) {
+        expect(
+          await db
+              .customSelect(
+                "SELECT * FROM $table WHERE logical_node_key_sha256='${consumer.nodeHash}'",
+              )
+              .get(),
+          isEmpty,
+        );
+      }
+      expect(
+        await db
+            .customSelect(
+              "SELECT * FROM discipline_dependency_index WHERE logical_node_key_sha256='${consumer.nodeHash}'",
+            )
+            .get(),
+        isEmpty,
+      );
+      expect(
+        await db
+            .customSelect(
+              "SELECT * FROM command_execution_records WHERE command_id='stale-consumer'",
+            )
+            .get(),
+        isEmpty,
+      );
+      final reopened = AppDatabase(NativeDatabase(file));
+      try {
+        expect(
+          await reopened
+              .customSelect(
+                "SELECT * FROM discipline_evaluation_pointers WHERE logical_node_key_sha256='${consumer.nodeHash}'",
+              )
+              .get(),
+          isEmpty,
+        );
+      } finally {
+        await reopened.close();
+      }
+    },
+  );
+
   test(
     'F2 global CCTV05 source and publication cascades roll back atomically and reject frozen invalidation',
     () async {
@@ -252,3 +357,23 @@ Future<void> _policy(
     ),
   ),
 );
+
+final class _BeforeExecute implements Elv5ProcessCalculationAdapter {
+  _BeforeExecute(this.inner, this.before);
+  final Elv5ProcessCalculationAdapter inner;
+  final Future<void> Function() before;
+  @override
+  Elv5ProcessCode get processCode => inner.processCode;
+  @override
+  Elv5WorkloadClass get workloadClass => inner.workloadClass;
+  @override
+  Future<Elv5CapturedProcess> capture(Elv5CalculationRequest request) =>
+      inner.capture(request);
+  @override
+  Future<Elv5ProcessEvaluationCandidate> execute(
+    Elv5CapturedProcess captured,
+  ) async {
+    await before();
+    return inner.execute(captured);
+  }
+}

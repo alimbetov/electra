@@ -1,3 +1,4 @@
+import 'drift_elv5_contract_identity.dart';
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
@@ -113,7 +114,13 @@ final class DriftLan02PortContractStore
       throw StateError('LAN02_DESIGN_REVISION_CONFLICT');
     final payload = command.contract.toCanonicalValue();
     final hash = _encoder.sha256(payload);
-    final ref = 'LAN02:${command.contract.switchId}:$hash';
+    final ref = elv5ContractEvidenceRef(
+      projectId: command.projectId,
+      designRevisionId: command.designRevisionId,
+      kind: 'LAN02',
+      subjectId: command.contract.switchId,
+      payloadSha256: hash,
+    );
     final existing =
         await database
             .customSelect(
@@ -207,6 +214,14 @@ final class DriftLan02PortContractStore
       );
       if (changed != 1) throw StateError('LAN02_CONTRACT_BINDING_CAS_FAILED');
     }
+    await invalidateElv5ContractSelector(
+      database,
+      projectId: command.projectId,
+      designRevisionId: command.designRevisionId,
+      processCode: 'LAN-02',
+      subjectId: command.contract.switchId,
+      originDeviceId: originDeviceId,
+    );
     final changedDesign = await database.customUpdate(
       'UPDATE project_design_revisions SET revision = revision + 1, updated_at = ?, origin_device_id = ? WHERE project_id = ? AND id = ? AND revision = ? AND state = ? AND deleted_at IS NULL',
       variables: <Variable>[

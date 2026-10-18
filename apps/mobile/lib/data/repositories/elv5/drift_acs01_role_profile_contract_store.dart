@@ -1,3 +1,4 @@
+import 'drift_elv5_contract_identity.dart';
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
@@ -119,7 +120,13 @@ final class DriftAcs01RoleProfileContractStore
 
     final payload = command.contract.toCanonicalValue();
     final hash = _encoder.sha256(payload);
-    final ref = 'ACS01:${command.contract.doorId}:$hash';
+    final ref = elv5ContractEvidenceRef(
+      projectId: command.projectId,
+      designRevisionId: command.designRevisionId,
+      kind: 'ACS01',
+      subjectId: command.contract.doorId,
+      payloadSha256: hash,
+    );
     final existing =
         await database
             .customSelect(
@@ -220,6 +227,14 @@ final class DriftAcs01RoleProfileContractStore
       );
       if (changed != 1) throw StateError('ACS01_CONTRACT_BINDING_CAS_FAILED');
     }
+    await invalidateElv5ContractSelector(
+      database,
+      projectId: command.projectId,
+      designRevisionId: command.designRevisionId,
+      processCode: 'ACS-01',
+      subjectId: command.contract.doorId,
+      originDeviceId: originDeviceId,
+    );
     final changedDesign = await database.customUpdate(
       'UPDATE project_design_revisions SET revision = revision + 1, updated_at = ?, origin_device_id = ? '
       'WHERE project_id = ? AND id = ? AND revision = ? AND state = ? AND deleted_at IS NULL',

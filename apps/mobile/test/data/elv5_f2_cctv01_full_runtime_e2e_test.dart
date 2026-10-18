@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:drift/native.dart';
 import 'package:electra_mobile/application/elv5/cctv/cctv01_geometry_contract.dart';
 import 'package:electra_mobile/data/database/app_database.dart';
 import 'package:electra_mobile/data/repositories/elv5/drift_elv5_cctv_contract_mutation_coordinator.dart';
@@ -9,6 +11,36 @@ import '../support/elv5_f2_production_lifecycle.dart';
 
 void main() {
   test(
+    'CCTV01 first geometry contract invalidates missing-contract CURRENT after restart',
+    () async {
+      final life = Elv5F2ProductionLifecycle(
+        process: Elv5ProcessCode.cctv01,
+        subjectKind: 'CAMERA',
+        subjectId: 'cam-1',
+      );
+      final dir = await Directory.systemTemp.createTemp('cctv01-missing-');
+      final file = File('${dir.path}/db.sqlite');
+      var db = AppDatabase(NativeDatabase(file));
+      life.db = db;
+      addTearDown(() async {
+        await db.close();
+        await dir.delete(recursive: true);
+      });
+      await _seedGeometry(db);
+      await life.runtime(db).service.execute(life.command('missing', 1, 0));
+      expect((await life.evaluation()).read<String>('execution'), 'BLOCKED');
+      await _replace(db, 1, null, false);
+      expect((await life.pointer()).read<String>('freshness'), 'STALE');
+      await db.close();
+      db = AppDatabase(NativeDatabase(file));
+      life.db = db;
+      expect((await life.pointer()).read<String>('freshness'), 'STALE');
+      await life.runtime(db).service.execute(life.command('present', 2, 2));
+      expect((await life.evaluation()).read<String>('assessment'), 'PASS');
+    },
+  );
+
+  test(
     'F2 CCTV-01 production Q6/Q7/Q8 immutable exact surface frames and optical contract survive restart and freeze',
     () async {
       final lifecycle = Elv5F2ProductionLifecycle(
@@ -18,47 +50,7 @@ void main() {
       );
       await lifecycle.run(
         seed: (db) async {
-          await seedF2FireTopology(db);
-          final now = Elv5F2ProductionLifecycle.now();
-          await db
-              .into(db.componentInstances)
-              .insert(
-                ComponentInstancesCompanion.insert(
-                  id: 'cam-1',
-                  definitionId: 'fictional-camera',
-                  definitionVersion: 1,
-                  roomId: 'room-1',
-                  hostSurfacePatchId: 'patch-x',
-                  localXmm: 2000,
-                  localYmm: 2000,
-                  createdAt: now,
-                  updatedAt: now,
-                  originDeviceId: 'f2-cctv',
-                ),
-              );
-          await db
-              .into(db.surfacePatches)
-              .insert(
-                SurfacePatchesCompanion.insert(
-                  id: 'target-patch',
-                  roomId: 'room-1',
-                  surfaceId: 'ceiling',
-                  originXmm: 0,
-                  originYmm: 0,
-                  originZmm: 1000,
-                  uAxisX: 1,
-                  uAxisY: 0,
-                  uAxisZ: 0,
-                  vAxisX: 0,
-                  vAxisY: 1,
-                  vAxisZ: 0,
-                  orientation: 'horizontal',
-                  boundaryJson: '[[0,0],[4000,0],[4000,4000],[0,4000]]',
-                  createdAt: now,
-                  updatedAt: now,
-                  originDeviceId: 'f2-cctv',
-                ),
-              );
+          await _seedGeometry(db);
           await _replace(db, 1, null, false);
         },
         mutate: (db) => _replace(db, 2, 1, true),
@@ -150,3 +142,47 @@ Future<void> _replace(
     ),
   ),
 );
+
+Future<void> _seedGeometry(AppDatabase db) async {
+  await seedF2FireTopology(db);
+  final now = Elv5F2ProductionLifecycle.now();
+  await db
+      .into(db.componentInstances)
+      .insert(
+        ComponentInstancesCompanion.insert(
+          id: 'cam-1',
+          definitionId: 'fictional-camera',
+          definitionVersion: 1,
+          roomId: 'room-1',
+          hostSurfacePatchId: 'patch-x',
+          localXmm: 2000,
+          localYmm: 2000,
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'f2-cctv',
+        ),
+      );
+  await db
+      .into(db.surfacePatches)
+      .insert(
+        SurfacePatchesCompanion.insert(
+          id: 'target-patch',
+          roomId: 'room-1',
+          surfaceId: 'ceiling',
+          originXmm: 0,
+          originYmm: 0,
+          originZmm: 1000,
+          uAxisX: 1,
+          uAxisY: 0,
+          uAxisZ: 0,
+          vAxisX: 0,
+          vAxisY: 1,
+          vAxisZ: 0,
+          orientation: 'horizontal',
+          boundaryJson: '[[0,0],[4000,0],[4000,4000],[0,4000]]',
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'f2-cctv',
+        ),
+      );
+}

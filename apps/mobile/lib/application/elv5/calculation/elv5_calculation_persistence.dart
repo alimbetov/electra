@@ -18,6 +18,12 @@ final class Elv5CalculationRevisionGuard {
 }
 
 abstract interface class Elv5CalculationPublicationGuardStore {
+  Future<bool> upstreamStillCurrent({
+    required String projectId,
+    required String designRevisionId,
+    required Map<String, int> generations,
+  });
+
   Future<Elv5CalculationRevisionGuard?> loadRevision({
     required String projectId,
     required String designRevisionId,

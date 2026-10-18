@@ -1,3 +1,4 @@
+import 'drift_elv5_contract_identity.dart';
 import 'drift_elv5_dependency_invalidator.dart';
 import 'drift_fa08_invalidation_coordinator.dart';
 import 'dart:convert';
@@ -211,7 +212,13 @@ final class DriftElv5AmpacitySectionContractStore
         );
         final payload = command.contract.toCanonicalValue();
         final hash = _encoder.sha256(payload);
-        final evidenceRef = 'AMPACITY:${command.contract.routeSectionId}:$hash';
+        final evidenceRef = elv5ContractEvidenceRef(
+          projectId: command.projectId,
+          designRevisionId: command.designRevisionId,
+          kind: 'AMPACITY',
+          subjectId: command.contract.routeSectionId,
+          payloadSha256: hash,
+        );
         await _ensureEvidence(
           command: command,
           evidenceRef: evidenceRef,

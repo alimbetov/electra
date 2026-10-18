@@ -237,6 +237,40 @@ Future<void> verifyF2GlobalFreeze(
     );
     final captured = await reader.read(projectId: 'p', designRevisionId: 'd');
     expect(captured.kind, Elv5FrozenDisciplineReadKind.captured);
+    final manifest =
+        (await db
+                .customSelect(
+                  "SELECT * FROM design_revision_snapshot_manifests WHERE design_revision_id='d'",
+                )
+                .getSingle())
+            .data;
+    final section =
+        (await db
+                .customSelect(
+                  "SELECT * FROM design_revision_discipline_snapshots WHERE design_revision_id='d'",
+                )
+                .getSingle())
+            .data;
+    expect(manifest['manifest_schema'], 'electra.elv4-snapshot-manifest.v1');
+    expect(manifest['manifest_sha256'], elvSnapshotManifestHash(manifest));
+    expect(manifest['discipline_sha256'], isNull);
+    expect(section['physical_sha256'], manifest['physical_sha256']);
+    expect(section['power_sha256'], manifest['power_sha256']);
+    expect(section['section_schema'], elv5DisciplineSectionSchema);
+    await expectLater(
+      reader.capture(
+        projectId: 'p',
+        designRevisionId: 'd',
+        expectedRevision: revision,
+        physicalSha256: manifest['physical_sha256']! as String,
+        powerSha256: manifest['power_sha256']! as String,
+      ),
+      throwsA(
+        predicate(
+          (e) => e.toString().contains('ELV5_DESIGN_REVISION_READ_ONLY'),
+        ),
+      ),
+    );
     final after = await _state(db, _freezeTables);
     await db.close();
     db = AppDatabase(NativeDatabase(file));
@@ -290,8 +324,13 @@ Future<void> verifyF2GlobalFreeze(
       'faultAfterAllSections': true,
       'restartReplayIdentical': true,
       'newCalculationRejected': true,
-      'sectionSchema': elv5DisciplineSectionSchema,
-      'manifestSchema': elv5SnapshotManifestSchema,
+      'disciplineSectionSchema': section['section_schema'],
+      'manifestSchema': manifest['manifest_schema'],
+      'manifestImmutable': true,
+      'disciplineAppendOnly': true,
+      'physicalHashLinked':
+          section['physical_sha256'] == manifest['physical_sha256'],
+      'powerHashLinked': section['power_sha256'] == manifest['power_sha256'],
     });
   } finally {
     await db.close();

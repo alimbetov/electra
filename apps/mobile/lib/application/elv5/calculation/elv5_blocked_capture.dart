@@ -79,6 +79,7 @@ final class Elv5BlockedAwareTypedProcessCalculationAdapter<I>
       return Elv5CapturedProcess(
         request: request,
         opaqueInput: captured,
+        upstreamPointerGenerations: captured.upstreamPointerGenerations,
         inputFingerprint: captured.inputFingerprint,
         captureRevision: captured.captureRevision,
       );

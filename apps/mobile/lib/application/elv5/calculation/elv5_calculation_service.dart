@@ -126,6 +126,18 @@ final class Elv5CalculationService {
         }
       }
 
+      for (final input in captured) {
+        if (!await session.publicationGuards.upstreamStillCurrent(
+          projectId: command.projectId,
+          designRevisionId: command.designRevisionId,
+          generations: input.upstreamPointerGenerations,
+        )) {
+          throw const Elv5ReplacementCommandException(
+            'ELV5_UPSTREAM_GENERATION_CONFLICT',
+          );
+        }
+      }
+
       final pointerKeys = evaluations.map((e) => e.nodeKeySha256).toSet();
       final existingPointers = await session.pointers.loadPointersBulk(
         projectId: command.projectId,
@@ -159,7 +171,10 @@ final class Elv5CalculationService {
           projectId: command.projectId,
           designRevisionId: command.designRevisionId,
           logicalNodeKeySha256: evaluation.nodeKeySha256,
-          markers: evaluation.dependencies,
+          markers: [
+            ...evaluation.dependencies,
+            _inputSelector(command, evaluation),
+          ],
         );
       }
 
@@ -208,6 +223,29 @@ final class Elv5CalculationService {
       );
       return Elv5CalculationResult(replayed: false, logicalResultJson: logical);
     });
+  }
+
+  Elv5DependencyMarker _inputSelector(
+    Elv5WireCommandEnvelope command,
+    Elv5ProcessEvaluationCandidate evaluation,
+  ) {
+    final key = <String, Object?>{
+      'schema': 'electra.elv5-dependency-key.v1',
+      'relationKind': 'SET',
+      'domain': 'PROCESS_INPUT_SELECTOR',
+      'subjectId':
+          '${evaluation.nodeKey.processCode.wireCode}:${evaluation.nodeKey.subject.id}',
+    };
+    const encoder = Elv5CanonicalJsonV1();
+    return Elv5DependencyMarker(
+      projectId: command.projectId,
+      designRevisionId: command.designRevisionId,
+      dependencyKey: utf8.decode(encoder.encode(key)),
+      dependencyKeySha256: encoder.sha256(key),
+      logicalNodeKeySha256: evaluation.nodeKeySha256,
+      relationKind: 'SET',
+      updatedAtUtc: _now(),
+    );
   }
 
   List<Elv5CalculationRequest> _requests(Elv5WireCommandEnvelope command) {

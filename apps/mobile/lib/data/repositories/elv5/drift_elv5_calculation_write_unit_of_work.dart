@@ -54,6 +54,41 @@ final class _GuardStore implements Elv5CalculationPublicationGuardStore {
   final AppDatabase database;
 
   @override
+  Future<bool> upstreamStillCurrent({
+    required String projectId,
+    required String designRevisionId,
+    required Map<String, int> generations,
+  }) async {
+    // Both ELV4 and ELV5 nodes are consumed by discipline resolvers. The
+    // caller owns the publication transaction, so these checks and writes
+    // share one SQLite snapshot/write boundary.
+    for (final entry in generations.entries) {
+      final rows =
+          await database
+              .customSelect(
+                "SELECT generation, freshness AS state FROM discipline_evaluation_pointers "
+                "WHERE project_id=? AND design_revision_id=? AND logical_node_key_sha256=? "
+                "UNION ALL SELECT generation, state FROM power_evaluation_pointers "
+                "WHERE project_id=? AND design_revision_id=? AND logical_node_key_sha256=?",
+                variables: [
+                  Variable.withString(projectId),
+                  Variable.withString(designRevisionId),
+                  Variable.withString(entry.key),
+                  Variable.withString(projectId),
+                  Variable.withString(designRevisionId),
+                  Variable.withString(entry.key),
+                ],
+              )
+              .get();
+      if (rows.length != 1 ||
+          rows.single.read<String>('state') != 'CURRENT' ||
+          rows.single.read<int>('generation') != entry.value)
+        return false;
+    }
+    return true;
+  }
+
+  @override
   Future<Elv5CalculationRevisionGuard?> loadRevision({
     required String projectId,
     required String designRevisionId,

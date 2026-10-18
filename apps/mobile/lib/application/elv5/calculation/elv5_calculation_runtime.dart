@@ -253,10 +253,12 @@ final class Elv5CapturedProcess {
     required this.opaqueInput,
     required this.inputFingerprint,
     required this.captureRevision,
+    this.upstreamPointerGenerations = const {},
   });
 
   final Elv5CalculationRequest request;
   final Object opaqueInput;
+  final Map<String, int> upstreamPointerGenerations;
   final String inputFingerprint;
   final int captureRevision;
 }
@@ -288,6 +290,7 @@ final class Elv5TypedProcessCalculationAdapter<I>
     return Elv5CapturedProcess(
       request: request,
       opaqueInput: captured,
+      upstreamPointerGenerations: captured.upstreamPointerGenerations,
       inputFingerprint: captured.inputFingerprint,
       captureRevision: captured.captureRevision,
     );

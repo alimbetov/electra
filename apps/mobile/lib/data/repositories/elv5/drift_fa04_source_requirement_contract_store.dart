@@ -1,3 +1,4 @@
+import 'drift_elv5_contract_identity.dart';
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
@@ -151,7 +152,13 @@ final class DriftFa04SourceRequirementContractStore
 
     final payload = command.contract.toCanonicalValue();
     final contentHash = _encoder.sha256(payload);
-    final evidenceRef = 'FA04:${command.contract.sourceId}:$contentHash';
+    final evidenceRef = elv5ContractEvidenceRef(
+      projectId: command.projectId,
+      designRevisionId: command.designRevisionId,
+      kind: 'FA04',
+      subjectId: command.contract.sourceId,
+      payloadSha256: contentHash,
+    );
     final canonicalPayload = utf8.decode(_encoder.encode(payload));
     final existingEvidence =
         await database
@@ -269,6 +276,14 @@ final class DriftFa04SourceRequirementContractStore
       if (changed != 1) throw StateError('FA04_CONTRACT_BINDING_CAS_FAILED');
     }
 
+    await invalidateElv5ContractSelector(
+      database,
+      projectId: command.projectId,
+      designRevisionId: command.designRevisionId,
+      processCode: 'FA-04',
+      subjectId: command.contract.sourceId,
+      originDeviceId: originDeviceId,
+    );
     final changedDesign = await database.customUpdate(
       'UPDATE project_design_revisions SET revision = revision + 1, '
       'updated_at = ?, origin_device_id = ? WHERE project_id = ? AND id = ? '

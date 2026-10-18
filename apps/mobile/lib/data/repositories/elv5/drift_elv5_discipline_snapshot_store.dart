@@ -322,7 +322,8 @@ final class DriftElv5DisciplineSnapshotStore {
             )
             .getSingleOrNull();
     if (row == null) {
-      if (manifest.read<String>('manifest_schema') == elv5SnapshotManifestSchema) {
+      if (manifest.read<String>('manifest_schema') ==
+          elv5SnapshotManifestSchema) {
         throw StateError('ELV5_FROZEN_SECTION_MISSING');
       }
       return const Elv5FrozenDisciplineRead(

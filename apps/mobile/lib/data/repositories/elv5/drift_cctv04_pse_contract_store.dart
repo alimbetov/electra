@@ -1,3 +1,4 @@
+import 'drift_elv5_contract_identity.dart';
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
@@ -127,7 +128,13 @@ final class DriftCctv04PseProjectionContractStore
 
     final payload = command.contract.toCanonicalValue();
     final hash = _encoder.sha256(payload);
-    final ref = 'CCTV04:${command.contract.pseId}:$hash';
+    final ref = elv5ContractEvidenceRef(
+      projectId: command.projectId,
+      designRevisionId: command.designRevisionId,
+      kind: 'CCTV04',
+      subjectId: command.contract.pseId,
+      payloadSha256: hash,
+    );
     final existing =
         await database
             .customSelect(
@@ -242,6 +249,14 @@ final class DriftCctv04PseProjectionContractStore
       }
     }
 
+    await invalidateElv5ContractSelector(
+      database,
+      projectId: command.projectId,
+      designRevisionId: command.designRevisionId,
+      processCode: 'CCTV-04',
+      subjectId: command.contract.pseId,
+      originDeviceId: originDeviceId,
+    );
     final changedDesign = await database.customUpdate(
       'UPDATE project_design_revisions SET revision = revision + 1, '
       'updated_at = ?, origin_device_id = ? WHERE project_id = ? AND id = ? '

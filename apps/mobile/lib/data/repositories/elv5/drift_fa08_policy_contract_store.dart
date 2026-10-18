@@ -1,3 +1,4 @@
+import 'drift_elv5_contract_identity.dart';
 import 'drift_elv5_dependency_invalidator.dart';
 import 'drift_fa08_invalidation_coordinator.dart';
 import 'dart:convert';
@@ -133,7 +134,13 @@ final class DriftFa08CablePolicyContractStore
     );
     final payload = command.contract.toCanonicalValue();
     final hash = _encoder.sha256(payload);
-    final evidenceRef = 'FA08:${command.contract.cableRunId}:$hash';
+    final evidenceRef = elv5ContractEvidenceRef(
+      projectId: command.projectId,
+      designRevisionId: command.designRevisionId,
+      kind: 'FA08',
+      subjectId: command.contract.cableRunId,
+      payloadSha256: hash,
+    );
     final existing =
         await database
             .customSelect(
@@ -242,6 +249,14 @@ final class DriftFa08CablePolicyContractStore
       if (changed != 1) throw StateError('FA08_POLICY_BINDING_CAS_FAILED');
     }
 
+    await invalidateElv5ContractSelector(
+      database,
+      projectId: command.projectId,
+      designRevisionId: command.designRevisionId,
+      processCode: 'FA-08',
+      subjectId: command.contract.cableRunId,
+      originDeviceId: originDeviceId,
+    );
     final changedDesign = await database.customUpdate(
       'UPDATE project_design_revisions SET revision = revision + 1, updated_at = ?, '
       'origin_device_id = ? WHERE project_id = ? AND id = ? AND revision = ? '
