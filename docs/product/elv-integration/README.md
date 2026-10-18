@@ -15,6 +15,7 @@ agreement; branch SHA pins describe inspected inputs, not future runtime support
 | [Interface registry](interface-registry.json) | Nine proposed schemas, result adapters, operation boundaries and invalidation events |
 | [Qualification plan](qualification-plan.json) | Planned cross-stage oracle objectives; no executed runtime claims |
 | [Local stage binding](stage-binding.json) | Local stage/document fingerprints, agreement digest and blocked runtime entry gates |
+| [Electrical study handoff](electrical-study-handoff-contract.md) | Shared immutable references for short-circuit, voltage-disturbance, motor-start and source-transfer studies; ELV6/7/8 are consumers, not competing physics owners |
 
 Run `python3 scripts/ci/check-elv-integration-contract.py` on each branch.
 The check validates local design agreement, schemas, branch adapters, source pins
@@ -34,7 +35,6 @@ inherited upstream specifications over a current stage branch. Publish coordinat
 contract updates with expected-head leases; if an upstream changes, inspect and
 reconcile rather than resetting its branch to a previously read SHA.
 
-
 ## Generator, PV, storage and transfer amendment
 
 [Source-system contract](source-systems-contract.md) defines exact owner roles,
@@ -46,3 +46,15 @@ remain unchanged. [Source qualification](source-qualification-plan.json) has
 metadata discovery without production approval. [Design readiness](design-readiness.json)
 separates defined contracts from blocked upstream/runtime/source-review gates.
 The catalogue now plans 23 families with a distinct PV module product definition.
+
+## Marking, printing, panel deliverables and study amendment
+
+ELV8 future runtime entry MUST also reconcile to
+[`../elv8-marking-printing-panel-deliverables-amendment.md`](../elv8-marking-printing-panel-deliverables-amendment.md)
+and its machine contract. It freezes one-identity/many-projections semantics, cable/core/terminal/device marker classes,
+PDF/CSV/XLSX printer-neutral output, QR field identity, ELV6 2D panel/hierarchy deliverables, repeated-floor reporting,
+exact-SKU physical evidence and deterministic frozen deliverables.
+
+Qualified fault/disturbance/scenario results are rendered through
+[`electrical-study-handoff-contract.md`](electrical-study-handoff-contract.md); report generation MUST NOT recalculate electrical physics or turn stale/unresolved evidence into PASS.
+The amendment is design authority for future implementation; it does not claim runtime or acceptance.
