@@ -115,11 +115,13 @@ final class DriftElv5SnapshotMaterializer {
       final subjectId =
           physicalIds[original['aggregate_id']] ??
           original['aggregate_id']! as String;
+      final kind = (oldRef! as String).split(':').first;
       final ref = elv5ContractEvidenceRef(
         projectId: projectId,
         designRevisionId: revisionId,
-        kind: (oldRef! as String).split(':').first,
-        subjectId: subjectId,
+        kind: kind,
+        subjectId:
+            kind == 'ENV' ? '${binding['subject_kind']}:$subjectId' : subjectId,
         payloadSha256: hash,
       );
       final row = <String, Object?>{

@@ -1,3 +1,4 @@
+import 'drift_elv5_contract_identity.dart';
 import 'drift_fa08_invalidation_coordinator.dart';
 import 'dart:convert';
 
@@ -152,7 +153,13 @@ final class DriftElv5EnvironmentProfileStore
     );
     final payload = command.profile.toCanonicalValue();
     final hash = _encoder.sha256(payload);
-    final evidenceRef = 'ENV:${command.scopeKind}:${command.scopeId}:$hash';
+    final evidenceRef = elv5ContractEvidenceRef(
+      projectId: command.projectId,
+      designRevisionId: command.designRevisionId,
+      kind: 'ENV',
+      subjectId: '${command.scopeKind}:${command.scopeId}',
+      payloadSha256: hash,
+    );
     final existing =
         await database
             .customSelect(

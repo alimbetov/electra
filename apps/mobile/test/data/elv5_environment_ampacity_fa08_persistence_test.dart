@@ -1,3 +1,9 @@
+import 'package:electra_mobile/application/elv_command_result.dart';
+import 'package:electra_mobile/application/elv_design_revision_command.dart';
+import 'package:electra_mobile/data/repositories/drift_elv_design_revision_repository.dart';
+import 'package:engineering_core/engineering_core.dart'
+    show ProjectDesignRevision;
+import '../support/elv5_f2_fire_sources.dart';
 import 'package:drift/native.dart';
 import 'package:electra_mobile/application/elv5/environment/ampacity_section_contract.dart';
 import 'package:electra_mobile/application/elv5/environment/environment_profile_persistence.dart';
@@ -11,6 +17,108 @@ import 'package:engineering_core/engineering_core_elv5.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  test(
+    'environment evidence is revision-owned across public freeze and create-next',
+    () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      await seedF2FireTopology(db);
+      final store = DriftElv5EnvironmentProfileStore(
+        db,
+        originDeviceId: 'review',
+        nowUtc: _now,
+      );
+      final profile = _environment('same-edition', '30');
+      await store.replace(
+        ReplaceElv5EnvironmentProfileCommand(
+          projectId: 'p',
+          designRevisionId: 'd',
+          expectedDesignRevision: 1,
+          bindingId: 'env-room',
+          expectedBindingRevision: null,
+          scopeKind: 'ROOM',
+          scopeId: 'room-1',
+          profile: profile,
+        ),
+      );
+      final revisions = DriftElvDesignRevisionRepository(
+        db,
+        originDeviceId: 'review',
+        now: _now,
+      );
+      expect(
+        await revisions.freeze(
+          const FreezeProjectDesignRevisionCommand(
+            commandId: 'freeze',
+            projectId: 'p',
+            designRevisionId: 'd',
+            expectedRevision: 2,
+          ),
+        ),
+        isA<ElvCommandSuccess<ProjectDesignRevision>>(),
+      );
+      expect(
+        await revisions.createNext(
+          const CreateNextWorkingDesignRevisionCommand(
+            commandId: 'next',
+            projectId: 'p',
+            newRevisionId: 'd2',
+            code: 'R2',
+            basedOnRevisionId: 'd',
+          ),
+        ),
+        isA<ElvCommandSuccess<ProjectDesignRevision>>(),
+      );
+      final next =
+          (await store.loadActiveForScope(
+            projectId: 'p',
+            designRevisionId: 'd2',
+            scopeKind: 'ROOM',
+            scopeId: 'room-1',
+          ))!;
+      expect(next.profile.temperatureC.maximum, Elv5Rational.integer(30));
+      await store.replace(
+        ReplaceElv5EnvironmentProfileCommand(
+          projectId: 'p',
+          designRevisionId: 'd2',
+          expectedDesignRevision: 1,
+          bindingId: next.bindingId,
+          expectedBindingRevision: 1,
+          scopeKind: 'ROOM',
+          scopeId: 'room-1',
+          profile: profile,
+        ),
+      );
+      expect(
+        (await store.loadActiveForScope(
+          projectId: 'p',
+          designRevisionId: 'd',
+          scopeKind: 'ROOM',
+          scopeId: 'room-1',
+        ))!.bindingRevision,
+        1,
+      );
+      expect(
+        (await store.loadActiveForScope(
+          projectId: 'p',
+          designRevisionId: 'd2',
+          scopeKind: 'ROOM',
+          scopeId: 'room-1',
+        ))!.bindingRevision,
+        2,
+      );
+      expect(
+        await _count(
+          db,
+          'elv_revision_aggregate_evidence_records',
+          "aggregate_kind='ELV5_ENVIRONMENT_PROFILE'",
+        ),
+        2,
+      );
+      expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
+    },
+  );
+
   test('ROOM environment replacement is immutable and CAS guarded', () async {
     final db = await _database();
     addTearDown(db.close);
