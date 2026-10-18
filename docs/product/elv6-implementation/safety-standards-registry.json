@@ -1,0 +1,243 @@
+{
+  "schema": "electra.elv6-safety-standards-registry.v1",
+  "status": "DESIGN_NORMATIVE_READINESS",
+  "owner": "ELV6_DESIGN_ELV7_RULES",
+  "rule": "ELV6 captures exact physical evidence; ELV7 decides jurisdictional applicability and compliance. No numeric threshold from an external standard becomes an ELV6 kernel constant unless it is an intrinsic adopted product capability.",
+  "jurisdictionProfiles": [
+    "IEC_BASELINE",
+    "KZ_NATIONAL",
+    "EU_CENELEC",
+    "MACHINE_CONTROL_OPTIONAL",
+    "DISCIPLINE_CCTV",
+    "DISCIPLINE_LAN_ICT",
+    "DISCIPLINE_ACS",
+    "DISCIPLINE_FIRE"
+  ],
+  "standards": [
+    {
+      "id": "IEC-61439-1-2020",
+      "title": "Low-voltage switchgear and controlgear assemblies - Part 1: General rules",
+      "authority": "IEC",
+      "profiles": ["IEC_BASELINE", "KZ_NATIONAL", "EU_CENELEC"],
+      "applicability": "Core assembly construction and verification framework for LV assemblies.",
+      "elv6Evidence": ["host/enclosure identity", "internal arrangement", "barriers/partitions", "accessible-part geometry", "clearance/creepage measurement inputs", "protective-bonding physical points", "thermal-input basis", "modification provenance"],
+      "elv7Owner": true,
+      "elv6Gap": "PARTIAL"
+    },
+    {
+      "id": "IEC-61439-2-2020",
+      "title": "Low-voltage switchgear and controlgear assemblies - Part 2: Power switchgear and controlgear assemblies",
+      "authority": "IEC",
+      "profiles": ["IEC_BASELINE", "KZ_NATIONAL", "EU_CENELEC"],
+      "applicability": "Specific PSC-assembly requirements used together with IEC 61439-1.",
+      "elv6Evidence": ["assembly classification context", "device/functional-unit placement", "partition/separation geometry", "service/access geometry", "thermal basis", "protective-bonding basis"],
+      "elv7Owner": true,
+      "elv6Gap": "PARTIAL"
+    },
+    {
+      "id": "IEC-62208-2023",
+      "title": "Empty enclosures for low-voltage switchgear and controlgear assemblies - General requirements",
+      "authority": "IEC",
+      "profiles": ["IEC_BASELINE", "EU_CENELEC"],
+      "applicability": "Empty-enclosure characteristics and tests before incorporation of equipment.",
+      "elv6Evidence": ["enclosure technical-definition provenance", "material/surface facts", "opening/cutout provenance", "door/hinge geometry", "load capability facts", "environmental capability refs"],
+      "elv7Owner": true,
+      "elv6Gap": "PARTIAL"
+    },
+    {
+      "id": "KZ-GOST-32127-2013-IEC-62208-2002",
+      "title": "Empty enclosures for low-voltage switchgear and controlgear assemblies",
+      "authority": "KZ_KSM",
+      "profiles": ["KZ_NATIONAL"],
+      "applicability": "Current Kazakhstan national-use interstate enclosure baseline discovered in KSM catalogue; exact project applicability must be pinned by ELV7 profile.",
+      "elv6Evidence": ["same evidence projection as IEC 62208 family", "national-edition provenance"],
+      "elv7Owner": true,
+      "elv6Gap": "PARTIAL"
+    },
+    {
+      "id": "IEC-60529-1989-A1-1999-A2-2013",
+      "title": "Degrees of protection provided by enclosures (IP Code)",
+      "authority": "IEC",
+      "profiles": ["IEC_BASELINE", "EU_CENELEC"],
+      "applicability": "Ingress protection classification of enclosures.",
+      "elv6Evidence": ["all enclosure openings", "door/panel state", "gland/entry identity", "seal/gasket technical refs", "cutout/knockout modifications", "unused-opening closure state", "post-modification enclosure fingerprint"],
+      "elv7Owner": true,
+      "elv6Gap": "HIGH"
+    },
+    {
+      "id": "KZ-ST-RK-IEC-60529-2012",
+      "title": "Degrees of protection provided by enclosures (IP Code)",
+      "authority": "KZ_KSM",
+      "profiles": ["KZ_NATIONAL"],
+      "applicability": "Kazakhstan national IP-code standard listed as current by KSM.",
+      "elv6Evidence": ["same evidence projection as IEC 60529 family", "national-edition provenance"],
+      "elv7Owner": true,
+      "elv6Gap": "HIGH"
+    },
+    {
+      "id": "IEC-62262",
+      "title": "Degrees of protection provided by enclosures against external mechanical impacts (IK code)",
+      "authority": "IEC",
+      "profiles": ["IEC_BASELINE", "EU_CENELEC"],
+      "applicability": "Mechanical impact protection classification.",
+      "elv6Evidence": ["enclosure/door/panel technical capability refs", "modification/cutout provenance", "external protrusions", "mounting/support configuration"],
+      "elv7Owner": true,
+      "elv6Gap": "MEDIUM"
+    },
+    {
+      "id": "KZ-ST-RK-IEC-62262-2012",
+      "title": "Degrees of protection provided by enclosures against external mechanical impacts",
+      "authority": "KZ_KSM",
+      "profiles": ["KZ_NATIONAL"],
+      "applicability": "Kazakhstan national IK-code standard listed as current by KSM.",
+      "elv6Evidence": ["same evidence projection as IEC 62262 family", "national-edition provenance"],
+      "elv7Owner": true,
+      "elv6Gap": "MEDIUM"
+    },
+    {
+      "id": "IEC-60664-1-2020-A1-2025",
+      "title": "Insulation coordination for equipment within low-voltage supply systems - Part 1",
+      "authority": "IEC",
+      "profiles": ["IEC_BASELINE", "EU_CENELEC"],
+      "applicability": "Basis for clearance, creepage and solid-insulation coordination.",
+      "elv6Evidence": ["conductive-part geometry", "live-part/net classification refs", "shortest air-distance measurements", "creepage path measurement basis", "insulation/material-group technical refs", "pollution/altitude/environment context refs"],
+      "elv7Owner": true,
+      "elv6Gap": "BLOCKER_FOR_NORMATIVE_READINESS"
+    },
+    {
+      "id": "IEC-60364-4-41-2005-A1-2017",
+      "title": "Low-voltage electrical installations - Protection against electric shock",
+      "authority": "IEC",
+      "profiles": ["IEC_BASELINE", "EU_CENELEC"],
+      "applicability": "Protection against electric shock and protective measures.",
+      "elv6Evidence": ["accessible-zone geometry", "barrier/door/enclosure state", "hazardous/live-part classification refs", "protective-bonding physical graph", "service-access state"],
+      "elv7Owner": true,
+      "elv6Gap": "HIGH"
+    },
+    {
+      "id": "IEC-60364-5-54-2011-A1-2021",
+      "title": "Earthing arrangements and protective conductors",
+      "authority": "IEC",
+      "profiles": ["IEC_BASELINE", "EU_CENELEC"],
+      "applicability": "Earthing arrangements, protective conductors and protective bonding conductors.",
+      "elv6Evidence": ["bond points", "declared bond links", "door/body/backplate/DIN/rack PE connectivity basis", "conductor identity/cross-section refs when upstream-owned", "connection-point accessibility"],
+      "elv7Owner": true,
+      "elv6Gap": "PARTIAL"
+    },
+    {
+      "id": "KZ-ST-RK-IEC-60364-5-54-2012",
+      "title": "Low-voltage electrical installations - Earthing arrangements and protective conductors",
+      "authority": "KZ_KSM",
+      "profiles": ["KZ_NATIONAL"],
+      "applicability": "Kazakhstan national protective-conductor/earthing standard listed as current by KSM.",
+      "elv6Evidence": ["same evidence projection as IEC 60364-5-54 family", "national-edition provenance"],
+      "elv7Owner": true,
+      "elv6Gap": "PARTIAL"
+    },
+    {
+      "id": "IEC-TR-60890-2022",
+      "title": "Method of temperature-rise verification of low-voltage assemblies by calculation",
+      "authority": "IEC",
+      "profiles": ["IEC_BASELINE", "EU_CENELEC"],
+      "applicability": "Temperature-rise calculation method and required physical/thermal inputs; applicability is profile-dependent.",
+      "elv6Evidence": ["heat-loss facts", "heat-source distribution", "enclosure dimensions", "partitions", "exposed/cooling surfaces", "ventilation openings", "fan facts", "adjacent-wall context", "ambient/design-condition refs"],
+      "elv7Owner": true,
+      "elv6Gap": "LOW"
+    },
+    {
+      "id": "IEC-60297-3-100-2008",
+      "title": "482.6 mm (19 in) series - Basic dimensions of panels, subracks, chassis, racks and cabinets",
+      "authority": "IEC",
+      "profiles": ["IEC_BASELINE", "DISCIPLINE_LAN_ICT", "DISCIPLINE_CCTV", "DISCIPLINE_ACS", "DISCIPLINE_FIRE"],
+      "applicability": "19-inch mechanical interface dimensions when that rack family is adopted.",
+      "elv6Evidence": ["rack profile identity", "U pitch", "interface widths", "rail geometry", "mounting depth", "front/rear/four-post mounting mode"],
+      "elv7Owner": false,
+      "elv6Gap": "LOW"
+    },
+    {
+      "id": "KZ-ST-RK-IEC-60297-3-100-2018",
+      "title": "482.6 mm (19 in) series - Basic dimensions",
+      "authority": "KZ_KSM",
+      "profiles": ["KZ_NATIONAL", "DISCIPLINE_LAN_ICT", "DISCIPLINE_CCTV", "DISCIPLINE_ACS", "DISCIPLINE_FIRE"],
+      "applicability": "Kazakhstan national 19-inch mechanical structure standard listed as current by KSM.",
+      "elv6Evidence": ["same evidence projection as IEC 60297-3-100 family", "national-edition provenance"],
+      "elv7Owner": false,
+      "elv6Gap": "LOW"
+    },
+    {
+      "id": "IEC-61587-1-2022",
+      "title": "Mechanical structures for electrical and electronic equipment - Environmental requirements, tests and safety aspects",
+      "authority": "IEC",
+      "profiles": ["IEC_BASELINE", "DISCIPLINE_LAN_ICT", "DISCIPLINE_CCTV", "DISCIPLINE_ACS", "DISCIPLINE_FIRE"],
+      "applicability": "Mechanical/environmental performance and safety aspects of cabinets, racks, subracks and chassis.",
+      "elv6Evidence": ["rack/cabinet technical-definition provenance", "static-load capability", "mass/CoG basis", "mounting/support configuration", "environmental classification refs"],
+      "elv7Owner": true,
+      "elv6Gap": "MEDIUM"
+    },
+    {
+      "id": "IEC-60204-1-2016-A1-2021",
+      "title": "Safety of machinery - Electrical equipment of machines - General requirements",
+      "authority": "IEC",
+      "profiles": ["MACHINE_CONTROL_OPTIONAL"],
+      "applicability": "Optional profile for cabinets that are part of machinery electrical equipment.",
+      "elv6Evidence": ["enclosure/access geometry", "device placement", "bonding basis", "conductor/termination physical organization", "marking/documentation anchors"],
+      "elv7Owner": true,
+      "elv6Gap": "PROFILE_DEPENDENT"
+    },
+    {
+      "id": "ISO-IEC-11801-1-2017-A1-2025",
+      "title": "Information technology - Generic cabling for customer premises - General requirements",
+      "authority": "ISO_IEC",
+      "profiles": ["DISCIPLINE_LAN_ICT", "DISCIPLINE_CCTV", "DISCIPLINE_ACS"],
+      "applicability": "Generic ICT cabling baseline, including cabling supporting power delivery.",
+      "elv6Evidence": ["physical termination positions", "patch-panel/rack placement", "media/interface refs", "cable-end identity", "remote-power context refs", "segregation measurements"],
+      "elv7Owner": true,
+      "elv6Gap": "PARTIAL"
+    },
+    {
+      "id": "EN-50174-2-2018",
+      "title": "Information technology - Cabling installation - Installation planning and practices inside buildings",
+      "authority": "CENELEC",
+      "profiles": ["EU_CENELEC", "DISCIPLINE_LAN_ICT", "DISCIPLINE_CCTV", "DISCIPLINE_ACS"],
+      "applicability": "Inside-building ICT cabling installation practices; a 2026 draft revision exists and must not replace the current project profile until formally adopted/pinned.",
+      "elv6Evidence": ["pathway/space context refs", "segregation-distance measurements", "rack/termination layout", "bonding references", "remote-power installation context"],
+      "elv7Owner": true,
+      "elv6Gap": "PARTIAL"
+    },
+    {
+      "id": "IEC-62676-1-1-2013",
+      "title": "Video surveillance systems for use in security applications - General system requirements",
+      "authority": "IEC",
+      "profiles": ["DISCIPLINE_CCTV"],
+      "applicability": "CCTV/VSS system baseline; layout consumes equipment/power/communication identities but does not duplicate system calculations.",
+      "elv6Evidence": ["CCTV equipment placement", "power/network termination physical positions", "service/access envelopes", "environmental enclosure refs"],
+      "elv7Owner": true,
+      "elv6Gap": "LOW"
+    },
+    {
+      "id": "IEC-60839-11-2-2014",
+      "title": "Electronic access control systems - Application guidelines",
+      "authority": "IEC",
+      "profiles": ["DISCIPLINE_ACS"],
+      "applicability": "Installation/application guidance for electronic access control systems.",
+      "elv6Evidence": ["ACS controller/PSU/battery placement", "termination physical capacity", "service/access envelopes", "enclosure environmental refs"],
+      "elv7Owner": true,
+      "elv6Gap": "LOW"
+    }
+  ],
+  "kazakhstanStatusNotes": [
+    "KSM lists GOST IEC 61439-1-2013 and GOST IEC 61439-2-2015 as current national-use standards.",
+    "KSM lists GOST IEC 61439-1-2024 and GOST IEC 61439-2-2024 as adopted by the interstate council but not yet introduced; they must not silently replace the current KZ profile.",
+    "KSM lists ST RK IEC 60529-2012, ST RK IEC 62262-2012, ST RK IEC 60364-5-54-2012 and ST RK IEC 60297-3-100-2018 as current."
+  ],
+  "mandatoryReadinessGaps": [
+    "NRG-01 enclosure integrity/modification evidence for IP profile",
+    "NRG-02 clearance and creepage measurement projection",
+    "NRG-03 accessible hazardous-part/barrier evidence",
+    "NRG-04 partition/form-of-separation geometry and identity",
+    "NRG-05 insulation/material/environment context needed by downstream rules",
+    "NRG-06 explicit enclosure/rack environmental and mechanical capability provenance",
+    "NRG-07 versioned national/profile applicability registry with effective-status pinning",
+    "NRG-08 freeze/replay provenance for all normative evidence projections"
+  ]
+}
