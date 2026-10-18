@@ -6,6 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 BASE = ROOT / 'docs/product/elv6-implementation'
 REGISTRY = BASE / 'safety-standards-registry.json'
+MATRIX = BASE / 'safety-domain-readiness-matrix.json'
 CONTRACT = BASE / 'normative-safety-evidence-contract.md'
 
 REQUIRED_PROFILES = {
@@ -43,6 +44,20 @@ REQUIRED_STANDARD_IDS = {
     'IEC-60839-11-2-2014',
 }
 
+REQUIRED_DOMAINS = {
+    'LV_ASSEMBLY',
+    'INSULATION_COORDINATION',
+    'ENCLOSURE_IP_IK',
+    'ELECTRIC_SHOCK_AND_BONDING',
+    'PROTECTIVE_DEVICES',
+    'THERMAL',
+    'RACK_MECHANICAL',
+    'ICT_LAN',
+    'CCTV',
+    'ACS',
+    'FIRE',
+}
+
 REQUIRED_GAPS = {
     'NRG-01 enclosure integrity/modification evidence for IP profile',
     'NRG-02 clearance and creepage measurement projection',
@@ -55,10 +70,7 @@ REQUIRED_GAPS = {
 }
 
 
-def main():
-    registry = json.loads(REGISTRY.read_text())
-    contract = CONTRACT.read_text()
-
+def validate_registry(registry):
     assert registry['schema'] == 'electra.elv6-safety-standards-registry.v1'
     assert registry['status'] == 'DESIGN_NORMATIVE_READINESS'
     assert registry['owner'] == 'ELV6_DESIGN_ELV7_RULES'
@@ -81,11 +93,66 @@ def main():
 
     assert set(registry['mandatoryReadinessGaps']) == REQUIRED_GAPS
 
+    notes = '\n'.join(registry['kazakhstanStatusNotes'])
+    assert '61439-1-2013' in notes and '61439-2-2015' in notes
+    assert '61439-1-2024' in notes and 'not yet introduced' in notes
+    assert 'ST RK IEC 60529-2012' in notes
+    assert 'ST RK IEC 62262-2012' in notes
+    assert 'ST RK IEC 60364-5-54-2012' in notes
+    assert 'ST RK IEC 60297-3-100-2018' in notes
+
+    return len(rows)
+
+
+def validate_domain_matrix(matrix):
+    assert matrix['schema'] == 'electra.elv6-safety-domain-readiness-matrix.v1'
+    assert matrix['status'] == 'DESIGN_HARDENING'
+    assert matrix['branch'] == 'feat/flutter-elv6-enclosure-layout-design'
+
+    rows = matrix['domains']
+    by_id = {row['id']: row for row in rows}
+    assert len(rows) == len(by_id) == len(REQUIRED_DOMAINS)
+    assert set(by_id) == REQUIRED_DOMAINS
+
+    for row in rows:
+        assert row['standards'], ('missing standards', row['id'])
+        assert row['elv6Evidence'], ('missing ELV6 evidence', row['id'])
+        assert row['runtimeOwner']
+        assert row['verdictOwner']
+        assert row['readiness']
+
+    protective = by_id['PROTECTIVE_DEVICES']
+    assert 'B/C/D' in protective['hardBoundary']
+    assert protective['runtimeOwner'] == 'ELV4_SELECTION_ELV6_PLACEMENT'
+    assert any('IEC 60898-1' in item for item in protective['standards'])
+    assert any('IEC 61008-1' in item for item in protective['standards'])
+    assert any('IEC 61009-1' in item for item in protective['standards'])
+
+    assert 'IEC 60839-11-1:2013' in by_id['ACS']['standards']
+    assert any('EN 54-4' in item for item in by_id['FIRE']['standards'])
+    assert any('EN 54-13' in item for item in by_id['FIRE']['standards'])
+
+    kz = matrix['kazakhstanPinnedStatus']
+    for key in [
+        'GOST IEC 61439-1-2013',
+        'GOST IEC 61439-2-2015',
+        'ST RK IEC 60529-2012',
+        'ST RK IEC 62262-2012',
+        'ST RK IEC 60364-5-54-2012',
+        'ST RK IEC 60297-3-100-2018',
+    ]:
+        assert key in kz
+
+    assert len(matrix['runtimeEntryBlockers']) == 9
+    return len(rows)
+
+
+def validate_contract(contract):
     for forbidden in ['ELV6 is compliant', 'ELV6_COMPLIANT', 'auto-upgrade national standard']:
         assert forbidden not in contract
 
     for token in [
-        'ELV6 does not decide whether a cabinet/rack is compliant',
+        'ELV6 captures exact physical evidence; ELV7 decides jurisdictional applicability and compliance',
         'Elv6EnclosureIntegrityEvidence',
         'Elv6AirClearanceMeasurement',
         'Elv6CreepagePathMeasurement',
@@ -98,17 +165,20 @@ def main():
     ]:
         assert token in contract, ('missing normative safety contract token', token)
 
-    notes = '\n'.join(registry['kazakhstanStatusNotes'])
-    assert '61439-1-2013' in notes and '61439-2-2015' in notes
-    assert '61439-1-2024' in notes and 'not yet introduced' in notes
-    assert 'ST RK IEC 60529-2012' in notes
-    assert 'ST RK IEC 62262-2012' in notes
-    assert 'ST RK IEC 60364-5-54-2012' in notes
-    assert 'ST RK IEC 60297-3-100-2018' in notes
+
+def main():
+    registry = json.loads(REGISTRY.read_text())
+    matrix = json.loads(MATRIX.read_text())
+    contract = CONTRACT.read_text()
+
+    standard_count = validate_registry(registry)
+    domain_count = validate_domain_matrix(matrix)
+    validate_contract(contract)
 
     print(
-        f'PASS: ELV6 safety readiness registry {len(rows)} standards, '
-        f'{len(REQUIRED_PROFILES)} profiles, {len(REQUIRED_GAPS)} mandatory evidence gaps; design-only guard'
+        f'PASS: ELV6 safety readiness registry {standard_count} standards, '
+        f'{domain_count} safety domains, {len(REQUIRED_PROFILES)} profiles, '
+        f'{len(REQUIRED_GAPS)} mandatory evidence gaps; design-only guard'
     )
 
 
