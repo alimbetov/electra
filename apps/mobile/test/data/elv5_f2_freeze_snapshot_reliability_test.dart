@@ -252,21 +252,32 @@ void main() {
               )
               .getSingle())
           .read<String>('payload_json');
-      await db.customStatement(
-        "UPDATE design_revision_discipline_snapshots SET payload_json='{}' WHERE design_revision_id='d'",
-      );
       await expectLater(
-        _store(db).read(projectId: 'p', designRevisionId: 'd'),
+        db.customStatement(
+          "UPDATE design_revision_discipline_snapshots SET payload_json='{}' WHERE design_revision_id='d'",
+        ),
         throwsA(
-          predicate(
-            (e) => e.toString().contains('ELV5_FROZEN_SECTION_HASH_MISMATCH'),
-          ),
+          predicate((e) => e.toString().contains('ELV5_IMMUTABLE_EVIDENCE')),
         ),
       );
-      await db.customStatement(
-        "UPDATE design_revision_discipline_snapshots SET payload_json=? WHERE design_revision_id='d'",
-        [snapshot],
-      );
+      // Model offline file damage, distinct from a supported production write.
+      await _offlineSnapshotFixture(db, () async {
+        await db.customStatement(
+          "UPDATE design_revision_discipline_snapshots SET payload_json='{}' WHERE design_revision_id='d'",
+        );
+        await expectLater(
+          _store(db).read(projectId: 'p', designRevisionId: 'd'),
+          throwsA(
+            predicate(
+              (e) => e.toString().contains('ELV5_FROZEN_SECTION_HASH_MISMATCH'),
+            ),
+          ),
+        );
+        await db.customStatement(
+          "UPDATE design_revision_discipline_snapshots SET payload_json=? WHERE design_revision_id='d'",
+          [snapshot],
+        );
+      });
       expect(
         (await _store(db).read(projectId: 'p', designRevisionId: 'd')).payload,
         captured.payload,
@@ -298,8 +309,21 @@ void main() {
                   .getSingle())
               .data;
       final historical = Map<String, Object?>.from(row);
-      await db.customStatement(
-        "DELETE FROM design_revision_discipline_snapshots WHERE design_revision_id='d'",
+      await expectLater(
+        db.customStatement(
+          "DELETE FROM design_revision_discipline_snapshots WHERE design_revision_id='d'",
+        ),
+        throwsA(
+          predicate((e) => e.toString().contains('ELV5_IMMUTABLE_EVIDENCE')),
+        ),
+      );
+      // Historical fixture predates the ELV5 extension; production deletion is
+      // forbidden and was asserted above. Restore both guards afterwards.
+      await _offlineSnapshotFixture(
+        db,
+        () => db.customStatement(
+          "DELETE FROM design_revision_discipline_snapshots WHERE design_revision_id='d'",
+        ),
       );
       final read = await _store(db).read(projectId: 'p', designRevisionId: 'd');
       expect(read.kind, Elv5FrozenDisciplineReadKind.notCaptured);
@@ -382,5 +406,28 @@ final class _FreezeFault implements ElvFailureProbe {
     expect(discipline, hasLength(64));
     observedAllSections = true;
     throw StateError('F2_FREEZE_FAULT');
+  }
+}
+
+Future<void> _offlineSnapshotFixture(
+  AppDatabase db,
+  Future<void> Function() edit,
+) async {
+  final triggers =
+      await db
+          .customSelect(
+            "SELECT name,sql FROM sqlite_master WHERE type='trigger' AND name IN ('trg_elv5_design_revision_discipline_snapshots_immutable_update','trg_elv5_design_revision_discipline_snapshots_immutable_delete') ORDER BY name",
+          )
+          .get();
+  expect(triggers, hasLength(2));
+  for (final trigger in triggers) {
+    await db.customStatement('DROP TRIGGER ${trigger.read<String>('name')}');
+  }
+  try {
+    await edit();
+  } finally {
+    for (final trigger in triggers) {
+      await db.customStatement(trigger.read<String>('sql'));
+    }
   }
 }
