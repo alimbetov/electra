@@ -8,11 +8,11 @@
   "agreementArtifacts": [
     {
       "path": "docs/product/elv-integration/README.md",
-      "sha256": "b581737e896109517492c3cae499f0fc00ed3b53bb7614daa76bd99218d803a7"
+      "sha256": "4b4bf334633bd95d86c14f51d87a18bcbb3d48f83835075bc704c5330bbbc203"
     },
     {
       "path": "docs/product/elv-integration/runtime-handoff-contract.md",
-      "sha256": "293355e5d842646808efffb5c86af5623e792bb87937a7cba73bcb1db4050599"
+      "sha256": "a06c31ca65af5da63ea82a7de514247d5b9004d0c5e2b3b9624439dcd69349b8"
     },
     {
       "path": "docs/product/elv-integration/interface-registry.json",
@@ -21,24 +21,44 @@
     {
       "path": "docs/product/elv-integration/qualification-plan.json",
       "sha256": "36a44f095990987b36ead777a6bed2f4468c49676ada8e82b6f6b0eb29875f83"
+    },
+    {
+      "path": "docs/product/elv-integration/source-systems-contract.md",
+      "sha256": "6de57efc816287a18f81cb1e847d26eee51ce2452c34a3be0dc82857c54bb9bb"
+    },
+    {
+      "path": "docs/product/elv-integration/source-systems-registry.json",
+      "sha256": "59ec51fc3da6d6fbb063acc96171906b34e13cf89e74631d72cec5d4d55e2889"
+    },
+    {
+      "path": "docs/product/elv-integration/source-qualification-plan.json",
+      "sha256": "ebf6a1e5acc2f94ff195c83e4f9a2f357a3f2561fb5e18e688d6f4f6b7b7b725"
+    },
+    {
+      "path": "docs/product/elv-integration/source-authority-review.md",
+      "sha256": "b6f43a8cfe555230b482fa621793ed38cdcbda732b24e27a297238c708ccd890"
+    },
+    {
+      "path": "docs/product/elv-integration/design-readiness.json",
+      "sha256": "858738e71edf86efd2470a8c2793911a1327a239b3bfa51c79dd6948cf351291"
     }
   ],
   "localDocuments": [
     {
       "path": "docs/product/elv7-authoritative-spec-index.md",
-      "sha256": "c3837271d24448d7b84a110192ec1ececee7c46c0fde9ffc44fa15e814c6088e"
+      "sha256": "2674eb64797ab1af7513498032f99f4545a1e4bd9492003ca83be92a6803bd5e"
     },
     {
       "path": "docs/product/elv7-p0-p9-delivery-plan.md",
-      "sha256": "763e08b8b6ef7e3326d47854be064cc264e20d477d93e9eb64c3bfca4f0fe044"
+      "sha256": "61409db04d770e9b16dfbc88c7ac8cf98e01a0c1acca98ec46c985d32f5ed4a3"
     },
     {
       "path": "docs/product/elv7-normative-validation-design-specification.md",
-      "sha256": "7ccb116553720cfb60c7ed3eeb337fd099f1dddcb3271448433c1167315cdf8b"
+      "sha256": "b203d96636bbc911e06484782ad339cd4c65f82b04ce943f49184d672fadf1ac"
     },
     {
       "path": "docs/product/component-catalog/configuration-and-layout-contract.md",
-      "sha256": "224c6a1b5c0e888b1cc8a3b2efd1af8981ec16cb56a52077799a43a8953552e9"
+      "sha256": "03bbfb64cb51edaeda6dbb8b3ca44a543b95dd8461dd6a9e01edb5bfe63b14e3"
     }
   ],
   "runtimeEntryBlockers": [
@@ -50,5 +70,6 @@
     "EXACT_WIRE_CODECS_AND_ADAPTERS"
   ],
   "catalogueAuthoritySource": "f32432c8b14134a5961420fb2a219ecbfb2652ce",
-  "note": "Fingerprints prove reviewed design text only; no implemented/qualified/accepted capability is inferred."
+  "note": "Fingerprints prove reviewed design text only; no implemented/qualified/accepted capability is inferred.",
+  "sourceSystemsRuntimeReady": false
 }

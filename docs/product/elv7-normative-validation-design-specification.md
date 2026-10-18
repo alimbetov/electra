@@ -624,3 +624,22 @@ The [implementation package](elv7-implementation/README.md) hardens this design:
 Within these subjects the detailed dossiers supersede less precise language in
 this design draft. No runtime, production pack approval or legal certification
 is claimed by this documentation or its structural checker.
+
+
+## Source-system implementation contract (ELV7)
+
+[Shared source contract](elv-integration/source-systems-contract.md) defines exact
+mandatory inputs and fail-closed semantics.
+
+Source-domain instances bind exact adopted profile/product/site authority and
+all required operating modes. Existing families cover scope/applicability,
+disconnect/interrupting/TCC/residual/earthing, conductor/SPD and physical/assembly
+obligations. Source sequence/energy kernels remain electrical-owner prerequisites;
+ELV7 consumes their qualified proofs and does not fabricate a simulation inside a
+normative checker. The 45-family registry remains unchanged; unsupported checker
+capability is visible and cannot be hidden as a generic PASS. No global generator
+fault multiplier, PV availability, zero-export proof, neutral switch rule or RCD
+type is inferred. Catalogue certification/anti-islanding metadata is not whole-site
+authorization. Missing qualified source/transfer/energy producer or applicable
+national/site clauses yields scoped NOT_EVALUABLE/BLOCKED. Approved deviations
+cannot make a required source-mode violation compliant.

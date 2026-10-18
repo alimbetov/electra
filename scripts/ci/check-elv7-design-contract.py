@@ -55,7 +55,7 @@ def check_component_catalogue():
     families = manifest["families"]
     unique([f["code"] for f in families], "catalogue family codes")
     unique([f["technicalSchema"] for f in families], "catalogue technical schemas")
-    require(len(families) == 22, "Expected 22 planned product families")
+    require(len(families) == 23, "Expected 23 planned product families")
     for family in families:
         require(family["requiredFacets"] and family["implementation"] == "NOT_STARTED" and
                 family["qualified"] is False, "Unsubstantiated family support")
@@ -123,7 +123,7 @@ def check_component_catalogue():
         for link in re.findall(r"\]\(([^)]+)\)", doc.read_text()):
             if "://" not in link and not link.startswith("#"):
                 require((doc.parent / link.split("#")[0]).exists(), f"Broken catalogue link: {link}")
-    print("CATALOGUE DESIGN CONSISTENCY PASS: 22 planned families; "
+    print("CATALOGUE DESIGN CONSISTENCY PASS: 23 planned families; "
           "21 CAP / 14 K / 10 SH mappings; 40 PLANNED cases; no runtime acceptance.")
 
 

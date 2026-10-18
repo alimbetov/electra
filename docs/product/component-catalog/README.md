@@ -38,3 +38,10 @@ amendment for this catalogue design: exact technical/offer snapshots, project-lo
 adoption, producer-owned layout/normative evidence and immutable report ordering.
 The canonical catalogue dossier is on the ELV7 design branch; ELV6/ELV8 consume
 its pinned source and the replicated agreement, not independently invented stores.
+
+
+The [source-systems amendment](../elv-integration/source-systems-contract.md)
+adds exact generator/PV/storage/transfer facets, including `SOURCE_PV_MODULE`:
+23 planned families in total. Its 32 source qualification scenarios are planned
+separately from the 40 catalogue and 364 normative scenarios. Read
+[readiness gates](../elv-integration/design-readiness.json) before runtime entry.

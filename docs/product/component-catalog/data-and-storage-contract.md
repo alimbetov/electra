@@ -189,3 +189,16 @@ Rollback before cutover restores the old authority; after new semantic writes,
 rollback needs an explicit compatible reader/import path, not a blind downgrade.
 A future shared server can publish the same immutable packages; no backend,
 account, personal data or permanent network connection is required for design.
+
+
+## 8. Exact source-system facets
+
+[Source-system contract](../elv-integration/source-systems-contract.md) defines
+condition-bound generator, PV module, inverter/MPPT, battery/BESS, UPS and tested
+transfer-assembly facts. `SOURCE_PV_MODULE` is the 23rd planned product family;
+a PV string/array is a project configuration of exact modules/connections, not a
+new fake single-SKU product. Preserve output-domain versus input-domain facts,
+firmware/settings revisions and separate grid-following/forming/island/black-start
+capabilities. No live price, forecast, user-entered "hybrid" label or bidirectional
+port can act as source-study/grid-permission evidence. Four qualified electrical
+producer projections and all required mode proofs are separate runtime gates.

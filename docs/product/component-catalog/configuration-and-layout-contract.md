@@ -161,3 +161,13 @@ in a separate evaluation space; same-UoW owner participants apply reviewed
 changes before committed owner revalidation. Freeze selection/adoption first,
 then assemble reports referencing the frozen root; never hash a future report
 into the source root or rewrite frozen sections after rendering.
+
+
+## 8. Generator / PV / storage configuration
+
+Use [the source-system amendment](../elv-integration/source-systems-contract.md)
+for all-mode source/ATS/inverter/battery/host/accessory eligibility. A low-cost
+normal-grid candidate that cannot prove required generator/island/UPS-bypass/fault
+behavior is not a validated configuration. Missing qualified source/energy/transfer
+producer or required site authority is an explicit blocker. The configuration
+planner does not implement a hidden AC-fault, PV-yield or battery-SoC simulator.

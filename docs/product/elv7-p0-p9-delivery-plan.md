@@ -210,3 +210,15 @@ separate normative-requirement/assessment adapters; P2 separates public wire fro
 ledger names; P4/P5 qualify scoped producer generations and trust invalidation;
 P8 executes the shared cross-stage oracles; P9 supplies immutable assessment and
 coverage evidence to ELV8. Shared design alignment is not runtime acceptance.
+
+
+## Generator / PV / storage / transfer source gates
+
+Apply [the source-system contract](elv-integration/source-systems-contract.md)
+and [readiness ledger](elv-integration/design-readiness.json): P0 binds exact
+canonical electrical producer/commands/schema/domains and legacy compatibility;
+P1/P2 freeze typed source/settings/scenario projections and scoped adoption;
+P3–P5 implement only owner-appropriate rule/adaptor/invalidation behavior;
+P8 executes the 32 source-specific oracles plus inherited/shared regressions;
+P9 requires exact-SHA actual owner evidence before source-mode runtime acceptance.
+Normative source metadata, planned tests and design CI do not satisfy those gates.

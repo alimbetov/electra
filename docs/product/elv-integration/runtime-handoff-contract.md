@@ -218,3 +218,14 @@ needs non-skipped production persistence/command witnesses on exact source SHAs,
 including old ELV4/FL14 regressions, all affected ELV5/6/7/8 owners, rollback/CAS/
 restart/freeze/historical/fault suites and scope/source provenance. Same shared
 agreement hash on three design branches proves alignment, not runtime acceptance.
+
+
+## 9. Source-system specialization
+
+[Generator/PV/storage/transfer](source-systems-contract.md) supplies a versioned
+source-domain specialization of this agreement. Its four electrical producer
+projections do not replace the nine stage interfaces, add LAY processes or grant
+AC simulation capability to existing ELV4 DC/PoE models. Per-mode source/site
+proofs enter the same dependency/CAS/freeze protocol. Missing required electrical
+producer, scenario or authority blocks only its dependent scope; full-source
+configuration acceptance cannot ignore that gap.

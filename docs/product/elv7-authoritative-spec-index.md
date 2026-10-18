@@ -89,3 +89,12 @@ Source metadata discovery is distinct from a verified executable rule pack.
 
 Design consistency is checked by `scripts/ci/check-elv7-design-contract.py`.
 Every runtime package remains NOT_STARTED; 364 scenarios are planned, not executed.
+
+
+## External and hybrid power source contract
+
+[Source-system amendment](elv-integration/source-systems-contract.md) is mandatory
+for generator, PV/inverter, UPS/BESS/battery and transfer integration.
+[Readiness ledger](elv-integration/design-readiness.json) distinguishes the defined
+ELV7 contract from unqualified electrical producer and source-authority gates.
+No runtime or production-compliance readiness is inferred from the design guard.

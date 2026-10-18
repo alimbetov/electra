@@ -358,6 +358,18 @@
       "technicalSchema": "electra.catalogue-automation-sensor-actuator.v1",
       "implementation": "NOT_STARTED",
       "qualified": false
+    },
+    {
+      "code": "SOURCE_PV_MODULE",
+      "requiredFacets": [
+        "moduleElectricalTemperatureEnvelope",
+        "mechanicalDefinition",
+        "connectorAndPolarity",
+        "qualifiedSourceEvidence"
+      ],
+      "technicalSchema": "electra.catalogue-source-pv-module.v1",
+      "implementation": "NOT_STARTED",
+      "qualified": false
     }
   ],
   "facetPolicy": "Facet applicability is resolved by exact functional role and family schema; absent mandatory facts are UNKNOWN. Registered fields alone confer no supported checker.",
@@ -714,5 +726,6 @@
       "code": "C7",
       "status": "NOT_STARTED"
     }
-  ]
+  ],
+  "sourceSystemsContract": "../elv-integration/source-systems-registry.json"
 }
