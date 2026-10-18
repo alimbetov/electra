@@ -1,3 +1,12 @@
+import 'package:engineering_core/engineering_core.dart'
+    show
+        EngineeringReferenceCatalog,
+        CableDefinition,
+        CableResourceDefinition,
+        CableResourceKind,
+        TerminationPolicy,
+        TerminationPolicyMode,
+        canonicalEngineeringJsonV1;
 import '../support/elv5_f2_execution_witness.dart';
 import '../support/elv5_f2_global_reliability.dart';
 import 'dart:convert';
@@ -530,11 +539,104 @@ Future<void> _seedProjectAndRealizedSection(AppDatabase db) async {
         ),
       );
 
-  await db.customStatement('PRAGMA foreign_keys = OFF');
+  await db
+      .into(db.floors)
+      .insert(
+        FloorsCompanion.insert(
+          id: 'floor-x',
+          projectId: 'p',
+          name: 'Telecom floor',
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'f2-lan05',
+        ),
+      );
+
   await db.customStatement(
     "INSERT INTO rooms (id,floor_id,name,room_type,room_category,width_mm,depth_mm,structural_height_mm_override,finished_ceiling_height_mm_override,revision,created_at,updated_at,deleted_at,origin_device_id) "
-    "VALUES ('room-1','floor-x','Telecom room','technical','technical',4000,4000,NULL,NULL,1,'${now.toIso8601String()}','${now.toIso8601String()}',NULL,'f2-lan05')",
+    "VALUES ('room-1','floor-x','Telecom room','technical','technical',100000,4000,NULL,NULL,1,'${now.millisecondsSinceEpoch ~/ 1000}','${now.millisecondsSinceEpoch ~/ 1000}',NULL,'f2-lan05')",
   );
+  await db
+      .into(db.surfacePatches)
+      .insert(
+        SurfacePatchesCompanion.insert(
+          id: 'patch-1',
+          roomId: 'room-1',
+          surfaceId: 'floor',
+          originXmm: 0,
+          originYmm: 0,
+          originZmm: 0,
+          uAxisX: 1,
+          uAxisY: 0,
+          uAxisZ: 0,
+          vAxisX: 0,
+          vAxisY: 1,
+          vAxisZ: 0,
+          orientation: 'horizontal',
+          boundaryJson: '[[0,0],[100000,0],[100000,4000],[0,4000]]',
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'f2-lan05',
+        ),
+      );
+  final cableDefinition = CableDefinition(
+    code: 'FIBER',
+    label: 'Qualification fiber',
+    mediaCode: 'FIBER',
+    resourceDefinitions: [
+      CableResourceDefinition(
+        identity: '__WHOLE_CABLE__',
+        kind: CableResourceKind.wholeCable,
+        allocatable: true,
+        atomic: true,
+        terminationPolicy: TerminationPolicy(
+          mode: TerminationPolicyMode.bothEnds,
+          terminalRequired: true,
+        ),
+      ),
+    ],
+  );
+  final catalog = EngineeringReferenceCatalog(
+    id: 'lan05-catalog',
+    code: 'LAN05',
+    version: '1',
+    source: 'Explicit F2 optical fixture',
+    cableDefinitions: [cableDefinition],
+  );
+  await db
+      .into(db.engineeringReferenceCatalogs)
+      .insert(
+        EngineeringReferenceCatalogsCompanion.insert(
+          id: catalog.id,
+          projectId: 'p',
+          code: catalog.code,
+          catalogVersion: catalog.version,
+          payloadJson: canonicalEngineeringJsonV1(catalog.toMap()),
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'f2-lan05',
+        ),
+      );
+  final ref = catalog.cableDefinitionRef('FIBER');
+  await db
+      .into(db.elvCables)
+      .insert(
+        ElvCablesCompanion.insert(
+          id: 'fiber-1',
+          projectId: 'p',
+          label: 'FIBER-1',
+          normalizedLabel: 'FIBER-1',
+          name: 'Qualification optical cable',
+          definitionCatalogId: ref.catalogId,
+          definitionCatalogVersion: ref.catalogVersion,
+          definitionCode: ref.definitionCode,
+          definitionContentHash: ref.definitionContentHash,
+          lifecycleState: 'ACTIVE',
+          createdAt: now,
+          updatedAt: now,
+          originDeviceId: 'f2-lan05',
+        ),
+      );
   await db
       .into(db.cableRoutes)
       .insert(
@@ -631,7 +733,11 @@ Future<void> _seedProjectAndRealizedSection(AppDatabase db) async {
           originDeviceId: 'f2-lan05',
         ),
       );
-  await db.customStatement('PRAGMA foreign_keys = ON');
+  expect(
+    await db.customSelect('PRAGMA foreign_key_check').get(),
+    isEmpty,
+    reason: 'LAN05 qualification must start from FK-valid physical sources',
+  );
 }
 
 DateTime _now() => DateTime.utc(2026, 10, 17, 14);
