@@ -100,7 +100,7 @@ class ExecutionWitnessTests(unittest.TestCase):
         values = {
             'GLOBAL_PUBLICATION_ROLLBACK': {'faultTables':['discipline_evaluation_records','discipline_dependency_index','discipline_evaluation_pointers','command_execution_records'],'reopenedAfterEveryFault':True},
             'GLOBAL_INDEPENDENT_CAS': {'connections':2,'committedWriters':1,'loserCode':'ELV5_POINTER_GENERATION_CONFLICT','pointerGeneration':1},
-            'GLOBAL_FREEZE_MANIFEST': {'publicFreezeApi':True,'faultAfterAllSections':True,'restartReplayIdentical':True,'newCalculationRejected':True,'manifestImmutable':True,'disciplineAppendOnly':True,'physicalHashLinked':True,'powerHashLinked':True,'manifestSchema':'electra.elv4-snapshot-manifest.v1','disciplineSectionSchema':'electra.elv5-discipline-freeze-section.v1'},
+            'GLOBAL_FREEZE_MANIFEST': {'publicFreezeApi':True,'faultAfterAllSections':True,'restartReplayIdentical':True,'newCalculationRejected':True,'createNextRestoresConfiguration':True,'manifestImmutable':True,'disciplineAppendOnly':True,'physicalHashLinked':True,'powerHashLinked':True,'manifestSchema':'electra.elv4-snapshot-manifest.v1','disciplineSectionSchema':'electra.elv5-discipline-freeze-section.v1'},
         }
         for stage, evidence in values.items():
             payload = {'schema':'electra.elv5-f2-lifecycle-event.v1','processCode':self.witness['processCode'],'sourceSha':self.source,'stage':stage,**evidence}
@@ -113,7 +113,7 @@ class ExecutionWitnessTests(unittest.TestCase):
 
     def test_global_suite_rejects_weak_or_missing_failure_proof(self):
         self.add_global_events()
-        for stage, field, value in [('GLOBAL_PUBLICATION_ROLLBACK','faultTables',[]),('GLOBAL_INDEPENDENT_CAS','connections',1),('GLOBAL_INDEPENDENT_CAS','committedWriters',2),('GLOBAL_FREEZE_MANIFEST','publicFreezeApi',False),('GLOBAL_FREEZE_MANIFEST','faultAfterAllSections',False),('GLOBAL_FREEZE_MANIFEST','manifestSchema','electra.elv-snapshot-manifest.v2'),('GLOBAL_FREEZE_MANIFEST','manifestImmutable',False),('GLOBAL_FREEZE_MANIFEST','disciplineAppendOnly',False),('GLOBAL_FREEZE_MANIFEST','physicalHashLinked',False),('GLOBAL_FREEZE_MANIFEST','powerHashLinked',False)]:
+        for stage, field, value in [('GLOBAL_PUBLICATION_ROLLBACK','faultTables',[]),('GLOBAL_INDEPENDENT_CAS','connections',1),('GLOBAL_INDEPENDENT_CAS','committedWriters',2),('GLOBAL_FREEZE_MANIFEST','publicFreezeApi',False),('GLOBAL_FREEZE_MANIFEST','faultAfterAllSections',False),('GLOBAL_FREEZE_MANIFEST','manifestSchema','electra.elv-snapshot-manifest.v2'),('GLOBAL_FREEZE_MANIFEST','manifestImmutable',False),('GLOBAL_FREEZE_MANIFEST','disciplineAppendOnly',False),('GLOBAL_FREEZE_MANIFEST','physicalHashLinked',False),('GLOBAL_FREEZE_MANIFEST','powerHashLinked',False),('GLOBAL_FREEZE_MANIFEST','createNextRestoresConfiguration',False)]:
             with self.subTest(stage=stage,field=field):
                 before=copy.deepcopy(self.events)
                 self.mutate_stage(stage,lambda row:row.update({field:value}))

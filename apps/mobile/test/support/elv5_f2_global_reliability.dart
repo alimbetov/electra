@@ -319,6 +319,57 @@ Future<void> verifyF2GlobalFreeze(
     );
     expect(await _state(db, _freezeTables), after);
     expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
+    expect(
+      await DriftElvDesignRevisionRepository(
+        db,
+        originDeviceId: 'f2-global',
+        now: _now,
+      ).createNext(
+        const CreateNextWorkingDesignRevisionCommand(
+          commandId: 'global-next',
+          projectId: 'p',
+          newRevisionId: 'global-r2',
+          code: 'R2',
+          basedOnRevisionId: 'd',
+        ),
+      ),
+      isA<ElvCommandSuccess<ProjectDesignRevision>>(),
+    );
+    final capturedFacts = captured.payload!['facts'] as Map;
+    for (final table in elv5DisciplineAspectTables) {
+      expect(
+        await db
+            .customSelect(
+              "SELECT * FROM $table WHERE design_revision_id='global-r2'",
+            )
+            .get(),
+        hasLength((capturedFacts[table] as List).length),
+        reason: 'create-next must restore $table',
+      );
+    }
+    for (final table in [
+      'discipline_evaluation_records',
+      'discipline_evaluation_pointers',
+      'discipline_dependency_index',
+    ]) {
+      expect(
+        await db
+            .customSelect(
+              "SELECT * FROM $table WHERE design_revision_id='global-r2'",
+            )
+            .get(),
+        isEmpty,
+      );
+    }
+    expect(
+      (await DriftElv5DisciplineSnapshotStore(
+        db,
+        originDeviceId: 'f2-global',
+        nowUtc: _now,
+      ).read(projectId: 'p', designRevisionId: 'd')).payload,
+      captured.payload,
+    );
+    expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
     _emit(code, 'GLOBAL_FREEZE_MANIFEST', {
       'publicFreezeApi': true,
       'faultAfterAllSections': true,
@@ -326,6 +377,7 @@ Future<void> verifyF2GlobalFreeze(
       'newCalculationRejected': true,
       'disciplineSectionSchema': section['section_schema'],
       'manifestSchema': manifest['manifest_schema'],
+      'createNextRestoresConfiguration': true,
       'manifestImmutable': true,
       'disciplineAppendOnly': true,
       'physicalHashLinked':

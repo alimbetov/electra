@@ -16,6 +16,81 @@ import '../support/elv5_f2_production_lifecycle.dart';
 
 void main() {
   test(
+    'F2 create-next remaps captured ELV5 physical assignments and leaves R1 immutable',
+    () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      await seedF2LanTopology(db);
+      await seedF2LanRoute(db);
+      await replaceF2LanAggregate(
+        db,
+        operation: 'REPLACE_LINK_COMPOSITION',
+        commandId: 'seed-link',
+        payload: {
+          'linkId': 'link-1',
+          'orderedSections': [
+            {
+              'ordinal': 0,
+              'realizedSectionId': 'traversal-1',
+              'classification': 'PERMANENT',
+            },
+          ],
+          'policyBindingId': 'unresolved-policy',
+        },
+      );
+
+      expect(
+        await _revision(db).freeze(_freeze(2)),
+        isA<ElvCommandSuccess<ProjectDesignRevision>>(),
+      );
+      final before =
+          (await _store(
+            db,
+          ).read(projectId: 'p', designRevisionId: 'd')).payload;
+      expect(
+        await _revision(db).createNext(
+          const CreateNextWorkingDesignRevisionCommand(
+            commandId: 'next',
+            projectId: 'p',
+            newRevisionId: 'd2',
+            code: 'R2',
+            basedOnRevisionId: 'd',
+          ),
+        ),
+        isA<ElvCommandSuccess<ProjectDesignRevision>>(),
+      );
+      final root =
+          await db
+              .customSelect(
+                "SELECT * FROM link_composition_bindings WHERE design_revision_id='d2'",
+              )
+              .getSingle();
+      final assignment =
+          await db
+              .customSelect(
+                "SELECT * FROM link_section_assignments WHERE design_revision_id='d2'",
+              )
+              .getSingle();
+      expect(assignment.read<String>('binding_id'), root.read<String>('id'));
+      final traversal =
+          await db
+              .customSelect(
+                "SELECT t.id FROM cable_run_traversals t JOIN canonical_cable_runs r ON r.id=t.cable_run_id WHERE r.design_revision_id='d2'",
+              )
+              .getSingle();
+      expect(
+        assignment.read<String>('realized_section_id'),
+        traversal.read<String>('id'),
+      );
+      expect(
+        (await _store(db).read(projectId: 'p', designRevisionId: 'd')).payload,
+        before,
+      );
+      expect(await db.customSelect('PRAGMA foreign_key_check').get(), isEmpty);
+    },
+  );
+
+  test(
     'F2 global real freeze rolls back all sections and preserves captured discipline across restart and live-source changes',
     () async {
       final dir = await Directory.systemTemp.createTemp('f2-freeze-sections-');
@@ -88,10 +163,7 @@ void main() {
                   )
                   .getSingle())
               .data;
-      expect(
-        manifest['manifest_schema'],
-        'electra.elv4-snapshot-manifest.v1',
-      );
+      expect(manifest['manifest_schema'], 'electra.elv4-snapshot-manifest.v1');
       expect(manifest['manifest_sha256'], elvSnapshotManifestHash(manifest));
       expect(manifest['discipline_section_schema'], isNull);
       expect(manifest['discipline_sha256'], isNull);
@@ -263,13 +335,12 @@ final class _FreezeFault implements ElvFailureProbe {
             .data;
     expect(manifest['manifest_schema'], 'electra.elv4-snapshot-manifest.v1');
     expect(manifest['discipline_sha256'], isNull);
-    final discipline =
-        (await db
-                .customSelect(
-                  'SELECT discipline_sha256 FROM design_revision_discipline_snapshots',
-                )
-                .getSingle())
-            .read<String>('discipline_sha256');
+    final discipline = (await db
+            .customSelect(
+              'SELECT discipline_sha256 FROM design_revision_discipline_snapshots',
+            )
+            .getSingle())
+        .read<String>('discipline_sha256');
     expect(discipline, hasLength(64));
     observedAllSections = true;
     throw StateError('F2_FREEZE_FAULT');
