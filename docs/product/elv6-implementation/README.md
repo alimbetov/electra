@@ -12,15 +12,16 @@ ELV6 converts exact upstream engineering facts into reproducible physical enclos
 2. [`mutation-safety-contract.md`](mutation-safety-contract.md) — strict placement-intent wire union, server-derived physical geometry/provenance and fail-closed referenced-member replacement semantics.
 3. [`normative-safety-evidence-contract.md`](normative-safety-evidence-contract.md) — cross-cutting safety evidence projections for enclosure integrity, clearance/creepage, hazardous access, partitions, environment/profile provenance and freeze/replay.
 4. [`safety-standards-registry.json`](safety-standards-registry.json) — machine-readable IEC/KZ/EU/discipline standards applicability and ELV6 evidence-gap registry. It is a design/readiness registry, not a compliance ruleset.
-5. [`process-registry.json`](process-registry.json) — closed 24-process layout/evaluation registry.
-6. [`command-registry.json`](command-registry.json) — closed 21-operation public command registry under `electra.elv6-layout-command.v1`.
-7. [`command-examples.json`](command-examples.json) — one canonical design-time valid payload and deterministic missing-field rejection for every registered operation.
-8. [`qualification-manifest.json`](qualification-manifest.json) — 72 process oracles: POS/NEG/BLOCKED for all 24 codes plus cross-cutting constructability/concurrency cases.
-9. [`../elv6-enclosure-layout-design-specification.md`](../elv6-enclosure-layout-design-specification.md) — stage purpose, ownership and package architecture.
-10. [`../elv6-p0-p9-delivery-plan.md`](../elv6-p0-p9-delivery-plan.md) — 80 implementation/acceptance requirements.
-11. [`../../audit/elv6-hard-technical-audit.md`](../../audit/elv6-hard-technical-audit.md) — initial 18 hard engineering/system-architecture findings and remediation.
-12. [`../../audit/elv6-final-architecture-hardening.md`](../../audit/elv6-final-architecture-hardening.md) — findings 19–20: client-derived geometry/provenance and orphaned-reference replacement hazards.
-13. [`../../audit/elv6-normative-safety-readiness-audit.md`](../../audit/elv6-normative-safety-readiness-audit.md) — standards-driven readiness audit and eight mandatory normative-evidence gaps.
+5. [`safety-domain-readiness-matrix.json`](safety-domain-readiness-matrix.json) — safety-domain ownership/readiness matrix covering LV assemblies, insulation coordination, IP/IK, bonding, protective devices, thermal, racks, ICT, CCTV, ACS and FIRE.
+6. [`process-registry.json`](process-registry.json) — closed 24-process layout/evaluation registry.
+7. [`command-registry.json`](command-registry.json) — closed 21-operation public command registry under `electra.elv6-layout-command.v1`.
+8. [`command-examples.json`](command-examples.json) — one canonical design-time valid payload and deterministic missing-field rejection for every registered operation.
+9. [`qualification-manifest.json`](qualification-manifest.json) — 72 process oracles: POS/NEG/BLOCKED for all 24 codes plus cross-cutting constructability/concurrency cases.
+10. [`../elv6-enclosure-layout-design-specification.md`](../elv6-enclosure-layout-design-specification.md) — stage purpose, ownership and package architecture.
+11. [`../elv6-p0-p9-delivery-plan.md`](../elv6-p0-p9-delivery-plan.md) — 80 implementation/acceptance requirements.
+12. [`../../audit/elv6-hard-technical-audit.md`](../../audit/elv6-hard-technical-audit.md) — initial 18 hard engineering/system-architecture findings and remediation.
+13. [`../../audit/elv6-final-architecture-hardening.md`](../../audit/elv6-final-architecture-hardening.md) — findings 19–20: client-derived geometry/provenance and orphaned-reference replacement hazards.
+14. [`../../audit/elv6-normative-safety-readiness-audit.md`](../../audit/elv6-normative-safety-readiness-audit.md) — standards-driven readiness audit and eight mandatory normative-evidence gaps.
 
 ## Closed registries
 
@@ -56,6 +57,17 @@ Set-replacement commands are reference-safe: mounting surfaces and cable entries
 
 ELV6 owns exact physical evidence; ELV7 owns jurisdiction/profile applicability and compliance verdicts.
 
+The stage ownership rule is explicit:
+
+```text
+ELV4  electrical sizing and protective-device selection
+ELV6  physical realization and immutable safety evidence
+ELV7  normative/jurisdictional verdicts
+ELV8  manufacturer/SKU selection and deliverables
+```
+
+A `B/C/D` trip curve, rated current, breaking capacity, RCD type or protection setting is never selected or altered by ELV6. ELV6 consumes the exact upstream protective-device identity and owns only physical placement, DIN/module occupation, terminal/service access, adjacency/heat-loss evidence and enclosure-local wiring/termination facts.
+
 The safety readiness layer requires at least:
 
 ```text
@@ -71,6 +83,8 @@ freeze/replay hashes for all evidence projections
 ```
 
 A newer IEC/GOST/EN publication must never auto-replace the effective project profile. In particular, the KZ profile distinguishes current national standards from documents that are adopted interstate but not yet introduced nationally.
+
+The domain matrix additionally pins ACS `IEC 60839-11-1/-2`, FIRE `EN 54-2/-4/-13` and `CEN/TS 54-14`, ICT/LAN references, rack mechanical standards, and protective-device standard families. These entries define evidence demand/ownership only; they do not create hidden ELV6 compliance formulas.
 
 ## Runtime ownership gate
 
@@ -111,7 +125,7 @@ check-elv6-command-registry.py
 check-elv6-qualification-design.py
 ```
 
-They verify the 24/80/20 counts, dependency DAG and hard engineering boundary tokens; the safety standards/profile registry plus mandatory normative-evidence contract; exact 21-command wire/payload registry including server-derived-placement constraints; 21 canonical payload examples; and 72 POS/NEG/BLOCKED process oracles.
+They verify the 24/80/20 counts, dependency DAG and hard engineering boundary tokens; the safety standards/profile registry, 11-domain readiness matrix plus mandatory normative-evidence contract; exact 21-command wire/payload registry including server-derived-placement constraints; 21 canonical payload examples; and 72 POS/NEG/BLOCKED process oracles.
 
 These gates prevent specification drift. They are explicitly **not runtime acceptance or proof of standards compliance**.
 
