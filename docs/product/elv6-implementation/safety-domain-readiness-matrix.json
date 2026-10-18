@@ -1,0 +1,117 @@
+{
+  "schema": "electra.elv6-safety-domain-readiness-matrix.v1",
+  "status": "DESIGN_HARDENING",
+  "branch": "feat/flutter-elv6-enclosure-layout-design",
+  "claimBoundary": "ELV6 records exact physical evidence. ELV4 owns electrical sizing/protection calculations. ELV7 owns jurisdictional/normative verdicts. ELV8 owns product/SKU selection.",
+  "domains": [
+    {
+      "id": "LV_ASSEMBLY",
+      "standards": ["IEC 61439-1:2020", "IEC 61439-2:2020", "GOST IEC 61439-1-2013", "GOST IEC 61439-2-2015"],
+      "elv6Evidence": ["assembly/enclosure identity", "functional-unit placement", "partition geometry", "access/service state", "bonding points", "thermal basis", "modification fingerprint"],
+      "runtimeOwner": "ELV6_EVIDENCE",
+      "verdictOwner": "ELV7",
+      "readiness": "PARTIAL"
+    },
+    {
+      "id": "INSULATION_COORDINATION",
+      "standards": ["IEC 60664-1:2020+A1:2025"],
+      "elv6Evidence": ["air-clearance measurements", "creepage-path measurements", "conductive/live-part geometry", "insulation/material context", "altitude/pollution context provenance"],
+      "runtimeOwner": "ELV6_EVIDENCE",
+      "verdictOwner": "ELV7",
+      "readiness": "BLOCKED_BY_EVIDENCE_MODEL"
+    },
+    {
+      "id": "ENCLOSURE_IP_IK",
+      "standards": ["IEC 60529", "ST RK IEC 60529-2012", "IEC 62262", "ST RK IEC 62262-2012", "IEC 62208:2023"],
+      "elv6Evidence": ["opening/cutout inventory", "gland/closure/seal identities", "door/panel states", "enclosure modification provenance", "mechanical capability refs"],
+      "runtimeOwner": "ELV6_EVIDENCE",
+      "verdictOwner": "ELV7",
+      "readiness": "BLOCKED_BY_INTEGRITY_PROJECTION"
+    },
+    {
+      "id": "ELECTRIC_SHOCK_AND_BONDING",
+      "standards": ["IEC 60364-4-41:2005+A1:2017", "IEC 60364-5-54:2011+A1:2021", "ST RK IEC 60364-5-54-2012"],
+      "elv6Evidence": ["hazard-access states", "barrier geometry", "bond points", "bond links", "PE termination locations", "door/body/backplate/DIN/rack connectivity basis"],
+      "runtimeOwner": "ELV6_EVIDENCE",
+      "verdictOwner": "ELV7",
+      "readiness": "PARTIAL"
+    },
+    {
+      "id": "PROTECTIVE_DEVICES",
+      "standards": ["IEC 60947-2 family", "IEC 60898-1:2015+A1:2019", "IEC 61008-1:2024", "IEC 61009-1:2024", "IEC 60269 family"],
+      "elv6Evidence": ["protective-device immutable upstream ref", "pole/module physical width", "DIN placement", "terminal orientation/access", "heat-loss technical fact", "adjacent-device/derating context", "wire/terminal physical compatibility refs"],
+      "runtimeOwner": "ELV4_SELECTION_ELV6_PLACEMENT",
+      "verdictOwner": "ELV4_AND_ELV7",
+      "readiness": "PARTIAL",
+      "hardBoundary": "ELV6 never selects B/C/D curve, rated current, breaking capacity, RCD type or trip settings. It physically realizes and exposes layout evidence for the upstream-selected protective device."
+    },
+    {
+      "id": "THERMAL",
+      "standards": ["IEC TR 60890:2022", "IEC 61439 family"],
+      "elv6Evidence": ["heat-loss values", "spatial heat-source distribution", "enclosure dimensions", "partitions", "cooling surfaces", "natural/forced ventilation", "adjacent-wall context", "ambient-profile ref"],
+      "runtimeOwner": "ELV6_EVIDENCE",
+      "verdictOwner": "ELV7",
+      "readiness": "GOOD_BASIS_NEEDS_RUNTIME"
+    },
+    {
+      "id": "RACK_MECHANICAL",
+      "standards": ["IEC 60297-3-100:2008", "ST RK IEC 60297-3-100-2018", "IEC 61587-1:2022"],
+      "elv6Evidence": ["rack profile", "U pitch", "rail depth", "mounting interface", "mass/CoG", "static-load capability", "environmental capability refs"],
+      "runtimeOwner": "ELV6",
+      "verdictOwner": "ELV6_INTRINSIC_AND_ELV7_NORMATIVE",
+      "readiness": "GOOD_BASIS_NEEDS_RUNTIME"
+    },
+    {
+      "id": "ICT_LAN",
+      "standards": ["ISO/IEC 11801-1:2017+A1:2025", "EN 50174-2:2018", "EN 50310 family"],
+      "elv6Evidence": ["patch/termination positions", "rack layout", "cable-end identities", "segregation measurements", "bonding refs", "remote-power context"],
+      "runtimeOwner": "ELV6_EVIDENCE",
+      "verdictOwner": "ELV7",
+      "readiness": "PARTIAL"
+    },
+    {
+      "id": "CCTV",
+      "standards": ["IEC 62676-1-1:2013"],
+      "elv6Evidence": ["equipment placement", "power/network termination positions", "service/removal envelopes", "environmental enclosure refs"],
+      "runtimeOwner": "ELV6_EVIDENCE",
+      "verdictOwner": "ELV7",
+      "readiness": "GOOD_BASIS_NEEDS_RUNTIME"
+    },
+    {
+      "id": "ACS",
+      "standards": ["IEC 60839-11-1:2013", "IEC 60839-11-2:2014"],
+      "elv6Evidence": ["controller/PSU/battery placement", "termination capacity", "service/access envelopes", "environmental enclosure refs", "component identity/fingerprint"],
+      "runtimeOwner": "ELV6_EVIDENCE",
+      "verdictOwner": "ELV7",
+      "readiness": "PARTIAL"
+    },
+    {
+      "id": "FIRE",
+      "standards": ["EN 54-2 family", "EN 54-4 family", "EN 54-13:2017+A1:2019", "CEN/TS 54-14:2018"],
+      "elv6Evidence": ["CIE/PSE/battery physical placement", "component compatibility refs", "terminal/entry identity", "service/removal access", "power-source physical separation facts", "enclosure/environment refs", "component provenance"],
+      "runtimeOwner": "ELV6_EVIDENCE",
+      "verdictOwner": "ELV7",
+      "readiness": "PARTIAL",
+      "hardBoundary": "ELV6 does not duplicate EN 54 functional/system compliance; it supplies physical evidence consumed by the fire normative profile."
+    }
+  ],
+  "kazakhstanPinnedStatus": {
+    "GOST IEC 61439-1-2013": "CURRENT_NATIONAL_USE_FROM_2019-01-01",
+    "GOST IEC 61439-2-2015": "CURRENT_NATIONAL_USE_FROM_2019-01-01",
+    "ST RK IEC 60529-2012": "CURRENT_FROM_2013-07-01",
+    "ST RK IEC 62262-2012": "CURRENT_FROM_2013-07-01",
+    "ST RK IEC 60364-5-54-2012": "CURRENT_FROM_2013-07-01",
+    "ST RK IEC 60297-3-100-2018": "CURRENT_FROM_2020-01-01"
+  },
+  "runtimeEntryBlockers": [
+    "NRG-01 enclosure integrity/modification projection",
+    "NRG-02 air-clearance measurement projection",
+    "NRG-02 creepage-path measurement projection",
+    "NRG-03 hazardous-part/barrier access projection",
+    "NRG-04 partition/form-of-separation projection",
+    "NRG-05 safety environment/material context",
+    "NRG-06 versioned capability provenance",
+    "NRG-07 national/profile effective-edition pinning",
+    "NRG-08 freeze/replay provenance for normative evidence"
+  ]
+}
