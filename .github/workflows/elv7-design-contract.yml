@@ -6,12 +6,14 @@ on:
     paths:
       - 'docs/product/elv7-**'
       - 'docs/product/elv7-implementation/**'
+      - 'docs/product/component-catalog/**'
       - 'scripts/ci/check-elv7-design-contract.py'
       - '.github/workflows/elv7-design-contract.yml'
   pull_request:
     paths:
       - 'docs/product/elv7-**'
       - 'docs/product/elv7-implementation/**'
+      - 'docs/product/component-catalog/**'
       - 'scripts/ci/check-elv7-design-contract.py'
       - '.github/workflows/elv7-design-contract.yml'
 

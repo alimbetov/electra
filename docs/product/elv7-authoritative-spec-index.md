@@ -17,6 +17,7 @@ The repository already contains the accepted architecture inventory [ELV Normati
 4. [ELV Normative Standards Matrix](elv-normative-standards-matrix.md) — baseline profile/precedence/rule-class inventory; production applicability still requires verified official sources.
 5. [ELV6 authoritative index](elv6-authoritative-spec-index.md) and [ELV6 design](elv6-enclosure-layout-design-specification.md) define the immediately preceding physical-layout boundary.
 6. ELV1–ELV5 authoritative contracts remain governing for identities, physical realization, power and discipline calculations.
+7. [Extensible product catalogue and configuration proposal](component-catalog/README.md) — separate offline catalogue/offer database, ELV6/ELV7/ELV8 boundaries and exact target-platform CAP/K/SH mapping. This is cross-stage design work, not ELV7 product-selection runtime.
 
 ## Authority hierarchy
 

@@ -1,0 +1,302 @@
+{
+  "schema": "electra.component-catalog-acceptance-plan.v1",
+  "evidenceScope": "DESIGN_ONLY",
+  "runtimeAccepted": false,
+  "plannedCaseCount": 40,
+  "cases": [
+    {
+      "id": "CAT-01",
+      "scenario": "LEGACY_ID_MIGRATION",
+      "oracle": "Old edition-local IDs and archived selection snapshots remain readable; no stable-ID reinterpretation.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-02",
+      "scenario": "LEGACY_FK_ANCHORS",
+      "oracle": "Catalogue extraction preserves project FKs until qualified migration; no competing writable catalogue after cutover.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-03",
+      "scenario": "IMPORT_REPLAY_CONFLICT",
+      "oracle": "Same identity/hash replays; changed payload conflicts; invalid rows cannot partly activate a release.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-04",
+      "scenario": "PARAMETER_TYPED_EXTENSION",
+      "oracle": "New namespaced optional vendor parameter survives import; unsupported mandatory checker blocks eligibility.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-05",
+      "scenario": "UNIT_PRECISION_OVERFLOW",
+      "oracle": "A/kA/mA, rms/peak and mm/um conversions obey semantic units and exact bounded precision.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-06",
+      "scenario": "MCB_RCD_NAMESPACE",
+      "oracle": "Overcurrent B and residual B never substitute; complete product TCC/standard/domain evidence required.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-07",
+      "scenario": "CONDITIONED_CAPACITY",
+      "oracle": "Interrupting capacity at wrong voltage/poles/DC/standard cannot match an AC requirement.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-08",
+      "scenario": "CATALOGUE_CRASH_PUBLICATION",
+      "oracle": "Fault before catalogue release pointer causes total rollback; restart sees old coherent release.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-09",
+      "scenario": "PROJECT_ADOPTION_CRASH",
+      "oracle": "Fault while copying immutable closure rolls back snapshots/dependencies/pointer/receipt together.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-10",
+      "scenario": "CATALOGUE_DISAPPEARS_DURING_APPLY",
+      "oracle": "Captured closure permits coherent project-local apply or explicit rejection; no dangling references.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-11",
+      "scenario": "HISTORY_WITHOUT_CATALOGUE",
+      "oracle": "Freeze/reopen/replay works after catalogue deletion; old physical/power manifests remain unchanged.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-12",
+      "scenario": "TRUST_REVOCATION",
+      "oracle": "Known adopted source revocation invalidates CURRENT claim independently of new-edition adoption; history immutable.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-13",
+      "scenario": "UNKNOWN_PRICE",
+      "oracle": "Technically valid unpriced product remains visible but cannot win a proved comparable-cost optimum as zero.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-14",
+      "scenario": "PRICE_DATE_BOUNDARY",
+      "oracle": "Offer validity uses explicit instant and interval; expired/offline stock cannot become a current quote.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-15",
+      "scenario": "PACK_MOQ_TIERS",
+      "oracle": "Aggregate demand across circuits before pack/MOQ/increment/tier computation; report purchased surplus and installed quantity.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-16",
+      "scenario": "CURRENCY_TAX_ROUNDING",
+      "oracle": "Pin FX/currency/tax/rounding editions and cost scope; incompatible bases block cheapest claim.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-17",
+      "scenario": "PRICE_ONLY_REFRESH",
+      "oracle": "Offer change stales consumed economic proposal/report without changing technical selection or geometry.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-18",
+      "scenario": "CHEAPEST_DOES_NOT_FIT",
+      "oracle": "Reject cheap product whose complete body/service/accessory envelope fails ELV6; never offset fit failure with price.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-19",
+      "scenario": "MODULE_LABEL_NOT_GEOMETRY",
+      "oracle": "Module width alone cannot qualify depth/terminal/bend/removal fit; unknown geometry remains unresolved.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-20",
+      "scenario": "ACCESSORY_COMPATIBILITY_GRAPH",
+      "oracle": "Exact edition/interface pair evidence required; reject cycles, missing modules and duplicate shared accessory quantities.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-21",
+      "scenario": "BOARD_WHOLE_ASSEMBLY",
+      "oracle": "Main/bus/outgoing/N/PE/phase/reserve/accessory/thermal constraints checked on complete K0 candidate.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-22",
+      "scenario": "NORMAL_EMERGENCY_MODES",
+      "oracle": "Candidate must satisfy declared normal/emergency/source-transfer domains; missing qualified simulation remains blocked.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-23",
+      "scenario": "MULTI_OBJECTIVE_PARETO",
+      "oracle": "Explain objective vector and non-dominated proven-feasible candidates; no hidden weighted safety tradeoff.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-24",
+      "scenario": "BOUNDED_SEARCH_NOT_OPTIMUM",
+      "oracle": "Timeout/cancellation/first feasible solution cannot become NO_SOLUTION_PROVEN or OPTIMAL_PROVEN.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-25",
+      "scenario": "MANUAL_OVERRIDE_NOT_COMPLIANCE",
+      "oracle": "USER_OVERRIDE retains reasons and violations; human selection cannot green a failed mandatory constraint.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-26",
+      "scenario": "STALE_PROPOSAL_CAS",
+      "oracle": "Independent connections change design/selection/profile/trust generation after capture; reject stale apply atomically.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-27",
+      "scenario": "LEDGER_AFTER_FREEZE",
+      "oracle": "Replay same command/payload after freeze returns recorded outcome; different payload conflicts; new mutation rejected.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-28",
+      "scenario": "OWNER_TRANSACTION_FAULT",
+      "oracle": "Fault in any affected owner writer rolls back whole apply; unsupported shared UoW blocks full configuration apply.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-29",
+      "scenario": "REVALIDATE_REAL_DESIGN",
+      "oracle": "Trial candidate results cannot become CURRENT of applied project without real owner capture/publication.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-30",
+      "scenario": "MISSING_SEARCH_SELECTOR_GAIN",
+      "oracle": "Previously empty candidate scope gains product; economic proposal invalidated through selector membership.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-31",
+      "scenario": "COMPANY_POLICY_PRECEDENCE",
+      "oracle": "Company overlay cannot overwrite vendor facts or applicable mandatory normative constraints.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-32",
+      "scenario": "ROOM_MULTI_GANG_GEOMETRY",
+      "oracle": "K12 device/frame/backbox/door/wall constraints and real load bindings remain coherent under explicit acceptance.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-33",
+      "scenario": "SMART_PROTOCOL_TRANSPORT",
+      "oracle": "K13 Matter/Thread and KNX/DALI variants remain distinct typed bindings; unknown certification/firmware blocks required claims.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-34",
+      "scenario": "SMART_AVAILABILITY_AXES",
+      "oracle": "Electrical/control/communication failures and local/manual fallback remain separate; comfort cannot override life safety.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-35",
+      "scenario": "SMART_NO_SECRETS",
+      "oracle": "Catalogue/project/import/export contain no runtime pairing credentials, private keys or cloud tokens.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-36",
+      "scenario": "BROWNFIELD_UNCERTAIN_IDENTITY",
+      "oracle": "OCR/photo/nameplate match is an inferred candidate; installed identity and ratings need explicit evidence.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-37",
+      "scenario": "SHARE_REDACTION",
+      "oracle": "Read-only shared snapshot preserves technical reproducibility but obeys offer-term/source-license export policy.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-38",
+      "scenario": "IMPORT_RESOURCE_BOUNDS",
+      "oracle": "Oversize archives, path traversal, remote executable references and numeric bombs reject before activation.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-39",
+      "scenario": "ROLLBACK_REOPEN",
+      "oracle": "Migration restart/rollback and new-schema reader boundaries preserve old selection regression contracts.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "CAT-40",
+      "scenario": "REFERENCE_BUILDING",
+      "oracle": "Whole grid/transformer/MDB/MCC/motor/ELV/emergency target project produces deterministic selected BOM, audit and dossier when actual owners are qualified.",
+      "status": "PLANNED",
+      "executed": false
+    }
+  ],
+  "requiredWitnessFields": [
+    "sourceSha",
+    "testPath",
+    "testName",
+    "nonSkippedResult",
+    "catalogueManifestHash",
+    "technicalEditionHashes",
+    "offerManifestHash",
+    "projectRevision",
+    "consumedGenerations",
+    "persistedCommandOutcome",
+    "canonicalResultHash"
+  ],
+  "note": "These objectives need real fixtures and production runtime execution; design guard validates coverage and pins only."
+}

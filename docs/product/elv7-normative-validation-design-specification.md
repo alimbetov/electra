@@ -547,6 +547,14 @@ summary by deliverable scope
 
 ELV8 may use verified hard constraints to filter products but cannot reinterpret a violation as compliant. Product selection that changes technical facts triggers targeted revalidation.
 
+The [catalogue/configuration design proposal](component-catalog/README.md)
+extends that boundary with an independent local technical/offer store and
+project-owned adoption snapshots. It maps the target professional platform,
+including board synthesis, cost/Pareto optimization, room layout and automation.
+Product declarations are evidence, not approved normative rule packs. ELV7 source
+identity/profile/checker ownership stays canonical; installing a product database
+cannot automatically adopt norms, select products or grant statutory compliance.
+
 ## 19. Qualification requirements
 
 Runtime closure requires at least:

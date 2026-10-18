@@ -31,6 +31,102 @@ def pinned_file(sha, path):
     return subprocess.check_output(["git", "show", f"{sha}:{path}"], cwd=ROOT)
 
 
+def check_component_catalogue():
+    """Check the design handoff against real pinned target inventories."""
+    directory = ROOT / "docs/product/component-catalog"
+    manifest = json.loads((directory / "design-manifest.json").read_text())
+    plan = json.loads((directory / "acceptance-plan.json").read_text())
+    require(manifest["schema"] == "electra.component-catalog-design.v1" and
+            plan["schema"] == "electra.component-catalog-acceptance-plan.v1",
+            "Catalogue design schema drift")
+    require(manifest["status"] == "DESIGN_PROPOSAL" and
+            manifest["runtimeStatus"] == "NOT_STARTED" and
+            manifest["productionDataLoaded"] is False and
+            manifest["productionQualifiedFamilies"] == 0,
+            "Catalogue design cannot imply implemented data/runtime")
+    storage = manifest["storage"]
+    require(storage["catalogueDatabase"] == "electra-catalog.db" and
+            storage["projectDatabase"] == "EXISTING_APP_DATABASE" and
+            storage["crossDatabaseAtomicityAssumed"] is False and
+            storage["projectSnapshotsSelfContained"] is True and
+            storage["pricesInTechnicalHash"] is False and
+            storage["migrationVersionReserved"] is False,
+            "Catalogue/project/price ownership boundary drift")
+    families = manifest["families"]
+    unique([f["code"] for f in families], "catalogue family codes")
+    unique([f["technicalSchema"] for f in families], "catalogue technical schemas")
+    require(len(families) == 22, "Expected 22 planned product families")
+    for family in families:
+        require(family["requiredFacets"] and family["implementation"] == "NOT_STARTED" and
+                family["qualified"] is False, "Unsubstantiated family support")
+
+    upstreams = manifest["upstreams"]
+    unique([u["branch"] for u in upstreams], "catalogue handoff branches")
+    require({u["branch"] for u in upstreams} == {
+        "target/electra-professional-electrical-platform",
+        "feat/flutter-elv6-enclosure-layout-design", "feat/flutter-elv8-deliverables-design"},
+        "Missing catalogue upstream contract")
+    artifacts = {}
+    for upstream in upstreams:
+        require(re.fullmatch(r"[0-9a-f]{40}", upstream["sourceSha"]) and
+                upstream["authority"] == "DESIGN_ONLY_NOT_RUNTIME_ACCEPTANCE",
+                "Invalid catalogue source pin/authority")
+        unique([a["path"] for a in upstream["artifacts"]], "catalogue source paths")
+        for artifact in upstream["artifacts"]:
+            require(artifact["path"].startswith("docs/product/") and
+                    ".." not in Path(artifact["path"]).parts, "Unsafe catalogue upstream path")
+            raw = pinned_file(upstream["sourceSha"], artifact["path"])
+            require(hashlib.sha256(raw).hexdigest() == artifact["sha256"],
+                    f"Catalogue source fingerprint mismatch: {artifact['path']}")
+            artifacts[artifact["path"]] = raw
+    required_sources = {
+        "platformMappings": ("electra-professional-electrical-platform-target.json", "code", 21),
+        "killerMappings": ("electra-killer-capability-layer.json", "id", 14),
+        "smartBuildingMappings": ("electra-smart-building-home-automation-target.json", "id", 10),
+    }
+    for field, (filename, code_key, count) in required_sources.items():
+        source = json.loads(artifacts[f"docs/product/{filename}"])
+        mappings = manifest[field]
+        unique([m["code"] for m in mappings], field)
+        require(len(mappings) == count and {m["code"] for m in mappings} ==
+                {c[code_key] for c in source["capabilities"]}, f"Incomplete target mapping: {field}")
+        for mapping in mappings:
+            require(mapping["contribution"] and mapping["implementation"] == "NOT_STARTED",
+                    f"Missing design contribution or false runtime claim: {mapping['code']}")
+    smart = json.loads(artifacts["docs/product/electra-smart-building-home-automation-target.json"])
+    require(manifest["smartBuildingProtocolFamilies"] == smart["protocolFamilies"],
+            "Dropped or conflated smart-building protocol/transport family")
+    require(manifest["knownSourceDiscrepancies"], "Record target prose/machine inventory discrepancy")
+    require({"NO_CROSS_DATABASE_TRANSACTION_ASSUMPTION", "SELF_CONTAINED_PROJECT_ADOPTION",
+             "HARD_CONSTRAINTS_BEFORE_COST", "PRICE_ONLY_CHANGE_NO_TECHNICAL_MUTATION",
+             "ELV6_OWNS_REAL_LAYOUT", "ELV7_OWNS_NORMATIVE_CLAIMS", "ELV8_OWNS_SELECTION",
+             "NO_FALSE_OPTIMUM", "PROTOCOL_SEPARATE_FROM_TRANSPORT",
+             "POWER_CONTROL_COMMUNICATION_SEPARATE", "NO_SECRET_CREDENTIALS",
+             "NO_TARGET_ACCEPTANCE_INFERENCE"} <= set(manifest["requiredInvariants"]),
+            "Catalogue/configuration safety boundary missing")
+    require({p["code"] for p in manifest["implementationPackages"]} ==
+            {f"C{i}" for i in range(8)} and all(p["status"] == "NOT_STARTED"
+            for p in manifest["implementationPackages"]), "Catalogue package status drift")
+    cases = plan["cases"]
+    unique([c["id"] for c in cases], "catalogue planned case IDs")
+    unique([c["scenario"] for c in cases], "catalogue planned scenarios")
+    require(plan["evidenceScope"] == "DESIGN_ONLY" and plan["runtimeAccepted"] is False and
+            len(cases) == plan["plannedCaseCount"] == 40, "Catalogue qualification plan drift")
+    for case in cases:
+        require(case["oracle"] and case["status"] == "PLANNED" and case["executed"] is False,
+                "Planned catalogue case cannot certify runtime")
+    require({"CHEAPEST_DOES_NOT_FIT", "OWNER_TRANSACTION_FAULT", "PRICE_ONLY_REFRESH",
+             "PACK_MOQ_TIERS", "SMART_PROTOCOL_TRANSPORT", "BROWNFIELD_UNCERTAIN_IDENTITY",
+             "HISTORY_WITHOUT_CATALOGUE"} <= {c["scenario"] for c in cases},
+            "Missing critical catalogue acceptance objective")
+    for doc in directory.glob("*.md"):
+        for link in re.findall(r"\]\(([^)]+)\)", doc.read_text()):
+            if "://" not in link and not link.startswith("#"):
+                require((doc.parent / link.split("#")[0]).exists(), f"Broken catalogue link: {link}")
+    print("CATALOGUE DESIGN CONSISTENCY PASS: 22 planned families; "
+          "21 CAP / 14 K / 10 SH mappings; 40 PLANNED cases; no runtime acceptance.")
+
+
 def main():
     rules = load("rule-family-registry.json", "electra.elv7-rule-family-registry.v1")
     commands = load("command-registry.json", "electra.elv7-command-registry.v1")
@@ -150,6 +246,7 @@ def main():
                       "SUPPLY_RELIABILITY_CATEGORY", "ENCLOSURE_PROTECTION", "CIRCUIT_PURPOSE_GROUP",
                       "RESIDUAL_TIME_BEHAVIOUR"):
         require(namespace in protection, f"Missing classification namespace: {namespace}")
+    check_component_catalogue()
     print("ELV7 DESIGN CONSISTENCY PASS: 45 families; 27 mapped ELV5 processes; "
           "12 project commands; 364 PLANNED cases; 0 runtime-qualified families.")
 

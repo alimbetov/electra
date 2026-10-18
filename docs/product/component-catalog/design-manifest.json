@@ -1,0 +1,718 @@
+{
+  "schema": "electra.component-catalog-design.v1",
+  "status": "DESIGN_PROPOSAL",
+  "runtimeStatus": "NOT_STARTED",
+  "productionDataLoaded": false,
+  "productionQualifiedFamilies": 0,
+  "storage": {
+    "catalogueDatabase": "electra-catalog.db",
+    "projectDatabase": "EXISTING_APP_DATABASE",
+    "crossDatabaseAtomicityAssumed": false,
+    "projectSnapshotsSelfContained": true,
+    "pricesInTechnicalHash": false,
+    "legacySchemaAtAudit": 24,
+    "migrationVersionReserved": false
+  },
+  "upstreams": [
+    {
+      "branch": "target/electra-professional-electrical-platform",
+      "sourceSha": "9275c3546c1783055984ec7e656057f15a2bd6ec",
+      "authority": "DESIGN_ONLY_NOT_RUNTIME_ACCEPTANCE",
+      "artifacts": [
+        {
+          "path": "docs/product/electra-professional-electrical-platform-target.json",
+          "sha256": "21bfa7bc53075719d329c1832caf4a53e5e1cea96d984b4195c3e186ce58e9eb"
+        },
+        {
+          "path": "docs/product/electra-professional-electrical-platform-target.md",
+          "sha256": "344ddcd1b2fbe294e70caa1b5f726ddb6f539d835b911648c75098ed2e9685f6"
+        },
+        {
+          "path": "docs/product/electra-killer-capability-layer.json",
+          "sha256": "24eded603baee075f85ca8975f442fc61ab43b6b80d1eedd93611fde91af7241"
+        },
+        {
+          "path": "docs/product/electra-killer-capability-layer.md",
+          "sha256": "e5b2c1d6c55dfe785f871b1a4a04760abd454983edd29f8c55bfddd26e1f55a2"
+        },
+        {
+          "path": "docs/product/electra-smart-building-home-automation-target.json",
+          "sha256": "206d56aa03ef12954c9a2b9f1b043358e9fe74c89c0a3fde05808a32c248b483"
+        },
+        {
+          "path": "docs/product/electra-smart-building-home-automation-target.md",
+          "sha256": "56d3fd0c731ef8a17681798086c1b8a956033cd78b5263efebfb78e54de097b0"
+        }
+      ]
+    },
+    {
+      "branch": "feat/flutter-elv6-enclosure-layout-design",
+      "sourceSha": "ab59bb012689c91f371981ce712c81ba71bdae4f",
+      "authority": "DESIGN_ONLY_NOT_RUNTIME_ACCEPTANCE",
+      "artifacts": [
+        {
+          "path": "docs/product/elv6-implementation/code-level-runtime-contract.md",
+          "sha256": "691fa432298895f703afa051882a498b752a6e75f4cc00d7012f545e5781c9b4"
+        },
+        {
+          "path": "docs/product/elv6-implementation/normative-safety-evidence-contract.md",
+          "sha256": "8ba573b63d35740c2db73301d6812b1c93880cbddedad2637f3e3f6da1201db1"
+        }
+      ]
+    },
+    {
+      "branch": "feat/flutter-elv8-deliverables-design",
+      "sourceSha": "efeba9138dd1b918c1f4451ae878986c799b19e9",
+      "authority": "DESIGN_ONLY_NOT_RUNTIME_ACCEPTANCE",
+      "artifacts": [
+        {
+          "path": "docs/product/elv8-deliverables-design-specification.md",
+          "sha256": "4f6bdb02788c0dcb8d6142dd19a5bae8010269ab78bb24dc6f836d8aa5af7261"
+        }
+      ]
+    }
+  ],
+  "knownSourceDiscrepancies": [
+    {
+      "source": "electra-killer-capability-layer.md",
+      "detail": "Markdown inventory K0-K12/thirteen lags machine manifest K0-K13/fourteen; K13 has a separate source contract; parallel source not modified."
+    }
+  ],
+  "families": [
+    {
+      "code": "PROTECTION_MCB",
+      "requiredFacets": [
+        "ratedCurrent",
+        "poleArrangement",
+        "supplyDomain",
+        "tripEnvelope",
+        "interruptingCapacityDomain"
+      ],
+      "technicalSchema": "electra.catalogue-protection-mcb.v1",
+      "implementation": "NOT_STARTED",
+      "qualified": false
+    },
+    {
+      "code": "PROTECTION_MCCB_ACB",
+      "requiredFacets": [
+        "adjustableRelease",
+        "timeCurrentEnvelope",
+        "interruptingCapacityDomain",
+        "settingsEdition"
+      ],
+      "technicalSchema": "electra.catalogue-protection-mccb-acb.v1",
+      "implementation": "NOT_STARTED",
+      "qualified": false
+    },
+    {
+      "code": "RESIDUAL_PROTECTION",
+      "requiredFacets": [
+        "residualWaveformType",
+        "residualTimeBehaviour",
+        "sensitivity",
+        "shortCircuitCoordination"
+      ],
+      "technicalSchema": "electra.catalogue-residual-protection.v1",
+      "implementation": "NOT_STARTED",
+      "qualified": false
+    },
+    {
+      "code": "FUSES",
+      "requiredFacets": [
+        "utilizationClass",
+        "timeCurrentEnvelope",
+        "letThroughEnergy",
+        "holderCompatibility"
+      ],
+      "technicalSchema": "electra.catalogue-fuses.v1",
+      "implementation": "NOT_STARTED",
+      "qualified": false
+    },
+    {
+      "code": "SPD",
+      "requiredFacets": [
+        "testType",
+        "supplyEarthingDomain",
+        "voltageProtectionDomain",
+        "dischargeCapability",
+        "backupProtection"
+      ],
+      "technicalSchema": "electra.catalogue-spd.v1",
+      "implementation": "NOT_STARTED",
+      "qualified": false
+    },
+    {
+      "code": "SWITCHING_CONTACTORS",
+      "requiredFacets": [
+        "utilizationDomain",
+        "contactRatings",
+        "coilSupply",
+        "interlockCompatibility"
+      ],
+      "technicalSchema": "electra.catalogue-switching-contactors.v1",
+      "implementation": "NOT_STARTED",
+      "qualified": false
+    },
+    {
+      "code": "SOURCE_TRANSFORMER",
+      "requiredFacets": [
+        "ratings",
+        "windingConnection",
+        "impedanceEvidence",
+        "losses",
+        "operatingDomain"
+      ],
+      "technicalSchema": "electra.catalogue-source-transformer.v1",
+      "implementation": "NOT_STARTED",
+      "qualified": false
+    },
+    {
+      "code": "SOURCE_GENERATOR",
+      "requiredFacets": [
+        "ratings",
+        "operatingDomain",
+        "faultContributionEvidence",
+        "startCapability",
+        "interfaces"
+      ],
+      "technicalSchema": "electra.catalogue-source-generator.v1",
+      "implementation": "NOT_STARTED",
+      "qualified": false
+    },
+    {
+      "code": "SOURCE_UPS_BESS_INVERTER",
+      "requiredFacets": [
+        "sourceModes",
+        "powerEnergyCapability",
+        "transferBehaviour",
+        "electricalInterfaces",
+        "batteryCompatibility"
+      ],
+      "technicalSchema": "electra.catalogue-source-ups-bess-inverter.v1",
+      "implementation": "NOT_STARTED",
+      "qualified": false
+    },
+    {
+      "code": "SOURCE_ATS",
+      "requiredFacets": [
+        "poleArrangement",
+        "ratings",
+        "transitionCapability",
+        "interlockEvidence",
+        "controlInterfaces"
+      ],
+      "technicalSchema": "electra.catalogue-source-ats.v1",
+      "implementation": "NOT_STARTED",
+      "qualified": false
+    },
+    {
+      "code": "CABLE_CONDUCTOR_BUSDUCT",
+      "requiredFacets": [
+        "conductorGeometry",
+        "materialInsulation",
+        "electricalThermalData",
+        "installationDomain",
+        "fireClassification"
+      ],
+      "technicalSchema": "electra.catalogue-cable-conductor-busduct.v1",
+      "implementation": "NOT_STARTED",
+      "qualified": false
+    },
+    {
+      "code": "ENCLOSURE_BOARD_MCC",
+      "requiredFacets": [
+        "busAndWayCapability",
+        "physicalDefinition",
+        "mountingSurfaces",
+        "supportCapabilities",
+        "integrityEvidence"
+      ],
+      "technicalSchema": "electra.catalogue-enclosure-board-mcc.v1",
+      "implementation": "NOT_STARTED",
+      "qualified": false
+    },
+    {
+      "code": "MOUNTING_WIRING_ACCESSORY",
+      "requiredFacets": [
+        "interfaces",
+        "physicalDefinition",
+        "capacityDomain",
+        "compatibleEditions"
+      ],
+      "technicalSchema": "electra.catalogue-mounting-wiring-accessory.v1",
+      "implementation": "NOT_STARTED",
+      "qualified": false
+    },
+    {
+      "code": "MOTOR_DRIVE",
+      "requiredFacets": [
+        "ratedElectricalDomain",
+        "startingOperatingDomain",
+        "controlInterfaces",
+        "driveMotorCompatibility"
+      ],
+      "technicalSchema": "electra.catalogue-motor-drive.v1",
+      "implementation": "NOT_STARTED",
+      "qualified": false
+    },
+    {
+      "code": "LIGHTING_DRIVER",
+      "requiredFacets": [
+        "loadDomain",
+        "mountingDefinition",
+        "driverCompatibility",
+        "controlCapability",
+        "emergencySupplyCapability"
+      ],
+      "technicalSchema": "electra.catalogue-lighting-driver.v1",
+      "implementation": "NOT_STARTED",
+      "qualified": false
+    },
+    {
+      "code": "SOCKET_SWITCH_ROOM_DEVICE",
+      "requiredFacets": [
+        "loadContactDomain",
+        "mountingDefinition",
+        "gangFrameCompatibility",
+        "controlInterfaces"
+      ],
+      "technicalSchema": "electra.catalogue-socket-switch-room-device.v1",
+      "implementation": "NOT_STARTED",
+      "qualified": false
+    },
+    {
+      "code": "CCTV",
+      "requiredFacets": [
+        "imagingStreamCapability",
+        "powerInterface",
+        "networkInterface",
+        "recordingCompatibility",
+        "physicalDefinition"
+      ],
+      "technicalSchema": "electra.catalogue-cctv.v1",
+      "implementation": "NOT_STARTED",
+      "qualified": false
+    },
+    {
+      "code": "LAN",
+      "requiredFacets": [
+        "mediaPortCapability",
+        "powerPoECapability",
+        "capacityDomain",
+        "transceiverCompatibility",
+        "physicalDefinition"
+      ],
+      "technicalSchema": "electra.catalogue-lan.v1",
+      "implementation": "NOT_STARTED",
+      "qualified": false
+    },
+    {
+      "code": "ACS",
+      "requiredFacets": [
+        "controlIOCapability",
+        "lockReaderInterfaces",
+        "powerStates",
+        "failSafeDomain",
+        "physicalDefinition"
+      ],
+      "technicalSchema": "electra.catalogue-acs.v1",
+      "implementation": "NOT_STARTED",
+      "qualified": false
+    },
+    {
+      "code": "FIRE",
+      "requiredFacets": [
+        "addressLoopCapability",
+        "normalAlarmPower",
+        "notificationInterfaces",
+        "approvedCombinationEvidence",
+        "physicalDefinition"
+      ],
+      "technicalSchema": "electra.catalogue-fire.v1",
+      "implementation": "NOT_STARTED",
+      "qualified": false
+    },
+    {
+      "code": "AUTOMATION_CONTROLLER_GATEWAY",
+      "requiredFacets": [
+        "controlPointCapabilities",
+        "protocolBindings",
+        "transportBindings",
+        "busPowerChannelCapability",
+        "localFallbackEvidence"
+      ],
+      "technicalSchema": "electra.catalogue-automation-controller-gateway.v1",
+      "implementation": "NOT_STARTED",
+      "qualified": false
+    },
+    {
+      "code": "AUTOMATION_SENSOR_ACTUATOR",
+      "requiredFacets": [
+        "sensorActuatorDomain",
+        "loadControlCapability",
+        "protocolBindings",
+        "transportBindings",
+        "powerDemand",
+        "physicalDefinition"
+      ],
+      "technicalSchema": "electra.catalogue-automation-sensor-actuator.v1",
+      "implementation": "NOT_STARTED",
+      "qualified": false
+    }
+  ],
+  "facetPolicy": "Facet applicability is resolved by exact functional role and family schema; absent mandatory facts are UNKNOWN. Registered fields alone confer no supported checker.",
+  "platformMappings": [
+    {
+      "code": "CAP-01",
+      "name": "Project Model",
+      "contribution": "Immutable adopted editions and self-contained snapshots; shared revision/command/freeze owner remains canonical",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "CAP-02",
+      "name": "Electrical Topology",
+      "contribution": "Typed terminals/ports, phase/neutral/PE semantics and internal connection capability; project topology supplies actual connections",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "CAP-03",
+      "name": "Sources and Transformation",
+      "contribution": "Transformer/generator/UPS/battery/BESS/PV-inverter/ATS variant ratings, impedance/source capability evidence, transfer/control interfaces; grid study is owner input, not fabricated SKU data",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "CAP-04",
+      "name": "Loads and Demand",
+      "contribution": "Rated power/current, power factor/efficiency domains, demand/operating-mode evidence; project profiles own diversity, priority and actual demand",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "CAP-05",
+      "name": "Switchboards Panelboards MCC",
+      "contribution": "Bus/incomer/outgoing capacity, N/PE terminal capability, pole arrangement, kits and exact physical definitions; ELV6 owns placements",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "CAP-06",
+      "name": "Cables Conductors Containment",
+      "contribution": "Material, insulation, cross-section, loaded conductor basis, N/PE/PEN, resistance/thermal data, installation-domain references; no unverified ampacity from a marketing string",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "CAP-07",
+      "name": "Core Electrical Calculations",
+      "contribution": "Dimensioned, condition-bound parameter evidence for accepted electrical kernels; no formulas hidden in SKUs",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "CAP-08",
+      "name": "Protection and Coordination",
+      "contribution": "B/C/D and typed residual/fuse classes, complete release/TCC/energy and coordination evidence, exact pair/conditions",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "CAP-09",
+      "name": "Motors and Drives",
+      "contribution": "Motor/load curves, startup modes, duty, VFD/soft-starter settings and compatible starter/overload accessories; electrical owner calculates start/fault effects",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "CAP-10",
+      "name": "Earthing Bonding SPD",
+      "contribution": "PE/PEN terminal, bonding and SPD type/system/impulse/interface evidence; actual earthing arrangement and electrode tests are project facts",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "CAP-11",
+      "name": "Lighting and Small Power",
+      "contribution": "Luminaires, drivers, sockets, switches, multi-gang compatibility, emergency supply interfaces and physical footprints; no inferred lux coverage",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "CAP-12",
+      "name": "ELV CCTV LAN ACS FIRE",
+      "contribution": "CCTV/LAN/ACS/FIRE typed facets and exact power/media/mounting/accessory compatibility, shared with existing ELV2–ELV5 identities",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "CAP-13",
+      "name": "Operating Scenarios",
+      "contribution": "Product operating-domain envelopes, ATS timing/interlock capability and source/control failure behavior; versioned project scenario engine owns execution",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "CAP-14",
+      "name": "Reliability and Failure Analysis",
+      "contribution": "Redundancy interface/independence constraints and provenance-qualified reliability data when available; no invented MTBF or uptime from a brand",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "CAP-15",
+      "name": "Normative Validation",
+      "contribution": "Exact standards/product declaration references and applicability context; ELV7 verifies rules/claims",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "CAP-16",
+      "name": "Equipment Selection",
+      "contribution": "Candidate technical/physical/offer snapshots; AUTO_SELECTED / USER_SELECTED / USER_OVERRIDE reason, alternatives and explainable eligibility",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "CAP-17",
+      "name": "Single Line Diagram",
+      "contribution": "Versioned symbol/terminal/rating bindings; diagram is a project topology view, not catalogue connectivity truth",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "CAP-18",
+      "name": "Automatic Project Audit",
+      "contribution": "Missing/untrusted/stale/obsolete/revoked/counterfeit-suspect identity findings; remediation candidates, never silent auto-fix",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "CAP-19",
+      "name": "Professional Deliverables",
+      "contribution": "Equipment descriptions, quantities/units, accessories, installation pricing and selected snapshots for BOM/schedules/dossier; source model owns takeoff",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "CAP-20",
+      "name": "Collaboration and Sharing",
+      "contribution": "Embed exact selected technical/evidence closure in immutable shared revisions; exclude private supplier terms and restricted files under explicit export policy",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "CAP-21",
+      "name": "Field Verification and Commissioning",
+      "contribution": "Compare installed manufacturer/variant/serial evidence to designed edition, track inspection/test references; inspection records never mutate catalogue definitions",
+      "implementation": "NOT_STARTED"
+    }
+  ],
+  "killerMappings": [
+    {
+      "code": "K0",
+      "name": "Automatic Switchboard Synthesis",
+      "contribution": "Whole board variant incl. incomer/bus/N/PE/protection/accessories/reserve, phase policy and verified ELV6 fit; finalized circuit requirements first",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "K1",
+      "name": "Project Autopilot",
+      "contribution": "Requirement-driven architecture candidates with explicit source/asset needs; no SKU-driven topology mutation; actual topology/scenario kernels remain prerequisites",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "K2",
+      "name": "Engineering Audit + Auto-Fix",
+      "contribution": "Alternative technical editions/kits, dependency impact and complete validation before reviewed apply",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "K3",
+      "name": "Failure X-Ray",
+      "contribution": "Control/power dependencies of supplies/gateways/accessories exposed to failure owner; no failure propagation invented by catalogue",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "K4",
+      "name": "Revision Impact Intelligence",
+      "contribution": "Differentiate technical, geometry, source-trust, compatibility and offer changes with affected scope and preserved historic selections",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "K5",
+      "name": "Multi-Objective Design Optimizer",
+      "contribution": "Explicit objective vectors and Pareto frontier for comparable proven-feasible alternatives; weights/units and dominance semantics visible; no false global optimum",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "K6",
+      "name": "Critical Power Simulator",
+      "contribution": "Exact normal/emergency/source-transfer operating capability and setting editions; electrical state and time simulation remains owner-produced",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "K7",
+      "name": "As-Built / Commissioning Twin",
+      "contribution": "Designed/installed/verified/commissioned evidence separate; same-looking vendor label does not prove equivalent rating or installed identity",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "K8",
+      "name": "Vendor-Neutral Equipment Optimizer",
+      "contribution": "Requirements before products; strict eligible set then complete cost/ranking; optional brand policy never weakens physical/normative facts",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "K9",
+      "name": "Company Engineering Rules",
+      "contribution": "Versioned project/company overlays, preferred patterns and allowlists; no edits to vendor edition or override of mandatory law",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "K10",
+      "name": "Brownfield Reconstruction",
+      "contribution": "Preserve UNKNOWN/INFERRED/OBSERVED/VERIFIED identity and parameter evidence; partial nameplate/OCR is a candidate, not an authoritative product mapping",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "K11",
+      "name": "Explainable Engineering Copilot",
+      "contribution": "Read-only grounded lookup/explanation and proposed commands tied to edition/source; AI-generated product facts never enter approved data without validation",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "K12",
+      "name": "Smart Room Electrical Layout",
+      "contribution": "Family-specific footprint, mounting surface, allowed orientations, physical grouping, switch/socket compatibility and supply/control interfaces; room/door/window/guide coordinates remain geometry-owner facts",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "K13",
+      "name": "Smart Building & Home Automation Designer",
+      "contribution": "Protocol-agnostic sensor/actuator/controller capabilities, distinct protocol/transport and power/control/communication dependencies; design and commissioning data only",
+      "implementation": "NOT_STARTED"
+    }
+  ],
+  "smartBuildingMappings": [
+    {
+      "code": "SH-01",
+      "name": "Automation topology",
+      "contribution": "Controller/gateway/sensor/actuator roles, compatible port/segment schema, bus supply demand and declared channel capacities",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "SH-02",
+      "name": "Electrical-load binding",
+      "contribution": "Real electrical load refs, actuator contact/dimming/starting-load domain and separately versioned control capability; no double-counted smart-device load",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "SH-03",
+      "name": "Lighting automation / DALI",
+      "contribution": "Exact DALI family/capabilities, control gear/device distinction, bus power/address/group capacity and evidence; no global hard-coded bus limits",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "SH-04",
+      "name": "KNX engineering",
+      "contribution": "Exact transport/interface, supply/line/coupler demand/capability, typed addressing profile; no automatic equivalence of Classic/IP/Secure/IoT",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "SH-05",
+      "name": "Matter / Thread / Zigbee / Z-Wave / Wi-Fi / PLC-IoT",
+      "contribution": "Separate protocol and transport editions, regional radio applicability, frequency/power/product variant and gateway/bridge dependencies; Matter is not equated to Thread",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "SH-06",
+      "name": "Scenes and control logic",
+      "contribution": "Supported control-point types/ranges, command/fallback/manual-override capability; project scenes and priorities belong to automation owner",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "SH-07",
+      "name": "Automation failure simulation",
+      "contribution": "Distinct electrical, control and communication availability; gateway/cloud/local dependencies explicit, unknown fallback not assumed",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "SH-08",
+      "name": "Smart Room Wizard",
+      "contribution": "Room-role matching to typed sensors/actuators/control bindings and complete accessory power/space demand; candidates before mutation",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "SH-09",
+      "name": "Control / I-O matrices",
+      "contribution": "Channel, sensor/actuator/control-point and terminal definitions for I/O/KNX/DALI/commissioning schedules",
+      "implementation": "NOT_STARTED"
+    },
+    {
+      "code": "SH-10",
+      "name": "Automation Audit",
+      "contribution": "Missing address/channel/gateway/fallback/security/commissioning facts become visible obligations; life-safety overrides comfort policy",
+      "implementation": "NOT_STARTED"
+    }
+  ],
+  "smartBuildingProtocolFamilies": [
+    "KNX_CLASSIC",
+    "KNX_IP",
+    "KNX_SECURE",
+    "KNX_IOT",
+    "DALI_2",
+    "D4I",
+    "DALI_PLUS",
+    "MATTER",
+    "THREAD",
+    "ZIGBEE",
+    "ZWAVE",
+    "ZWAVE_LONG_RANGE",
+    "WIFI",
+    "PLC_IOT",
+    "MODBUS_RTU",
+    "MODBUS_TCP",
+    "BACNET_IP"
+  ],
+  "requiredInvariants": [
+    "REUSE_EXISTING_MANUFACTURER_IDENTITIES",
+    "IMMUTABLE_TECHNICAL_EDITIONS",
+    "INDEPENDENT_OFFER_EDITIONS",
+    "TYPED_PARAMETER_SCHEMAS",
+    "UNKNOWN_IS_NOT_ZERO",
+    "ELV6_OWNS_REAL_LAYOUT",
+    "ELV7_OWNS_NORMATIVE_CLAIMS",
+    "ELV8_OWNS_SELECTION",
+    "NO_CROSS_DATABASE_TRANSACTION_ASSUMPTION",
+    "SELF_CONTAINED_PROJECT_ADOPTION",
+    "REQUIREMENTS_BEFORE_VENDOR",
+    "HARD_CONSTRAINTS_BEFORE_COST",
+    "COMPLETE_ACCESSORY_CLOSURE",
+    "NO_FALSE_OPTIMUM",
+    "REVIEW_BEFORE_MUTATION",
+    "ATOMIC_PROJECT_APPLY",
+    "PRICE_ONLY_CHANGE_NO_TECHNICAL_MUTATION",
+    "PROTOCOL_SEPARATE_FROM_TRANSPORT",
+    "POWER_CONTROL_COMMUNICATION_SEPARATE",
+    "LIFE_SAFETY_BEFORE_COMFORT",
+    "NO_SECRET_CREDENTIALS",
+    "OFFLINE_HISTORICAL_REPLAY",
+    "NO_TARGET_ACCEPTANCE_INFERENCE"
+  ],
+  "implementationPackages": [
+    {
+      "code": "C0",
+      "status": "NOT_STARTED"
+    },
+    {
+      "code": "C1",
+      "status": "NOT_STARTED"
+    },
+    {
+      "code": "C2",
+      "status": "NOT_STARTED"
+    },
+    {
+      "code": "C3",
+      "status": "NOT_STARTED"
+    },
+    {
+      "code": "C4",
+      "status": "NOT_STARTED"
+    },
+    {
+      "code": "C5",
+      "status": "NOT_STARTED"
+    },
+    {
+      "code": "C6",
+      "status": "NOT_STARTED"
+    },
+    {
+      "code": "C7",
+      "status": "NOT_STARTED"
+    }
+  ]
+}
