@@ -39,6 +39,15 @@ void main() {
         },
       );
 
+      // A deleted mutable root may legitimately retain its old children.
+      // New-revision restoration must preserve that state without bypassing
+      // the normal active-parent insertion guard.
+      final deletedAt =
+          Elv5F2ProductionLifecycle.now().millisecondsSinceEpoch ~/ 1000;
+      await db.customStatement(
+        "UPDATE link_composition_bindings SET deleted_at=? WHERE design_revision_id='d'",
+        [deletedAt],
+      );
       expect(
         await _revision(db).freeze(_freeze(2)),
         isA<ElvCommandSuccess<ProjectDesignRevision>>(),
@@ -110,6 +119,7 @@ void main() {
               )
               .getSingle();
       expect(assignment.read<String>('binding_id'), root.read<String>('id'));
+      expect(root.read<int>('deleted_at'), deletedAt);
       final traversal =
           await db
               .customSelect(

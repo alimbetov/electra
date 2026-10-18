@@ -138,6 +138,7 @@ final class DriftElv5SnapshotMaterializer {
       await _insert('elv_revision_aggregate_evidence_records', row);
       editions[oldRef] = {'ref': ref, 'hash': hash};
     }
+    final tombstones = <({String table, String id, Object deletedAt})>[];
     for (final table in elv5DisciplineAspectTables) {
       for (final original in rows(table)) {
         final row = Map<String, Object?>.from(original);
@@ -146,6 +147,17 @@ final class DriftElv5SnapshotMaterializer {
         if (row.containsKey('id')) row['id'] = roots[table]![row['id']];
         if (_parents.containsKey(table))
           row['binding_id'] = roots[_parents[table]]![row['binding_id']];
+        // Existing child rows may belong to a tombstoned source root. Restore
+        // their parent first, then restore its tombstone before this enclosing
+        // create-next transaction becomes visible. Keep the normal child guard.
+        if (roots.containsKey(table) && row['deleted_at'] != null) {
+          tombstones.add((
+            table: table,
+            id: row['id']! as String,
+            deletedAt: row['deleted_at']!,
+          ));
+          row['deleted_at'] = null;
+        }
         if (row.containsKey('revision')) row['revision'] = 1;
         for (final key in ['created_at', 'updated_at']) {
           if (row.containsKey(key))
@@ -179,6 +191,13 @@ final class DriftElv5SnapshotMaterializer {
         }
         await _insert(table, row);
       }
+    }
+    for (final tombstone in tombstones) {
+      await runRawStatement(
+        database,
+        'UPDATE ${tombstone.table} SET deleted_at=? WHERE project_id=? AND design_revision_id=? AND id=?',
+        [tombstone.deletedAt, projectId, revisionId, tombstone.id],
+      );
     }
   }
 
