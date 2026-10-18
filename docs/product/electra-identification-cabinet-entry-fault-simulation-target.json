@@ -5,6 +5,7 @@
   "scope": [
     "ENGINEERING_IDENTIFICATION_AND_MARKING",
     "CABINET_CABLE_ENTRY_AND_INTERNAL_ROUTING",
+    "TWO_D_PANEL_CABINET_EDITOR",
     "ELECTRICAL_DISTURBANCE_AND_FAULT_SIMULATION"
   ],
   "relatedCapabilities": [
@@ -13,10 +14,12 @@
     "CAP-07",
     "CAP-08",
     "CAP-13",
+    "CAP-16",
     "CAP-17",
     "CAP-19",
     "CAP-21",
     "K0",
+    "K2",
     "K3",
     "K6",
     "K7"
@@ -99,8 +102,39 @@
     "editorViews": [
       "PHYSICAL",
       "ELECTRICAL",
-      "WIRING"
-    ]
+      "WIRING",
+      "CABLE_ENTRY_ROUTING",
+      "VALIDATION"
+    ],
+    "editorContract": "electra-2d-panel-cabinet-editor-target.json"
+  },
+  "twoDPanelEditor": {
+    "document": "electra-2d-panel-cabinet-editor-target.md",
+    "machineRegistry": "electra-2d-panel-cabinet-editor-target.json",
+    "status": "TARGET_NOT_IMPLEMENTATION_NOT_ACCEPTANCE",
+    "canonicalUnit": "MILLIMETRE",
+    "principle": "Graphical edits modify typed engineering placement/routing facts and must re-run validation; pixels are not an independent source of truth.",
+    "views": [
+      "PHYSICAL",
+      "ELECTRICAL",
+      "WIRING",
+      "CABLE_ENTRY_ROUTING",
+      "VALIDATION"
+    ],
+    "firstProfessionalWorkflow": [
+      "FRONT_VIEW_2D_ENCLOSURE",
+      "DIN_RAILS",
+      "BREAKERS_AND_DEVICES",
+      "TERMINALS",
+      "NEUTRAL_PE_BARS",
+      "WIRING_DUCTS",
+      "CABLE_ENTRY_ZONES",
+      "DETERMINISTIC_DRAG_SNAP",
+      "CAPACITY_OVERLAP_FIT_VALIDATION",
+      "K0_PREVIEW_EDIT_REVALIDATE",
+      "DETERMINISTIC_PDF_EXPORT"
+    ],
+    "threeDDeferred": true
   },
   "simulation": {
     "levels": [
@@ -192,11 +226,13 @@
   "ownership": {
     "CABLE_IDENTITY_ROUTE": "CAP-06_EXISTING_CABLE_OWNER",
     "PANEL_PHYSICAL_LAYOUT": "ELV6_CAP-05",
+    "PANEL_2D_EDITOR": "ELV6_CAP-05_VIEW_EDIT_LAYER",
     "CABINET_ENTRY_INTERNAL_ROUTE": "ELV6_PHYSICAL_EVIDENCE_SPECIALIZATION",
     "NORMATIVE_ENTRY_SEGREGATION": "ELV7_CAP-15",
     "CATALOG_SKU": "ELV8_CAP-16",
     "LABEL_QR_DELIVERABLE": "CAP-19_CAP-21",
     "AUTO_PANEL_SYNTHESIS": "K0",
+    "AUTO_FIX_LAYOUT": "K2",
     "FAILURE_PROPAGATION": "K3",
     "CRITICAL_POWER_TIMELINE": "K6",
     "FIELD_COMMISSIONING": "K7",
@@ -205,11 +241,13 @@
   "invariants": [
     "SAME_FROZEN_REVISION_POLICY_TEMPLATE_SAME_MARKER_PROJECTION",
     "SAME_FROZEN_TOPOLOGY_INPUT_ALGORITHM_RULESET_SAME_SIMULATION_RESULT",
+    "SAME_FROZEN_LAYOUT_CATALOG_RULESET_SAME_2D_PANEL_FINGERPRINT",
     "LABEL_CHANGE_INVALIDATES_MARKER_DRAWING_SCHEDULE_PROJECTIONS",
     "TERMINATION_OR_ENTRY_CHANGE_INVALIDATES_CABINET_ROUTES_AND_DELIVERABLES",
     "TOPOLOGY_SOURCE_PROTECTION_CHANGE_INVALIDATES_DEPENDENT_STUDIES",
     "UNKNOWN_MANDATORY_INPUTS_FAIL_VISIBLY",
     "GRAPHICAL_EDITS_NEVER_BYPASS_VALIDATION",
+    "FREEHAND_PIXELS_NEVER_BECOME_ENGINEERING_TRUTH",
     "FROZEN_HISTORY_REMAINS_REPRODUCIBLE"
   ],
   "recommendedDeliveryOrder": [
@@ -218,7 +256,7 @@
     "A3_QR_FIELD_IDENTITY_K7",
     "A4_CABINET_CABLE_ENTRY_ZONE",
     "A5_INTERNAL_ROUTE_AND_PHYSICAL_VALIDATION",
-    "A6_PANEL_EDITOR_ENTRY_ROUTING_VISUALIZATION",
+    "A6_2D_PANEL_CABINET_EDITOR",
     "A7_SHORT_CIRCUIT_ENGINE_MIN_MAX",
     "A8_PROTECTION_RESPONSE",
     "A9_VOLTAGE_DISTURBANCE_AND_MOTOR_START",
