@@ -2,13 +2,13 @@
 
 Status: DESIGN HARDENED / ALL ELV7 RUNTIME PACKAGES OPEN
 Branch: `feat/flutter-elv7-normative-validation-design`
-ELV6 design baseline at audit: `f5cc382942225d340b54461f37a9efd8d280f814`
+ELV6 provisional design inspected for this contract: `4778dae76a0315ab8bc04c9d63a3ac666aa9674d`
 Specification: [design](elv7-normative-validation-design-specification.md).
 Normative architecture baseline: [ELV Normative Standards Matrix](elv-normative-standards-matrix.md).
 
 | Package | Scope | Mandatory outputs | Depends on |
 |---|---|---|---|
-| P0 | Baseline/provenance audit | accepted ELV6/schema/API inventory; standards-matrix field/enum reconciliation; upstream fact projection; official-source verification governance | Accepted ELV1–ELV6 + standards matrix |
+| P0 | Baseline/provenance audit | actual upstream acceptance/schema/API inventory; standards-matrix field/enum reconciliation; upstream fact projection; official-source verification governance | Exact main + pinned provisional ELV6 contract + standards matrix |
 | P1 | Canonical profile/rule identity | one `NormativeProfile` model; StandardReference/source lifecycle; existing rule classes; precedence; immutable editions; checker/provider registry | P0 |
 | P2 | Persistence and command lifecycle | additive/reuse schema map; exact command registry; replay/UoW/history; explicit profile adoption; freeze/create-next hooks | P1 + shared runtime |
 | P3 | Applicability, precedence and pure validation | applicability resolver; typed checkers; declared facts; rule composition/precedence; deterministic aggregate semantics | P1/P2 |
@@ -27,7 +27,7 @@ P0 must produce source-reality evidence before any production rule pack starts:
 - every ELV2–ELV6 fact ELV7 may consume, including owner, identity, unit, projection version and stale semantics;
 - exact mapping from existing `NormativeProfile`, `StandardReference`, precedence, lifecycle and rule-class concepts in `elv-normative-standards-matrix.md` to executable types;
 - proof that no second competing normative profile taxonomy exists;
-- governance for `FICTIONAL`, `PROJECT_AUTHORED`, `UNVERIFIED_EXTERNAL`, `VERIFIED_EXTERNAL`, `RETIRED` source verification states;
+- governance for existing `FICTIONAL`, `PROJECT_AUTHORED`, `UNVERIFIED_EXTERNAL`, `VERIFIED_EXTERNAL` provenance/verification values; separate retirement/revocation lifecycle and an explicit decoder for legacy `RETIRED` records;
 - official-source verification procedure for production rule packs, including edition/status/effective-date/applicability evidence;
 - licensing/file-storage boundary for standards material.
 
@@ -197,7 +197,7 @@ Default runtime sequence: P0 → P1 → P2 → P3 → P4/P5 → P6 → P7 → P8
 | P5 | empty/missing/member selector dependencies, all upstream generation CAS, batch closure and immutable result publication |
 | P6 | reviews/deviations with authority/expiry/fingerprint checks; mandatory violations never become green through disposition |
 | P7 | separate B/C/D and RCD selectors, minimum/maximum Ik and limiting-time inspector, what-if, coverage and profile impact UX |
-| P8 | expand and execute 362 planned scenarios, Q0–Q9 including unchanged upstream acceptance and freeze regressions |
+| P8 | expand and execute 364 planned scenarios, Q0–Q9 including unchanged upstream acceptance and freeze regressions |
 | P9 | exact-SHA non-skipped witness matrix, verified-source coverage, actual unsupported/manual-only limits, ELV8 contract |
 
 The [implementation package](elv7-implementation/README.md) is mandatory for these

@@ -105,7 +105,7 @@ verifiedBy?
 verifiedAt?
 ```
 
-`verificationStatus` minimum:
+Existing provenance/verification vocabulary to reconcile without breaking decoders:
 
 ```text
 FICTIONAL
@@ -115,7 +115,16 @@ VERIFIED_EXTERNAL
 RETIRED
 ```
 
-`VERIFIED_EXTERNAL` means provenance/edition mapping has been reviewed according to product governance. It is not by itself a legal guarantee.
+`RETIRED` is a legacy mixed lifecycle value, not proof of past verification.
+P1 separates provenance/verification from publication, retirement and revocation
+events with an explicit compatibility mapping; unknown prior approval remains
+unknown. Published identities and old approval records are never rewritten.
+
+`VERIFIED_EXTERNAL` requires source/edition, applicability, interpretation,
+checker qualification and approval evidence under the declared release policy.
+It is not by itself a legal guarantee. A known revocation or expired authority
+invalidates a CURRENT claim independently of optional adoption of a new source
+edition. Historical as-of results and later source knowledge remain separate.
 
 ### 4.3 Normative profile edition
 
@@ -592,7 +601,7 @@ The [implementation package](elv7-implementation/README.md) hardens this design:
 - immutable profile/source identities reconciled with existing normative/protection code;
 - exact commands, coverage/negative selectors, atomic publication and append-only freeze;
 - provisional ELV6 24-process/safety evidence handoff, without declaring runtime implemented;
-- 362 planned qualification scenarios and Q0–Q9 source/runtime evidence gates.
+- 364 planned qualification scenarios and Q0–Q9 source/runtime evidence gates.
 
 Within these subjects the detailed dossiers supersede less precise language in
 this design draft. No runtime, production pack approval or legal certification

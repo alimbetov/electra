@@ -11,7 +11,7 @@ Status: DESIGN HARDENED / RUNTIME NOT STARTED / NO VERIFIED PRODUCTION PACKS.
 | [Upstream handoff](upstream-handoff-contract.md) | Main/ELV5 reality, provisional ELV6 evidence and ownership |
 | [Baseline pins](baseline-and-handoff.json) | Exact source SHA/schema/ELV6 contract fingerprints |
 | [Source review](source-review-notes.md) | Primary-source observations and unverified release obligations |
-| [Qualification plan](qualification-plan.json) | 362 planned scenarios, Q0–Q9 witness fields, zero executed qualifications |
+| [Qualification plan](qualification-plan.json) | 364 planned scenarios, Q0–Q9 witness fields, zero executed qualifications |
 
 Run `python3 scripts/ci/check-elv7-design-contract.py` for design consistency.
 It checks registry coverage, namespaces, command boundaries, source/status

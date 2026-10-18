@@ -3,7 +3,7 @@
   "evidenceScope": "DESIGN_ONLY",
   "runtimeAccepted": false,
   "qualifiedFamilies": 0,
-  "plannedCaseCount": 362,
+  "plannedCaseCount": 364,
   "cases": [
     {
       "id": "NRM-01-SAT",
@@ -2851,6 +2851,22 @@
       "id": "ELV7-GOVERNANCE-11",
       "scenario": "LICENSED_SOURCE_NOT_EMBEDDED",
       "gate": "Q0",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-GOVERNANCE-12",
+      "scenario": "SOURCE_REVOCATION_DURING_CAPTURE",
+      "gate": "Q7",
+      "oracle": "A known lifecycle/trust generation change rejects late publication and invalidates existing CURRENT claim; no edition adoption required; historical as-of evidence stays immutable.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-GOVERNANCE-13",
+      "scenario": "AUTHORITY_EXPIRY_BOUNDARY_OFFLINE",
+      "gate": "Q4",
+      "oracle": "Explicit trusted instant at/after validUntil blocks CURRENT PASS, before boundary obeys approval; offline reader declares snapshot validity and cannot infer present-day source trust; no checker wall-clock read.",
       "status": "PLANNED",
       "executed": false
     }

@@ -67,7 +67,7 @@ ELV7 is the first stage allowed to make a **verified jurisdictional compliance a
 
 ## Runtime entry gate
 
-P0 must pin the accepted ELV6 head, current database schema, upstream validation projections and exact existing revision/freeze/history/replay contracts, then reconcile every field/enum in the existing standards matrix with the executable ELV7 model. P1 freezes rule/profile identity and provenance semantics before any jurisdiction-specific runtime rule is added.
+P0 must pin actual upstream acceptance authority, current database schema, upstream validation projections and exact existing revision/freeze/history/replay contracts, then reconcile every field/enum in the existing standards matrix with the executable ELV7 model. ELV6 remains a provisional design dependency until its runtime is accepted; only rules consuming it require that runtime entry gate. Independent ELV7 rules can proceed with qualified producers. P1 freezes rule/profile identity and provenance semantics before any jurisdiction-specific runtime rule is added.
 
 All ELV7 P0–P9 runtime packages are currently `NOT_STARTED`; this branch is a design contract, not compliance certification.
 
@@ -86,4 +86,4 @@ through a project waiver. Empty/unresolved mandatory coverage cannot become PASS
 Source metadata discovery is distinct from a verified executable rule pack.
 
 Design consistency is checked by `scripts/ci/check-elv7-design-contract.py`.
-Every runtime package remains NOT_STARTED; 362 scenarios are planned, not executed.
+Every runtime package remains NOT_STARTED; 364 scenarios are planned, not executed.

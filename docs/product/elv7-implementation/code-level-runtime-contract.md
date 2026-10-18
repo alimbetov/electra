@@ -120,6 +120,23 @@ review, checker qualification and production pack approval are separate gates.
 reviewer authority and validity dates. A URL or official catalogue listing
 alone is `METADATA_REVIEWED`, not a verified executable rule.
 
+Provenance/verification and lifecycle are separate axes. Preserve existing
+source-state decoders, including legacy `RETIRED`, without interpreting retirement
+as proof that the source was ever verified. New published records append lifecycle
+events rather than overwriting a previous approval.
+
+Adopting a newer source edition is explicit. In contrast, a known revocation,
+expired authority approval or lost trust in the adopted edition invalidates the
+current claim without waiting for a user to adopt another edition. Capture the
+source-lifecycle/trust generation as a dependency and CAS it on publication;
+absence of the corresponding event must not masquerade as a valid approval.
+Historical replay keeps the recorded as-of approval/evidence and reports later
+knowledge separately. Time-limited claims record `validUntil`; a current-claim
+reader checks an explicit trusted evaluation instant and cannot present expired
+proof as CURRENT PASS. The pure checker reads neither system clock nor network.
+Offline claims state the trust-snapshot date and validity; they cannot certify
+unknown present-day legal/source status from an indefinitely cached approval.
+
 ## 6. Outcomes and claims
 
 Execution, completeness, raw normative outcome, freshness, claim scope and

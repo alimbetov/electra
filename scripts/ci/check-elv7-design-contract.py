@@ -93,7 +93,7 @@ def main():
 
     cases = plan["cases"]
     unique([c["id"] for c in cases], "planned case IDs")
-    require(len(cases) == plan["plannedCaseCount"] == 362, "Qualification plan count drift")
+    require(len(cases) == plan["plannedCaseCount"] == 364, "Qualification plan count drift")
     require(plan["evidenceScope"] == "DESIGN_ONLY" and plan["runtimeAccepted"] is False and
             plan["qualifiedFamilies"] == 0, "Planned cases cannot certify production")
     for c in cases:
@@ -106,13 +106,14 @@ def main():
         require(actual == {f"{family}-{suffix}" for suffix in
                            ("SAT", "VIO", "NA", "MISS", "BOUND", "STALE", "HIST")},
                 f"Incomplete family qualification plan: {family}")
-    for prefix, count in (("PROTECTION", 24), ("LIFECYCLE", 12), ("GOVERNANCE", 11)):
+    for prefix, count in (("PROTECTION", 24), ("LIFECYCLE", 12), ("GOVERNANCE", 13)):
         require(sum(c["id"].startswith(f"ELV7-{prefix}-") for c in cases) == count,
                 f"Missing {prefix} risk cases")
     scenarios = {c.get("scenario") for c in cases}
     require({"D_14_VS_20_PRODUCT_SCOPE", "RCD_B_NOT_MCB_B", "LOWER_MAGNETIC_BOUNDARY",
              "WAIVER_CANNOT_GREEN_LEGAL_VIOLATION", "EMPTY_SCOPE_NOT_PASS",
-             "INDEPENDENT_CONNECTION_CAS", "TOMBSTONED_ROOT_CREATE_NEXT"} <= scenarios,
+             "INDEPENDENT_CONNECTION_CAS", "TOMBSTONED_ROOT_CREATE_NEXT",
+             "SOURCE_REVOCATION_DURING_CAPTURE", "AUTHORITY_EXPIRY_BOUNDARY_OFFLINE"} <= scenarios,
             "Critical regression objectives missing")
     require({"sourceSha", "sourceTreeState", "testPath", "testName", "nonSkippedResult",
              "profileHash", "checkerVersion", "authorityHash", "persistedRunId",
@@ -150,7 +151,7 @@ def main():
                       "RESIDUAL_TIME_BEHAVIOUR"):
         require(namespace in protection, f"Missing classification namespace: {namespace}")
     print("ELV7 DESIGN CONSISTENCY PASS: 45 families; 27 mapped ELV5 processes; "
-          "12 project commands; 362 PLANNED cases; 0 runtime-qualified families.")
+          "12 project commands; 364 PLANNED cases; 0 runtime-qualified families.")
 
 
 if __name__ == "__main__":
