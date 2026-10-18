@@ -3,6 +3,8 @@
 Status: target product architecture  
 Branch: `target/electra-professional-electrical-platform`
 
+Canonical implementation-facing UX contract: [Project Workspace UX Specification](project-workspace-ux-specification.md).
+
 ## 1. Product principle
 
 Electra SHALL be organized around the engineer's real project workflow rather than exposing internal calculation/process architecture as the primary UX.
