@@ -3,6 +3,8 @@
 Status: normative product/design contract  
 Branch: `feat/flutter-elv5-power-topology-design`
 
+Canonical workspace/runtime binding: [Project Workspace Integration Contract](elv5-project-workspace-integration-contract.md).
+
 ## 1. Product intent
 
 ELV5 SHALL support the primary field-engineering workflow in the same terms an electrician/ELV engineer uses on site:
