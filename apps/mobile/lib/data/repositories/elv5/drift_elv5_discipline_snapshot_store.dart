@@ -64,15 +64,17 @@ String elvSnapshotManifestHash(Map<String, Object?> row) {
   };
   if (schema == 'electra.elv4-snapshot-manifest.v1') {
     if (row['discipline_section_schema'] != null ||
-        row['discipline_sha256'] != null)
+        row['discipline_sha256'] != null) {
       throw StateError('ELV5_MANIFEST_VERSION_MISMATCH');
+    }
   } else if (schema == elv5SnapshotManifestSchema) {
     if (row['discipline_section_schema'] != elv5DisciplineSectionSchema ||
         row['discipline_sha256'] is! String ||
         !RegExp(
           r'^[0-9a-f]{64}$',
-        ).hasMatch(row['discipline_sha256']! as String))
+        ).hasMatch(row['discipline_sha256']! as String)) {
       throw StateError('ELV5_MANIFEST_DISCIPLINE_HASH_REQUIRED');
+    }
     payload['disciplineSectionSchema'] = row['discipline_section_schema'];
     payload['disciplineSha256'] = row['discipline_sha256'];
   } else {
@@ -105,6 +107,7 @@ final class DriftElv5DisciplineSnapshotStore {
   final String originDeviceId;
   final DateTime Function() nowUtc;
   static const _encoder = Elv5CanonicalJsonV1();
+
   Future<List<Map<String, Object?>>> _rows(
     String sql,
     List<Variable> variables,
@@ -139,10 +142,13 @@ final class DriftElv5DisciplineSnapshotStore {
               variables: scope,
             )
             .getSingle();
-    if (revision.read<String>('state') != 'WORKING')
+    if (revision.read<String>('state') != 'WORKING') {
       throw StateError('ELV5_DESIGN_REVISION_READ_ONLY');
-    if (revision.read<int>('revision') != expectedRevision)
+    }
+    if (revision.read<int>('revision') != expectedRevision) {
       throw StateError('ELV5_DESIGN_REVISION_CONFLICT');
+    }
+
     final facts = <String, Object?>{};
     var activeRoots = 0;
     for (final table in elv5DisciplineAspectTables) {
@@ -151,8 +157,9 @@ final class DriftElv5DisciplineSnapshotStore {
         scope,
       );
       facts[table] = rows;
-      if (_roots.contains(table))
+      if (_roots.contains(table)) {
         activeRoots += rows.where((r) => r['deleted_at'] == null).length;
+      }
     }
     for (final table in [
       'elv_revision_aggregate_evidence_records',
@@ -165,6 +172,7 @@ final class DriftElv5DisciplineSnapshotStore {
         scope,
       );
     }
+
     final evaluations = {
       for (final r
           in facts['discipline_evaluation_records']!
@@ -175,21 +183,23 @@ final class DriftElv5DisciplineSnapshotStore {
       if (_encoder.sha256(jsonDecode(row['output_json']! as String)) !=
               row['output_sha256'] ||
           _encoder.sha256(jsonDecode(row['evidence_json']! as String)) !=
-              row['evidence_sha256'])
+              row['evidence_sha256']) {
         throw StateError('ELV5_FREEZE_EVALUATION_HASH_MISMATCH');
+      }
     }
     for (final pointer
         in facts['discipline_evaluation_pointers']!
             as List<Map<String, Object?>>) {
       final id = pointer['evaluation_id'];
-      final e = evaluations[id];
+      final evaluation = evaluations[id];
       if (id != null &&
-          (e == null ||
-              e['logical_node_key_sha256'] !=
+          (evaluation == null ||
+              evaluation['logical_node_key_sha256'] !=
                   pointer['logical_node_key_sha256'] ||
-              e['input_fingerprint'] != pointer['input_fingerprint'] ||
-              e['output_sha256'] != pointer['output_sha256']))
+              evaluation['input_fingerprint'] != pointer['input_fingerprint'] ||
+              evaluation['output_sha256'] != pointer['output_sha256'])) {
         throw StateError('ELV5_FREEZE_POINTER_EVIDENCE_MISMATCH');
+      }
     }
     for (final dependency
         in facts['discipline_dependency_index']!
@@ -197,9 +207,11 @@ final class DriftElv5DisciplineSnapshotStore {
       if (_encoder.sha256(
             jsonDecode(dependency['dependency_key']! as String),
           ) !=
-          dependency['dependency_key_sha256'])
+          dependency['dependency_key_sha256']) {
         throw StateError('ELV5_DEPENDENCY_INDEX_HASH_MISMATCH');
+      }
     }
+
     // Canonical component/catalog/route facts are already captured by the power
     // section. ELV5 additionally owns exact room/surface geometry and contracts.
     final project = [Variable.withString(projectId)];
@@ -222,6 +234,7 @@ final class DriftElv5DisciplineSnapshotStore {
         project,
       );
     }
+
     final payload = <String, Object?>{
       'schema': elv5DisciplineSectionSchema,
       'projectId': projectId,
@@ -235,6 +248,10 @@ final class DriftElv5DisciplineSnapshotStore {
     final json = utf8.decode(_encoder.encode(payload));
     final hash = _encoder.sha256(payload);
     final instant = nowUtc().toUtc();
+
+    // ELV4 snapshot manifest is immutable evidence. ELV5 must never upgrade it
+    // in place. The discipline section is an independent append-only extension
+    // cryptographically bound to the same physical and power section hashes.
     final manifest =
         await database
             .customSelect(
@@ -242,13 +259,16 @@ final class DriftElv5DisciplineSnapshotStore {
               variables: scope,
             )
             .getSingle();
-    if (manifest.read<String>('manifest_schema') !=
-            'electra.elv4-snapshot-manifest.v1' ||
+    final manifestSchema = manifest.read<String>('manifest_schema');
+    if ((manifestSchema != 'electra.elv4-snapshot-manifest.v1' &&
+            manifestSchema != elv5SnapshotManifestSchema) ||
         manifest.read<String>('manifest_sha256') !=
             elvSnapshotManifestHash(manifest.data) ||
         manifest.read<String>('physical_sha256') != physicalSha256 ||
-        manifest.read<String>('power_sha256') != powerSha256)
+        manifest.read<String>('power_sha256') != powerSha256) {
       throw StateError('ELV5_FREEZE_SOURCE_MANIFEST_MISMATCH');
+    }
+
     await runRawStatement(
       database,
       'INSERT INTO design_revision_discipline_snapshots (design_revision_id,project_id,section_schema,capture_kind,payload_json,discipline_sha256,physical_sha256,power_sha256,created_at,origin_device_id) VALUES (?,?,?,?,?,?,?,?,?,?)',
@@ -265,26 +285,9 @@ final class DriftElv5DisciplineSnapshotStore {
         Variable.withString(originDeviceId),
       ],
     );
-    final extended = <String, Object?>{
-      ...manifest.data,
-      'manifest_schema': elv5SnapshotManifestSchema,
-      'discipline_section_schema': elv5DisciplineSectionSchema,
-      'discipline_sha256': hash,
-    };
-    final changed = await database.customUpdate(
-      'UPDATE design_revision_snapshot_manifests SET manifest_schema=?,manifest_sha256=?,discipline_section_schema=?,discipline_sha256=? WHERE project_id=? AND design_revision_id=? AND manifest_schema=?',
-      variables: [
-        Variable.withString(elv5SnapshotManifestSchema),
-        Variable.withString(elvSnapshotManifestHash(extended)),
-        Variable.withString(elv5DisciplineSectionSchema),
-        Variable.withString(hash),
-        ...scope,
-        Variable.withString('electra.elv4-snapshot-manifest.v1'),
-      ],
-    );
-    if (changed != 1) throw StateError('ELV5_FREEZE_MANIFEST_CAS_FAILED');
     return hash;
   });
+
   Future<Elv5FrozenDisciplineRead> read({
     required String projectId,
     required String designRevisionId,
@@ -300,21 +303,17 @@ final class DriftElv5DisciplineSnapshotStore {
               variables: scope,
             )
             .getSingleOrNull();
-    if (manifest == null ||
-        manifest.read<String>('manifest_schema') ==
-            'electra.elv4-snapshot-manifest.v1') {
-      if (manifest != null &&
-          manifest.read<String>('manifest_sha256') !=
-              elvSnapshotManifestHash(manifest.data))
-        throw StateError('ELV5_FROZEN_MANIFEST_HASH_MISMATCH');
+    if (manifest == null) {
       return const Elv5FrozenDisciplineRead(
         Elv5FrozenDisciplineReadKind.notCaptured,
         null,
       );
     }
     if (manifest.read<String>('manifest_sha256') !=
-        elvSnapshotManifestHash(manifest.data))
+        elvSnapshotManifestHash(manifest.data)) {
       throw StateError('ELV5_FROZEN_MANIFEST_HASH_MISMATCH');
+    }
+
     final row =
         await database
             .customSelect(
@@ -322,22 +321,38 @@ final class DriftElv5DisciplineSnapshotStore {
               variables: scope,
             )
             .getSingleOrNull();
-    if (row == null) throw StateError('ELV5_FROZEN_SECTION_MISSING');
+    if (row == null) {
+      if (manifest.read<String>('manifest_schema') == elv5SnapshotManifestSchema) {
+        throw StateError('ELV5_FROZEN_SECTION_MISSING');
+      }
+      return const Elv5FrozenDisciplineRead(
+        Elv5FrozenDisciplineReadKind.notCaptured,
+        null,
+      );
+    }
+
     final value = jsonDecode(row.read<String>('payload_json'));
-    if (value is! Map) throw StateError('ELV5_FROZEN_SECTION_INVALID');
+    if (value is! Map) {
+      throw StateError('ELV5_FROZEN_SECTION_INVALID');
+    }
     final payload = Map<String, Object?>.from(value);
+    final manifestDisciplineSha = manifest.readNullable<String>(
+      'discipline_sha256',
+    );
     if (row.read<String>('section_schema') != elv5DisciplineSectionSchema ||
         payload['schema'] != elv5DisciplineSectionSchema ||
         payload['projectId'] != projectId ||
         payload['designRevisionId'] != designRevisionId ||
         row.read<String>('discipline_sha256') != _encoder.sha256(payload) ||
-        row.read<String>('discipline_sha256') !=
-            manifest.read<String>('discipline_sha256') ||
+        (manifestDisciplineSha != null &&
+            row.read<String>('discipline_sha256') != manifestDisciplineSha) ||
         payload['physicalSha256'] != manifest.read<String>('physical_sha256') ||
         payload['powerSha256'] != manifest.read<String>('power_sha256') ||
         row.read<String>('physical_sha256') != payload['physicalSha256'] ||
-        row.read<String>('power_sha256') != payload['powerSha256'])
+        row.read<String>('power_sha256') != payload['powerSha256']) {
       throw StateError('ELV5_FROZEN_SECTION_HASH_MISMATCH');
+    }
+
     final physical =
         await database
             .customSelect(
@@ -353,8 +368,10 @@ final class DriftElv5DisciplineSnapshotStore {
             jsonDecode(physical.read<String>('payload_json')) as Map,
           ),
         ).contentSha256 !=
-        payload['physicalSha256'])
+        payload['physicalSha256']) {
       throw StateError('ELV5_FROZEN_PHYSICAL_HASH_MISMATCH');
+    }
+
     final power =
         await database
             .customSelect(
@@ -366,11 +383,14 @@ final class DriftElv5DisciplineSnapshotStore {
         power.read<String>('physical_sha256') != payload['physicalSha256'] ||
         sha256HexUtf8(power.read<String>('payload_json')) !=
             payload['powerSha256'] ||
-        power.read<String>('power_sha256') != payload['powerSha256'])
+        power.read<String>('power_sha256') != payload['powerSha256']) {
       throw StateError('ELV5_FROZEN_POWER_HASH_MISMATCH');
+    }
+
     final count = payload['activeRootCount'];
-    if (count is! int || count < 0 || payload['facts'] is! Map)
+    if (count is! int || count < 0 || payload['facts'] is! Map) {
       throw StateError('ELV5_FROZEN_SECTION_INVALID');
+    }
     return Elv5FrozenDisciplineRead(
       count == 0
           ? Elv5FrozenDisciplineReadKind.capturedEmpty
