@@ -1,0 +1,300 @@
+{
+  "schema": "electra.elv7-command-registry.v1",
+  "wireSchema": "electra.elv7-normative-command.v1",
+  "payloadVersion": 1,
+  "runtimeStatus": "NOT_STARTED",
+  "commands": [
+    {
+      "operation": "ADOPT_NORMATIVE_PROFILE",
+      "aggregate": "PROFILE_BINDING",
+      "invariant": "IMPACT_PREVIEW_REQUIRED",
+      "replay": "BEFORE_PRECONDITIONS",
+      "transaction": "SHARED_PROJECT_UOW",
+      "envelopeRequired": [
+        "commandId",
+        "projectId",
+        "designRevisionId",
+        "expectedDesignRevision",
+        "expectedAggregateGeneration",
+        "normalizedPayloadHash"
+      ],
+      "payloadSchema": "electra.elv7-adopt-normative-profile.v1",
+      "payloadRequired": [
+        "profileEditionId",
+        "profileEditionHash",
+        "scopeSelector",
+        "expectedAdoptionGeneration",
+        "reviewedImpactFingerprint"
+      ]
+    },
+    {
+      "operation": "RELEASE_NORMATIVE_PROFILE",
+      "aggregate": "PROFILE_BINDING",
+      "invariant": "NO_GREEN_WITHOUT_REQUIRED_PROFILE",
+      "replay": "BEFORE_PRECONDITIONS",
+      "transaction": "SHARED_PROJECT_UOW",
+      "envelopeRequired": [
+        "commandId",
+        "projectId",
+        "designRevisionId",
+        "expectedDesignRevision",
+        "expectedAggregateGeneration",
+        "normalizedPayloadHash"
+      ],
+      "payloadSchema": "electra.elv7-release-normative-profile.v1",
+      "payloadRequired": [
+        "bindingId",
+        "expectedAdoptionGeneration",
+        "reviewedImpactFingerprint",
+        "reason"
+      ]
+    },
+    {
+      "operation": "REPLACE_NORMATIVE_CONTEXT",
+      "aggregate": "CONTEXT",
+      "invariant": "OLD_NEW_SELECTOR_INVALIDATION",
+      "replay": "BEFORE_PRECONDITIONS",
+      "transaction": "SHARED_PROJECT_UOW",
+      "envelopeRequired": [
+        "commandId",
+        "projectId",
+        "designRevisionId",
+        "expectedDesignRevision",
+        "expectedAggregateGeneration",
+        "normalizedPayloadHash"
+      ],
+      "payloadSchema": "electra.elv7-replace-normative-context.v1",
+      "payloadRequired": [
+        "contextId",
+        "contextSchema",
+        "completeReplacement",
+        "expectedAdoptionGeneration",
+        "reviewedImpactFingerprint"
+      ]
+    },
+    {
+      "operation": "RUN_NORMATIVE_VALIDATION",
+      "aggregate": "VALIDATION_POINTER",
+      "invariant": "ALL_UPSTREAM_GENERATIONS_CAS",
+      "replay": "BEFORE_PRECONDITIONS",
+      "transaction": "SHARED_PROJECT_UOW",
+      "envelopeRequired": [
+        "commandId",
+        "projectId",
+        "designRevisionId",
+        "expectedDesignRevision",
+        "expectedAggregateGeneration",
+        "normalizedPayloadHash"
+      ],
+      "payloadSchema": "electra.elv7-run-normative-validation.v1",
+      "payloadRequired": [
+        "scopeSelector",
+        "expectedAdoptionGeneration",
+        "expectedCurrentPointerGeneration",
+        "captureFingerprint"
+      ]
+    },
+    {
+      "operation": "RECORD_NORMATIVE_REVIEW",
+      "aggregate": "REVIEW",
+      "invariant": "EVIDENCE_AND_AUTHORITY_REQUIRED",
+      "replay": "BEFORE_PRECONDITIONS",
+      "transaction": "SHARED_PROJECT_UOW",
+      "envelopeRequired": [
+        "commandId",
+        "projectId",
+        "designRevisionId",
+        "expectedDesignRevision",
+        "expectedAggregateGeneration",
+        "normalizedPayloadHash"
+      ],
+      "payloadSchema": "electra.elv7-record-normative-review.v1",
+      "payloadRequired": [
+        "findingId",
+        "findingFingerprint",
+        "evidenceRefs",
+        "proposedConclusion",
+        "actorEvidenceRef"
+      ]
+    },
+    {
+      "operation": "APPROVE_NORMATIVE_REVIEW",
+      "aggregate": "REVIEW",
+      "invariant": "NO_AUTOMATED_VIOLATION_REWRITE",
+      "replay": "BEFORE_PRECONDITIONS",
+      "transaction": "SHARED_PROJECT_UOW",
+      "envelopeRequired": [
+        "commandId",
+        "projectId",
+        "designRevisionId",
+        "expectedDesignRevision",
+        "expectedAggregateGeneration",
+        "normalizedPayloadHash"
+      ],
+      "payloadSchema": "electra.elv7-approve-normative-review.v1",
+      "payloadRequired": [
+        "reviewId",
+        "findingFingerprint",
+        "expectedDispositionGeneration",
+        "authorityEvidenceRef",
+        "validUntil"
+      ]
+    },
+    {
+      "operation": "REJECT_NORMATIVE_REVIEW",
+      "aggregate": "REVIEW",
+      "invariant": "RAW_FINDING_IMMUTABLE",
+      "replay": "BEFORE_PRECONDITIONS",
+      "transaction": "SHARED_PROJECT_UOW",
+      "envelopeRequired": [
+        "commandId",
+        "projectId",
+        "designRevisionId",
+        "expectedDesignRevision",
+        "expectedAggregateGeneration",
+        "normalizedPayloadHash"
+      ],
+      "payloadSchema": "electra.elv7-reject-normative-review.v1",
+      "payloadRequired": [
+        "reviewId",
+        "findingFingerprint",
+        "expectedDispositionGeneration",
+        "authorityEvidenceRef",
+        "reason"
+      ]
+    },
+    {
+      "operation": "CREATE_NORMATIVE_DEVIATION",
+      "aggregate": "DEVIATION",
+      "invariant": "EXACT_FINDING_FINGERPRINT",
+      "replay": "BEFORE_PRECONDITIONS",
+      "transaction": "SHARED_PROJECT_UOW",
+      "envelopeRequired": [
+        "commandId",
+        "projectId",
+        "designRevisionId",
+        "expectedDesignRevision",
+        "expectedAggregateGeneration",
+        "normalizedPayloadHash"
+      ],
+      "payloadSchema": "electra.elv7-create-normative-deviation.v1",
+      "payloadRequired": [
+        "findingId",
+        "findingFingerprint",
+        "justification",
+        "compensatingMeasures",
+        "requestedValidity",
+        "actorEvidenceRef"
+      ]
+    },
+    {
+      "operation": "APPROVE_NORMATIVE_DEVIATION",
+      "aggregate": "DEVIATION",
+      "invariant": "LEGAL_COMPLIANCE_NOT_UPGRADED",
+      "replay": "BEFORE_PRECONDITIONS",
+      "transaction": "SHARED_PROJECT_UOW",
+      "envelopeRequired": [
+        "commandId",
+        "projectId",
+        "designRevisionId",
+        "expectedDesignRevision",
+        "expectedAggregateGeneration",
+        "normalizedPayloadHash"
+      ],
+      "payloadSchema": "electra.elv7-approve-normative-deviation.v1",
+      "payloadRequired": [
+        "deviationId",
+        "findingFingerprint",
+        "expectedDispositionGeneration",
+        "authorityEvidenceRef",
+        "validUntil"
+      ]
+    },
+    {
+      "operation": "REJECT_NORMATIVE_DEVIATION",
+      "aggregate": "DEVIATION",
+      "invariant": "RAW_FINDING_IMMUTABLE",
+      "replay": "BEFORE_PRECONDITIONS",
+      "transaction": "SHARED_PROJECT_UOW",
+      "envelopeRequired": [
+        "commandId",
+        "projectId",
+        "designRevisionId",
+        "expectedDesignRevision",
+        "expectedAggregateGeneration",
+        "normalizedPayloadHash"
+      ],
+      "payloadSchema": "electra.elv7-reject-normative-deviation.v1",
+      "payloadRequired": [
+        "deviationId",
+        "findingFingerprint",
+        "expectedDispositionGeneration",
+        "authorityEvidenceRef",
+        "reason"
+      ]
+    },
+    {
+      "operation": "REVOKE_NORMATIVE_DISPOSITION",
+      "aggregate": "DISPOSITION",
+      "invariant": "APPEND_EVENT_NOT_DELETE",
+      "replay": "BEFORE_PRECONDITIONS",
+      "transaction": "SHARED_PROJECT_UOW",
+      "envelopeRequired": [
+        "commandId",
+        "projectId",
+        "designRevisionId",
+        "expectedDesignRevision",
+        "expectedAggregateGeneration",
+        "normalizedPayloadHash"
+      ],
+      "payloadSchema": "electra.elv7-revoke-normative-disposition.v1",
+      "payloadRequired": [
+        "dispositionId",
+        "expectedDispositionGeneration",
+        "authorityEvidenceRef",
+        "reason"
+      ]
+    },
+    {
+      "operation": "ADOPT_NORMATIVE_SOURCE_UPDATE",
+      "aggregate": "SOURCE_MANIFEST",
+      "invariant": "EXPLICIT_REVOCATION_IMPACT_REVIEW",
+      "replay": "BEFORE_PRECONDITIONS",
+      "transaction": "SHARED_PROJECT_UOW",
+      "envelopeRequired": [
+        "commandId",
+        "projectId",
+        "designRevisionId",
+        "expectedDesignRevision",
+        "expectedAggregateGeneration",
+        "normalizedPayloadHash"
+      ],
+      "payloadSchema": "electra.elv7-adopt-normative-source-update.v1",
+      "payloadRequired": [
+        "oldManifestHash",
+        "newManifestHash",
+        "expectedAdoptionGeneration",
+        "reviewedImpactFingerprint",
+        "sourceLifecycleGeneration"
+      ]
+    }
+  ],
+  "catalogueAdministration": [
+    "CREATE_DRAFT_NORMATIVE_EDITION",
+    "REPLACE_DRAFT_RULE_PACK_MEMBERSHIP",
+    "PUBLISH_NORMATIVE_EDITION",
+    "RECORD_SOURCE_APPROVAL",
+    "APPEND_SOURCE_LIFECYCLE_EVENT"
+  ],
+  "inheritedRevisionCommands": [
+    "FREEZE_PROJECT_DESIGN_REVISION",
+    "CREATE_NEXT_WORKING_DESIGN_REVISION"
+  ],
+  "forbiddenProjectFields": [
+    "verified",
+    "compliant",
+    "checkerCode",
+    "trustedDependencyClosure"
+  ],
+  "payloadValidation": "Typed schemas reject unknown fields; server verifies scoped IDs, recomputes hashes, impact/capture closures and actor authority. Client fingerprints are preconditions, never trusted facts."
+}

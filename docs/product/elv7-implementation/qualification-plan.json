@@ -1,0 +1,2872 @@
+{
+  "schema": "electra.elv7-qualification-plan.v1",
+  "evidenceScope": "DESIGN_ONLY",
+  "runtimeAccepted": false,
+  "qualifiedFamilies": 0,
+  "plannedCaseCount": 362,
+  "cases": [
+    {
+      "id": "NRM-01-SAT",
+      "family": "NRM-01",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-01-VIO",
+      "family": "NRM-01",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-01-NA",
+      "family": "NRM-01",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-01-MISS",
+      "family": "NRM-01",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-01-BOUND",
+      "family": "NRM-01",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-01-STALE",
+      "family": "NRM-01",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-01-HIST",
+      "family": "NRM-01",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-02-SAT",
+      "family": "NRM-02",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-02-VIO",
+      "family": "NRM-02",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-02-NA",
+      "family": "NRM-02",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-02-MISS",
+      "family": "NRM-02",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-02-BOUND",
+      "family": "NRM-02",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-02-STALE",
+      "family": "NRM-02",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-02-HIST",
+      "family": "NRM-02",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-03-SAT",
+      "family": "NRM-03",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-03-VIO",
+      "family": "NRM-03",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-03-NA",
+      "family": "NRM-03",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-03-MISS",
+      "family": "NRM-03",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-03-BOUND",
+      "family": "NRM-03",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-03-STALE",
+      "family": "NRM-03",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-03-HIST",
+      "family": "NRM-03",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-04-SAT",
+      "family": "NRM-04",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-04-VIO",
+      "family": "NRM-04",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-04-NA",
+      "family": "NRM-04",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-04-MISS",
+      "family": "NRM-04",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-04-BOUND",
+      "family": "NRM-04",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-04-STALE",
+      "family": "NRM-04",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-04-HIST",
+      "family": "NRM-04",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-05-SAT",
+      "family": "NRM-05",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-05-VIO",
+      "family": "NRM-05",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-05-NA",
+      "family": "NRM-05",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-05-MISS",
+      "family": "NRM-05",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-05-BOUND",
+      "family": "NRM-05",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-05-STALE",
+      "family": "NRM-05",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-05-HIST",
+      "family": "NRM-05",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-06-SAT",
+      "family": "NRM-06",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-06-VIO",
+      "family": "NRM-06",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-06-NA",
+      "family": "NRM-06",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-06-MISS",
+      "family": "NRM-06",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-06-BOUND",
+      "family": "NRM-06",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-06-STALE",
+      "family": "NRM-06",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-06-HIST",
+      "family": "NRM-06",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-07-SAT",
+      "family": "NRM-07",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-07-VIO",
+      "family": "NRM-07",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-07-NA",
+      "family": "NRM-07",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-07-MISS",
+      "family": "NRM-07",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-07-BOUND",
+      "family": "NRM-07",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-07-STALE",
+      "family": "NRM-07",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-07-HIST",
+      "family": "NRM-07",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-08-SAT",
+      "family": "NRM-08",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-08-VIO",
+      "family": "NRM-08",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-08-NA",
+      "family": "NRM-08",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-08-MISS",
+      "family": "NRM-08",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-08-BOUND",
+      "family": "NRM-08",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-08-STALE",
+      "family": "NRM-08",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-08-HIST",
+      "family": "NRM-08",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-09-SAT",
+      "family": "NRM-09",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-09-VIO",
+      "family": "NRM-09",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-09-NA",
+      "family": "NRM-09",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-09-MISS",
+      "family": "NRM-09",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-09-BOUND",
+      "family": "NRM-09",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-09-STALE",
+      "family": "NRM-09",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-09-HIST",
+      "family": "NRM-09",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-10-SAT",
+      "family": "NRM-10",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-10-VIO",
+      "family": "NRM-10",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-10-NA",
+      "family": "NRM-10",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-10-MISS",
+      "family": "NRM-10",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-10-BOUND",
+      "family": "NRM-10",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-10-STALE",
+      "family": "NRM-10",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-10-HIST",
+      "family": "NRM-10",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-11-SAT",
+      "family": "NRM-11",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-11-VIO",
+      "family": "NRM-11",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-11-NA",
+      "family": "NRM-11",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-11-MISS",
+      "family": "NRM-11",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-11-BOUND",
+      "family": "NRM-11",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-11-STALE",
+      "family": "NRM-11",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-11-HIST",
+      "family": "NRM-11",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-12-SAT",
+      "family": "NRM-12",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-12-VIO",
+      "family": "NRM-12",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-12-NA",
+      "family": "NRM-12",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-12-MISS",
+      "family": "NRM-12",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-12-BOUND",
+      "family": "NRM-12",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-12-STALE",
+      "family": "NRM-12",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-12-HIST",
+      "family": "NRM-12",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-13-SAT",
+      "family": "NRM-13",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-13-VIO",
+      "family": "NRM-13",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-13-NA",
+      "family": "NRM-13",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-13-MISS",
+      "family": "NRM-13",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-13-BOUND",
+      "family": "NRM-13",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-13-STALE",
+      "family": "NRM-13",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-13-HIST",
+      "family": "NRM-13",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-14-SAT",
+      "family": "NRM-14",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-14-VIO",
+      "family": "NRM-14",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-14-NA",
+      "family": "NRM-14",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-14-MISS",
+      "family": "NRM-14",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-14-BOUND",
+      "family": "NRM-14",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-14-STALE",
+      "family": "NRM-14",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-14-HIST",
+      "family": "NRM-14",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-15-SAT",
+      "family": "NRM-15",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-15-VIO",
+      "family": "NRM-15",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-15-NA",
+      "family": "NRM-15",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-15-MISS",
+      "family": "NRM-15",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-15-BOUND",
+      "family": "NRM-15",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-15-STALE",
+      "family": "NRM-15",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-15-HIST",
+      "family": "NRM-15",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-16-SAT",
+      "family": "NRM-16",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-16-VIO",
+      "family": "NRM-16",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-16-NA",
+      "family": "NRM-16",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-16-MISS",
+      "family": "NRM-16",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-16-BOUND",
+      "family": "NRM-16",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-16-STALE",
+      "family": "NRM-16",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-16-HIST",
+      "family": "NRM-16",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-17-SAT",
+      "family": "NRM-17",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-17-VIO",
+      "family": "NRM-17",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-17-NA",
+      "family": "NRM-17",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-17-MISS",
+      "family": "NRM-17",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-17-BOUND",
+      "family": "NRM-17",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-17-STALE",
+      "family": "NRM-17",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-17-HIST",
+      "family": "NRM-17",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-18-SAT",
+      "family": "NRM-18",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-18-VIO",
+      "family": "NRM-18",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-18-NA",
+      "family": "NRM-18",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-18-MISS",
+      "family": "NRM-18",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-18-BOUND",
+      "family": "NRM-18",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-18-STALE",
+      "family": "NRM-18",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-18-HIST",
+      "family": "NRM-18",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-19-SAT",
+      "family": "NRM-19",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-19-VIO",
+      "family": "NRM-19",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-19-NA",
+      "family": "NRM-19",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-19-MISS",
+      "family": "NRM-19",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-19-BOUND",
+      "family": "NRM-19",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-19-STALE",
+      "family": "NRM-19",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-19-HIST",
+      "family": "NRM-19",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-20-SAT",
+      "family": "NRM-20",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-20-VIO",
+      "family": "NRM-20",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-20-NA",
+      "family": "NRM-20",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-20-MISS",
+      "family": "NRM-20",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-20-BOUND",
+      "family": "NRM-20",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-20-STALE",
+      "family": "NRM-20",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-20-HIST",
+      "family": "NRM-20",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-21-SAT",
+      "family": "NRM-21",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-21-VIO",
+      "family": "NRM-21",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-21-NA",
+      "family": "NRM-21",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-21-MISS",
+      "family": "NRM-21",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-21-BOUND",
+      "family": "NRM-21",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-21-STALE",
+      "family": "NRM-21",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-21-HIST",
+      "family": "NRM-21",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-22-SAT",
+      "family": "NRM-22",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-22-VIO",
+      "family": "NRM-22",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-22-NA",
+      "family": "NRM-22",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-22-MISS",
+      "family": "NRM-22",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-22-BOUND",
+      "family": "NRM-22",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-22-STALE",
+      "family": "NRM-22",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-22-HIST",
+      "family": "NRM-22",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-23-SAT",
+      "family": "NRM-23",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-23-VIO",
+      "family": "NRM-23",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-23-NA",
+      "family": "NRM-23",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-23-MISS",
+      "family": "NRM-23",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-23-BOUND",
+      "family": "NRM-23",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-23-STALE",
+      "family": "NRM-23",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-23-HIST",
+      "family": "NRM-23",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-24-SAT",
+      "family": "NRM-24",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-24-VIO",
+      "family": "NRM-24",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-24-NA",
+      "family": "NRM-24",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-24-MISS",
+      "family": "NRM-24",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-24-BOUND",
+      "family": "NRM-24",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-24-STALE",
+      "family": "NRM-24",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-24-HIST",
+      "family": "NRM-24",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-25-SAT",
+      "family": "NRM-25",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-25-VIO",
+      "family": "NRM-25",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-25-NA",
+      "family": "NRM-25",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-25-MISS",
+      "family": "NRM-25",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-25-BOUND",
+      "family": "NRM-25",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-25-STALE",
+      "family": "NRM-25",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-25-HIST",
+      "family": "NRM-25",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-26-SAT",
+      "family": "NRM-26",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-26-VIO",
+      "family": "NRM-26",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-26-NA",
+      "family": "NRM-26",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-26-MISS",
+      "family": "NRM-26",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-26-BOUND",
+      "family": "NRM-26",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-26-STALE",
+      "family": "NRM-26",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-26-HIST",
+      "family": "NRM-26",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-27-SAT",
+      "family": "NRM-27",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-27-VIO",
+      "family": "NRM-27",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-27-NA",
+      "family": "NRM-27",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-27-MISS",
+      "family": "NRM-27",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-27-BOUND",
+      "family": "NRM-27",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-27-STALE",
+      "family": "NRM-27",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-27-HIST",
+      "family": "NRM-27",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-28-SAT",
+      "family": "NRM-28",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-28-VIO",
+      "family": "NRM-28",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-28-NA",
+      "family": "NRM-28",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-28-MISS",
+      "family": "NRM-28",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-28-BOUND",
+      "family": "NRM-28",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-28-STALE",
+      "family": "NRM-28",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-28-HIST",
+      "family": "NRM-28",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-29-SAT",
+      "family": "NRM-29",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-29-VIO",
+      "family": "NRM-29",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-29-NA",
+      "family": "NRM-29",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-29-MISS",
+      "family": "NRM-29",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-29-BOUND",
+      "family": "NRM-29",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-29-STALE",
+      "family": "NRM-29",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-29-HIST",
+      "family": "NRM-29",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-30-SAT",
+      "family": "NRM-30",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-30-VIO",
+      "family": "NRM-30",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-30-NA",
+      "family": "NRM-30",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-30-MISS",
+      "family": "NRM-30",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-30-BOUND",
+      "family": "NRM-30",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-30-STALE",
+      "family": "NRM-30",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-30-HIST",
+      "family": "NRM-30",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-31-SAT",
+      "family": "NRM-31",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-31-VIO",
+      "family": "NRM-31",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-31-NA",
+      "family": "NRM-31",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-31-MISS",
+      "family": "NRM-31",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-31-BOUND",
+      "family": "NRM-31",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-31-STALE",
+      "family": "NRM-31",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-31-HIST",
+      "family": "NRM-31",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-32-SAT",
+      "family": "NRM-32",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-32-VIO",
+      "family": "NRM-32",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-32-NA",
+      "family": "NRM-32",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-32-MISS",
+      "family": "NRM-32",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-32-BOUND",
+      "family": "NRM-32",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-32-STALE",
+      "family": "NRM-32",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-32-HIST",
+      "family": "NRM-32",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-33-SAT",
+      "family": "NRM-33",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-33-VIO",
+      "family": "NRM-33",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-33-NA",
+      "family": "NRM-33",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-33-MISS",
+      "family": "NRM-33",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-33-BOUND",
+      "family": "NRM-33",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-33-STALE",
+      "family": "NRM-33",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-33-HIST",
+      "family": "NRM-33",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-34-SAT",
+      "family": "NRM-34",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-34-VIO",
+      "family": "NRM-34",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-34-NA",
+      "family": "NRM-34",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-34-MISS",
+      "family": "NRM-34",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-34-BOUND",
+      "family": "NRM-34",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-34-STALE",
+      "family": "NRM-34",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-34-HIST",
+      "family": "NRM-34",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-35-SAT",
+      "family": "NRM-35",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-35-VIO",
+      "family": "NRM-35",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-35-NA",
+      "family": "NRM-35",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-35-MISS",
+      "family": "NRM-35",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-35-BOUND",
+      "family": "NRM-35",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-35-STALE",
+      "family": "NRM-35",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-35-HIST",
+      "family": "NRM-35",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-36-SAT",
+      "family": "NRM-36",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-36-VIO",
+      "family": "NRM-36",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-36-NA",
+      "family": "NRM-36",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-36-MISS",
+      "family": "NRM-36",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-36-BOUND",
+      "family": "NRM-36",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-36-STALE",
+      "family": "NRM-36",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-36-HIST",
+      "family": "NRM-36",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-37-SAT",
+      "family": "NRM-37",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-37-VIO",
+      "family": "NRM-37",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-37-NA",
+      "family": "NRM-37",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-37-MISS",
+      "family": "NRM-37",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-37-BOUND",
+      "family": "NRM-37",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-37-STALE",
+      "family": "NRM-37",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-37-HIST",
+      "family": "NRM-37",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-38-SAT",
+      "family": "NRM-38",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-38-VIO",
+      "family": "NRM-38",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-38-NA",
+      "family": "NRM-38",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-38-MISS",
+      "family": "NRM-38",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-38-BOUND",
+      "family": "NRM-38",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-38-STALE",
+      "family": "NRM-38",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-38-HIST",
+      "family": "NRM-38",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-39-SAT",
+      "family": "NRM-39",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-39-VIO",
+      "family": "NRM-39",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-39-NA",
+      "family": "NRM-39",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-39-MISS",
+      "family": "NRM-39",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-39-BOUND",
+      "family": "NRM-39",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-39-STALE",
+      "family": "NRM-39",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-39-HIST",
+      "family": "NRM-39",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-40-SAT",
+      "family": "NRM-40",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-40-VIO",
+      "family": "NRM-40",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-40-NA",
+      "family": "NRM-40",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-40-MISS",
+      "family": "NRM-40",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-40-BOUND",
+      "family": "NRM-40",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-40-STALE",
+      "family": "NRM-40",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-40-HIST",
+      "family": "NRM-40",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-41-SAT",
+      "family": "NRM-41",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-41-VIO",
+      "family": "NRM-41",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-41-NA",
+      "family": "NRM-41",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-41-MISS",
+      "family": "NRM-41",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-41-BOUND",
+      "family": "NRM-41",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-41-STALE",
+      "family": "NRM-41",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-41-HIST",
+      "family": "NRM-41",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-42-SAT",
+      "family": "NRM-42",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-42-VIO",
+      "family": "NRM-42",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-42-NA",
+      "family": "NRM-42",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-42-MISS",
+      "family": "NRM-42",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-42-BOUND",
+      "family": "NRM-42",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-42-STALE",
+      "family": "NRM-42",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-42-HIST",
+      "family": "NRM-42",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-43-SAT",
+      "family": "NRM-43",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-43-VIO",
+      "family": "NRM-43",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-43-NA",
+      "family": "NRM-43",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-43-MISS",
+      "family": "NRM-43",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-43-BOUND",
+      "family": "NRM-43",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-43-STALE",
+      "family": "NRM-43",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-43-HIST",
+      "family": "NRM-43",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-44-SAT",
+      "family": "NRM-44",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-44-VIO",
+      "family": "NRM-44",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-44-NA",
+      "family": "NRM-44",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-44-MISS",
+      "family": "NRM-44",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-44-BOUND",
+      "family": "NRM-44",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-44-STALE",
+      "family": "NRM-44",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-44-HIST",
+      "family": "NRM-44",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-45-SAT",
+      "family": "NRM-45",
+      "gate": "Q1",
+      "oracle": "Complete qualified input satisfies exact adopted requirement",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-45-VIO",
+      "family": "NRM-45",
+      "gate": "Q1",
+      "oracle": "Independent oracle proves violation in an applicable mandatory scenario",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-45-NA",
+      "family": "NRM-45",
+      "gate": "Q2",
+      "oracle": "Complete applicability proof excludes the rule; not a PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-45-MISS",
+      "family": "NRM-45",
+      "gate": "Q4",
+      "oracle": "Remove one mandatory fact; NOT_EVALUABLE/BLOCKED, never PASS",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-45-BOUND",
+      "family": "NRM-45",
+      "gate": "Q4",
+      "oracle": "At/below/above and interval-overlap cases honor explicit source endpoint semantics",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-45-STALE",
+      "family": "NRM-45",
+      "gate": "Q7",
+      "oracle": "Captured dependency/selector generation changes; reject publication atomically",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "NRM-45-HIST",
+      "family": "NRM-45",
+      "gate": "Q8",
+      "oracle": "Freeze/restart/create-next retains exact R1 rule/source/input/result hashes",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-PROTECTION-01",
+      "scenario": "B_C_D_SAME_IN",
+      "gate": "Q4",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-PROTECTION-02",
+      "scenario": "D_14_VS_20_PRODUCT_SCOPE",
+      "gate": "Q4",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-PROTECTION-03",
+      "scenario": "UNKNOWN_K_Z_ENVELOPE",
+      "gate": "Q4",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-PROTECTION-04",
+      "scenario": "AC_CURVE_ON_DC",
+      "gate": "Q4",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-PROTECTION-05",
+      "scenario": "LOWER_MAGNETIC_BOUNDARY",
+      "gate": "Q4",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-PROTECTION-06",
+      "scenario": "EXACT_OPEN_CLOSED_BOUND",
+      "gate": "Q4",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-PROTECTION-07",
+      "scenario": "THERMAL_REGION_FALLBACK",
+      "gate": "Q4",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-PROTECTION-08",
+      "scenario": "IK_MIN_MAX_SWAP",
+      "gate": "Q4",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-PROTECTION-09",
+      "scenario": "ICN_BELOW_IK_MAX",
+      "gate": "Q4",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-PROTECTION-10",
+      "scenario": "ICU_ICS_NOT_INTERCHANGEABLE",
+      "gate": "Q4",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-PROTECTION-11",
+      "scenario": "ADJUSTABLE_SETTING_STALE",
+      "gate": "Q4",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-PROTECTION-12",
+      "scenario": "INRUSH_DURATION",
+      "gate": "Q4",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-PROTECTION-13",
+      "scenario": "PEAK_RMS_MISMATCH",
+      "gate": "Q4",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-PROTECTION-14",
+      "scenario": "PREHEATED_AMBIENT",
+      "gate": "Q4",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-PROTECTION-15",
+      "scenario": "RCD_B_NOT_MCB_B",
+      "gate": "Q4",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-PROTECTION-16",
+      "scenario": "UNSUPPORTED_RESIDUAL_WAVEFORM",
+      "gate": "Q4",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-PROTECTION-17",
+      "scenario": "AM_WITHOUT_OVERLOAD_PARTNER",
+      "gate": "Q4",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-PROTECTION-18",
+      "scenario": "SELECTIVITY_PAIR_MISSING",
+      "gate": "Q4",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-PROTECTION-19",
+      "scenario": "CASCADE_PAIR_WRONG_VOLTAGE",
+      "gate": "Q4",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-PROTECTION-20",
+      "scenario": "IT_SECOND_FAULT_MISSING",
+      "gate": "Q4",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-PROTECTION-21",
+      "scenario": "KA_A_MA_UNITS",
+      "gate": "Q4",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-PROTECTION-22",
+      "scenario": "CPR_NOT_FUNCTIONAL_INTEGRITY",
+      "gate": "Q4",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-PROTECTION-23",
+      "scenario": "CLASSIFICATION_NAMESPACE_COLLISION",
+      "gate": "Q4",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-PROTECTION-24",
+      "scenario": "CORRUPT_ENVELOPE_HASH",
+      "gate": "Q4",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-LIFECYCLE-01",
+      "scenario": "LEDGER_REPLAY_AFTER_FREEZE",
+      "gate": "Q7",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-LIFECYCLE-02",
+      "scenario": "SAME_COMMAND_DIFFERENT_PAYLOAD",
+      "gate": "Q7",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-LIFECYCLE-03",
+      "scenario": "INDEPENDENT_CONNECTION_CAS",
+      "gate": "Q7",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-LIFECYCLE-04",
+      "scenario": "FAULT_AFTER_RUN_INSERT",
+      "gate": "Q7",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-LIFECYCLE-05",
+      "scenario": "FAULT_AFTER_DEPENDENCY_INSERT",
+      "gate": "Q7",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-LIFECYCLE-06",
+      "scenario": "FAULT_BEFORE_POINTER",
+      "gate": "Q7",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-LIFECYCLE-07",
+      "scenario": "FAULT_BEFORE_LEDGER",
+      "gate": "Q7",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-LIFECYCLE-08",
+      "scenario": "WORKER_CRASH_CANCEL",
+      "gate": "Q7",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-LIFECYCLE-09",
+      "scenario": "MISSING_SELECTOR_GAIN",
+      "gate": "Q7",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-LIFECYCLE-10",
+      "scenario": "EMPTY_TARGET_GAIN",
+      "gate": "Q7",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-LIFECYCLE-11",
+      "scenario": "TOMBSTONED_ROOT_CREATE_NEXT",
+      "gate": "Q7",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-LIFECYCLE-12",
+      "scenario": "HISTORICAL_SECTION_TAMPER",
+      "gate": "Q7",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-GOVERNANCE-01",
+      "scenario": "UNVERIFIED_SOURCE_CANNOT_CERTIFY",
+      "gate": "Q0",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-GOVERNANCE-02",
+      "scenario": "NATIONAL_NOT_YET_EFFECTIVE",
+      "gate": "Q0",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-GOVERNANCE-03",
+      "scenario": "RETIRED_HISTORICAL_EDITION",
+      "gate": "Q0",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-GOVERNANCE-04",
+      "scenario": "PRECEDENCE_DAG_CYCLE",
+      "gate": "Q0",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-GOVERNANCE-05",
+      "scenario": "CONFLICT_EMPTY_INTERSECTION",
+      "gate": "Q0",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-GOVERNANCE-06",
+      "scenario": "WAIVER_CANNOT_GREEN_LEGAL_VIOLATION",
+      "gate": "Q0",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-GOVERNANCE-07",
+      "scenario": "EXPIRED_REVIEW",
+      "gate": "Q0",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-GOVERNANCE-08",
+      "scenario": "REVIEW_WRONG_EVIDENCE",
+      "gate": "Q0",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-GOVERNANCE-09",
+      "scenario": "EMPTY_SCOPE_NOT_PASS",
+      "gate": "Q0",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-GOVERNANCE-10",
+      "scenario": "UNSUPPORTED_CHECKER_COVERAGE",
+      "gate": "Q0",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "ELV7-GOVERNANCE-11",
+      "scenario": "LICENSED_SOURCE_NOT_EMBEDDED",
+      "gate": "Q0",
+      "status": "PLANNED",
+      "executed": false
+    }
+  ],
+  "requiredWitnessFields": [
+    "sourceSha",
+    "sourceTreeState",
+    "testPath",
+    "testName",
+    "nonSkippedResult",
+    "profileHash",
+    "checkerVersion",
+    "authorityHash",
+    "persistedRunId",
+    "consumedGenerations",
+    "canonicalOutcomeHash"
+  ],
+  "note": "Cardinality and design validation are not executed runtime evidence; each scenario expands to complete independent numeric/state fixtures before qualification."
+}

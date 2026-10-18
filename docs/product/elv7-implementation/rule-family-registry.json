@@ -1,0 +1,1588 @@
+{
+  "schema": "electra.elv7-rule-family-registry.v1",
+  "status": "DESIGN_CONTRACT",
+  "runtimeStatus": "NOT_STARTED",
+  "productionVerifiedPacks": 0,
+  "families": [
+    {
+      "id": "NRM-01",
+      "title": "Scope and mandatory coverage",
+      "domain": "GOVERNANCE",
+      "targetKind": "DESIGN",
+      "checkerId": "elv7.nrm01.v1",
+      "inputSchema": "electra.elv7-nrm01-input.v1",
+      "requiredFacts": [
+        "coverageManifest",
+        "targetMembership",
+        "requiredScenarios"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Missing mandatory family or empty unproved scope blocks PASS",
+      "elv5Processes": [],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-02",
+      "title": "National source applicability and effective dates",
+      "domain": "GOVERNANCE",
+      "targetKind": "PROFILE",
+      "checkerId": "elv7.nrm02.v1",
+      "inputSchema": "electra.elv7-nrm02-input.v1",
+      "requiredFacts": [
+        "sourceEdition",
+        "nationalIncorporation",
+        "assessmentDate"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Newer international edition cannot silently replace adopted KZ source",
+      "elv5Processes": [],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-03",
+      "title": "Precedence and conflict composition",
+      "domain": "GOVERNANCE",
+      "targetKind": "RULE_SET",
+      "checkerId": "elv7.nrm03.v1",
+      "inputSchema": "electra.elv7-nrm03-input.v1",
+      "requiredFacts": [
+        "precedenceDag",
+        "independentObligations",
+        "parameterDomains"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Conflicting mandatory obligations remain explicit; lower rank cannot waive law",
+      "elv5Processes": [],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-04",
+      "title": "Overload coordination",
+      "domain": "PROTECTION",
+      "targetKind": "CIRCUIT",
+      "checkerId": "elv7.nrm04.v1",
+      "inputSchema": "electra.elv7-nrm04-input.v1",
+      "requiredFacts": [
+        "loadCurrentRms",
+        "selectedIn",
+        "correctedIz",
+        "conventionalTripCurrent"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Dimensioned worst-case Ib/In/Iz and source-defined I2 criterion",
+      "elv5Processes": [],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-05",
+      "title": "Minimum fault current and disconnection time",
+      "domain": "PROTECTION",
+      "targetKind": "CIRCUIT",
+      "checkerId": "elv7.nrm05.v1",
+      "inputSchema": "electra.elv7-nrm05-input.v1",
+      "requiredFacts": [
+        "minFaultCurrent",
+        "tripEnvelope",
+        "requiredDisconnectTime"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Worst-case complete-envelope time proof, not lower magnetic threshold",
+      "elv5Processes": [],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-06",
+      "title": "Rated interrupting capacity",
+      "domain": "PROTECTION",
+      "targetKind": "DEVICE",
+      "checkerId": "elv7.nrm06.v1",
+      "inputSchema": "electra.elv7-nrm06-input.v1",
+      "requiredFacts": [
+        "maxProspectiveFaultCurrent",
+        "ratedCapacityAtVoltage",
+        "capacityStandard"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Icn/Icu/Ics semantics cannot be exchanged",
+      "elv5Processes": [],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-07",
+      "title": "Starting current ride-through",
+      "domain": "PROTECTION",
+      "targetKind": "CIRCUIT",
+      "checkerId": "elv7.nrm07.v1",
+      "inputSchema": "electra.elv7-nrm07-input.v1",
+      "requiredFacts": [
+        "inrushEnvelope",
+        "nonTripEnvelope",
+        "thermalInitialState"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Peak/RMS and duration/ambient mismatches block proof",
+      "elv5Processes": [],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-08",
+      "title": "Selective coordination",
+      "domain": "PROTECTION",
+      "targetKind": "DEVICE_PAIR",
+      "checkerId": "elv7.nrm08.v1",
+      "inputSchema": "electra.elv7-nrm08-input.v1",
+      "requiredFacts": [
+        "upstreamSettings",
+        "downstreamSettings",
+        "coordinationEvidence"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Pair-specific settings/domain proof; no rating-order heuristic",
+      "elv5Processes": [],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-09",
+      "title": "Backup and cascading coordination",
+      "domain": "PROTECTION",
+      "targetKind": "DEVICE_PAIR",
+      "checkerId": "elv7.nrm09.v1",
+      "inputSchema": "electra.elv7-nrm09-input.v1",
+      "requiredFacts": [
+        "testedPair",
+        "combinationRating",
+        "sourceVoltage"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Unlisted pair does not increase breaking capacity",
+      "elv5Processes": [],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-10",
+      "title": "Residual waveform compatibility",
+      "domain": "PROTECTION",
+      "targetKind": "CIRCUIT",
+      "checkerId": "elv7.nrm10.v1",
+      "inputSchema": "electra.elv7-nrm10-input.v1",
+      "requiredFacts": [
+        "residualWaveform",
+        "rcdWaveformType",
+        "frequencyDcContext"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "RCD Type B and MCB curve B remain independent",
+      "elv5Processes": [],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-11",
+      "title": "Residual sensitivity and timing",
+      "domain": "PROTECTION",
+      "targetKind": "CIRCUIT",
+      "checkerId": "elv7.nrm11.v1",
+      "inputSchema": "electra.elv7-nrm11-input.v1",
+      "requiredFacts": [
+        "ratedResidualCurrent",
+        "residualTimeEnvelope",
+        "requiredSensitivityTime"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Delay/selectivity and waveform class are independent",
+      "elv5Processes": [],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-12",
+      "title": "Earthing and protective conductor arrangement",
+      "domain": "PROTECTION",
+      "targetKind": "CIRCUIT",
+      "checkerId": "elv7.nrm12.v1",
+      "inputSchema": "electra.elv7-nrm12-input.v1",
+      "requiredFacts": [
+        "earthingType",
+        "pePenContinuity",
+        "faultModeContext"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "TN/TT/IT and first/second fault require distinct applicability",
+      "elv5Processes": [],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-13",
+      "title": "Electric shock and automatic disconnection",
+      "domain": "PROTECTION",
+      "targetKind": "CIRCUIT",
+      "checkerId": "elv7.nrm13.v1",
+      "inputSchema": "electra.elv7-nrm13-input.v1",
+      "requiredFacts": [
+        "loopOrEarthEvidence",
+        "earthingType",
+        "touchProtectionRule"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Applicable arrangement-specific criterion; no global loop formula",
+      "elv5Processes": [],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-14",
+      "title": "Conductor short-circuit energy withstand",
+      "domain": "PROTECTION",
+      "targetKind": "CONDUCTOR",
+      "checkerId": "elv7.nrm14.v1",
+      "inputSchema": "electra.elv7-nrm14-input.v1",
+      "requiredFacts": [
+        "letThroughEnergy",
+        "materialK",
+        "crossSection",
+        "timeDomain"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Worst-case I2t versus k2S2 only within a verified applicability domain",
+      "elv5Processes": [],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-15",
+      "title": "Permitted voltage drop",
+      "domain": "PROTECTION",
+      "targetKind": "CIRCUIT",
+      "checkerId": "elv7.nrm15.v1",
+      "inputSchema": "electra.elv7-nrm15-input.v1",
+      "requiredFacts": [
+        "ownerVoltageDrop",
+        "sourceMode",
+        "requiredDropLimit"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Terminal operation and regulatory voltage-drop requirements are separate",
+      "elv5Processes": [],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-16",
+      "title": "Environment and corrected ampacity",
+      "domain": "PROTECTION",
+      "targetKind": "CABLE_RUN",
+      "checkerId": "elv7.nrm16.v1",
+      "inputSchema": "electra.elv7-nrm16-input.v1",
+      "requiredFacts": [
+        "ownerAmpacity",
+        "installationMethod",
+        "ambientGroupingEvidence"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "No global ampacity multiplier; missing evidence stays unresolved",
+      "elv5Processes": [
+        "FA-08"
+      ],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-17",
+      "title": "Fuse and adjustable-release duty",
+      "domain": "PROTECTION",
+      "targetKind": "DEVICE",
+      "checkerId": "elv7.nrm17.v1",
+      "inputSchema": "electra.elv7-nrm17-input.v1",
+      "requiredFacts": [
+        "utilizationClass",
+        "releaseSettings",
+        "overloadPartner"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "aM partial-range protection cannot prove complete overload protection",
+      "elv5Processes": [],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-18",
+      "title": "Surge protective coordination",
+      "domain": "PROTECTION",
+      "targetKind": "CIRCUIT",
+      "checkerId": "elv7.nrm18.v1",
+      "inputSchema": "electra.elv7-nrm18-input.v1",
+      "requiredFacts": [
+        "spdTestType",
+        "ucUp",
+        "impulseRatings",
+        "earthingContext"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Legacy B/C/D marketing classes have no implicit mapping",
+      "elv5Processes": [],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-19",
+      "title": "Routing segregation",
+      "domain": "ROUTING",
+      "targetKind": "PATHWAY",
+      "checkerId": "elv7.nrm19.v1",
+      "inputSchema": "electra.elv7-nrm19-input.v1",
+      "requiredFacts": [
+        "observedSeparation",
+        "barrierEvidence",
+        "circuitClass"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Observed geometry does not itself encode a national distance",
+      "elv5Processes": [],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-20",
+      "title": "Pathway fill, bend and supports",
+      "domain": "ROUTING",
+      "targetKind": "PATHWAY",
+      "checkerId": "elv7.nrm20.v1",
+      "inputSchema": "electra.elv7-nrm20-input.v1",
+      "requiredFacts": [
+        "fillEvidence",
+        "bendEvidence",
+        "supportEvidence"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Adopted rule, installation and geometry must share scope",
+      "elv5Processes": [],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-21",
+      "title": "Firestop and cable fire performance",
+      "domain": "ROUTING",
+      "targetKind": "PENETRATION",
+      "checkerId": "elv7.nrm21.v1",
+      "inputSchema": "electra.elv7-nrm21-input.v1",
+      "requiredFacts": [
+        "firestopAssembly",
+        "cableClassification",
+        "functionalIntegrity"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Reaction-to-fire and circuit integrity are separate evidence",
+      "elv5Processes": [],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-22",
+      "title": "Insulation clearance and creepage",
+      "domain": "ENCLOSURE",
+      "targetKind": "REGION_PAIR",
+      "checkerId": "elv7.nrm22.v1",
+      "inputSchema": "electra.elv7-nrm22-input.v1",
+      "requiredFacts": [
+        "clearanceMeasurement",
+        "creepagePath",
+        "voltagePollutionAltitudeMaterial"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Creepage cannot be replaced by Euclidean distance",
+      "elv5Processes": [],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-23",
+      "title": "Access to hazardous parts and barriers",
+      "domain": "ENCLOSURE",
+      "targetKind": "HOST_ACCESS_STATE",
+      "checkerId": "elv7.nrm23.v1",
+      "inputSchema": "electra.elv7-nrm23-input.v1",
+      "requiredFacts": [
+        "hazardAccess",
+        "barrierDefinitions",
+        "accessState"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Closed-door evidence does not prove safe open-door maintenance",
+      "elv5Processes": [],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-24",
+      "title": "IP and IK after modifications",
+      "domain": "ENCLOSURE",
+      "targetKind": "HOST",
+      "checkerId": "elv7.nrm24.v1",
+      "inputSchema": "electra.elv7-nrm24-input.v1",
+      "requiredFacts": [
+        "integrityOpenings",
+        "modificationFingerprint",
+        "testDeclaration"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Empty-box declaration alone cannot certify modified assembly",
+      "elv5Processes": [],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-25",
+      "title": "Bonding and separation forms",
+      "domain": "ENCLOSURE",
+      "targetKind": "HOST",
+      "checkerId": "elv7.nrm25.v1",
+      "inputSchema": "electra.elv7-nrm25-input.v1",
+      "requiredFacts": [
+        "bondingPaths",
+        "partitions",
+        "separationProjection"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Physical evidence and tested/form-specific requirements both required",
+      "elv5Processes": [],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-26",
+      "title": "Assembly thermal verification",
+      "domain": "ENCLOSURE",
+      "targetKind": "HOST",
+      "checkerId": "elv7.nrm26.v1",
+      "inputSchema": "electra.elv7-nrm26-input.v1",
+      "requiredFacts": [
+        "thermalModel",
+        "operatingLoad",
+        "verificationMethod"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "No certified assembly claim from occupancy or a heat sum alone",
+      "elv5Processes": [],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-27",
+      "title": "Assembly mechanical capacity and reserve",
+      "domain": "ENCLOSURE",
+      "targetKind": "HOST",
+      "checkerId": "elv7.nrm27.v1",
+      "inputSchema": "electra.elv7-nrm27-input.v1",
+      "requiredFacts": [
+        "layoutFit",
+        "massCoG",
+        "serviceEnvelope",
+        "capacityProvenance"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "LAN06 basis is not actual enclosure fit",
+      "elv5Processes": [
+        "LAN-06"
+      ],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-28",
+      "title": "LAN length and category compatibility",
+      "domain": "LAN",
+      "targetKind": "LINK",
+      "checkerId": "elv7.nrm28.v1",
+      "inputSchema": "electra.elv7-nrm28-input.v1",
+      "requiredFacts": [
+        "installedLength",
+        "mediaComponents",
+        "selectedLinkClass"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Permanent-link and channel domains remain distinct",
+      "elv5Processes": [
+        "LAN-01",
+        "LAN-04"
+      ],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-29",
+      "title": "LAN ports, patching and administration",
+      "domain": "LAN",
+      "targetKind": "LINK",
+      "checkerId": "elv7.nrm29.v1",
+      "inputSchema": "electra.elv7-nrm29-input.v1",
+      "requiredFacts": [
+        "portAssignments",
+        "patchAssignments",
+        "labelEvidence"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Actual selected scope and missing endpoints included",
+      "elv5Processes": [
+        "LAN-02",
+        "LAN-07"
+      ],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-30",
+      "title": "LAN remote-power requirements",
+      "domain": "LAN",
+      "targetKind": "POWERED_LINK",
+      "checkerId": "elv7.nrm30.v1",
+      "inputSchema": "electra.elv7-nrm30-input.v1",
+      "requiredFacts": [
+        "poeResult",
+        "deliveryEvidence",
+        "requiredPowerPolicy"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "CURRENT PoE engineering evidence is necessary, not a legal claim",
+      "elv5Processes": [
+        "LAN-03"
+      ],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-31",
+      "title": "Optical acceptance requirements",
+      "domain": "LAN",
+      "targetKind": "OPTICAL_LINK",
+      "checkerId": "elv7.nrm31.v1",
+      "inputSchema": "electra.elv7-nrm31-input.v1",
+      "requiredFacts": [
+        "bidirectionalOpticalBudget",
+        "testProfile",
+        "lossEvidence"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Sensitivity and overload remain separate directions/cases",
+      "elv5Processes": [
+        "LAN-05"
+      ],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-32",
+      "title": "CCTV placement and coverage",
+      "domain": "CCTV",
+      "targetKind": "CAMERA",
+      "checkerId": "elv7.nrm32.v1",
+      "inputSchema": "electra.elv7-nrm32-input.v1",
+      "requiredFacts": [
+        "coverageGeometry",
+        "operationalRole",
+        "nationalPlacementContext"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "No statutory camera-placement claim from geometric overlap alone",
+      "elv5Processes": [
+        "CCTV-01"
+      ],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-33",
+      "title": "CCTV transmission and recorder capacity",
+      "domain": "CCTV",
+      "targetKind": "RECORDER",
+      "checkerId": "elv7.nrm33.v1",
+      "inputSchema": "electra.elv7-nrm33-input.v1",
+      "requiredFacts": [
+        "streamRates",
+        "recorderCapacity",
+        "networkContext"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Explicit peak/expected guarantees and counting semantics",
+      "elv5Processes": [
+        "CCTV-02",
+        "CCTV-05"
+      ],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-34",
+      "title": "CCTV retention and storage duty",
+      "domain": "CCTV",
+      "targetKind": "RECORDING_POOL",
+      "checkerId": "elv7.nrm34.v1",
+      "inputSchema": "electra.elv7-nrm34-input.v1",
+      "requiredFacts": [
+        "retentionResult",
+        "recordingSchedule",
+        "storagePolicy"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Expected storage estimate does not imply guaranteed retention",
+      "elv5Processes": [
+        "CCTV-03"
+      ],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-35",
+      "title": "CCTV power and link applicability",
+      "domain": "CCTV",
+      "targetKind": "LINK",
+      "checkerId": "elv7.nrm35.v1",
+      "inputSchema": "electra.elv7-nrm35-input.v1",
+      "requiredFacts": [
+        "pseEvidence",
+        "linkCompatibility",
+        "backupPolicy"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Intrinsic capability is not national availability compliance",
+      "elv5Processes": [
+        "CCTV-04",
+        "CCTV-06"
+      ],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-36",
+      "title": "ACS roles, interfaces and controller resources",
+      "domain": "ACS",
+      "targetKind": "DOOR",
+      "checkerId": "elv7.nrm36.v1",
+      "inputSchema": "electra.elv7-nrm36-input.v1",
+      "requiredFacts": [
+        "roleAssignments",
+        "interfaces",
+        "resourceResult"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Missing required role/target blocks complete scope",
+      "elv5Processes": [
+        "ACS-01",
+        "ACS-02"
+      ],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-37",
+      "title": "ACS electrical supply and autonomy",
+      "domain": "ACS",
+      "targetKind": "DOOR",
+      "checkerId": "elv7.nrm37.v1",
+      "inputSchema": "electra.elv7-nrm37-input.v1",
+      "requiredFacts": [
+        "terminalVoltage",
+        "sourceCapacity",
+        "autonomyResult"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "All mandatory source modes and adopted duration required",
+      "elv5Processes": [
+        "ACS-03",
+        "ACS-04",
+        "ACS-05"
+      ],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-38",
+      "title": "ACS fire-release and egress",
+      "domain": "ACS",
+      "targetKind": "DOOR",
+      "checkerId": "elv7.nrm38.v1",
+      "inputSchema": "electra.elv7-nrm38-input.v1",
+      "requiredFacts": [
+        "releaseTruthTable",
+        "safetyMode",
+        "egressApplicability"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Technical fail-safe truth table is not egress-code certification",
+      "elv5Processes": [
+        "ACS-06"
+      ],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-39",
+      "title": "FIRE addressing and topology",
+      "domain": "FIRE",
+      "targetKind": "FIRE_LOOP",
+      "checkerId": "elv7.nrm39.v1",
+      "inputSchema": "electra.elv7-nrm39-input.v1",
+      "requiredFacts": [
+        "addressCapacity",
+        "topology",
+        "faultIsolationEvidence"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Count/topology proof plus jurisdiction-specific supervision",
+      "elv5Processes": [
+        "FA-01",
+        "FA-07"
+      ],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-40",
+      "title": "FIRE loop electrical requirements",
+      "domain": "FIRE",
+      "targetKind": "FIRE_LOOP",
+      "checkerId": "elv7.nrm40.v1",
+      "inputSchema": "electra.elv7-nrm40-input.v1",
+      "requiredFacts": [
+        "loadBudget",
+        "terminalVoltage",
+        "operatingScenarios"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Missing alarm/fault/minimum supply case blocks coverage",
+      "elv5Processes": [
+        "FA-02",
+        "FA-03"
+      ],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-41",
+      "title": "FIRE source reserve and autonomy",
+      "domain": "FIRE",
+      "targetKind": "SOURCE",
+      "checkerId": "elv7.nrm41.v1",
+      "inputSchema": "electra.elv7-nrm41-input.v1",
+      "requiredFacts": [
+        "sourceRequirements",
+        "batteryAutonomy",
+        "standbyAlarmPolicy"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "One adopted authoritative standby/alarm basis; no double count",
+      "elv5Processes": [
+        "FA-04",
+        "FA-05"
+      ],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-42",
+      "title": "FIRE notification requirements",
+      "domain": "FIRE",
+      "targetKind": "NOTIFICATION_CIRCUIT",
+      "checkerId": "elv7.nrm42.v1",
+      "inputSchema": "electra.elv7-nrm42-input.v1",
+      "requiredFacts": [
+        "notificationLoad",
+        "electricalResult",
+        "notificationApplicability"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Electrical circuit capacity does not prove audibility/visibility coverage",
+      "elv5Processes": [
+        "FA-06"
+      ],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-43",
+      "title": "FIRE cable route and ampacity",
+      "domain": "FIRE",
+      "targetKind": "CABLE_RUN",
+      "checkerId": "elv7.nrm43.v1",
+      "inputSchema": "electra.elv7-nrm43-input.v1",
+      "requiredFacts": [
+        "ampacityResult",
+        "environmentEvidence",
+        "fireRoutingContext"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Iz engineering and legal fire-route obligations assessed separately",
+      "elv5Processes": [
+        "FA-08"
+      ],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-44",
+      "title": "Commissioning and inspection obligations",
+      "domain": "MANUAL",
+      "targetKind": "INSTALLATION_SCOPE",
+      "checkerId": "elv7.nrm44.v1",
+      "inputSchema": "electra.elv7-nrm44-input.v1",
+      "requiredFacts": [
+        "testResults",
+        "inspectionEvidence",
+        "reviewAuthority"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Missing mandatory inspection/test cannot be signed away as geometry PASS",
+      "elv5Processes": [],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    },
+    {
+      "id": "NRM-45",
+      "title": "Cybersecurity project requirements",
+      "domain": "MANUAL",
+      "targetKind": "IP_SYSTEM",
+      "checkerId": "elv7.nrm45.v1",
+      "inputSchema": "electra.elv7-nrm45-input.v1",
+      "requiredFacts": [
+        "adoptedSecurityControls",
+        "configurationEvidence",
+        "reviewAuthority"
+      ],
+      "requiredSources": [
+        "EXACT_ADOPTED_RULE_EDITION",
+        "APPLICABILITY_AUTHORITY"
+      ],
+      "dimensionPolicy": "TYPED_EXACT_INTERVALS",
+      "negativeOracle": "Only declared project/jurisdiction scope; no universal secure-system certificate",
+      "elv5Processes": [],
+      "qualificationGates": [
+        "Q0",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9"
+      ],
+      "implementation": "NOT_STARTED",
+      "productionQualified": false
+    }
+  ]
+}

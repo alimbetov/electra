@@ -1,0 +1,73 @@
+{
+  "schema": "electra.elv7-baseline-handoff.v1",
+  "mainMergeSha": "29957ba9288c0bcf0d8d7ca061d46d2cdbf62fbd",
+  "elv5RuntimeSha": "b3dc15fe48ce1f75d6a4b737d881373d63efda30",
+  "elv5CiRun": 39094948151,
+  "elv5Merged": true,
+  "elv5FullAcceptanceInferred": false,
+  "databaseSchemaAtAudit": 24,
+  "elv6DesignSha": "4778dae76a0315ab8bc04c9d63a3ac666aa9674d",
+  "elv6RuntimeStatus": "NOT_STARTED",
+  "elv6ContractStatus": "PROVISIONAL_DESIGN_ONLY",
+  "elv6Artifacts": [
+    {
+      "path": "docs/product/elv6-implementation/process-registry.json",
+      "sha256": "578a62dcb896e59155c7adea75db819bf5856ae9e8ee79b8ef8a6c7e07b3d405"
+    },
+    {
+      "path": "docs/product/elv6-implementation/normative-safety-evidence-contract.md",
+      "sha256": "8ba573b63d35740c2db73301d6812b1c93880cbddedad2637f3e3f6da1201db1"
+    },
+    {
+      "path": "docs/product/elv6-implementation/code-level-runtime-contract.md",
+      "sha256": "691fa432298895f703afa051882a498b752a6e75f4cc00d7012f545e5781c9b4"
+    },
+    {
+      "path": "docs/product/elv6-implementation/safety-standards-registry.json",
+      "sha256": "92cf336af1b0779d2cb14dedcd1e7d0ff0ddc698bf3d38cd58705ce8e1f8276d"
+    }
+  ],
+  "elv6EvidenceKinds": [
+    "ENCLOSURE_INTEGRITY",
+    "AIR_CLEARANCE",
+    "CREEPAGE_PATH",
+    "HAZARD_ACCESS",
+    "SEPARATION_PARTITIONS",
+    "SAFETY_ENVIRONMENT",
+    "MECHANICAL_CAPABILITY",
+    "BONDING",
+    "LAYOUT_PROCESS_RESULTS"
+  ],
+  "elv6LayoutProcessCount": 24,
+  "elv5ProcessCount": 27,
+  "requiredElv5Processes": [
+    "CCTV-01",
+    "CCTV-02",
+    "CCTV-03",
+    "CCTV-04",
+    "CCTV-05",
+    "CCTV-06",
+    "LAN-01",
+    "LAN-02",
+    "LAN-03",
+    "LAN-04",
+    "LAN-05",
+    "LAN-06",
+    "LAN-07",
+    "ACS-01",
+    "ACS-02",
+    "ACS-03",
+    "ACS-04",
+    "ACS-05",
+    "ACS-06",
+    "FA-01",
+    "FA-02",
+    "FA-03",
+    "FA-04",
+    "FA-05",
+    "FA-06",
+    "FA-07",
+    "FA-08"
+  ],
+  "rule": "Reconcile exact accepted runtime/projection schemas before implementation; no inference of compliance from branch merge, technical PASS or provisional ELV6 design."
+}

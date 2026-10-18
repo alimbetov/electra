@@ -1,0 +1,30 @@
+name: ELV7 Design Contract
+
+on:
+  push:
+    branches: [main, feat/flutter-elv7-normative-validation-design]
+    paths:
+      - 'docs/product/elv7-**'
+      - 'docs/product/elv7-implementation/**'
+      - 'scripts/ci/check-elv7-design-contract.py'
+      - '.github/workflows/elv7-design-contract.yml'
+  pull_request:
+    paths:
+      - 'docs/product/elv7-**'
+      - 'docs/product/elv7-implementation/**'
+      - 'scripts/ci/check-elv7-design-contract.py'
+      - '.github/workflows/elv7-design-contract.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  design-consistency:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The handoff checks an exact ELV6 design commit on a parallel branch.
+          fetch-depth: 0
+      - name: Check design registries and pinned upstream contracts
+        run: python3 scripts/ci/check-elv7-design-contract.py

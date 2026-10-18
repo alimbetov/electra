@@ -1,6 +1,6 @@
 # Electra — ELV7 Normative Profile and Validation Design Specification
 
-Status: DESIGN DRAFT / RUNTIME NOT STARTED
+Status: DESIGN HARDENED / RUNTIME NOT STARTED
 Branch: `feat/flutter-elv7-normative-validation-design`
 Pinned upstream ELV6 at branch creation: `5dc25c34c1ec506ea79f0c9e7225952fa3553142`
 Entry: [authoritative index](elv7-authoritative-spec-index.md).
@@ -302,16 +302,21 @@ ADVISORY
 
 A `LEGAL_MANDATORY` rule is not represented merely as a red icon; its class/precedence remains explicit data.
 
-### 8.2 Aggregate status
+### 8.2 Aggregate status and disposition
 
-At a declared scope:
+Raw compliance is FAIL when any applicable mandatory violation is proven;
+otherwise BLOCKED while mandatory coverage, applicability, evidence, source
+approval or required manual proof is incomplete; otherwise PASS only for an
+explicit complete scope. Proven whole-scope inapplicability is NOT_APPLICABLE,
+not a green PASS. Preserve unresolved counts even when a FAIL badge dominates.
 
-- `FAIL`: an applicable mandatory rule is violated and not validly dispositioned according to reporting policy;
-- `BLOCKED`: mandatory applicability/evidence/manual review is unresolved;
-- `PASS_WITH_DEVIATIONS`: all mandatory rules are evaluable and every allowed violation has an active approved deviation;
-- `PASS`: all mandatory applicable rules are satisfied and required manual reviews are accepted with evidence.
+An approved waiver never rewrites the raw outcome or grants statutory compliance.
+The earlier draft `PASS_WITH_DEVIATIONS` is deprecated as a compliance verdict;
+use a separate `reportDisposition = HAS_APPROVED_DEVIATIONS` overlay. Only a
+verified applicable legal alternative/exemption can affect applicability.
 
-Optional/advisory findings never upgrade a blocked mandatory scope to PASS. Raw outcomes never change when a deviation is approved.
+Detailed precedence, claims and manual-review semantics are mandatory in
+[the runtime contract](elv7-implementation/code-level-runtime-contract.md).
 
 ## 9. Evidence projection
 
@@ -425,23 +430,14 @@ No durable `RUNNING` current-compliance record is authoritative.
 
 ## 14. Commands
 
-Proposed command families:
+The exact proposed wire surface is the [command registry](elv7-implementation/command-registry.json):
+12 project operations plus separate catalogue-governance operations. Public
+freeze/create-next remain inherited shared commands. Catalogue administration
+cannot be sent as an untrusted project payload to mark a source verified.
 
-```text
-CreateNormativeProfileEdition
-Add/RemoveRulePackFromProfileEdition
-PublishNormativeProfileEdition
-RetireNormativeProfileEdition
-AdoptProjectNormativeProfile
-ReleaseProjectNormativeProfile
-RunNormativeValidation
-Record/Approve/RejectManualReview
-Create/Approve/Reject/ExpireDeviation
-```
-
-P0/P1 reconcile these names with any existing reference/profile APIs before P2 freezes the wire registry. Profile/rule catalog administration may later move to backend governance; project use of cached/adopted editions remains offline-capable.
-
-All project mutations reuse existing command ID, replay-before-precondition, history and UoW semantics.
+All project mutations reuse command ID, replay-before-precondition, durable
+rejection, history and UoW semantics. Assessment publication rechecks every
+consumed upstream/profile/selector/review generation in the same transaction.
 
 ## 15. Persistence
 
@@ -584,3 +580,20 @@ Runtime closure requires at least:
 ELV7 does not own automatic redesign, manufacturer/SKU ranking, procurement/BOM pricing, arbitrary legal advice, automatic standards crawling, free-form executable rule scripting or unlicensed full-text standards storage.
 
 Future rule types are added through versioned checker/provider contracts and migration-safe profile editions.
+
+## 22. Mandatory implementation dossiers (2026-10-18)
+
+The [implementation package](elv7-implementation/README.md) hardens this design:
+
+- 45 normative rule families; all 27 ELV5 processes mapped explicitly;
+- B/C/D and product-specific TCC envelopes, with separate RCD/fuse/SPD/fire/room classifications;
+- exact scalar/interval proof contracts, minimum/maximum fault distinction,
+  overload, inrush, disconnection, interruption, selectivity and cascading;
+- immutable profile/source identities reconciled with existing normative/protection code;
+- exact commands, coverage/negative selectors, atomic publication and append-only freeze;
+- provisional ELV6 24-process/safety evidence handoff, without declaring runtime implemented;
+- 362 planned qualification scenarios and Q0–Q9 source/runtime evidence gates.
+
+Within these subjects the detailed dossiers supersede less precise language in
+this design draft. No runtime, production pack approval or legal certification
+is claimed by this documentation or its structural checker.

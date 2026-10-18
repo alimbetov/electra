@@ -1,6 +1,6 @@
 # ELV7 — P0–P9 delivery plan
 
-Status: DESIGN DRAFT / ALL ELV7 RUNTIME PACKAGES OPEN
+Status: DESIGN HARDENED / ALL ELV7 RUNTIME PACKAGES OPEN
 Branch: `feat/flutter-elv7-normative-validation-design`
 ELV6 design baseline at audit: `f5cc382942225d340b54461f37a9efd8d280f814`
 Specification: [design](elv7-normative-validation-design-specification.md).
@@ -70,7 +70,7 @@ Implement:
 - precedence that prevents lower-priority/project/manufacturer rules from silently weakening higher-priority mandatory requirements;
 - explicit independent, superseding, excluded and contradictory rule relationships;
 - per-family monotonic/non-monotonic composition policy rather than universal `max()`;
-- aggregate `PASS / PASS_WITH_DEVIATIONS / FAIL / BLOCKED` semantics;
+- raw `PASS / FAIL / BLOCKED / NOT_APPLICABLE` semantics with separate deviation disposition;
 - stable finding/result order and canonical hashes.
 
 Arbitrary executable formula/rule scripting is out of scope.
@@ -172,15 +172,33 @@ Reconcile requirement ↔ source/rule ↔ code ↔ migration ↔ test ↔ exact-
 
 | Package | Design | Runtime | Evidence |
 |---|---|---|---|
-| P0 | DRAFT | NOT_STARTED | standards matrix is design baseline only |
-| P1 | DRAFT | NOT_STARTED | existing profile/rule-class concepts require runtime reconciliation |
-| P2 | DRAFT | NOT_STARTED | — |
-| P3 | DRAFT | NOT_STARTED | — |
-| P4 | DRAFT | NOT_STARTED | — |
-| P5 | DRAFT | NOT_STARTED | — |
-| P6 | DRAFT | NOT_STARTED | — |
-| P7 | DRAFT | NOT_STARTED | — |
-| P8 | DRAFT | NOT_STARTED | — |
-| P9 | DRAFT | NOT_STARTED | — |
+| P0 | CONTRACT_DEFINED | NOT_STARTED | standards matrix is design baseline only |
+| P1 | CONTRACT_DEFINED | NOT_STARTED | existing profile/rule-class concepts require runtime reconciliation |
+| P2 | CONTRACT_DEFINED | NOT_STARTED | — |
+| P3 | CONTRACT_DEFINED | NOT_STARTED | — |
+| P4 | CONTRACT_DEFINED | NOT_STARTED | — |
+| P5 | CONTRACT_DEFINED | NOT_STARTED | — |
+| P6 | CONTRACT_DEFINED | NOT_STARTED | — |
+| P7 | CONTRACT_DEFINED | NOT_STARTED | — |
+| P8 | CONTRACT_DEFINED | NOT_STARTED | — |
+| P9 | CONTRACT_DEFINED | NOT_STARTED | — |
 
 Default runtime sequence: P0 → P1 → P2 → P3 → P4/P5 → P6 → P7 → P8 → P9. Rule-fixture/source-verification design and UX contracts should start earlier, but runtime qualification remains dependency-gated.
+
+## Code-contract work breakdown
+
+| Package | Concrete implementation inputs and exit proof |
+|---|---|
+| P0 | baseline-and-handoff manifest, existing normative/protection owners, exact national applicability and ELV6 projection-gap audit; allocate actual migration version |
+| P1 | classification namespaces, typed rational intervals and TCC domain, immutable profile/source/rule/checker identities, coverage and disposition axes |
+| P2 | 12-operation wire registry, separate catalogue governance, scoped FKs, immutable records, replay/durable rejection/history and append-only freeze/create-next |
+| P3 | all 45 family checker contracts, finite applicability grammar, interval/uncertainty semantics and precedence DAG; independent numerical oracles |
+| P4 | real owner adapters for 27 ELV5 processes, ELV6 LAY/safety projections and AC protection studies; no fabricated producer facts |
+| P5 | empty/missing/member selector dependencies, all upstream generation CAS, batch closure and immutable result publication |
+| P6 | reviews/deviations with authority/expiry/fingerprint checks; mandatory violations never become green through disposition |
+| P7 | separate B/C/D and RCD selectors, minimum/maximum Ik and limiting-time inspector, what-if, coverage and profile impact UX |
+| P8 | expand and execute 362 planned scenarios, Q0–Q9 including unchanged upstream acceptance and freeze regressions |
+| P9 | exact-SHA non-skipped witness matrix, verified-source coverage, actual unsupported/manual-only limits, ELV8 contract |
+
+The [implementation package](elv7-implementation/README.md) is mandatory for these
+packages. Planned-case cardinality and structural design CI are not qualification.

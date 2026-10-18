@@ -1,0 +1,161 @@
+#!/usr/bin/env python3
+"""Validate ELV7 design manifests; never emit runtime qualification evidence."""
+
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+import sys
+
+ROOT = Path(__file__).resolve().parents[2]
+PACKAGE = ROOT / "docs/product/elv7-implementation"
+
+
+def require(condition, message):
+    if not condition:
+        raise ValueError(message)
+
+
+def unique(items, label):
+    require(len(items) == len(set(items)), f"Duplicate {label}")
+
+
+def load(name, schema):
+    data = json.loads((PACKAGE / name).read_text())
+    require(data["schema"] == schema, f"Wrong schema: {name}")
+    return data
+
+
+def pinned_file(sha, path):
+    return subprocess.check_output(["git", "show", f"{sha}:{path}"], cwd=ROOT)
+
+
+def main():
+    rules = load("rule-family-registry.json", "electra.elv7-rule-family-registry.v1")
+    commands = load("command-registry.json", "electra.elv7-command-registry.v1")
+    plan = load("qualification-plan.json", "electra.elv7-qualification-plan.v1")
+    baseline = load("baseline-and-handoff.json", "electra.elv7-baseline-handoff.v1")
+    gates = {f"Q{i}" for i in range(10)}
+    families = rules["families"]
+    ids = [f["id"] for f in families]
+    unique(ids, "family IDs")
+    require(set(ids) == {f"NRM-{i:02}" for i in range(1, 46)}, "Expected 45 families")
+    unique([f["checkerId"] for f in families], "checker IDs")
+    unique([f["inputSchema"] for f in families], "input schemas")
+    require(rules["productionVerifiedPacks"] == 0, "Design cannot certify source packs")
+    require(rules["runtimeStatus"] == commands["runtimeStatus"] == "NOT_STARTED",
+            "Runtime status changed: qualify runtime separately before replacing design guard")
+    mapped = set()
+    for f in families:
+        require(f["implementation"] == "NOT_STARTED" and f["productionQualified"] is False,
+                f"Unsubstantiated runtime qualification: {f['id']}")
+        require(set(f["qualificationGates"]) == gates, f"Missing Q0-Q9: {f['id']}")
+        require(f["requiredFacts"] and f["negativeOracle"] and f["requiredSources"],
+                f"Incomplete input/source/oracle contract: {f['id']}")
+        unique(f["elv5Processes"], f"process mapping in {f['id']}")
+        mapped.update(f["elv5Processes"])
+    expected_processes = {f"{prefix}-{i:02}" for prefix, count in
+                          (("CCTV", 6), ("LAN", 7), ("ACS", 6), ("FA", 8))
+                          for i in range(1, count + 1)}
+    require(mapped == expected_processes == set(baseline["requiredElv5Processes"]),
+            "All and only 27 ELV5 process codes must map to normative families")
+    require(baseline["elv5ProcessCount"] == len(mapped), "Incorrect ELV5 count")
+
+    expected_operations = {
+        "ADOPT_NORMATIVE_PROFILE", "RELEASE_NORMATIVE_PROFILE", "REPLACE_NORMATIVE_CONTEXT",
+        "RUN_NORMATIVE_VALIDATION", "RECORD_NORMATIVE_REVIEW", "APPROVE_NORMATIVE_REVIEW",
+        "REJECT_NORMATIVE_REVIEW", "CREATE_NORMATIVE_DEVIATION", "APPROVE_NORMATIVE_DEVIATION",
+        "REJECT_NORMATIVE_DEVIATION", "REVOKE_NORMATIVE_DISPOSITION", "ADOPT_NORMATIVE_SOURCE_UPDATE",
+    }
+    operations = [c["operation"] for c in commands["commands"]]
+    unique(operations, "operations")
+    require(set(operations) == expected_operations, "Project wire surface drift")
+    require(commands["wireSchema"] == "electra.elv7-normative-command.v1" and
+            commands["payloadVersion"] == 1, "Wire version drift")
+    common = {"commandId", "projectId", "designRevisionId", "expectedDesignRevision",
+              "expectedAggregateGeneration", "normalizedPayloadHash"}
+    for c in commands["commands"]:
+        require(c["replay"] == "BEFORE_PRECONDITIONS" and
+                c["transaction"] == "SHARED_PROJECT_UOW", f"Lifecycle split: {c['operation']}")
+        require(common <= set(c["envelopeRequired"]), f"Missing envelope fields: {c['operation']}")
+        require(c["payloadRequired"] and c["invariant"] and c["aggregate"],
+                f"Incomplete payload contract: {c['operation']}")
+        require(c["payloadSchema"] == "electra.elv7-" + c["operation"].lower().replace("_", "-") + ".v1",
+                f"Unversioned payload: {c['operation']}")
+    unique(commands["catalogueAdministration"], "catalogue commands")
+    require(not (set(operations) & set(commands["catalogueAdministration"])), "Governance boundary overlap")
+    require(set(commands["inheritedRevisionCommands"]) == {
+        "FREEZE_PROJECT_DESIGN_REVISION", "CREATE_NEXT_WORKING_DESIGN_REVISION"},
+        "Use shared revision commands")
+    require({"verified", "compliant", "checkerCode", "trustedDependencyClosure"} <=
+            set(commands["forbiddenProjectFields"]), "Client trust boundary weakened")
+
+    cases = plan["cases"]
+    unique([c["id"] for c in cases], "planned case IDs")
+    require(len(cases) == plan["plannedCaseCount"] == 362, "Qualification plan count drift")
+    require(plan["evidenceScope"] == "DESIGN_ONLY" and plan["runtimeAccepted"] is False and
+            plan["qualifiedFamilies"] == 0, "Planned cases cannot certify production")
+    for c in cases:
+        require(c["status"] == "PLANNED" and c["executed"] is False and c["gate"] in gates,
+                f"Invalid planned-case claim: {c['id']}")
+        require(c.get("oracle") or c.get("scenario"), f"Missing case objective: {c['id']}")
+        require("family" not in c or c["family"] in ids, f"Unknown family: {c['id']}")
+    for family in ids:
+        actual = {c["id"] for c in cases if c.get("family") == family}
+        require(actual == {f"{family}-{suffix}" for suffix in
+                           ("SAT", "VIO", "NA", "MISS", "BOUND", "STALE", "HIST")},
+                f"Incomplete family qualification plan: {family}")
+    for prefix, count in (("PROTECTION", 24), ("LIFECYCLE", 12), ("GOVERNANCE", 11)):
+        require(sum(c["id"].startswith(f"ELV7-{prefix}-") for c in cases) == count,
+                f"Missing {prefix} risk cases")
+    scenarios = {c.get("scenario") for c in cases}
+    require({"D_14_VS_20_PRODUCT_SCOPE", "RCD_B_NOT_MCB_B", "LOWER_MAGNETIC_BOUNDARY",
+             "WAIVER_CANNOT_GREEN_LEGAL_VIOLATION", "EMPTY_SCOPE_NOT_PASS",
+             "INDEPENDENT_CONNECTION_CAS", "TOMBSTONED_ROOT_CREATE_NEXT"} <= scenarios,
+            "Critical regression objectives missing")
+    require({"sourceSha", "sourceTreeState", "testPath", "testName", "nonSkippedResult",
+             "profileHash", "checkerVersion", "authorityHash", "persistedRunId",
+             "consumedGenerations", "canonicalOutcomeHash"} <= set(plan["requiredWitnessFields"]),
+            "Missing execution provenance fields")
+
+    for field in ("mainMergeSha", "elv5RuntimeSha", "elv6DesignSha"):
+        require(re.fullmatch(r"[0-9a-f]{40}", baseline[field]), f"Invalid SHA: {field}")
+    require(baseline["elv5FullAcceptanceInferred"] is False and
+            baseline["elv6RuntimeStatus"] == "NOT_STARTED" and
+            baseline["elv6ContractStatus"] == "PROVISIONAL_DESIGN_ONLY",
+            "Merge/design must not imply runtime acceptance")
+    artifacts = baseline["elv6Artifacts"]
+    unique([a["path"] for a in artifacts], "ELV6 pins")
+    require(len(artifacts) == 4, "Expected four provisional upstream contracts")
+    for artifact in artifacts:
+        require(artifact["path"].startswith("docs/product/elv6-implementation/") and
+                ".." not in Path(artifact["path"]).parts, "Unsafe upstream path")
+        raw = pinned_file(baseline["elv6DesignSha"], artifact["path"])
+        require(hashlib.sha256(raw).hexdigest() == artifact["sha256"],
+                f"ELV6 contract fingerprint mismatch: {artifact['path']}")
+        if artifact["path"].endswith("/process-registry.json"):
+            layout = json.loads(raw)
+            require(len(layout["processes"]) == baseline["elv6LayoutProcessCount"] == 24,
+                    "ELV6 process coverage drift")
+
+    for doc in PACKAGE.glob("*.md"):
+        for link in re.findall(r"\]\(([^)]+)\)", doc.read_text()):
+            if "://" not in link and not link.startswith("#"):
+                require((doc.parent / link.split("#")[0]).exists(), f"Broken link in {doc.name}: {link}")
+    protection = (PACKAGE / "protection-and-classification-contract.md").read_text()
+    for namespace in ("OVERCURRENT_TRIP_CURVE", "RESIDUAL_WAVEFORM_TYPE", "FUSE_UTILIZATION",
+                      "SPD_TEST_TYPE", "CABLE_REACTION_TO_FIRE", "BUILDING_FIRE_CATEGORY",
+                      "SUPPLY_RELIABILITY_CATEGORY", "ENCLOSURE_PROTECTION", "CIRCUIT_PURPOSE_GROUP",
+                      "RESIDUAL_TIME_BEHAVIOUR"):
+        require(namespace in protection, f"Missing classification namespace: {namespace}")
+    print("ELV7 DESIGN CONSISTENCY PASS: 45 families; 27 mapped ELV5 processes; "
+          "12 project commands; 362 PLANNED cases; 0 runtime-qualified families.")
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except (ValueError, KeyError, OSError, json.JSONDecodeError, subprocess.CalledProcessError) as exc:
+        print(f"ELV7 DESIGN CONSISTENCY FAIL: {exc}", file=sys.stderr)
+        sys.exit(1)
