@@ -1,0 +1,45 @@
+{
+  "schema": "electra.elv6-panel-hierarchy-2d-cable-entry-amendment.v1",
+  "status": "DESIGN_AMENDMENT_NOT_RUNTIME_NOT_ACCEPTANCE",
+  "authority": "NORMATIVE_FOR_FUTURE_ELV6_RUNTIME_ENTRY",
+  "ownership": {
+    "PANEL_HIERARCHY_AND_PHYSICAL_LAYOUT": "ELV6",
+    "CABLE_ENTRY_AND_INTERNAL_ROUTE": "ELV6",
+    "CANONICAL_CABLE_IDENTITY": "UPSTREAM_EXISTING_OWNER",
+    "NORMATIVE_APPLICABILITY": "ELV7",
+    "EXACT_SKU_SELECTION": "ELV8",
+    "ELECTRICAL_STUDY_PHYSICS": "SHARED_ELECTRICAL_PRODUCER"
+  },
+  "panelHierarchy": {
+    "levels": ["MAIN_BOARD", "FLOOR_DISTRIBUTION_BOARD", "LOCAL_SYSTEM_MACHINE_PANEL", "CIRCUIT", "LOAD"],
+    "feederPathRequired": true,
+    "templateObjects": ["PanelModuleTemplate", "PanelModuleInstance", "PanelInstanceOverride"],
+    "bottomUpRollup": ["CONNECTED_LOAD", "DEMAND_LOAD", "PHASE_TOTALS", "CRITICALITY", "NORMAL_EMERGENCY_CLASSIFICATION", "SCENARIO_CONTRIBUTION"],
+    "topDownConstraints": ["FEEDER_MAX_CURRENT", "VOLTAGE_DROP_BUDGET", "SOURCE_CAPACITY", "SHORT_CIRCUIT_EVIDENCE", "RESERVE_POLICY"],
+    "doubleDiversityForbidden": true
+  },
+  "editor2d": {
+    "mandatory": true,
+    "canonicalUnit": "MILLIMETRE",
+    "screenCoordinatesPresentationOnly": true,
+    "views": ["PHYSICAL", "ELECTRICAL", "WIRING", "CABLE_ENTRY_ROUTING", "VALIDATION"],
+    "primitives": ["Panel2DLayout", "CabinetSection2D", "MountingSurface2D", "DinRailPlacement2D", "DevicePlacement2D", "TerminalBlockPlacement2D", "BusbarPlacement2D", "NeutralBarPlacement2D", "PeBarPlacement2D", "WiringDuctPlacement2D", "CableEntryZonePlacement2D", "GlandPlatePlacement2D", "LabelPlacement2D"],
+    "p0Interactions": ["SELECT_MULTISELECT", "PAN_ZOOM", "DRAG_DEVICE", "DETERMINISTIC_DIN_SNAP", "MOVE_REORDER_RAIL", "PLACE_TERMINALS_BARS_DUCTS", "PLACE_CABLE_ENTRY_ZONE", "RESERVE_ZONE", "LOCK_PLACEMENT", "UNDO_REDO_WORKING_REVISION", "K0_PREVIEW_COMPARE_ACCEPT_REGENERATE_REJECT"],
+    "freehandEngineeringTruthForbidden": true
+  },
+  "cableEntry": {
+    "sides": ["TOP", "BOTTOM", "LEFT", "RIGHT", "MIXED", "CUSTOM", "UNSPECIFIED"],
+    "objects": ["CableEntryZone", "CableEntryAssignment", "GlandPlate", "GlandInterface", "CabinetInternalCablePath"],
+    "checks": ["MINIMUM_BEND_RADIUS", "GLAND_COMPATIBILITY", "ENTRY_CAPACITY", "INTERNAL_DUCT_FILL", "SERVICE_SEGREGATION", "TERMINATION_REACHABILITY", "ACCESSIBILITY_MAINTAINABILITY", "SERVICE_LOOP", "SHIELD_PE_PATH", "RESERVE_ENTRY_CAPACITY", "ROUTE_COLLISION"]
+  },
+  "k0": {
+    "mustRejectUnroutablePanel": true,
+    "flow": ["REQUIREMENTS", "HIERARCHY_CANDIDATE", "DEVICE_ENCLOSURE_CANDIDATE", "ENTRY_ASSIGNMENT", "INTERNAL_ROUTE_FEASIBILITY", "2D_LAYOUT", "VALIDATION", "PREVIEW_EDIT_REVALIDATE", "ACCEPT_OR_REGENERATE_OR_REJECT"]
+  },
+  "electricalStudyBoundary": {
+    "consumerOnly": true,
+    "handoff": "elv-integration/electrical-study-handoff-contract.md",
+    "hiddenCompetingEngineForbidden": true
+  },
+  "deferred": ["GENERAL_PURPOSE_CAD", "PHOTOREALISM", "FULL_3D_CABINET", "FABRICATION_DRAWINGS", "THERMAL_CFD"]
+}
