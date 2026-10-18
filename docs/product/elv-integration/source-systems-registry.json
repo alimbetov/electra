@@ -1,0 +1,425 @@
+{
+  "schema": "electra.elv-source-systems-contract.v1",
+  "status": "CONTRACT_DEFINED",
+  "runtimeReady": false,
+  "qualifiedElectricalProducer": false,
+  "productionVerifiedSourcePacks": 0,
+  "newLayProcessesAdded": 0,
+  "newNormativeFamiliesAdded": 0,
+  "sourceKinds": [
+    "GRID_INTERFACE",
+    "TRANSFORMER",
+    "GENERATOR",
+    "PV_ARRAY",
+    "INVERTER",
+    "UPS",
+    "BATTERY_BANK",
+    "BESS",
+    "TRANSFER_DEVICE",
+    "OTHER_DECLARED"
+  ],
+  "projections": [
+    {
+      "id": "SOURCE_CONFIGURATION",
+      "schema": "electra.electrical-source-configuration.v1",
+      "logicalProducer": "CANONICAL_ELECTRICAL_OWNER",
+      "producerBindingStatus": "BLOCKED_UPSTREAM",
+      "consumers": [
+        "ELV6",
+        "ELV7",
+        "ELV8"
+      ],
+      "requiredEnvelopeFields": [
+        "projectId",
+        "designRevisionId",
+        "scopeKey",
+        "scenarioIds",
+        "producerRef",
+        "producerVersion",
+        "canonicalVersion",
+        "topologyHash",
+        "configurationHash",
+        "consumedRefs",
+        "generationTokens",
+        "coverage",
+        "missingFacts",
+        "freshness",
+        "completion",
+        "execution",
+        "payloadHash"
+      ],
+      "requiredPayloadFields": {
+        "sourceAssets": "List<CanonicalElectricalAssetRef>",
+        "portConnections": "List<TypedPortConnection>",
+        "scenarioDefinitions": "List<OrderedScenarioDefinition>",
+        "capabilityEvidence": "List<ScopedProductCapabilityRef>",
+        "earthingNeutralByMode": "Map<ScenarioSegmentId,EarthingNeutralEvidenceRef>",
+        "siteAuthorityRefs": "List<EffectiveAuthorityRef>",
+        "requiredCoverage": "List<ModeCoverageRequirement>",
+        "exclusionProofs": "List<ModeExclusionProof>"
+      },
+      "qualified": false
+    },
+    {
+      "id": "SOURCE_STUDY",
+      "schema": "electra.electrical-source-study.v1",
+      "logicalProducer": "CANONICAL_ELECTRICAL_OWNER",
+      "producerBindingStatus": "BLOCKED_UPSTREAM",
+      "consumers": [
+        "ELV6",
+        "ELV7",
+        "ELV8"
+      ],
+      "requiredEnvelopeFields": [
+        "projectId",
+        "designRevisionId",
+        "scopeKey",
+        "scenarioIds",
+        "producerRef",
+        "producerVersion",
+        "canonicalVersion",
+        "topologyHash",
+        "configurationHash",
+        "consumedRefs",
+        "generationTokens",
+        "coverage",
+        "missingFacts",
+        "freshness",
+        "completion",
+        "execution",
+        "payloadHash"
+      ],
+      "requiredPayloadFields": {
+        "operatingPointRefs": "List<ScopedOperatingPointRef>",
+        "observationPointRefs": "List<CanonicalElectricalPortRef>",
+        "voltageEnvelopes": "List<DimensionedScenarioInterval>",
+        "currentPowerEnvelopes": "List<DirectionAndMeaningBoundEnvelope>",
+        "faultEnvelopes": "List<ProspectiveFaultVersusTimeEvidence>",
+        "protectiveSettingsRefs": "List<ImmutableSettingRef>",
+        "earthingLoopEvidenceRefs": "List<ScenarioEarthingLoopEvidenceRef>",
+        "loadContinuityRefs": "List<QualifiedLoadServiceEvidenceRef>"
+      },
+      "qualified": false
+    },
+    {
+      "id": "TRANSFER_SEQUENCE",
+      "schema": "electra.electrical-transfer-sequence.v1",
+      "logicalProducer": "CANONICAL_ELECTRICAL_OWNER",
+      "producerBindingStatus": "BLOCKED_UPSTREAM",
+      "consumers": [
+        "ELV6",
+        "ELV7",
+        "ELV8"
+      ],
+      "requiredEnvelopeFields": [
+        "projectId",
+        "designRevisionId",
+        "scopeKey",
+        "scenarioIds",
+        "producerRef",
+        "producerVersion",
+        "canonicalVersion",
+        "topologyHash",
+        "configurationHash",
+        "consumedRefs",
+        "generationTokens",
+        "coverage",
+        "missingFacts",
+        "freshness",
+        "completion",
+        "execution",
+        "payloadHash"
+      ],
+      "requiredPayloadFields": {
+        "initialStateRef": "ImmutableSourceSwitchStateRef",
+        "events": "List<OrderedGuardedTransferEvent>",
+        "switchPoleStateIntervals": "List<PortAndPoleIntervalState>",
+        "guardProofs": "List<ScopedGuardEvidenceRef>",
+        "isolationSynchronizationRefs": "List<QualifiedIsolationSynchronizationRef>",
+        "interruptionIntervals": "List<LoadServiceInterruptionEvidence>",
+        "controlSupplyRefs": "List<ControlSupplyAvailabilityRef>",
+        "failureAssumptions": "List<ExplicitFaultAssumption>"
+      },
+      "qualified": false
+    },
+    {
+      "id": "ENERGY_BALANCE",
+      "schema": "electra.electrical-energy-balance.v1",
+      "logicalProducer": "CANONICAL_ELECTRICAL_OWNER",
+      "producerBindingStatus": "BLOCKED_UPSTREAM",
+      "consumers": [
+        "ELV6",
+        "ELV7",
+        "ELV8"
+      ],
+      "requiredEnvelopeFields": [
+        "projectId",
+        "designRevisionId",
+        "scopeKey",
+        "scenarioIds",
+        "producerRef",
+        "producerVersion",
+        "canonicalVersion",
+        "topologyHash",
+        "configurationHash",
+        "consumedRefs",
+        "generationTokens",
+        "coverage",
+        "missingFacts",
+        "freshness",
+        "completion",
+        "execution",
+        "payloadHash"
+      ],
+      "requiredPayloadFields": {
+        "initialStorageStates": "List<UsableStorageStateEvidence>",
+        "segments": "List<EnergyBalanceSegment>",
+        "sourceAvailabilityEnvelopes": "List<ScopedPowerAvailabilityEvidence>",
+        "conversionAndAuxiliaryRefs": "List<QualifiedLossAuxiliaryModelRef>",
+        "storageTransitions": "List<BoundedStorageTransition>",
+        "curtailedExportedUnservedEnergy": "List<DimensionedEnergyInterval>",
+        "balanceResidualPolicyRef": "QualifiedNumericTolerancePolicyRef",
+        "finalStorageStates": "List<UsableStorageStateEvidence>"
+      },
+      "qualified": false
+    }
+  ],
+  "modes": [
+    {
+      "id": "GRID_NORMAL",
+      "obligation": "Connected grid import/authorized local sources and stated loads",
+      "applicability": "DERIVED_FROM_TOPOLOGY_AND_DECLARED_PURPOSE",
+      "missingRequiredMode": "BLOCKED_NOT_PASS"
+    },
+    {
+      "id": "GRID_LOSS",
+      "obligation": "Grid unavailable with actual isolation/source response",
+      "applicability": "DERIVED_FROM_TOPOLOGY_AND_DECLARED_PURPOSE",
+      "missingRequiredMode": "BLOCKED_NOT_PASS"
+    },
+    {
+      "id": "GENERATOR_START",
+      "obligation": "Startup/readiness/step-load and critical-load continuity",
+      "applicability": "DERIVED_FROM_TOPOLOGY_AND_DECLARED_PURPOSE",
+      "missingRequiredMode": "BLOCKED_NOT_PASS"
+    },
+    {
+      "id": "GENERATOR_SUPPLY",
+      "obligation": "Generator duty and actual fault/protection domain",
+      "applicability": "DERIVED_FROM_TOPOLOGY_AND_DECLARED_PURPOSE",
+      "missingRequiredMode": "BLOCKED_NOT_PASS"
+    },
+    {
+      "id": "GENERATOR_FAILURE",
+      "obligation": "Generator unavailable and alternate supply/failure effects",
+      "applicability": "DERIVED_FROM_TOPOLOGY_AND_DECLARED_PURPOSE",
+      "missingRequiredMode": "BLOCKED_NOT_PASS"
+    },
+    {
+      "id": "RETRANSFER_TO_GRID",
+      "obligation": "Reconnection, source transfer, cooldown and load interruption",
+      "applicability": "DERIVED_FROM_TOPOLOGY_AND_DECLARED_PURPOSE",
+      "missingRequiredMode": "BLOCKED_NOT_PASS"
+    },
+    {
+      "id": "UPS_INVERTER",
+      "obligation": "Battery/inverter supply domain and usable storage state",
+      "applicability": "DERIVED_FROM_TOPOLOGY_AND_DECLARED_PURPOSE",
+      "missingRequiredMode": "BLOCKED_NOT_PASS"
+    },
+    {
+      "id": "UPS_BYPASS",
+      "obligation": "Static/maintenance bypass supply, capacity and protection domain",
+      "applicability": "DERIVED_FROM_TOPOLOGY_AND_DECLARED_PURPOSE",
+      "missingRequiredMode": "BLOCKED_NOT_PASS"
+    },
+    {
+      "id": "PV_GRID_CONNECTED",
+      "obligation": "PV input/environment and approved grid-interactive output",
+      "applicability": "DERIVED_FROM_TOPOLOGY_AND_DECLARED_PURPOSE",
+      "missingRequiredMode": "BLOCKED_NOT_PASS"
+    },
+    {
+      "id": "PV_UNAVAILABLE",
+      "obligation": "Low/zero generation appropriate to declared continuity purpose",
+      "applicability": "DERIVED_FROM_TOPOLOGY_AND_DECLARED_PURPOSE",
+      "missingRequiredMode": "BLOCKED_NOT_PASS"
+    },
+    {
+      "id": "INTENTIONAL_ISLAND",
+      "obligation": "Qualified forming source, isolated topology and mode-specific protection",
+      "applicability": "DERIVED_FROM_TOPOLOGY_AND_DECLARED_PURPOSE",
+      "missingRequiredMode": "BLOCKED_NOT_PASS"
+    },
+    {
+      "id": "STORAGE_CHARGE",
+      "obligation": "Charging source/control, limits, losses and simultaneous load demand",
+      "applicability": "DERIVED_FROM_TOPOLOGY_AND_DECLARED_PURPOSE",
+      "missingRequiredMode": "BLOCKED_NOT_PASS"
+    },
+    {
+      "id": "STORAGE_DISCHARGE",
+      "obligation": "Usable energy/power limits, reserve and actual load demand",
+      "applicability": "DERIVED_FROM_TOPOLOGY_AND_DECLARED_PURPOSE",
+      "missingRequiredMode": "BLOCKED_NOT_PASS"
+    },
+    {
+      "id": "STORAGE_DEPLETED",
+      "obligation": "Cutoff/low-energy consequence and required retained functions",
+      "applicability": "DERIVED_FROM_TOPOLOGY_AND_DECLARED_PURPOSE",
+      "missingRequiredMode": "BLOCKED_NOT_PASS"
+    },
+    {
+      "id": "MAINTENANCE_ISOLATION",
+      "obligation": "Lockout/bypass/source removal and alternate critical supplies",
+      "applicability": "DERIVED_FROM_TOPOLOGY_AND_DECLARED_PURPOSE",
+      "missingRequiredMode": "BLOCKED_NOT_PASS"
+    },
+    {
+      "id": "TRANSFER_CONTROL_FAILURE",
+      "obligation": "Control supply/sensor/contactor failure assumptions and evidence",
+      "applicability": "DERIVED_FROM_TOPOLOGY_AND_DECLARED_PURPOSE",
+      "missingRequiredMode": "BLOCKED_NOT_PASS"
+    }
+  ],
+  "sourceRuleBindings": [
+    {
+      "id": "SRC-R01",
+      "normativeFamilies": [
+        "NRM-01"
+      ],
+      "obligation": "Required source/mode/scenario coverage and explicit non-applicability proof",
+      "status": "UNQUALIFIED_RULE_INSTANTIATION"
+    },
+    {
+      "id": "SRC-R02",
+      "normativeFamilies": [
+        "NRM-02",
+        "NRM-03"
+      ],
+      "obligation": "National/site grid-connection/export/parallel permission and adopted source authority",
+      "status": "UNQUALIFIED_RULE_INSTANTIATION"
+    },
+    {
+      "id": "SRC-R03",
+      "normativeFamilies": [
+        "NRM-05",
+        "NRM-06",
+        "NRM-13",
+        "NRM-14"
+      ],
+      "obligation": "Per-mode prospective faults, disconnect/interruption and conductor thermal proof",
+      "status": "UNQUALIFIED_RULE_INSTANTIATION"
+    },
+    {
+      "id": "SRC-R04",
+      "normativeFamilies": [
+        "NRM-04",
+        "NRM-07",
+        "NRM-08",
+        "NRM-09"
+      ],
+      "obligation": "Loading/startup and exact device-pair coordination evidence",
+      "status": "UNQUALIFIED_RULE_INSTANTIATION"
+    },
+    {
+      "id": "SRC-R05",
+      "normativeFamilies": [
+        "NRM-10",
+        "NRM-11",
+        "NRM-12",
+        "NRM-13"
+      ],
+      "obligation": "Residual response and earthing/neutral/PE protection by mode",
+      "status": "UNQUALIFIED_RULE_INSTANTIATION"
+    },
+    {
+      "id": "SRC-R06",
+      "normativeFamilies": [
+        "NRM-15",
+        "NRM-16",
+        "NRM-18"
+      ],
+      "obligation": "Per-mode drop/ampacity and applicable AC/DC SPD evidence",
+      "status": "UNQUALIFIED_RULE_INSTANTIATION"
+    },
+    {
+      "id": "SRC-R07",
+      "normativeFamilies": [
+        "NRM-19",
+        "NRM-20",
+        "NRM-21",
+        "NRM-22",
+        "NRM-23",
+        "NRM-24",
+        "NRM-25",
+        "NRM-26",
+        "NRM-27"
+      ],
+      "obligation": "Declared physical/environment/assembly safety evidence and scoped limitations",
+      "status": "UNQUALIFIED_RULE_INSTANTIATION"
+    },
+    {
+      "id": "SRC-R08",
+      "normativeFamilies": [
+        "NRM-01",
+        "NRM-44"
+      ],
+      "obligation": "Qualified source-transfer/interlock/anti-islanding and commissioning proof coverage; no new hidden simulation",
+      "status": "UNQUALIFIED_RULE_INSTANTIATION"
+    },
+    {
+      "id": "SRC-R09",
+      "normativeFamilies": [
+        "NRM-01",
+        "NRM-44"
+      ],
+      "obligation": "Qualified storage/continuity energy-study evidence and control fallback proof; no new hidden energy kernel",
+      "status": "UNQUALIFIED_RULE_INSTANTIATION"
+    }
+  ],
+  "invariants": {
+    "unknownSourceIsUnlimited": false,
+    "scenarioLabelSetsState": false,
+    "gridFollowingImpliesIslandSupply": false,
+    "bidirectionalPortProvesParallelOperation": false,
+    "nameplatePvGuaranteesBackup": false,
+    "zeroExportSetpointIsProof": false,
+    "waiverGreensMandatoryViolation": false,
+    "dcPoeEvidenceProvesAcSourceStudy": false,
+    "candidateStudyMayBeCopiedCurrent": false,
+    "projectStudyMayUseLiveWeather": false,
+    "existingSingleSourceSelectorMayEncodeParallelSilently": false,
+    "sourceAuthorityRequiresEditionAndSiteScope": true,
+    "allRequiredModesMustBeCovered": true,
+    "sourceStudyHashesMustMatchConfiguration": true,
+    "stateChangeInvalidatesScopedConsumers": true,
+    "historicalStudyIsOfflineReproducible": true
+  },
+  "physicalBoundary": {
+    "owner": "ELV6",
+    "roofStructuralSolarYieldEngineIncluded": false,
+    "fuelExhaustMechanicalEngineIncluded": false,
+    "claimsNormativeCompliance": false
+  },
+  "baselineRefs": {
+    "ELV6": "a41b765724a52b079dc0376b2f1ef7edd4e837a4",
+    "ELV7": "b34cd51759681c44d4c955bf6bdb54a99d0aa7d4",
+    "ELV8": "67095da84e865b41bbfe9545556d709640261e84"
+  },
+  "errorCodes": [
+    "UNSUPPORTED_SOURCE_MODEL",
+    "SOURCE_MODE_COVERAGE_MISSING",
+    "SOURCE_CAPTURE_MISMATCH",
+    "SOURCE_STUDY_DOMAIN_UNSUPPORTED",
+    "TRANSFER_GUARD_UNPROVEN",
+    "PARALLEL_PERMISSION_UNPROVEN",
+    "GRID_EXPORT_AUTHORITY_MISSING",
+    "ISLAND_FORMING_CAPABILITY_UNPROVEN",
+    "NEUTRAL_CONFIGURATION_UNRESOLVED",
+    "SOURCE_CONTROL_POWER_UNPROVEN",
+    "STORAGE_INITIAL_STATE_UNKNOWN",
+    "SOURCE_EVIDENCE_STALE"
+  ],
+  "errorPolicy": "Missing engineering facts produce scoped BLOCKED/NOT_EVALUABLE with these reasons; malformed identity/hash/ownership remains a transport/storage integrity error."
+}

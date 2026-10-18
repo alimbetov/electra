@@ -1,0 +1,66 @@
+{
+  "schema": "electra.elv-design-readiness.v1",
+  "scope": "SOURCE_SYSTEMS_AMENDMENT",
+  "designStatus": "CONTRACT_DEFINED_WITH_EXPLICIT_ENTRY_GATES",
+  "runtimeReady": false,
+  "percentageClaim": null,
+  "items": [
+    {
+      "id": "SOURCE_INTERFACES",
+      "state": "CONTRACT_DEFINED",
+      "closure": "Four exact proposed electrical producer schemas, sixteen mode classes, domain/error/owner/unknown semantics and thirty-two planned oracles are recorded."
+    },
+    {
+      "id": "ELV6_PHYSICAL_ADAPTER",
+      "state": "CONTRACT_DEFINED",
+      "closure": "Physical source/interface/service/mass/heat and safety scope defined; implementation requires accepted producer refs and same-UoW physical owner."
+    },
+    {
+      "id": "ELV7_RULE_BINDINGS",
+      "state": "SOURCE_REVIEW_REQUIRED",
+      "closure": "Source-domain instances mapped to existing normative families; exact lawful clauses/KZ/site applicability, independent oracles and release approvals absent."
+    },
+    {
+      "id": "CATALOGUE_SOURCE_FACETS",
+      "state": "CONTRACT_DEFINED",
+      "closure": "Typed generator/PV/inverter/storage/ATS capabilities and PV module family specified; no real product/price dataset or qualified import exists."
+    },
+    {
+      "id": "ELV8_CONFIGURATION_ADAPTER",
+      "state": "CONTRACT_DEFINED",
+      "closure": "Whole-configuration and all-mode eligibility, commercial scope, candidate/CURRENT separation, reviewed apply and actual owner revalidation defined."
+    },
+    {
+      "id": "ELECTRICAL_SOURCE_PRODUCER",
+      "state": "BLOCKED_UPSTREAM",
+      "closure": "Pin canonical source/topology/scenario/study/energy owner code paths, schemas, public commands, migrations and non-skipped production evidence for every consumed mode."
+    },
+    {
+      "id": "SCHEMA_AND_OWNER_UOW",
+      "state": "BLOCKED_ENTRY",
+      "closure": "Reconcile ELV6/8 schema 23 to actual main 24 and qualified shared-UoW owner participants; do not reserve a next migration number."
+    },
+    {
+      "id": "SOURCE_AUTHORITY",
+      "state": "SOURCE_REVIEW_REQUIRED",
+      "closure": "Approve exact normative/product/site/utility permissions with effective dates, licensing, source trust and revocation semantics; official metadata is not production approval."
+    },
+    {
+      "id": "RUNTIME_QUALIFICATION",
+      "state": "NOT_STARTED",
+      "closure": "Execute source, cross-stage and inherited ELV4/FL14 rollback/CAS/restart/freeze/fault/regression suites against actual producers on exact SHA."
+    }
+  ],
+  "allowedNow": [
+    "IMPLEMENT_PURE_VERSIONED_CODEC_AND_CHECKER_INFRASTRUCTURE",
+    "IMPLEMENT_CATALOGUE_SCHEMA_AND_STAGED_IMPORT_WITH_LEGACY_COMPATIBILITY",
+    "IMPLEMENT_INDEPENDENT_ELV6_PHYSICAL_KERNELS",
+    "USE_FICTIONAL_FIXTURES_LABELLED_NOT_PRODUCTION"
+  ],
+  "forbiddenUntilGatesPass": [
+    "CLAIM_FULL_SOURCE_RUNTIME_READY",
+    "CLAIM_SOURCE_SYSTEM_NORMATIVE_PASS",
+    "VALIDATE_SOURCE_CONFIGURATION_WITH_MISSING_REQUIRED_MODE",
+    "MARK_ELV6_ELV7_ELV8_ACCEPTED_FROM_DESIGN_CI"
+  ]
+}

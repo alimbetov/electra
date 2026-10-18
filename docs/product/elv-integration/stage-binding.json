@@ -8,11 +8,11 @@
   "agreementArtifacts": [
     {
       "path": "docs/product/elv-integration/README.md",
-      "sha256": "b581737e896109517492c3cae499f0fc00ed3b53bb7614daa76bd99218d803a7"
+      "sha256": "4b4bf334633bd95d86c14f51d87a18bcbb3d48f83835075bc704c5330bbbc203"
     },
     {
       "path": "docs/product/elv-integration/runtime-handoff-contract.md",
-      "sha256": "293355e5d842646808efffb5c86af5623e792bb87937a7cba73bcb1db4050599"
+      "sha256": "a06c31ca65af5da63ea82a7de514247d5b9004d0c5e2b3b9624439dcd69349b8"
     },
     {
       "path": "docs/product/elv-integration/interface-registry.json",
@@ -21,20 +21,40 @@
     {
       "path": "docs/product/elv-integration/qualification-plan.json",
       "sha256": "36a44f095990987b36ead777a6bed2f4468c49676ada8e82b6f6b0eb29875f83"
+    },
+    {
+      "path": "docs/product/elv-integration/source-systems-contract.md",
+      "sha256": "6de57efc816287a18f81cb1e847d26eee51ce2452c34a3be0dc82857c54bb9bb"
+    },
+    {
+      "path": "docs/product/elv-integration/source-systems-registry.json",
+      "sha256": "59ec51fc3da6d6fbb063acc96171906b34e13cf89e74631d72cec5d4d55e2889"
+    },
+    {
+      "path": "docs/product/elv-integration/source-qualification-plan.json",
+      "sha256": "ebf6a1e5acc2f94ff195c83e4f9a2f357a3f2561fb5e18e688d6f4f6b7b7b725"
+    },
+    {
+      "path": "docs/product/elv-integration/source-authority-review.md",
+      "sha256": "b6f43a8cfe555230b482fa621793ed38cdcbda732b24e27a297238c708ccd890"
+    },
+    {
+      "path": "docs/product/elv-integration/design-readiness.json",
+      "sha256": "858738e71edf86efd2470a8c2793911a1327a239b3bfa51c79dd6948cf351291"
     }
   ],
   "localDocuments": [
     {
       "path": "docs/product/elv8-authoritative-spec-index.md",
-      "sha256": "38e193aa105bb6aca470fb9033628f709686ba540088ea734badbff993e29dfd"
+      "sha256": "cbf85ec7054d645c993609a9d39b872d389be0aaf1808ebf7f44d111fe5ed6bb"
     },
     {
       "path": "docs/product/elv8-p0-p9-delivery-plan.md",
-      "sha256": "ade4232ceae1f95f45e97bc3c7300610bf7bb622c08d8aa8a28150e89d51bb45"
+      "sha256": "1eb3bbda515d4452f89e6b1da42b2434a0ec4ad5af519dfdd1c3df01bf79e570"
     },
     {
       "path": "docs/product/elv8-deliverables-design-specification.md",
-      "sha256": "e2b25744ed13cc26a998f790f9c75ee0b59b8b37acfd538fc39b556666ffa511"
+      "sha256": "3e1facf64261dc4cd63441f4774d693dbb1d921ed2307cf910020b8f17a28a2d"
     }
   ],
   "runtimeEntryBlockers": [
@@ -46,5 +66,6 @@
     "EXACT_WIRE_CODECS_AND_ADAPTERS"
   ],
   "catalogueAuthoritySource": "f32432c8b14134a5961420fb2a219ecbfb2652ce",
-  "note": "Fingerprints prove reviewed design text only; no implemented/qualified/accepted capability is inferred."
+  "note": "Fingerprints prove reviewed design text only; no implemented/qualified/accepted capability is inferred.",
+  "sourceSystemsRuntimeReady": false
 }

@@ -734,3 +734,21 @@ families/scenario/protocol producers remain visible runtime blockers.
 P0 must reconcile this branch's inspected schema 23 with main schema 24 and
 actual upstream acceptance. The old inherited ELV6/ELV7 files on this branch
 are historical snapshots, not authority over their actively maintained branches.
+
+
+## Source-system implementation contract (ELV8)
+
+[Shared source contract](elv-integration/source-systems-contract.md) defines exact
+mandatory inputs and fail-closed semantics.
+
+Whole candidate configurations bind source/inverter/PV modules/storage/ATS,
+control supply/bus/protection/cables/terminals/host and required accessories. Each
+required grid/generator/UPS-bypass/island/charge/discharge/maintenance/failure mode
+must have matching qualified electrical study and applicable permission evidence.
+An isolated PV nameplate or inverter "hybrid" label cannot prove backup/island
+eligibility. UNKNOWN source/transfer/energy inputs remain blocking even when the
+normal-grid candidate is cheap and geometrically fits. Compare acquisition cost
+only with complete declared BOM/price scope; fuel/tariff/lifecycle optimization
+needs its own explicit qualified source/horizon model. Use reviewed shared-UoW
+owner apply and real electrical/ELV6/ELV7 revalidation; no live switching, dispatch,
+procurement, copied candidate CURRENT or new stage freeze command.

@@ -96,3 +96,12 @@ selection snapshots remain project-owned. Existing FL14 IDs/codecs/FK anchors
 are preserved through an explicit migration, not a parallel writable catalogue.
 The authoritative catalogue design is pinned to the ELV7 source in the shared
 agreement. It includes the professional CAP/K/SH target mapping, not just breakers.
+
+
+## External and hybrid power source contract
+
+[Source-system amendment](elv-integration/source-systems-contract.md) is mandatory
+for generator, PV/inverter, UPS/BESS/battery and transfer integration.
+[Readiness ledger](elv-integration/design-readiness.json) distinguishes the defined
+ELV8 contract from unqualified electrical producer and source-authority gates.
+No runtime or production-compliance readiness is inferred from the design guard.

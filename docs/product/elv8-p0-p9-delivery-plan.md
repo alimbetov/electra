@@ -252,3 +252,15 @@ Apply [the common agreement](elv-integration/README.md) to every package:
 - P7: expose technical, normative, commercial and search completeness independently.
 - P8/P9: shared cross-stage oracles plus unchanged ELV4/FL14 regressions and exact-SHA
   production witnesses before any ELV8 acceptance claim.
+
+
+## Generator / PV / storage / transfer source gates
+
+Apply [the source-system contract](elv-integration/source-systems-contract.md)
+and [readiness ledger](elv-integration/design-readiness.json): P0 binds exact
+canonical electrical producer/commands/schema/domains and legacy compatibility;
+P1/P2 freeze typed source/settings/scenario projections and scoped adoption;
+P3–P5 implement only owner-appropriate rule/adaptor/invalidation behavior;
+P8 executes the 32 source-specific oracles plus inherited/shared regressions;
+P9 requires exact-SHA actual owner evidence before source-mode runtime acceptance.
+Normative source metadata, planned tests and design CI do not satisfy those gates.

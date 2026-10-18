@@ -1,0 +1,245 @@
+{
+  "schema": "electra.elv-source-qualification-plan.v1",
+  "evidenceScope": "DESIGN_ONLY",
+  "runtimeAccepted": false,
+  "plannedCaseCount": 32,
+  "cases": [
+    {
+      "id": "SRC-01",
+      "scenario": "LEGACY_EXTERNAL_DECLARED_NOT_AC_STUDY",
+      "oracle": "Legacy externalDeclared and DC/PoE adapters cannot claim AC generator/inverter fault study.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "SRC-02",
+      "scenario": "PARALLEL_NOT_SINGLE_SOURCE_SELECTION",
+      "oracle": "Parallel source set cannot be silently placed into the existing single-source selector codec.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "SRC-03",
+      "scenario": "SOURCE_CONFIGURATION_HASH_MISMATCH",
+      "oracle": "Reject a study/sequence/energy bundle using another topology/settings/firmware/mode capture.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "SRC-04",
+      "scenario": "GENERATOR_START_CONTINUITY",
+      "oracle": "Delayed/failed generator readiness must be checked against actual critical-load interruption coverage.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "SRC-05",
+      "scenario": "GENERATOR_DUTY_STEP_LOAD",
+      "oracle": "Product kW nameplate alone cannot prove duty/step load/reactive capability in the actual environment.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "SRC-06",
+      "scenario": "GENERATOR_FAULT_DECAY",
+      "oracle": "Per-mode time-dependent fault evidence must cover the protective trip domain; no grid-fault substitution.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "SRC-07",
+      "scenario": "GRID_FOLLOWING_ISLAND",
+      "oracle": "Grid-following label without forming/island capability blocks isolated-bus eligibility.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "SRC-08",
+      "scenario": "BLACK_START_WITH_UNKNOWN_CONTROL_SUPPLY",
+      "oracle": "Black-start/ATS operation cannot pass with missing auxiliary/control power evidence.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "SRC-09",
+      "scenario": "UNAUTHORIZED_PARALLEL",
+      "oracle": "Unknown site/equipment/synchronization authority blocks temporary or sustained paralleling.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "SRC-10",
+      "scenario": "OPEN_TRANSITION_OVERLAP",
+      "oracle": "Source contact overlap contradicting an adopted separation guard is a violation if proven, not a valid transfer.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "SRC-11",
+      "scenario": "WELDED_CONTACT",
+      "oracle": "Fault model retains energized source path and cannot infer isolation from commanded-open state.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "SRC-12",
+      "scenario": "NEUTRAL_MODE_CHANGE",
+      "oracle": "Changing neutral/bond relation changes affected electrical/normative proof; no universal neutral-switch default.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "SRC-13",
+      "scenario": "PE_SWITCH_NOT_SYNTHESIZED",
+      "oracle": "Candidate generator cannot add a PE switching function to make a transfer configuration appear compatible.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "SRC-14",
+      "scenario": "UPS_BYPASS_FAULT_DOMAIN",
+      "oracle": "UPS inverter evidence cannot certify bypass capacity/protection/continuity.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "SRC-15",
+      "scenario": "PV_NIGHT_ZERO_GENERATION",
+      "oracle": "PV nameplate/forecast cannot satisfy required night/low-generation backup without actual alternate supply.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "SRC-16",
+      "scenario": "PV_STRING_VOLTAGE_BOUNDARY",
+      "oracle": "Exact temperature-dependent string/input envelopes checked against adopted inverter domains; unknown temperature/model blocks.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "SRC-17",
+      "scenario": "PV_MPPT_INPUT_DOMAIN",
+      "oracle": "MPPT start/operating/max voltage/current and actual string assignment all covered; rated output alone insufficient.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "SRC-18",
+      "scenario": "PV_DC_DEVICE_AC_ONLY",
+      "oracle": "AC-only switch/protection evidence cannot qualify DC polarity/voltage/fault duty.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "SRC-19",
+      "scenario": "ZERO_EXPORT_NOT_SETPOINT",
+      "oracle": "Zero setpoint without bounded measurement/control/fault evidence cannot prove authorized no-export operation.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "SRC-20",
+      "scenario": "ANTI_ISLAND_NOT_INTENTIONAL_ISLAND",
+      "oracle": "Product anti-islanding test declaration does not prove island-forming or whole-site grid permission.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "SRC-21",
+      "scenario": "STORAGE_INITIAL_STATE",
+      "oracle": "Unknown initial SoC/usable state cannot be assumed full or default reserve.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "SRC-22",
+      "scenario": "STORAGE_POWER_VS_ENERGY",
+      "oracle": "Adequate kWh with insufficient instantaneous power/cutoff evidence cannot satisfy required load.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "SRC-23",
+      "scenario": "STORAGE_BANK_DOUBLE_COUNT",
+      "oracle": "One physical bank through multiple inverter/UPS representations is counted once with explicit conversion edges.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "SRC-24",
+      "scenario": "ENERGY_BALANCE_CONVERSION_AUXILIARY",
+      "oracle": "Charging/discharging/loss/auxiliary/curtailment/export/unserved flows balance under a declared qualified tolerance policy.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "SRC-25",
+      "scenario": "CHARGE_AND_LOAD_LIMIT",
+      "oracle": "Simultaneous charging and load demand respect actual source/charger/port limits.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "SRC-26",
+      "scenario": "SOURCE_MODE_INVALIDATION",
+      "oracle": "Settings/source/phase/neutral/control timing change stales exactly the declared old/new dependency closure.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "SRC-27",
+      "scenario": "MISSING_MODE_GAIN",
+      "oracle": "Adding a generator/PV/BESS changes scenario coverage/selectors; missing failure mode cannot disappear from denominator.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "SRC-28",
+      "scenario": "OTHER_SOURCE_ADAPTER_UNKNOWN",
+      "oracle": "Wind/fuel-cell/other source label without a qualified adapter remains unsupported, not a generic unlimited source.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "SRC-29",
+      "scenario": "ELV6_SCOPE_PARTIAL",
+      "oracle": "Unknown heat/mass blocks thermal/support only; valid independent body geometry remains useful.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "SRC-30",
+      "scenario": "ELV6_EXTERNAL_INTERFACE",
+      "oracle": "Offsite generator/PV array represented by exact local interface; no invented cabinet placement or roof/structural engine.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "SRC-31",
+      "scenario": "SOURCE_UOW_CAS_FAULT",
+      "oracle": "Owner setting/connection/selection adoption and stale pointers/history/receipt roll back together under fault/CAS race.",
+      "status": "PLANNED",
+      "executed": false
+    },
+    {
+      "id": "SRC-32",
+      "scenario": "SOURCE_HISTORICAL_REPLAY",
+      "oracle": "Frozen source configuration/settings/scenarios and lawful consumed study closure replay offline after catalogue/source update.",
+      "status": "PLANNED",
+      "executed": false
+    }
+  ],
+  "requiredWitnessFields": [
+    "sourceSha",
+    "testPath",
+    "testName",
+    "nonSkippedResult",
+    "sourceConfigurationHash",
+    "scenarioId",
+    "segmentId",
+    "producerAlgorithmVersion",
+    "consumedGenerations",
+    "persistedOutcomeId",
+    "canonicalResultHash"
+  ]
+}
