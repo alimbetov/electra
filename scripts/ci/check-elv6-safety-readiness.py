@@ -152,7 +152,7 @@ def validate_contract(contract):
         assert forbidden not in contract
 
     for token in [
-        'ELV6 captures exact physical evidence; ELV7 decides jurisdictional applicability and compliance',
+        'ELV6 owns the exact revisioned physical evidence required to make that decision later',
         'Elv6EnclosureIntegrityEvidence',
         'Elv6AirClearanceMeasurement',
         'Elv6CreepagePathMeasurement',
